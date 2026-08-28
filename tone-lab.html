@@ -166,12 +166,12 @@
     </div>
     <div class="ctl">
       <label>코어 집중도 <span class="val" id="v-tight"></span></label>
-      <input type="range" id="gradT" min="1" max="8" step="0.25" value="5.25" />
+      <input type="range" id="gradT" min="1" max="8" step="0.25" value="6.5" />
       <span class="hint">높일수록 채색 구간이 좁아지고 빨리 사라짐</span>
     </div>
     <div class="ctl">
       <label>코어 밝기 <span class="val" id="v-lift"></span></label>
-      <input type="range" id="gradLift" min="0" max="1" step="0.05" value="0" />
+      <input type="range" id="gradLift" min="0" max="1" step="0.05" value="0.25" />
       <span class="hint">0 이면 코어가 상태색 500 그대로</span>
     </div>
     <div class="ctl">
@@ -998,9 +998,9 @@ document.getElementById('preset-ref').addEventListener('click', function () {
   document.getElementById('mainPreset').value = 'covalent';
   document.getElementById('mainHue').value = 253;
   document.getElementById('gradA').value = 0.9;
-  document.getElementById('gradT').value = 5.25;
+  document.getElementById('gradT').value = 6.5;
   document.getElementById('gradH').value = 20;
-  document.getElementById('gradLift').value = 0;
+  document.getElementById('gradLift').value = 0.25;
   render();
 });
 
