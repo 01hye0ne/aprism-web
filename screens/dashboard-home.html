@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>04.1 통합 관제 메인 — APRISM</title>
+  <meta name="description" content="APRISM 공장 환경점검 로봇 관제 대시보드 메인 화면 퍼블리싱" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/static/woff2/SUIT.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" />
+  <link rel="stylesheet" href="../assets/css/tokens.css" />
+  <link rel="stylesheet" href="../assets/css/app-shell.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--bg-canvas);
+      color: var(--fg-primary);
+      font-family: var(--font-family-sans);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    h1, h2, h3, p { margin: 0; }
+
+    /* 검토용 도구. 디자인에 없는 요소라 화면 위에 별도 바로 둔다.
+       떠 있게 하면 우측 패널의 바닥 버튼을 가린다. */
+    :root { --review-bar: 36px; }
+    .app { --app-height: calc(100vh - var(--review-bar)); }
+
+    .review-bar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      height: var(--review-bar);
+      display: flex;
+      align-items: center;
+      gap: var(--space-16);
+      padding: 0 var(--space-12);
+      background-color: var(--bg-container);
+      border-bottom: var(--border-width-thin) solid var(--border-subtle);
+      font-size: var(--font-size-12);
+      line-height: var(--font-line-height-18);
+      color: var(--fg-tertiary);
+    }
+
+    .review-bar .crumb { display: flex; align-items: center; gap: var(--space-8); }
+    .review-bar .crumb b { color: var(--fg-secondary); font-weight: 500; }
+    .review-bar .spacer { flex: 1 1 auto; }
+
+    .review-bar a,
+    .review-bar button {
+      display: inline-flex;
+      align-items: center;
+      height: 24px;
+      padding: 0 var(--space-8);
+      border: 0;
+      border-radius: var(--radius-control);
+      background: transparent;
+      color: var(--fg-tertiary);
+      font: inherit;
+      text-decoration: none;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .review-bar a:hover,
+    .review-bar button:hover {
+      background-color: var(--bg-interactive-hover);
+      color: var(--fg-primary);
+    }
+
+    /* 퍼블리싱 노트 */
+    .notes {
+      max-width: 880px;
+      margin: 0 auto;
+      padding: var(--space-64) var(--space-24) 96px;
+      font-size: var(--font-size-14);
+      line-height: var(--font-line-height-22);
+      color: var(--fg-secondary);
+    }
+
+    .notes h2 {
+      margin-bottom: var(--space-8);
+      font-size: var(--font-size-24);
+      line-height: var(--font-line-height-32);
+      letter-spacing: -0.01em;
+      color: var(--fg-primary);
+    }
+
+    .notes h3 {
+      margin: var(--space-40) 0 var(--space-12);
+      font-size: var(--font-size-16);
+      line-height: var(--font-line-height-24);
+      color: var(--fg-primary);
+    }
+
+    .notes p + p { margin-top: var(--space-12); }
+
+    .notes .lead { margin-bottom: var(--space-8); }
+
+    .notes table {
+      width: 100%;
+      margin-top: var(--space-12);
+      border-collapse: collapse;
+      font-size: var(--font-size-13);
+      line-height: var(--font-line-height-20);
+    }
+
+    .notes th,
+    .notes td {
+      padding: var(--space-8) var(--space-12);
+      border-bottom: var(--border-width-thin) solid var(--border-subtle);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .notes th {
+      color: var(--fg-tertiary);
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .notes code {
+      font-family: var(--font-family-mono);
+      font-size: 0.92em;
+      color: var(--fg-primary);
+    }
+
+    .notes ul { margin: var(--space-8) 0 0; padding-left: 1.1em; }
+    .notes li { margin-bottom: var(--space-4); }
+    .notes strong { color: var(--fg-primary); font-weight: 600; }
+
+    .notes .eyebrow {
+      font-family: var(--font-family-mono);
+      font-size: var(--font-size-12);
+      font-weight: 500;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      color: var(--fg-brand);
+      margin-bottom: var(--space-8);
+    }
+  </style>
+</head>
+<body>
+
+<!-- ---------- 검토 도구 · 디자인 아님 ---------- -->
+<div class="review-bar">
+  <span class="crumb">
+    <a href="../index.html">← 목록</a>
+    <b>04.1 통합 관제 메인</b>
+    <span>Figma UI_99_작업화면 · 121:7848</span>
+  </span>
+  <span class="spacer"></span>
+  <a href="#notes">퍼블리싱 노트</a>
+  <button type="button" data-theme-toggle><span data-theme-label>Dark</span></button>
+</div>
+
+<!-- ============================================================
+     Template / 04.1 Dashboard Home · 1922
+     Figma: UI_99_작업화면  node 121:7848
+     ============================================================ -->
+<div class="app">
+
+  <!-- ---------- GNB Rail (확정 영역) ---------- -->
+  <nav class="gnb-rail" aria-label="전역 내비게이션">
+    <div class="gnb-top">
+      <span class="i gnb-brand" style="--i:var(--ic-brand-mark)" role="img" aria-label="APRISM"></span>
+      <div class="gnb-items">
+        <a class="gnb-item" href="#" aria-current="page">
+          <span class="i i-20" style="--i:var(--ic-home)"></span>
+          <span>관제</span>
+        </a>
+        <a class="gnb-item" href="#">
+          <span class="i i-20" style="--i:var(--ic-shield)"></span>
+          <span>안전진단</span>
+        </a>
+        <a class="gnb-item" href="#">
+          <span class="i i-20" style="--i:var(--ic-bot)"></span>
+          <span>로봇</span>
+        </a>
+        <a class="gnb-item" href="#">
+          <span class="i i-20" style="--i:var(--ic-cpu)"></span>
+          <span>AI</span>
+        </a>
+        <a class="gnb-item" href="#">
+          <span class="i i-20" style="--i:var(--ic-calendar)"></span>
+          <span>스케줄러</span>
+        </a>
+        <a class="gnb-item" href="#">
+          <span class="i i-20" style="--i:var(--ic-message)"></span>
+          <span>Delta</span>
+        </a>
+        <a class="gnb-item" href="#">
+          <span class="i i-20" style="--i:var(--ic-document)"></span>
+          <span>보고서</span>
+        </a>
+        <a class="gnb-item" href="#">
+          <span class="i i-20" style="--i:var(--ic-users)"></span>
+          <span>계정관리</span>
+        </a>
+      </div>
+    </div>
+    <a class="gnb-item" href="#">
+      <span class="i i-20" style="--i:var(--ic-settings)"></span>
+      <span>환경설정</span>
+    </a>
+  </nav>
+
+  <div class="app-body">
+
+    <!-- ---------- Status Bar ---------- -->
+    <header class="status-bar">
+      <button type="button" class="icon-button" aria-label="패널 접기">
+        <span class="i i-20" style="--i:var(--ic-collapse)"></span>
+      </button>
+
+      <div class="status-bar-right">
+        <div class="account-chip">
+          <span class="avatar">
+            <span class="i i-14" style="--i:var(--ic-user)"></span>
+          </span>
+          <span class="t-label-2">김현수 · 관제운영</span>
+          <span class="i i-16" style="--i:var(--ic-chevron-up)"></span>
+        </div>
+
+        <div class="status-bar-meta">
+          <span class="signal-bars" role="img" aria-label="통신 신호 강함">
+            <i></i><i></i><i></i><i></i>
+          </span>
+          <span class="utc-clock">
+            <span class="i i-16" style="--i:var(--ic-clock)"></span>
+            <span class="t-caption num">2026-08-26T10:11:24Z</span>
+          </span>
+        </div>
+      </div>
+    </header>
+
+    <div class="app-content">
+
+      <!-- ---------- Site Context Panel ---------- -->
+      <aside class="context-panel" aria-label="사이트 컨텍스트">
+        <section class="panel-section">
+          <p class="t-overline section-label">SITE</p>
+          <h1 class="t-heading-3 site-name">지하발전소 B3</h1>
+          <div class="select-field t-body-3" role="button" tabindex="0">
+            <span>터빈 2 / Unit 03</span>
+            <span class="i i-16" style="--i:var(--ic-chevron-down)"></span>
+          </div>
+        </section>
+
+        <section class="panel-section">
+          <p class="t-overline section-label">운영 모드</p>
+          <span class="badge badge-mode t-label-2">
+            <span class="badge-dot"></span>진행 중
+          </span>
+        </section>
+
+        <section class="panel-section">
+          <p class="t-overline section-label">퀵 액션</p>
+          <button type="button" class="btn btn-primary btn-block">미션 생성</button>
+          <button type="button" class="btn btn-secondary btn-block">퀵 버튼</button>
+          <button type="button" class="btn btn-secondary btn-block">퀵 버튼</button>
+          <button type="button" class="btn btn-secondary btn-block">퀵 버튼</button>
+        </section>
+      </aside>
+
+      <!-- ---------- Main ---------- -->
+      <main class="main">
+        <div class="two-col">
+
+          <!-- ---------- Map Panel ---------- -->
+          <section class="map-panel" aria-label="설비 배치도">
+            <div class="map-canvas">
+              <div class="map-plan" aria-hidden="true">
+                <span class="shape" style="--i:var(--ic-map-a); left:-248px; top:208.15px; width:754.765px; height:221.702px; transform:scaleX(-1)"></span>
+                <span class="shape" style="--i:var(--ic-map-b); left:104.11px; top:-38px; width:350.485px; height:221.702px; transform:scaleX(-1)"></span>
+                <span class="shape" style="--i:var(--ic-map-c); left:462.75px; top:415.18px; width:213.551px; height:454.815px"></span>
+                <span class="shape" style="--i:var(--ic-map-d); left:588.27px; top:133.17px; width:247.784px; height:136.934px"></span>
+                <span class="shape" style="--i:var(--ic-map-e); left:635.55px; top:312.48px; width:754.765px; height:221.702px"></span>
+
+                <span class="badge badge-info t-label-2 map-marker">
+                  <span class="badge-dot"></span>Robot 02
+                </span>
+              </div>
+
+              <div class="map-tools">
+                <button type="button" class="icon-button" aria-label="확대">
+                  <span class="i i-20" style="--i:var(--ic-zoom-in)"></span>
+                </button>
+                <button type="button" class="icon-button" aria-label="로봇 추적">
+                  <span class="i i-20" style="--i:var(--ic-target)"></span>
+                </button>
+                <button type="button" class="icon-button is-active" aria-label="영상 리플레이">
+                  <span class="i i-20" style="--i:var(--ic-play)"></span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Key Feature · Conversational AI -->
+            <section class="ai-panel" aria-label="AI 운영 지원">
+              <div class="ai-scrim" aria-hidden="true"></div>
+              <div class="ai-placeholder" aria-hidden="true"></div>
+
+              <div class="ai-message">
+                <p class="t-caption ai-eyebrow">DELTA · AI 운영 지원</p>
+                <p class="t-heading-2 ai-line-1">B3 터빈2에 위험 1건.</p>
+                <p class="t-heading-2 ai-line-2">무엇을 확인해 드릴까요?</p>
+              </div>
+
+              <div class="ai-suggestions">
+                <button type="button" class="ai-chip t-label-2">Spiral Casing 압력 추이 보여줘</button>
+                <button type="button" class="ai-chip t-label-2">이 설비 최근 결함 3건</button>
+                <button type="button" class="ai-chip t-label-2">재진단 예약해줘</button>
+              </div>
+
+              <div class="ai-input">
+                <span class="t-body-2">무엇이든 물어보세요</span>
+                <button type="button" class="ai-send" aria-label="보내기">
+                  <span class="i i-16" style="--i:var(--ic-arrow-right)"></span>
+                </button>
+              </div>
+            </section>
+          </section>
+
+          <!-- ---------- Robot / Mission Panel ---------- -->
+          <section class="right-panel" aria-label="로봇 · 미션">
+
+            <div class="panel-header">
+              <h2 class="t-heading-3">현재 미션 · 정기 순회 #248</h2>
+              <p class="t-caption">3대 연결 · 1대 수행 중</p>
+            </div>
+
+            <div class="robot-strip">
+              <article class="robot-card is-selected">
+                <p class="t-label-1 robot-id">ROBOT 02</p>
+                <span class="badge badge-bare badge-normal t-label-2">
+                  <span class="badge-dot"></span>수행 중
+                </span>
+                <div class="robot-row">
+                  <span class="battery-track"><span class="battery-fill" style="width:64%"></span></span>
+                  <span class="t-caption num">64%</span>
+                </div>
+                <div class="robot-row is-end">
+                  <span class="i i-14" style="--i:var(--ic-bolt)"></span>
+                  <span class="t-caption num">78%</span>
+                </div>
+                <div class="robot-row is-end">
+                  <span class="signal-bars"><i></i><i></i><i></i><i></i></span>
+                  <span class="t-caption" style="margin-left:4px">Strong</span>
+                </div>
+              </article>
+
+              <article class="robot-card">
+                <p class="t-label-1 robot-id">ROBOT 02</p>
+                <span class="badge badge-bare badge-idle t-label-2">
+                  <span class="badge-dot"></span>대기
+                </span>
+                <div class="robot-row">
+                  <span class="battery-track"><span class="battery-fill is-brand" style="width:100%"></span></span>
+                  <span class="t-caption num">100%</span>
+                </div>
+                <div class="robot-row is-end">
+                  <span class="i i-14" style="--i:var(--ic-bolt)"></span>
+                  <span class="t-caption num">78%</span>
+                </div>
+                <div class="robot-row is-end">
+                  <span class="signal-bars"><i></i><i></i><i></i><i></i></span>
+                  <span class="t-caption" style="margin-left:4px">Strong</span>
+                </div>
+              </article>
+
+              <article class="robot-card">
+                <p class="t-label-1 robot-id">ROBOT 02</p>
+                <span class="badge badge-bare badge-idle t-label-2">
+                  <span class="badge-dot"></span>복귀 중
+                </span>
+                <div class="robot-row">
+                  <span class="battery-track"><span class="battery-fill" style="width:64%"></span></span>
+                  <span class="t-caption num">64%</span>
+                </div>
+                <div class="robot-row is-end">
+                  <span class="i i-14" style="--i:var(--ic-bolt)"></span>
+                  <span class="t-caption num">78%</span>
+                </div>
+                <div class="robot-row is-end">
+                  <span class="signal-bars"><i></i><i></i><i></i><i></i></span>
+                  <span class="t-caption" style="margin-left:4px">Strong</span>
+                </div>
+              </article>
+            </div>
+
+            <hr class="divider" />
+
+            <div class="mission-header">
+              <p class="t-overline section-label">현재 미션</p>
+              <h3 class="t-title-1">Thrust Oil 정유기 운전 상태</h3>
+
+              <div class="progress-bar">
+                <div class="progress-meta">
+                  <span class="t-caption">미션 진행률 (%)</span>
+                  <span class="progress-values t-caption">
+                    <span class="num">3 / 5</span>
+                    <b class="num">00%</b>
+                  </span>
+                </div>
+                <div class="progress-track">
+                  <div class="progress-fill" style="width:60%; background-image:linear-gradient(90deg,#285896 0%,#6f99f5 21%,#ffdadb 100%)"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="timeline">
+              <article class="timeline-item is-done">
+                <span class="rail-capsule">
+                  <span class="i i-14" style="--i:var(--ic-check)"></span>
+                </span>
+                <div class="step-card">
+                  <div class="step-head">
+                    <div class="step-title-row">
+                      <span class="t-label-1 step-title">WP-02 터빈1 베어링 온도</span>
+                      <span class="t-label-2 step-duration">16분</span>
+                    </div>
+                    <div class="step-meta-row">
+                      <span class="t-label-2 step-status">완료</span>
+                      <span class="t-caption step-time num">10:08 – 10:24</span>
+                    </div>
+                  </div>
+                </div>
+              </article>
+
+              <article class="timeline-item is-running">
+                <span class="rail-capsule">
+                  <span class="i i-14" style="--i:var(--ic-play-sm)"></span>
+                </span>
+                <div class="step-card">
+                  <div class="step-head">
+                    <div class="step-title-row">
+                      <span class="t-label-1 step-title">WP-03 터빈2 스파이럴 케이싱</span>
+                      <span class="t-label-2 step-duration">16분</span>
+                    </div>
+                    <div class="step-meta-row">
+                      <span class="t-label-2 step-status">진행 중</span>
+                      <span class="t-caption step-time num">10:08 – 10:24</span>
+                    </div>
+                  </div>
+                  <p class="t-caption step-desc">압력·온도 센서 판독 중. 기준값 대비 편차를 실시간 비교합니다.압력·온도 센서 판독 중. 기준값 대비 편차를 실시간 비교합니다.압력·온도 센서 판독 중. 기준값 대비 편차를 실시간 비교합니다.</p>
+                </div>
+              </article>
+
+              <article class="timeline-item is-pending">
+                <span class="rail-capsule"></span>
+                <div class="step-card">
+                  <div class="step-head">
+                    <div class="step-title-row">
+                      <span class="t-label-1 step-title">WP-04 냉각수 배관 누수 점검</span>
+                    </div>
+                    <div class="step-meta-row">
+                      <span class="t-label-2 step-status">대기</span>
+                    </div>
+                  </div>
+                </div>
+              </article>
+
+              <article class="timeline-item is-pending">
+                <span class="rail-capsule"></span>
+                <div class="step-card">
+                  <div class="step-head">
+                    <div class="step-title-row">
+                      <span class="t-label-1 step-title">WP-05 비상 발전기실 가스</span>
+                    </div>
+                    <div class="step-meta-row">
+                      <span class="t-label-2 step-status">대기</span>
+                    </div>
+                  </div>
+                </div>
+              </article>
+            </div>
+
+            <div class="panel-actions">
+              <button type="button" class="btn btn-secondary">수동 조작</button>
+              <button type="button" class="btn btn-primary">미션 관리</button>
+            </div>
+
+          </section>
+
+        </div>
+      </main>
+
+    </div>
+  </div>
+</div>
+
+<!-- ---------- 퍼블리싱 노트 ---------- -->
+<section class="notes" id="notes">
+  <p class="eyebrow">Publishing Notes</p>
+  <h2>이 화면을 옮기며 판단한 것</h2>
+  <p class="lead">
+    Figma <strong>UI_99_작업화면 · Template / 04.1 Dashboard Home</strong>(node 121:7848)을 옮겼습니다.
+    GUI 작업 전이라 색과 서체는 그대로 두고, 구조만 손봤습니다.
+  </p>
+
+  <h3>1. 무엇이 늘어나는가를 코드에서 정했습니다</h3>
+  <p>
+    Figma 파일은 <strong>1920×1024 한 점에서만 성립</strong>합니다.
+    <code>Two Column</code>까지는 FILL이 잘 내려오는데 그 안의 두 자식이 모두 FIXED라,
+    지도 폭 1170이 "나머지"가 아니라 "상수"로 굳어 있습니다.
+  </p>
+  <p>
+    다만 <strong>Map Panel 컴포넌트 설명에는 이미 답이 적혀 있습니다</strong> —
+    "Canvas는 Fill로 늘어난다. 1600px 이상에서 지도는 제한 없이 확장한다."
+    설명을 따랐습니다. 폭이 고정된 것은 GNB · Context Panel(240) · Right Panel(360) 셋뿐이고,
+    나머지는 지도가 흡수합니다. 창 크기를 바꿔보시면 확인됩니다.
+  </p>
+
+  <h3>2. 우측 패널이 높이를 채우고, 타임라인만 스크롤합니다</h3>
+  <p>
+    Figma에서 이 패널은 세로 HUG라 912 트랙 안에서 839에서 멈춥니다(73px 빈 공간).
+    웨이포인트가 늘면 <code>Content</code>의 clipsContent에 잘려 <strong>아무 경고 없이 사라지고</strong>,
+    바닥의 「수동 조작 / 미션 관리」도 같이 밀려 내려갑니다.
+  </p>
+  <p>
+    여기서는 패널이 높이를 채우고, 길이가 변하는 타임라인만 스크롤 영역으로 두었습니다.
+    버튼은 항상 바닥에 남습니다.
+  </p>
+
+  <h3>3. AI 블록을 지도 안으로 옮겼습니다</h3>
+  <p>
+    Figma에서 이 블록은 <code>Status Bar</code>와 형제인 절대배치 노드라 지도와 아무 관계가 없고,
+    제약이 MIN/MIN이라 폭이 변해도 좌상단에 붙박이입니다.
+    좌표를 재보면 <strong>지도 왼쪽 경계보다 4px 밖으로</strong> 나가 있습니다(13431 vs 13435).
+  </p>
+  <p>
+    Map Panel의 자식으로 옮겨서 지도를 따라가게 했습니다. 4px 어긋남도 같이 해소됩니다.
+    이 영역은 Figma에서 다시 디자인하실 예정이라 나머지는 그대로 두었습니다.
+  </p>
+
+  <h3>4. 로봇 카드는 대수 상한 없이 버팁니다</h3>
+  <p>
+    최대 대수가 아직 정해지지 않아서, <strong>몇 대가 되든 깨지지 않는 쪽</strong>으로 두었습니다.
+    카드는 폭을 나눠 갖되 92px 아래로는 줄지 않고, 그보다 좁아지면 가로로 스크롤합니다.
+    3대일 때는 Figma와 같은 폭이 나옵니다.
+  </p>
+  <p>
+    Figma의 현재 구조는 <code>NO_WRAP</code> + 3장 균등이라 4대가 되면 카드당 74px이 되어
+    「수행 중」 「64%」 「Strong」이 들어갈 자리가 없습니다. 상한이 정해지면 다시 조정하겠습니다.
+  </p>
+
+  <h3>5. 면 위계를 시스템 규칙대로 되돌렸습니다</h3>
+  <p>
+    Figma에서 <code>Main</code>과 <code>Map Panel</code>의 배경이 모두
+    <code>button/primary/bg/disabled</code>로 칠해져 있습니다 —
+    <strong>비활성 버튼 색을 페이지 배경으로 쓰고 있습니다.</strong>
+    그 결과 캔버스가 가장 어둡고 패널·카드가 밝아야 한다는 규칙이 이 화면에서는 보이지 않습니다.
+  </p>
+  <p>
+    <code>Main</code>은 <code>bg/canvas</code>, <code>Map Panel</code>은 <code>bg/surface/default</code>로
+    두었습니다. 이번 톤 작업에서 확정한 위계가 실제 화면에서 어떻게 보이는지 확인하실 수 있습니다.
+    되돌리길 원하시면 알려주세요.
+  </p>
+
+  <h3>6. 그대로 둔 것</h3>
+  <p>
+    <strong>문구는 한 글자도 바꾸지 않았습니다.</strong> 값을 나타내는 도형만 그 값에 맞췄습니다.
+  </p>
+  <table>
+    <tr><th>항목</th><th>Figma</th><th>여기</th></tr>
+    <tr><td>로봇 카드 3장 이름</td><td>모두 <code>ROBOT 02</code></td><td>그대로</td></tr>
+    <tr><td>퀵 액션 2~4번</td><td>모두 <code>퀵 버튼</code></td><td>그대로 (레이어 이름은 수동 조작·안전진단·보고서)</td></tr>
+    <tr><td>진행률 수치</td><td><code>3 / 5</code> · <code>00%</code></td><td>그대로 (3/5는 60%입니다)</td></tr>
+    <tr><td>진행률 막대</td><td>132 / 320 = 41%</td><td>60% (3/5에 맞춤)</td></tr>
+    <tr><td>배터리 막대</td><td>고정 26px · 40px · 26px</td><td>64% · 100% · 64% (라벨에 맞춤)</td></tr>
+    <tr><td>AI 블록 우상단</td><td>95×91 흰 사각형</td><td>그대로 (미완성 자리로 보입니다)</td></tr>
+  </table>
+
+  <h3>7. 확인이 필요한 지점</h3>
+  <ul>
+    <li>
+      <strong><code>Status Bar</code>가 컴포넌트 마스터입니다.</strong> 화면 템플릿 안에 원본이 들어앉아 있고,
+      파일 전체에 인스턴스가 0개입니다. 게다가 Auto Layout이 없어 우측 묶음이 왼쪽에 못 박혀 있습니다.
+      여기서는 GNB Rail과 같은 방식으로 다시 짰습니다.
+    </li>
+    <li>
+      <strong><code>Mission Timeline Iist</code></strong> — <code>List</code>의 <code>l</code>이 대문자 <code>I</code>입니다.
+      published 라이브러리 컴포넌트라 이 오타가 이 파일을 쓰는 모든 화면에 퍼집니다.
+    </li>
+    <li>
+      <strong>Progress Bar에 그라데이션이 들어가 있습니다.</strong> 컴포넌트 설명에 "Gradient를 Fill에 쓰지 않는다"고
+      적혀 있는데, 실제 Fill은 <code>#285896 → #6f99f5 → #ffdadb</code> 하드코딩입니다.
+      끝의 분홍이 어느 토큰에도 없습니다. 일단 그대로 옮겼습니다.
+    </li>
+    <li>
+      <strong>GNB 항목 8개가 모두 <code>fg/disabled</code>입니다.</strong> 선택된 「관제」만 <code>fg/brand</code>입니다.
+      다른 영역이 아직 안 만들어져서 의도적으로 비활성 처리하신 것인지 확인 부탁드립니다.
+    </li>
+    <li>
+      <strong>로봇 카드에 배터리 수치가 두 개입니다.</strong> 막대 옆 <code>64%</code>와 번개 아이콘 옆 <code>78%</code>가
+      서로 다른 값을 가리킵니다. Battery 행과 Battery Gauge 인스턴스가 겹쳐 들어간 것으로 보입니다.
+    </li>
+    <li>
+      <strong>껍데기 프레임 3개</strong> — <code>Frame 1597881552</code>(완전 통과용),
+      <code>Main</code>/<code>Content</code>(중복), <code>Frame 1597881537</code>(부모와 gap 중복).
+      웹에서는 걷어냈고 Figma에서는 그대로 두었습니다.
+    </li>
+  </ul>
+
+  <h3>8. 아이콘과 서체</h3>
+  <p>
+    내보낸 SVG 27개에는 Light 모드 색이 구워져 있어 그대로 쓰면 테마를 따라가지 못합니다.
+    CSS <code>mask</code>로 모양만 쓰고 색은 토큰이 채우도록 했습니다. 우측 아래에서 테마를 바꿔보시면 확인됩니다.
+  </p>
+  <p>
+    수치에는 SUIT의 <code>tabular-nums</code>를 적용해 자릿수를 고정했습니다.
+    Figma의 Type 패널에는 이 항목이 없어서 Figma에서는 확인되지 않지만, 브라우저에서는 동작합니다.
+    지난번에 만든 <code>Typography/Mono/*</code> 스타일은 아직 이 화면에 적용되지 않은 상태라 그대로 두었습니다.
+  </p>
+
+  <h3>9. tokens.css를 다시 만들었습니다</h3>
+  <p>
+    이 화면을 옮기며 대조해 보니 <code>tokens.css</code>의 Semantic 매핑에
+    <strong>Light 3곳 · Dark 7곳</strong>이 실제 Figma 값과 달랐습니다
+    (<code>chart/track</code>, <code>chart/grid</code>, <code>bg/interactive/hover</code>,
+    <code>status/normal/icon</code> 등). 변수 설명을 근거로 삼았던 부분이 원인입니다.
+  </p>
+  <p>
+    <code>valuesByMode</code> 실측 덤프로 전부 다시 생성했습니다.
+    Primitive 106 · Semantic 90×2 · Component 42, 합계 244개 변수입니다.
+    이제 Component 계층까지 들어와서 <code>button/*</code>, <code>input/*</code>, <code>navigation/*</code>을
+    화면에서 그대로 쓸 수 있습니다.
+  </p>
+</section>
+
+<script src="../assets/js/theme.js"></script>
+</body>
+</html>

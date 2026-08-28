@@ -1,15 +1,18 @@
 /* APRISM Design Tokens
  *
- * Figma UI_00_Design System 의 Primitive / Semantic 구조를 그대로 옮긴 것이다.
+ * Figma UI_00_Design System 의 Primitive / Semantic / Component 세 계층을 그대로 옮긴 것이다.
  * 의존 방향은 한 방향으로만 흐른다: Primitive -> Semantic -> Component.
- * 컴포넌트는 Semantic 만 참조한다. Primitive 를 직접 쓰지 않는다.
+ * 화면은 Semantic 과 Component 만 참조한다. Primitive 를 직접 쓰지 않는다.
  *
- * 이 파일은 톤 실험실에서 확정한 값으로 생성됐다.
+ * 값의 출처는 Figma variable 의 valuesByMode 실측 덤프다.
+ * 변수 설명(description)은 실제 값과 어긋나는 경우가 있어 근거로 쓰지 않는다.
+ *
+ * Primitive 는 톤 실험실에서 확정한 값이다.
  *   뉴트럴 색상 255도 · 쿨강도 0.006 · Dark 층위 간격 2.0배 · Canvas 명도 0.200
- *   상태색 틴트 채도 0.72배 (원색 300 500 700 800 은 유지)
- *   main 계열 색상 260도
+ *   상태색 틴트 채도 0.72배 (원색 300 500 700 800 은 유지) · main 계열 색상 260도
  *
- * 아직 Figma 실측으로 확인하지 못한 Semantic 매핑은 파일 하단에 적어 두었다.
+ * Component 계층은 Figma 에서 모드가 없다. Semantic 을 가리키기만 하므로
+ * CSS 에서도 :root 한 곳에만 두면 테마 전환을 자동으로 따라간다.
  */
 
 :root {
@@ -64,196 +67,372 @@
   --color-safe-700: #0E7258;
   --color-safe-900: #19382D;
 
-  /* Alert 전용 glow. 원색에 알파를 준 값이라 변경 대상이 아니다. */
+  /* 알파. 원색에 투명도를 준 값이라 톤 조정 대상이 아니다. */
   --color-alpha-glow-danger: rgb(240 57 24 / 55%);
-  --color-alpha-glow-warning: rgb(238 206 27 / 50%);
   --color-alpha-glow-safe: rgb(29 166 127 / 40%);
+  --color-alpha-glow-warning: rgb(238 206 27 / 50%);
+  --color-alpha-scrim-dark: rgb(0 0 0 / 60%);
+  --color-alpha-scrim-light: rgb(23 23 25 / 50%);
 
-  /* Radius · Spacing · Border · Typography (Figma Primitive 실측값) */
-  --radius-card: 4px;
-  --border-width-thin: 1px;
+  /* Typography */
+  --font-line-height-18: 18px;
+  --font-line-height-20: 20px;
+  --font-line-height-22: 22px;
+  --font-line-height-24: 24px;
+  --font-line-height-26: 26px;
+  --font-line-height-28: 28px;
+  --font-line-height-32: 32px;
+  --font-line-height-40: 40px;
+  --font-line-height-44: 44px;
+  --font-line-height-48: 48px;
+  --font-line-height-56: 56px;
+  --font-line-height-64: 64px;
+  --font-size-12: 12px;
+  --font-size-13: 13px;
+  --font-size-14: 14px;
+  --font-size-16: 16px;
+  --font-size-18: 18px;
+  --font-size-20: 20px;
+  --font-size-24: 24px;
+  --font-size-32: 32px;
+  --font-size-36: 36px;
+  --font-size-40: 40px;
+  --font-size-48: 48px;
+  --font-size-56: 56px;
+  --font-weight-bold: 700;
+  --font-weight-medium: 500;
+  --font-weight-regular: 400;
+  --font-weight-semibold: 600;
+
+  /* Radius */
+  --radius-4: 4px;
+  --radius-6: 6px;
+  --radius-8: 8px;
+  --radius-full: 9999px;
+  --radius-none: 0px;
+
+  /* Size · 레이아웃 골격의 고정 치수 */
+  --size-content-max: 1600px;
+  --size-content-padding-x: 24px;
+  --size-context-panel-width: 240px;
+  --size-control-lg: 40px;
+  --size-control-md: 36px;
+  --size-control-sm: 32px;
+  --size-gnb-expanded: 240px;
+  --size-gnb-rail: 76px;
+  --size-header-height: 64px;
+  --size-icon-16: 16px;
+  --size-icon-20: 20px;
+  --size-icon-24: 24px;
+  --size-panel-right: 360px;
+  --size-row-compact: 36px;
+  --size-row-default: 44px;
+
+  /* Spacing */
+  --space-0: 0px;
   --space-4: 4px;
   --space-8: 8px;
   --space-12: 12px;
   --space-16: 16px;
   --space-20: 20px;
+  --space-24: 24px;
+  --space-32: 32px;
+  --space-40: 40px;
   --space-48: 48px;
   --space-64: 64px;
-  --font-size-12: 12px;
-  --font-size-13: 13px;
-  --font-size-14: 14px;
-  --font-size-16: 16px;
-  --font-size-20: 20px;
-  --font-size-32: 32px;
-  --font-line-height-18: 18px;
-  --font-line-height-20: 20px;
-  --font-line-height-22: 22px;
-  --font-line-height-24: 24px;
-  --font-line-height-28: 28px;
-  --font-line-height-40: 40px;
+
+  /* Border width */
+  --border-width-none: 0px;
+  --border-width-strong: 2px;
+  --border-width-thin: 1px;
 
   --font-family-sans: "SUIT Variable", "SUIT", -apple-system, "Segoe UI", system-ui, sans-serif;
   /* 수치·코드·기술 라벨 전용. 한글은 글자가 없어 SUIT 로 자동 대체된다. */
   --font-family-mono: "JetBrains Mono", "SUIT Variable", ui-monospace, monospace;
+}
 
-  /* ---------- Semantic · Light 기본 ---------- */
+/* ---------- Semantic · Light 기본 ---------- */
 
+:root {
   /* fg */
-  --fg-primary: var(--color-gray-950); /* 본문·제목 */
-  --fg-secondary: var(--color-gray-600); /* 보조 텍스트 */
-  --fg-tertiary: var(--color-gray-500); /* Caption·라벨 */
-  --fg-disabled: var(--color-gray-400); /* 비활성 전경 */
-  --fg-inverse: var(--color-gray-0); /* 반전 면 위 전경 */
-  --fg-brand: var(--color-main-700); /* 브랜드 강조 텍스트 */
-  --fg-link: var(--color-main-700); /* 인라인 링크 */
-  --fg-on-brand: var(--color-gray-950); /* 브랜드 면 위 전경 */
+  --fg-brand: var(--color-main-700);
+  --fg-disabled: var(--color-gray-400);
+  --fg-inverse: var(--color-gray-0);
+  --fg-link: var(--color-main-700);
+  --fg-on-brand: var(--color-gray-950);
+  --fg-primary: var(--color-gray-950);
+  --fg-secondary: var(--color-gray-600);
+  --fg-tertiary: var(--color-gray-500);
 
   /* bg */
-  --bg-canvas: var(--color-gray-50); /* 페이지 최하단 배경 */
-  --bg-navigation: var(--color-gray-0); /* GNB Rail · Status Bar */
-  --bg-container: var(--color-gray-0); /* Panel · Context 영역 */
-  --bg-surface-default: var(--color-gray-0); /* Card · Table row */
-  --bg-surface-subtle: var(--color-gray-100); /* Table header · 약한 면 */
-  --bg-surface-raised: var(--color-gray-0); /* Control · Floating 층위 */
-  --bg-surface-selected: var(--color-main-100); /* 선택된 행·Nav·List */
-  --bg-brand: var(--color-main-500); /* Primary Button · 브랜드 면 */
-  --bg-accent: var(--color-main-700); /* 강조 면 */
-  --bg-critical: var(--color-danger-700); /* 파괴적 액션 면 */
-  --bg-inverse: var(--color-gray-950); /* 반전 면 */
-
-  /* bg-interactive */
-  --bg-interactive-hover: var(--color-gray-100); /* Table row · Ghost · Nav hover */
-  --bg-interactive-pressed: var(--color-gray-200); /* 위 요소들의 pressed */
-  --bg-interactive-brand-hover: var(--color-main-800); /* Primary Button hover */
-  --bg-interactive-brand-pressed: var(--color-main-900); /* Primary Button pressed */
-  --bg-interactive-critical-hover: var(--color-danger-800); /* Danger Button hover */
-  --bg-interactive-critical-pressed: var(--color-danger-900); /* Danger Button pressed */
+  --bg-accent: var(--color-main-700);
+  --bg-brand: var(--color-main-500);
+  --bg-canvas: var(--color-gray-50);
+  --bg-container: var(--color-gray-0);
+  --bg-critical: var(--color-danger-700);
+  --bg-interactive-accent-hover: var(--color-main-800);
+  --bg-interactive-accent-pressed: var(--color-main-900);
+  --bg-interactive-brand-hover: var(--color-main-400);
+  --bg-interactive-brand-pressed: var(--color-main-300);
+  --bg-interactive-critical-hover: var(--color-danger-800);
+  --bg-interactive-critical-pressed: var(--color-danger-900);
+  --bg-interactive-hover: var(--color-gray-100);
+  --bg-interactive-inverse-hover: var(--color-gray-750);
+  --bg-interactive-inverse-pressed: var(--color-gray-700);
+  --bg-interactive-pressed: var(--color-gray-200);
+  --bg-inverse: var(--color-gray-950);
+  --bg-navigation: var(--color-gray-0);
+  --bg-overlay: var(--color-alpha-scrim-light);
+  --bg-surface-default: var(--color-gray-0);
+  --bg-surface-disabled: var(--color-gray-100);
+  --bg-surface-raised: var(--color-gray-0);
+  --bg-surface-selected: var(--color-main-100);
+  --bg-surface-subtle: var(--color-gray-100);
 
   /* border */
-  --border-subtle: var(--color-gray-200); /* Divider · 약한 경계 */
-  --border-default: var(--color-gray-300); /* 카드 hairline */
-  --border-strong: var(--color-gray-400); /* 강한 경계 */
-  --border-brand: var(--color-main-500); /* 선택 Tab · 활성 Nav 표식 */
+  --border-brand: var(--color-main-500);
+  --border-control: var(--color-gray-500);
+  --border-control-hover: var(--color-gray-600);
+  --border-default: var(--color-gray-300);
+  --border-disabled: var(--color-gray-200);
+  --border-focus: var(--color-main-700);
+  --border-strong: var(--color-gray-400);
+  --border-subtle: var(--color-gray-200);
 
   /* status */
-  --status-critical-fg: var(--color-danger-700); /* 위험 상태 텍스트 */
-  --status-critical-bg: var(--color-danger-100); /* 위험 상태 면 */
-  --status-critical-icon: var(--color-danger-500); /* 위험 상태 아이콘·Dot */
-  --status-warning-fg: var(--color-warning-700); /* 주의 상태 텍스트 */
-  --status-warning-bg: var(--color-warning-100); /* 주의 상태 면 */
-  --status-warning-icon: var(--color-warning-700); /* 주의 상태 아이콘·Dot */
-  --status-normal-fg: var(--color-safe-700); /* 정상 상태 텍스트 */
-  --status-normal-bg: var(--color-safe-100); /* 정상 상태 면 */
-  --status-normal-icon: var(--color-safe-500); /* 정상 상태 아이콘·Dot */
-  --status-info-fg: var(--color-main-700); /* 안내 상태 텍스트 */
-  --status-info-bg: var(--color-main-100); /* 안내 상태 면 */
+  --status-critical-bg: var(--color-danger-100);
+  --status-critical-border: var(--color-danger-300);
+  --status-critical-fg: var(--color-danger-700);
+  --status-critical-icon: var(--color-danger-500);
+  --status-info-bg: var(--color-main-100);
+  --status-info-border: var(--color-main-500);
+  --status-info-fg: var(--color-main-700);
+  --status-info-icon: var(--color-main-500);
+  --status-normal-bg: var(--color-safe-100);
+  --status-normal-border: var(--color-safe-300);
+  --status-normal-fg: var(--color-safe-700);
+  --status-normal-icon: var(--color-safe-500);
+  --status-warning-bg: var(--color-warning-100);
+  --status-warning-border: var(--color-warning-300);
+  --status-warning-fg: var(--color-warning-700);
+  --status-warning-icon: var(--color-warning-700);
 
   /* alert */
-  --alert-danger-fg: var(--color-danger-700); /* 위험 알림 제목·본문 */
-  --alert-danger-bg: var(--color-danger-100); /* 위험 알림 면 */
-  --alert-danger-edge: var(--color-danger-500); /* 위험 알림 2px 경계 */
-  --alert-warning-fg: var(--color-warning-700); /* 주의 알림 제목·본문 */
-  --alert-warning-bg: var(--color-warning-100); /* 주의 알림 면 */
-  --alert-warning-edge: var(--color-warning-500); /* 주의 알림 2px 경계 */
-  --alert-safe-fg: var(--color-safe-700); /* 안전 알림 제목·본문 */
-  --alert-safe-bg: var(--color-safe-100); /* 안전 알림 면 */
-  --alert-safe-edge: var(--color-safe-500); /* 안전 알림 1px 경계 */
-  --alert-safe-on-edge: var(--color-gray-900); /* 원색 경계 위 텍스트 */
+  --alert-danger-bg: var(--color-danger-100);
+  --alert-danger-edge: var(--color-danger-500);
+  --alert-danger-fg: var(--color-danger-700);
+  --alert-danger-glow: var(--color-alpha-glow-danger);
+  --alert-danger-on-edge: var(--color-gray-950);
+  --alert-safe-bg: var(--color-safe-100);
+  --alert-safe-edge: var(--color-safe-500);
+  --alert-safe-fg: var(--color-safe-700);
+  --alert-safe-glow: var(--color-alpha-glow-safe);
+  --alert-safe-on-edge: var(--color-gray-950);
+  --alert-warning-bg: var(--color-warning-100);
+  --alert-warning-edge: var(--color-warning-500);
+  --alert-warning-fg: var(--color-warning-700);
+  --alert-warning-glow: var(--color-alpha-glow-warning);
+  --alert-warning-on-edge: var(--color-gray-950);
 
   /* chart */
-  --chart-categorical-1: var(--color-main-500); /* 주 데이터 계열 */
-  --chart-axis: var(--color-gray-400); /* 축선·축 라벨 */
-  --chart-grid: var(--color-gray-200); /* 격자선 */
-  --chart-track: var(--color-gray-100); /* Progress·Gauge 미채움 */
-  --chart-heat-1: var(--color-gray-200); /* 순차 스케일 · 가장 낮음 */
-  --chart-heat-2: var(--color-warning-100); /* 순차 스케일 · 낮음 */
-  --chart-heat-4: var(--color-danger-300); /* 순차 스케일 · 높음 */
-  --chart-heat-5: var(--color-danger-500); /* 순차 스케일 · 가장 높음 */
+  --chart-axis: var(--color-gray-400);
+  --chart-categorical-1: var(--color-main-500);
+  --chart-categorical-2: var(--color-main-700);
+  --chart-categorical-3: var(--color-main-900);
+  --chart-categorical-4: var(--color-main-300);
+  --chart-grid: var(--color-gray-200);
+  --chart-heat-1: var(--color-gray-200);
+  --chart-heat-2: var(--color-warning-100);
+  --chart-heat-3: var(--color-warning-300);
+  --chart-heat-4: var(--color-danger-300);
+  --chart-heat-5: var(--color-danger-500);
+  --chart-negative: var(--color-danger-500);
+  --chart-neutral: var(--color-gray-500);
+  --chart-positive: var(--color-safe-500);
+  --chart-track: var(--color-gray-100);
+  --chart-warning: var(--color-warning-700);
 
-  /* Alert glow 는 Effect Style 이라 모드를 갖지 않는다. */
-  --alert-danger-glow: var(--color-alpha-glow-danger);
-  --alert-warning-glow: var(--color-alpha-glow-warning);
-  --alert-safe-glow: var(--color-alpha-glow-safe);
+  /* radius */
+  --radius-card: var(--radius-4);
+  --radius-container: var(--radius-8);
+  --radius-control: var(--radius-4);
+  --radius-pill: var(--radius-full);
 }
 
 /* ---------- Semantic · Dark ---------- */
 
 :root[data-theme="dark"] {
   /* fg */
+  --fg-brand: var(--color-main-500);
+  --fg-disabled: var(--color-gray-600);
+  --fg-inverse: var(--color-gray-950);
+  --fg-link: var(--color-main-500);
+  --fg-on-brand: var(--color-gray-950);
   --fg-primary: var(--color-gray-50);
   --fg-secondary: var(--color-gray-400);
   --fg-tertiary: var(--color-gray-450);
-  --fg-disabled: var(--color-gray-600);
-  --fg-inverse: var(--color-gray-950);
-  --fg-brand: var(--color-main-500);
-  --fg-link: var(--color-main-500);
-  --fg-on-brand: var(--color-gray-950);
 
   /* bg */
-  --bg-canvas: var(--color-gray-950);
-  --bg-navigation: var(--color-gray-900);
-  --bg-container: var(--color-gray-850);
-  --bg-surface-default: var(--color-gray-800);
-  --bg-surface-subtle: var(--color-gray-750);
-  --bg-surface-raised: var(--color-gray-750);
-  /* Figma 실측값은 gray/700 이다. 변수 설명은 main/900 이라고 적혀 있고
-     gray/700 은 bg/interactive/pressed 와 같은 값이라 선택과 눌림이 구분되지 않는다.
-     바인딩 오류로 보이며 확인 대기 중이다. 지금은 Figma 를 따른다. */
-  --bg-surface-selected: var(--color-gray-700);
-  --bg-brand: var(--color-main-500);
   --bg-accent: var(--color-main-500);
+  --bg-brand: var(--color-main-500);
+  --bg-canvas: var(--color-gray-950);
+  --bg-container: var(--color-gray-850);
   --bg-critical: var(--color-danger-500);
-  --bg-inverse: var(--color-gray-0);
-
-  /* bg-interactive */
-  --bg-interactive-hover: var(--color-gray-800);
-  --bg-interactive-pressed: var(--color-gray-700);
+  --bg-interactive-accent-hover: var(--color-main-400);
+  --bg-interactive-accent-pressed: var(--color-main-300);
   --bg-interactive-brand-hover: var(--color-main-400);
   --bg-interactive-brand-pressed: var(--color-main-300);
-  --bg-interactive-critical-hover: var(--color-danger-700);
-  --bg-interactive-critical-pressed: var(--color-danger-800);
+  --bg-interactive-critical-hover: var(--color-danger-300);
+  --bg-interactive-critical-pressed: var(--color-danger-100);
+  --bg-interactive-hover: var(--color-gray-700);
+  --bg-interactive-inverse-hover: var(--color-gray-100);
+  --bg-interactive-inverse-pressed: var(--color-gray-200);
+  --bg-interactive-pressed: var(--color-gray-700);
+  --bg-inverse: var(--color-gray-0);
+  --bg-navigation: var(--color-gray-900);
+  --bg-overlay: var(--color-alpha-scrim-dark);
+  --bg-surface-default: var(--color-gray-800);
+  --bg-surface-disabled: var(--color-gray-750);
+  --bg-surface-raised: var(--color-gray-750);
+  --bg-surface-selected: var(--color-gray-700);
+  --bg-surface-subtle: var(--color-gray-750);
 
   /* border */
-  --border-subtle: var(--color-gray-700);
-  --border-default: var(--color-gray-650);
-  --border-strong: var(--color-gray-600);
   --border-brand: var(--color-main-500);
+  --border-control: var(--color-gray-500);
+  --border-control-hover: var(--color-gray-400);
+  --border-default: var(--color-gray-650);
+  --border-disabled: var(--color-gray-700);
+  --border-focus: var(--color-main-500);
+  --border-strong: var(--color-gray-600);
+  --border-subtle: var(--color-gray-700);
 
   /* status */
-  --status-critical-fg: var(--color-danger-300);
   --status-critical-bg: var(--color-danger-900);
-  --status-critical-icon: var(--color-danger-500);
-  --status-warning-fg: var(--color-warning-300);
-  --status-warning-bg: var(--color-warning-900);
-  --status-warning-icon: var(--color-warning-300);
-  --status-normal-fg: var(--color-safe-300);
-  --status-normal-bg: var(--color-safe-900);
-  --status-normal-icon: var(--color-safe-500);
-  --status-info-fg: var(--color-main-300);
+  --status-critical-border: var(--color-danger-700);
+  --status-critical-fg: var(--color-danger-300);
+  --status-critical-icon: var(--color-danger-300);
   --status-info-bg: var(--color-main-900);
+  --status-info-border: var(--color-main-500);
+  --status-info-fg: var(--color-main-300);
+  --status-info-icon: var(--color-main-500);
+  --status-normal-bg: var(--color-safe-900);
+  --status-normal-border: var(--color-safe-700);
+  --status-normal-fg: var(--color-safe-300);
+  --status-normal-icon: var(--color-safe-300);
+  --status-warning-bg: var(--color-warning-900);
+  --status-warning-border: var(--color-warning-700);
+  --status-warning-fg: var(--color-warning-300);
+  --status-warning-icon: var(--color-warning-300);
 
   /* alert */
-  --alert-danger-fg: var(--color-danger-300);
   --alert-danger-bg: var(--color-danger-900);
   --alert-danger-edge: var(--color-danger-500);
-  --alert-warning-fg: var(--color-warning-300);
-  --alert-warning-bg: var(--color-warning-900);
-  --alert-warning-edge: var(--color-warning-500);
-  --alert-safe-fg: var(--color-safe-300);
+  --alert-danger-fg: var(--color-danger-300);
+  --alert-danger-glow: var(--color-alpha-glow-danger);
+  --alert-danger-on-edge: var(--color-gray-950);
   --alert-safe-bg: var(--color-safe-900);
   --alert-safe-edge: var(--color-safe-300);
-  --alert-safe-on-edge: var(--color-gray-900);
+  --alert-safe-fg: var(--color-safe-300);
+  --alert-safe-glow: var(--color-alpha-glow-safe);
+  --alert-safe-on-edge: var(--color-gray-950);
+  --alert-warning-bg: var(--color-warning-900);
+  --alert-warning-edge: var(--color-warning-500);
+  --alert-warning-fg: var(--color-warning-300);
+  --alert-warning-glow: var(--color-alpha-glow-warning);
+  --alert-warning-on-edge: var(--color-gray-950);
 
   /* chart */
-  --chart-categorical-1: var(--color-main-500);
   --chart-axis: var(--color-gray-600);
-  --chart-grid: var(--color-gray-800);
-  --chart-track: var(--color-gray-850);
-  --chart-heat-1: var(--color-gray-700);
+  --chart-categorical-1: var(--color-main-500);
+  --chart-categorical-2: var(--color-main-300);
+  --chart-categorical-3: var(--color-main-100);
+  --chart-categorical-4: var(--color-main-700);
+  --chart-grid: var(--color-gray-700);
+  --chart-heat-1: var(--color-gray-650);
   --chart-heat-2: var(--color-warning-900);
+  --chart-heat-3: var(--color-warning-700);
   --chart-heat-4: var(--color-danger-700);
   --chart-heat-5: var(--color-danger-300);
+  --chart-negative: var(--color-danger-300);
+  --chart-neutral: var(--color-gray-500);
+  --chart-positive: var(--color-safe-300);
+  --chart-track: var(--color-gray-750);
+  --chart-warning: var(--color-warning-300);
 
+  /* radius */
+  --radius-card: var(--radius-4);
+  --radius-container: var(--radius-8);
+  --radius-control: var(--radius-4);
+  --radius-pill: var(--radius-full);
+}
+
+/* ---------- Component · 모드 없음 ---------- */
+/*
+ * Figma 의 Component collection 은 모드가 하나뿐이고 Semantic 을 가리키기만 한다.
+ * 따라서 Light/Dark 로 나누지 않는다 — 가리키는 Semantic 이 이미 모드를 갖고 있다.
+ */
+
+:root {
+  /* button/accent */
+  --button-accent-bg-default: var(--bg-accent);
+  --button-accent-bg-disabled: var(--bg-surface-disabled);
+  --button-accent-bg-hover: var(--bg-interactive-accent-hover);
+  --button-accent-bg-pressed: var(--bg-interactive-accent-pressed);
+  --button-accent-fg-default: var(--fg-inverse);
+  --button-accent-fg-disabled: var(--fg-disabled);
+
+  /* button/danger */
+  --button-danger-bg-default: var(--bg-critical);
+  --button-danger-bg-disabled: var(--bg-surface-disabled);
+  --button-danger-bg-hover: var(--bg-interactive-critical-hover);
+  --button-danger-bg-pressed: var(--bg-interactive-critical-pressed);
+  --button-danger-fg-default: var(--fg-inverse);
+  --button-danger-fg-disabled: var(--fg-disabled);
+
+  /* button/focus */
+  --button-focus-border: var(--border-focus);
+
+  /* button/ghost */
+  --button-ghost-bg-hover: var(--bg-interactive-hover);
+  --button-ghost-bg-pressed: var(--bg-interactive-pressed);
+  --button-ghost-fg-default: var(--fg-brand);
+  --button-ghost-fg-disabled: var(--fg-disabled);
+  --button-ghost-fg-pressed: var(--fg-primary);
+
+  /* button/primary */
+  --button-primary-bg-default: var(--bg-inverse);
+  --button-primary-bg-disabled: var(--bg-surface-disabled);
+  --button-primary-bg-hover: var(--bg-interactive-inverse-hover);
+  --button-primary-bg-pressed: var(--bg-interactive-inverse-pressed);
+  --button-primary-fg-default: var(--fg-inverse);
+  --button-primary-fg-disabled: var(--fg-disabled);
+
+  /* button/secondary */
+  --button-secondary-bg-default: var(--bg-surface-default);
+  --button-secondary-bg-disabled: var(--bg-surface-disabled);
+  --button-secondary-bg-hover: var(--bg-interactive-hover);
+  --button-secondary-bg-pressed: var(--bg-interactive-pressed);
+  --button-secondary-border-default: var(--border-default);
+  --button-secondary-border-disabled: var(--border-disabled);
+  --button-secondary-fg-default: var(--fg-primary);
+  --button-secondary-fg-disabled: var(--fg-disabled);
+
+  /* input/border */
+  --input-border-default: var(--border-control);
+  --input-border-disabled: var(--border-disabled);
+  --input-border-error: var(--status-critical-border);
+  --input-border-focus: var(--border-focus);
+  --input-border-hover: var(--border-control-hover);
+
+  /* navigation/item */
+  --navigation-item-bg-hover: var(--bg-interactive-hover);
+  --navigation-item-bg-selected: var(--bg-surface-selected);
+
+  /* table/row */
+  --table-row-bg-default: var(--bg-surface-default);
+  --table-row-bg-hover: var(--bg-interactive-hover);
+  --table-row-bg-selected: var(--bg-surface-selected);
 }
 
 /* ---------- Gradient ---------- */
@@ -304,10 +483,10 @@
 }
 
 /*
- * 아직 Figma 실측으로 확인하지 못한 항목
- *   - bg/overlay (Light: alpha/scrim/light · Dark: alpha/scrim/dark) 의 실제 알파값
- *   - bg/surface/selected Dark 가 gray/700 으로 묶여 있어 pressed 와 값이 같다 (확인 대기)
- *   - Semantic 90개 중 위에 없는 나머지 항목
- *   - Component 컬렉션 42개
- * Foundations 페이지가 만들어지면 get_variable_defs 로 한 번에 대조한다.
+ * 확인이 필요한 지점
+ *   - bg/surface/selected Dark 가 gray/700 이라 bg/interactive/pressed 와 값이 같다.
+ *     선택과 눌림이 구분되지 않는다. 변수 설명에는 main/900 이라고 적혀 있다.
+ *   - danger/400 이 없어 Dark 에서 Danger Button 의 hover 가 더 어두워진다
+ *     (bg/interactive/critical-hover Dark = danger/300 으로 더 밝아지도록 되어 있으나
+ *      Light 는 danger/800 으로 더 어두워져 두 모드의 방향이 반대다).
  */

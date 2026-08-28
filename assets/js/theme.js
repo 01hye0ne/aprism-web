@@ -28,7 +28,13 @@
     }
   }
 
-  apply(read() === "light" ? "light" : "dark");
+  // ?theme=light 로 링크를 공유하면 상대방도 같은 모드로 본다.
+  function forced() {
+    var m = /[?&]theme=(light|dark)/.exec(location.search);
+    return m ? m[1] : null;
+  }
+
+  apply(forced() || (read() === "light" ? "light" : "dark"));
 
   if (button) {
     button.addEventListener("click", function () {
