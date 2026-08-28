@@ -32,6 +32,8 @@
       --sans: "SUIT", -apple-system, "Segoe UI", system-ui, sans-serif;
       --mono-a: "JetBrains Mono", "SUIT", ui-monospace, monospace;
       --mono-b: "IBM Plex Mono", "SUIT", ui-monospace, monospace;
+      /* 페이지 전체가 따르는 선택 서체. 2번 섹션의 비교표만 예외로 각자 고정한다. */
+      --mono-sel: var(--mono-b);
     }
 
     * { box-sizing: border-box; }
@@ -39,7 +41,7 @@
     .wrap { max-width: 1180px; margin: 0 auto; padding: 40px 24px 90px; }
 
     header.doc { border-bottom: 1px solid var(--border-subtle); padding-bottom: 24px; margin-bottom: 20px; }
-    .eyebrow { font-family: var(--mono-a); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--brand); margin: 0 0 10px; font-weight: 500; }
+    .eyebrow { font-family: var(--mono-sel); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--brand); margin: 0 0 10px; font-weight: 500; }
     h1 { margin: 0 0 10px; font-size: 26px; }
     .sub { margin: 0; color: var(--fg-secondary); max-width: 72ch; }
 
@@ -63,6 +65,7 @@
     .f-sans { font-family: var(--sans); }
     .f-sans-tab { font-family: var(--sans); font-variant-numeric: tabular-nums; }
     .f-mono-a { font-family: var(--mono-a); }
+    .f-mono-sel { font-family: var(--mono-sel); }
     .f-mono-b { font-family: var(--mono-b); }
 
     table { width: 100%; border-collapse: collapse; font-size: 13px; }
@@ -73,14 +76,14 @@
     .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 7px; vertical-align: 0px; }
 
     .plate { background: var(--container); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 20px 22px; }
-    .tech-label { font-family: var(--mono-a); font-size: 11px; letter-spacing: .09em; text-transform: uppercase; color: var(--fg-quiet); line-height: 1.5; }
+    .tech-label { font-family: var(--mono-sel); font-size: 11px; letter-spacing: .09em; text-transform: uppercase; color: var(--fg-quiet); line-height: 1.5; }
     .tech-label b { display: block; color: var(--fg-secondary); font-weight: 500; }
 
     .verdict { border: 1px solid var(--border-subtle); border-left: 3px solid var(--brand); border-radius: 6px; padding: 15px 17px; margin-bottom: 12px; background: var(--container); }
     .verdict h3 { margin: 0 0 6px; font-size: 14px; }
     .verdict p { margin: 0 0 6px; color: var(--fg-secondary); font-size: 13px; }
     .verdict p:last-child { margin-bottom: 0; }
-    code { font-family: var(--mono-a); font-size: 12px; background: var(--raised); padding: 1px 5px; border-radius: 3px; color: var(--fg-primary); }
+    code { font-family: var(--mono-sel); font-size: 12px; background: var(--raised); padding: 1px 5px; border-radius: 3px; color: var(--fg-primary); }
 
     .ctrl { display: flex; gap: 10px; align-items: center; margin-bottom: 16px; }
     button { font: inherit; font-size: 12px; padding: 7px 13px; border-radius: 6px; border: 1px solid var(--border-default); background: var(--raised); color: var(--fg-primary); cursor: pointer; }
@@ -103,11 +106,18 @@
     </p>
   </header>
 
+  <div class="ctrl" style="margin-top:22px">
+    <span style="font-size:12px;font-weight:600">검토 서체</span>
+    <button type="button" class="pick" data-font="b" aria-pressed="true">IBM Plex Mono</button>
+    <button type="button" class="pick" data-font="a" aria-pressed="false">JetBrains Mono</button>
+    <span class="note" style="margin:0">2번 섹션의 비교표를 제외한 페이지 전체에 적용됩니다.</span>
+  </div>
+
   <section>
     <h2>1. 실시간 갱신에서 무슨 일이 일어나는가</h2>
     <p class="note">
       아래 세 열은 같은 센서 값을 0.7초마다 갱신합니다. 왼쪽부터 <strong>SUIT 기본</strong>,
-      <strong>SUIT + tabular-nums</strong>, <strong>JetBrains Mono</strong>입니다.
+      <strong>SUIT + tabular-nums</strong>, <strong>위에서 선택한 모노 서체</strong>입니다.
       숫자 폭이 자릿수마다 다르면 값이 바뀔 때 열 전체가 좌우로 흔들립니다.
       관제 화면처럼 하루 종일 갱신되는 화면에서는 이 미세한 떨림이 피로로 누적됩니다.
     </p>
@@ -125,8 +135,8 @@
         <div class="col-body"><ul class="feed f-sans-tab" id="feed-2"></ul></div>
       </div>
       <div class="col">
-        <div class="col-head"><span>JetBrains Mono</span><em>모노스페이스</em></div>
-        <div class="col-body"><ul class="feed f-mono-a" id="feed-3"></ul></div>
+        <div class="col-head"><span id="feed-3-label">IBM Plex Mono</span><em>모노스페이스</em></div>
+        <div class="col-body"><ul class="feed f-mono-sel" id="feed-3"></ul></div>
       </div>
     </div>
     <div class="verdict" style="margin-top:18px">
@@ -185,15 +195,15 @@
       <div style="margin-top:22px;padding-top:18px;border-top:1px solid var(--border-subtle);display:flex;gap:28px;flex-wrap:wrap;align-items:flex-end">
         <div>
           <div class="tech-label" style="margin-bottom:4px">TEMP · MOTOR 3</div>
-          <div class="f-mono-a" style="font-size:28px;font-weight:500;line-height:1.1">78.4<span style="font-size:14px;color:var(--fg-quiet)"> °C</span></div>
+          <div class="f-mono-sel" style="font-size:28px;font-weight:500;line-height:1.1">78.4<span style="font-size:14px;color:var(--fg-quiet)"> °C</span></div>
         </div>
         <div>
           <div class="tech-label" style="margin-bottom:4px">BATTERY</div>
-          <div class="f-mono-a" style="font-size:28px;font-weight:500;line-height:1.1">64<span style="font-size:14px;color:var(--fg-quiet)"> %</span></div>
+          <div class="f-mono-sel" style="font-size:28px;font-weight:500;line-height:1.1">64<span style="font-size:14px;color:var(--fg-quiet)"> %</span></div>
         </div>
         <div>
           <div class="tech-label" style="margin-bottom:4px">POSITION</div>
-          <div class="f-mono-a" style="font-size:28px;font-weight:500;line-height:1.1">12.480, 4.215</div>
+          <div class="f-mono-sel" style="font-size:28px;font-weight:500;line-height:1.1">12.480, 4.215</div>
         </div>
       </div>
     </div>
@@ -213,19 +223,19 @@
             <td><code>Typography/Mono/Metric</code></td>
             <td>20 / 28 SemiBold</td>
             <td>KPI 대표 수치, 게이지 값</td>
-            <td class="f-mono-a" style="font-size:20px;font-weight:600">78.4 °C</td>
+            <td class="f-mono-sel" style="font-size:20px;font-weight:600">78.4 °C</td>
           </tr>
           <tr>
             <td><code>Typography/Mono/Data/1</code></td>
             <td>14 / 20 Medium</td>
             <td>표·리스트의 수치, 로봇 ID, 좌표</td>
-            <td class="f-mono-a" style="font-size:14px;font-weight:500">RBT-03 · 12.480, 4.215</td>
+            <td class="f-mono-sel" style="font-size:14px;font-weight:500">RBT-03 · 12.480, 4.215</td>
           </tr>
           <tr>
             <td><code>Typography/Mono/Data/2</code></td>
             <td>13 / 18 Regular</td>
             <td>밀도 높은 표, 로그</td>
-            <td class="f-mono-a" style="font-size:13px">14:22:07 WP-07 THRESHOLD</td>
+            <td class="f-mono-sel" style="font-size:13px">14:22:07 WP-07 THRESHOLD</td>
           </tr>
           <tr>
             <td><code>Typography/Mono/Label</code></td>
@@ -258,10 +268,12 @@
     <div class="verdict">
       <h3>서체 후보</h3>
       <p>
-        <strong>JetBrains Mono</strong> — 자간이 넓고 글자가 큼직해 작은 크기에서 잘 읽힙니다. 관제 화면에 유리합니다.
+        <strong>IBM Plex Mono</strong> — 더 좁고 중성적입니다. 표 밀도를 높이기에 좋고 레퍼런스의 인상에 더 가깝습니다.
+        같은 폭에 열을 더 넣을 수 있어 관제 표에 유리합니다.
       </p>
       <p>
-        <strong>IBM Plex Mono</strong> — 더 좁고 중성적입니다. 표 밀도를 높이기에 좋고 레퍼런스의 인상에 더 가깝습니다.
+        <strong>JetBrains Mono</strong> — 자간이 넓고 글자가 큼직해 아주 작은 크기에서 읽기 쉽습니다.
+        대신 같은 표에서 가로 폭을 더 차지합니다.
       </p>
       <p>둘 다 OFL 라이선스라 상업적 사용과 임베딩에 제약이 없습니다. 위 2번 표에서 나란히 비교하실 수 있습니다.</p>
     </div>
@@ -334,6 +346,19 @@ var btn = document.getElementById('toggle');
 btn.addEventListener('click', function () {
   if (timer) { stop(); btn.textContent = '갱신 시작'; btn.setAttribute('aria-pressed', 'false'); }
   else { start(); btn.textContent = '갱신 멈춤'; btn.setAttribute('aria-pressed', 'true'); }
+});
+
+// 선택 서체를 페이지 전체에 반영한다. 2번 섹션 비교표는 각자 고정이라 영향받지 않는다.
+var FONT_NAME = { a: 'JetBrains Mono', b: 'IBM Plex Mono' };
+Array.prototype.forEach.call(document.querySelectorAll('.pick'), function (b) {
+  b.addEventListener('click', function () {
+    var key = b.getAttribute('data-font');
+    document.documentElement.style.setProperty('--mono-sel', 'var(--mono-' + key + ')');
+    document.getElementById('feed-3-label').textContent = FONT_NAME[key];
+    Array.prototype.forEach.call(document.querySelectorAll('.pick'), function (o) {
+      o.setAttribute('aria-pressed', String(o === b));
+    });
+  });
 });
 
 renderFeeds();
