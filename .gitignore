@@ -1,0 +1,19 @@
+# OS
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
+
+# Editor
+.vscode/
+.idea/
+*.swp
+
+# Build / dependency
+node_modules/
+dist/
+.cache/
+
+# Local env
+.env
+.env.local

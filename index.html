@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>APRISM — 화면 퍼블리싱</title>
+  <meta name="description" content="APRISM 공장 환경점검 로봇 관제 대시보드 화면 퍼블리싱" />
+  <link rel="stylesheet" href="./assets/css/base.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span class="brand-name">APRISM</span>
+    </div>
+    <button type="button" class="theme-toggle" data-theme-toggle aria-label="테마 전환">
+      <span data-theme-label>Dark</span>
+    </button>
+  </header>
+
+  <main class="site-main">
+    <section class="intro">
+      <p class="eyebrow">Wireframe Publishing</p>
+      <h1>화면 퍼블리싱 인덱스</h1>
+      <p class="lead">
+        Figma 와이어프레임을 웹으로 퍼블리싱하고 공유하기 위한 페이지입니다.
+        작업된 화면은 아래 목록에 추가됩니다.
+      </p>
+    </section>
+
+    <section class="screens" aria-labelledby="screens-title">
+      <h2 id="screens-title">화면 목록</h2>
+      <ul class="screen-list">
+        <li class="screen-card is-empty">
+          <span class="screen-status">준비 중</span>
+          <span class="screen-name">아직 퍼블리싱된 화면이 없습니다</span>
+          <span class="screen-desc">Figma 와이어프레임을 기준으로 화면을 추가할 예정입니다.</span>
+        </li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <span>APRISM · 공장 환경점검 로봇 관제 대시보드</span>
+  </footer>
+
+  <script src="./assets/js/theme.js"></script>
+</body>
+</html>
