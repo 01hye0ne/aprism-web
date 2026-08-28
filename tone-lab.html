@@ -127,7 +127,7 @@
     </div>
     <div class="ctl">
       <label>쿨 강도 (Chroma) <span class="val" id="v-chroma"></span></label>
-      <input type="range" id="chroma" min="0" max="0.040" step="0.001" value="0.013" />
+      <input type="range" id="chroma" min="0" max="0.040" step="0.001" value="0.006" />
       <span class="hint">0.021이 현재 Light 램프와 같은 세기</span>
     </div>
     <div class="ctl">
@@ -137,7 +137,7 @@
     </div>
     <div class="ctl">
       <label>Dark Canvas 명도 <span class="val" id="v-canvas"></span></label>
-      <input type="range" id="canvasL" min="0.15" max="0.28" step="0.005" value="0.18" />
+      <input type="range" id="canvasL" min="0.15" max="0.28" step="0.005" value="0.20" />
       <span class="hint">낮출수록 깊은 charcoal</span>
     </div>
     <div class="ctl">
@@ -218,6 +218,16 @@
       세 상태가 같은 무게로 읽히게 합니다. 색상(Hue)은 그대로 두므로 의미 구분은 유지됩니다.
     </p>
     <div id="status-ramps"></div>
+  </section>
+
+  <section>
+    <h2>Gradient</h2>
+    <p class="note">
+      Paint Style은 <strong>모드를 갖지 않습니다.</strong> Light와 Dark가 같은 그라데이션을 씁니다.
+      아래는 각 그라데이션을 5구간으로 샘플링해 그 위 텍스트 대비를 계산한 것입니다.
+      스타일 설명에 적힌 “Gradient 위 텍스트는 전 구간에서 대비를 검증한다”를 자동으로 확인합니다.
+    </p>
+    <div id="gradients"></div>
   </section>
 
   <section>
@@ -599,6 +609,74 @@ var CURRENT_LIGHT = { canvas: '#F7F8FA', navigation: '#FFFFFF', container: '#FFF
 
 var DELTA_STEPS = [['950', '900', 'canvas → navigation'], ['900', '850', 'navigation → container'], ['850', '800', 'container → surface/default'], ['800', '750', 'surface/default → raised']];
 
+// Figma Paint Style의 실제 stop 값. Paint Style은 모드가 없어 Light/Dark가 같은 값을 쓴다.
+var GRADIENTS_CURRENT = [
+  ['Gradient/Main',    [[0, '#285896'], [0.21, '#6F99F5'], [1, '#FFDADB']], 'Hero KPI · 주요 데이터 강조'],
+  ['Gradient/Danger',  [[0, '#F03918'], [1, '#F6727F']], '위험 수준 데이터 강조'],
+  ['Gradient/Warning', [[0, '#EECE1B'], [1, '#EEDA6B']], '주의 수준 데이터 강조'],
+  ['Gradient/Safe',    [[0, '#1DA67F'], [1, '#5FD382']], '정상 수준 데이터 강조']
+];
+
+// Figma는 그라데이션을 sRGB에서 보간한다. 화면에 실제로 그려지는 값을 그대로 계산한다.
+function sampleGradient(stops, t) {
+  var i = 0;
+  while (i < stops.length - 2 && t > stops[i + 1][0]) { i++; }
+  var a = stops[i], b = stops[i + 1];
+  var f = b[0] === a[0] ? 0 : (t - a[0]) / (b[0] - a[0]);
+  f = Math.min(1, Math.max(0, f));
+  var ca = hexToRgb(a[1]), cb = hexToRgb(b[1]);
+  return '#' + [0, 1, 2].map(function (k) {
+    return Math.round(ca[k] + (cb[k] - ca[k]) * f).toString(16).padStart(2, '0');
+  }).join('').toUpperCase();
+}
+
+function cssGradient(stops) {
+  return 'linear-gradient(90deg,' + stops.map(function (s) {
+    return s[1] + ' ' + (s[0] * 100).toFixed(0) + '%';
+  }).join(',') + ')';
+}
+
+function renderGradients(gray, status) {
+  var light = gray['50'].hex;
+  var dark = gray['950'].hex;
+  var proposed = [
+    ['Gradient/Main', [[0, status.main['700'].hex], [0.5, status.main['500'].hex], [1, status.main['300'].hex]], '분홍 stop을 제거하고 계열 안에서 700 → 500 → 300 으로 정리'],
+    ['Gradient/Brand-Surface (신규)', [[0, status.main['900'].hex], [1, gray['850'].hex]], 'AI 영역처럼 텍스트를 얹는 넓은 면 전용. 명도 폭이 좁아 전 구간에서 텍스트가 읽힌다'],
+    ['Gradient/Danger', [[0, status.danger['500'].hex], [1, status.danger['300'].hex]], '변경 없음 — 계열 규칙과 이미 일치'],
+    ['Gradient/Safe', [[0, status.safe['500'].hex], [1, status.safe['300'].hex]], '변경 없음']
+  ];
+
+  function bar(stops) {
+    var cells = [0, 0.25, 0.5, 0.75, 1].map(function (t) {
+      var c = sampleGradient(stops, t);
+      var onLight = contrast(c, light), onDark = contrast(c, dark);
+      var cls = function (r) { return r >= 4.5 ? 'pass' : (r >= 3 ? 'warn' : 'fail'); };
+      return '<td class="num">' + (t * 100).toFixed(0) + '%</td>' +
+        '<td class="thex"><span class="sw-sm" style="background:' + c + '"></span>' + c + '</td>' +
+        '<td class="' + cls(onLight) + '">' + onLight.toFixed(2) + '</td>' +
+        '<td class="' + cls(onDark) + '">' + onDark.toFixed(2) + '</td>';
+    });
+    return '<div style="height:34px;border-radius:6px;margin:8px 0 10px;background:' + cssGradient(stops) + '"></div>' +
+      '<div class="scroll"><table><thead><tr><th>위치</th><th>색</th><th class="num">밝은 텍스트</th><th class="num">어두운 텍스트</th></tr></thead><tbody>' +
+      cells.map(function (c) { return '<tr>' + c + '</tr>'; }).join('') + '</tbody></table></div>';
+  }
+
+  var html = '';
+  GRADIENTS_CURRENT.forEach(function (g, i) {
+    var pr = proposed[i === 0 ? 0 : (i + 1)];
+    html += '<h3 style="font-size:13px;margin:26px 0 4px;color:var(--ui-dim);font-weight:600;">' + g[0] + '</h3>' +
+      '<p class="note" style="margin-bottom:8px">' + g[2] + '</p>' +
+      '<div class="stacks">' +
+        '<div><div class="sim-label" style="margin-bottom:2px">현재</div>' + bar(g[1]) + '</div>' +
+        (pr ? '<div><div class="sim-label" style="margin-bottom:2px">변경안 — ' + pr[2] + '</div>' + bar(pr[1]) + '</div>' : '<div></div>') +
+      '</div>';
+  });
+  var nb = proposed[1];
+  html += '<h3 style="font-size:13px;margin:30px 0 4px;color:var(--ui-flag);font-weight:600;">' + nb[0] + '</h3>' +
+    '<p class="note" style="margin-bottom:8px">' + nb[2] + '</p>' + bar(nb[1]);
+  return html;
+}
+
 function render() {
   var p = {
     hue: +document.getElementById('hue').value,
@@ -699,6 +777,8 @@ function render() {
       '<td class="role">' + pair[5] + '</td></tr>';
   }).join('');
 
+  document.getElementById('gradients').innerHTML = renderGradients(gray, status);
+
   // 출력
   var lines = ['# Primitive / color / gray', ''];
   Object.keys(GRAY_ROLE).forEach(function (k) {
@@ -737,9 +817,9 @@ document.getElementById('preset-ref').addEventListener('click', function () {
 
 document.getElementById('reset').addEventListener('click', function () {
   document.getElementById('hue').value = 255;
-  document.getElementById('chroma').value = 0.013;
+  document.getElementById('chroma').value = 0.006;
   document.getElementById('spacing').value = 2.0;
-  document.getElementById('canvasL').value = 0.18;
+  document.getElementById('canvasL').value = 0.20;
   document.getElementById('statusC').value = 0.72;
   document.getElementById('alignL').checked = false;
   document.getElementById('mainPreset').value = 'ref';
