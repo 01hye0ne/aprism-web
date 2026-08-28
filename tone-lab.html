@@ -160,9 +160,14 @@
       <span class="hint">레퍼런스 기반일 때만 적용</span>
     </div>
     <div class="ctl">
-      <label>그라데이션 강도 <span class="val" id="v-grad"></span></label>
-      <input type="range" id="gradA" min="0.1" max="1" step="0.05" value="0.35" />
-      <span class="hint">배경에 얹히는 최대 불투명도</span>
+      <label>코어 강도 <span class="val" id="v-grad"></span></label>
+      <input type="range" id="gradA" min="0.3" max="1" step="0.05" value="1" />
+      <span class="hint">가장 진한 지점의 불투명도</span>
+    </div>
+    <div class="ctl">
+      <label>코어 집중도 <span class="val" id="v-tight"></span></label>
+      <input type="range" id="gradT" min="1" max="8" step="0.25" value="4.5" />
+      <span class="hint">높일수록 채색 구간이 좁아지고 빨리 사라짐</span>
     </div>
     <div class="ctl ctl-actions">
       <label class="toggle"><input type="checkbox" id="alignL" /> 상태색 명도 정렬</label>
@@ -234,23 +239,34 @@
       아래는 각 그라데이션을 두 배경 위에 합성하고 5구간의 텍스트 대비를 계산한 것입니다.
     </p>
     <div class="dec" style="margin-bottom:18px;border-left:3px solid var(--ui-flag)">
-      <dt style="margin-bottom:6px">알파 상한 — 텍스트를 얹는 면은 45% 이하</dt>
+      <dt style="margin-bottom:6px">칙칙해지지 않게 하는 조건</dt>
       <dd>
-        불투명도를 올릴수록 배경이 밝아져 그 위 텍스트 대비가 떨어집니다.
-        <strong>노랑(<code>warning/500</code>)이 가장 먼저 무너집니다</strong> — 네 계열 중 명도가 가장 높아
-        어두운 배경을 가장 빠르게 들어올리기 때문입니다.<br /><br />
-        Dark canvas 기준 최저 대비: 알파 35%에서 6.88:1 · 50%에서 4.49:1 · 70%에서 2.72:1.
-        <strong>텍스트가 얹히는 면은 45%를 넘기지 않습니다.</strong>
-        텍스트가 없는 데이터 채움(면적 차트, 게이지)은 100%까지 써도 됩니다.
+        어두운 배경에 색을 낮은 불투명도로 넓게 깔면 중간톤이 배경과 섞여 탁해집니다.
+        반대로 <strong>높은 채도를 넓게 쓰면 가벼워 보입니다.</strong> 두 함정을 동시에 피하는 방법은
+        면적 배분입니다.<br /><br />
+        <strong>채색 구간을 앞쪽 15% 안에 몰아넣고 나머지 85%를 배경으로 비웁니다.</strong>
+        코어는 원색 그대로 진하게 두되 아주 좁게, 탁해지는 전이 구간은 짧게 지나가고,
+        면적의 대부분은 순수한 배경색이 됩니다. 레퍼런스의 발광하는 인상이 이 배분에서 나옵니다.<br /><br />
+        코어 끝단에만 한 단계 밝은 <code>300</code>을 써서 빛이 새어나오는 느낌을 만들고
+        곧바로 원색 <code>500</code>으로 넘어갑니다.
+      </dd>
+    </div>
+    <div class="dec" style="margin-bottom:18px">
+      <dt style="margin-bottom:6px">텍스트는 감쇠 구간에 놓습니다</dt>
+      <dd>
+        코어가 원색 그대로이므로 그 위에는 본문을 얹을 수 없습니다.
+        각 패널 아래에 <strong>본문 텍스트 안전 구간</strong>을 표시했습니다 — 그 지점 이후부터
+        4.5:1이 확보됩니다. 첨부하신 레퍼런스도 발광부는 가장자리에 두고 텍스트는
+        감쇠된 영역에 배치합니다.<br /><br />
+        <code>코어 집중도</code>를 높이면 안전 구간이 앞당겨집니다.
       </dd>
     </div>
     <div class="dec" style="margin-bottom:18px">
       <dt style="margin-bottom:6px">구현 시 주의</dt>
       <dd>
         끝 stop을 <code>transparent</code> 키워드로 두면 안 됩니다. 그 값은 <em>검정 투명</em>이라
-        중간 구간이 탁하게 죽습니다. 반드시 <strong>같은 RGB 값에 알파 0</strong>을 지정하십시오.
-        Figma에서도 같은 색을 복제해 불투명도만 0으로 내리는 방식이어야 합니다.<br /><br />
-        막대·배지처럼 <em>면 전체가 한 색</em>이어야 하는 곳에는 그라데이션을 쓰지 않습니다.
+        중간 구간이 탁하게 죽습니다. 반드시 <strong>같은 RGB 값에 알파 0</strong>을 지정하십시오.<br /><br />
+        막대·배지처럼 면 전체가 한 색이어야 하는 곳에는 그라데이션을 쓰지 않습니다.
         기존 규칙대로 단색 <code>status/*</code> 토큰이 담당합니다.
       </dd>
     </div>
@@ -657,11 +673,16 @@ function cssGradient(stops) {
   }).join(',') + ')';
 }
 
-// 알파 소멸형: 같은 색의 불투명도만 낮춰 배경으로 녹인다.
-// 끝 stop 을 transparent 키워드로 두면 검정 투명으로 보간돼 중간이 탁해진다.
-// 반드시 같은 RGB 에 알파 0 을 지정한다.
-function alphaStops(hex, peak) {
-  return [[0, hex, peak], [0.5, hex, peak * 0.45], [1, hex, 0]];
+// 좁고 화사한 코어 + 빠른 감쇠.
+// 넓은 중간톤은 배경과 섞이며 칙칙해지므로 채색 구간을 앞쪽에 몰아넣고
+// 나머지 대부분을 배경으로 비운다. 코어 끝단만 한 단계 밝은 300 을 써서
+// 발광하는 인상을 만들고 곧바로 원색 500 으로 넘어간다.
+function coreStops(c300, c500, peak, tight) {
+  var pts = [0, 0.12, 0.22, 0.36, 0.55, 0.78, 1];
+  return pts.map(function (t) {
+    var a = t >= 1 ? 0 : peak * Math.pow(1 - t, tight);
+    return [t, t === 0 ? c300 : c500, a];
+  });
 }
 
 function rgba(hex, a) {
@@ -671,32 +692,43 @@ function rgba(hex, a) {
 
 function cssAlphaGradient(stops) {
   return 'linear-gradient(90deg,' + stops.map(function (st) {
-    return rgba(st[1], st[2]) + ' ' + (st[0] * 100).toFixed(0) + '%';
+    return rgba(st[1], st[2]) + ' ' + (st[0] * 100).toFixed(1) + '%';
   }).join(',') + ')';
 }
 
-// 알파 그라데이션을 배경 위에 합성한 결과색. sRGB 위의 일반 알파 합성이다.
+// 브라우저와 Figma는 알파 그라데이션을 premultiplied 로 보간한다. 같은 방식으로 계산한다.
 function compositeAt(stops, t, bgHex) {
   var i = 0;
   while (i < stops.length - 2 && t > stops[i + 1][0]) { i++; }
   var a = stops[i], b = stops[i + 1];
   var f = b[0] === a[0] ? 0 : (t - a[0]) / (b[0] - a[0]);
   f = Math.min(1, Math.max(0, f));
+  var ca = hexToRgb(a[1]), cb = hexToRgb(b[1]);
   var alpha = a[2] + (b[2] - a[2]) * f;
-  var fg = hexToRgb(a[1]), bg = hexToRgb(bgHex);
+  var bg = hexToRgb(bgHex);
   return '#' + [0, 1, 2].map(function (k) {
-    return Math.round(fg[k] * alpha + bg[k] * (1 - alpha)).toString(16).padStart(2, '0');
+    var pre = ca[k] * a[2] + (cb[k] * b[2] - ca[k] * a[2]) * f;
+    return Math.round(Math.min(255, Math.max(0, pre + bg[k] * (1 - alpha)))).toString(16).padStart(2, '0');
   }).join('').toUpperCase();
 }
 
-function renderGradients(gray, status, peak) {
+// 텍스트가 4.5:1 을 확보하는 첫 지점. 이 뒤쪽에 본문을 놓으면 된다.
+function textSafeFrom(stops, bgHex, textHex) {
+  for (var t = 0; t <= 1.0001; t += 0.01) {
+    if (contrast(compositeAt(stops, t, bgHex), textHex) >= 4.5) { return t; }
+  }
+  return null;
+}
+
+function renderGradients(gray, status, peak, tight) {
   var canvasDark = gray['950'].hex;
   var canvasLight = gray['50'].hex;
   var textOnDark = gray['50'].hex;
   var textOnLight = gray['950'].hex;
+  var SAMPLES = [0, 0.05, 0.12, 0.22, 0.36, 0.55, 1];
 
   function sampleTable(stops, bg, textOn) {
-    var rows = [0, 0.25, 0.5, 0.75, 1].map(function (t) {
+    var rows = SAMPLES.map(function (t) {
       var c = compositeAt(stops, t, bg);
       var r = contrast(c, textOn);
       var cls = r >= 4.5 ? 'pass' : (r >= 3 ? 'warn' : 'fail');
@@ -709,26 +741,27 @@ function renderGradients(gray, status, peak) {
   }
 
   function panel(label, bg, stops, textOn) {
+    var safe = textSafeFrom(stops, bg, textOn);
+    var safeText = safe === null ? '전 구간 불가' : (safe * 100).toFixed(0) + '% 이후';
     return '<div>' +
       '<div class="sim-label" style="margin-bottom:6px">' + label + '</div>' +
-      '<div style="background:' + bg + ';border-radius:8px;padding:14px;border:1px solid ' + gray['700'].hex + '">' +
-        '<div style="height:56px;border-radius:6px;background:' + cssAlphaGradient(stops) +
-        ';display:flex;align-items:center;padding:0 14px;color:' + textOn +
-        ';font-size:12px;font-weight:600">텍스트 가독성 확인</div>' +
+      '<div style="background:' + bg + ';border-radius:8px;padding:0;border:1px solid ' + gray['700'].hex + ';overflow:hidden">' +
+        '<div style="height:96px;background:' + cssAlphaGradient(stops) + '"></div>' +
       '</div>' +
+      '<div class="sim-label" style="margin:8px 0 2px">본문 텍스트 안전 구간 · <span style="color:var(--ui-accent)">' + safeText + '</span></div>' +
       sampleTable(stops, bg, textOn) +
     '</div>';
   }
 
   return Object.keys(GRADIENTS_CURRENT).map(function (name) {
     var role = GRADIENT_ROLE[name];
-    var base = status[role[0]]['500'].hex;
-    var stops = alphaStops(base, peak);
+    var fam = status[role[0]];
+    var stops = coreStops(fam['300'].hex, fam['500'].hex, peak, tight);
     return '<h3 style="font-size:13px;margin:30px 0 4px;color:var(--ui-dim);font-weight:600;">' + name + '</h3>' +
       '<p class="note" style="margin-bottom:10px">' + role[1] +
-      ' · 기준색 <code>' + role[0] + '/500 ' + base + '</code></p>' +
+      ' · 코어 <code>' + role[0] + '/300 ' + fam['300'].hex + '</code> → <code>' + role[0] + '/500 ' + fam['500'].hex + '</code></p>' +
       '<div class="sim-label" style="margin-bottom:4px">현재 — 불투명 2~3 stop</div>' +
-      '<div style="height:30px;border-radius:6px;margin-bottom:16px;background:' +
+      '<div style="height:26px;border-radius:6px;margin-bottom:16px;background:' +
       cssGradient(GRADIENTS_CURRENT[name]) + '"></div>' +
       '<div class="stacks">' +
         panel('변경안 · Dark canvas 위', canvasDark, stops, textOnDark) +
@@ -747,7 +780,8 @@ function render() {
     alignL: document.getElementById('alignL').checked,
     mainPreset: document.getElementById('mainPreset').value,
     mainHue: +document.getElementById('mainHue').value,
-    gradA: +document.getElementById('gradA').value
+    gradA: +document.getElementById('gradA').value,
+    gradT: +document.getElementById('gradT').value
   };
   document.getElementById('v-hue').textContent = p.hue + '°';
   document.getElementById('v-chroma').textContent = p.chroma.toFixed(3);
@@ -756,6 +790,7 @@ function render() {
   document.getElementById('v-status').textContent = p.statusC.toFixed(2) + '×';
   document.getElementById('v-mainPreset').textContent = p.mainPreset === 'ref' ? '변경' : '유지';
   document.getElementById('v-grad').textContent = Math.round(p.gradA * 100) + '%';
+  document.getElementById('v-tight').textContent = p.gradT.toFixed(2);
   document.getElementById('v-mainHue').textContent = p.mainPreset === 'ref' ? p.mainHue + '°' : '—';
 
   var gray = buildGray(p);
@@ -839,7 +874,7 @@ function render() {
       '<td class="role">' + pair[5] + '</td></tr>';
   }).join('');
 
-  document.getElementById('gradients').innerHTML = renderGradients(gray, status, p.gradA);
+  document.getElementById('gradients').innerHTML = renderGradients(gray, status, p.gradA, p.gradT);
 
   // 출력
   var lines = ['# Primitive / color / gray', ''];
@@ -860,7 +895,7 @@ function render() {
   document.getElementById('output').textContent = lines.join('\n');
 }
 
-['hue', 'chroma', 'spacing', 'canvasL', 'statusC', 'alignL', 'mainPreset', 'mainHue', 'gradA'].forEach(function (id) {
+['hue', 'chroma', 'spacing', 'canvasL', 'statusC', 'alignL', 'mainPreset', 'mainHue', 'gradA', 'gradT'].forEach(function (id) {
   document.getElementById(id).addEventListener('input', render);
 });
 // 레퍼런스의 구조를 그대로 적용한다. 뉴트럴 채도를 COOL GRAY 수준까지 낮추고
@@ -874,7 +909,8 @@ document.getElementById('preset-ref').addEventListener('click', function () {
   document.getElementById('alignL').checked = false;
   document.getElementById('mainPreset').value = 'covalent';
   document.getElementById('mainHue').value = 253;
-  document.getElementById('gradA').value = 0.35;
+  document.getElementById('gradA').value = 1;
+  document.getElementById('gradT').value = 4.5;
   render();
 });
 
@@ -887,7 +923,8 @@ document.getElementById('reset').addEventListener('click', function () {
   document.getElementById('alignL').checked = false;
   document.getElementById('mainPreset').value = 'ref';
   document.getElementById('mainHue').value = 260;
-  document.getElementById('gradA').value = 0.35;
+  document.getElementById('gradA').value = 1;
+  document.getElementById('gradT').value = 4.5;
   render();
 });
 render();
