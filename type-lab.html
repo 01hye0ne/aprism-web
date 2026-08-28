@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>APRISM — 데이터 서체 검토</title>
+  <meta name="description" content="관제 화면의 수치·코드 표기에 모노스페이스 서체가 필요한지 판단하기 위한 비교 페이지" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/static/woff2/SUIT.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" />
+  <style>
+    /* 확정된 APRISM Dark 토큰을 그대로 사용한다 (쿨강도 0.006 · Canvas 0.200 · 간격 2.0배) */
+    :root {
+      color-scheme: dark;
+      --canvas: #151617;
+      --navigation: #1F2021;
+      --container: #292A2C;
+      --surface: #353638;
+      --raised: #414345;
+      --border-subtle: #4B4D4F;
+      --border-default: #55575A;
+      --fg-primary: #F7F7F8;
+      --fg-secondary: #B2B4B7;
+      --fg-tertiary: #ADAFB1;
+      --fg-quiet: #86888B;
+      --brand: #5A8EE4;
+      --danger: #FF6B72;
+      --warning: #EEDA6B;
+      --safe: #5FD382;
+
+      --sans: "SUIT", -apple-system, "Segoe UI", system-ui, sans-serif;
+      --mono-a: "JetBrains Mono", "SUIT", ui-monospace, monospace;
+      --mono-b: "IBM Plex Mono", "SUIT", ui-monospace, monospace;
+    }
+
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--canvas); color: var(--fg-primary); font-family: var(--sans); font-size: 14px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+    .wrap { max-width: 1180px; margin: 0 auto; padding: 40px 24px 90px; }
+
+    header.doc { border-bottom: 1px solid var(--border-subtle); padding-bottom: 24px; margin-bottom: 20px; }
+    .eyebrow { font-family: var(--mono-a); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--brand); margin: 0 0 10px; font-weight: 500; }
+    h1 { margin: 0 0 10px; font-size: 26px; }
+    .sub { margin: 0; color: var(--fg-secondary); max-width: 72ch; }
+
+    section { margin-top: 52px; }
+    h2 { font-size: 17px; margin: 0 0 6px; }
+    .note { color: var(--fg-secondary); margin: 0 0 20px; max-width: 78ch; font-size: 13px; }
+    .note strong { color: var(--fg-primary); }
+
+    .cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .col { border: 1px solid var(--border-subtle); border-radius: 8px; overflow: hidden; background: var(--surface); }
+    .col-head { padding: 9px 13px; font-size: 11.5px; font-weight: 600; background: var(--container); border-bottom: 1px solid var(--border-subtle); display: flex; justify-content: space-between; gap: 8px; }
+    .col-head em { font-style: normal; color: var(--fg-quiet); font-weight: 400; }
+    .col-body { padding: 12px 14px; }
+
+    .feed { list-style: none; margin: 0; padding: 0; }
+    .feed li { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 5px 0; border-bottom: 1px solid var(--border-subtle); font-size: 13px; }
+    .feed li:last-child { border-bottom: 0; }
+    .feed .k { color: var(--fg-quiet); font-size: 12px; }
+    .feed .v { font-variant-numeric: inherit; }
+
+    .f-sans { font-family: var(--sans); }
+    .f-sans-tab { font-family: var(--sans); font-variant-numeric: tabular-nums; }
+    .f-mono-a { font-family: var(--mono-a); }
+    .f-mono-b { font-family: var(--mono-b); }
+
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { text-align: left; font-size: 10.5px; letter-spacing: .07em; text-transform: uppercase; color: var(--fg-quiet); font-weight: 600; padding: 0 10px 8px; border-bottom: 1px solid var(--border-default); white-space: nowrap; }
+    td { padding: 7px 10px; border-bottom: 1px solid var(--border-subtle); }
+    td.n { text-align: right; }
+    .scroll { overflow-x: auto; }
+    .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 7px; vertical-align: 0px; }
+
+    .plate { background: var(--container); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 20px 22px; }
+    .tech-label { font-family: var(--mono-a); font-size: 11px; letter-spacing: .09em; text-transform: uppercase; color: var(--fg-quiet); line-height: 1.5; }
+    .tech-label b { display: block; color: var(--fg-secondary); font-weight: 500; }
+
+    .verdict { border: 1px solid var(--border-subtle); border-left: 3px solid var(--brand); border-radius: 6px; padding: 15px 17px; margin-bottom: 12px; background: var(--container); }
+    .verdict h3 { margin: 0 0 6px; font-size: 14px; }
+    .verdict p { margin: 0 0 6px; color: var(--fg-secondary); font-size: 13px; }
+    .verdict p:last-child { margin-bottom: 0; }
+    code { font-family: var(--mono-a); font-size: 12px; background: var(--raised); padding: 1px 5px; border-radius: 3px; color: var(--fg-primary); }
+
+    .ctrl { display: flex; gap: 10px; align-items: center; margin-bottom: 16px; }
+    button { font: inherit; font-size: 12px; padding: 7px 13px; border-radius: 6px; border: 1px solid var(--border-default); background: var(--raised); color: var(--fg-primary); cursor: pointer; }
+    button:hover { border-color: var(--brand); color: var(--brand); }
+    button[aria-pressed="true"] { border-color: var(--brand); color: var(--brand); }
+
+    footer.doc { margin-top: 64px; padding-top: 20px; border-top: 1px solid var(--border-subtle); color: var(--fg-quiet); font-size: 12px; }
+
+    @media (max-width: 860px) { .cols { grid-template-columns: 1fr; } .wrap { padding: 24px 16px 60px; } }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header class="doc">
+    <p class="eyebrow">Design System · Typography</p>
+    <h1>데이터 서체 검토</h1>
+    <p class="sub">
+      관제 화면의 수치·코드·시각 표기에 모노스페이스가 필요한지 판단하기 위한 페이지입니다.
+      색상은 확정된 Dark 토큰(쿨강도 0.006 · Canvas 0.200)을 그대로 사용했습니다.
+    </p>
+  </header>
+
+  <section>
+    <h2>1. 실시간 갱신에서 무슨 일이 일어나는가</h2>
+    <p class="note">
+      아래 세 열은 같은 센서 값을 0.7초마다 갱신합니다. 왼쪽부터 <strong>SUIT 기본</strong>,
+      <strong>SUIT + tabular-nums</strong>, <strong>JetBrains Mono</strong>입니다.
+      숫자 폭이 자릿수마다 다르면 값이 바뀔 때 열 전체가 좌우로 흔들립니다.
+      관제 화면처럼 하루 종일 갱신되는 화면에서는 이 미세한 떨림이 피로로 누적됩니다.
+    </p>
+    <div class="ctrl">
+      <button type="button" id="toggle" aria-pressed="true">갱신 멈춤</button>
+      <span class="note" style="margin:0">멈춘 상태에서는 정렬만, 움직이는 상태에서는 떨림을 보십시오.</span>
+    </div>
+    <div class="cols">
+      <div class="col">
+        <div class="col-head"><span>SUIT 기본</span><em>비례 숫자</em></div>
+        <div class="col-body"><ul class="feed f-sans" id="feed-1"></ul></div>
+      </div>
+      <div class="col">
+        <div class="col-head"><span>SUIT + tabular-nums</span><em>고정폭 숫자</em></div>
+        <div class="col-body"><ul class="feed f-sans-tab" id="feed-2"></ul></div>
+      </div>
+      <div class="col">
+        <div class="col-head"><span>JetBrains Mono</span><em>모노스페이스</em></div>
+        <div class="col-body"><ul class="feed f-mono-a" id="feed-3"></ul></div>
+      </div>
+    </div>
+    <div class="verdict" style="margin-top:18px">
+      <h3>가운데 열을 먼저 보십시오</h3>
+      <p>
+        <code>tabular-nums</code>는 서체를 바꾸지 않고 OpenType 기능만 켜는 방법입니다. 비용이 거의 없습니다.
+        <strong>가운데 열이 왼쪽과 똑같이 흔들린다면 SUIT가 이 기능을 지원하지 않는다는 뜻이고,</strong>
+        그때는 별도 서체가 유일한 해법이 됩니다.
+      </p>
+      <p>
+        가운데 열이 오른쪽처럼 안정적이라면, 정렬 문제만 놓고 보면 서체를 추가할 이유가 없습니다.
+        그 경우 모노를 도입할 근거는 정렬이 아니라 <strong>레퍼런스의 계측기 인상</strong>이 됩니다.
+      </p>
+    </div>
+  </section>
+
+  <section>
+    <h2>2. 실제 표에서 비교</h2>
+    <p class="note">
+      way-point 목록입니다. 코드·시각·수치가 세로로 정렬되는지, 한글과 섞였을 때 어색하지 않은지 보십시오.
+    </p>
+    <div class="cols">
+      <div class="col">
+        <div class="col-head"><span>SUIT 기본</span></div>
+        <div class="col-body"><div class="scroll"><table class="f-sans" id="tbl-1"></table></div></div>
+      </div>
+      <div class="col">
+        <div class="col-head"><span>JetBrains Mono</span></div>
+        <div class="col-body"><div class="scroll"><table class="f-mono-a" id="tbl-2"></table></div></div>
+      </div>
+      <div class="col">
+        <div class="col-head"><span>IBM Plex Mono</span></div>
+        <div class="col-body"><div class="scroll"><table class="f-mono-b" id="tbl-3"></table></div></div>
+      </div>
+    </div>
+    <p class="note" style="margin-top:16px">
+      한글은 모노 서체에 글자가 없어 자동으로 SUIT로 대체됩니다. 즉 <strong>숫자·코드만 모노가 되고
+      한글은 그대로</strong>입니다. 폰트 스택을 <code>"JetBrains Mono", "SUIT", sans-serif</code> 순으로
+      두면 한 문장 안에서도 글자 단위로 나뉘어 적용됩니다.
+    </p>
+  </section>
+
+  <section>
+    <h2>3. 레퍼런스의 기술 라벨</h2>
+    <p class="note">
+      Covalent가 쓰는 작은 대문자 모노 라벨입니다. 관제 제품에서는 장식이 아니라
+      화면·장비·좌표를 식별하는 실제 기능을 합니다.
+    </p>
+    <div class="plate">
+      <div style="display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap">
+        <div class="tech-label"><b>APRISM</b>ROBOT OPERATIONS<br />CONTROL SYSTEM</div>
+        <div class="tech-label"><b>SITE</b>A-DONG · 1F<br />MAP REV. 2026.08</div>
+        <div class="tech-label"><b>UNIT</b>RBT-03<br />FW 4.2.1 · BUILD 8841</div>
+        <div class="tech-label"><b>MISSION</b>MSN-2026-0828-07<br />WP 05 / 12 · ETA 00:04:12</div>
+      </div>
+      <div style="margin-top:22px;padding-top:18px;border-top:1px solid var(--border-subtle);display:flex;gap:28px;flex-wrap:wrap;align-items:flex-end">
+        <div>
+          <div class="tech-label" style="margin-bottom:4px">TEMP · MOTOR 3</div>
+          <div class="f-mono-a" style="font-size:28px;font-weight:500;line-height:1.1">78.4<span style="font-size:14px;color:var(--fg-quiet)"> °C</span></div>
+        </div>
+        <div>
+          <div class="tech-label" style="margin-bottom:4px">BATTERY</div>
+          <div class="f-mono-a" style="font-size:28px;font-weight:500;line-height:1.1">64<span style="font-size:14px;color:var(--fg-quiet)"> %</span></div>
+        </div>
+        <div>
+          <div class="tech-label" style="margin-bottom:4px">POSITION</div>
+          <div class="f-mono-a" style="font-size:28px;font-weight:500;line-height:1.1">12.480, 4.215</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>4. 제안하는 스타일</h2>
+    <p class="note">
+      기존 <code>font-size</code>·<code>line-height</code> 변수를 그대로 재사용하므로 새 Primitive는 필요 없습니다.
+      Text Style 4종과 서체 파일만 추가됩니다.
+    </p>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>스타일</th><th>크기 / 행간</th><th>용도</th><th>미리보기</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><code>Typography/Mono/Metric</code></td>
+            <td>20 / 28 SemiBold</td>
+            <td>KPI 대표 수치, 게이지 값</td>
+            <td class="f-mono-a" style="font-size:20px;font-weight:600">78.4 °C</td>
+          </tr>
+          <tr>
+            <td><code>Typography/Mono/Data/1</code></td>
+            <td>14 / 20 Medium</td>
+            <td>표·리스트의 수치, 로봇 ID, 좌표</td>
+            <td class="f-mono-a" style="font-size:14px;font-weight:500">RBT-03 · 12.480, 4.215</td>
+          </tr>
+          <tr>
+            <td><code>Typography/Mono/Data/2</code></td>
+            <td>13 / 18 Regular</td>
+            <td>밀도 높은 표, 로그</td>
+            <td class="f-mono-a" style="font-size:13px">14:22:07 WP-07 THRESHOLD</td>
+          </tr>
+          <tr>
+            <td><code>Typography/Mono/Label</code></td>
+            <td>12 / 18 Medium · 대문자 · 자간 0.09em</td>
+            <td>기술 라벨, 섹션 식별자</td>
+            <td class="tech-label" style="font-size:12px">MOLECULAR AUDIT</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="verdict" style="margin-top:20px">
+      <h3>적용 범위를 먼저 못박아야 합니다</h3>
+      <p>
+        <strong>쓴다</strong> — 로봇·설비 ID, way-point 코드, 타임스탬프, 센서 수치, 좌표, 미션 번호,
+        펌웨어·빌드 버전, 로그 라인, 기술 라벨.
+      </p>
+      <p>
+        <strong>쓰지 않는다</strong> — 본문, 버튼 라벨, 메뉴, 제목, 알림 문구, 한글 문장.
+        모노는 가독 속도가 낮아 읽는 텍스트에 쓰면 손해입니다.
+      </p>
+      <p>
+        이 경계가 없으면 “기술적으로 보이니까”라는 이유로 번져나가 화면이 오히려 어수선해집니다.
+      </p>
+    </div>
+  </section>
+
+  <section>
+    <h2>5. 판단할 것</h2>
+    <div class="verdict">
+      <h3>서체 후보</h3>
+      <p>
+        <strong>JetBrains Mono</strong> — 자간이 넓고 글자가 큼직해 작은 크기에서 잘 읽힙니다. 관제 화면에 유리합니다.
+      </p>
+      <p>
+        <strong>IBM Plex Mono</strong> — 더 좁고 중성적입니다. 표 밀도를 높이기에 좋고 레퍼런스의 인상에 더 가깝습니다.
+      </p>
+      <p>둘 다 OFL 라이선스라 상업적 사용과 임베딩에 제약이 없습니다. 위 2번 표에서 나란히 비교하실 수 있습니다.</p>
+    </div>
+    <div class="verdict">
+      <h3>비용</h3>
+      <p>서체 파일 1종 추가 · Text Style 4종 추가 · 기존 컴포넌트 중 수치를 표시하는 것들의 Text Style 교체.</p>
+      <p>
+        Foundation 변경이라 시스템의 사용 우선순위 6단계 절차(해결 불가 이유 · 예상 재사용처 ·
+        Light/Dark 영향 · 네이밍 제시 후 승인)를 밟아야 합니다.
+        Light/Dark 영향은 없습니다 — 서체는 모드와 무관합니다.
+      </p>
+    </div>
+  </section>
+
+  <footer class="doc">
+    APRISM Design System · Typography Review · SUIT는 sunn-us/SUIT, 모노 후보는 Google Fonts에서 불러옵니다
+  </footer>
+</div>
+
+<script>
+var ROWS = [
+  ['WP-05', '14:18:02', 78.4, 64, 'safe', '완료'],
+  ['WP-06', '14:20:41', 91.2, 61, 'warning', '주의'],
+  ['WP-07', '14:22:07', 108.6, 59, 'danger', '위험'],
+  ['WP-08', '14:24:30', 7.9, 58, 'quiet', '대기'],
+  ['WP-09', '14:27:15', 22.05, 57, 'quiet', '대기']
+];
+
+var COLORS = { safe: 'var(--safe)', warning: 'var(--warning)', danger: 'var(--danger)', quiet: 'var(--fg-quiet)' };
+
+// 자릿수가 자주 바뀌도록 값을 흔든다. 실제 센서 피드와 같은 조건을 만든다.
+function jitter(base) {
+  var v = base + (Math.random() * 2 - 1) * base * 0.65;
+  return Math.max(0.1, v);
+}
+
+function renderFeeds() {
+  var rows = ROWS.map(function (r) {
+    return { k: r[0], t: r[1], v: jitter(r[2]), b: Math.round(jitter(r[3])) };
+  });
+  ['feed-1', 'feed-2', 'feed-3'].forEach(function (id) {
+    document.getElementById(id).innerHTML = rows.map(function (r) {
+      return '<li><span class="k">' + r.k + ' · ' + r.t + '</span>' +
+        '<span class="v">' + r.v.toFixed(2) + ' °C / ' + r.b + '%</span></li>';
+    }).join('');
+  });
+}
+
+function renderTables() {
+  var head = '<thead><tr><th>코드</th><th>시각</th><th class="n">온도</th><th class="n">배터리</th><th>상태</th></tr></thead>';
+  var body = '<tbody>' + ROWS.map(function (r) {
+    return '<tr>' +
+      '<td>' + r[0] + '</td>' +
+      '<td>' + r[1] + '</td>' +
+      '<td class="n">' + r[2].toFixed(2) + '</td>' +
+      '<td class="n">' + r[3] + '%</td>' +
+      '<td><span class="dot" style="background:' + COLORS[r[4]] + '"></span>' + r[5] + '</td>' +
+    '</tr>';
+  }).join('') + '</tbody>';
+  ['tbl-1', 'tbl-2', 'tbl-3'].forEach(function (id) {
+    document.getElementById(id).innerHTML = head + body;
+  });
+}
+
+var timer = null;
+function start() { if (!timer) { timer = setInterval(renderFeeds, 700); } }
+function stop() { clearInterval(timer); timer = null; }
+
+var btn = document.getElementById('toggle');
+btn.addEventListener('click', function () {
+  if (timer) { stop(); btn.textContent = '갱신 시작'; btn.setAttribute('aria-pressed', 'false'); }
+  else { start(); btn.textContent = '갱신 멈춤'; btn.setAttribute('aria-pressed', 'true'); }
+});
+
+renderFeeds();
+renderTables();
+start();
+</script>
+</body>
+</html>
