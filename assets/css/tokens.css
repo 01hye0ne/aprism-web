@@ -196,7 +196,10 @@
   --bg-surface-default: var(--color-gray-800);
   --bg-surface-subtle: var(--color-gray-750);
   --bg-surface-raised: var(--color-gray-750);
-  --bg-surface-selected: var(--color-main-900);
+  /* Figma 실측값은 gray/700 이다. 변수 설명은 main/900 이라고 적혀 있고
+     gray/700 은 bg/interactive/pressed 와 같은 값이라 선택과 눌림이 구분되지 않는다.
+     바인딩 오류로 보이며 확인 대기 중이다. 지금은 Figma 를 따른다. */
+  --bg-surface-selected: var(--color-gray-700);
   --bg-brand: var(--color-main-500);
   --bg-accent: var(--color-main-500);
   --bg-critical: var(--color-danger-500);
@@ -303,6 +306,7 @@
 /*
  * 아직 Figma 실측으로 확인하지 못한 항목
  *   - bg/overlay (Light: alpha/scrim/light · Dark: alpha/scrim/dark) 의 실제 알파값
+ *   - bg/surface/selected Dark 가 gray/700 으로 묶여 있어 pressed 와 값이 같다 (확인 대기)
  *   - Semantic 90개 중 위에 없는 나머지 항목
  *   - Component 컬렉션 42개
  * Foundations 페이지가 만들어지면 get_variable_defs 로 한 번에 대조한다.
