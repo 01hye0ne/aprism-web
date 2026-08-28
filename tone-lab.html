@@ -115,6 +115,8 @@
     <div class="dec"><dt>색온도</dt><dd>램프 전체를 약한 쿨 뉴트럴로 통일</dd></div>
     <div class="dec"><dt>층위 간격</dt><dd>Dark 인접 층위 간격을 현재의 2배로</dd></div>
     <div class="dec"><dt>문서 불일치</dt><dd>실측값 기준 통일 · <code>border/brand</code> Light = <code>main/500</code></dd></div>
+    <div class="dec"><dt>브랜드 색</dt><dd>기존 <code>main</code>은 임시값이므로 레퍼런스 기반으로 교체</dd></div>
+    <div class="dec"><dt>상태색 채도</dt><dd>틴트 단계만 낮추고 <code>300</code>·<code>500</code> 원색은 경보 강도 유지</dd></div>
   </dl>
 
   <div class="controls">
@@ -125,12 +127,12 @@
     </div>
     <div class="ctl">
       <label>쿨 강도 (Chroma) <span class="val" id="v-chroma"></span></label>
-      <input type="range" id="chroma" min="0" max="0.040" step="0.001" value="0.018" />
+      <input type="range" id="chroma" min="0" max="0.040" step="0.001" value="0.014" />
       <span class="hint">0.021이 현재 Light 램프와 같은 세기</span>
     </div>
     <div class="ctl">
       <label>Dark 층위 간격 <span class="val" id="v-spacing"></span></label>
-      <input type="range" id="spacing" min="1" max="2.8" step="0.1" value="1.7" />
+      <input type="range" id="spacing" min="1" max="2.8" step="0.1" value="2.0" />
       <span class="hint">1.0 = 현재 · 1.8 = AA 유지 한계</span>
     </div>
     <div class="ctl">
@@ -140,20 +142,20 @@
     </div>
     <div class="ctl">
       <label>상태색 채도 <span class="val" id="v-status"></span></label>
-      <input type="range" id="statusC" min="0.6" max="1.2" step="0.02" value="0.8" />
-      <span class="hint">danger · warning · safe 에만 적용</span>
+      <input type="range" id="statusC" min="0.6" max="1.2" step="0.02" value="0.72" />
+      <span class="hint">틴트 단계(100 · 900)에만 적용 · 원색은 유지</span>
     </div>
     <div class="ctl">
       <label>main 계열 <span class="val" id="v-mainPreset"></span></label>
       <select id="mainPreset">
-        <option value="current">현재 값 유지</option>
         <option value="ref">레퍼런스 기반</option>
+        <option value="current">기존 임시값 유지</option>
       </select>
-      <span class="hint">브랜드 색 변경은 승인 원본값을 건드립니다</span>
+      <span class="hint">기존 값은 임시값이라 교체 대상</span>
     </div>
     <div class="ctl">
       <label>main 색상 <span class="val" id="v-mainHue"></span></label>
-      <input type="range" id="mainHue" min="235" max="275" step="1" value="258" />
+      <input type="range" id="mainHue" min="235" max="275" step="1" value="260" />
       <span class="hint">레퍼런스 기반일 때만 적용</span>
     </div>
     <div class="ctl ctl-actions">
@@ -196,7 +198,9 @@
   <section>
     <h2>Dark 층위 간격</h2>
     <p class="note">
-      인접한 두 층 사이의 대비입니다. 현재는 모두 1.09:1 이하라 경계선 없이는 구분되지 않습니다.
+      인접한 두 층 사이의 차이입니다. 어두운 색끼리는 WCAG 대비비가 실제 구분 정도를 과소평가하므로
+      (분모의 상수가 지배해 값이 1에 붙습니다) <strong>지각 명도차 ΔL</strong>로 판정합니다.
+      현재 램프는 ΔL 0.021~0.024, 조정 후에는 그 두 배입니다.
     </p>
     <div class="scroll">
       <table><thead><tr>
@@ -226,14 +230,15 @@
     </div>
 
     <div class="dec" style="margin-top:18px;border-left:3px solid var(--ui-flag)">
-      <dt style="margin-bottom:6px">간격 2배에서 생기는 트레이드오프</dt>
+      <dt style="margin-bottom:6px">간격을 벌릴 때의 트레이드오프</dt>
       <dd>
-        층위를 벌리면 가장 밝은 Surface인 <code>raised</code>가 함께 밝아지고, 그 위의 <code>fg/tertiary</code>
+        층위를 벌리면 가장 밝은 Surface인 <code>raised</code>도 함께 밝아져 그 위의 <code>fg/tertiary</code>
         대비가 줄어듭니다. <code>gray/450</code>을 자동으로 올려 보정하지만
-        <code>gray/400</code>(Dark <code>fg/secondary</code>)을 넘을 수는 없습니다. 두 텍스트 단계가 붙어버리면
-        위계 자체가 사라지기 때문입니다.<br /><br />
-        그 결과 <strong>간격 1.8배까지는 4.5:1을 지키고, 2.0배부터는 4.35:1로 내려갑니다.</strong>
-        간격을 1.8배로 낮추거나, Control 위에 Caption을 두지 않는 쪽으로 컴포넌트 규칙을 정하면 해결됩니다.
+        <code>gray/400</code>(Dark <code>fg/secondary</code>)을 넘을 수는 없습니다.
+        두 텍스트 단계가 붙으면 위계 자체가 사라지기 때문입니다.<br /><br />
+        <strong>Canvas 명도를 낮추면 여유가 생깁니다.</strong> 스택 전체가 아래로 내려가
+        같은 간격에서도 <code>raised</code>가 덜 밝아지기 때문입니다.
+        간격과 Canvas 명도를 함께 움직이면서 아래 대비표의 “Control 위 Caption” 행을 보십시오.
       </dd>
     </div>
 
@@ -393,8 +398,12 @@ var STATUS = {
     '100': ['#E8EEFF', 'Light status/info/bg · surface/selected'], '300': ['#9DBAF9', 'Dark Primary pressed'],
     '400': ['#8CACF7', 'Dark Primary hover'], '500': ['#6F99F5', 'border/focus · Dark fg/brand'],
     '700': ['#285896', 'Light bg/brand · fg/brand'], '800': ['#21456F', 'Light Primary hover'],
-    '900': ['#1B365D', 'Dark surface/selected'] } }
+    '900': ['#1B365D', 'Dark surface/selected'],
+    'gradient-end': ['#FFDADB', 'Gradient/Main 종료 stop'] } }
 };
+
+// 채도 조정은 틴트 단계에만 적용한다. 300·500은 alert 원색 채널이라 강도를 지킨다.
+var TINT_STEPS = { '100': true, '900': true };
 
 // 명도 정렬을 켜면 각 단계를 이 목표 명도로 맞춘다.
 var ALIGN_TARGET = { '100': 0.945, '300': 0.760, '400': 0.720, '500': 0.635, '700': 0.455, '800': 0.400, '900': 0.300 };
@@ -408,7 +417,9 @@ var MAIN_REF = {
   '500': { L: 0.650, C: 0.140 },
   '700': { L: 0.500, C: 0.152 },
   '800': { L: 0.420, C: 0.130 },
-  '900': { L: 0.310, C: 0.078 }
+  '900': { L: 0.310, C: 0.078 },
+  // 분홍으로 끝나던 종료 stop을 브랜드 계열 안으로 되돌린다.
+  'gradient-end': { L: 0.955, C: 0.052 }
 };
 
 // ============ 램프 생성 ============
@@ -465,7 +476,7 @@ function buildStatus(p) {
         L = MAIN_REF[step].L; C = MAIN_REF[step].C; H = p.mainHue;
       } else {
         L = (!isMain && p.alignL && ALIGN_TARGET[step] !== undefined) ? ALIGN_TARGET[step] : src.L;
-        C = isMain ? src.C : src.C * p.statusC;
+        C = (!isMain && TINT_STEPS[step]) ? src.C * p.statusC : src.C;
         H = src.H;
       }
       out[fam][step] = { L: L, C: C, H: H, hex: oklchToHex(L, C, H) };
@@ -622,9 +633,11 @@ function render() {
     var curPair = [CURRENT_GRAY[d[0]], CURRENT_GRAY[d[1]]];
     var nextPair = [gray[d[0]].hex, gray[d[1]].hex];
     var rNow = contrast(curPair[0], curPair[1]), rNext = contrast(nextPair[0], nextPair[1]);
+    // 어두운 색끼리는 WCAG 대비비가 실제 구분 정도를 과소평가한다.
+    // (분모의 상수 0.05가 지배해 값이 1에 붙는다) 지각 명도차 ΔL로 판정한다.
     var dL = Math.abs(gray[d[0]].L - gray[d[1]].L);
-    var cls = rNext >= 1.3 ? 'pass' : (rNext >= 1.15 ? 'warn' : 'fail');
-    var label = rNext >= 1.3 ? '뚜렷함' : (rNext >= 1.15 ? '식별 가능' : '구분 어려움');
+    var cls = dL >= 0.040 ? 'pass' : (dL >= 0.025 ? 'warn' : 'fail');
+    var label = dL >= 0.040 ? '뚜렷함' : (dL >= 0.025 ? '식별 가능' : '구분 어려움');
     return '<tr><td>' + d[2] + '</td>' +
       '<td class="num">' + rNow.toFixed(2) + ':1</td>' +
       '<td class="num changed">' + rNext.toFixed(2) + ':1</td>' +
@@ -694,13 +707,13 @@ function render() {
 });
 document.getElementById('reset').addEventListener('click', function () {
   document.getElementById('hue').value = 255;
-  document.getElementById('chroma').value = 0.018;
-  document.getElementById('spacing').value = 1.7;
+  document.getElementById('chroma').value = 0.014;
+  document.getElementById('spacing').value = 2.0;
   document.getElementById('canvasL').value = 0.18;
-  document.getElementById('statusC').value = 0.8;
+  document.getElementById('statusC').value = 0.72;
   document.getElementById('alignL').checked = false;
-  document.getElementById('mainPreset').value = 'current';
-  document.getElementById('mainHue').value = 258;
+  document.getElementById('mainPreset').value = 'ref';
+  document.getElementById('mainHue').value = 260;
   render();
 });
 render();
