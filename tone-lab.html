@@ -149,6 +149,7 @@
       <label>main 계열 <span class="val" id="v-mainPreset"></span></label>
       <select id="mainPreset">
         <option value="ref">레퍼런스 기반</option>
+        <option value="covalent">Covalent BLUE BOND 기준</option>
         <option value="current">기존 임시값 유지</option>
       </select>
       <span class="hint">기존 값은 임시값이라 교체 대상</span>
@@ -160,6 +161,7 @@
     </div>
     <div class="ctl ctl-actions">
       <label class="toggle"><input type="checkbox" id="alignL" /> 상태색 명도 정렬</label>
+      <button type="button" id="preset-ref">레퍼런스 방향</button>
       <button type="button" id="reset">초기화</button>
     </div>
   </div>
@@ -422,6 +424,19 @@ var MAIN_REF = {
   'gradient-end': { L: 0.955, C: 0.052 }
 };
 
+// 레퍼런스(Covalent) BLUE BOND #469EFF 를 main/500 에 그대로 맞춘 램프.
+// L 0.692 · C 0.166 · H 253 이 기준점이고 나머지 단계를 거기에 맞춰 배치한다.
+var MAIN_COVALENT = {
+  '100': { L: 0.950, C: 0.034 },
+  '300': { L: 0.820, C: 0.098 },
+  '400': { L: 0.760, C: 0.130 },
+  '500': { L: 0.692, C: 0.166 },
+  '700': { L: 0.530, C: 0.170 },
+  '800': { L: 0.440, C: 0.145 },
+  '900': { L: 0.320, C: 0.088 },
+  'gradient-end': { L: 0.960, C: 0.050 }
+};
+
 // ============ 램프 생성 ============
 function buildGray(p) {
   var out = {}, keys = Object.keys(LIGHT_L);
@@ -472,8 +487,9 @@ function buildStatus(p) {
     Object.keys(STATUS[fam].steps).forEach(function (step) {
       var src = hexToOklch(STATUS[fam].steps[step][0]);
       var L, C, H;
-      if (isMain && p.mainPreset === 'ref' && MAIN_REF[step]) {
-        L = MAIN_REF[step].L; C = MAIN_REF[step].C; H = p.mainHue;
+      var table = p.mainPreset === 'covalent' ? MAIN_COVALENT : (p.mainPreset === 'ref' ? MAIN_REF : null);
+      if (isMain && table && table[step]) {
+        L = table[step].L; C = table[step].C; H = p.mainHue;
       } else {
         L = (!isMain && p.alignL && ALIGN_TARGET[step] !== undefined) ? ALIGN_TARGET[step] : src.L;
         C = (!isMain && TINT_STEPS[step]) ? src.C * p.statusC : src.C;
@@ -705,6 +721,20 @@ function render() {
 ['hue', 'chroma', 'spacing', 'canvasL', 'statusC', 'alignL', 'mainPreset', 'mainHue'].forEach(function (id) {
   document.getElementById(id).addEventListener('input', render);
 });
+// 레퍼런스의 구조를 그대로 적용한다. 뉴트럴 채도를 COOL GRAY 수준까지 낮추고
+// 브랜드 블루만 채도를 올려, 화면에서 색을 가진 것이 블루 하나가 되게 한다.
+document.getElementById('preset-ref').addEventListener('click', function () {
+  document.getElementById('hue').value = 248;
+  document.getElementById('chroma').value = 0.006;
+  document.getElementById('spacing').value = 2.0;
+  document.getElementById('canvasL').value = 0.20;
+  document.getElementById('statusC').value = 0.72;
+  document.getElementById('alignL').checked = false;
+  document.getElementById('mainPreset').value = 'covalent';
+  document.getElementById('mainHue').value = 253;
+  render();
+});
+
 document.getElementById('reset').addEventListener('click', function () {
   document.getElementById('hue').value = 255;
   document.getElementById('chroma').value = 0.013;
