@@ -221,3 +221,18 @@ body {
     font-size: 22px;
   }
 }
+
+a.screen-name {
+  color: var(--text-primary);
+  text-decoration: none;
+}
+
+a.screen-name:hover {
+  color: var(--color-main);
+  text-decoration: underline;
+}
+
+.screen-card:has(a.screen-name):hover {
+  border-color: var(--border-default);
+  background-color: var(--bg-surface-raised);
+}
