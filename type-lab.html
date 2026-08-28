@@ -140,19 +140,20 @@
       </div>
     </div>
     <div class="verdict" style="margin-top:18px">
-      <h3>확인 결과 — SUIT는 tabular-nums 를 지원합니다</h3>
+      <h3>브라우저에서는 되지만 Figma에서는 쓸 수 없습니다</h3>
       <p>
-        가운데 열이 오른쪽처럼 안정적입니다. <strong>정렬 문제는 서체를 추가하지 않고
-        OpenType 기능만 켜서 해결됩니다.</strong> 비용이 사실상 없는 방법이므로 이쪽이 기본이 됩니다.
+        가운데 열은 안정적입니다 — SUIT 파일 자체에는 tabular figures 기능이 들어 있습니다.
+        그런데 <strong>Figma의 Type settings에 이 항목이 노출되지 않습니다.</strong>
+        디자이너가 Figma에서 켤 수 없고, Text Style에 담을 수도 없습니다.
       </p>
       <p>
-        따라서 모노 서체를 도입할 근거는 정렬이 아니라 <strong>계측기 인상</strong> 하나로 좁혀집니다.
-        아래 4번에서 두 역할을 나눠 제안합니다.
+        코드에서만 <code>font-variant-numeric</code>을 적용하면 Figma 화면과 실제 제품이 달라집니다.
+        시스템의 기여 원칙 “Figma Library를 유일한 운영 원본으로 삼는다”와 정면으로 어긋나므로
+        <strong>이 방법은 채택할 수 없습니다.</strong>
       </p>
       <p>
-        <strong>다만 하나 확인이 필요합니다</strong> — 이 데모는 SUIT <em>static</em> 빌드를 불러옵니다.
-        Figma에서 쓰시는 것은 <code>SUIT Variable</code>이므로, 그쪽에도 tabular figures 기능이
-        노출되는지 Figma의 Type settings에서 직접 확인해 주세요.
+        따라서 정렬 문제는 해결되지 않은 상태로 남고, <strong>모노 서체가 정렬과 인상 두 가지를
+        모두 담당해야 합니다.</strong> 적용 범위가 표의 수치까지 넓어집니다.
       </p>
     </div>
   </section>
@@ -216,85 +217,55 @@
   <section>
     <h2>4. 제안하는 스타일</h2>
     <p class="note">
-      정렬은 SUIT가 해결하므로 역할을 둘로 나눕니다.
-      <strong>표와 본문의 숫자는 SUIT가 맡고, 모노는 기술적 정체성이 필요한 곳에만 씁니다.</strong>
-      이러면 표 안에서 한글 라벨과 숫자가 같은 서체로 유지되고, 모노는 독립된 요소에만 등장합니다.
+      Figma에서 tabular figures를 쓸 수 없으므로 수치 정렬까지 모노가 담당합니다.
+      기존 <code>font-size</code>·<code>line-height</code> 변수를 그대로 재사용하므로 새 Primitive는 필요 없습니다.
     </p>
-
-    <h3 style="font-size:13px;margin:26px 0 8px;color:var(--fg-secondary);font-weight:600;">SUIT — 기존 스타일에 기능만 추가</h3>
-    <div class="scroll">
-      <table>
-        <thead><tr><th>스타일</th><th>변경</th><th>용도</th><th>미리보기</th></tr></thead>
-        <tbody>
-          <tr>
-            <td><code>Typography/Body/2/Tabular</code></td>
-            <td>14 / 22 · <code>tnum</code> 켜기</td>
-            <td>표 셀의 수치, 리스트의 값</td>
-            <td class="f-sans-tab">108.60 · 91.20 · 7.90</td>
-          </tr>
-          <tr>
-            <td><code>Typography/Label/2/Tabular</code></td>
-            <td>13 / 18 · <code>tnum</code> 켜기</td>
-            <td>밀도 높은 표, 보조 수치</td>
-            <td class="f-sans-tab" style="font-size:13px">64% · 59% · 57%</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <h3 style="font-size:13px;margin:30px 0 8px;color:var(--fg-secondary);font-weight:600;">JetBrains Mono — 새로 추가</h3>
     <div class="scroll">
       <table>
         <thead><tr><th>스타일</th><th>크기 / 행간</th><th>용도</th><th>미리보기</th></tr></thead>
         <tbody>
-          <tr>
-            <td><code>Typography/Mono/Label</code></td>
-            <td>12 / 18 Medium · 대문자 · 자간 0.09em</td>
-            <td>기술 라벨, 섹션 식별자</td>
-            <td class="tech-label" style="font-size:12px">SITE · UNIT · MISSION</td>
-          </tr>
-          <tr>
-            <td><code>Typography/Mono/Code</code></td>
-            <td>13 / 18 Regular</td>
-            <td>식별 코드, 로그 라인, 좌표, 버전</td>
-            <td class="f-mono-sel" style="font-size:13px">RBT-03 · WP-07 · FW 4.2.1</td>
-          </tr>
           <tr>
             <td><code>Typography/Mono/Metric</code></td>
             <td>20 / 28 Medium</td>
             <td>KPI 대표 수치, 게이지 값</td>
             <td class="f-mono-sel" style="font-size:20px;font-weight:500">78.4 °C</td>
           </tr>
+          <tr>
+            <td><code>Typography/Mono/Data/1</code></td>
+            <td>14 / 20 Medium</td>
+            <td>표 셀의 수치, 좌표, 리스트 값</td>
+            <td class="f-mono-sel" style="font-size:14px;font-weight:500">108.60 · 12.480, 4.215</td>
+          </tr>
+          <tr>
+            <td><code>Typography/Mono/Data/2</code></td>
+            <td>13 / 18 Regular</td>
+            <td>밀도 높은 표, 로그 라인</td>
+            <td class="f-mono-sel" style="font-size:13px">14:22:07 WP-07 THRESHOLD</td>
+          </tr>
+          <tr>
+            <td><code>Typography/Mono/Label</code></td>
+            <td>12 / 18 Medium · 대문자 · 자간 0.09em</td>
+            <td>기술 라벨, 섹션 식별자</td>
+            <td class="tech-label" style="font-size:12px">SITE · UNIT · MISSION</td>
+          </tr>
         </tbody>
       </table>
     </div>
 
     <div class="verdict" style="margin-top:20px">
-      <h3>왜 표의 숫자까지 모노로 가지 않는가</h3>
-      <p>
-        way-point 표는 한 행에 <code>WP-07</code> · <code>14:22:07</code> · <code>108.60</code> ·
-        <code>위험</code>이 함께 놓입니다. 숫자를 전부 모노로 바꾸면 <strong>매 행마다 두 서체가 교대로</strong>
-        나타나 오히려 산만해집니다. 반면 식별 코드와 기술 라벨은 독립된 덩어리라 서체가 달라도 자연스럽습니다.
-      </p>
-      <p>
-        2번 섹션의 표에서 이 차이를 직접 보실 수 있습니다. 그 표가 어수선하지 않게 느껴지신다면
-        수치까지 모노로 가는 선택도 가능합니다 — 그 경우 <code>Typography/Mono/Data</code> 를 추가하고
-        위 SUIT Tabular 두 종을 빼면 됩니다.
-      </p>
-    </div>
-
-    <div class="verdict">
       <h3>적용 범위를 먼저 못박아야 합니다</h3>
       <p>
-        <strong>모노를 쓴다</strong> — 로봇·설비 ID, way-point 코드, 미션 번호, 좌표,
-        펌웨어·빌드 버전, 로그 라인, 대문자 기술 라벨, KPI 대표 수치.
+        <strong>쓴다</strong> — 표·리스트의 모든 수치, 로봇·설비 ID, way-point 코드, 미션 번호,
+        타임스탬프, 좌표, 펌웨어·빌드 버전, 로그 라인, 대문자 기술 라벨, KPI 대표 수치.
       </p>
       <p>
-        <strong>쓰지 않는다</strong> — 본문, 버튼 라벨, 메뉴, 제목, 알림 문구, 한글 문장,
-        그리고 표 셀 안의 일반 수치(이쪽은 SUIT Tabular).
+        <strong>쓰지 않는다</strong> — 본문, 버튼 라벨, 메뉴, 제목, 알림 문구, 한글 문장.
+        모노는 읽는 속도가 느려 문장에 쓰면 손해입니다.
       </p>
       <p>
-        이 경계가 없으면 “기술적으로 보이니까”라는 이유로 번져나가 화면이 오히려 어수선해집니다.
+        표 안에서 한글 상태 라벨(<code>완료</code>·<code>주의</code>·<code>위험</code>)은 모노에 글자가 없어
+        자동으로 SUIT로 대체됩니다. 2번 섹션의 표가 실제로 그 상태이니, 두 서체가 한 행에 섞인 모습이
+        괜찮은지 확인해 주십시오. 이것이 이 방향의 유일한 시각적 부담입니다.
       </p>
     </div>
   </section>
@@ -319,12 +290,16 @@
     <div class="verdict">
       <h3>비용</h3>
       <p>
-        서체 파일 1종 추가 · Text Style 3종 추가(Mono) · 기존 스타일 2종에 <code>tnum</code> 활성화 변형 추가.
-        새 Primitive는 필요 없습니다 — 기존 <code>font-size</code>·<code>line-height</code> 변수를 그대로 씁니다.
+        서체 파일 1종 추가 · Text Style 4종 추가 · 수치를 표시하는 기존 컴포넌트의 Text Style 교체.
+        새 Primitive는 필요 없습니다.
       </p>
       <p>
         Foundation 변경이라 사용 우선순위 6단계 절차(해결 불가 이유 · 예상 재사용처 ·
         Light/Dark 영향 · 네이밍 제시 후 승인)를 밟아야 합니다. Light/Dark 영향은 없습니다.
+      </p>
+      <p>
+        <strong>해결 불가 이유는 이미 확보돼 있습니다</strong> — SUIT의 tabular figures를
+        Figma에서 사용할 수 없다는 점, 그리고 관제 화면의 수치가 상시 갱신된다는 점입니다.
       </p>
     </div>
   </section>
