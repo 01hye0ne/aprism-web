@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>APRISM — Figma 반영 목록</title>
+  <meta name="description" content="확정된 톤 작업을 Figma UI_00_Design System 에 반영하기 위한 변경 목록과 변경 로그" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" />
+  <link rel="stylesheet" href="./assets/css/tokens.css" />
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg-canvas); color: var(--fg-primary);
+      font-family: var(--font-family-sans); font-size: 14px; line-height: 1.65; -webkit-font-smoothing: antialiased; }
+    .wrap { max-width: 1060px; margin: 0 auto; padding: 40px 24px 90px; }
+    header.doc { border-bottom: 1px solid var(--border-subtle); padding-bottom: 24px; margin-bottom: 32px; }
+    .eyebrow { font-family: var(--font-family-mono); font-size: 11px; letter-spacing: .12em;
+      text-transform: uppercase; color: var(--fg-brand); margin: 0 0 10px; font-weight: 500; }
+    h1 { margin: 0 0 10px; font-size: 26px; }
+    .sub { margin: 0; color: var(--fg-secondary); max-width: 72ch; }
+    section { margin-top: 48px; }
+    h2 { font-size: 17px; margin: 0 0 6px; }
+    h3 { font-size: 13px; margin: 28px 0 8px; color: var(--fg-secondary); font-weight: 600; }
+    .note { color: var(--fg-secondary); margin: 0 0 18px; max-width: 78ch; font-size: 13px; }
+    code { font-family: var(--font-family-mono); font-size: 12px; background: var(--bg-surface-raised);
+      padding: 1px 6px; border-radius: 3px; color: var(--fg-primary); }
+    code.hit { color: var(--fg-brand); }
+    .scroll { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { text-align: left; font-size: 10.5px; letter-spacing: .07em; text-transform: uppercase;
+      color: var(--fg-tertiary); font-weight: 600; padding: 0 10px 8px;
+      border-bottom: 1px solid var(--border-default); white-space: nowrap; }
+    td { padding: 6px 10px; border-bottom: 1px solid var(--border-subtle); vertical-align: middle; white-space: nowrap; }
+    tr.same td { opacity: .45; }
+    .tname { font-family: var(--font-family-mono); font-size: 12px; }
+    .arrow { color: var(--fg-tertiary); }
+    .num { font-family: var(--font-family-mono); font-size: 12px; text-align: right; color: var(--fg-secondary); }
+    .nochange { color: var(--fg-tertiary); font-size: 12px; }
+    .sw { display: inline-block; width: 34px; height: 18px; border-radius: 3px; vertical-align: -4px;
+      margin-right: 8px; border: 1px solid rgb(128 128 128 / 35%); }
+    .gradbar { height: 40px; border-radius: 6px; margin: 8px 0 10px; border: 1px solid var(--border-subtle); }
+    .log { border: 1px solid var(--border-subtle); border-left: 3px solid var(--border-brand);
+      border-radius: 6px; padding: 18px 20px; background: var(--bg-container); }
+    .log dl { margin: 0; display: grid; grid-template-columns: 128px 1fr; gap: 10px 18px; }
+    .log dt { font-family: var(--font-family-mono); font-size: 11px; letter-spacing: .06em;
+      text-transform: uppercase; color: var(--fg-tertiary); padding-top: 2px; }
+    .log dd { margin: 0; color: var(--fg-secondary); font-size: 13px; }
+    ol.steps { padding-left: 20px; margin: 0; }
+    ol.steps li { margin-bottom: 12px; color: var(--fg-secondary); font-size: 13px; }
+    ol.steps li strong { color: var(--fg-primary); }
+    .warn { border-left-color: var(--alert-warning-edge); }
+    footer.doc { margin-top: 64px; padding-top: 20px; border-top: 1px solid var(--border-subtle);
+      color: var(--fg-tertiary); font-size: 12px; }
+    @media (max-width: 700px) { .wrap { padding: 24px 16px 60px; } .log dl { grid-template-columns: 1fr; gap: 4px 0; } }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header class="doc">
+    <p class="eyebrow">Design System · Change Set</p>
+    <h1>Figma 반영 목록</h1>
+    <p class="sub">
+      톤 실험실에서 확정한 값을 <code>UI_00_Design System</code> 에 옮기기 위한 변경 목록입니다.
+      Primitive 값 교체가 대부분이고 Semantic 바인딩 변경은 두 건입니다.
+    </p>
+  </header>
+
+  <section style="margin-top:0">
+    <h2>변경 로그</h2>
+    <p class="note">시스템 기여 원칙이 요구하는 항목입니다 — 변경 이유, 영향 범위, Migration 필요 여부.</p>
+    <div class="log">
+      <dl>
+        <dt>변경 이유</dt>
+        <dd>
+          Gray 램프 안에 쿨 뉴트럴과 순수 무채색이 섞여 Light·Dark 가 다른 제품처럼 보였습니다.
+          Dark 층위 간격이 1.09:1 이하라 카드와 배경이 구분되지 않았고,
+          <code>bg/canvas</code> 바인딩이 문서와 반대 방향이었습니다.
+          브랜드 색은 임시값 상태였고, <code>Gradient/Main</code> 은 어느 텍스트 색으로도 전 구간을 읽을 수 없었습니다.
+        </dd>
+        <dt>영향 범위</dt>
+        <dd>
+          Primitive 28개 값 교체 · Semantic 바인딩 2건 · Gradient Paint Style 4종 ·
+          Text Style 4종 신규. Semantic 이름과 구조는 그대로이므로 <strong>Component API 변경은 없습니다.</strong>
+          모든 화면의 배경·카드·텍스트·상태색이 함께 바뀝니다.
+        </dd>
+        <dt>Migration</dt>
+        <dd>
+          Primitive 값만 바꾸면 Semantic 이 alias 로 전파되므로 <strong>기존 인스턴스는 자동 반영됩니다.</strong>
+          수동 작업이 필요한 것은 Gradient Paint Style 의 stop 재정의와, 수치를 표시하는 컴포넌트의
+          Text Style 을 Mono 계열로 교체하는 작업입니다.
+        </dd>
+        <dt>검증</dt>
+        <dd>
+          주요 전경 × 배경 17개 조합이 모두 WCAG 기준을 통과합니다.
+          기존에도 미달이던 Light <code>fg/tertiary</code>(3.55:1) 한 건만 남아 있으며 이번 변경으로 생긴 것이 아닙니다.
+        </dd>
+      </dl>
+    </div>
+  </section>
+
+  <section>
+    <h2>1. Primitive — Neutral</h2>
+    <p class="note">
+      15개가 바뀝니다. 색상 255°의 약한 쿨 뉴트럴로 통일하고, Dark 구간(650~950)의 명도 간격을 두 배로 벌렸습니다.
+      <code>gray/0</code> 은 순백을 유지합니다.
+    </p>
+    <div class="scroll"><table><thead><tr><th>토큰</th><th>현재</th><th></th><th>변경</th></tr></thead><tbody>
+<tr class="same"><td class="tname">color/gray/0</td><td><span class="sw" style="background:#FFFFFF"></span><code>#FFFFFF</code></td><td class="arrow">→</td><td><span class="nochange">변경 없음</span></td></tr>
+<tr class=""><td class="tname">color/gray/50</td><td><span class="sw" style="background:#F7F8FA"></span><code>#F7F8FA</code></td><td class="arrow">→</td><td><span class="sw" style="background:#F7F7F8"></span><code class="hit">#F7F7F8</code></td></tr>
+<tr class=""><td class="tname">color/gray/100</td><td><span class="sw" style="background:#F0F1F4"></span><code>#F0F1F4</code></td><td class="arrow">→</td><td><span class="sw" style="background:#F0F1F2"></span><code class="hit">#F0F1F2</code></td></tr>
+<tr class=""><td class="tname">color/gray/200</td><td><span class="sw" style="background:#E4E6EB"></span><code>#E4E6EB</code></td><td class="arrow">→</td><td><span class="sw" style="background:#E4E6E7"></span><code class="hit">#E4E6E7</code></td></tr>
+<tr class=""><td class="tname">color/gray/300</td><td><span class="sw" style="background:#D2D5DC"></span><code>#D2D5DC</code></td><td class="arrow">→</td><td><span class="sw" style="background:#D2D4D6"></span><code class="hit">#D2D4D6</code></td></tr>
+<tr class=""><td class="tname">color/gray/400</td><td><span class="sw" style="background:#B0B4BD"></span><code>#B0B4BD</code></td><td class="arrow">→</td><td><span class="sw" style="background:#B2B4B7"></span><code class="hit">#B2B4B7</code></td></tr>
+<tr class=""><td class="tname">color/gray/450</td><td><span class="sw" style="background:#A5A5A5"></span><code>#A5A5A5</code></td><td class="arrow">→</td><td><span class="sw" style="background:#ADAFB1"></span><code class="hit">#ADAFB1</code></td></tr>
+<tr class=""><td class="tname">color/gray/500</td><td><span class="sw" style="background:#878C97"></span><code>#878C97</code></td><td class="arrow">→</td><td><span class="sw" style="background:#86888B"></span><code class="hit">#86888B</code></td></tr>
+<tr class=""><td class="tname">color/gray/600</td><td><span class="sw" style="background:#656565"></span><code>#656565</code></td><td class="arrow">→</td><td><span class="sw" style="background:#5D6063"></span><code class="hit">#5D6063</code></td></tr>
+<tr class=""><td class="tname">color/gray/650</td><td><span class="sw" style="background:#474747"></span><code>#474747</code></td><td class="arrow">→</td><td><span class="sw" style="background:#55575A"></span><code class="hit">#55575A</code></td></tr>
+<tr class=""><td class="tname">color/gray/700</td><td><span class="sw" style="background:#3A3A3A"></span><code>#3A3A3A</code></td><td class="arrow">→</td><td><span class="sw" style="background:#4B4D4F"></span><code class="hit">#4B4D4F</code></td></tr>
+<tr class=""><td class="tname">color/gray/750</td><td><span class="sw" style="background:#343434"></span><code>#343434</code></td><td class="arrow">→</td><td><span class="sw" style="background:#414345"></span><code class="hit">#414345</code></td></tr>
+<tr class=""><td class="tname">color/gray/800</td><td><span class="sw" style="background:#2E2E2E"></span><code>#2E2E2E</code></td><td class="arrow">→</td><td><span class="sw" style="background:#353638"></span><code class="hit">#353638</code></td></tr>
+<tr class=""><td class="tname">color/gray/850</td><td><span class="sw" style="background:#282828"></span><code>#282828</code></td><td class="arrow">→</td><td><span class="sw" style="background:#292A2C"></span><code class="hit">#292A2C</code></td></tr>
+<tr class=""><td class="tname">color/gray/900</td><td><span class="sw" style="background:#232323"></span><code>#232323</code></td><td class="arrow">→</td><td><span class="sw" style="background:#1F2021"></span><code class="hit">#1F2021</code></td></tr>
+<tr class=""><td class="tname">color/gray/950</td><td><span class="sw" style="background:#1E1E1E"></span><code>#1E1E1E</code></td><td class="arrow">→</td><td><span class="sw" style="background:#151617"></span><code class="hit">#151617</code></td></tr>
+    </tbody></table></div>
+  </section>
+
+  <section>
+    <h2>2. Primitive — 색상 계열</h2>
+    <p class="note">
+      13/23개가 바뀝니다. <code>main</code> 은 전 단계를 교체하고,
+      상태 3계열은 <strong>틴트 단계(<code>100</code> · <code>900</code>)만</strong> 채도를 0.72배로 낮춥니다.
+      원색 <code>300</code> · <code>500</code> · <code>700</code> · <code>800</code> 은 그대로 두어 경보 강도를 지킵니다.
+    </p>
+    <h3>main — 주요 액션 · 포커스 · 선택 · 로봇 이동 경로 · 차트 계열</h3>
+    <div class="scroll"><table><thead><tr><th>토큰</th><th>현재</th><th></th><th>변경</th></tr></thead><tbody>
+<tr class=""><td class="tname">color/main/100</td><td><span class="sw" style="background:#E8EEFF"></span><code>#E8EEFF</code></td><td class="arrow">→</td><td><span class="sw" style="background:#E3EEFF"></span><code class="hit">#E3EEFF</code></td></tr>
+<tr class=""><td class="tname">color/main/300</td><td><span class="sw" style="background:#9DBAF9"></span><code>#9DBAF9</code></td><td class="arrow">→</td><td><span class="sw" style="background:#A1BFF1"></span><code class="hit">#A1BFF1</code></td></tr>
+<tr class=""><td class="tname">color/main/400</td><td><span class="sw" style="background:#8CACF7"></span><code>#8CACF7</code></td><td class="arrow">→</td><td><span class="sw" style="background:#7FA8EC"></span><code class="hit">#7FA8EC</code></td></tr>
+<tr class=""><td class="tname">color/main/500</td><td><span class="sw" style="background:#6F99F5"></span><code>#6F99F5</code></td><td class="arrow">→</td><td><span class="sw" style="background:#5A8EE4"></span><code class="hit">#5A8EE4</code></td></tr>
+<tr class=""><td class="tname">color/main/700</td><td><span class="sw" style="background:#285896"></span><code>#285896</code></td><td class="arrow">→</td><td><span class="sw" style="background:#295FB8"></span><code class="hit">#295FB8</code></td></tr>
+<tr class=""><td class="tname">color/main/800</td><td><span class="sw" style="background:#21456F"></span><code>#21456F</code></td><td class="arrow">→</td><td><span class="sw" style="background:#1D4A93"></span><code class="hit">#1D4A93</code></td></tr>
+<tr class=""><td class="tname">color/main/900</td><td><span class="sw" style="background:#1B365D"></span><code>#1B365D</code></td><td class="arrow">→</td><td><span class="sw" style="background:#172F57"></span><code class="hit">#172F57</code></td></tr>
+    </tbody></table></div>
+    <h3>danger — 고장 · 위험 · 비상 · 운행 중지 · 임계치 초과</h3>
+    <div class="scroll"><table><thead><tr><th>토큰</th><th>현재</th><th></th><th>변경</th></tr></thead><tbody>
+<tr class=""><td class="tname">color/danger/100</td><td><span class="sw" style="background:#FFE9E7"></span><code>#FFE9E7</code></td><td class="arrow">→</td><td><span class="sw" style="background:#FBEBE9"></span><code class="hit">#FBEBE9</code></td></tr>
+<tr class="same"><td class="tname">color/danger/300</td><td><span class="sw" style="background:#FF6B72"></span><code>#FF6B72</code></td><td class="arrow">→</td><td><span class="nochange">변경 없음</span></td></tr>
+<tr class="same"><td class="tname">color/danger/500</td><td><span class="sw" style="background:#F03918"></span><code>#F03918</code></td><td class="arrow">→</td><td><span class="nochange">변경 없음</span></td></tr>
+<tr class="same"><td class="tname">color/danger/700</td><td><span class="sw" style="background:#B92B18"></span><code>#B92B18</code></td><td class="arrow">→</td><td><span class="nochange">변경 없음</span></td></tr>
+<tr class="same"><td class="tname">color/danger/800</td><td><span class="sw" style="background:#8A2012"></span><code>#8A2012</code></td><td class="arrow">→</td><td><span class="nochange">변경 없음</span></td></tr>
+<tr class=""><td class="tname">color/danger/900</td><td><span class="sw" style="background:#4A1108"></span><code>#4A1108</code></td><td class="arrow">→</td><td><span class="sw" style="background:#421A13"></span><code class="hit">#421A13</code></td></tr>
+    </tbody></table></div>
+    <h3>warning — 점검 필요 · 주의 · 임계치 접근</h3>
+    <div class="scroll"><table><thead><tr><th>토큰</th><th>현재</th><th></th><th>변경</th></tr></thead><tbody>
+<tr class=""><td class="tname">color/warning/100</td><td><span class="sw" style="background:#FFF8D6"></span><code>#FFF8D6</code></td><td class="arrow">→</td><td><span class="sw" style="background:#FDF8DF"></span><code class="hit">#FDF8DF</code></td></tr>
+<tr class="same"><td class="tname">color/warning/300</td><td><span class="sw" style="background:#EEDA6B"></span><code>#EEDA6B</code></td><td class="arrow">→</td><td><span class="nochange">변경 없음</span></td></tr>
+<tr class="same"><td class="tname">color/warning/500</td><td><span class="sw" style="background:#EECE1B"></span><code>#EECE1B</code></td><td class="arrow">→</td><td><span class="nochange">변경 없음</span></td></tr>
+<tr class="same"><td class="tname">color/warning/700</td><td><span class="sw" style="background:#8C7400"></span><code>#8C7400</code></td><td class="arrow">→</td><td><span class="nochange">변경 없음</span></td></tr>
+<tr class=""><td class="tname">color/warning/900</td><td><span class="sw" style="background:#3B3105"></span><code>#3B3105</code></td><td class="arrow">→</td><td><span class="sw" style="background:#383116"></span><code class="hit">#383116</code></td></tr>
+    </tbody></table></div>
+    <h3>safe — 정상 · 안전 · 점검 완료</h3>
+    <div class="scroll"><table><thead><tr><th>토큰</th><th>현재</th><th></th><th>변경</th></tr></thead><tbody>
+<tr class=""><td class="tname">color/safe/100</td><td><span class="sw" style="background:#E2F8ED"></span><code>#E2F8ED</code></td><td class="arrow">→</td><td><span class="sw" style="background:#E6F6EE"></span><code class="hit">#E6F6EE</code></td></tr>
+<tr class="same"><td class="tname">color/safe/300</td><td><span class="sw" style="background:#5FD382"></span><code>#5FD382</code></td><td class="arrow">→</td><td><span class="nochange">변경 없음</span></td></tr>
+<tr class="same"><td class="tname">color/safe/500</td><td><span class="sw" style="background:#1DA67F"></span><code>#1DA67F</code></td><td class="arrow">→</td><td><span class="nochange">변경 없음</span></td></tr>
+<tr class="same"><td class="tname">color/safe/700</td><td><span class="sw" style="background:#0E7258"></span><code>#0E7258</code></td><td class="arrow">→</td><td><span class="nochange">변경 없음</span></td></tr>
+<tr class=""><td class="tname">color/safe/900</td><td><span class="sw" style="background:#083A2C"></span><code>#083A2C</code></td><td class="arrow">→</td><td><span class="sw" style="background:#19382D"></span><code class="hit">#19382D</code></td></tr>
+    </tbody></table></div>
+    <p class="note" style="margin-top:18px">
+      <code>color/main/gradient-end</code>(<code>#FFDADB</code>)와 <code>color/danger/gradient-end</code>는
+      <strong>삭제 대상</strong>입니다. 새 그라데이션은 알파 0 으로 사라지므로 종료 stop 색상이 필요 없습니다.
+    </p>
+  </section>
+
+  <section>
+    <h2>3. Semantic 바인딩 변경</h2>
+    <p class="note">이 두 건 외에 Semantic 은 손대지 않습니다.</p>
+    <div class="scroll"><table><thead><tr><th>토큰</th><th>모드</th><th>현재</th><th></th><th>변경</th></tr></thead><tbody>
+      <tr><td class="tname">bg/canvas</td><td>Dark</td><td><code>color/gray/750</code></td><td class="arrow">→</td><td><code class="hit">color/gray/950</code></td></tr>
+      <tr><td class="tname">border/brand</td><td>Light</td><td><code>설명은 main/700</code></td><td class="arrow">→</td><td><code class="hit">실측대로 main/500 로 설명 수정</code></td></tr>
+    </tbody></table></div>
+    <p class="note" style="margin-top:16px">
+      <code>bg/canvas</code> 는 Dark 에서 가장 밝은 면이었습니다. 배경이 카드보다 밝아 층위가 뒤집혀 있었고
+      설계 문서의 “Card 는 Canvas 보다 한 단계 밝은 Surface” 규칙과도 반대였습니다.
+      가장 어두운 <code>gray/950</code> 으로 되돌립니다.<br /><br />
+      <code>border/brand</code> 는 값 변경이 아니라 <strong>설명 정정</strong>입니다.
+      실제 바인딩은 <code>main/500</code> 인데 설명에 <code>main/700</code> 이라고 적혀 있습니다.
+    </p>
+  </section>
+
+  <section>
+    <h2>4. Gradient Paint Style</h2>
+    <p class="note">
+      4종 모두 stop 을 다시 정의합니다. 배경색을 stop 에 넣지 않고 <strong>같은 색의 불투명도만 0 까지 낮춰</strong>
+      배경에 녹입니다. Paint Style 은 모드를 갖지 않으므로 이 방식만 Light·Dark 양쪽에서 성립합니다.
+    </p>
+    <div class="log warn" style="margin-bottom:24px">
+      <dl>
+        <dt>주의</dt>
+        <dd>
+          끝 stop 을 <code>transparent</code> 키워드로 두면 검정 투명으로 보간돼 중간 구간이 탁해집니다.
+          Figma 에서도 <strong>같은 색을 복제해 불투명도만 0 으로</strong> 내리십시오.<br /><br />
+          코어가 원색이라 그 위에는 본문을 얹을 수 없습니다. 텍스트 안전 구간은
+          Dark 기준 danger 2% · main 4% · safe 5% · warning 10% 이후입니다.
+        </dd>
+      </dl>
+    </div>
+<h3>Gradient/Main</h3>
+    <div class="gradbar" style="background:linear-gradient(90deg, rgba(117, 152, 232, 0.9) 0%, rgba(104, 148, 230, 0.562) 7%, rgba(90, 142, 228, 0.29) 16%, rgba(54, 149, 223, 0.089) 30%, rgba(54, 149, 223, 0.01) 50%, rgba(54, 149, 223, 0) 75%, rgba(54, 149, 223, 0) 100%)"></div>
+    <div class="scroll"><table class="tight"><thead><tr><th>위치</th><th>색</th><th class="num">불투명도</th></tr></thead><tbody>
+<tr><td class="num">0%</td><td><span class="sw" style="background:#7598E8"></span><code>#7598E8</code></td><td class="num">90.0%</td></tr>
+<tr><td class="num">7%</td><td><span class="sw" style="background:#6894E6"></span><code>#6894E6</code></td><td class="num">56.2%</td></tr>
+<tr><td class="num">16%</td><td><span class="sw" style="background:#5A8EE4"></span><code>#5A8EE4</code></td><td class="num">29.0%</td></tr>
+<tr><td class="num">30%</td><td><span class="sw" style="background:#3695DF"></span><code>#3695DF</code></td><td class="num">8.9%</td></tr>
+<tr><td class="num">50%</td><td><span class="sw" style="background:#3695DF"></span><code>#3695DF</code></td><td class="num">1.0%</td></tr>
+<tr><td class="num">75%</td><td><span class="sw" style="background:#3695DF"></span><code>#3695DF</code></td><td class="num">0.0%</td></tr>
+<tr><td class="num">100%</td><td><span class="sw" style="background:#3695DF"></span><code>#3695DF</code></td><td class="num">0.0%</td></tr>
+    </tbody></table></div>
+<h3>Gradient/Danger</h3>
+    <div class="gradbar" style="background:linear-gradient(90deg, rgba(244, 70, 63, 0.9) 0%, rgba(242, 65, 46, 0.562) 7%, rgba(240, 57, 24, 0.29) 16%, rgba(217, 92, 0, 0.089) 30%, rgba(217, 92, 0, 0.01) 50%, rgba(217, 92, 0, 0) 75%, rgba(217, 92, 0, 0) 100%)"></div>
+    <div class="scroll"><table class="tight"><thead><tr><th>위치</th><th>색</th><th class="num">불투명도</th></tr></thead><tbody>
+<tr><td class="num">0%</td><td><span class="sw" style="background:#F4463F"></span><code>#F4463F</code></td><td class="num">90.0%</td></tr>
+<tr><td class="num">7%</td><td><span class="sw" style="background:#F2412E"></span><code>#F2412E</code></td><td class="num">56.2%</td></tr>
+<tr><td class="num">16%</td><td><span class="sw" style="background:#F03918"></span><code>#F03918</code></td><td class="num">29.0%</td></tr>
+<tr><td class="num">30%</td><td><span class="sw" style="background:#D95C00"></span><code>#D95C00</code></td><td class="num">8.9%</td></tr>
+<tr><td class="num">50%</td><td><span class="sw" style="background:#D95C00"></span><code>#D95C00</code></td><td class="num">1.0%</td></tr>
+<tr><td class="num">75%</td><td><span class="sw" style="background:#D95C00"></span><code>#D95C00</code></td><td class="num">0.0%</td></tr>
+<tr><td class="num">100%</td><td><span class="sw" style="background:#D95C00"></span><code>#D95C00</code></td><td class="num">0.0%</td></tr>
+    </tbody></table></div>
+<h3>Gradient/Warning</h3>
+    <div class="gradbar" style="background:linear-gradient(90deg, rgba(247, 205, 54, 0.9) 0%, rgba(242, 206, 44, 0.562) 7%, rgba(238, 206, 27, 0.29) 16%, rgba(255, 193, 126, 0.089) 30%, rgba(255, 193, 126, 0.01) 50%, rgba(255, 193, 126, 0) 75%, rgba(255, 193, 126, 0) 100%)"></div>
+    <div class="scroll"><table class="tight"><thead><tr><th>위치</th><th>색</th><th class="num">불투명도</th></tr></thead><tbody>
+<tr><td class="num">0%</td><td><span class="sw" style="background:#F7CD36"></span><code>#F7CD36</code></td><td class="num">90.0%</td></tr>
+<tr><td class="num">7%</td><td><span class="sw" style="background:#F2CE2C"></span><code>#F2CE2C</code></td><td class="num">56.2%</td></tr>
+<tr><td class="num">16%</td><td><span class="sw" style="background:#EECE1B"></span><code>#EECE1B</code></td><td class="num">29.0%</td></tr>
+<tr><td class="num">30%</td><td><span class="sw" style="background:#FFC17E"></span><code>#FFC17E</code></td><td class="num">8.9%</td></tr>
+<tr><td class="num">50%</td><td><span class="sw" style="background:#FFC17E"></span><code>#FFC17E</code></td><td class="num">1.0%</td></tr>
+<tr><td class="num">75%</td><td><span class="sw" style="background:#FFC17E"></span><code>#FFC17E</code></td><td class="num">0.0%</td></tr>
+<tr><td class="num">100%</td><td><span class="sw" style="background:#FFC17E"></span><code>#FFC17E</code></td><td class="num">0.0%</td></tr>
+    </tbody></table></div>
+<h3>Gradient/Safe</h3>
+    <div class="gradbar" style="background:linear-gradient(90deg, rgba(31, 177, 140, 0.9) 0%, rgba(22, 173, 134, 0.562) 7%, rgba(29, 166, 127, 0.29) 16%, rgba(0, 166, 134, 0.089) 30%, rgba(0, 166, 134, 0.01) 50%, rgba(0, 166, 134, 0) 75%, rgba(0, 166, 134, 0) 100%)"></div>
+    <div class="scroll"><table class="tight"><thead><tr><th>위치</th><th>색</th><th class="num">불투명도</th></tr></thead><tbody>
+<tr><td class="num">0%</td><td><span class="sw" style="background:#1FB18C"></span><code>#1FB18C</code></td><td class="num">90.0%</td></tr>
+<tr><td class="num">7%</td><td><span class="sw" style="background:#16AD86"></span><code>#16AD86</code></td><td class="num">56.2%</td></tr>
+<tr><td class="num">16%</td><td><span class="sw" style="background:#1DA67F"></span><code>#1DA67F</code></td><td class="num">29.0%</td></tr>
+<tr><td class="num">30%</td><td><span class="sw" style="background:#00A686"></span><code>#00A686</code></td><td class="num">8.9%</td></tr>
+<tr><td class="num">50%</td><td><span class="sw" style="background:#00A686"></span><code>#00A686</code></td><td class="num">1.0%</td></tr>
+<tr><td class="num">75%</td><td><span class="sw" style="background:#00A686"></span><code>#00A686</code></td><td class="num">0.0%</td></tr>
+<tr><td class="num">100%</td><td><span class="sw" style="background:#00A686"></span><code>#00A686</code></td><td class="num">0.0%</td></tr>
+    </tbody></table></div>
+  </section>
+
+  <section>
+    <h2>5. Text Style 신규</h2>
+    <p class="note">
+      Figma 에서 SUIT 의 tabular figures 를 쓸 수 없어 수치 정렬을 모노가 담당합니다.
+      기존 <code>font-size</code> · <code>line-height</code> 변수를 재사용하므로 새 Primitive 는 없습니다.
+      서체는 <strong>JetBrains Mono</strong>(OFL)입니다.
+    </p>
+    <div class="scroll"><table><thead><tr><th>스타일</th><th>크기 / 행간</th><th>용도</th></tr></thead><tbody>
+      <tr><td class="tname">Typography/Mono/Metric</td><td>20 / 28 Medium</td><td>KPI 대표 수치, 게이지 값</td></tr>
+      <tr><td class="tname">Typography/Mono/Data/1</td><td>14 / 20 Medium</td><td>표 셀 수치, 좌표, 리스트 값</td></tr>
+      <tr><td class="tname">Typography/Mono/Data/2</td><td>13 / 18 Regular</td><td>밀도 높은 표, 로그 라인</td></tr>
+      <tr><td class="tname">Typography/Mono/Label</td><td>12 / 18 Medium · 대문자 · 자간 0.09em</td><td>기술 라벨, 섹션 식별자</td></tr>
+    </tbody></table></div>
+    <p class="note" style="margin-top:16px">
+      <strong>적용하지 않는 곳</strong> — 본문, 버튼 라벨, 메뉴, 제목, 알림 문구, 한글 문장.
+      한글은 모노에 글자가 없어 SUIT 로 자동 대체되므로, 표에서는 수치가 모노, 상태 라벨이 SUIT 로 나뉩니다.
+    </p>
+  </section>
+
+  <section>
+    <h2>6. 작업 순서</h2>
+    <p class="note">
+      시스템 기여 원칙의 “Foundation → Semantic → Component → Pattern → Screen 영향 순서” 를 따릅니다.
+    </p>
+    <ol class="steps">
+      <li><strong>Primitive 값 교체</strong> — Neutral 15개, 색상 계열 13개. 이 시점에 모든 화면이 한 번에 바뀝니다.</li>
+      <li><strong>gradient-end 2개 삭제</strong> — 새 그라데이션에서 참조하지 않습니다.</li>
+      <li><strong>Semantic 바인딩 2건</strong> — <code>bg/canvas</code> Dark, <code>border/brand</code> 설명.</li>
+      <li><strong>Gradient Paint Style 4종 재정의</strong> — 위 stop 표대로.</li>
+      <li><strong>Text Style 4종 추가</strong> — 서체 설치 후.</li>
+      <li><strong>수치 컴포넌트의 Text Style 교체</strong> — 표·KPI·로그.</li>
+      <li><strong>Dark 화면 육안 검증</strong> — 층위 구분, 상태색 식별, Alert 가시성.</li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>아직 확인하지 못한 것</h2>
+    <p class="note">
+      Semantic 90개 중 화면과 검색으로 확인한 것은 일부입니다. 나머지와 Component 컬렉션 42개,
+      그리고 <code>bg/overlay</code> 가 참조하는 <code>alpha/scrim/*</code> 의 실제 알파값은 아직 실측하지 못했습니다.
+      Foundations 페이지에 토큰 전량을 바인딩한 프레임이 생기면 <code>get_variable_defs</code> 로 한 번에 대조할 수 있습니다.<br /><br />
+      <code>danger/400</code> 추가 건은 보류 중입니다 — Dark Danger 버튼이 hover 에서 어두워지는 문제를 해결하려면
+      필요하지만, 그 버튼의 라벨 색이 흰색인지 어두운 색인지 확인이 필요합니다.
+    </p>
+  </section>
+
+  <footer class="doc">
+    APRISM Design System · Change Set · 대상 파일 <code>UI_00_Design System</code>
+  </footer>
+</div>
+</body>
+</html>

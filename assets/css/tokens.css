@@ -1,0 +1,309 @@
+/* APRISM Design Tokens
+ *
+ * Figma UI_00_Design System 의 Primitive / Semantic 구조를 그대로 옮긴 것이다.
+ * 의존 방향은 한 방향으로만 흐른다: Primitive -> Semantic -> Component.
+ * 컴포넌트는 Semantic 만 참조한다. Primitive 를 직접 쓰지 않는다.
+ *
+ * 이 파일은 톤 실험실에서 확정한 값으로 생성됐다.
+ *   뉴트럴 색상 255도 · 쿨강도 0.006 · Dark 층위 간격 2.0배 · Canvas 명도 0.200
+ *   상태색 틴트 채도 0.72배 (원색 300 500 700 800 은 유지)
+ *   main 계열 색상 260도
+ *
+ * 아직 Figma 실측으로 확인하지 못한 Semantic 매핑은 파일 하단에 적어 두었다.
+ */
+
+:root {
+  /* ---------- Primitive · 모드 없음 ---------- */
+
+  /* Neutral */
+  --color-gray-0: #FFFFFF;
+  --color-gray-50: #F7F7F8;
+  --color-gray-100: #F0F1F2;
+  --color-gray-200: #E4E6E7;
+  --color-gray-300: #D2D4D6;
+  --color-gray-400: #B2B4B7;
+  --color-gray-450: #ADAFB1;
+  --color-gray-500: #86888B;
+  --color-gray-600: #5D6063;
+  --color-gray-650: #55575A;
+  --color-gray-700: #4B4D4F;
+  --color-gray-750: #414345;
+  --color-gray-800: #353638;
+  --color-gray-850: #292A2C;
+  --color-gray-900: #1F2021;
+  --color-gray-950: #151617;
+
+  /* Brand · 주요 액션 · 포커스 · 선택 · 로봇 이동 경로 */
+  --color-main-100: #E3EEFF;
+  --color-main-300: #A1BFF1;
+  --color-main-400: #7FA8EC;
+  --color-main-500: #5A8EE4;
+  --color-main-700: #295FB8;
+  --color-main-800: #1D4A93;
+  --color-main-900: #172F57;
+
+  /* 고장 · 위험 · 비상 · 운행 중지 */
+  --color-danger-100: #FBEBE9;
+  --color-danger-300: #FF6B72;
+  --color-danger-500: #F03918;
+  --color-danger-700: #B92B18;
+  --color-danger-800: #8A2012;
+  --color-danger-900: #421A13;
+
+  /* 점검 필요 · 주의 · 임계치 접근 */
+  --color-warning-100: #FDF8DF;
+  --color-warning-300: #EEDA6B;
+  --color-warning-500: #EECE1B;
+  --color-warning-700: #8C7400;
+  --color-warning-900: #383116;
+
+  /* 정상 · 안전 · 점검 완료 */
+  --color-safe-100: #E6F6EE;
+  --color-safe-300: #5FD382;
+  --color-safe-500: #1DA67F;
+  --color-safe-700: #0E7258;
+  --color-safe-900: #19382D;
+
+  /* Alert 전용 glow. 원색에 알파를 준 값이라 변경 대상이 아니다. */
+  --color-alpha-glow-danger: rgb(240 57 24 / 55%);
+  --color-alpha-glow-warning: rgb(238 206 27 / 50%);
+  --color-alpha-glow-safe: rgb(29 166 127 / 40%);
+
+  /* Radius · Spacing · Border · Typography (Figma Primitive 실측값) */
+  --radius-card: 4px;
+  --border-width-thin: 1px;
+  --space-4: 4px;
+  --space-8: 8px;
+  --space-12: 12px;
+  --space-16: 16px;
+  --space-20: 20px;
+  --space-48: 48px;
+  --space-64: 64px;
+  --font-size-12: 12px;
+  --font-size-13: 13px;
+  --font-size-14: 14px;
+  --font-size-16: 16px;
+  --font-size-20: 20px;
+  --font-size-32: 32px;
+  --font-line-height-18: 18px;
+  --font-line-height-20: 20px;
+  --font-line-height-22: 22px;
+  --font-line-height-24: 24px;
+  --font-line-height-28: 28px;
+  --font-line-height-40: 40px;
+
+  --font-family-sans: "SUIT Variable", "SUIT", -apple-system, "Segoe UI", system-ui, sans-serif;
+  /* 수치·코드·기술 라벨 전용. 한글은 글자가 없어 SUIT 로 자동 대체된다. */
+  --font-family-mono: "JetBrains Mono", "SUIT Variable", ui-monospace, monospace;
+
+  /* ---------- Semantic · Light 기본 ---------- */
+
+  /* fg */
+  --fg-primary: var(--color-gray-950); /* 본문·제목 */
+  --fg-secondary: var(--color-gray-600); /* 보조 텍스트 */
+  --fg-tertiary: var(--color-gray-500); /* Caption·라벨 */
+  --fg-disabled: var(--color-gray-400); /* 비활성 전경 */
+  --fg-inverse: var(--color-gray-0); /* 반전 면 위 전경 */
+  --fg-brand: var(--color-main-700); /* 브랜드 강조 텍스트 */
+  --fg-link: var(--color-main-700); /* 인라인 링크 */
+  --fg-on-brand: var(--color-gray-950); /* 브랜드 면 위 전경 */
+
+  /* bg */
+  --bg-canvas: var(--color-gray-50); /* 페이지 최하단 배경 */
+  --bg-navigation: var(--color-gray-0); /* GNB Rail · Status Bar */
+  --bg-container: var(--color-gray-0); /* Panel · Context 영역 */
+  --bg-surface-default: var(--color-gray-0); /* Card · Table row */
+  --bg-surface-subtle: var(--color-gray-100); /* Table header · 약한 면 */
+  --bg-surface-raised: var(--color-gray-0); /* Control · Floating 층위 */
+  --bg-surface-selected: var(--color-main-100); /* 선택된 행·Nav·List */
+  --bg-brand: var(--color-main-500); /* Primary Button · 브랜드 면 */
+  --bg-accent: var(--color-main-700); /* 강조 면 */
+  --bg-critical: var(--color-danger-700); /* 파괴적 액션 면 */
+  --bg-inverse: var(--color-gray-950); /* 반전 면 */
+
+  /* bg-interactive */
+  --bg-interactive-hover: var(--color-gray-100); /* Table row · Ghost · Nav hover */
+  --bg-interactive-pressed: var(--color-gray-200); /* 위 요소들의 pressed */
+  --bg-interactive-brand-hover: var(--color-main-800); /* Primary Button hover */
+  --bg-interactive-brand-pressed: var(--color-main-900); /* Primary Button pressed */
+  --bg-interactive-critical-hover: var(--color-danger-800); /* Danger Button hover */
+  --bg-interactive-critical-pressed: var(--color-danger-900); /* Danger Button pressed */
+
+  /* border */
+  --border-subtle: var(--color-gray-200); /* Divider · 약한 경계 */
+  --border-default: var(--color-gray-300); /* 카드 hairline */
+  --border-strong: var(--color-gray-400); /* 강한 경계 */
+  --border-brand: var(--color-main-500); /* 선택 Tab · 활성 Nav 표식 */
+
+  /* status */
+  --status-critical-fg: var(--color-danger-700); /* 위험 상태 텍스트 */
+  --status-critical-bg: var(--color-danger-100); /* 위험 상태 면 */
+  --status-critical-icon: var(--color-danger-500); /* 위험 상태 아이콘·Dot */
+  --status-warning-fg: var(--color-warning-700); /* 주의 상태 텍스트 */
+  --status-warning-bg: var(--color-warning-100); /* 주의 상태 면 */
+  --status-warning-icon: var(--color-warning-700); /* 주의 상태 아이콘·Dot */
+  --status-normal-fg: var(--color-safe-700); /* 정상 상태 텍스트 */
+  --status-normal-bg: var(--color-safe-100); /* 정상 상태 면 */
+  --status-normal-icon: var(--color-safe-500); /* 정상 상태 아이콘·Dot */
+  --status-info-fg: var(--color-main-700); /* 안내 상태 텍스트 */
+  --status-info-bg: var(--color-main-100); /* 안내 상태 면 */
+
+  /* alert */
+  --alert-danger-fg: var(--color-danger-700); /* 위험 알림 제목·본문 */
+  --alert-danger-bg: var(--color-danger-100); /* 위험 알림 면 */
+  --alert-danger-edge: var(--color-danger-500); /* 위험 알림 2px 경계 */
+  --alert-warning-fg: var(--color-warning-700); /* 주의 알림 제목·본문 */
+  --alert-warning-bg: var(--color-warning-100); /* 주의 알림 면 */
+  --alert-warning-edge: var(--color-warning-500); /* 주의 알림 2px 경계 */
+  --alert-safe-fg: var(--color-safe-700); /* 안전 알림 제목·본문 */
+  --alert-safe-bg: var(--color-safe-100); /* 안전 알림 면 */
+  --alert-safe-edge: var(--color-safe-500); /* 안전 알림 1px 경계 */
+  --alert-safe-on-edge: var(--color-gray-900); /* 원색 경계 위 텍스트 */
+
+  /* chart */
+  --chart-categorical-1: var(--color-main-500); /* 주 데이터 계열 */
+  --chart-axis: var(--color-gray-400); /* 축선·축 라벨 */
+  --chart-grid: var(--color-gray-200); /* 격자선 */
+  --chart-track: var(--color-gray-100); /* Progress·Gauge 미채움 */
+  --chart-heat-1: var(--color-gray-200); /* 순차 스케일 · 가장 낮음 */
+  --chart-heat-2: var(--color-warning-100); /* 순차 스케일 · 낮음 */
+  --chart-heat-4: var(--color-danger-300); /* 순차 스케일 · 높음 */
+  --chart-heat-5: var(--color-danger-500); /* 순차 스케일 · 가장 높음 */
+
+  /* Alert glow 는 Effect Style 이라 모드를 갖지 않는다. */
+  --alert-danger-glow: var(--color-alpha-glow-danger);
+  --alert-warning-glow: var(--color-alpha-glow-warning);
+  --alert-safe-glow: var(--color-alpha-glow-safe);
+}
+
+/* ---------- Semantic · Dark ---------- */
+
+:root[data-theme="dark"] {
+  /* fg */
+  --fg-primary: var(--color-gray-50);
+  --fg-secondary: var(--color-gray-400);
+  --fg-tertiary: var(--color-gray-450);
+  --fg-disabled: var(--color-gray-600);
+  --fg-inverse: var(--color-gray-950);
+  --fg-brand: var(--color-main-500);
+  --fg-link: var(--color-main-500);
+  --fg-on-brand: var(--color-gray-950);
+
+  /* bg */
+  --bg-canvas: var(--color-gray-950);
+  --bg-navigation: var(--color-gray-900);
+  --bg-container: var(--color-gray-850);
+  --bg-surface-default: var(--color-gray-800);
+  --bg-surface-subtle: var(--color-gray-750);
+  --bg-surface-raised: var(--color-gray-750);
+  --bg-surface-selected: var(--color-main-900);
+  --bg-brand: var(--color-main-500);
+  --bg-accent: var(--color-main-500);
+  --bg-critical: var(--color-danger-500);
+  --bg-inverse: var(--color-gray-0);
+
+  /* bg-interactive */
+  --bg-interactive-hover: var(--color-gray-800);
+  --bg-interactive-pressed: var(--color-gray-700);
+  --bg-interactive-brand-hover: var(--color-main-400);
+  --bg-interactive-brand-pressed: var(--color-main-300);
+  --bg-interactive-critical-hover: var(--color-danger-700);
+  --bg-interactive-critical-pressed: var(--color-danger-800);
+
+  /* border */
+  --border-subtle: var(--color-gray-700);
+  --border-default: var(--color-gray-650);
+  --border-strong: var(--color-gray-600);
+  --border-brand: var(--color-main-500);
+
+  /* status */
+  --status-critical-fg: var(--color-danger-300);
+  --status-critical-bg: var(--color-danger-900);
+  --status-critical-icon: var(--color-danger-500);
+  --status-warning-fg: var(--color-warning-300);
+  --status-warning-bg: var(--color-warning-900);
+  --status-warning-icon: var(--color-warning-300);
+  --status-normal-fg: var(--color-safe-300);
+  --status-normal-bg: var(--color-safe-900);
+  --status-normal-icon: var(--color-safe-500);
+  --status-info-fg: var(--color-main-300);
+  --status-info-bg: var(--color-main-900);
+
+  /* alert */
+  --alert-danger-fg: var(--color-danger-300);
+  --alert-danger-bg: var(--color-danger-900);
+  --alert-danger-edge: var(--color-danger-500);
+  --alert-warning-fg: var(--color-warning-300);
+  --alert-warning-bg: var(--color-warning-900);
+  --alert-warning-edge: var(--color-warning-500);
+  --alert-safe-fg: var(--color-safe-300);
+  --alert-safe-bg: var(--color-safe-900);
+  --alert-safe-edge: var(--color-safe-300);
+  --alert-safe-on-edge: var(--color-gray-900);
+
+  /* chart */
+  --chart-categorical-1: var(--color-main-500);
+  --chart-axis: var(--color-gray-600);
+  --chart-grid: var(--color-gray-800);
+  --chart-track: var(--color-gray-850);
+  --chart-heat-1: var(--color-gray-700);
+  --chart-heat-2: var(--color-warning-900);
+  --chart-heat-4: var(--color-danger-700);
+  --chart-heat-5: var(--color-danger-300);
+
+}
+
+/* ---------- Gradient ---------- */
+/*
+ * 배경색을 stop 에 넣지 않고 같은 색의 불투명도만 0 까지 낮춘다.
+ * Paint Style 은 모드를 갖지 않으므로 이 방식만 Light·Dark 양쪽에서 성립한다.
+ * 끝 stop 에 transparent 키워드를 쓰면 검정 투명으로 보간돼 중간이 탁해진다.
+ * 텍스트는 코어를 피해 감쇠 구간에 놓는다.
+ */
+
+:root {
+  --gradient-main: linear-gradient(90deg,
+    rgb(117 152 232 / 90.0%) 0%,
+    rgb(104 148 230 / 56.2%) 7%,
+    rgb(90 142 228 / 29.0%) 16%,
+    rgb(54 149 223 / 8.9%) 30%,
+    rgb(54 149 223 / 1.0%) 50%,
+    rgb(54 149 223 / 0.0%) 75%,
+    rgb(54 149 223 / 0.0%) 100%
+  );
+  --gradient-danger: linear-gradient(90deg,
+    rgb(244 70 63 / 90.0%) 0%,
+    rgb(242 65 46 / 56.2%) 7%,
+    rgb(240 57 24 / 29.0%) 16%,
+    rgb(217 92 0 / 8.9%) 30%,
+    rgb(217 92 0 / 1.0%) 50%,
+    rgb(217 92 0 / 0.0%) 75%,
+    rgb(217 92 0 / 0.0%) 100%
+  );
+  --gradient-warning: linear-gradient(90deg,
+    rgb(247 205 54 / 90.0%) 0%,
+    rgb(242 206 44 / 56.2%) 7%,
+    rgb(238 206 27 / 29.0%) 16%,
+    rgb(255 193 126 / 8.9%) 30%,
+    rgb(255 193 126 / 1.0%) 50%,
+    rgb(255 193 126 / 0.0%) 75%,
+    rgb(255 193 126 / 0.0%) 100%
+  );
+  --gradient-safe: linear-gradient(90deg,
+    rgb(31 177 140 / 90.0%) 0%,
+    rgb(22 173 134 / 56.2%) 7%,
+    rgb(29 166 127 / 29.0%) 16%,
+    rgb(0 166 134 / 8.9%) 30%,
+    rgb(0 166 134 / 1.0%) 50%,
+    rgb(0 166 134 / 0.0%) 75%,
+    rgb(0 166 134 / 0.0%) 100%
+  );
+}
+
+/*
+ * 아직 Figma 실측으로 확인하지 못한 항목
+ *   - bg/overlay (Light: alpha/scrim/light · Dark: alpha/scrim/dark) 의 실제 알파값
+ *   - Semantic 90개 중 위에 없는 나머지 항목
+ *   - Component 컬렉션 42개
+ * Foundations 페이지가 만들어지면 get_variable_defs 로 한 번에 대조한다.
+ */
