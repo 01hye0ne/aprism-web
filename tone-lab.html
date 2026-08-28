@@ -160,14 +160,24 @@
       <span class="hint">레퍼런스 기반일 때만 적용</span>
     </div>
     <div class="ctl">
-      <label>코어 강도 <span class="val" id="v-grad"></span></label>
-      <input type="range" id="gradA" min="0.3" max="1" step="0.05" value="1" />
-      <span class="hint">가장 진한 지점의 불투명도</span>
+      <label>코어 강도 · Dark <span class="val" id="v-gradD"></span></label>
+      <input type="range" id="gradAD" min="0.3" max="1" step="0.05" value="0.7" />
+      <span class="hint">어두운 배경 위 코어 불투명도</span>
+    </div>
+    <div class="ctl">
+      <label>코어 강도 · Light <span class="val" id="v-gradL"></span></label>
+      <input type="range" id="gradAL" min="0.3" max="1" step="0.05" value="0.8" />
+      <span class="hint">밝은 배경 위 코어 불투명도</span>
     </div>
     <div class="ctl">
       <label>코어 집중도 <span class="val" id="v-tight"></span></label>
-      <input type="range" id="gradT" min="1" max="8" step="0.25" value="4.5" />
+      <input type="range" id="gradT" min="1" max="8" step="0.25" value="5" />
       <span class="hint">높일수록 채색 구간이 좁아지고 빨리 사라짐</span>
+    </div>
+    <div class="ctl">
+      <label>색조 폭 <span class="val" id="v-hueSpan"></span></label>
+      <input type="range" id="gradH" min="0" max="40" step="1" value="18" />
+      <span class="hint">코어와 꼬리의 색상을 벌려 색감을 넓힘</span>
     </div>
     <div class="ctl ctl-actions">
       <label class="toggle"><input type="checkbox" id="alignL" /> 상태색 명도 정렬</label>
@@ -249,6 +259,29 @@
         면적의 대부분은 순수한 배경색이 됩니다. 레퍼런스의 발광하는 인상이 이 배분에서 나옵니다.<br /><br />
         코어 끝단에만 한 단계 밝은 <code>300</code>을 써서 빛이 새어나오는 느낌을 만들고
         곧바로 원색 <code>500</code>으로 넘어갑니다.
+      </dd>
+    </div>
+    <div class="dec" style="margin-bottom:18px;border-left:3px solid var(--ui-flag)">
+      <dt style="margin-bottom:6px">모드별 강도는 하나의 Paint Style에 담기지 않습니다</dt>
+      <dd>
+        Dark 70% · Light 80%는 서로 다른 값이고, <strong>Paint Style은 모드를 갖지 않습니다.</strong>
+        아래 미리보기는 두 값을 각각 적용한 결과지만, Figma에서 그대로 재현하려면 선택이 필요합니다.<br /><br />
+        <strong>1. 하나로 통일</strong> — 75% 한 값으로 두면 스타일 하나로 끝납니다. 두 모드의 차이가
+        10%p라 실제 화면에서 구분이 어려우므로 이 방법을 권합니다.<br />
+        <strong>2. 레이어 불투명도를 변수에 연결</strong> — Paint Style은 100%로 두고 그것을 얹은 레이어의
+        불투명도를 모드별 숫자 변수에 바인딩합니다. Figma에서 지원되는지 확인이 필요합니다.<br />
+        <strong>3. 스타일 2개</strong> — 모드마다 다른 스타일을 붙여야 해서 “Variable Mode 전환만으로
+        테마가 바뀐다”는 규칙이 깨집니다. 권하지 않습니다.
+      </dd>
+    </div>
+    <div class="dec" style="margin-bottom:18px">
+      <dt style="margin-bottom:6px">색조를 벌려 색감을 넓힙니다</dt>
+      <dd>
+        한 계열을 단일 색상으로만 감쇠시키면 색감이 납작합니다. 코어 끝단의 highlight를
+        인접 색조로 옮기고 꼬리를 반대쪽으로 보내면, 좁은 구간 안에서도 색이 살아 움직입니다.<br /><br />
+        의미를 해치지 않는 방향으로만 움직입니다 — <code>main</code>은 보라 쪽,
+        <code>danger</code>는 자홍 쪽, <code>warning</code>은 주황 쪽(초록으로 가면 안전과 혼동),
+        <code>safe</code>는 청록 쪽입니다.
       </dd>
     </div>
     <div class="dec" style="margin-bottom:18px">
@@ -673,15 +706,31 @@ function cssGradient(stops) {
   }).join(',') + ')';
 }
 
-// 좁고 화사한 코어 + 빠른 감쇠.
+// 계열마다 인접 색조로 벌리는 방향. 의미를 해치지 않는 쪽으로만 움직인다.
+// main 은 보라 쪽, danger 는 자홍 쪽, warning 은 주황 쪽, safe 는 청록 쪽.
+var HUE_DIR = { main: 1, danger: -1, warning: -1, safe: 1 };
+
+// 좁고 화사한 코어 + 빠른 감쇠 + 색조 이동.
 // 넓은 중간톤은 배경과 섞이며 칙칙해지므로 채색 구간을 앞쪽에 몰아넣고
-// 나머지 대부분을 배경으로 비운다. 코어 끝단만 한 단계 밝은 300 을 써서
-// 발광하는 인상을 만들고 곧바로 원색 500 으로 넘어간다.
-function coreStops(c300, c500, peak, tight) {
-  var pts = [0, 0.12, 0.22, 0.36, 0.55, 0.78, 1];
-  return pts.map(function (t) {
-    var a = t >= 1 ? 0 : peak * Math.pow(1 - t, tight);
-    return [t, t === 0 ? c300 : c500, a];
+// 나머지를 배경으로 비운다. 코어 끝단은 한 단계 밝은 300 을 색조까지 옮겨 highlight 로 쓰고,
+// 원색 500 을 지나 꼬리에서 반대쪽 색조로 넘어가며 사라진다.
+// 색조 폭은 원색(500)의 색상을 기준으로 잰다. 램프 안에서 300과 500의 색상이
+// 조금씩 어긋나 있어, 각 단계를 따로 밀면 계열마다 아크 폭이 달라진다.
+function arcColors(c300, c500, span, dir) {
+  var o3 = hexToOklch(c300), o5 = hexToOklch(c500);
+  return {
+    hi: oklchToHex(o3.L, o3.C, (o5.H + span * dir + 360) % 360),
+    lo: oklchToHex(o5.L, o5.C, (o5.H - span * 0.6 * dir + 360) % 360)
+  };
+}
+
+function coreStops(c300, c500, peak, tight, span, dir) {
+  var arc = arcColors(c300, c500, span, dir);
+  var hi = arc.hi, lo = arc.lo;
+  var pts = [[0, hi], [0.07, c300], [0.16, c500], [0.30, lo], [0.50, lo], [0.75, lo], [1, lo]];
+  return pts.map(function (q) {
+    var a = q[0] >= 1 ? 0 : peak * Math.pow(1 - q[0], tight);
+    return [q[0], q[1], a];
   });
 }
 
@@ -720,7 +769,7 @@ function textSafeFrom(stops, bgHex, textHex) {
   return null;
 }
 
-function renderGradients(gray, status, peak, tight) {
+function renderGradients(gray, status, peakDark, peakLight, tight, span) {
   var canvasDark = gray['950'].hex;
   var canvasLight = gray['50'].hex;
   var textOnDark = gray['50'].hex;
@@ -756,16 +805,22 @@ function renderGradients(gray, status, peak, tight) {
   return Object.keys(GRADIENTS_CURRENT).map(function (name) {
     var role = GRADIENT_ROLE[name];
     var fam = status[role[0]];
-    var stops = coreStops(fam['300'].hex, fam['500'].hex, peak, tight);
+    var dir = HUE_DIR[role[0]] || 1;
+    var stopsDark = coreStops(fam['300'].hex, fam['500'].hex, peakDark, tight, span, dir);
+    var stopsLight = coreStops(fam['300'].hex, fam['500'].hex, peakLight, tight, span, dir);
+    var arc = arcColors(fam['300'].hex, fam['500'].hex, span, dir);
+    var hi = arc.hi, lo = arc.lo;
     return '<h3 style="font-size:13px;margin:30px 0 4px;color:var(--ui-dim);font-weight:600;">' + name + '</h3>' +
-      '<p class="note" style="margin-bottom:10px">' + role[1] +
-      ' · 코어 <code>' + role[0] + '/300 ' + fam['300'].hex + '</code> → <code>' + role[0] + '/500 ' + fam['500'].hex + '</code></p>' +
+      '<p class="note" style="margin-bottom:10px">' + role[1] + ' · ' +
+      '<span class="sw-sm" style="background:' + hi + '"></span><code>' + hi + '</code> highlight → ' +
+      '<span class="sw-sm" style="background:' + fam['500'].hex + '"></span><code>' + fam['500'].hex + '</code> 원색 → ' +
+      '<span class="sw-sm" style="background:' + lo + '"></span><code>' + lo + '</code> 꼬리</p>' +
       '<div class="sim-label" style="margin-bottom:4px">현재 — 불투명 2~3 stop</div>' +
       '<div style="height:26px;border-radius:6px;margin-bottom:16px;background:' +
       cssGradient(GRADIENTS_CURRENT[name]) + '"></div>' +
       '<div class="stacks">' +
-        panel('변경안 · Dark canvas 위', canvasDark, stops, textOnDark) +
-        panel('변경안 · Light canvas 위', canvasLight, stops, textOnLight) +
+        panel('변경안 · Dark canvas 위 · 강도 ' + Math.round(peakDark * 100) + '%', canvasDark, stopsDark, textOnDark) +
+        panel('변경안 · Light canvas 위 · 강도 ' + Math.round(peakLight * 100) + '%', canvasLight, stopsLight, textOnLight) +
       '</div>';
   }).join('');
 }
@@ -780,8 +835,10 @@ function render() {
     alignL: document.getElementById('alignL').checked,
     mainPreset: document.getElementById('mainPreset').value,
     mainHue: +document.getElementById('mainHue').value,
-    gradA: +document.getElementById('gradA').value,
-    gradT: +document.getElementById('gradT').value
+    gradAD: +document.getElementById('gradAD').value,
+    gradAL: +document.getElementById('gradAL').value,
+    gradT: +document.getElementById('gradT').value,
+    gradH: +document.getElementById('gradH').value
   };
   document.getElementById('v-hue').textContent = p.hue + '°';
   document.getElementById('v-chroma').textContent = p.chroma.toFixed(3);
@@ -789,8 +846,10 @@ function render() {
   document.getElementById('v-canvas').textContent = 'L ' + p.canvasL.toFixed(3);
   document.getElementById('v-status').textContent = p.statusC.toFixed(2) + '×';
   document.getElementById('v-mainPreset').textContent = p.mainPreset === 'ref' ? '변경' : '유지';
-  document.getElementById('v-grad').textContent = Math.round(p.gradA * 100) + '%';
+  document.getElementById('v-gradD').textContent = Math.round(p.gradAD * 100) + '%';
+  document.getElementById('v-gradL').textContent = Math.round(p.gradAL * 100) + '%';
   document.getElementById('v-tight').textContent = p.gradT.toFixed(2);
+  document.getElementById('v-hueSpan').textContent = p.gradH + '°';
   document.getElementById('v-mainHue').textContent = p.mainPreset === 'ref' ? p.mainHue + '°' : '—';
 
   var gray = buildGray(p);
@@ -874,7 +933,7 @@ function render() {
       '<td class="role">' + pair[5] + '</td></tr>';
   }).join('');
 
-  document.getElementById('gradients').innerHTML = renderGradients(gray, status, p.gradA, p.gradT);
+  document.getElementById('gradients').innerHTML = renderGradients(gray, status, p.gradAD, p.gradAL, p.gradT, p.gradH);
 
   // 출력
   var lines = ['# Primitive / color / gray', ''];
@@ -895,7 +954,7 @@ function render() {
   document.getElementById('output').textContent = lines.join('\n');
 }
 
-['hue', 'chroma', 'spacing', 'canvasL', 'statusC', 'alignL', 'mainPreset', 'mainHue', 'gradA', 'gradT'].forEach(function (id) {
+['hue', 'chroma', 'spacing', 'canvasL', 'statusC', 'alignL', 'mainPreset', 'mainHue', 'gradAD', 'gradAL', 'gradT', 'gradH'].forEach(function (id) {
   document.getElementById(id).addEventListener('input', render);
 });
 // 레퍼런스의 구조를 그대로 적용한다. 뉴트럴 채도를 COOL GRAY 수준까지 낮추고
@@ -909,8 +968,10 @@ document.getElementById('preset-ref').addEventListener('click', function () {
   document.getElementById('alignL').checked = false;
   document.getElementById('mainPreset').value = 'covalent';
   document.getElementById('mainHue').value = 253;
-  document.getElementById('gradA').value = 1;
-  document.getElementById('gradT').value = 4.5;
+  document.getElementById('gradAD').value = 0.7;
+  document.getElementById('gradAL').value = 0.8;
+  document.getElementById('gradT').value = 5;
+  document.getElementById('gradH').value = 18;
   render();
 });
 
@@ -923,8 +984,10 @@ document.getElementById('reset').addEventListener('click', function () {
   document.getElementById('alignL').checked = false;
   document.getElementById('mainPreset').value = 'ref';
   document.getElementById('mainHue').value = 260;
-  document.getElementById('gradA').value = 1;
-  document.getElementById('gradT').value = 4.5;
+  document.getElementById('gradAD').value = 0.7;
+  document.getElementById('gradAL').value = 0.8;
+  document.getElementById('gradT').value = 5;
+  document.getElementById('gradH').value = 18;
   render();
 });
 render();
