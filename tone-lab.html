@@ -170,6 +170,11 @@
       <span class="hint">높일수록 채색 구간이 좁아지고 빨리 사라짐</span>
     </div>
     <div class="ctl">
+      <label>코어 밝기 <span class="val" id="v-lift"></span></label>
+      <input type="range" id="gradLift" min="0" max="1" step="0.05" value="0" />
+      <span class="hint">0 이면 코어가 상태색 500 그대로</span>
+    </div>
+    <div class="ctl">
       <label>색조 폭 <span class="val" id="v-hueSpan"></span></label>
       <input type="range" id="gradH" min="0" max="40" step="1" value="20" />
       <span class="hint">기준 20°. 계열별 방향은 아래 표 참고</span>
@@ -254,6 +259,16 @@
         면적의 대부분은 순수한 배경색이 됩니다. 레퍼런스의 발광하는 인상이 이 배분에서 나옵니다.<br /><br />
         코어 끝단에만 한 단계 밝은 <code>300</code>을 써서 빛이 새어나오는 느낌을 만들고
         곧바로 원색 <code>500</code>으로 넘어갑니다.
+      </dd>
+    </div>
+    <div class="dec" style="margin-bottom:18px">
+      <dt style="margin-bottom:6px">코어를 원색 500 으로 두면 상태색과 이어집니다</dt>
+      <dd>
+        <code>코어 밝기</code>가 0 이면 그라데이션의 가장 진한 지점이 <strong>상태 Badge·Icon 에 쓰이는
+        500 과 같은 색</strong>이 됩니다. 같은 화면에서 배지와 그라데이션이 같은 빨강·노랑·초록으로 읽히므로
+        상태 색상 램프와 통일감이 생깁니다.<br /><br />
+        값을 올리면 코어가 <code>300</code> 쪽으로 밝아지며 발광하는 인상이 강해지지만,
+        그만큼 상태색과는 멀어집니다. 두 인상을 비교해 보십시오.
       </dd>
     </div>
     <div class="dec" style="margin-bottom:18px">
@@ -710,10 +725,10 @@ var HUE_ARC = {
 // 원색 500 을 지나 꼬리에서 반대쪽 색조로 넘어가며 사라진다.
 // 색조 폭은 원색(500)의 색상을 기준으로 잰다. 램프 안에서 300과 500의 색상이
 // 조금씩 어긋나 있어, 각 단계를 따로 밀면 계열마다 아크 폭이 달라진다.
-function coreStops(c300, c500, peak, tight, span, arcDef) {
+function coreStops(c300, c500, peak, tight, span, arcDef, lift) {
   var o3 = hexToOklch(c300), o5 = hexToOklch(c500);
   var k = span / 20;
-  var hiH = o5.H + arcDef.hi * k;
+  var f = lift === undefined ? 1 : lift;
   var loH = o5.H + arcDef.lo * k;
 
   // w = 1 이면 300 단계의 명도·채도, 0 이면 원색의 명도·채도.
@@ -726,9 +741,11 @@ function coreStops(c300, c500, peak, tight, span, arcDef) {
     return oklchToHex(L, C, (hue + 360) % 360);
   }
 
+  // lift 가 0 이면 코어가 원색 그대로다. 명도·채도·색상 이동이 모두 0 이 되어
+  // 상태 Badge·Icon 에 쓰이는 500 과 같은 색이 그라데이션의 가장 진한 지점에 온다.
   var pts = [
-    [0.00, mk(1.00, hiH, arcDef.hiC)],
-    [0.07, mk(0.55, o5.H + arcDef.hi * k * 0.45)],
+    [0.00, mk(1.00 * f, o5.H + arcDef.hi * k * f, 1 - (1 - arcDef.hiC) * f)],
+    [0.07, mk(0.55 * f, o5.H + arcDef.hi * k * 0.45 * f)],
     [0.16, mk(0.00, o5.H)],
     [0.30, mk(0.00, loH)],
     [0.50, mk(0.00, loH)],
@@ -742,8 +759,8 @@ function coreStops(c300, c500, peak, tight, span, arcDef) {
   });
 }
 
-function arcColors(c300, c500, span, arc) {
-  var st = coreStops(c300, c500, 1, 1, span, arc);
+function arcColors(c300, c500, span, arc, lift) {
+  var st = coreStops(c300, c500, 1, 1, span, arc, lift);
   return { hi: st[0][1], lo: st[3][1] };
 }
 
@@ -782,7 +799,7 @@ function textSafeFrom(stops, bgHex, textHex) {
   return null;
 }
 
-function renderGradients(gray, status, peak, tight, span) {
+function renderGradients(gray, status, peak, tight, span, lift) {
   var canvasDark = gray['950'].hex;
   var canvasLight = gray['50'].hex;
   var textOnDark = gray['50'].hex;
@@ -819,12 +836,12 @@ function renderGradients(gray, status, peak, tight, span) {
     var role = GRADIENT_ROLE[name];
     var fam = status[role[0]];
     var arcDef = HUE_ARC[role[0]];
-    var stops = coreStops(fam['300'].hex, fam['500'].hex, peak, tight, span, arcDef);
-    var arc = arcColors(fam['300'].hex, fam['500'].hex, span, arcDef);
+    var stops = coreStops(fam['300'].hex, fam['500'].hex, peak, tight, span, arcDef, lift);
+    var arc = arcColors(fam['300'].hex, fam['500'].hex, span, arcDef, lift);
     var hi = arc.hi, lo = arc.lo;
     return '<h3 style="font-size:13px;margin:30px 0 4px;color:var(--ui-dim);font-weight:600;">' + name + '</h3>' +
       '<p class="note" style="margin-bottom:10px">' + role[1] + ' · ' +
-      '<span class="sw-sm" style="background:' + hi + '"></span><code>' + hi + '</code> highlight → ' +
+      '<span class="sw-sm" style="background:' + hi + '"></span><code>' + hi + '</code> 코어 → ' +
       '<span class="sw-sm" style="background:' + fam['500'].hex + '"></span><code>' + fam['500'].hex + '</code> 원색 → ' +
       '<span class="sw-sm" style="background:' + lo + '"></span><code>' + lo + '</code> 꼬리</p>' +
       '<div class="sim-label" style="margin-bottom:4px">현재 — 불투명 2~3 stop</div>' +
@@ -849,7 +866,8 @@ function render() {
     mainHue: +document.getElementById('mainHue').value,
     gradA: +document.getElementById('gradA').value,
     gradT: +document.getElementById('gradT').value,
-    gradH: +document.getElementById('gradH').value
+    gradH: +document.getElementById('gradH').value,
+    gradLift: +document.getElementById('gradLift').value
   };
   document.getElementById('v-hue').textContent = p.hue + '°';
   document.getElementById('v-chroma').textContent = p.chroma.toFixed(3);
@@ -860,6 +878,7 @@ function render() {
   document.getElementById('v-grad').textContent = Math.round(p.gradA * 100) + '%';
   document.getElementById('v-tight').textContent = p.gradT.toFixed(2);
   document.getElementById('v-hueSpan').textContent = p.gradH + '°';
+  document.getElementById('v-lift').textContent = p.gradLift === 0 ? '500 그대로' : p.gradLift.toFixed(2);
   document.getElementById('v-mainHue').textContent = p.mainPreset === 'ref' ? p.mainHue + '°' : '—';
 
   var gray = buildGray(p);
@@ -943,7 +962,7 @@ function render() {
       '<td class="role">' + pair[5] + '</td></tr>';
   }).join('');
 
-  document.getElementById('gradients').innerHTML = renderGradients(gray, status, p.gradA, p.gradT, p.gradH);
+  document.getElementById('gradients').innerHTML = renderGradients(gray, status, p.gradA, p.gradT, p.gradH, p.gradLift);
 
   // 출력
   var lines = ['# Primitive / color / gray', ''];
@@ -964,7 +983,7 @@ function render() {
   document.getElementById('output').textContent = lines.join('\n');
 }
 
-['hue', 'chroma', 'spacing', 'canvasL', 'statusC', 'alignL', 'mainPreset', 'mainHue', 'gradA', 'gradT', 'gradH'].forEach(function (id) {
+['hue', 'chroma', 'spacing', 'canvasL', 'statusC', 'alignL', 'mainPreset', 'mainHue', 'gradA', 'gradT', 'gradH', 'gradLift'].forEach(function (id) {
   document.getElementById(id).addEventListener('input', render);
 });
 // 레퍼런스의 구조를 그대로 적용한다. 뉴트럴 채도를 COOL GRAY 수준까지 낮추고
@@ -981,6 +1000,7 @@ document.getElementById('preset-ref').addEventListener('click', function () {
   document.getElementById('gradA').value = 0.9;
   document.getElementById('gradT').value = 5.25;
   document.getElementById('gradH').value = 20;
+  document.getElementById('gradLift').value = 0;
   render();
 });
 
