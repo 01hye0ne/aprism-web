@@ -233,7 +233,12 @@
       <strong><code>Mission Timeline Iist</code></strong> — <code>List</code>의 <code>l</code>이 대문자
       <code>I</code>입니다. 지난번에도 남아 있던 오타입니다.
     </li>
-    <li>진행률이 여전히 <code>3 / 5</code> · <code>00%</code>입니다. 3/5는 60%입니다.</li>
+    <li>
+      진행률이 <code>3 / 5</code> · <code>00%</code>로 서로 맞지 않았습니다.
+      웨이포인트가 로봇 선택에 따라 달라지게 되면서 <strong>진행률은 단계에서 계산</strong>합니다 —
+      1번 로봇은 7단계 중 3단계 완료라 <code>3 / 7</code> · <code>43%</code>로 나옵니다.
+      <strong>Figma 쪽 값도 맞춰 주시면 좋겠습니다.</strong>
+    </li>
   </ul>
 
   <h3>5. AI(Delta) 요약 — closed / opened</h3>
@@ -253,11 +258,44 @@
     Figma의 opened에는 테두리가 없지만, 폭을 0으로 만들면 여닫을 때 2px씩 튀어서 색만 없앴습니다.
   </p>
 
-  <h3>6. 그대로 둔 것 · 코드에서 정한 것</h3>
+  <h3>6. 붙인 동작 — 패널 접기 · 로봇 선택</h3>
   <p>
-    <strong>문구는 한 글자도 바꾸지 않았습니다.</strong>
-    <code>로봇명</code> ×3, <code>waypoint name</code> ×7, <code>전체 미션명</code>, <code>00%</code>,
+    <strong>사이트 패널 접기.</strong> 우상단 <code>panel-left</code> 버튼으로 여닫습니다.
+    <strong>접힌 모습은 Figma에 없어서 여기서 정했습니다</strong> — 버튼만 남는
+    <strong>44</strong>(12+20+12) 폭으로 줄이고 남는 자리는 지도가 가져갑니다.
+    버튼이 패널 안에 있어서 폭을 0으로 만들 수는 없었습니다.
+    접히면 아이콘이 좌우로 뒤집혀 "펼치기"로 읽힙니다.
+    <strong>접힌 상태를 그려 주시면 그대로 맞추겠습니다.</strong>
+  </p>
+  <p>
+    <strong>로봇 선택.</strong> 카드를 누르면 <code>Robot Card</code>의
+    <code>Type = Default ↔ Selected</code>가 바뀝니다. 두 Variant의 차이는 카드 면
+    (<code>bg/surface/selected</code>) 하나뿐이라 그대로 옮겼습니다.
+    한 번에 하나만 선택됩니다(<code>aria-pressed</code>).
+  </p>
+  <p>
+    <strong>선택에 따라 아래 waypoint 목록과 진행률이 바뀝니다.</strong>
+    Figma에는 타임라인이 하나뿐이라 <strong>2·3번 로봇의 내용은 여기서 지었습니다</strong> —
+    카드에 걸린 상태를 따랐습니다.
+  </p>
+  <table>
+    <tr><th>로봇</th><th>카드 상태</th><th>waypoint</th><th>진행률</th></tr>
+    <tr><td>1</td><td><code>Running</code> · 78% · Strong</td><td>7단계 — 3 완료, 4 수행중(설명 있음), 나머지 대기</td><td>3 / 7 · 43%</td></tr>
+    <tr><td>2</td><td><code>Returning</code> · 18% · Weak</td><td>5단계 — 전부 완료</td><td>5 / 5 · 100%</td></tr>
+    <tr><td>3</td><td><code>Idle</code> · 35% · Good</td><td>4단계 — 전부 대기</td><td>0 / 4 · 0%</td></tr>
+  </table>
+  <p>
+    문구는 Figma와 같은 <code>waypoint name</code>을 그대로 씁니다. 시각·소요 시간만 다릅니다.
+    <strong>실제 값이 정해지면 알려 주세요.</strong>
+    타임라인은 <code>assets/js/screen.js</code> 안의 <code>ROBOTS</code> 배열에서 그립니다.
+  </p>
+
+  <h3>7. 그대로 둔 것 · 코드에서 정한 것</h3>
+  <p>
+    <strong>문구는 자리표시자 그대로 둡니다.</strong>
+    <code>로봇명</code> ×3, <code>waypoint name</code>, <code>전체 미션명</code>,
     채워지지 않은 사각형 자리 모두 Figma 그대로입니다.
+    진행률(<code>00%</code>)만 계산 값으로 바뀌었습니다 — 아래 7번을 봐 주세요.
   </p>
   <p>
     무엇이 늘어나는지는 코드에서 정했습니다 — 고정 폭은

@@ -285,16 +285,34 @@ button {
   flex-direction: column;
   gap: var(--space-20);
   padding: var(--space-8) var(--space-12);
-  overflow-y: auto;
+  overflow: hidden auto;
+  /* 안쪽 .panel-section 이 216 고정이라 이게 없으면 min-content 가 240 으로 바닥이 되어
+     접어도 폭이 줄지 않는다. */
+  min-width: 0;
+  transition: flex-basis 200ms ease;
 }
 
-/* 패널을 접는 자리다. Figma 에는 아이콘만 있고 동작은 걸려 있지 않다. */
+/*
+ * 접힌 상태는 Figma 에 없다. 여기서 정했다 — 버튼만 남는 44(12+20+12) 폭으로 줄이고
+ * 남는 자리는 지도가 가져간다. 버튼이 패널 안에 있어서 폭을 0 으로 만들 수는 없다.
+ */
+.context-panel.is-collapsed { flex-basis: calc(var(--size-icon-20) + var(--space-12) * 2); }
+
+.context-panel.is-collapsed .panel-section {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* 패널을 접고 펴는 버튼이다. Figma 에는 아이콘만 있고 동작은 걸려 있지 않다. */
 .panel-collapse {
   flex: none;
   display: flex;
   justify-content: flex-end;
   height: var(--size-icon-20);
 }
+
+/* 접힌 상태에서는 아이콘을 뒤집어 "펼치기" 로 읽히게 한다. */
+.context-panel.is-collapsed .panel-collapse .i { transform: scaleX(-1); }
 
 .panel-collapse button {
   display: inline-flex;
@@ -309,11 +327,14 @@ button {
 
 .panel-collapse button:hover { color: var(--fg-primary); }
 
+/* 폭을 고정해 둔다 — 패널이 접힐 때 좁아진 폭에 맞춰 글이 다시 흐르면 보기 흉하다. */
 .panel-section {
   flex: none;
+  width: calc(var(--size-context-panel-width) - var(--space-12) * 2);
   display: flex;
   flex-direction: column;
   gap: var(--space-8);
+  transition: opacity 140ms ease;
 }
 
 .section-label { color: var(--fg-tertiary); }
@@ -693,7 +714,8 @@ button {
 
 /* 움직임을 줄이도록 설정한 환경에서는 전환 없이 바로 바뀐다. */
 @media (prefers-reduced-motion: reduce) {
-  .ai-panel, .ai-fold, .ai-toggle, .ai-toggle .i { transition: none; }
+  .ai-panel, .ai-fold, .ai-toggle, .ai-toggle .i,
+  .context-panel, .panel-section { transition: none; }
 }
 
 /* ---------- Right Panel ---------- */
@@ -774,6 +796,7 @@ button {
   scrollbar-width: thin;
 }
 
+/* Figma Robot Card 의 Type=Default / Selected 다. 차이는 카드 면 하나뿐이다. */
 .robot-card {
   flex: 1 1 0;
   min-width: 132px;
@@ -781,10 +804,23 @@ button {
   flex-direction: column;
   gap: var(--space-8);
   padding: var(--space-4);
+  border: 0;
   border-radius: var(--radius-card);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
 }
 
-.robot-card.is-selected { background-color: var(--bg-surface-selected); }
+.robot-card[aria-pressed="true"] { background-color: var(--bg-surface-selected); }
+
+.robot-card:hover:not([aria-pressed="true"]) { background-color: var(--bg-interactive-hover); }
+
+.robot-card:focus-visible {
+  outline: var(--border-width-strong) solid var(--border-focus);
+  outline-offset: -2px;
+}
 
 .robot-card .label {
   display: flex;
