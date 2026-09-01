@@ -202,13 +202,14 @@
   <h3>4. AI(Delta) 요약 — closed / opened</h3>
   <p>
     <code>AI Assist Panel</code>의 <code>Emphasis</code> 속성(<code>closed</code> · <code>opened</code>)을
-    <strong>평상시 closed, hover 하면 opened</strong>로 연결했습니다. 마우스가 없는 환경도 있어서
-    <code>:focus-within</code>을 같이 걸었습니다 — 패널에 탭으로 들어가도 열립니다.
+    <strong>우측 상단 토글 버튼</strong>으로 전환합니다. 기본은 closed 입니다.
+    닫힘 <code>^</code> · 열림 <code>v</code>로 방향이 바뀌고, <code>chevron-down</code> 하나를 돌려 씁니다.
   </p>
   <p>
     두 상태를 모두 DOM에 두고 <code>grid-template-rows</code>를 <code>0fr ↔ 1fr</code>로 여닫습니다.
     <code>height: auto</code>는 전환이 안 되지만 이 방식은 됩니다.
     <code>prefers-reduced-motion</code>이 켜진 환경에서는 전환 없이 바로 바뀝니다.
+    펼친 상태에서 <code>Esc</code>로 닫을 수 있고, 초점은 버튼에 남습니다.
   </p>
   <p>
     닫힌 상태의 2px 상단 테두리(<code>border/focus</code>)는 열릴 때 <strong>투명해집니다</strong> —

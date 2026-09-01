@@ -457,8 +457,7 @@ button {
 /* ---------- AI Assist Panel ---------- */
 /*
  * Figma 의 Emphasis 속성이 closed / opened 두 Variant 를 갖는다.
- * 평상시 closed, hover 하면 opened 로 연다.
- * 키보드로도 열려야 하므로 :focus-within 을 같이 건다.
+ * 기본은 closed 이고 우측 토글 버튼으로 전환한다(screen.js).
  *
  * 두 상태를 모두 DOM 에 두고 grid-template-rows 0fr <-> 1fr 로 여닫는다.
  * height:auto 는 전환이 안 되지만 이 방식은 된다.
@@ -467,6 +466,7 @@ button {
  * stop 위치가 토큰 정의와 달라서 이 자리의 실측값을 그대로 쓴다.
  */
 .ai-panel {
+  position: relative;
   flex: none;
   display: flex;
   flex-direction: column;
@@ -475,7 +475,6 @@ button {
   border-top: var(--border-width-strong) solid var(--border-focus);
   border-radius: var(--radius-container);
   overflow: hidden;
-  cursor: pointer;
   /* 기본값(origin: padding-box, repeat)이면 테두리 영역에 타일 아래끝이 반복돼
      상단 2px 에 가장 밝은 stop 이 줄로 나타난다. border-box 로 늘려 덮는다. */
   background-origin: border-box;
@@ -490,16 +489,51 @@ button {
   transition: padding 180ms ease, border-top-color 180ms ease;
 }
 
-.ai-panel:hover,
-.ai-panel:focus-within {
+.ai-panel.is-open {
   padding: var(--space-24);
   border-top-color: transparent;
 }
 
-.ai-panel:focus-visible {
-  outline: var(--border-width-strong) solid var(--border-focus);
-  outline-offset: -2px;
+/* 토글 버튼. 두 상태에서 같은 자리(우측 상단)에 남아야 해서 절대배치한다.
+   절대배치의 기준은 padding box 라 padding 값과 같은 offset 을 직접 준다. */
+.ai-toggle {
+  position: absolute;
+  top: var(--space-16);
+  right: var(--space-16);
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-control-md);
+  height: var(--size-control-md);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: #ffffff;
+  cursor: pointer;
+  transition: top 180ms ease, right 180ms ease, background-color 120ms ease;
 }
+
+.ai-panel.is-open .ai-toggle {
+  top: var(--space-24);
+  right: var(--space-24);
+}
+
+.ai-toggle:hover { background-color: rgb(255 255 255 / 14%); }
+
+.ai-toggle:focus-visible {
+  outline: var(--border-width-strong) solid var(--border-focus);
+  outline-offset: 1px;
+}
+
+/* 닫힘 ^ / 열림 v. chevron-down 하나를 돌려 쓴다. */
+.ai-toggle .i {
+  transform: rotate(180deg);
+  transition: transform 180ms ease;
+}
+
+.ai-panel.is-open .ai-toggle .i { transform: rotate(0deg); }
 
 .ai-fold {
   display: grid;
@@ -511,17 +545,16 @@ button {
 .ai-fold-closed { grid-template-rows: 1fr; opacity: 1; }
 .ai-fold-open { grid-template-rows: 0fr; opacity: 0; }
 
-.ai-panel:hover .ai-fold-closed,
-.ai-panel:focus-within .ai-fold-closed { grid-template-rows: 0fr; opacity: 0; }
-
-.ai-panel:hover .ai-fold-open,
-.ai-panel:focus-within .ai-fold-open { grid-template-rows: 1fr; opacity: 1; }
+.ai-panel.is-open .ai-fold-closed { grid-template-rows: 0fr; opacity: 0; }
+.ai-panel.is-open .ai-fold-open { grid-template-rows: 1fr; opacity: 1; }
 
 /* closed */
 .ai-closed {
   display: flex;
   align-items: center;
   gap: var(--space-16);
+  /* 토글 버튼과 겹치지 않도록 자리를 비운다. */
+  padding-right: calc(var(--size-control-md) + var(--space-8));
 }
 
 /* Figma 에 채워지지 않은 채 남아 있는 자리다. */
@@ -551,6 +584,7 @@ button {
   display: flex;
   flex-direction: column;
   gap: var(--space-8);
+  padding-right: calc(var(--size-control-md) + var(--space-8));
 }
 
 .ai-eyebrow { color: var(--fg-tertiary); }
@@ -603,7 +637,7 @@ button {
 
 /* 움직임을 줄이도록 설정한 환경에서는 전환 없이 바로 바뀐다. */
 @media (prefers-reduced-motion: reduce) {
-  .ai-panel, .ai-fold { transition: none; }
+  .ai-panel, .ai-fold, .ai-toggle, .ai-toggle .i { transition: none; }
 }
 
 /* ---------- Right Panel ---------- */

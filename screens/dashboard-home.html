@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/static/woff2/SUIT.css" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" />
   <link rel="stylesheet" href="../assets/css/tokens.css?v=1d75b47d" />
-  <link rel="stylesheet" href="../assets/css/app-shell.css?v=fe7c40a8" />
+  <link rel="stylesheet" href="../assets/css/app-shell.css?v=4ef4c1e6" />
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
@@ -116,8 +116,13 @@
               </div>
             </div>
 
-            <!-- AI Assist Panel · Emphasis=closed 기본, hover 시 opened -->
-            <section class="ai-panel" tabindex="0" aria-label="Delta AI 요약">
+            <!-- AI Assist Panel · Emphasis=closed 기본, 우측 토글로 opened -->
+            <section class="ai-panel" data-ai-panel aria-label="Delta AI 요약">
+
+              <button type="button" class="ai-toggle" data-ai-toggle
+                      aria-expanded="false" aria-controls="ai-summary" aria-label="요약 펼치기">
+                <span class="i i-20" style="--i:var(--ic-chevron-down)"></span>
+              </button>
 
               <div class="ai-fold ai-fold-closed">
                 <div><div class="ai-closed">
@@ -126,7 +131,7 @@
                 </div></div>
               </div>
 
-              <div class="ai-fold ai-fold-open">
+              <div class="ai-fold ai-fold-open" id="ai-summary">
                 <div><div class="ai-opened">
                   <div class="ai-message">
                     <p class="t-caption ai-eyebrow">DELTA</p>
@@ -382,5 +387,6 @@
 
 
 <script src="../assets/js/theme.js?v=dcf8f460"></script>
+<script src="../assets/js/screen.js?v=9ab10676"></script>
 </body>
 </html>
