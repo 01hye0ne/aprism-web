@@ -298,6 +298,16 @@
     진행률(<code>00%</code>)만 계산 값으로 바뀌었습니다 — 아래 7번을 봐 주세요.
   </p>
   <p>
+    <strong>스크롤바도 토큰으로 맞췄습니다.</strong> Figma 에 없는 부분이라 코드에서 정했습니다 —
+    막대는 <code>border/default</code>, 손이 닿으면 <code>border/strong</code>으로 한 단 진해집니다.
+    Light 는 <code>gray/300 → 400</code>(어두워짐), Dark 는 <code>gray/650 → 600</code>(밝아짐)이라
+    두 모드 모두 대비가 커지는 방향입니다. 트랙은 비워 두고 패널 면(<code>bg/canvas</code>)이 비칩니다.
+    막대는 <code>radius/pill</code>이고 실제 두께는 4px 입니다.
+    Chrome · Safari 는 <code>::-webkit-scrollbar</code>, Firefox 는 <code>scrollbar-color</code>로
+    갈라 뒀습니다 — 둘을 같이 주면 Chrome 이 표준 속성을 우선하면서 앞쪽을 무시합니다.
+    타임라인 · 로봇 카드 · 사이트 패널 · GNB 에 같이 적용했습니다.
+  </p>
+  <p>
     무엇이 늘어나는지는 코드에서 정했습니다 — 고정 폭은
     <strong>GNB(76) · Context Panel(240) · Right Panel(420)</strong> 셋뿐이고 지도가 나머지를 흡수합니다.
     우측 패널은 높이를 채우고 <strong>타임라인만 스크롤</strong>합니다. 웨이포인트가 7개로 늘어난 지금은
