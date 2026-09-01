@@ -6,7 +6,7 @@
  *
  * 컬렉션 구조가 바뀌었다.
  *   이전: Primitive(106) / Semantic(90, Light·Dark) / Component(42, 모드 없음)
- *   현재: Primitive(111) / Semantic(122, Light·Dark) / Texts(7, 문자열)
+ *   현재: Primitive(111) / Semantic(123, Light·Dark) / Texts(7, 문자열)
  *
  * Component 컬렉션이 없어지고 button/* 32개가 Semantic 으로 들어왔다.
  * 나머지 10개(input/border/*, navigation/item/*, table/row/*)는 이관되지 않고 사라졌다.
@@ -195,6 +195,7 @@
   --bg-navigation: var(--color-gray-0);
   --bg-overlay: var(--color-alpha-scrim-light);
   --bg-surface-default: var(--color-gray-0);
+  --bg-surface-alpha: var(--color-alpha-scrim-light);
   --bg-surface-disabled: var(--color-gray-100);
   --bg-surface-raised: var(--color-gray-0);
   --bg-surface-selected: var(--color-main-100);
@@ -346,6 +347,8 @@
   --bg-navigation: var(--color-gray-900);
   --bg-overlay: var(--color-alpha-scrim-dark);
   --bg-surface-default: var(--color-gray-800);
+  /* Light 와 값이 같다 — 어두운 scrim 이라 어느 모드에서든 위에 흰 글자를 올린다. */
+  --bg-surface-alpha: var(--color-alpha-scrim-light);
   --bg-surface-disabled: var(--color-gray-750);
   --bg-surface-raised: var(--color-gray-750);
   --bg-surface-selected: var(--color-gray-700);

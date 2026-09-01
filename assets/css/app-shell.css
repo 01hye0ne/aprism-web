@@ -812,7 +812,33 @@ button {
   cursor: pointer;
 }
 
-.robot-card[aria-pressed="true"] { background-color: var(--bg-surface-selected); }
+/*
+ * Selected 는 단색이 아니라 세로 그라데이션이다. stop 셋 모두 토큰에 묶여 있어
+ * 두 모드를 알아서 따라간다.
+ *   30%  bg/surface/selected   Light main/100 · Dark gray/700
+ *   98%  status/info/bg        Light main/100 · Dark main/900
+ *   100% bg/accent             Light main/700 · Dark main/600
+ * 카드 padding 4 · 줄 사이 gap 2 로 이 면이 줄 둘레에 비쳐 파란 테두리처럼 보인다.
+ */
+.robot-card[aria-pressed="true"] {
+  background-image: linear-gradient(
+    180deg,
+    var(--bg-surface-selected) 30%,
+    var(--status-info-bg) 98%,
+    var(--bg-accent) 100%
+  );
+}
+
+/* 선택된 카드의 줄은 어두운 scrim(bg/surface/alpha)이다. 두 모드 값이 같다. */
+.robot-card[aria-pressed="true"] .robot-row {
+  background-color: var(--bg-surface-alpha);
+}
+
+/*
+ * scrim 이 어느 모드에서든 어둡기 때문에 이 라벨은 흰색이어야 한다 —
+ * Figma 도 raw white 다. 선택되지 않은 줄은 밝은 면이라 fg/secondary 로 둔다.
+ */
+.robot-card[aria-pressed="true"] .robot-row > span:first-child { color: #ffffff; }
 
 .robot-card:hover:not([aria-pressed="true"]) { background-color: var(--bg-interactive-hover); }
 
