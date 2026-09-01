@@ -96,44 +96,55 @@
     구조가 크게 바뀌었습니다. 디자인 시스템도 컬렉션 구성이 달라져서 <code>tokens.css</code>를 다시 만들었습니다.
   </p>
 
-  <h3>1. AI 패널 일렁임 — 그라데이션 · Spectrum</h3>
+  <h3>1. AI 패널 일렁임 — 선 · Spectrum · 배경</h3>
   <p>
-    Siri · Gemini 처럼 패널이 가만히 있지 않도록 두 층을 움직였습니다.
-    <strong>둘 다 한 방향으로만 흐르는 무한 루프입니다</strong> — 갔다가 되돌아오지 않습니다.
+    Siri · Gemini 처럼 패널이 가만히 있지 않도록 세 층을 움직였습니다.
+    <strong>모두 한 방향으로만 흐르는 무한 루프</strong>라 갔다가 되돌아오지 않습니다.
     <strong>Figma 에는 없는 층입니다</strong> — 정지 화면으로는 담을 수 없는 것이라 여기서만 더했습니다.
   </p>
   <table>
-    <tr><th>층</th><th>움직임</th><th>주기 · 방향</th></tr>
-    <tr><td>그라데이션 A</td><td><code>alert/{계열}/edge</code> 26%</td><td>18s →</td></tr>
-    <tr><td>그라데이션 B</td><td><code>alert/{계열}/glow-Primary</code> 22%</td><td>25s ←</td></tr>
-    <tr><td>그라데이션 C</td><td><code>alert/{계열}/glow-Secondary</code> 38% + 밝기 호흡</td><td>31s → · 13s</td></tr>
-    <tr><td>Spectrum</td><td>막대 높낮이가 파형 두 겹을 따라 물결칩니다</td><td>16s · 11s</td></tr>
+    <tr><th>층</th><th>움직임</th><th>주기</th></tr>
+    <tr><td><strong>위쪽 선</strong></td><td>5-stop 무늬가 흐르고 그 위로 밝은 섬광 둘이 번갈아 훑습니다</td><td>6s</td></tr>
+    <tr><td><strong>Spectrum</strong></td><td>막대 높낮이가 파형 두 겹을 따라 크게 물결치고 밝은 띠가 지나갑니다</td><td>7s · 4.5s</td></tr>
+    <tr><td>배경 그라데이션</td><td>계열 색 셋이 좌우로 천천히 흐릅니다(그대로 두었습니다)</td><td>18s · 25s · 31s</td></tr>
   </table>
+
   <p>
-    <strong>이음매 없이 도는 원리는 이렇습니다.</strong> 각 층은 패널의 300% 폭이고 무늬가 가로로 반복됩니다.
-    거기서 <strong>무늬 딱 한 칸만큼</strong> 밀면 처음과 픽셀 단위로 같아집니다 —
-    그래서 <code>linear</code> 로 무한히 돌려도 튀는 지점이 없습니다.
-    칸 크기 · 속도 · 방향이 층마다 달라서(18 · 25 · 31 · 13초)
-    <strong>세 층이 겹치는 모양은 열두 시간 넘게 되풀이되지 않습니다.</strong>
+    <strong>선에는 섬광이 지나갑니다.</strong> 아래에는 Figma 의 5-stop 을 좌우 대칭으로 이어 붙인 무늬가
+    등속으로 흐르고, 그 위로 <strong>좁고 밝은 줄기 둘</strong>이 서로 어긋난 구간(0~62% · 38~100%)을
+    훑어서 섬광이 끊기지 않습니다.
+    섬광의 심은 <code>fg/primary</code> 라 <strong>Dark 에선 흰빛, Light 에선 짙은 빛으로 알아서 뒤집힙니다</strong> —
+    Light 에서 흰 섬광을 쓰면 밝은 패널에 묻혀 선이 끊긴 것처럼 보였습니다.
   </p>
   <p>
-    <strong>색은 톤 밖으로 나가지 않습니다.</strong> 세 색 모두 계열 토큰을 섞은 것이라
-    Type 을 Warning · Critical · Safe 로 바꾸면 그 계열로 함께 바뀝니다
-    (<code>--ai-tone-a</code> · <code>b</code> · <code>c</code> 세 값만 갈아끼웁니다).
-    무늬끼리 넉넉히 겹치게 해서 <strong>패널 전체 밝기는 4% 안에서만 움직입니다</strong> —
-    밝아졌다 어두워졌다 하는 게 아니라 <strong>어느 색이 어디 있느냐가 바뀝니다</strong>
-    (같은 자리 색은 최대 48/255 까지 변합니다).
+    선을 그리는 <code>::before</code> 는 높이를 패널 전체에서 <strong>24px</strong> 로 줄였습니다.
+    나머지 세 변의 두께가 0 이라 남는 테두리가 위쪽뿐이어서 모양은 그대로이고,
+    매 프레임 다시 칠할 넓이만 줄어듭니다. 모서리 테이퍼는 Figma 실측과 여전히 같습니다.
   </p>
+
   <p>
     <strong>Spectrum 은 막대가 아니라 파형이 움직입니다.</strong> 막대(2px 간격 4px)는 제자리에 고정된
     마스크이고, 그 안에서 <strong>높이를 정하는 파형만 흐릅니다</strong> — 막대가 흘러가는 게 아니라
-    제자리에서 길어졌다 짧아집니다. 파형은 깊은 것(주기 240 · 80 · 48)과 얕은 것(120 · 48 · 30)
-    <strong>두 겹을 겹쳐 낮은 쪽</strong>을 씁니다. 둘의 속도가 달라서 같은 물결이 반복되지 않습니다.
+    제자리에서 길어졌다 짧아집니다.
+    폭을 크게 키워 <strong>막대가 2px 에서 14px 까지</strong> 오갑니다(16px 띠 안에서).
+    파형은 깊은 것(주기 240 · 80 · 48)과 얕은 것(120 · 48 · 30) <strong>두 겹을 겹쳐 낮은 쪽</strong>을 쓰고,
+    둘의 속도가 달라 같은 물결이 반복되지 않습니다. 막대 색에도 밝은 띠가 함께 지나갑니다.
+    세로 감쇠는 <code>40% @70%</code> → <code>55% @55%</code> 로 더 풀었습니다.
+  </p>
+
+  <p>
+    <strong>배경은 건드리지 않았습니다.</strong> 계열 색 셋이 패널의 300% 폭 안에서 가로로 반복되고
+    <strong>무늬 딱 한 칸만큼</strong> 밀리므로 <code>linear</code> 로 무한히 돌려도 이음매가 없습니다.
+    칸 크기 · 속도 · 방향이 층마다 달라(18s → · 25s ← · 31s →) 겹치는 모양이 열두 시간 넘게
+    되풀이되지 않고, 무늬끼리 넉넉히 겹쳐 <strong>전체 밝기는 4% 안에서만</strong> 움직입니다.
   </p>
   <p>
-    그라데이션은 <code>transform</code> 만 바꾸므로 합성기에서 처리됩니다.
-    Spectrum 의 둘째 파형만 <code>mask-position</code> 을 쓰는데, 폭 16px 띠라 부담이 없습니다.
-    <strong><code>prefers-reduced-motion</code> 을 켠 환경에서는 멈춥니다.</strong>
+    색은 모두 계열 토큰을 섞은 것이라 Type 을 Warning · Critical · Safe 로 바꾸면 함께 바뀝니다
+    (<code>--ai-tone-a · b · c</code> 와 <code>--ai-line-spark</code>).
+    배경은 <code>transform</code> 만 바꾸므로 합성기에서 처리되고, 선과 Spectrum 은
+    <code>background-position</code> · <code>mask-position</code> 을 쓰지만
+    각각 높이 24px · 16px 띠라 다시 칠할 넓이가 작습니다.
+    <strong><code>prefers-reduced-motion</code> 을 켠 환경에서는 모두 멈춥니다.</strong>
   </p>
   <p>
     곁들여 두 가지를 맞췄습니다.
@@ -141,8 +152,6 @@
     퍼블리싱에서는 글자 위에 얹혀 있었습니다.
     그리고 <strong>열린 상태에서는 Spectrum 을 감춥니다</strong> — Figma 의 opened 변형에는 Spectrum 이 없고
     그 자리를 입력창이 차지합니다.
-    막대의 세로 감쇠는 <code>20% @80%</code> → <code>40% @70%</code> 로 완화했습니다.
-    파형이 이미 높낮이를 만들기 때문에 예전 감쇠로는 물결이 보이지 않았습니다.
   </p>
 
   <h3>2. 이번 업데이트 — 사이트 패널 · AI 바 · 토큰</h3>
