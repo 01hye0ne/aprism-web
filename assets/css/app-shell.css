@@ -461,9 +461,9 @@ button {
 
 /* ---------- Map Panel ---------- */
 /*
- * 테두리가 새로 생겼다(border/default, 1px). 면은 여전히 없다.
- * Figma 의 stroke 는 align=INSIDE 라 안쪽 폭을 깎지 않는다 —
- * border 로 그리면 지도가 1120 이 아니라 1118 이 된다. inset shadow 가 같은 뜻이다.
+ * 테두리도 면도 없다.
+ * Figma 의 Map Panel 에는 border/default 1px stroke 가 걸려 있지만
+ * 지도 영역에 선이 보이면 안 된다고 해서 뺐다. Figma 쪽도 정리가 필요하다.
  */
 .map-panel {
   flex: 1 1 auto;
@@ -473,7 +473,6 @@ button {
   gap: var(--space-16);
   padding: var(--space-20);
   border-radius: var(--radius-card);
-  box-shadow: inset 0 0 0 var(--border-width-thin) var(--border-default);
 }
 
 .map-canvas {
