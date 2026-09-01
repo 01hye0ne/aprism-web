@@ -279,15 +279,16 @@ button {
 }
 
 /* ---------- Site Context Panel ---------- */
+/*
+ * 세 덩이로 나뉜다 — 머리줄(44) · 사이트 이름 블록(bg/accent) · 나머지.
+ * 패널 자체에는 padding 이 없고 각 덩이가 자기 여백을 갖는다.
+ */
 .context-panel {
   flex: 0 0 var(--size-context-panel-width);
   display: flex;
   flex-direction: column;
-  gap: var(--space-20);
-  padding: var(--space-8) var(--space-12);
   overflow: hidden auto;
-  /* 안쪽 .panel-section 이 216 고정이라 이게 없으면 min-content 가 240 으로 바닥이 되어
-     접어도 폭이 줄지 않는다. */
+  /* 안쪽 덩이들이 240 고정이라 이게 없으면 min-content 가 바닥이 되어 접히지 않는다. */
   min-width: 0;
   transition: flex-basis 200ms ease;
 }
@@ -298,23 +299,26 @@ button {
  */
 .context-panel.is-collapsed { flex-basis: calc(var(--size-icon-20) + var(--space-12) * 2); }
 
-.context-panel.is-collapsed .panel-section {
-  opacity: 0;
-  pointer-events: none;
-}
-
-/* 패널을 접고 펴는 버튼이다. Figma 에는 아이콘만 있고 동작은 걸려 있지 않다. */
-.panel-collapse {
+/* 머리줄 — SITE 라벨과 접기 버튼이 한 줄에 있다. */
+.panel-head {
   flex: none;
   display: flex;
-  justify-content: flex-end;
-  height: var(--size-icon-20);
+  align-items: center;
+  gap: var(--space-20);
+  height: 44px;
+  padding: var(--space-12);
 }
 
-/* 접힌 상태에서는 아이콘을 뒤집어 "펼치기" 로 읽히게 한다. */
-.context-panel.is-collapsed .panel-collapse .i { transform: scaleX(-1); }
+.panel-head .section-label {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  transition: opacity 140ms ease;
+}
 
-.panel-collapse button {
+.panel-head button {
+  flex: none;
   display: inline-flex;
   width: var(--size-icon-20);
   height: var(--size-icon-20);
@@ -325,35 +329,69 @@ button {
   cursor: pointer;
 }
 
-.panel-collapse button:hover { color: var(--fg-primary); }
+.panel-head button:hover { color: var(--fg-primary); }
 
-/* 폭을 고정해 둔다 — 패널이 접힐 때 좁아진 폭에 맞춰 글이 다시 흐르면 보기 흉하다. */
+/* 접힌 상태에서는 아이콘을 뒤집어 "펼치기" 로 읽히게 한다. */
+.context-panel.is-collapsed .panel-head .i { transform: scaleX(-1); }
+.context-panel.is-collapsed .panel-head .section-label { opacity: 0; }
+
+/*
+ * 사이트 이름과 터빈 선택이 bg/accent 면 위로 올라갔다.
+ * 폭을 고정해 둔다 — 패널이 접힐 때 좁아진 폭에 맞춰 글이 다시 흐르면 보기 흉하다.
+ */
+.site-block,
+.panel-body {
+  flex: none;
+  width: var(--size-context-panel-width);
+  display: flex;
+  flex-direction: column;
+  transition: opacity 140ms ease;
+}
+
+.site-block {
+  gap: var(--space-12);
+  padding: var(--space-20) var(--space-12) var(--space-16);
+  background-color: var(--bg-accent);
+}
+
+.site-block h1 { color: var(--fg-primary); }
+
+.panel-body {
+  gap: var(--space-20);
+  padding: var(--space-16) var(--space-12);
+}
+
+.context-panel.is-collapsed .site-block,
+.context-panel.is-collapsed .panel-body {
+  opacity: 0;
+  pointer-events: none;
+}
+
 .panel-section {
   flex: none;
-  width: calc(var(--size-context-panel-width) - var(--space-12) * 2);
   display: flex;
   flex-direction: column;
   gap: var(--space-8);
-  transition: opacity 140ms ease;
 }
 
 .section-label { color: var(--fg-tertiary); }
 
 /* ---------- Select ---------- */
+/* 테두리가 없어지고 면이 bg/surface/alpha 로 바뀌었다 — bg/accent 위에 얹힌다. */
 .select-field {
   display: flex;
   align-items: center;
   gap: var(--space-8);
   height: var(--size-control-sm);
   padding: 0 var(--space-12);
-  border: var(--border-width-thin) solid var(--border-control);
+  border: 0;
   border-radius: var(--radius-control);
-  background-color: var(--bg-surface-default);
+  background-color: var(--bg-surface-alpha);
   color: var(--fg-primary);
   cursor: pointer;
 }
 
-.select-field:hover { border-color: var(--border-control-hover); }
+.select-field:hover { background-color: var(--bg-surface-selected); }
 
 .select-field > span:first-child {
   flex: 1 1 auto;
@@ -383,8 +421,10 @@ button {
   background-color: currentColor;
 }
 
+/* Figma 는 26 고정이고 stroke 가 안쪽이다. CSS border 는 높이에 더해지므로 못 박는다. */
 .badge-mode {
   align-self: flex-start;
+  height: 26px;
   background-color: var(--bg-surface-subtle);
   border: var(--border-width-thin) solid var(--border-default);
   color: var(--fg-secondary);
@@ -464,12 +504,12 @@ button {
 }
 
 /* ---------- Main ---------- */
-/* Figma 의 Margin 프레임이다. 여백이 8 에서 4 로 줄었다. */
+/* Figma 의 Margin 프레임이다. 왼쪽 여백이 없어져 지도가 사이트 패널에 붙는다. */
 .main {
   flex: 1 1 auto;
   min-width: 0;
   display: flex;
-  padding: var(--space-4);
+  padding: var(--space-4) var(--space-4) var(--space-4) 0;
 }
 
 .two-col {
@@ -558,12 +598,36 @@ button {
   background-repeat: no-repeat;
   background-image: linear-gradient(
     180deg,
-    rgb(54 149 223 / 10%) 0%,
-    rgb(90 142 228 / 29%) 82.2%,
-    rgb(104 148 230 / 56.2%) 95.7%,
-    rgb(117 152 232 / 90%) 100%
+    rgb(54 178 223 / 10%) 0%,
+    rgb(90 142 228 / 30%) 55%,
+    rgb(104 148 230 / 50%) 90%,
+    rgb(117 152 232 / 60%) 95%,
+    var(--alert-default-glow-primary) 100%
   );
+  /* Figma 의 INNER_SHADOW — 아래에서 위로 번지는 발광이다. */
+  box-shadow: inset 0 -8px 12px -4px var(--alert-default-glow-secondary);
   transition: padding 180ms ease, border-top-color 180ms ease;
+}
+
+/*
+ * Figma 의 Spectrum. 2px 선 300개를 반복 배경 하나로 대신한다.
+ * 선마다 세로 그라데이션(위 투명 -> 아래 불투명)이 걸려 있어 mask 로 같은 감쇠를 준다.
+ * 패널 아래 변에 고정이고 좌우로 늘어난다(Figma 의 SCALE/MAX 제약).
+ */
+.ai-spectrum {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 16px;
+  pointer-events: none;
+  background-image: repeating-linear-gradient(
+    90deg,
+    var(--alert-default-glow-primary) 0 2px,
+    transparent 2px 4px
+  );
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, rgb(0 0 0 / 20%) 80%, #000 100%);
+  mask-image: linear-gradient(180deg, transparent 0%, rgb(0 0 0 / 20%) 80%, #000 100%);
 }
 
 .ai-panel.is-open {

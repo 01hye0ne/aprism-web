@@ -4,17 +4,19 @@
  * 값의 출처는 variable 의 valuesByMode 실측 덤프다.
  * 변수 설명(description)은 실제 값과 어긋나는 경우가 있어 근거로 쓰지 않는다.
  *
- * 컬렉션 구조가 바뀌었다.
- *   이전: Primitive(106) / Semantic(90, Light·Dark) / Component(42, 모드 없음)
- *   현재: Primitive(111) / Semantic(123, Light·Dark) / Texts(7, 문자열)
+ * 컬렉션이 또 커졌다.
+ *   이전: Primitive(111) / Semantic(123, Light·Dark) / Texts(7)
+ *   현재: Primitive(120) / Semantic(134, Light·Dark) / Texts(7)
  *
- * Component 컬렉션이 없어지고 button/* 32개가 Semantic 으로 들어왔다.
- * 나머지 10개(input/border/*, navigation/item/*, table/row/*)는 이관되지 않고 사라졌다.
- * 그 자리에는 대응하는 Semantic 을 직접 쓴다.
- *   input/border/default -> border/control
- *   input/border/hover   -> border/control-hover
- *   navigation/item/bg/* -> bg/surface/selected · bg/interactive/hover
- *   table/row/bg/*       -> bg/surface/default · bg/interactive/hover · bg/surface/selected
+ * 이번에 바뀐 것
+ *   - alert/* 의 glow 가 둘로 갈렸다: glow-Primary(불투명 원색) · glow-Secondary(반투명).
+ *     이전 이름 alert/…/glow 는 사라졌다.
+ *   - alert/Default/* 계열이 새로 생겼다. AI Assist Panel 이 이걸 쓴다.
+ *   - bg/accent 의 Light·Dark 가 서로 바뀌었다 — Light main/700->600, Dark main/600->700.
+ *   - bg/Safe · bg/navigation · bg/interactive/accent-* · bg/interactive/inverse-* ·
+ *     chart/categorical/1~4 · chart/heat/1~5 · radius/Chart 가 새로 생겼다.
+ *   - Primitive 에 main/50·200·400·800·950, danger/200, safe/200, warning/100 2,
+ *     gray/450, radius/2, alpha/glow/Primary·Secondary 8개가 늘었다.
  *
  * Texts 컬렉션(문자열 7개)은 화면 문구용이라 CSS 로 내보내지 않는다.
  *   Mission/전체 미션명 · Mission/현재 수행명 · Mission/상태 1~3
@@ -42,7 +44,7 @@
   --color-gray-900: #1F2021;
   --color-gray-950: #151617;
 
-  /* Brand · 11단계로 재설계됨 */
+  /* Main */
   --color-main-50: #EFF6FE;
   --color-main-100: #E0ECFB;
   --color-main-200: #C7DDF8;
@@ -55,48 +57,41 @@
   --color-main-900: #2E539F;
   --color-main-950: #1E2D4D;
 
-  /* 고장 · 위험 · 비상 · 운행 중지 */
+  /* Status */
   --color-danger-100: #FBEBE9;
+  --color-danger-200: #FFA69A;
   --color-danger-300: #FF6B72;
   --color-danger-500: #FF383C;
   --color-danger-700: #B92B18;
   --color-danger-800: #8A2012;
   --color-danger-900: #421A13;
-
-  /* 점검 필요 · 주의 · 임계치 접근 */
+  --color-safe-100: #E6F6EE;
+  --color-safe-200: #72F494;
+  --color-safe-300: #34C759;
+  --color-safe-500: #1DA67F;
+  --color-safe-700: #0E7258;
+  --color-safe-900: #19382D;
   --color-warning-100: #FDF8DF;
+  /* Figma 이름이 "warning/100 2" 다. 오타로 보인다 — 값은 glow/Primary/warning 과 같다. */
+  --color-warning-100-2: #F8EBAE;
   --color-warning-300: #EEDA6B;
   --color-warning-500: #FFCC00;
   --color-warning-700: #8C7400;
   --color-warning-900: #383116;
 
-  /* 정상 · 안전 · 점검 완료 */
-  --color-safe-100: #E6F6EE;
-  --color-safe-300: #34C759;
-  --color-safe-500: #1DA67F;
-  --color-safe-700: #0E7258;
-  --color-safe-900: #19382D;
-
-  /* 알파. 원색에 투명도를 준 값이다. */
-  --color-alpha-glow-danger: rgb(240 57 24 / 55%);
-  --color-alpha-glow-safe: rgb(29 166 127 / 40%);
-  --color-alpha-glow-warning: rgb(238 206 27 / 50%);
+  /* Alpha · 발광과 scrim. glow/Primary 는 불투명 원색, Secondary 는 반투명이다. */
+  --color-alpha-glow-primary-default: #89B9ED;
+  --color-alpha-glow-primary-danger: #FFA69A;
+  --color-alpha-glow-primary-safe: #72F494;
+  --color-alpha-glow-primary-warning: #F8EBAE;
+  --color-alpha-glow-secondary-default: rgb(140 172 247 / 50%);
+  --color-alpha-glow-secondary-danger: rgb(240 57 24 / 55%);
+  --color-alpha-glow-secondary-safe: rgb(29 166 127 / 40%);
+  --color-alpha-glow-secondary-warning: rgb(238 206 27 / 50%);
   --color-alpha-scrim-dark: rgb(0 0 0 / 60%);
   --color-alpha-scrim-light: rgb(23 23 25 / 50%);
 
-  /* Typography */
-  --font-line-height-18: 18px;
-  --font-line-height-20: 20px;
-  --font-line-height-22: 22px;
-  --font-line-height-24: 24px;
-  --font-line-height-26: 26px;
-  --font-line-height-28: 28px;
-  --font-line-height-32: 32px;
-  --font-line-height-40: 40px;
-  --font-line-height-44: 44px;
-  --font-line-height-48: 48px;
-  --font-line-height-56: 56px;
-  --font-line-height-64: 64px;
+  /* Font size */
   --font-size-12: 12px;
   --font-size-13: 13px;
   --font-size-14: 14px;
@@ -109,13 +104,30 @@
   --font-size-40: 40px;
   --font-size-48: 48px;
   --font-size-56: 56px;
-  --font-weight-bold: 700;
-  --font-weight-medium: 500;
+
+  /* Font line-height */
+  --font-line-height-18: 18px;
+  --font-line-height-20: 20px;
+  --font-line-height-22: 22px;
+  --font-line-height-24: 24px;
+  --font-line-height-26: 26px;
+  --font-line-height-28: 28px;
+  --font-line-height-32: 32px;
+  --font-line-height-40: 40px;
+  --font-line-height-44: 44px;
+  --font-line-height-48: 48px;
+  --font-line-height-56: 56px;
+  --font-line-height-64: 64px;
+
+  /* Font weight */
   --font-weight-regular: 400;
+  --font-weight-medium: 500;
   --font-weight-semibold: 600;
+  --font-weight-bold: 700;
 
   /* Radius */
   --radius-none: 0px;
+  --radius-2: 2px;
   --radius-4: 4px;
   --radius-6: 6px;
   --radius-8: 8px;
@@ -154,8 +166,8 @@
 
   /* Border width */
   --border-width-none: 0px;
-  --border-width-strong: 2px;
   --border-width-thin: 1px;
+  --border-width-strong: 2px;
 
   --font-family-sans: "SUIT Variable", "SUIT", -apple-system, "Segoe UI", system-ui, sans-serif;
   /* 수치·코드·기술 라벨 전용. 한글은 글자가 없어 SUIT 로 자동 대체된다. */
@@ -165,18 +177,32 @@
 /* ---------- Semantic · Light 기본 ---------- */
 
 :root {
-  /* fg */
-  --fg-brand: var(--color-main-700);
-  --fg-disabled: var(--color-gray-400);
-  --fg-inverse: var(--color-gray-0);
-  --fg-link: var(--color-main-700);
-  --fg-on-brand: var(--color-gray-950);
-  --fg-primary: var(--color-gray-950);
-  --fg-secondary: var(--color-gray-600);
-  --fg-tertiary: var(--color-gray-500);
-
-  /* bg */
-  --bg-accent: var(--color-main-700);
+  --alert-default-bg: var(--color-main-100);
+  --alert-default-edge: var(--color-main-500);
+  --alert-default-fg: var(--color-main-700);
+  --alert-default-glow-primary: var(--color-alpha-glow-primary-default);
+  --alert-default-glow-secondary: var(--color-alpha-glow-secondary-default);
+  --alert-default-on-edge: var(--color-gray-950);
+  --alert-danger-bg: var(--color-danger-100);
+  --alert-danger-edge: var(--color-danger-500);
+  --alert-danger-fg: var(--color-danger-700);
+  --alert-danger-glow-primary: var(--color-alpha-glow-primary-danger);
+  --alert-danger-glow-secondary: var(--color-alpha-glow-secondary-danger);
+  --alert-danger-on-edge: var(--color-gray-950);
+  --alert-safe-bg: var(--color-safe-100);
+  --alert-safe-edge: var(--color-safe-500);
+  --alert-safe-fg: var(--color-safe-700);
+  --alert-safe-glow-primary: var(--color-alpha-glow-primary-safe);
+  --alert-safe-glow-secondary: var(--color-alpha-glow-secondary-safe);
+  --alert-safe-on-edge: var(--color-gray-950);
+  --alert-warning-bg: var(--color-warning-100);
+  --alert-warning-edge: var(--color-warning-500);
+  --alert-warning-fg: var(--color-warning-700);
+  --alert-warning-glow-primary: var(--color-alpha-glow-primary-warning);
+  --alert-warning-glow-secondary: var(--color-alpha-glow-secondary-warning);
+  --alert-warning-on-edge: var(--color-gray-950);
+  --bg-safe: var(--color-safe-700);
+  --bg-accent: var(--color-main-600);
   --bg-brand: var(--color-main-500);
   --bg-canvas: var(--color-gray-50);
   --bg-container: var(--color-gray-50);
@@ -194,20 +220,18 @@
   --bg-inverse: var(--color-gray-950);
   --bg-navigation: var(--color-gray-0);
   --bg-overlay: var(--color-alpha-scrim-light);
-  --bg-surface-default: var(--color-gray-0);
   /*
-   * Figma 와 다르다. Figma 는 Light 도 Dark 와 같은 어두운 scrim 인데,
+   * Figma 와 다르다. Figma 는 Light 도 Dark 와 같은 어두운 scrim(scrim/light)인데,
    * 밝은 카드 위에 얹으면 줄 배경이 중간 회색(#7C828A)이 되어 그 위의 Light 용
    * 값 색이 대비 1.1~1.5 로 무너진다. 밝은 쪽으로 뒤집으라는 지시를 받아 여기서 정했다.
    * Figma 의 bg/surface/alpha 도 Light 모드 값을 이걸로 바꿔야 한다.
    */
   --bg-surface-alpha: rgb(255 255 255 / 70%);
+  --bg-surface-default: var(--color-gray-0);
   --bg-surface-disabled: var(--color-gray-100);
   --bg-surface-raised: var(--color-gray-0);
   --bg-surface-selected: var(--color-main-100);
   --bg-surface-subtle: var(--color-gray-100);
-
-  /* border */
   --border-brand: var(--color-main-500);
   --border-control: var(--color-gray-500);
   --border-control-hover: var(--color-gray-600);
@@ -216,8 +240,6 @@
   --border-focus: var(--color-main-700);
   --border-strong: var(--color-gray-400);
   --border-subtle: var(--color-gray-200);
-
-  /* button */
   --button-accent-bg-default: var(--color-main-700);
   --button-accent-bg-disabled: var(--color-gray-100);
   --button-accent-bg-hover: var(--color-main-800);
@@ -250,43 +272,6 @@
   --button-secondary-border-disabled: var(--color-gray-200);
   --button-secondary-fg-default: var(--color-gray-950);
   --button-secondary-fg-disabled: var(--color-gray-400);
-
-  /* status */
-  --status-critical-bg: var(--color-danger-100);
-  --status-critical-border: var(--color-danger-300);
-  --status-critical-fg: var(--color-danger-700);
-  --status-critical-icon: var(--color-danger-500);
-  --status-info-bg: var(--color-main-100);
-  --status-info-border: var(--color-main-500);
-  --status-info-fg: var(--color-main-700);
-  --status-info-icon: var(--color-main-500);
-  --status-normal-bg: var(--color-safe-100);
-  --status-normal-border: var(--color-safe-300);
-  --status-normal-fg: var(--color-safe-700);
-  --status-normal-icon: var(--color-safe-500);
-  --status-warning-bg: var(--color-warning-100);
-  --status-warning-border: var(--color-warning-300);
-  --status-warning-fg: var(--color-warning-700);
-  --status-warning-icon: var(--color-warning-700);
-
-  /* alert */
-  --alert-danger-bg: var(--color-danger-100);
-  --alert-danger-edge: var(--color-danger-500);
-  --alert-danger-fg: var(--color-danger-700);
-  --alert-danger-glow: var(--color-alpha-glow-danger);
-  --alert-danger-on-edge: var(--color-gray-950);
-  --alert-safe-bg: var(--color-safe-100);
-  --alert-safe-edge: var(--color-safe-500);
-  --alert-safe-fg: var(--color-safe-700);
-  --alert-safe-glow: var(--color-alpha-glow-safe);
-  --alert-safe-on-edge: var(--color-gray-950);
-  --alert-warning-bg: var(--color-warning-100);
-  --alert-warning-edge: var(--color-warning-500);
-  --alert-warning-fg: var(--color-warning-700);
-  --alert-warning-glow: var(--color-alpha-glow-warning);
-  --alert-warning-on-edge: var(--color-gray-950);
-
-  /* chart */
   --chart-axis: var(--color-gray-400);
   --chart-categorical-1: var(--color-main-500);
   --chart-categorical-2: var(--color-main-700);
@@ -303,39 +288,74 @@
   --chart-positive: var(--color-safe-500);
   --chart-track: var(--color-gray-100);
   --chart-warning: var(--color-warning-700);
-
-  /* radius */
+  --fg-brand: var(--color-main-700);
+  --fg-disabled: var(--color-gray-400);
+  --fg-inverse: var(--color-gray-0);
+  --fg-link: var(--color-main-700);
+  --fg-on-brand: var(--color-gray-950);
+  --fg-primary: var(--color-gray-950);
+  --fg-secondary: var(--color-gray-600);
+  --fg-tertiary: var(--color-gray-500);
+  --radius-chart: var(--radius-2);
   --radius-card: var(--radius-4);
   --radius-container: var(--radius-8);
   --radius-control: var(--radius-4);
   --radius-pill: var(--radius-full);
+  --status-critical-bg: var(--color-danger-100);
+  --status-critical-border: var(--color-danger-300);
+  --status-critical-fg: var(--color-danger-700);
+  --status-critical-icon: var(--color-danger-500);
+  --status-info-bg: var(--color-main-100);
+  --status-info-border: var(--color-main-500);
+  --status-info-fg: var(--color-main-700);
+  --status-info-icon: var(--color-main-500);
+  --status-normal-bg: var(--color-safe-100);
+  --status-normal-border: var(--color-safe-300);
+  --status-normal-fg: var(--color-safe-700);
+  --status-normal-icon: var(--color-safe-500);
+  --status-warning-bg: var(--color-warning-100);
+  --status-warning-border: var(--color-warning-300);
+  --status-warning-fg: var(--color-warning-700);
+  --status-warning-icon: var(--color-warning-700);
 }
 
 /* ---------- Semantic · Dark ---------- */
 /*
- * button/* 32개는 Light 와 Dark 값이 전부 같다 — Figma 실측 그대로다.
- * Component 컬렉션에 있을 때는 별칭 하나(bg/inverse 등)가 모드를 알아서 따라갔는데,
- * Semantic 으로 옮기면서 두 모드에 Light 값이 같이 들어갔다.
- * 그래서 Dark 에서도 버튼이 Light 모습으로 나온다. 아래 두 곳이 특히 눈에 띈다.
+ * button/* 32개는 Light 와 Dark 값이 전부 같다 — Figma 실측 그대로다. 아직 그대로다.
  *   button/primary/bg/default = gray/950 -> bg/canvas(gray/950)와 같은 색이라 면이 사라진다
  *   button/secondary/bg/default = gray/0 -> 어두운 화면 위에 흰 버튼이 놓인다
- * 의도한 것인지 확인이 필요하다. 지금은 Figma 를 그대로 따른다.
+ * alert/…/glow-Primary · glow-Secondary 도 두 모드 값이 같다. 이쪽은 의도로 보인다 —
+ * AI Assist Panel 의 발광이 모드와 무관하게 같은 색이어야 하기 때문이다.
  */
 
 :root[data-theme="dark"] {
-  /* fg */
-  --fg-brand: var(--color-main-500);
-  --fg-disabled: var(--color-gray-600);
-  --fg-inverse: var(--color-gray-950);
-  --fg-link: var(--color-main-500);
-  --fg-on-brand: var(--color-gray-950);
-  --fg-primary: var(--color-gray-50);
-  --fg-secondary: var(--color-gray-400);
-  --fg-tertiary: var(--color-gray-450);
-
-  /* bg */
-  --bg-accent: var(--color-main-600);
-  --bg-brand: var(--color-main-600);
+  --alert-default-bg: var(--color-main-900);
+  --alert-default-edge: var(--color-main-300);
+  --alert-default-fg: var(--color-main-300);
+  --alert-default-glow-primary: var(--color-alpha-glow-primary-default);
+  --alert-default-glow-secondary: var(--color-alpha-glow-secondary-default);
+  --alert-default-on-edge: var(--color-gray-950);
+  --alert-danger-bg: var(--color-danger-900);
+  --alert-danger-edge: var(--color-danger-200);
+  --alert-danger-fg: var(--color-danger-300);
+  --alert-danger-glow-primary: var(--color-alpha-glow-primary-danger);
+  --alert-danger-glow-secondary: var(--color-alpha-glow-secondary-danger);
+  --alert-danger-on-edge: var(--color-gray-950);
+  --alert-safe-bg: var(--color-safe-900);
+  --alert-safe-edge: var(--color-safe-200);
+  --alert-safe-fg: var(--color-safe-300);
+  --alert-safe-glow-primary: var(--color-alpha-glow-primary-safe);
+  --alert-safe-glow-secondary: var(--color-alpha-glow-secondary-safe);
+  --alert-safe-on-edge: var(--color-gray-950);
+  --alert-warning-bg: var(--color-warning-900);
+  --alert-warning-edge: var(--color-warning-500);
+  --alert-warning-fg: var(--color-warning-300);
+  --alert-warning-glow-primary: var(--color-alpha-glow-primary-warning);
+  --alert-warning-glow-secondary: var(--color-alpha-glow-secondary-warning);
+  --alert-warning-on-edge: var(--color-gray-950);
+  --bg-safe: var(--color-safe-500);
+  --bg-accent: var(--color-main-700);
+  --bg-brand: var(--color-main-700);
   --bg-canvas: var(--color-gray-950);
   --bg-container: var(--color-gray-800);
   --bg-critical: var(--color-danger-500);
@@ -352,15 +372,12 @@
   --bg-inverse: var(--color-gray-0);
   --bg-navigation: var(--color-gray-900);
   --bg-overlay: var(--color-alpha-scrim-dark);
-  --bg-surface-default: var(--color-gray-800);
-  /* Dark 는 Figma 값 그대로다. Light 만 밝은 쪽으로 뒤집었다(위 주석). */
   --bg-surface-alpha: var(--color-alpha-scrim-light);
+  --bg-surface-default: var(--color-gray-800);
   --bg-surface-disabled: var(--color-gray-750);
   --bg-surface-raised: var(--color-gray-750);
   --bg-surface-selected: var(--color-gray-700);
   --bg-surface-subtle: var(--color-gray-750);
-
-  /* border */
   --border-brand: var(--color-main-500);
   --border-control: var(--color-gray-500);
   --border-control-hover: var(--color-gray-400);
@@ -369,8 +386,6 @@
   --border-focus: var(--color-main-600);
   --border-strong: var(--color-gray-600);
   --border-subtle: var(--color-gray-700);
-
-  /* button */
   --button-accent-bg-default: var(--color-main-700);
   --button-accent-bg-disabled: var(--color-gray-100);
   --button-accent-bg-hover: var(--color-main-800);
@@ -403,8 +418,35 @@
   --button-secondary-border-disabled: var(--color-gray-200);
   --button-secondary-fg-default: var(--color-gray-950);
   --button-secondary-fg-disabled: var(--color-gray-400);
-
-  /* status */
+  --chart-axis: var(--color-gray-600);
+  --chart-categorical-1: var(--color-main-500);
+  --chart-categorical-2: var(--color-main-300);
+  --chart-categorical-3: var(--color-main-100);
+  --chart-categorical-4: var(--color-main-700);
+  --chart-grid: var(--color-gray-700);
+  --chart-heat-1: var(--color-gray-650);
+  --chart-heat-2: var(--color-warning-900);
+  --chart-heat-3: var(--color-warning-700);
+  --chart-heat-4: var(--color-danger-700);
+  --chart-heat-5: var(--color-danger-300);
+  --chart-negative: var(--color-danger-300);
+  --chart-neutral: var(--color-gray-500);
+  --chart-positive: var(--color-safe-300);
+  --chart-track: var(--color-gray-700);
+  --chart-warning: var(--color-warning-300);
+  --fg-brand: var(--color-main-500);
+  --fg-disabled: var(--color-gray-600);
+  --fg-inverse: var(--color-gray-950);
+  --fg-link: var(--color-main-500);
+  --fg-on-brand: var(--color-gray-950);
+  --fg-primary: var(--color-gray-50);
+  --fg-secondary: var(--color-gray-400);
+  --fg-tertiary: var(--color-gray-450);
+  --radius-chart: var(--radius-2);
+  --radius-card: var(--radius-4);
+  --radius-container: var(--radius-8);
+  --radius-control: var(--radius-4);
+  --radius-pill: var(--radius-full);
   --status-critical-bg: var(--color-danger-900);
   --status-critical-border: var(--color-danger-700);
   --status-critical-fg: var(--color-danger-300);
@@ -421,47 +463,6 @@
   --status-warning-border: var(--color-warning-700);
   --status-warning-fg: var(--color-warning-300);
   --status-warning-icon: var(--color-warning-500);
-
-  /* alert */
-  --alert-danger-bg: var(--color-danger-900);
-  --alert-danger-edge: var(--color-danger-500);
-  --alert-danger-fg: var(--color-danger-300);
-  --alert-danger-glow: var(--color-alpha-glow-danger);
-  --alert-danger-on-edge: var(--color-gray-950);
-  --alert-safe-bg: var(--color-safe-900);
-  --alert-safe-edge: var(--color-safe-300);
-  --alert-safe-fg: var(--color-safe-300);
-  --alert-safe-glow: var(--color-alpha-glow-safe);
-  --alert-safe-on-edge: var(--color-gray-950);
-  --alert-warning-bg: var(--color-warning-900);
-  --alert-warning-edge: var(--color-warning-500);
-  --alert-warning-fg: var(--color-warning-300);
-  --alert-warning-glow: var(--color-alpha-glow-warning);
-  --alert-warning-on-edge: var(--color-gray-950);
-
-  /* chart */
-  --chart-axis: var(--color-gray-600);
-  --chart-categorical-1: var(--color-main-500);
-  --chart-categorical-2: var(--color-main-300);
-  --chart-categorical-3: var(--color-main-100);
-  --chart-categorical-4: var(--color-main-700);
-  --chart-grid: var(--color-gray-700);
-  --chart-heat-1: var(--color-gray-650);
-  --chart-heat-2: var(--color-warning-900);
-  --chart-heat-3: var(--color-warning-700);
-  --chart-heat-4: var(--color-danger-700);
-  --chart-heat-5: var(--color-danger-300);
-  --chart-negative: var(--color-danger-300);
-  --chart-neutral: var(--color-gray-500);
-  --chart-positive: var(--color-safe-300);
-  --chart-track: var(--color-gray-750);
-  --chart-warning: var(--color-warning-300);
-
-  /* radius */
-  --radius-card: var(--radius-4);
-  --radius-container: var(--radius-8);
-  --radius-control: var(--radius-4);
-  --radius-pill: var(--radius-full);
 }
 
 /* ---------- Gradient ---------- */
@@ -516,9 +517,12 @@
 /*
  * 확인이 필요한 지점
  *   - button/* 32개의 Light·Dark 값이 동일하다 (위 Dark 블록 주석 참조)
- *   - input/border/* · navigation/item/* · table/row/* 10개가 이관 없이 사라졌다.
- *     Text Field · Select · Nav Item · GNB Rail Item · Table Row 의 바인딩 확인 필요.
+ *   - input/border/* · navigation/item/* · table/row/* 10개는 여전히 없다.
  *   - bg/surface/selected Dark 가 gray/700 이라 bg/interactive/pressed 와 값이 같다.
+ *   - bg/surface/alpha 의 Light 값은 우리가 밝은 쪽으로 뒤집어 쓴다 (위 주석 참조).
+ *   - Primitive 이름 "color/warning/100 2" 에 공백과 숫자가 붙어 있다. 오타로 보인다.
+ *   - 아래 Gradient 넷은 Paint Style 을 옮긴 것인데, AI Assist Panel 이 새 컴포넌트로
+ *     바뀌면서 더 이상 쓰이지 않는다. 다른 화면에서 쓸 수 있어 남겨 둔다.
  *   - Text Style 이름과 실제 굵기가 어긋난다.
  *       Typography/Heading/3/SemiBold -> 실제 ExtraBold
  *       Typography/Label/1/SemiBold   -> 실제 ExtraBold
