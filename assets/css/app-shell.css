@@ -643,8 +643,7 @@ button {
 }
 
 .ai-panel.is-safe {
-  /* Figma 는 여기만 chart/positive 를 쓴다. 나머지 셋은 status/…/border 다. */
-  border-top-color: var(--chart-positive);
+  border-top-color: var(--status-normal-border);
   background-image: linear-gradient(
     180deg,
     rgb(0 166 134 / 10%) 0%,

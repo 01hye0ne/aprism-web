@@ -72,8 +72,8 @@
   --color-safe-700: #0E7258;
   --color-safe-900: #19382D;
   --color-warning-100: #FDF8DF;
-  /* Figma 이름이 "warning/100 2" 다. 오타로 보인다 — 값은 glow/Primary/warning 과 같다. */
-  --color-warning-100-2: #F8EBAE;
+  /* 램프의 200 단계. 다른 계열처럼 glow/Primary/warning 과 같은 값이다. */
+  --color-warning-200: #F8EBAE;
   --color-warning-300: #EEDA6B;
   --color-warning-500: #FFCC00;
   --color-warning-700: #8C7400;
@@ -520,7 +520,9 @@
  *   - input/border/* · navigation/item/* · table/row/* 10개는 여전히 없다.
  *   - bg/surface/selected Dark 가 gray/700 이라 bg/interactive/pressed 와 값이 같다.
  *   - bg/surface/alpha 의 Light 값은 우리가 밝은 쪽으로 뒤집어 쓴다 (위 주석 참조).
- *   - Primitive 이름 "color/warning/100 2" 에 공백과 숫자가 붙어 있다. 오타로 보인다.
+ *   - 이름 정리를 Figma 에 반영했다 — color/warning/100 2 -> 200, bg/Safe -> bg/safe,
+ *     radius/Chart -> radius/chart, alert/Default/* -> alert/default/*,
+ *     alpha/glow/*/Default -> */default.
  *   - 아래 Gradient 넷은 Paint Style 을 옮긴 것인데, AI Assist Panel 이 새 컴포넌트로
  *     바뀌면서 더 이상 쓰이지 않는다. 다른 화면에서 쓸 수 있어 남겨 둔다.
  *   - Text Style 이름과 실제 굵기가 어긋난다.
