@@ -1,13 +1,11 @@
 /* APRISM 관제 화면 셸
  *
- * Figma UI_99_작업화면 의 Template / 04.1 Dashboard Home 을 옮긴 것이다.
- * 색·치수·서체는 tokens.css 의 Semantic / Component 토큰만 참조한다.
+ * Figma UI_00_Design System 의 Template / 04.1 Dashboard Home (node 399:6225) 을 옮긴 것이다.
+ * 색·치수·서체는 tokens.css 의 Semantic 토큰만 참조한다.
  * Primitive(--color-*)를 여기서 직접 쓰지 않는다. Figma 의 의존 규칙과 같다.
  *
  * Figma 파일이 표현하지 못한 것 하나를 코드에서는 표현한다: 무엇이 늘어나는가.
- * Map Panel 컴포넌트 설명에 "Canvas 는 Fill 로 늘어난다. 1600px 이상에서
- * 지도는 제한 없이 확장한다" 라고 적혀 있으나, 화면의 인스턴스는 1170 고정이다.
- * 여기서는 설명을 따른다. 고정 폭은 GNB / Context Panel / Right Panel 셋뿐이다.
+ * 고정 폭은 GNB(76) · Context Panel(240) · Right Panel(420) 셋뿐이고 지도가 나머지를 흡수한다.
  */
 
 /* button 은 font-family 를 상속하지 않는다. 지정하지 않으면 SUIT 대신
@@ -23,32 +21,23 @@ button {
  */
 :root {
   --ic-brand-mark: url(../icons/brand-mark.svg);
-  --ic-arrow-right: url(../icons/icon-arrow-right.svg);
-  --ic-bolt: url(../icons/icon-bolt.svg);
-  --ic-bot: url(../icons/icon-bot.svg);
-  --ic-calendar: url(../icons/icon-calendar.svg);
-  --ic-check: url(../icons/icon-check.svg);
-  --ic-chevron-down: url(../icons/icon-chevron-down.svg);
-  --ic-chevron-up: url(../icons/icon-chevron-up.svg);
-  --ic-clock: url(../icons/icon-clock.svg);
-  --ic-collapse: url(../icons/icon-collapse.svg);
-  --ic-cpu: url(../icons/icon-cpu.svg);
-  --ic-document: url(../icons/icon-document.svg);
-  --ic-home: url(../icons/icon-home.svg);
-  --ic-message: url(../icons/icon-message.svg);
-  --ic-play: url(../icons/icon-play.svg);
-  --ic-play-sm: url(../icons/icon-play-sm.svg);
-  --ic-settings: url(../icons/icon-settings.svg);
-  --ic-shield: url(../icons/icon-shield.svg);
-  --ic-target: url(../icons/icon-target.svg);
   --ic-user: url(../icons/icon-user.svg);
+  --ic-clock: url(../icons/icon-clock.svg);
+  --ic-home: url(../icons/icon-home.svg);
+  --ic-shield: url(../icons/icon-shield.svg);
+  --ic-bot: url(../icons/icon-bot.svg);
+  --ic-cpu: url(../icons/icon-cpu.svg);
+  --ic-calendar: url(../icons/icon-calendar.svg);
+  --ic-message: url(../icons/icon-message.svg);
+  --ic-document: url(../icons/icon-document.svg);
   --ic-users: url(../icons/icon-users.svg);
+  --ic-settings: url(../icons/icon-settings.svg);
+  --ic-chevron-down: url(../icons/icon-chevron-down.svg);
   --ic-zoom-in: url(../icons/icon-zoom-in.svg);
-  --ic-map-a: url(../icons/map-shape-a.svg);
-  --ic-map-b: url(../icons/map-shape-b.svg);
-  --ic-map-c: url(../icons/map-shape-c.svg);
-  --ic-map-d: url(../icons/map-shape-d.svg);
-  --ic-map-e: url(../icons/map-shape-e.svg);
+  --ic-target: url(../icons/icon-target.svg);
+  --ic-play: url(../icons/icon-play.svg);
+  --ic-check: url(../icons/icon-check.svg);
+  --ic-play-sm: url(../icons/icon-play-sm.svg);
 }
 
 /* ---------- 아이콘 ---------- */
@@ -75,63 +64,20 @@ button {
 .i-20 { width: var(--size-icon-20); height: var(--size-icon-20); }
 
 /* ---------- Text Style ---------- */
-/* Figma Text Style 과 1:1 로 맞춘다. letterSpacing 은 % 라서 em 으로 옮긴다. */
-.t-overline {
-  font-size: var(--font-size-13);
-  line-height: var(--font-line-height-18);
-  font-weight: 500;
-  letter-spacing: 0.04em;
-}
-
-.t-heading-2 {
-  font-size: var(--font-size-24);
-  line-height: var(--font-line-height-32);
-  font-weight: 600;
-  letter-spacing: -0.01em;
-}
-
-.t-heading-3 {
-  font-size: var(--font-size-20);
-  line-height: var(--font-line-height-28);
-  font-weight: 600;
-  letter-spacing: -0.01em;
-}
-
-.t-title-1 {
-  font-size: var(--font-size-18);
-  line-height: var(--font-line-height-26);
-  font-weight: 600;
-}
-
-.t-label-1 {
-  font-size: var(--font-size-14);
-  line-height: var(--font-line-height-20);
-  font-weight: 600;
-}
-
-.t-label-2 {
-  font-size: var(--font-size-13);
-  line-height: var(--font-line-height-18);
-  font-weight: 500;
-}
-
-.t-body-2 {
-  font-size: var(--font-size-14);
-  line-height: var(--font-line-height-22);
-  font-weight: 400;
-}
-
-.t-body-3 {
-  font-size: var(--font-size-13);
-  line-height: var(--font-line-height-20);
-  font-weight: 400;
-}
-
-.t-caption {
-  font-size: var(--font-size-12);
-  line-height: var(--font-line-height-18);
-  font-weight: 400;
-}
+/*
+ * Figma Text Style 과 1:1 로 맞춘다. letterSpacing 은 % 라서 em 으로 옮긴다.
+ * 이름과 실제 굵기가 어긋난 것이 셋 있는데 실제 굵기를 따랐다.
+ *   Heading/3/SemiBold -> ExtraBold(800)
+ *   Label/1/SemiBold   -> ExtraBold(800)
+ *   Title/1/SemiBold   -> Bold(700)
+ */
+.t-overline  { font-size: var(--font-size-13); line-height: var(--font-line-height-18); font-weight: 500; letter-spacing: 0.04em; }
+.t-heading-3 { font-size: var(--font-size-20); line-height: var(--font-line-height-28); font-weight: 800; letter-spacing: -0.01em; }
+.t-title-1   { font-size: var(--font-size-18); line-height: var(--font-line-height-26); font-weight: 700; }
+.t-label-1   { font-size: var(--font-size-14); line-height: var(--font-line-height-20); font-weight: 800; }
+.t-label-2   { font-size: var(--font-size-13); line-height: var(--font-line-height-18); font-weight: 500; }
+.t-body-3    { font-size: var(--font-size-13); line-height: var(--font-line-height-20); font-weight: 400; }
+.t-caption   { font-size: var(--font-size-12); line-height: var(--font-line-height-18); font-weight: 400; }
 
 /* 수치는 SUIT 의 tabular figures 로 자릿수를 고정한다.
    Figma 의 Type 패널에는 이 항목이 없어 Figma 에서는 확인되지 않는다. */
@@ -141,8 +87,10 @@ button {
 }
 
 /* ---------- 셸 ---------- */
+/* Status Bar 가 GNB 위까지 전체 폭을 덮는다 — 이전 판에서 바뀐 부분이다. */
 .app {
   display: flex;
+  flex-direction: column;
   height: var(--app-height, 100vh);
   min-height: 560px;
   overflow: hidden;
@@ -151,130 +99,45 @@ button {
   font-family: var(--font-family-sans);
 }
 
-.app-body {
-  flex: 1 1 auto;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-}
-
 .app-content {
   flex: 1 1 auto;
   min-height: 0;
   display: flex;
 }
 
-/* ---------- GNB Rail ---------- */
-/*
- * 사용자가 확정했다고 한 유일한 영역이라 Figma 구조를 그대로 옮긴다.
- * 폭은 Primitive size/gnb/rail 이 76 이지만 실제 인스턴스는 HUG 라서
- * 항목 70 + 좌우 padding 4 = 78 로 계산된다. 렌더 결과를 따른다.
- */
-.gnb-rail {
-  flex: 0 0 auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--space-16) var(--space-4);
-  background-color: var(--bg-navigation);
-  border-right: var(--border-width-thin) solid var(--border-subtle);
-}
-
-.gnb-top {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 32px;
-}
-
-.gnb-brand {
-  width: 42px;
-  height: 44px;
-  color: var(--fg-primary);
-}
-
-.gnb-items {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-4);
-}
-
-.gnb-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-4);
-  width: 70px;
-  height: 64px;
-  padding: var(--space-8) 0;
-  border-radius: var(--radius-4);
-  color: var(--fg-disabled);
-  text-align: center;
-  cursor: pointer;
-}
-
-.gnb-item:hover {
-  background-color: var(--navigation-item-bg-hover);
-}
-
-.gnb-item[aria-current="page"] {
-  background-color: var(--navigation-item-bg-selected);
-  color: var(--fg-brand);
-}
-
-.gnb-item span:last-child {
-  font-size: var(--font-size-12);
-  line-height: var(--font-line-height-18);
-}
-
 /* ---------- Status Bar ---------- */
-/*
- * Figma 에서는 Auto Layout 없이 자식 4개가 절대좌표 + MIN 제약으로 놓여 있어
- * 폭이 변하면 우측 묶음이 왼쪽에 그대로 남는다. 여기서는 GNB Rail 과 같은
- * 방식(좌 그룹 / space-between / 우 그룹)으로 다시 짠다.
- */
 .status-bar {
   flex: 0 0 auto;
-  height: var(--size-header-height);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 var(--space-16);
-  background-color: var(--bg-navigation);
+}
+
+.status-bar-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-gnb-rail);
+  padding: 14px var(--space-16);
+}
+
+.status-bar-logo .i {
+  width: 30px;
+  height: 32px;
+  color: var(--fg-primary);
 }
 
 .status-bar-right {
   display: flex;
   align-items: center;
-  gap: var(--space-24);
+  gap: var(--space-8);
+  padding: 14px var(--space-16);
 }
 
-.status-bar-meta {
+.status-bar-profile {
   display: flex;
   align-items: center;
-  gap: var(--space-16);
-}
-
-.icon-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: var(--size-control-md);
-  height: var(--size-control-md);
-  border: 0;
-  padding: 0;
-  border-radius: var(--radius-control);
-  background: transparent;
-  color: var(--fg-secondary);
-  cursor: pointer;
-}
-
-.icon-button:hover {
-  background-color: var(--button-ghost-bg-hover);
-  color: var(--fg-primary);
+  gap: var(--space-8);
 }
 
 .account-chip {
@@ -283,7 +146,7 @@ button {
   gap: var(--space-8);
   padding: 6px var(--space-12) 6px var(--space-8);
   border: var(--border-width-thin) solid var(--border-subtle);
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-card);
   background-color: var(--bg-surface-subtle);
   color: var(--fg-primary);
 }
@@ -304,6 +167,7 @@ button {
   align-items: flex-end;
   gap: 2px;
   height: 14px;
+  color: var(--status-normal-fg);
 }
 
 .signal-bars i {
@@ -324,19 +188,58 @@ button {
   color: var(--fg-tertiary);
 }
 
+/* ---------- GNB Rail ---------- */
+.gnb-rail {
+  flex: 0 0 var(--size-gnb-rail);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-16) var(--space-4);
+  overflow-y: auto;
+}
+
+.gnb-items {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.gnb-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  width: 68px;
+  padding: var(--space-8) 0;
+  border-radius: var(--radius-container);
+  color: var(--fg-secondary);
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.gnb-item:hover { background-color: var(--bg-interactive-hover); }
+
+.gnb-item[aria-current="page"] {
+  background-color: var(--bg-accent);
+  color: var(--fg-inverse);
+}
+
+.gnb-item span:last-child {
+  font-size: var(--font-size-12);
+  line-height: var(--font-line-height-18);
+}
+
 /* ---------- Site Context Panel ---------- */
-/*
- * Figma 에는 padding·gap 이 없는 껍데기 프레임(Frame 1597881537)이 한 겹 더 있고
- * 그 프레임의 gap 20 이 부모의 gap 20 과 중복이다. 여기서는 한 겹 걷어냈다.
- */
 .context-panel {
   flex: 0 0 var(--size-context-panel-width);
   display: flex;
   flex-direction: column;
   gap: var(--space-20);
   padding: var(--space-16);
-  background-color: var(--bg-surface-default);
-  border-right: var(--border-width-thin) solid var(--border-subtle);
   overflow-y: auto;
 }
 
@@ -347,13 +250,7 @@ button {
   gap: var(--space-8);
 }
 
-.section-label {
-  color: var(--fg-tertiary);
-}
-
-.site-name {
-  color: var(--fg-primary);
-}
+.section-label { color: var(--fg-tertiary); }
 
 /* ---------- Select ---------- */
 .select-field {
@@ -362,16 +259,14 @@ button {
   gap: var(--space-8);
   height: var(--size-control-sm);
   padding: 0 var(--space-12);
-  border: var(--border-width-thin) solid var(--input-border-default);
+  border: var(--border-width-thin) solid var(--border-control);
   border-radius: var(--radius-control);
   background-color: var(--bg-surface-default);
   color: var(--fg-primary);
   cursor: pointer;
 }
 
-.select-field:hover {
-  border-color: var(--input-border-hover);
-}
+.select-field:hover { border-color: var(--border-control-hover); }
 
 .select-field > span:first-child {
   flex: 1 1 auto;
@@ -381,9 +276,7 @@ button {
   white-space: nowrap;
 }
 
-.select-field .i {
-  color: var(--fg-secondary);
-}
+.select-field .i { color: var(--fg-secondary); }
 
 /* ---------- Badge ---------- */
 .badge {
@@ -410,37 +303,32 @@ button {
   color: var(--fg-secondary);
 }
 
-.badge-info {
-  background-color: var(--status-info-bg);
-  border: var(--border-width-thin) solid var(--status-info-border);
-  color: var(--status-info-fg);
-}
-
+.badge-info { color: var(--status-info-fg); }
 .badge-info .badge-dot { background-color: var(--status-info-icon); }
-
-/* 카드 안에서 면 없이 쓰는 형태. Figma 에서 padding 0 으로 오버라이드돼 있다. */
-.badge-bare {
-  padding: 0;
-}
-
 .badge-normal { color: var(--status-normal-fg); }
 .badge-normal .badge-dot { background-color: var(--status-normal-icon); }
 .badge-idle { color: var(--fg-secondary); }
+
+/* 지도 위 로봇 마커. 면과 경계가 있는 형태다. */
+.badge-marker {
+  background-color: var(--status-info-bg);
+  border: var(--border-width-thin) solid var(--status-info-border);
+}
 
 /* ---------- Button ---------- */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: var(--space-8);
-  height: var(--size-control-md);
-  padding: 0 var(--space-16);
+  gap: var(--space-4);
+  height: var(--size-control-sm);
+  padding: 0 var(--space-12);
   border: var(--border-width-thin) solid transparent;
   border-radius: var(--radius-control);
   font-family: inherit;
-  font-size: var(--font-size-14);
-  line-height: var(--font-line-height-20);
-  font-weight: 600;
+  font-size: var(--font-size-13);
+  line-height: var(--font-line-height-18);
+  font-weight: 500;
   cursor: pointer;
   white-space: nowrap;
 }
@@ -460,66 +348,57 @@ button {
 }
 
 .btn-secondary:hover { background-color: var(--button-secondary-bg-hover); }
-.btn-secondary:active { background-color: var(--button-secondary-bg-pressed); }
 
-.btn-block { width: 100%; }
+.icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-control-md);
+  height: var(--size-control-md);
+  border: 0;
+  padding: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--fg-secondary);
+  cursor: pointer;
+}
+
+.icon-button:hover {
+  background-color: var(--button-ghost-bg-hover);
+  color: var(--fg-primary);
+}
 
 /* ---------- Main ---------- */
 .main {
   flex: 1 1 auto;
   min-width: 0;
   display: flex;
-  padding: var(--space-24);
-  background-color: var(--bg-canvas);
+  padding: var(--space-8);
 }
 
 .two-col {
   flex: 1 1 auto;
   min-width: 0;
   display: flex;
-  gap: var(--space-24);
+  border-radius: var(--radius-container);
+  background-color: var(--bg-canvas);
 }
 
 /* ---------- Map Panel ---------- */
 .map-panel {
-  position: relative;
   flex: 1 1 auto;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
   padding: var(--space-20);
   border-radius: var(--radius-card);
-  background-color: var(--bg-surface-default);
 }
 
 .map-canvas {
   position: relative;
-  height: 100%;
-  overflow: hidden;
-}
-
-/*
- * 도면은 실제 평면 좌표라 창 크기에 따라 늘리지 않는다
- * (Map Panel 설명: "화면 회전이나 축 반전을 하지 않는다").
- * 원본 캔버스 크기 그대로 두고 가운데에 놓는다.
- */
-.map-plan {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 1130px;
-  height: 872px;
-  transform: translate(-50%, -50%);
-  color: var(--bg-surface-subtle);
-}
-
-.map-plan .shape {
-  position: absolute;
-  background-color: currentColor;
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  -webkit-mask-size: 100% 100%;
-  mask-size: 100% 100%;
-  -webkit-mask-image: var(--i);
-  mask-image: var(--i);
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 .map-marker {
@@ -529,10 +408,11 @@ button {
   transform: translate(-50%, -50%);
 }
 
+/* 지도 도구가 좌하단에서 우상단으로 옮겨졌다. */
 .map-tools {
   position: absolute;
-  left: 0;
-  bottom: 0;
+  right: 0;
+  top: 0;
   display: flex;
   flex-direction: column;
   gap: var(--space-8);
@@ -542,168 +422,259 @@ button {
   background-color: var(--bg-surface-default);
 }
 
-.map-tools .icon-button { color: var(--fg-secondary); }
-
 .map-tools .icon-button.is-active {
   background-color: var(--button-primary-bg-default);
   color: var(--button-primary-fg-default);
 }
 
+/* ---------- AI Assist Panel ---------- */
+/* 큰 그라데이션 면에서 지도 하단의 얇은 알림 바로 바뀌었다. */
+.ai-bar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: var(--space-16);
+  padding: var(--space-16);
+  border-top: var(--border-width-strong) solid var(--border-focus);
+  border-radius: var(--radius-container);
+  background-color: var(--bg-surface-default);
+}
+
+/* Figma 에 채워지지 않은 채 남아 있는 자리다. */
+.ai-thumb {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border: var(--border-width-thin) solid var(--fg-primary);
+}
+
+.ai-message {
+  font-size: var(--font-size-24);
+  line-height: var(--font-line-height-32);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--fg-primary);
+}
+
 /* ---------- Right Panel ---------- */
 /*
- * Figma 에서는 세로 HUG 라 912 트랙 안에서 839 에서 멈춘다(73px 빈 공간).
- * 항목이 늘면 Content 의 clipsContent 에 잘려 아무 경고 없이 사라진다.
- * 여기서는 패널이 높이를 채우고, 길이가 변하는 타임라인만 스크롤한다.
- * Panel Actions 는 항상 바닥에 남는다.
+ * Figma 에서 Floating 프레임(452) 안에 420 패널이 들어 있다.
+ * 패널이 높이를 채우고, 길이가 변하는 타임라인만 스크롤한다.
  */
+.floating {
+  flex: 0 0 auto;
+  display: flex;
+  padding: var(--space-16);
+}
+
 .right-panel {
   flex: 0 0 var(--size-panel-right);
   display: flex;
   flex-direction: column;
-  gap: var(--space-16);
+  gap: 18px;
   min-height: 0;
-  padding: var(--space-20);
-  border: var(--border-width-thin) solid var(--border-default);
-  border-radius: var(--radius-card);
+}
+
+.panel-card {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-4);
+  border-radius: var(--radius-container);
   background-color: var(--bg-surface-default);
+}
+
+.panel-card.is-fill {
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 .panel-header {
   flex: none;
   display: flex;
+  align-items: flex-start;
+  gap: var(--space-8);
+  padding: var(--space-20) var(--space-16);
+}
+
+.panel-header .texts {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
   flex-direction: column;
   gap: var(--space-4);
 }
 
-.panel-header p {
-  margin: 0;
-  color: var(--fg-tertiary);
-}
-
-.panel-header h2 {
-  margin: 0;
-  color: var(--fg-primary);
-}
-
-.divider {
-  flex: none;
-  height: 1px;
-  margin: 0;
-  border: 0;
-  background-color: var(--border-subtle);
-}
-
-.mission-header {
-  flex: none;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-8);
-}
-
-.mission-header h3 {
-  margin: 0;
-  color: var(--fg-primary);
-}
-
-.panel-actions {
-  flex: 0 0 auto;
-  display: flex;
-  gap: var(--space-8);
-}
-
-.panel-actions .btn { flex: 1 1 0; min-width: 0; }
+.panel-header h2 { color: var(--fg-primary); }
+.panel-header p { color: var(--fg-tertiary); }
 
 /* ---------- Robot Card ---------- */
 /*
  * 연결 대수는 데이터라서 상한이 정해지지 않았다("3대 연결" 은 값이다).
- * 카드는 폭을 나눠 갖되 92px 아래로는 줄지 않고, 그보다 좁아지면 가로로 스크롤한다.
- * 3대일 때는 Figma 와 같은 폭이 나오고, 몇 대가 되든 글자가 깨지지 않는다.
+ * 카드는 폭을 나눠 갖되 132px 아래로는 줄지 않고, 그보다 좁아지면 가로로 스크롤한다.
  */
 .robot-strip {
   flex: none;
   display: flex;
-  gap: var(--space-8);
+  gap: var(--space-4);
+  padding: var(--space-4);
+  border-radius: var(--radius-container);
+  background-color: var(--bg-canvas);
   overflow-x: auto;
   scrollbar-width: thin;
 }
 
 .robot-card {
   flex: 1 1 0;
-  min-width: 92px;
+  min-width: 132px;
   display: flex;
   flex-direction: column;
   gap: var(--space-8);
-  padding: var(--space-12);
-  border: var(--border-width-thin) solid var(--border-subtle);
-  border-radius: var(--radius-card);
-  background-color: var(--bg-surface-default);
+  padding: var(--space-4);
+  border-radius: var(--radius-container);
 }
 
-/* 현재 조작 대상. 색만이 아니라 2px 경계로도 구분한다(Robot Card 설명). */
-.robot-card.is-selected {
-  background-color: var(--bg-surface-selected);
-  border: var(--border-width-strong) solid var(--border-brand);
-  padding: calc(var(--space-12) - 1px);
+.robot-card.is-selected { background-color: var(--bg-surface-selected); }
+
+.robot-card .label {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-8) var(--space-8) 0;
 }
 
-.robot-card .robot-id { color: var(--fg-primary); }
-.robot-card.is-selected .robot-id { color: var(--fg-brand); }
+.robot-card .robot-id {
+  color: var(--fg-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Figma 에 채워지지 않은 채 남아 있는 자리다. */
+.robot-thumb {
+  align-self: flex-end;
+  width: 61px;
+  height: 61px;
+  border: var(--border-width-thin) solid var(--fg-primary);
+}
+
+.robot-lists {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
 
 .robot-row {
   display: flex;
   align-items: center;
-  gap: var(--space-4);
-  color: var(--fg-primary);
+  gap: var(--space-8);
+  min-height: 24px;
+  padding: var(--space-4) var(--space-8);
+  border-radius: var(--radius-card);
+  background-color: var(--bg-surface-default);
 }
 
-.robot-row.is-end { justify-content: flex-end; }
-
-.battery-track {
+/*
+ * Figma 에서 이 라벨이 토큰이 아니라 raw white 로 칠해져 있다.
+ * Light 모드에서는 흰 면 위 흰 글자가 되어 읽히지 않는다.
+ * 여기서는 fg/secondary 로 두었다. 확인이 필요한 지점이다.
+ */
+.robot-row > span:first-child {
   flex: 1 1 auto;
   min-width: 0;
-  height: 6px;
-  border-radius: var(--radius-pill);
+  color: var(--fg-secondary);
+}
+
+/* 배터리 — 단자가 붙은 형태로 바뀌었다. */
+.battery {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  color: var(--status-normal-fg);
+}
+
+.battery-body {
+  position: relative;
+  width: 26px;
+  height: 16px;
+  border: var(--border-width-strong) solid var(--border-strong);
+  border-radius: var(--radius-card);
   background-color: var(--chart-track);
   overflow: hidden;
 }
 
 .battery-fill {
-  height: 100%;
-  border-radius: var(--radius-pill);
-  background-color: var(--fg-primary);
+  position: absolute;
+  inset: 0 auto 0 0;
+  background-color: currentColor;
 }
 
-.battery-fill.is-brand { background-color: var(--bg-brand); }
+.battery-tip {
+  width: 2px;
+  height: 6px;
+  border: var(--border-width-thin) solid var(--border-strong);
+  border-radius: 0 var(--radius-card) var(--radius-card) 0;
+}
 
 /* ---------- Progress Bar ---------- */
+.mission-header {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  padding: var(--space-20) var(--space-12);
+}
+
 .progress-bar {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: var(--space-12);
 }
 
 .progress-meta {
   display: flex;
-  align-items: baseline;
+  align-items: flex-end;
   gap: var(--space-8);
-  color: var(--fg-tertiary);
 }
 
-.progress-meta > span:first-child { flex: 1 1 auto; }
-.progress-values { display: flex; gap: var(--space-8); color: var(--fg-secondary); }
-.progress-values b { font-weight: 700; }
+.progress-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  color: var(--fg-primary);
+}
 
-.progress-track {
-  height: 6px;
-  border-radius: var(--radius-pill);
-  background-color: var(--chart-track);
+.progress-title .badge-dot { background-color: var(--fg-secondary); }
+
+.progress-title > span:last-child {
   overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.progress-fill {
-  height: 100%;
-  border-radius: var(--radius-pill);
+.progress-values {
+  display: flex;
+  gap: var(--space-8);
+  color: var(--fg-secondary);
 }
+
+/* 연속 막대에서 단계 수만큼 나뉜 막대로 바뀌었다. */
+.progress-track {
+  display: flex;
+  gap: var(--space-2);
+  height: 12px;
+}
+
+.progress-track span {
+  flex: 1 1 0;
+  min-width: 0;
+  border-radius: var(--radius-card);
+  background-color: var(--chart-track);
+}
+
+.progress-track span.is-done { background-color: var(--bg-brand); }
 
 /* ---------- Mission Timeline ---------- */
 .timeline {
@@ -712,7 +683,9 @@ button {
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: var(--space-20);
+  padding: var(--space-16);
+  border-radius: var(--radius-container);
+  background-color: var(--bg-canvas);
   scrollbar-width: thin;
 }
 
@@ -724,58 +697,74 @@ button {
   min-height: 68px;
 }
 
+/* 캡슐이 알약 하나에서 "아이콘 + 세로선" 형태로 바뀌었다. */
 .rail-capsule {
   flex: none;
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 28px;
-  padding-top: var(--space-8);
-  border-radius: var(--radius-pill);
+}
+
+.rail-mark {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-container);
   background-color: var(--chart-track);
   color: var(--fg-secondary);
 }
 
-/* 대기·완료 구간은 캡슐 길이가 곧 예상 소요시간이라 늘리지 않는다. */
-.timeline-item:not(.is-running) .rail-capsule {
-  align-self: flex-start;
-  height: 28px;
-}
-
-.is-running .rail-capsule {
-  background-color: var(--bg-brand);
-  color: var(--fg-on-brand);
-}
-
-.step-card {
-  flex: 1 1 auto;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-8);
-  padding: var(--space-12);
-  border: var(--border-width-thin) solid var(--border-subtle);
-  border-radius: var(--radius-container);
-  background-color: var(--bg-surface-subtle);
-}
-
-.is-running .step-card {
-  background-color: var(--bg-brand);
-  border-color: var(--border-brand);
+.is-running .rail-mark {
+  background-color: var(--bg-accent);
   color: var(--fg-inverse);
 }
 
-.step-head {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
+.rail-line {
+  flex: 1 1 auto;
+  width: 8px;
+  min-height: 0;
+  background-color: var(--chart-track);
 }
 
-.step-title-row,
-.step-meta-row {
+.timeline-item:last-child .rail-line { background-color: transparent; }
+
+.step-wrap {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding-bottom: var(--space-16);
+}
+
+.step-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  padding: var(--space-12) var(--space-4) var(--space-12) var(--space-12);
+  border-radius: var(--radius-container);
+  background-color: var(--chart-track);
+}
+
+.step-title-row {
   display: flex;
   align-items: center;
   gap: var(--space-8);
+  padding-right: var(--space-2);
+}
+
+/* 단계 번호가 새로 생겼다. */
+.step-no {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-card);
+  background-color: var(--bg-surface-selected);
+  color: var(--fg-tertiary);
 }
 
 .step-title {
@@ -787,24 +776,17 @@ button {
   color: var(--fg-secondary);
 }
 
-.is-running .step-title { color: inherit; }
+.is-running .step-title { color: var(--fg-primary); }
 
-.step-duration,
-.step-status { color: var(--fg-tertiary); }
-.is-running .step-duration,
-.is-running .step-status { color: inherit; }
-
-.step-time {
-  flex: 1 1 auto;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  text-align: right;
-  color: var(--fg-tertiary);
+.step-meta-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  padding-right: var(--space-8);
 }
 
-.is-running .step-time { color: inherit; }
+.step-time { color: var(--fg-tertiary); }
+.step-duration { color: var(--fg-secondary); }
 
 .step-desc {
   margin: 0;
@@ -813,100 +795,5 @@ button {
   line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
-}
-
-/* ---------- AI Assist Panel ---------- */
-/*
- * Figma 에서는 Status Bar 와 형제인 절대배치 노드라 지도와 아무 관계가 없고
- * 제약이 MIN/MIN 이라 폭이 변해도 좌상단에 붙박이다. 좌표도 지도보다 4px 왼쪽이다.
- * 여기서는 Map Panel 의 자식으로 두어 지도를 따라가게 했다.
- */
-.ai-panel {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 588px;
-  max-width: calc(100% - var(--space-40));
-  height: 240px;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-20);
-  padding: var(--space-16) var(--space-24);
-  border-radius: var(--radius-container);
-  background-image: var(--gradient-main);
-  overflow: hidden;
-}
-
-.ai-scrim {
-  position: absolute;
-  inset: 0;
-  background-image: linear-gradient(
-    90deg,
-    rgb(23 23 25 / 62%) 0%,
-    rgb(23 23 25 / 34%) 55%,
-    rgb(23 23 25 / 0%) 100%
-  );
-}
-
-.ai-panel > *:not(.ai-scrim):not(.ai-placeholder) { position: relative; }
-
-.ai-message {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-}
-
-.ai-eyebrow { color: var(--fg-tertiary); }
-.ai-line-1 { color: #ffffff; }
-.ai-line-2 { color: rgb(255 255 255 / 55%); }
-
-.ai-suggestions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-8);
-}
-
-.ai-chip {
-  padding: var(--space-8) var(--space-12);
-  border: var(--border-width-thin) solid rgb(255 255 255 / 35%);
-  border-radius: var(--radius-pill);
-  background-color: rgb(255 255 255 / 18%);
-  color: rgb(255 255 255 / 95%);
-}
-
-/* 입력창은 불투명 면을 깔아 어느 stop 위에서도 대비를 보장한다(AI Assist Panel 설명). */
-.ai-input {
-  display: flex;
-  align-items: center;
-  gap: var(--space-8);
-  padding: var(--space-8) var(--space-8) var(--space-8) var(--space-16);
-  border: var(--border-width-thin) solid var(--border-default);
-  border-radius: var(--radius-control);
-  background-color: var(--bg-surface-default);
   color: var(--fg-primary);
-}
-
-.ai-input > span:first-child { flex: 1 1 auto; min-width: 0; }
-
-.ai-send {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: var(--size-control-sm);
-  height: var(--size-control-sm);
-  border: 0;
-  border-radius: var(--radius-control);
-  background-color: var(--button-primary-bg-default);
-  color: var(--button-primary-fg-default);
-  cursor: pointer;
-}
-
-/* Figma 에 채워지지 않은 채 남아 있는 자리. AI Assist Panel 안에 있다. */
-.ai-placeholder {
-  position: absolute;
-  right: 0;
-  top: 0;
-  width: 95px;
-  height: 91px;
-  background-color: #ffffff;
 }

@@ -1,18 +1,24 @@
 /* APRISM Design Tokens
  *
- * Figma UI_00_Design System 의 Primitive / Semantic / Component 세 계층을 그대로 옮긴 것이다.
- * 의존 방향은 한 방향으로만 흐른다: Primitive -> Semantic -> Component.
- * 화면은 Semantic 과 Component 만 참조한다. Primitive 를 직접 쓰지 않는다.
- *
- * 값의 출처는 Figma variable 의 valuesByMode 실측 덤프다.
+ * Figma UI_00_Design System 의 변수를 그대로 옮긴 것이다.
+ * 값의 출처는 variable 의 valuesByMode 실측 덤프다.
  * 변수 설명(description)은 실제 값과 어긋나는 경우가 있어 근거로 쓰지 않는다.
  *
- * Primitive 는 톤 실험실에서 확정한 값이다.
- *   뉴트럴 색상 255도 · 쿨강도 0.006 · Dark 층위 간격 2.0배 · Canvas 명도 0.200
- *   상태색 틴트 채도 0.72배 (원색 300 500 700 800 은 유지) · main 계열 색상 260도
+ * 컬렉션 구조가 바뀌었다.
+ *   이전: Primitive(106) / Semantic(90, Light·Dark) / Component(42, 모드 없음)
+ *   현재: Primitive(111) / Semantic(122, Light·Dark) / Texts(7, 문자열)
  *
- * Component 계층은 Figma 에서 모드가 없다. Semantic 을 가리키기만 하므로
- * CSS 에서도 :root 한 곳에만 두면 테마 전환을 자동으로 따라간다.
+ * Component 컬렉션이 없어지고 button/* 32개가 Semantic 으로 들어왔다.
+ * 나머지 10개(input/border/*, navigation/item/*, table/row/*)는 이관되지 않고 사라졌다.
+ * 그 자리에는 대응하는 Semantic 을 직접 쓴다.
+ *   input/border/default -> border/control
+ *   input/border/hover   -> border/control-hover
+ *   navigation/item/bg/* -> bg/surface/selected · bg/interactive/hover
+ *   table/row/bg/*       -> bg/surface/default · bg/interactive/hover · bg/surface/selected
+ *
+ * Texts 컬렉션(문자열 7개)은 화면 문구용이라 CSS 로 내보내지 않는다.
+ *   Mission/전체 미션명 · Mission/현재 수행명 · Mission/상태 1~3
+ *   Waypoint/Default · Waypoint/예시 1
  */
 
 :root {
@@ -36,19 +42,23 @@
   --color-gray-900: #1F2021;
   --color-gray-950: #151617;
 
-  /* Brand · 주요 액션 · 포커스 · 선택 · 로봇 이동 경로 */
-  --color-main-100: #E3EEFF;
-  --color-main-300: #A1BFF1;
-  --color-main-400: #7FA8EC;
-  --color-main-500: #5A8EE4;
-  --color-main-700: #295FB8;
-  --color-main-800: #1D4A93;
-  --color-main-900: #172F57;
+  /* Brand · 11단계로 재설계됨 */
+  --color-main-50: #EFF6FE;
+  --color-main-100: #E0ECFB;
+  --color-main-200: #C7DDF8;
+  --color-main-300: #A8CBF3;
+  --color-main-400: #89B9ED;
+  --color-main-500: #6AA7E7;
+  --color-main-600: #4990E0;
+  --color-main-700: #3B79D5;
+  --color-main-800: #3265C3;
+  --color-main-900: #2E539F;
+  --color-main-950: #1E2D4D;
 
   /* 고장 · 위험 · 비상 · 운행 중지 */
   --color-danger-100: #FBEBE9;
   --color-danger-300: #FF6B72;
-  --color-danger-500: #F03918;
+  --color-danger-500: #FF383C;
   --color-danger-700: #B92B18;
   --color-danger-800: #8A2012;
   --color-danger-900: #421A13;
@@ -56,18 +66,18 @@
   /* 점검 필요 · 주의 · 임계치 접근 */
   --color-warning-100: #FDF8DF;
   --color-warning-300: #EEDA6B;
-  --color-warning-500: #EECE1B;
+  --color-warning-500: #FFCC00;
   --color-warning-700: #8C7400;
   --color-warning-900: #383116;
 
   /* 정상 · 안전 · 점검 완료 */
   --color-safe-100: #E6F6EE;
-  --color-safe-300: #5FD382;
+  --color-safe-300: #34C759;
   --color-safe-500: #1DA67F;
   --color-safe-700: #0E7258;
   --color-safe-900: #19382D;
 
-  /* 알파. 원색에 투명도를 준 값이라 톤 조정 대상이 아니다. */
+  /* 알파. 원색에 투명도를 준 값이다. */
   --color-alpha-glow-danger: rgb(240 57 24 / 55%);
   --color-alpha-glow-safe: rgb(29 166 127 / 40%);
   --color-alpha-glow-warning: rgb(238 206 27 / 50%);
@@ -105,11 +115,11 @@
   --font-weight-semibold: 600;
 
   /* Radius */
+  --radius-none: 0px;
   --radius-4: 4px;
   --radius-6: 6px;
   --radius-8: 8px;
   --radius-full: 9999px;
-  --radius-none: 0px;
 
   /* Size · 레이아웃 골격의 고정 치수 */
   --size-content-max: 1600px;
@@ -124,12 +134,13 @@
   --size-icon-16: 16px;
   --size-icon-20: 20px;
   --size-icon-24: 24px;
-  --size-panel-right: 360px;
+  --size-panel-right: 420px;
   --size-row-compact: 36px;
   --size-row-default: 44px;
 
   /* Spacing */
   --space-0: 0px;
+  --space-2: 2px;
   --space-4: 4px;
   --space-8: 8px;
   --space-12: 12px;
@@ -168,7 +179,7 @@
   --bg-accent: var(--color-main-700);
   --bg-brand: var(--color-main-500);
   --bg-canvas: var(--color-gray-50);
-  --bg-container: var(--color-gray-0);
+  --bg-container: var(--color-gray-50);
   --bg-critical: var(--color-danger-700);
   --bg-interactive-accent-hover: var(--color-main-800);
   --bg-interactive-accent-pressed: var(--color-main-900);
@@ -198,6 +209,40 @@
   --border-focus: var(--color-main-700);
   --border-strong: var(--color-gray-400);
   --border-subtle: var(--color-gray-200);
+
+  /* button */
+  --button-accent-bg-default: var(--color-main-700);
+  --button-accent-bg-disabled: var(--color-gray-100);
+  --button-accent-bg-hover: var(--color-main-800);
+  --button-accent-bg-pressed: var(--color-main-900);
+  --button-accent-fg-default: var(--color-gray-0);
+  --button-accent-fg-disabled: var(--color-gray-400);
+  --button-danger-bg-default: var(--color-danger-700);
+  --button-danger-bg-disabled: var(--color-gray-100);
+  --button-danger-bg-hover: var(--color-danger-800);
+  --button-danger-bg-pressed: var(--color-danger-900);
+  --button-danger-fg-default: var(--color-gray-0);
+  --button-danger-fg-disabled: var(--color-gray-400);
+  --button-focus-border: var(--color-main-700);
+  --button-ghost-bg-hover: var(--color-gray-100);
+  --button-ghost-bg-pressed: var(--color-gray-200);
+  --button-ghost-fg-default: var(--color-main-700);
+  --button-ghost-fg-disabled: var(--color-gray-400);
+  --button-ghost-fg-pressed: var(--color-gray-950);
+  --button-primary-bg-default: var(--color-gray-950);
+  --button-primary-bg-disabled: var(--color-gray-100);
+  --button-primary-bg-hover: var(--color-gray-750);
+  --button-primary-bg-pressed: var(--color-gray-700);
+  --button-primary-fg-default: var(--color-gray-0);
+  --button-primary-fg-disabled: var(--color-gray-400);
+  --button-secondary-bg-default: var(--color-gray-0);
+  --button-secondary-bg-disabled: var(--color-gray-100);
+  --button-secondary-bg-hover: var(--color-gray-100);
+  --button-secondary-bg-pressed: var(--color-gray-200);
+  --button-secondary-border-default: var(--color-gray-300);
+  --button-secondary-border-disabled: var(--color-gray-200);
+  --button-secondary-fg-default: var(--color-gray-950);
+  --button-secondary-fg-disabled: var(--color-gray-400);
 
   /* status */
   --status-critical-bg: var(--color-danger-100);
@@ -260,6 +305,15 @@
 }
 
 /* ---------- Semantic · Dark ---------- */
+/*
+ * button/* 32개는 Light 와 Dark 값이 전부 같다 — Figma 실측 그대로다.
+ * Component 컬렉션에 있을 때는 별칭 하나(bg/inverse 등)가 모드를 알아서 따라갔는데,
+ * Semantic 으로 옮기면서 두 모드에 Light 값이 같이 들어갔다.
+ * 그래서 Dark 에서도 버튼이 Light 모습으로 나온다. 아래 두 곳이 특히 눈에 띈다.
+ *   button/primary/bg/default = gray/950 -> bg/canvas(gray/950)와 같은 색이라 면이 사라진다
+ *   button/secondary/bg/default = gray/0 -> 어두운 화면 위에 흰 버튼이 놓인다
+ * 의도한 것인지 확인이 필요하다. 지금은 Figma 를 그대로 따른다.
+ */
 
 :root[data-theme="dark"] {
   /* fg */
@@ -273,10 +327,10 @@
   --fg-tertiary: var(--color-gray-450);
 
   /* bg */
-  --bg-accent: var(--color-main-500);
-  --bg-brand: var(--color-main-500);
+  --bg-accent: var(--color-main-600);
+  --bg-brand: var(--color-main-600);
   --bg-canvas: var(--color-gray-950);
-  --bg-container: var(--color-gray-850);
+  --bg-container: var(--color-gray-800);
   --bg-critical: var(--color-danger-500);
   --bg-interactive-accent-hover: var(--color-main-400);
   --bg-interactive-accent-pressed: var(--color-main-300);
@@ -303,15 +357,49 @@
   --border-control-hover: var(--color-gray-400);
   --border-default: var(--color-gray-650);
   --border-disabled: var(--color-gray-700);
-  --border-focus: var(--color-main-500);
+  --border-focus: var(--color-main-600);
   --border-strong: var(--color-gray-600);
   --border-subtle: var(--color-gray-700);
+
+  /* button */
+  --button-accent-bg-default: var(--color-main-700);
+  --button-accent-bg-disabled: var(--color-gray-100);
+  --button-accent-bg-hover: var(--color-main-800);
+  --button-accent-bg-pressed: var(--color-main-900);
+  --button-accent-fg-default: var(--color-gray-0);
+  --button-accent-fg-disabled: var(--color-gray-400);
+  --button-danger-bg-default: var(--color-danger-700);
+  --button-danger-bg-disabled: var(--color-gray-100);
+  --button-danger-bg-hover: var(--color-danger-800);
+  --button-danger-bg-pressed: var(--color-danger-900);
+  --button-danger-fg-default: var(--color-gray-0);
+  --button-danger-fg-disabled: var(--color-gray-400);
+  --button-focus-border: var(--color-main-700);
+  --button-ghost-bg-hover: var(--color-gray-100);
+  --button-ghost-bg-pressed: var(--color-gray-200);
+  --button-ghost-fg-default: var(--color-main-700);
+  --button-ghost-fg-disabled: var(--color-gray-400);
+  --button-ghost-fg-pressed: var(--color-gray-950);
+  --button-primary-bg-default: var(--color-gray-950);
+  --button-primary-bg-disabled: var(--color-gray-100);
+  --button-primary-bg-hover: var(--color-gray-750);
+  --button-primary-bg-pressed: var(--color-gray-700);
+  --button-primary-fg-default: var(--color-gray-0);
+  --button-primary-fg-disabled: var(--color-gray-400);
+  --button-secondary-bg-default: var(--color-gray-0);
+  --button-secondary-bg-disabled: var(--color-gray-100);
+  --button-secondary-bg-hover: var(--color-gray-100);
+  --button-secondary-bg-pressed: var(--color-gray-200);
+  --button-secondary-border-default: var(--color-gray-300);
+  --button-secondary-border-disabled: var(--color-gray-200);
+  --button-secondary-fg-default: var(--color-gray-950);
+  --button-secondary-fg-disabled: var(--color-gray-400);
 
   /* status */
   --status-critical-bg: var(--color-danger-900);
   --status-critical-border: var(--color-danger-700);
   --status-critical-fg: var(--color-danger-300);
-  --status-critical-icon: var(--color-danger-300);
+  --status-critical-icon: var(--color-danger-500);
   --status-info-bg: var(--color-main-900);
   --status-info-border: var(--color-main-500);
   --status-info-fg: var(--color-main-300);
@@ -319,11 +407,11 @@
   --status-normal-bg: var(--color-safe-900);
   --status-normal-border: var(--color-safe-700);
   --status-normal-fg: var(--color-safe-300);
-  --status-normal-icon: var(--color-safe-300);
+  --status-normal-icon: var(--color-safe-500);
   --status-warning-bg: var(--color-warning-900);
   --status-warning-border: var(--color-warning-700);
   --status-warning-fg: var(--color-warning-300);
-  --status-warning-icon: var(--color-warning-300);
+  --status-warning-icon: var(--color-warning-500);
 
   /* alert */
   --alert-danger-bg: var(--color-danger-900);
@@ -367,91 +455,25 @@
   --radius-pill: var(--radius-full);
 }
 
-/* ---------- Component · 모드 없음 ---------- */
-/*
- * Figma 의 Component collection 은 모드가 하나뿐이고 Semantic 을 가리키기만 한다.
- * 따라서 Light/Dark 로 나누지 않는다 — 가리키는 Semantic 이 이미 모드를 갖고 있다.
- */
-
-:root {
-  /* button/accent */
-  --button-accent-bg-default: var(--bg-accent);
-  --button-accent-bg-disabled: var(--bg-surface-disabled);
-  --button-accent-bg-hover: var(--bg-interactive-accent-hover);
-  --button-accent-bg-pressed: var(--bg-interactive-accent-pressed);
-  --button-accent-fg-default: var(--fg-inverse);
-  --button-accent-fg-disabled: var(--fg-disabled);
-
-  /* button/danger */
-  --button-danger-bg-default: var(--bg-critical);
-  --button-danger-bg-disabled: var(--bg-surface-disabled);
-  --button-danger-bg-hover: var(--bg-interactive-critical-hover);
-  --button-danger-bg-pressed: var(--bg-interactive-critical-pressed);
-  --button-danger-fg-default: var(--fg-inverse);
-  --button-danger-fg-disabled: var(--fg-disabled);
-
-  /* button/focus */
-  --button-focus-border: var(--border-focus);
-
-  /* button/ghost */
-  --button-ghost-bg-hover: var(--bg-interactive-hover);
-  --button-ghost-bg-pressed: var(--bg-interactive-pressed);
-  --button-ghost-fg-default: var(--fg-brand);
-  --button-ghost-fg-disabled: var(--fg-disabled);
-  --button-ghost-fg-pressed: var(--fg-primary);
-
-  /* button/primary */
-  --button-primary-bg-default: var(--bg-inverse);
-  --button-primary-bg-disabled: var(--bg-surface-disabled);
-  --button-primary-bg-hover: var(--bg-interactive-inverse-hover);
-  --button-primary-bg-pressed: var(--bg-interactive-inverse-pressed);
-  --button-primary-fg-default: var(--fg-inverse);
-  --button-primary-fg-disabled: var(--fg-disabled);
-
-  /* button/secondary */
-  --button-secondary-bg-default: var(--bg-surface-default);
-  --button-secondary-bg-disabled: var(--bg-surface-disabled);
-  --button-secondary-bg-hover: var(--bg-interactive-hover);
-  --button-secondary-bg-pressed: var(--bg-interactive-pressed);
-  --button-secondary-border-default: var(--border-default);
-  --button-secondary-border-disabled: var(--border-disabled);
-  --button-secondary-fg-default: var(--fg-primary);
-  --button-secondary-fg-disabled: var(--fg-disabled);
-
-  /* input/border */
-  --input-border-default: var(--border-control);
-  --input-border-disabled: var(--border-disabled);
-  --input-border-error: var(--status-critical-border);
-  --input-border-focus: var(--border-focus);
-  --input-border-hover: var(--border-control-hover);
-
-  /* navigation/item */
-  --navigation-item-bg-hover: var(--bg-interactive-hover);
-  --navigation-item-bg-selected: var(--bg-surface-selected);
-
-  /* table/row */
-  --table-row-bg-default: var(--bg-surface-default);
-  --table-row-bg-hover: var(--bg-interactive-hover);
-  --table-row-bg-selected: var(--bg-surface-selected);
-}
-
 /* ---------- Gradient ---------- */
 /*
- * 배경색을 stop 에 넣지 않고 같은 색의 불투명도만 0 까지 낮춘다.
+ * 배경색을 stop 에 넣지 않고 같은 색의 불투명도만 낮춘다.
  * Paint Style 은 모드를 갖지 않으므로 이 방식만 Light·Dark 양쪽에서 성립한다.
- * 끝 stop 에 transparent 키워드를 쓰면 검정 투명으로 보간돼 중간이 탁해진다.
- * 텍스트는 코어를 피해 감쇠 구간에 놓는다.
+ *
+ * Gradient/Main 의 방향이 뒤집혔다 — 코어가 오른쪽 끝(100%)에 있고 왼쪽으로 감쇠한다.
+ * 나머지 셋은 여전히 코어가 왼쪽(0%)이다. 또한 Main 은 최소 알파가 0 이 아니라 0.1 이라
+ * 완전히 사라지지 않고 옅은 파란 막이 남는다. 넷 다 Figma 실측 그대로 옮겼다.
  */
 
 :root {
   --gradient-main: linear-gradient(90deg,
-    rgb(117 152 232 / 90.0%) 0%,
-    rgb(104 148 230 / 56.2%) 7%,
-    rgb(90 142 228 / 29.0%) 16%,
-    rgb(54 149 223 / 8.9%) 30%,
-    rgb(54 149 223 / 1.0%) 50%,
-    rgb(54 149 223 / 0.0%) 75%,
-    rgb(54 149 223 / 0.0%) 100%
+    rgb(54 149 223 / 10.0%) 0%,
+    rgb(54 149 223 / 10.0%) 25%,
+    rgb(54 149 223 / 10.0%) 50%,
+    rgb(54 149 223 / 10.0%) 70%,
+    rgb(90 142 228 / 29.0%) 84%,
+    rgb(104 148 230 / 56.2%) 93%,
+    rgb(117 152 232 / 90.0%) 100%
   );
   --gradient-danger: linear-gradient(90deg,
     rgb(244 70 63 / 90.0%) 0%,
@@ -484,9 +506,12 @@
 
 /*
  * 확인이 필요한 지점
+ *   - button/* 32개의 Light·Dark 값이 동일하다 (위 Dark 블록 주석 참조)
+ *   - input/border/* · navigation/item/* · table/row/* 10개가 이관 없이 사라졌다.
+ *     Text Field · Select · Nav Item · GNB Rail Item · Table Row 의 바인딩 확인 필요.
  *   - bg/surface/selected Dark 가 gray/700 이라 bg/interactive/pressed 와 값이 같다.
- *     선택과 눌림이 구분되지 않는다. 변수 설명에는 main/900 이라고 적혀 있다.
- *   - danger/400 이 없어 Dark 에서 Danger Button 의 hover 가 더 어두워진다
- *     (bg/interactive/critical-hover Dark = danger/300 으로 더 밝아지도록 되어 있으나
- *      Light 는 danger/800 으로 더 어두워져 두 모드의 방향이 반대다).
+ *   - Text Style 이름과 실제 굵기가 어긋난다.
+ *       Typography/Heading/3/SemiBold -> 실제 ExtraBold
+ *       Typography/Label/1/SemiBold   -> 실제 ExtraBold
+ *       Typography/Title/1/SemiBold   -> 실제 Bold
  */

@@ -24,8 +24,7 @@
 
     h1, h2, h3, p { margin: 0; }
 
-    /* 검토용 도구. 디자인에 없는 요소라 화면 위에 별도 바로 둔다.
-       떠 있게 하면 우측 패널의 바닥 버튼을 가린다. */
+    /* 검토용 도구. 디자인에 없는 요소라 화면 위에 별도 바로 둔다. */
     :root { --review-bar: 36px; }
     .app { --app-height: calc(100vh - var(--review-bar)); }
 
@@ -97,7 +96,6 @@
     }
 
     .notes p + p { margin-top: var(--space-12); }
-
     .notes .lead { margin-bottom: var(--space-8); }
 
     .notes table {
@@ -116,11 +114,7 @@
       vertical-align: top;
     }
 
-    .notes th {
-      color: var(--fg-tertiary);
-      font-weight: 500;
-      white-space: nowrap;
-    }
+    .notes th { color: var(--fg-tertiary); font-weight: 500; white-space: nowrap; }
 
     .notes code {
       font-family: var(--font-family-mono);
@@ -150,7 +144,7 @@
   <span class="crumb">
     <a href="../index.html">← 목록</a>
     <b>04.1 통합 관제 메인</b>
-    <span>Figma UI_99_작업화면 · 121:7848</span>
+    <span>Figma UI_00_Design System · 399:6225</span>
   </span>
   <span class="spacer"></span>
   <a href="#notes">퍼블리싱 노트</a>
@@ -158,476 +152,414 @@
 </div>
 
 <!-- ============================================================
-     Template / 04.1 Dashboard Home · 1922
-     Figma: UI_99_작업화면  node 121:7848
+     Template / 04.1 Dashboard Home · 1922   (node 399:6225)
      ============================================================ -->
 <div class="app">
 
-  <!-- ---------- GNB Rail (확정 영역) ---------- -->
-  <nav class="gnb-rail" aria-label="전역 내비게이션">
-    <div class="gnb-top">
-      <span class="i gnb-brand" style="--i:var(--ic-brand-mark)" role="img" aria-label="APRISM"></span>
+  <!-- ---------- Status Bar · 전체 폭 ---------- -->
+  <header class="status-bar">
+    <span class="status-bar-logo">
+      <span class="i" style="--i:var(--ic-brand-mark)" role="img" aria-label="APRISM"></span>
+    </span>
+
+    <div class="status-bar-right">
+      <div class="status-bar-profile">
+        <div class="account-chip">
+          <span class="avatar"><span class="i i-14" style="--i:var(--ic-user)"></span></span>
+          <span class="t-label-2">김현수 · 관제운영</span>
+        </div>
+        <span class="signal-bars" role="img" aria-label="통신 신호 강함"><i></i><i></i><i></i><i></i></span>
+      </div>
+      <span class="utc-clock">
+        <span class="i i-16" style="--i:var(--ic-clock)"></span>
+        <span class="t-caption num">2026-08-26T10:11:24Z</span>
+      </span>
+    </div>
+  </header>
+
+  <div class="app-content">
+
+    <!-- ---------- GNB Rail ---------- -->
+    <nav class="gnb-rail" aria-label="전역 내비게이션">
       <div class="gnb-items">
         <a class="gnb-item" href="#" aria-current="page">
-          <span class="i i-20" style="--i:var(--ic-home)"></span>
-          <span>관제</span>
+          <span class="i i-20" style="--i:var(--ic-home)"></span><span>관제</span>
         </a>
-        <a class="gnb-item" href="#">
-          <span class="i i-20" style="--i:var(--ic-shield)"></span>
-          <span>안전진단</span>
-        </a>
-        <a class="gnb-item" href="#">
-          <span class="i i-20" style="--i:var(--ic-bot)"></span>
-          <span>로봇</span>
-        </a>
-        <a class="gnb-item" href="#">
-          <span class="i i-20" style="--i:var(--ic-cpu)"></span>
-          <span>AI</span>
-        </a>
-        <a class="gnb-item" href="#">
-          <span class="i i-20" style="--i:var(--ic-calendar)"></span>
-          <span>스케줄러</span>
-        </a>
-        <a class="gnb-item" href="#">
-          <span class="i i-20" style="--i:var(--ic-message)"></span>
-          <span>Delta</span>
-        </a>
-        <a class="gnb-item" href="#">
-          <span class="i i-20" style="--i:var(--ic-document)"></span>
-          <span>보고서</span>
-        </a>
-        <a class="gnb-item" href="#">
-          <span class="i i-20" style="--i:var(--ic-users)"></span>
-          <span>계정관리</span>
-        </a>
+        <a class="gnb-item" href="#"><span class="i i-20" style="--i:var(--ic-shield)"></span><span>안전진단</span></a>
+        <a class="gnb-item" href="#"><span class="i i-20" style="--i:var(--ic-bot)"></span><span>로봇</span></a>
+        <a class="gnb-item" href="#"><span class="i i-20" style="--i:var(--ic-cpu)"></span><span>AI</span></a>
+        <a class="gnb-item" href="#"><span class="i i-20" style="--i:var(--ic-calendar)"></span><span>스케줄러</span></a>
+        <a class="gnb-item" href="#"><span class="i i-20" style="--i:var(--ic-message)"></span><span>Delta</span></a>
+        <a class="gnb-item" href="#"><span class="i i-20" style="--i:var(--ic-document)"></span><span>보고서</span></a>
+        <a class="gnb-item" href="#"><span class="i i-20" style="--i:var(--ic-users)"></span><span>계정관리</span></a>
       </div>
-    </div>
-    <a class="gnb-item" href="#">
-      <span class="i i-20" style="--i:var(--ic-settings)"></span>
-      <span>환경설정</span>
-    </a>
-  </nav>
+      <a class="gnb-item" href="#"><span class="i i-20" style="--i:var(--ic-settings)"></span><span>환경설정</span></a>
+    </nav>
 
-  <div class="app-body">
-
-    <!-- ---------- Status Bar ---------- -->
-    <header class="status-bar">
-      <button type="button" class="icon-button" aria-label="패널 접기">
-        <span class="i i-20" style="--i:var(--ic-collapse)"></span>
-      </button>
-
-      <div class="status-bar-right">
-        <div class="account-chip">
-          <span class="avatar">
-            <span class="i i-14" style="--i:var(--ic-user)"></span>
-          </span>
-          <span class="t-label-2">김현수 · 관제운영</span>
-          <span class="i i-16" style="--i:var(--ic-chevron-up)"></span>
+    <!-- ---------- Site Context Panel ---------- -->
+    <aside class="context-panel" aria-label="사이트 컨텍스트">
+      <section class="panel-section">
+        <p class="t-overline section-label">SITE</p>
+        <h1 class="t-heading-3">지하발전소 B3</h1>
+        <div class="select-field t-body-3" role="button" tabindex="0">
+          <span>터빈 2 / Unit 03</span>
+          <span class="i i-16" style="--i:var(--ic-chevron-down)"></span>
         </div>
+      </section>
 
-        <div class="status-bar-meta">
-          <span class="signal-bars" role="img" aria-label="통신 신호 강함">
-            <i></i><i></i><i></i><i></i>
-          </span>
-          <span class="utc-clock">
-            <span class="i i-16" style="--i:var(--ic-clock)"></span>
-            <span class="t-caption num">2026-08-26T10:11:24Z</span>
-          </span>
-        </div>
-      </div>
-    </header>
+      <section class="panel-section">
+        <p class="t-overline section-label">운영 모드</p>
+        <span class="badge badge-mode t-label-2"><span class="badge-dot"></span>진행 중</span>
+      </section>
+    </aside>
 
-    <div class="app-content">
+    <!-- ---------- Main ---------- -->
+    <main class="main">
+      <div class="two-col">
 
-      <!-- ---------- Site Context Panel ---------- -->
-      <aside class="context-panel" aria-label="사이트 컨텍스트">
-        <section class="panel-section">
-          <p class="t-overline section-label">SITE</p>
-          <h1 class="t-heading-3 site-name">지하발전소 B3</h1>
-          <div class="select-field t-body-3" role="button" tabindex="0">
-            <span>터빈 2 / Unit 03</span>
-            <span class="i i-16" style="--i:var(--ic-chevron-down)"></span>
-          </div>
-        </section>
+        <!-- ---------- Map Panel ---------- -->
+        <section class="map-panel" aria-label="설비 배치도">
+          <div class="map-canvas">
+            <span class="badge badge-info badge-marker t-label-2 map-marker">
+              <span class="badge-dot"></span>Robot 02
+            </span>
 
-        <section class="panel-section">
-          <p class="t-overline section-label">운영 모드</p>
-          <span class="badge badge-mode t-label-2">
-            <span class="badge-dot"></span>진행 중
-          </span>
-        </section>
-
-        <section class="panel-section">
-          <p class="t-overline section-label">퀵 액션</p>
-          <button type="button" class="btn btn-primary btn-block">미션 생성</button>
-          <button type="button" class="btn btn-secondary btn-block">퀵 버튼</button>
-          <button type="button" class="btn btn-secondary btn-block">퀵 버튼</button>
-          <button type="button" class="btn btn-secondary btn-block">퀵 버튼</button>
-        </section>
-      </aside>
-
-      <!-- ---------- Main ---------- -->
-      <main class="main">
-        <div class="two-col">
-
-          <!-- ---------- Map Panel ---------- -->
-          <section class="map-panel" aria-label="설비 배치도">
-            <div class="map-canvas">
-              <div class="map-plan" aria-hidden="true">
-                <span class="shape" style="--i:var(--ic-map-a); left:-248px; top:208.15px; width:754.765px; height:221.702px; transform:scaleX(-1)"></span>
-                <span class="shape" style="--i:var(--ic-map-b); left:104.11px; top:-38px; width:350.485px; height:221.702px; transform:scaleX(-1)"></span>
-                <span class="shape" style="--i:var(--ic-map-c); left:462.75px; top:415.18px; width:213.551px; height:454.815px"></span>
-                <span class="shape" style="--i:var(--ic-map-d); left:588.27px; top:133.17px; width:247.784px; height:136.934px"></span>
-                <span class="shape" style="--i:var(--ic-map-e); left:635.55px; top:312.48px; width:754.765px; height:221.702px"></span>
-
-                <span class="badge badge-info t-label-2 map-marker">
-                  <span class="badge-dot"></span>Robot 02
-                </span>
-              </div>
-
-              <div class="map-tools">
-                <button type="button" class="icon-button" aria-label="확대">
-                  <span class="i i-20" style="--i:var(--ic-zoom-in)"></span>
-                </button>
-                <button type="button" class="icon-button" aria-label="로봇 추적">
-                  <span class="i i-20" style="--i:var(--ic-target)"></span>
-                </button>
-                <button type="button" class="icon-button is-active" aria-label="영상 리플레이">
-                  <span class="i i-20" style="--i:var(--ic-play)"></span>
-                </button>
-              </div>
+            <div class="map-tools">
+              <button type="button" class="icon-button" aria-label="확대">
+                <span class="i i-20" style="--i:var(--ic-zoom-in)"></span>
+              </button>
+              <button type="button" class="icon-button" aria-label="로봇 추적">
+                <span class="i i-20" style="--i:var(--ic-target)"></span>
+              </button>
+              <button type="button" class="icon-button is-active" aria-label="영상 리플레이">
+                <span class="i i-20" style="--i:var(--ic-play)"></span>
+              </button>
             </div>
+          </div>
 
-            <!-- Key Feature · Conversational AI -->
-            <section class="ai-panel" aria-label="AI 운영 지원">
-              <div class="ai-scrim" aria-hidden="true"></div>
-              <div class="ai-placeholder" aria-hidden="true"></div>
-
-              <div class="ai-message">
-                <p class="t-caption ai-eyebrow">DELTA · AI 운영 지원</p>
-                <p class="t-heading-2 ai-line-1">B3 터빈2에 위험 1건.</p>
-                <p class="t-heading-2 ai-line-2">무엇을 확인해 드릴까요?</p>
-              </div>
-
-              <div class="ai-suggestions">
-                <button type="button" class="ai-chip t-label-2">Spiral Casing 압력 추이 보여줘</button>
-                <button type="button" class="ai-chip t-label-2">이 설비 최근 결함 3건</button>
-                <button type="button" class="ai-chip t-label-2">재진단 예약해줘</button>
-              </div>
-
-              <div class="ai-input">
-                <span class="t-body-2">무엇이든 물어보세요</span>
-                <button type="button" class="ai-send" aria-label="보내기">
-                  <span class="i i-16" style="--i:var(--ic-arrow-right)"></span>
-                </button>
-              </div>
-            </section>
+          <!-- AI Assist Panel -->
+          <section class="ai-bar" aria-label="AI 운영 지원">
+            <span class="ai-thumb" aria-hidden="true"></span>
+            <p class="ai-message">터빈2에 주의 1건.</p>
           </section>
+        </section>
 
-          <!-- ---------- Robot / Mission Panel ---------- -->
+        <!-- ---------- Robot / Mission Panel ---------- -->
+        <div class="floating">
           <section class="right-panel" aria-label="로봇 · 미션">
 
-            <div class="panel-header">
-              <h2 class="t-heading-3">현재 미션 · 정기 순회 #248</h2>
-              <p class="t-caption">3대 연결 · 1대 수행 중</p>
-            </div>
+            <!-- 카드 1 · 로봇 -->
+            <div class="panel-card">
+              <div class="panel-header">
+                <div class="texts">
+                  <h2 class="t-heading-3">전체 미션명</h2>
+                  <p class="t-caption">3대 연결 · 1대 수행 중</p>
+                </div>
+                <button type="button" class="btn btn-primary">미션 관리</button>
+              </div>
 
-            <div class="robot-strip">
-              <article class="robot-card is-selected">
-                <p class="t-label-1 robot-id">ROBOT 02</p>
-                <span class="badge badge-bare badge-normal t-label-2">
-                  <span class="badge-dot"></span>수행 중
-                </span>
-                <div class="robot-row">
-                  <span class="battery-track"><span class="battery-fill" style="width:64%"></span></span>
-                  <span class="t-caption num">64%</span>
-                </div>
-                <div class="robot-row is-end">
-                  <span class="i i-14" style="--i:var(--ic-bolt)"></span>
-                  <span class="t-caption num">78%</span>
-                </div>
-                <div class="robot-row is-end">
-                  <span class="signal-bars"><i></i><i></i><i></i><i></i></span>
-                  <span class="t-caption" style="margin-left:4px">Strong</span>
-                </div>
-              </article>
+              <div class="robot-strip">
+                <article class="robot-card is-selected">
+                  <div class="label">
+                    <p class="t-label-1 robot-id">로봇명</p>
+                    <span class="robot-thumb" aria-hidden="true"></span>
+                  </div>
+                  <div class="robot-lists">
+                    <div class="robot-row">
+                      <span class="t-caption">Mission</span>
+                      <span class="badge badge-info t-label-2"><span class="badge-dot"></span>수행중</span>
+                    </div>
+                    <div class="robot-row">
+                      <span class="t-caption">Battery</span>
+                      <span class="battery">
+                        <span class="battery-body"><span class="battery-fill" style="width:78%"></span></span>
+                        <span class="battery-tip"></span>
+                        <span class="t-caption num">78%</span>
+                      </span>
+                    </div>
+                    <div class="robot-row">
+                      <span class="t-caption">Signal</span>
+                      <span class="battery">
+                        <span class="signal-bars"><i></i><i></i><i></i><i></i></span>
+                        <span class="t-caption">Strong</span>
+                      </span>
+                    </div>
+                  </div>
+                </article>
 
-              <article class="robot-card">
-                <p class="t-label-1 robot-id">ROBOT 02</p>
-                <span class="badge badge-bare badge-idle t-label-2">
-                  <span class="badge-dot"></span>대기
-                </span>
-                <div class="robot-row">
-                  <span class="battery-track"><span class="battery-fill is-brand" style="width:100%"></span></span>
-                  <span class="t-caption num">100%</span>
-                </div>
-                <div class="robot-row is-end">
-                  <span class="i i-14" style="--i:var(--ic-bolt)"></span>
-                  <span class="t-caption num">78%</span>
-                </div>
-                <div class="robot-row is-end">
-                  <span class="signal-bars"><i></i><i></i><i></i><i></i></span>
-                  <span class="t-caption" style="margin-left:4px">Strong</span>
-                </div>
-              </article>
+                <article class="robot-card">
+                  <div class="label">
+                    <p class="t-label-1 robot-id">로봇명</p>
+                    <span class="robot-thumb" aria-hidden="true"></span>
+                  </div>
+                  <div class="robot-lists">
+                    <div class="robot-row">
+                      <span class="t-caption">Mission</span>
+                      <span class="badge badge-info t-label-2"><span class="badge-dot"></span>수행중</span>
+                    </div>
+                    <div class="robot-row">
+                      <span class="t-caption">Battery</span>
+                      <span class="battery">
+                        <span class="battery-body"><span class="battery-fill" style="width:78%"></span></span>
+                        <span class="battery-tip"></span>
+                        <span class="t-caption num">78%</span>
+                      </span>
+                    </div>
+                    <div class="robot-row">
+                      <span class="t-caption">Signal</span>
+                      <span class="battery">
+                        <span class="signal-bars"><i></i><i></i><i></i><i></i></span>
+                        <span class="t-caption">Strong</span>
+                      </span>
+                    </div>
+                  </div>
+                </article>
 
-              <article class="robot-card">
-                <p class="t-label-1 robot-id">ROBOT 02</p>
-                <span class="badge badge-bare badge-idle t-label-2">
-                  <span class="badge-dot"></span>복귀 중
-                </span>
-                <div class="robot-row">
-                  <span class="battery-track"><span class="battery-fill" style="width:64%"></span></span>
-                  <span class="t-caption num">64%</span>
-                </div>
-                <div class="robot-row is-end">
-                  <span class="i i-14" style="--i:var(--ic-bolt)"></span>
-                  <span class="t-caption num">78%</span>
-                </div>
-                <div class="robot-row is-end">
-                  <span class="signal-bars"><i></i><i></i><i></i><i></i></span>
-                  <span class="t-caption" style="margin-left:4px">Strong</span>
-                </div>
-              </article>
-            </div>
-
-            <hr class="divider" />
-
-            <div class="mission-header">
-              <p class="t-overline section-label">현재 미션</p>
-              <h3 class="t-title-1">Thrust Oil 정유기 운전 상태</h3>
-
-              <div class="progress-bar">
-                <div class="progress-meta">
-                  <span class="t-caption">미션 진행률 (%)</span>
-                  <span class="progress-values t-caption">
-                    <span class="num">3 / 5</span>
-                    <b class="num">00%</b>
-                  </span>
-                </div>
-                <div class="progress-track">
-                  <div class="progress-fill" style="width:60%; background-image:linear-gradient(90deg,#285896 0%,#6f99f5 21%,#ffdadb 100%)"></div>
-                </div>
+                <article class="robot-card">
+                  <div class="label">
+                    <p class="t-label-1 robot-id">로봇명</p>
+                    <span class="robot-thumb" aria-hidden="true"></span>
+                  </div>
+                  <div class="robot-lists">
+                    <div class="robot-row">
+                      <span class="t-caption">Mission</span>
+                      <span class="badge badge-info t-label-2"><span class="badge-dot"></span>수행중</span>
+                    </div>
+                    <div class="robot-row">
+                      <span class="t-caption">Battery</span>
+                      <span class="battery">
+                        <span class="battery-body"><span class="battery-fill" style="width:78%"></span></span>
+                        <span class="battery-tip"></span>
+                        <span class="t-caption num">78%</span>
+                      </span>
+                    </div>
+                    <div class="robot-row">
+                      <span class="t-caption">Signal</span>
+                      <span class="battery">
+                        <span class="signal-bars"><i></i><i></i><i></i><i></i></span>
+                        <span class="t-caption">Strong</span>
+                      </span>
+                    </div>
+                  </div>
+                </article>
               </div>
             </div>
 
-            <div class="timeline">
-              <article class="timeline-item is-done">
-                <span class="rail-capsule">
-                  <span class="i i-14" style="--i:var(--ic-check)"></span>
-                </span>
-                <div class="step-card">
-                  <div class="step-head">
+            <!-- 카드 2 · 미션 -->
+            <div class="panel-card is-fill">
+              <div class="mission-header">
+                <p class="t-overline section-label">전체 미션명</p>
+
+                <div class="progress-bar">
+                  <div class="progress-meta">
+                    <span class="progress-title t-title-1">
+                      <span class="badge-dot"></span><span>현재 수행명</span>
+                    </span>
+                    <span class="progress-values t-caption">
+                      <span class="num">3 / 5</span><span class="num">00%</span>
+                    </span>
+                  </div>
+                  <div class="progress-track" role="img" aria-label="5단계 중 3단계 완료">
+                    <span class="is-done"></span><span class="is-done"></span><span class="is-done"></span>
+                    <span></span><span></span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="timeline">
+                <article class="timeline-item is-done">
+                  <span class="rail-capsule">
+                    <span class="rail-mark"><span class="i i-14" style="--i:var(--ic-check)"></span></span>
+                    <span class="rail-line"></span>
+                  </span>
+                  <div class="step-wrap"><div class="step-card">
                     <div class="step-title-row">
-                      <span class="t-label-1 step-title">WP-02 터빈1 베어링 온도</span>
-                      <span class="t-label-2 step-duration">16분</span>
+                      <span class="step-no t-label-1">1</span>
+                      <span class="t-label-1 step-title">waypoint name</span>
+                      <span class="badge badge-normal t-label-2"><span class="badge-dot"></span>완료</span>
                     </div>
                     <div class="step-meta-row">
-                      <span class="t-label-2 step-status">완료</span>
                       <span class="t-caption step-time num">10:08 – 10:24</span>
+                      <span class="t-caption step-duration">16분</span>
                     </div>
-                  </div>
-                </div>
-              </article>
+                  </div></div>
+                </article>
 
-              <article class="timeline-item is-running">
-                <span class="rail-capsule">
-                  <span class="i i-14" style="--i:var(--ic-play-sm)"></span>
-                </span>
-                <div class="step-card">
-                  <div class="step-head">
+                <article class="timeline-item is-running">
+                  <span class="rail-capsule">
+                    <span class="rail-mark"><span class="i i-14" style="--i:var(--ic-play-sm)"></span></span>
+                    <span class="rail-line"></span>
+                  </span>
+                  <div class="step-wrap"><div class="step-card">
                     <div class="step-title-row">
-                      <span class="t-label-1 step-title">WP-03 터빈2 스파이럴 케이싱</span>
-                      <span class="t-label-2 step-duration">16분</span>
+                      <span class="step-no t-label-1">2</span>
+                      <span class="t-label-1 step-title">waypoint name</span>
+                      <span class="badge badge-info t-label-2"><span class="badge-dot"></span>수행중</span>
                     </div>
                     <div class="step-meta-row">
-                      <span class="t-label-2 step-status">진행 중</span>
                       <span class="t-caption step-time num">10:08 – 10:24</span>
+                      <span class="t-caption step-duration">16분</span>
                     </div>
-                  </div>
-                  <p class="t-caption step-desc">압력·온도 센서 판독 중. 기준값 대비 편차를 실시간 비교합니다.압력·온도 센서 판독 중. 기준값 대비 편차를 실시간 비교합니다.압력·온도 센서 판독 중. 기준값 대비 편차를 실시간 비교합니다.</p>
-                </div>
-              </article>
+                    <p class="t-caption step-desc">압력·온도 센서 판독 중. 기준값 대비 편차를 실시간 비교합니다.압력·온도 센서 판독 중. 기준값 대비 편차를 실시간 비교합니다.압력·온도 센서 판독 중. 기준값 대비 편차를 실시간 비교합니다.</p>
+                  </div></div>
+                </article>
 
-              <article class="timeline-item is-pending">
-                <span class="rail-capsule"></span>
-                <div class="step-card">
-                  <div class="step-head">
+                <article class="timeline-item is-pending">
+                  <span class="rail-capsule"><span class="rail-mark"></span><span class="rail-line"></span></span>
+                  <div class="step-wrap"><div class="step-card">
                     <div class="step-title-row">
-                      <span class="t-label-1 step-title">WP-04 냉각수 배관 누수 점검</span>
+                      <span class="step-no t-label-1">3</span>
+                      <span class="t-label-1 step-title">waypoint name</span>
+                      <span class="badge badge-idle t-label-2"><span class="badge-dot"></span>대기</span>
                     </div>
-                    <div class="step-meta-row">
-                      <span class="t-label-2 step-status">대기</span>
-                    </div>
-                  </div>
-                </div>
-              </article>
+                  </div></div>
+                </article>
 
-              <article class="timeline-item is-pending">
-                <span class="rail-capsule"></span>
-                <div class="step-card">
-                  <div class="step-head">
+                <article class="timeline-item is-pending">
+                  <span class="rail-capsule"><span class="rail-mark"></span><span class="rail-line"></span></span>
+                  <div class="step-wrap"><div class="step-card">
                     <div class="step-title-row">
-                      <span class="t-label-1 step-title">WP-05 비상 발전기실 가스</span>
+                      <span class="step-no t-label-1">4</span>
+                      <span class="t-label-1 step-title">waypoint name</span>
+                      <span class="badge badge-idle t-label-2"><span class="badge-dot"></span>대기</span>
                     </div>
-                    <div class="step-meta-row">
-                      <span class="t-label-2 step-status">대기</span>
-                    </div>
-                  </div>
-                </div>
-              </article>
-            </div>
+                  </div></div>
+                </article>
 
-            <div class="panel-actions">
-              <button type="button" class="btn btn-secondary">수동 조작</button>
-              <button type="button" class="btn btn-primary">미션 관리</button>
+                <article class="timeline-item is-pending">
+                  <span class="rail-capsule"><span class="rail-mark"></span><span class="rail-line"></span></span>
+                  <div class="step-wrap"><div class="step-card">
+                    <div class="step-title-row">
+                      <span class="step-no t-label-1">5</span>
+                      <span class="t-label-1 step-title">waypoint name</span>
+                      <span class="badge badge-idle t-label-2"><span class="badge-dot"></span>대기</span>
+                    </div>
+                  </div></div>
+                </article>
+
+                <article class="timeline-item is-pending">
+                  <span class="rail-capsule"><span class="rail-mark"></span><span class="rail-line"></span></span>
+                  <div class="step-wrap"><div class="step-card">
+                    <div class="step-title-row">
+                      <span class="step-no t-label-1">6</span>
+                      <span class="t-label-1 step-title">waypoint name</span>
+                      <span class="badge badge-idle t-label-2"><span class="badge-dot"></span>대기</span>
+                    </div>
+                  </div></div>
+                </article>
+
+                <article class="timeline-item is-pending">
+                  <span class="rail-capsule"><span class="rail-mark"></span><span class="rail-line"></span></span>
+                  <div class="step-wrap"><div class="step-card">
+                    <div class="step-title-row">
+                      <span class="step-no t-label-1">7</span>
+                      <span class="t-label-1 step-title">waypoint name</span>
+                      <span class="badge badge-idle t-label-2"><span class="badge-dot"></span>대기</span>
+                    </div>
+                  </div></div>
+                </article>
+              </div>
             </div>
 
           </section>
-
         </div>
-      </main>
 
-    </div>
+      </div>
+    </main>
+
   </div>
 </div>
 
 <!-- ---------- 퍼블리싱 노트 ---------- -->
 <section class="notes" id="notes">
   <p class="eyebrow">Publishing Notes</p>
-  <h2>이 화면을 옮기며 판단한 것</h2>
+  <h2>Figma 기준으로 다시 맞췄습니다</h2>
   <p class="lead">
-    Figma <strong>UI_99_작업화면 · Template / 04.1 Dashboard Home</strong>(node 121:7848)을 옮겼습니다.
-    GUI 작업 전이라 색과 서체는 그대로 두고, 구조만 손봤습니다.
+    화면이 <strong>UI_99_작업화면에서 UI_00_Design System 안(node 399:6225)</strong>으로 옮겨졌고,
+    구조가 크게 바뀌었습니다. 디자인 시스템도 컬렉션 구성이 달라져서 <code>tokens.css</code>를 다시 만들었습니다.
   </p>
 
-  <h3>1. 무엇이 늘어나는가를 코드에서 정했습니다</h3>
-  <p>
-    Figma 파일은 <strong>1920×1024 한 점에서만 성립</strong>합니다.
-    <code>Two Column</code>까지는 FILL이 잘 내려오는데 그 안의 두 자식이 모두 FIXED라,
-    지도 폭 1170이 "나머지"가 아니라 "상수"로 굳어 있습니다.
-  </p>
-  <p>
-    다만 <strong>Map Panel 컴포넌트 설명에는 이미 답이 적혀 있습니다</strong> —
-    "Canvas는 Fill로 늘어난다. 1600px 이상에서 지도는 제한 없이 확장한다."
-    설명을 따랐습니다. 폭이 고정된 것은 GNB · Context Panel(240) · Right Panel(360) 셋뿐이고,
-    나머지는 지도가 흡수합니다. 창 크기를 바꿔보시면 확인됩니다.
-  </p>
-
-  <h3>2. 우측 패널이 높이를 채우고, 타임라인만 스크롤합니다</h3>
-  <p>
-    Figma에서 이 패널은 세로 HUG라 912 트랙 안에서 839에서 멈춥니다(73px 빈 공간).
-    웨이포인트가 늘면 <code>Content</code>의 clipsContent에 잘려 <strong>아무 경고 없이 사라지고</strong>,
-    바닥의 「수동 조작 / 미션 관리」도 같이 밀려 내려갑니다.
-  </p>
-  <p>
-    여기서는 패널이 높이를 채우고, 길이가 변하는 타임라인만 스크롤 영역으로 두었습니다.
-    버튼은 항상 바닥에 남습니다.
-  </p>
-
-  <h3>3. AI 블록을 지도 안으로 옮겼습니다</h3>
-  <p>
-    Figma에서 이 블록은 <code>Status Bar</code>와 형제인 절대배치 노드라 지도와 아무 관계가 없고,
-    제약이 MIN/MIN이라 폭이 변해도 좌상단에 붙박이입니다.
-    좌표를 재보면 <strong>지도 왼쪽 경계보다 4px 밖으로</strong> 나가 있습니다(13431 vs 13435).
-  </p>
-  <p>
-    Map Panel의 자식으로 옮겨서 지도를 따라가게 했습니다. 4px 어긋남도 같이 해소됩니다.
-    이 영역은 Figma에서 다시 디자인하실 예정이라 나머지는 그대로 두었습니다.
-  </p>
-
-  <h3>4. 로봇 카드는 대수 상한 없이 버팁니다</h3>
-  <p>
-    최대 대수가 아직 정해지지 않아서, <strong>몇 대가 되든 깨지지 않는 쪽</strong>으로 두었습니다.
-    카드는 폭을 나눠 갖되 92px 아래로는 줄지 않고, 그보다 좁아지면 가로로 스크롤합니다.
-    3대일 때는 Figma와 같은 폭이 나옵니다.
-  </p>
-  <p>
-    Figma의 현재 구조는 <code>NO_WRAP</code> + 3장 균등이라 4대가 되면 카드당 74px이 되어
-    「수행 중」 「64%」 「Strong」이 들어갈 자리가 없습니다. 상한이 정해지면 다시 조정하겠습니다.
-  </p>
-
-  <h3>5. 면 위계를 시스템 규칙대로 되돌렸습니다</h3>
-  <p>
-    Figma에서 <code>Main</code>과 <code>Map Panel</code>의 배경이 모두
-    <code>button/primary/bg/disabled</code>로 칠해져 있습니다 —
-    <strong>비활성 버튼 색을 페이지 배경으로 쓰고 있습니다.</strong>
-    그 결과 캔버스가 가장 어둡고 패널·카드가 밝아야 한다는 규칙이 이 화면에서는 보이지 않습니다.
-  </p>
-  <p>
-    <code>Main</code>은 <code>bg/canvas</code>, <code>Map Panel</code>은 <code>bg/surface/default</code>로
-    두었습니다. 이번 톤 작업에서 확정한 위계가 실제 화면에서 어떻게 보이는지 확인하실 수 있습니다.
-    되돌리길 원하시면 알려주세요.
-  </p>
-
-  <h3>6. 그대로 둔 것</h3>
-  <p>
-    <strong>문구는 한 글자도 바꾸지 않았습니다.</strong> 값을 나타내는 도형만 그 값에 맞췄습니다.
-  </p>
+  <h3>1. 화면에서 바뀐 것</h3>
   <table>
-    <tr><th>항목</th><th>Figma</th><th>여기</th></tr>
-    <tr><td>로봇 카드 3장 이름</td><td>모두 <code>ROBOT 02</code></td><td>그대로</td></tr>
-    <tr><td>퀵 액션 2~4번</td><td>모두 <code>퀵 버튼</code></td><td>그대로 (레이어 이름은 수동 조작·안전진단·보고서)</td></tr>
-    <tr><td>진행률 수치</td><td><code>3 / 5</code> · <code>00%</code></td><td>그대로 (3/5는 60%입니다)</td></tr>
-    <tr><td>진행률 막대</td><td>132 / 320 = 41%</td><td>60% (3/5에 맞춤)</td></tr>
-    <tr><td>배터리 막대</td><td>고정 26px · 40px · 26px</td><td>64% · 100% · 64% (라벨에 맞춤)</td></tr>
-    <tr><td>AI 블록 우상단</td><td>95×91 흰 사각형</td><td>그대로 (미완성 자리로 보입니다)</td></tr>
+    <tr><th>항목</th><th>이전</th><th>현재</th></tr>
+    <tr><td>Status Bar</td><td>GNB 오른쪽, 1842</td><td><strong>전체 폭</strong>, 로고가 안으로 들어옴</td></tr>
+    <tr><td>GNB Rail</td><td>78 (HUG)</td><td>76 (<code>size/gnb/rail</code>과 일치)</td></tr>
+    <tr><td>Context Panel</td><td>SITE · 운영 모드 · 퀵 액션</td><td>퀵 액션 <strong>삭제</strong></td></tr>
+    <tr><td>Right Panel</td><td>360, 카드 1개</td><td><strong>420</strong>, 카드 2개로 분리</td></tr>
+    <tr><td>Robot Card</td><td>101 폭, 세로 나열</td><td>168 폭, 썸네일 + Mission/Battery/Signal 행</td></tr>
+    <tr><td>Progress Bar</td><td>연속 막대</td><td><strong>5칸 분할 막대</strong></td></tr>
+    <tr><td>Timeline</td><td>알약 캡슐, 4개</td><td>번호 + 아이콘/세로선, 7개</td></tr>
+    <tr><td>AI 영역</td><td>지도 위 588×240 그라데이션 면</td><td>지도 하단 <strong>얇은 알림 바</strong></td></tr>
+    <tr><td>지도 도구</td><td>좌하단</td><td>우상단</td></tr>
+    <tr><td>Panel Actions</td><td>수동 조작 / 미션 관리</td><td><strong>삭제</strong> (미션 관리는 헤더로 이동)</td></tr>
   </table>
+  <p>
+    도면 도형 5개도 사라져서 지도는 빈 캔버스입니다. 아이콘 에셋도 27개에서 18개로 줄었습니다.
+  </p>
 
-  <h3>7. 확인이 필요한 지점</h3>
+  <h3>2. 디자인 시스템에서 바뀐 것</h3>
+  <p>
+    <strong>Component 컬렉션이 없어지고</strong> <code>button/*</code> 32개가 Semantic으로 들어왔습니다.
+    컬렉션 구성이 <code>Primitive(111) · Semantic(122) · Texts(7)</code>이 되었습니다.
+  </p>
   <ul>
-    <li>
-      <strong><code>Status Bar</code>가 컴포넌트 마스터입니다.</strong> 화면 템플릿 안에 원본이 들어앉아 있고,
-      파일 전체에 인스턴스가 0개입니다. 게다가 Auto Layout이 없어 우측 묶음이 왼쪽에 못 박혀 있습니다.
-      여기서는 GNB Rail과 같은 방식으로 다시 짰습니다.
-    </li>
-    <li>
-      <strong><code>Mission Timeline Iist</code></strong> — <code>List</code>의 <code>l</code>이 대문자 <code>I</code>입니다.
-      published 라이브러리 컴포넌트라 이 오타가 이 파일을 쓰는 모든 화면에 퍼집니다.
-    </li>
-    <li>
-      <strong>Progress Bar에 그라데이션이 들어가 있습니다.</strong> 컴포넌트 설명에 "Gradient를 Fill에 쓰지 않는다"고
-      적혀 있는데, 실제 Fill은 <code>#285896 → #6f99f5 → #ffdadb</code> 하드코딩입니다.
-      끝의 분홍이 어느 토큰에도 없습니다. 일단 그대로 옮겼습니다.
-    </li>
-    <li>
-      <strong>GNB 항목 8개가 모두 <code>fg/disabled</code>입니다.</strong> 선택된 「관제」만 <code>fg/brand</code>입니다.
-      다른 영역이 아직 안 만들어져서 의도적으로 비활성 처리하신 것인지 확인 부탁드립니다.
-    </li>
-    <li>
-      <strong>로봇 카드에 배터리 수치가 두 개입니다.</strong> 막대 옆 <code>64%</code>와 번개 아이콘 옆 <code>78%</code>가
-      서로 다른 값을 가리킵니다. Battery 행과 Battery Gauge 인스턴스가 겹쳐 들어간 것으로 보입니다.
-    </li>
-    <li>
-      <strong>껍데기 프레임 3개</strong> — <code>Frame 1597881552</code>(완전 통과용),
-      <code>Main</code>/<code>Content</code>(중복), <code>Frame 1597881537</code>(부모와 gap 중복).
-      웹에서는 걷어냈고 Figma에서는 그대로 두었습니다.
-    </li>
+    <li><strong>main 램프가 11단계로 재설계</strong>됐습니다 (50~950). 이전은 7단계였습니다.</li>
+    <li><strong>원색 3개가 바뀌었습니다</strong> — <code>danger/500 #F03918 → #FF383C</code>,
+      <code>safe/300 #5FD382 → #34C759</code>, <code>warning/500 #EECE1B → #FFCC00</code></li>
+    <li><code>size/panel/right</code> 360 → <strong>420</strong>, <code>space/2</code> 추가</li>
+    <li><code>bg/container</code> Dark가 gray/850 → gray/800, <code>bg/brand</code> Dark가 main/500 → main/600</li>
+    <li>Dark의 상태 아이콘 3개가 300 → <strong>500</strong>으로 (원색을 그대로 쓰는 방향)</li>
+    <li><strong>Texts 컬렉션</strong>(문자열 7개)이 새로 생겼습니다. 화면 문구용이라 CSS로는 내보내지 않았습니다.</li>
   </ul>
 
-  <h3>8. 아이콘과 서체</h3>
-  <p>
-    내보낸 SVG 27개에는 Light 모드 색이 구워져 있어 그대로 쓰면 테마를 따라가지 못합니다.
-    CSS <code>mask</code>로 모양만 쓰고 색은 토큰이 채우도록 했습니다. 우측 아래에서 테마를 바꿔보시면 확인됩니다.
-  </p>
-  <p>
-    수치에는 SUIT의 <code>tabular-nums</code>를 적용해 자릿수를 고정했습니다.
-    Figma의 Type 패널에는 이 항목이 없어서 Figma에서는 확인되지 않지만, 브라우저에서는 동작합니다.
-    지난번에 만든 <code>Typography/Mono/*</code> 스타일은 아직 이 화면에 적용되지 않은 상태라 그대로 두었습니다.
-  </p>
+  <h3>3. 확인이 필요한 지점</h3>
+  <ul>
+    <li>
+      <strong><code>button/*</code> 32개의 Light와 Dark 값이 전부 같습니다.</strong>
+      Component 컬렉션에 있을 때는 별칭 하나(<code>bg/inverse</code> 등)가 모드를 알아서 따라갔는데,
+      Semantic으로 옮기면서 두 모드에 Light 값이 같이 들어갔습니다. 눈에 띄는 두 곳입니다 —
+      <code>button/primary/bg/default</code>가 <code>gray/950</code>이라 <code>bg/canvas</code>와 같은 색이고,
+      <code>button/secondary/bg/default</code>가 <code>gray/0</code>이라 어두운 화면 위에 흰 버튼이 놓입니다.
+      <strong>의도한 것인지 확인 부탁드립니다.</strong> Figma를 그대로 따랐습니다.
+    </li>
+    <li>
+      <strong><code>input/border/*</code> · <code>navigation/item/*</code> · <code>table/row/*</code> 10개가
+      이관 없이 사라졌습니다.</strong> Text Field · Select · Nav Item · GNB Rail Item · Table Row의
+      바인딩 확인이 필요합니다. 여기서는 대응하는 Semantic(<code>border/control</code> 등)을 직접 씁니다.
+    </li>
+    <li>
+      <strong>Robot Card의 Mission/Battery/Signal 라벨이 raw white입니다.</strong> 토큰이 아니라서
+      Light 모드에서는 흰 면 위 흰 글자가 됩니다. 여기서는 <code>fg/secondary</code>로 두었습니다.
+    </li>
+    <li>
+      <strong><code>Gradient/Main</code>의 방향이 뒤집혔습니다.</strong> 코어가 오른쪽 끝이고 왼쪽으로 감쇠합니다.
+      나머지 셋은 여전히 코어가 왼쪽입니다. 또 최소 알파가 0이 아니라 0.1이라 완전히 사라지지 않습니다.
+      (이 화면에서는 그라데이션을 쓰지 않아 눈에 띄지 않습니다.)
+    </li>
+    <li>
+      <strong>Text Style 이름과 실제 굵기가 어긋납니다.</strong>
+      <code>Heading/3/SemiBold</code>와 <code>Label/1/SemiBold</code>는 실제 ExtraBold,
+      <code>Title/1/SemiBold</code>는 실제 Bold입니다. 실제 굵기를 따랐습니다.
+    </li>
+    <li>
+      <strong><code>Mission Timeline Iist</code></strong> — <code>List</code>의 <code>l</code>이 대문자
+      <code>I</code>입니다. 지난번에도 남아 있던 오타입니다.
+    </li>
+    <li>진행률이 여전히 <code>3 / 5</code> · <code>00%</code>입니다. 3/5는 60%입니다.</li>
+  </ul>
 
-  <h3>9. tokens.css를 다시 만들었습니다</h3>
+  <h3>4. 그대로 둔 것 · 코드에서 정한 것</h3>
   <p>
-    이 화면을 옮기며 대조해 보니 <code>tokens.css</code>의 Semantic 매핑에
-    <strong>Light 3곳 · Dark 7곳</strong>이 실제 Figma 값과 달랐습니다
-    (<code>chart/track</code>, <code>chart/grid</code>, <code>bg/interactive/hover</code>,
-    <code>status/normal/icon</code> 등). 변수 설명을 근거로 삼았던 부분이 원인입니다.
+    <strong>문구는 한 글자도 바꾸지 않았습니다.</strong>
+    <code>로봇명</code> ×3, <code>waypoint name</code> ×7, <code>전체 미션명</code>, <code>00%</code>,
+    채워지지 않은 사각형 자리 모두 Figma 그대로입니다.
   </p>
   <p>
-    <code>valuesByMode</code> 실측 덤프로 전부 다시 생성했습니다.
-    Primitive 106 · Semantic 90×2 · Component 42, 합계 244개 변수입니다.
-    이제 Component 계층까지 들어와서 <code>button/*</code>, <code>input/*</code>, <code>navigation/*</code>을
-    화면에서 그대로 쓸 수 있습니다.
+    무엇이 늘어나는지는 코드에서 정했습니다 — 고정 폭은
+    <strong>GNB(76) · Context Panel(240) · Right Panel(420)</strong> 셋뿐이고 지도가 나머지를 흡수합니다.
+    우측 패널은 높이를 채우고 <strong>타임라인만 스크롤</strong>합니다. 웨이포인트가 7개로 늘어난 지금은
+    이게 없으면 아래쪽이 잘립니다. 로봇 카드는 대수 상한이 미정이라 132px 아래로는 줄지 않고
+    그보다 좁아지면 가로로 스크롤합니다.
   </p>
 </section>
 
