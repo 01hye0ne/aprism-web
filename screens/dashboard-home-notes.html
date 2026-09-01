@@ -145,6 +145,36 @@
       바인딩 확인이 필요합니다. 여기서는 대응하는 Semantic(<code>border/control</code> 등)을 직접 씁니다.
     </li>
     <li>
+      <strong>Waypoint 텍스트 속성이 동작하지 않습니다.</strong> 7개 항목 모두
+      <code>Waypoint = "Thrust Oil 정유기 운전 상태"</code>로 설정돼 있는데, 텍스트 레이어가
+      <code>Texts</code> 컬렉션의 문자열 변수(<code>Waypoint/Default</code> ·
+      <code>Waypoint/예시 1</code>)에 묶여 있어 <strong>변수 바인딩이 컴포넌트 속성을 이깁니다.</strong>
+      그래서 화면에는 "waypoint name"이 나옵니다. 둘 중 하나를 끊어야 합니다.
+    </li>
+    <li>
+      <strong><code>Show Progress = true</code>인데 진행 블록이 어디에도 안 나옵니다.</strong>
+      7개 항목 전부에 <code>Progress Label = "센서 판독 진행"</code>,
+      <code>Progress Value = "3 / 5 지점 · 62%"</code>가 들어가 있지만 화면에 없습니다.
+      <code>Show Description = true</code>도 마찬가지로 Running 항목에서만 보입니다.
+      Done · Pending Variant 에 해당 레이어가 없어서 불리언이 무력화된 것으로 보입니다.
+    </li>
+    <li>
+      <strong>로봇 카드 3장이 모두 <code>State = Running</code>입니다.</strong> 속성만 보면 셋이 같은
+      상태인데, 1번만 선택된 것처럼 보이는 건 <strong>수동 fill 오버라이드</strong>입니다.
+      Variant 로 통제되지 않아서 "현재 조작 대상"이 데이터로 바뀌지 않습니다.
+      카드에 텍스트 속성이 둘 있는 것도 확인이 필요합니다 —
+      <code>Robot = "ROBOT 02"</code>(화면에 안 나옴), <code>로봇명 = "로봇명"</code>(화면에 나옴).
+    </li>
+    <li>
+      <strong>Mode Badge 가 <code>Status = Normal</code>인데 중립색으로 오버라이드돼 있습니다.</strong>
+      오버라이드 3개가 걸려 있어 초록 대신 <code>fg/secondary</code>로 나옵니다.
+    </li>
+    <li>
+      Turbine Select 에 <code>Label = "터빈 선택"</code>,
+      <code>Helper = "현재 관제 대상 터빈을 선택합니다."</code>가 들어 있지만
+      <code>Show Label</code> · <code>Show Helper</code>가 false 라 숨겨져 있습니다. 화면도 그대로 두었습니다.
+    </li>
+    <li>
       <strong>Status Bar 로고가 raw white입니다.</strong> 토큰이 아니라서 Light 모드에서는
       흰 면 위 흰 로고가 됩니다. 여기서는 <code>fg/primary</code>로 두었습니다.
     </li>

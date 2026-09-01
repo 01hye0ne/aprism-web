@@ -10,6 +10,13 @@ import hashlib
 import io
 import os
 import re
+import sys
+
+# 윈도우 콘솔이 cp949 로 잡히면 em dash 같은 문자에서 죽는다.
+try:
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+except Exception:
+    pass
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PATTERN = re.compile(r'(?P<attr>href|src)="(?P<path>[^"]*?assets/[^"?]+\.(?:css|js))(?:\?v=[0-9a-f]+)?"')
