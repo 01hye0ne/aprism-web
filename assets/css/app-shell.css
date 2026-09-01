@@ -581,6 +581,8 @@ button {
  */
 .ai-panel {
   position: relative;
+  /* 일렁임 층을 글자 아래 · 배경 위에 두려면(z-index:-1) 여기가 쌓임 맥락이어야 한다. */
+  isolation: isolate;
   flex: none;
   display: flex;
   flex-direction: column;
@@ -607,6 +609,11 @@ button {
   /* Figma 의 INNER_SHADOW — 아래에서 위로 번지는 발광이다. */
   box-shadow: inset 0 -8px 12px -4px var(--alert-default-glow-secondary);
   transition: padding 180ms ease;
+
+  /* 일렁임에 쓰는 계열 색. Type 마다 이 둘만 바꾸면 된다. */
+  --ai-tone-a: color-mix(in srgb, var(--alert-default-edge) 32%, transparent);
+  --ai-tone-b: color-mix(in srgb, var(--alert-default-glow-primary) 26%, transparent);
+  --ai-spectrum-color: var(--alert-default-glow-primary);
 }
 
 /*
@@ -694,10 +701,76 @@ button {
   box-shadow: inset 0 -8px 12px -4px var(--alert-safe-glow-secondary);
 }
 
-/* Spectrum 도 계열 색을 따른다. */
-.ai-panel.is-critical .ai-spectrum { background-image: repeating-linear-gradient(90deg, var(--alert-danger-glow-primary) 0 2px, transparent 2px 4px); }
-.ai-panel.is-warning .ai-spectrum { background-image: repeating-linear-gradient(90deg, var(--alert-warning-glow-primary) 0 2px, transparent 2px 4px); }
-.ai-panel.is-safe .ai-spectrum { background-image: repeating-linear-gradient(90deg, var(--alert-safe-glow-primary) 0 2px, transparent 2px 4px); }
+/* 일렁임과 Spectrum 도 계열 색을 따른다. */
+.ai-panel.is-critical {
+  --ai-tone-a: color-mix(in srgb, var(--alert-danger-edge) 32%, transparent);
+  --ai-tone-b: color-mix(in srgb, var(--alert-danger-glow-primary) 26%, transparent);
+  --ai-spectrum-color: var(--alert-danger-glow-primary);
+}
+
+.ai-panel.is-warning {
+  --ai-tone-a: color-mix(in srgb, var(--alert-warning-edge) 32%, transparent);
+  --ai-tone-b: color-mix(in srgb, var(--alert-warning-glow-primary) 26%, transparent);
+  --ai-spectrum-color: var(--alert-warning-glow-primary);
+}
+
+.ai-panel.is-safe {
+  --ai-tone-a: color-mix(in srgb, var(--alert-safe-edge) 32%, transparent);
+  --ai-tone-b: color-mix(in srgb, var(--alert-safe-glow-primary) 26%, transparent);
+  --ai-spectrum-color: var(--alert-safe-glow-primary);
+}
+
+/*
+ * 배경 그라데이션 위에서 천천히 움직이는 색 덩어리 둘. Siri/Gemini 식 일렁임이다.
+ * Figma 에는 없다 — 정지 화면으로는 표현할 수 없는 층이라 여기서만 더한다.
+ *
+ * 색은 계열 토큰을 20~26% 로 섞은 것이라 톤 밖으로 나가지 않는다.
+ * 두 층의 주기가 서로 안 떨어지는 값(17s / 23s)이라 같은 그림이 반복되지 않는다.
+ * transform 만 움직이므로 합성기에서 처리된다 — 다시 그리지 않는다.
+ */
+.ai-aurora {
+  position: absolute;
+  inset: 0;
+  /* 배경 그라데이션 위, 글자 아래. */
+  z-index: -1;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.ai-aurora::before,
+.ai-aurora::after {
+  content: "";
+  position: absolute;
+  top: -70%;
+  bottom: -70%;
+  left: -50%;
+  width: 200%;
+  background-repeat: no-repeat;
+}
+
+.ai-aurora::before {
+  background-image:
+    radial-gradient(38% 130% at 22% 45%, var(--ai-tone-a) 0%, transparent 68%),
+    radial-gradient(32% 120% at 62% 55%, var(--ai-tone-b) 0%, transparent 70%);
+  animation: ai-drift-a 17s ease-in-out infinite alternate;
+}
+
+.ai-aurora::after {
+  background-image:
+    radial-gradient(42% 140% at 84% 50%, var(--ai-tone-b) 0%, transparent 68%);
+  animation: ai-drift-b 23s ease-in-out infinite alternate;
+}
+
+@keyframes ai-drift-a {
+  from { transform: translate3d(-7%, -6%, 0); }
+  to { transform: translate3d(7%, 5%, 0); }
+}
+
+@keyframes ai-drift-b {
+  from { transform: translate3d(6%, 4%, 0); }
+  to { transform: translate3d(-8%, -5%, 0); }
+}
 
 /*
  * Figma 의 Spectrum. 2px 선 300개를 반복 배경 하나로 대신한다.
@@ -709,19 +782,50 @@ button {
   left: 0;
   right: 0;
   bottom: 0;
+  z-index: -1;
   height: 16px;
+  overflow: hidden;
   pointer-events: none;
-  background-image: repeating-linear-gradient(
-    90deg,
-    var(--alert-default-glow-primary) 0 2px,
-    transparent 2px 4px
-  );
-  -webkit-mask-image: linear-gradient(180deg, transparent 0%, rgb(0 0 0 / 20%) 80%, #000 100%);
-  mask-image: linear-gradient(180deg, transparent 0%, rgb(0 0 0 / 20%) 80%, #000 100%);
+  /* 막대 자체는 여기 고정 마스크다 — 움직이는 것은 안쪽 높이 곡선뿐이다. */
+  -webkit-mask-image: repeating-linear-gradient(90deg, #000 0 2px, transparent 2px 4px);
+  mask-image: repeating-linear-gradient(90deg, #000 0 2px, transparent 2px 4px);
+}
+
+/*
+ * 막대 높낮이. 한 덩어리 색을 깔고 파형 모양으로 잘라낸다 —
+ * 파형이 지나가면 그 자리 막대가 길어졌다 짧아진다.
+ *
+ * 파형은 주기가 240 · 80 · 48 인 사인 셋을 더한 것이라
+ * 240 마다 정확히 이어지고, 그 한 주기만큼 밀면 이음매가 보이지 않는다.
+ * 요소 폭이 200% 이고 mask-size 가 25% 라 translate -25% 가 곧 한 주기다.
+ */
+.ai-spectrum::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: 200%;
+  background-color: var(--ai-spectrum-color);
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20240%2016'%20preserveAspectRatio='none'%3E%3Cpath%20d='M0%206%20L4%205.9%20L8%206.1%20L12%206.4%20L16%206.7%20L20%206.9%20L24%206.9%20L28%206.9%20L32%206.8%20L36%206.7%20L40%206.6%20L44%206.6%20L48%206.7%20L52%206.8%20L56%206.9%20L60%206.9%20L64%206.6%20L68%206.2%20L72%205.6%20L76%204.9%20L80%204.3%20L84%203.9%20L88%203.9%20L92%204.2%20L96%204.9%20L100%205.8%20L104%206.9%20L108%208%20L112%209%20L116%209.7%20L120%2010%20L124%2010.1%20L128%209.9%20L132%209.6%20L136%209.3%20L140%209.1%20L144%209.1%20L148%209.1%20L152%209.2%20L156%209.3%20L160%209.4%20L164%209.4%20L168%209.3%20L172%209.2%20L176%209.1%20L180%209.1%20L184%209.4%20L188%209.8%20L192%2010.4%20L196%2011.1%20L200%2011.7%20L204%2012.1%20L208%2012.1%20L212%2011.8%20L216%2011.1%20L220%2010.2%20L224%209.1%20L228%208%20L232%207%20L236%206.3%20L240%206%20L240%2016%20L0%2016Z'%20fill='%23000'/%3E%3C/svg%3E"), linear-gradient(180deg, transparent 0%, rgb(0 0 0 / 40%) 70%, #000 100%);
+  -webkit-mask-size: 25% 100%, 100% 100%;
+  -webkit-mask-repeat: repeat-x, no-repeat;
+  -webkit-mask-composite: source-in;
+  mask-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20240%2016'%20preserveAspectRatio='none'%3E%3Cpath%20d='M0%206%20L4%205.9%20L8%206.1%20L12%206.4%20L16%206.7%20L20%206.9%20L24%206.9%20L28%206.9%20L32%206.8%20L36%206.7%20L40%206.6%20L44%206.6%20L48%206.7%20L52%206.8%20L56%206.9%20L60%206.9%20L64%206.6%20L68%206.2%20L72%205.6%20L76%204.9%20L80%204.3%20L84%203.9%20L88%203.9%20L92%204.2%20L96%204.9%20L100%205.8%20L104%206.9%20L108%208%20L112%209%20L116%209.7%20L120%2010%20L124%2010.1%20L128%209.9%20L132%209.6%20L136%209.3%20L140%209.1%20L144%209.1%20L148%209.1%20L152%209.2%20L156%209.3%20L160%209.4%20L164%209.4%20L168%209.3%20L172%209.2%20L176%209.1%20L180%209.1%20L184%209.4%20L188%209.8%20L192%2010.4%20L196%2011.1%20L200%2011.7%20L204%2012.1%20L208%2012.1%20L212%2011.8%20L216%2011.1%20L220%2010.2%20L224%209.1%20L228%208%20L232%207%20L236%206.3%20L240%206%20L240%2016%20L0%2016Z'%20fill='%23000'/%3E%3C/svg%3E"), linear-gradient(180deg, transparent 0%, rgb(0 0 0 / 40%) 70%, #000 100%);
+  mask-size: 25% 100%, 100% 100%;
+  mask-repeat: repeat-x, no-repeat;
+  mask-composite: intersect;
+  animation: ai-wave 16s linear infinite;
+}
+
+@keyframes ai-wave {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-25%, 0, 0); }
 }
 
 /* 열리면 패널 패딩은 4 로 줄고 안쪽 Summary 가 16/12 를 갖는다(Figma 구조). */
 .ai-panel.is-open { padding: var(--space-4); }
+
+/* Figma 의 opened 변형에는 Spectrum 이 없다 — 그 자리를 입력창이 차지한다. */
+.ai-panel.is-open .ai-spectrum { display: none; }
 
 /* 토글 버튼. 두 상태에서 같은 자리(우측 상단)에 남아야 해서 절대배치한다.
    절대배치의 기준은 padding box 라 padding 값과 같은 offset 을 직접 준다. */
@@ -877,6 +981,8 @@ button {
 @media (prefers-reduced-motion: reduce) {
   .ai-panel, .ai-fold, .ai-toggle, .ai-toggle .i,
   .context-panel, .panel-section { transition: none; }
+  /* 일렁임은 장식이다. 움직임을 줄이라고 했으면 가운데 값에서 멈춘다. */
+  .ai-aurora::before, .ai-aurora::after, .ai-spectrum::before { animation: none; }
 }
 
 /* ---------- Right Panel ---------- */

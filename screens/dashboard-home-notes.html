@@ -96,7 +96,44 @@
     구조가 크게 바뀌었습니다. 디자인 시스템도 컬렉션 구성이 달라져서 <code>tokens.css</code>를 다시 만들었습니다.
   </p>
 
-  <h3>1. 이번 업데이트 — 사이트 패널 · AI 바 · 토큰</h3>
+  <h3>1. AI 패널 일렁임 — 그라데이션 · Spectrum</h3>
+  <p>
+    Siri · Gemini 처럼 패널이 가만히 있지 않도록 두 층을 움직였습니다.
+    <strong>Figma 에는 없는 층입니다</strong> — 정지 화면으로는 담을 수 없는 것이라 여기서만 더했습니다.
+  </p>
+  <table>
+    <tr><th>층</th><th>움직임</th><th>주기</th></tr>
+    <tr><td>배경 그라데이션</td><td>계열 색 덩어리 셋이 좌우 · 위아래로 천천히 흐릅니다</td><td>17s · 23s</td></tr>
+    <tr><td>Spectrum</td><td>막대 높낮이가 파형을 따라 물결칩니다</td><td>16s</td></tr>
+  </table>
+  <p>
+    <strong>색은 톤 밖으로 나가지 않습니다.</strong> 덩어리 색은
+    <code>alert/{계열}/edge</code> 32% · <code>alert/{계열}/glow-Primary</code> 26% 를 섞은 것이라
+    Type 을 Warning · Critical · Safe 로 바꾸면 그 계열 색으로 함께 바뀝니다
+    (<code>--ai-tone-a</code> · <code>--ai-tone-b</code> 두 값만 갈아끼웁니다).
+    두 층의 주기가 서로 나누어떨어지지 않아 같은 그림이 반복되지 않습니다.
+  </p>
+  <p>
+    <strong>Spectrum 은 막대가 아니라 파형이 움직입니다.</strong> 막대(2px 간격 4px)는 제자리에 고정된
+    마스크이고, 그 안에서 <strong>높이를 정하는 파형만 옆으로 흐릅니다</strong> — 막대가 흘러가는 게 아니라
+    제자리에서 길어졌다 짧아집니다. 파형은 주기가 240 · 80 · 48 인 사인 셋을 더한 것이라
+    240 마다 정확히 이어지고, 딱 한 주기만큼 밀기 때문에 이음매가 보이지 않습니다.
+  </p>
+  <p>
+    두 층 모두 <code>transform</code> 만 바꾸므로 합성기에서 처리됩니다 — 다시 그리지 않습니다.
+    <strong><code>prefers-reduced-motion</code> 을 켠 환경에서는 멈춥니다.</strong>
+  </p>
+  <p>
+    곁들여 두 가지를 맞췄습니다.
+    <strong>Spectrum 이 글자 아래로 내려갔습니다</strong> — Figma 에서도 Spectrum 은 맨 아래 층인데
+    퍼블리싱에서는 글자 위에 얹혀 있었습니다.
+    그리고 <strong>열린 상태에서는 Spectrum 을 감춥니다</strong> — Figma 의 opened 변형에는 Spectrum 이 없고
+    그 자리를 입력창이 차지합니다.
+    막대의 세로 감쇠는 <code>20% @80%</code> → <code>40% @70%</code> 로 완화했습니다.
+    파형이 이미 높낮이를 만들기 때문에 예전 감쇠로는 물결이 보이지 않았습니다.
+  </p>
+
+  <h3>2. 이번 업데이트 — 사이트 패널 · AI 바 · 토큰</h3>
 
   <p><strong>사이트 패널이 세 덩이로 나뉘었습니다.</strong> 패널 자체에는 여백이 없고 각 덩이가 자기 여백을 갖습니다.</p>
   <table>
@@ -227,7 +264,7 @@
     여기서는 셋 다 들어가게 나눕니다)과 타임라인 내용(로봇별로 다르게 지었습니다).
   </p>
 
-  <h3>2. AI 패널 디테일</h3>
+  <h3>3. AI 패널 디테일</h3>
   <p>퍼블리싱에서 빠져 있던 세 가지를 채웠습니다.</p>
   <table>
     <tr><th>부분</th><th>이전</th><th>현재</th></tr>
@@ -275,7 +312,7 @@
     raw white 인 것도 마찬가지입니다 — Light 에서 밝은 면 위 흰 글자가 됩니다.
   </p>
 
-  <h3>3. Figma 정리 — 이름 · 설명 · 토큰 바인딩</h3>
+  <h3>4. Figma 정리 — 이름 · 설명 · 토큰 바인딩</h3>
   <p>
     작업하면서 눈에 걸린 것들을 Figma 에서 직접 정리했습니다.
     <strong>published 라이브러리라 Publish 를 해야 다른 파일에 반영됩니다.</strong>
@@ -339,7 +376,7 @@
     </li>
   </ul>
 
-  <h3>4. 지난 업데이트 — 갭 · 라운드</h3>
+  <h3>5. 지난 업데이트 — 갭 · 라운드</h3>
   <p>
     Figma에서 간격과 모서리 값을 고치신 것을 반영했습니다. 실제로 바뀐 값입니다.
   </p>
@@ -416,7 +453,7 @@
     상태바가 64가 아니라 66이었습니다(Figma의 안쪽 stroke는 높이를 늘리지 않는데 CSS border는 늘립니다).
   </p>
 
-  <h3>5. 화면에서 바뀐 것</h3>
+  <h3>6. 화면에서 바뀐 것</h3>
   <table>
     <tr><th>항목</th><th>이전</th><th>현재</th></tr>
     <tr><td>Status Bar</td><td>GNB 오른쪽, 1842</td><td><strong>전체 폭</strong>, 로고가 안으로 들어옴</td></tr>
@@ -434,7 +471,7 @@
     도면 도형 5개도 사라져서 지도는 빈 캔버스입니다. 아이콘 에셋도 27개에서 18개로 줄었습니다.
   </p>
 
-  <h3>6. 디자인 시스템에서 바뀐 것</h3>
+  <h3>7. 디자인 시스템에서 바뀐 것</h3>
   <p>
     <strong>Component 컬렉션이 없어지고</strong> <code>button/*</code> 32개가 Semantic으로 들어왔습니다.
     컬렉션 구성이 <code>Primitive(111) · Semantic(122) · Texts(7)</code>이 되었습니다.
@@ -449,8 +486,16 @@
     <li><strong>Texts 컬렉션</strong>(문자열 7개)이 새로 생겼습니다. 화면 문구용이라 CSS로는 내보내지 않았습니다.</li>
   </ul>
 
-  <h3>7. 확인이 필요한 지점</h3>
+  <h3>8. 확인이 필요한 지점</h3>
   <ul>
+    <li>
+      <strong>AI Assist Panel 의 <code>Contrast Scrim</code> 이 비어 있습니다.</strong>
+      opened 변형 넷 모두 맨 아래에 <code>Contrast Scrim</code>(920×262, ABSOLUTE) 이 있는데
+      <strong>채우기가 하나도 없어 아무것도 그리지 않습니다</strong>.
+      이름대로라면 글자 대비를 받치는 층일 텐데, 그렇다면 Light 모드에서 캡슐 · 헤드라인이
+      읽히지 않는 문제가 바로 이 층으로 풀립니다. 채우실 값이 정해지면 퍼블리싱에 반영하겠습니다.
+      지금은 Figma 그대로 비워 두었습니다.
+    </li>
     <li>
       <strong><code>button/*</code> 32개의 Light와 Dark 값이 전부 같습니다.</strong>
       Component 컬렉션에 있을 때는 별칭 하나(<code>bg/inverse</code> 등)가 모드를 알아서 따라갔는데,
@@ -526,7 +571,7 @@
     </li>
   </ul>
 
-  <h3>8. AI(Delta) 요약 — closed / opened</h3>
+  <h3>9. AI(Delta) 요약 — closed / opened</h3>
   <p>
     <code>AI Assist Panel</code>의 <code>Emphasis</code> 속성(<code>closed</code> · <code>opened</code>)을
     <strong>우측 상단 토글 버튼</strong>으로 전환합니다. 기본은 closed 입니다.
@@ -543,7 +588,7 @@
     Figma의 opened에는 테두리가 없지만, 폭을 0으로 만들면 여닫을 때 2px씩 튀어서 색만 없앴습니다.
   </p>
 
-  <h3>9. 붙인 동작 — 패널 접기 · 로봇 선택</h3>
+  <h3>10. 붙인 동작 — 패널 접기 · 로봇 선택</h3>
   <p>
     <strong>사이트 패널 접기.</strong> 우상단 <code>panel-left</code> 버튼으로 여닫습니다.
     <strong>접힌 모습은 Figma에 없어서 여기서 정했습니다</strong> — 버튼만 남는
@@ -575,12 +620,12 @@
     타임라인은 <code>assets/js/screen.js</code> 안의 <code>ROBOTS</code> 배열에서 그립니다.
   </p>
 
-  <h3>10. 그대로 둔 것 · 코드에서 정한 것</h3>
+  <h3>11. 그대로 둔 것 · 코드에서 정한 것</h3>
   <p>
     <strong>문구는 자리표시자 그대로 둡니다.</strong>
     <code>로봇명</code> ×3, <code>waypoint name</code>, <code>전체 미션명</code>,
     채워지지 않은 사각형 자리 모두 Figma 그대로입니다.
-    진행률(<code>00%</code>)만 계산 값으로 바뀌었습니다 — 아래 7번을 봐 주세요.
+    진행률(<code>00%</code>)만 계산 값으로 바뀌었습니다 — 아래 8번을 봐 주세요.
   </p>
   <p>
     <strong>스크롤바도 토큰으로 맞췄습니다.</strong> Figma 에 없는 부분이라 코드에서 정했습니다 —
