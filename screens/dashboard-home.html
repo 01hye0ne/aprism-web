@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/static/woff2/SUIT.css" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" />
   <link rel="stylesheet" href="../assets/css/tokens.css?v=8ae74359" />
-  <link rel="stylesheet" href="../assets/css/app-shell.css?v=f5554b01" />
+  <link rel="stylesheet" href="../assets/css/app-shell.css?v=0a7a7795" />
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
@@ -131,8 +131,12 @@
             <!-- AI Assist Panel · Emphasis=closed 기본, 우측 토글로 opened -->
             <section class="ai-panel" data-ai-panel aria-label="Delta AI 요약">
 
-              <!-- 배경 그라데이션 위를 천천히 도는 색 덩어리. Figma 에는 없는 층이다. -->
-              <span class="ai-aurora" aria-hidden="true"></span>
+              <!-- 배경 그라데이션 위를 끊기지 않고 흐르는 색 셋. Figma 에는 없는 층이다. -->
+              <span class="ai-aurora" aria-hidden="true">
+                <span class="ai-flow ai-flow-a"></span>
+                <span class="ai-flow ai-flow-b"></span>
+                <span class="ai-flow ai-flow-c"></span>
+              </span>
 
               <!-- Figma 의 Spectrum. 2px 선 300개를 반복 마스크 하나로 대신한다. -->
               <span class="ai-spectrum" aria-hidden="true"></span>
