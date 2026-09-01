@@ -589,7 +589,7 @@ button {
      Figma 의 gap 20 은 opened 안쪽 간격이라 .ai-opened 가 갖는다. */
   gap: 0;
   padding: var(--space-16);
-  border-top: var(--border-width-strong) solid var(--border-focus);
+  /* 상단선은 border 가 아니라 아래 ::before 막대다 — Figma 의 stroke 가 그라데이션이다. */
   border-radius: var(--radius-container);
   overflow: hidden;
   /* 기본값(origin: padding-box, repeat)이면 테두리 영역에 타일 아래끝이 반복돼
@@ -606,8 +606,35 @@ button {
   );
   /* Figma 의 INNER_SHADOW — 아래에서 위로 번지는 발광이다. */
   box-shadow: inset 0 -8px 12px -4px var(--alert-default-glow-secondary);
-  transition: padding 180ms ease, border-top-color 180ms ease;
+  transition: padding 180ms ease;
 }
+
+/*
+ * 위쪽 2px 선. Figma 의 stroke 가 가로 그라데이션이라 border 로는 그릴 수 없다.
+ * 패널이 overflow:hidden 이라 이 막대도 모서리에 맞춰 잘린다.
+ *   0% border/focus · 25% alert/default/edge · 46.2% alert/default/glow-Primary
+ *   72.1% border/focus · 100% alert/default/edge
+ */
+.ai-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 1;
+  height: var(--border-width-strong);
+  background-image: linear-gradient(
+    90deg,
+    var(--border-focus) 0%,
+    var(--alert-default-edge) 25%,
+    var(--alert-default-glow-primary) 46.2%,
+    var(--border-focus) 72.1%,
+    var(--alert-default-edge) 100%
+  );
+}
+
+/* Default 만 그라데이션이다. 나머지 Type 은 단색 stroke 를 쓴다. */
+.ai-panel.is-critical::before { background-image: none; background-color: var(--status-critical-border); }
+.ai-panel.is-warning::before { background-image: none; background-color: var(--status-warning-border); }
+.ai-panel.is-safe::before { background-image: none; background-color: var(--status-normal-border); }
 
 /*
  * Figma 에는 Type 이 넷 있다 — Default · Warning · Critical · Safe.
@@ -617,7 +644,6 @@ button {
  * 나머지 셋은 raw 값이다. Figma 실측 그대로 옮겼다.
  */
 .ai-panel.is-critical {
-  border-top-color: var(--status-critical-border);
   background-image: linear-gradient(
     180deg,
     rgb(217 92 0 / 10%) 0%,
@@ -630,7 +656,6 @@ button {
 }
 
 .ai-panel.is-warning {
-  border-top-color: var(--status-warning-border);
   background-image: linear-gradient(
     180deg,
     rgb(255 193 126 / 10%) 0%,
@@ -643,7 +668,6 @@ button {
 }
 
 .ai-panel.is-safe {
-  border-top-color: var(--status-normal-border);
   background-image: linear-gradient(
     180deg,
     rgb(0 166 134 / 10%) 0%,
@@ -681,10 +705,8 @@ button {
   mask-image: linear-gradient(180deg, transparent 0%, rgb(0 0 0 / 20%) 80%, #000 100%);
 }
 
-.ai-panel.is-open {
-  padding: var(--space-24);
-  border-top-color: transparent;
-}
+/* 열리면 패널 패딩은 4 로 줄고 안쪽 Summary 가 16/12 를 갖는다(Figma 구조). */
+.ai-panel.is-open { padding: var(--space-4); }
 
 /* 토글 버튼. 두 상태에서 같은 자리(우측 상단)에 남아야 해서 절대배치한다.
    절대배치의 기준은 padding box 라 padding 값과 같은 offset 을 직접 준다. */
@@ -708,8 +730,8 @@ button {
 }
 
 .ai-panel.is-open .ai-toggle {
-  top: var(--space-24);
-  right: var(--space-24);
+  top: var(--space-20);
+  right: var(--space-16);
 }
 
 .ai-toggle:hover { background-color: rgb(255 255 255 / 14%); }
@@ -769,7 +791,15 @@ button {
 .ai-opened {
   display: flex;
   flex-direction: column;
+  gap: 0;
+}
+
+/* Figma 의 Summary. Input 은 이 밖에 있어서 패널 패딩(4)만 받는다. */
+.ai-summary {
+  display: flex;
+  flex-direction: column;
   gap: var(--space-20);
+  padding: var(--space-16) var(--space-12);
 }
 
 .ai-message {
@@ -789,25 +819,26 @@ button {
   gap: var(--space-8);
 }
 
+/* 면이 bg/accent 에서 반투명 scrim(bg/surface/alpha)으로 바뀌었다. */
 .ai-chip {
-  padding: var(--space-4) var(--space-8);
+  padding: var(--space-4) var(--space-12);
   border: 0;
   border-radius: var(--radius-pill);
-  background-color: var(--bg-accent);
+  background-color: var(--bg-surface-alpha);
   color: var(--fg-primary);
   cursor: pointer;
 }
 
-/* 입력창은 불투명 면을 깔아 어느 stop 위에서도 대비를 보장한다(컴포넌트 설명). */
+/* 테두리가 없어지고 면이 반투명 scrim(bg/surface/alpha)으로 바뀌었다. */
 .ai-input {
   display: flex;
   align-items: center;
   gap: var(--space-8);
   padding: var(--space-8) var(--space-8) var(--space-8) var(--space-16);
-  border: var(--border-width-thin) solid var(--border-default);
+  border: 0;
   border-radius: var(--radius-control);
-  background-color: var(--bg-surface-default);
-  color: var(--fg-tertiary);
+  background-color: var(--bg-surface-alpha);
+  color: var(--fg-secondary);
 }
 
 .ai-input > span:first-child { flex: 1 1 auto; min-width: 0; }
@@ -944,9 +975,22 @@ button {
   );
 }
 
-/* 선택된 카드의 줄은 어두운 scrim(bg/surface/alpha)이다. 두 모드 값이 같다. */
+/* 선택된 카드의 줄은 scrim(bg/surface/alpha)이다. */
 .robot-card[aria-pressed="true"] .robot-row {
   background-color: var(--bg-surface-alpha);
+}
+
+/*
+ * Light 에서만 scrim 을 밝은 쪽으로 뒤집는다.
+ *
+ * Figma 의 bg/surface/alpha 는 두 모드 모두 어두운 scrim 이다. AI 패널처럼 원색 면 위에
+ * 얹힐 때는 그게 맞지만, 이 카드는 Light 에서 면이 main/100(밝은 파랑)이라
+ * 어두운 scrim 을 깔면 줄이 중간 회색(#7C828A)이 되어 그 위 값 색의 대비가
+ * 1.1~1.5 로 무너진다. 그래서 이 카드 안에서만 뒤집는다.
+ * 예외를 여기로 좁혔기 때문에 AI 패널은 Figma 그대로 어두운 scrim 을 쓴다.
+ */
+:root:not([data-theme="dark"]) .robot-card[aria-pressed="true"] .robot-row {
+  background-color: rgb(255 255 255 / 70%);
 }
 
 /*

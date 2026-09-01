@@ -220,13 +220,7 @@
   --bg-inverse: var(--color-gray-950);
   --bg-navigation: var(--color-gray-0);
   --bg-overlay: var(--color-alpha-scrim-light);
-  /*
-   * Figma 와 다르다. Figma 는 Light 도 Dark 와 같은 어두운 scrim(scrim/light)인데,
-   * 밝은 카드 위에 얹으면 줄 배경이 중간 회색(#7C828A)이 되어 그 위의 Light 용
-   * 값 색이 대비 1.1~1.5 로 무너진다. 밝은 쪽으로 뒤집으라는 지시를 받아 여기서 정했다.
-   * Figma 의 bg/surface/alpha 도 Light 모드 값을 이걸로 바꿔야 한다.
-   */
-  --bg-surface-alpha: rgb(255 255 255 / 70%);
+  --bg-surface-alpha: var(--color-alpha-scrim-light);
   --bg-surface-default: var(--color-gray-0);
   --bg-surface-disabled: var(--color-gray-100);
   --bg-surface-raised: var(--color-gray-0);
@@ -519,7 +513,8 @@
  *   - button/* 32개의 Light·Dark 값이 동일하다 (위 Dark 블록 주석 참조)
  *   - input/border/* · navigation/item/* · table/row/* 10개는 여전히 없다.
  *   - bg/surface/selected Dark 가 gray/700 이라 bg/interactive/pressed 와 값이 같다.
- *   - bg/surface/alpha 의 Light 값은 우리가 밝은 쪽으로 뒤집어 쓴다 (위 주석 참조).
+ *   - bg/surface/alpha 는 두 모드가 같은 어두운 scrim 이다 — Figma 그대로다.
+ *     선택된 로봇 카드에서만 Light 에서 밝은 쪽으로 뒤집는다(app-shell.css).
  *   - 이름 정리를 Figma 에 반영했다 — color/warning/100 2 -> 200, bg/Safe -> bg/safe,
  *     radius/Chart -> radius/chart, alert/Default/* -> alert/default/*,
  *     alpha/glow/*/Default -> */default.
