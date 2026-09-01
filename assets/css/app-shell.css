@@ -77,6 +77,8 @@ button {
 .t-heading-1 { font-size: var(--font-size-32); line-height: var(--font-line-height-40); font-weight: 700; letter-spacing: -0.02em; }
 .t-heading-3 { font-size: var(--font-size-20); line-height: var(--font-line-height-28); font-weight: 800; letter-spacing: -0.01em; }
 .t-title-1   { font-size: var(--font-size-18); line-height: var(--font-line-height-26); font-weight: 700; }
+.t-title-2   { font-size: var(--font-size-16); line-height: var(--font-line-height-24); font-weight: 700; }
+.t-body-2    { font-size: var(--font-size-14); line-height: var(--font-line-height-22); font-weight: 400; }
 .t-label-1   { font-size: var(--font-size-14); line-height: var(--font-line-height-20); font-weight: 800; }
 .t-label-2   { font-size: var(--font-size-13); line-height: var(--font-line-height-18); font-weight: 500; }
 .t-body-3    { font-size: var(--font-size-13); line-height: var(--font-line-height-20); font-weight: 400; }
@@ -131,6 +133,7 @@ button {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding: 0 var(--space-4);
 }
 
 .status-bar-logo {
@@ -147,42 +150,42 @@ button {
   color: var(--fg-primary);
 }
 
+/* Figma 의 Right 프레임이다 — 패딩이 14/16 에서 8 로 줄어 상태바가 64 -> 60 이 됐다. */
 .status-bar-right {
   display: flex;
   align-items: center;
   gap: var(--space-8);
-  padding: 14px var(--space-16);
+  padding: var(--space-8);
 }
 
-.status-bar-profile {
+/*
+ * Account 와 Signal 이 같은 칩이 되었다. Figma stroke 는 안쪽으로 그려지는데
+ * CSS border 는 높이에 더해지므로 높이를 26 으로 못 박는다.
+ */
+.account-chip,
+.signal-chip {
   display: flex;
   align-items: center;
-  gap: var(--space-8);
-}
-
-/* Figma 는 36 고정이고 stroke 가 안쪽으로 그려진다.
-   CSS border 는 높이에 더해지므로 높이를 못 박아 상태바가 64 로 유지되게 한다. */
-.account-chip {
-  display: flex;
-  align-items: center;
-  gap: var(--space-8);
-  height: var(--size-control-md);
-  padding: 6px var(--space-12) 6px var(--space-8);
+  height: 26px;
   border: var(--border-width-thin) solid var(--border-subtle);
   border-radius: var(--radius-card);
   background-color: var(--bg-surface-subtle);
+}
+
+.account-chip {
+  gap: var(--space-8);
+  padding: var(--space-4) var(--space-12) var(--space-4) var(--space-8);
   color: var(--fg-primary);
 }
 
-.avatar {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-  border-radius: var(--radius-pill);
-  background-color: var(--bg-surface-subtle);
-  color: var(--fg-tertiary);
+.account-chip .i { color: var(--fg-secondary); }
+
+/* 이름과 직책 사이 구분선. Figma 에서도 글자 "|" 다. */
+.account-sep { color: var(--fg-tertiary); }
+
+.signal-chip {
+  padding: 6px var(--space-8);
+  color: var(--status-normal-fg);
 }
 
 /* 색은 감싼 쪽에서 정한다 — 로봇 카드에서는 .battery 의 상태색을 그대로 받는다. */
@@ -192,8 +195,6 @@ button {
   gap: 2px;
   height: 14px;
 }
-
-.status-bar-profile .signal-bars { color: var(--status-normal-fg); }
 
 .signal-bars i {
   width: 3px;
@@ -1166,11 +1167,12 @@ button {
   min-width: 132px;
   display: flex;
   flex-direction: column;
-  gap: var(--space-8);
-  padding: var(--space-4);
+  gap: 0;
+  padding: 0;
   border: 0;
   border-radius: var(--radius-card);
   background: transparent;
+  overflow: hidden;
   color: inherit;
   font: inherit;
   text-align: left;
@@ -1225,11 +1227,12 @@ button {
   outline-offset: -2px;
 }
 
+/* Figma 의 Label 프레임 — 40 고정(12 + 20 + 8)이고 이름만 들어간다. */
 .robot-card .label {
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
-  padding: var(--space-8) var(--space-8) 0;
+  padding: var(--space-12) var(--space-8) var(--space-8);
 }
 
 .robot-card .robot-id {
@@ -1239,26 +1242,34 @@ button {
   white-space: nowrap;
 }
 
-/* Figma 에 채워지지 않은 채 남아 있는 자리다. */
+/*
+ * Figma 의 Robot-Graphic 이다. 그림이 채워져서 그대로 내려받아 쓴다(168x90).
+ * 카드가 168 보다 좁으면 폭에 맞춰 줄고, 아래 10 은 발광이 번진 몫이라 잘라낸다.
+ */
 .robot-thumb {
-  align-self: flex-end;
-  width: 61px;
-  height: 61px;
-  border: var(--border-width-thin) solid var(--fg-primary);
+  flex: none;
+  height: 80px;
+  overflow: hidden;
+}
+
+.robot-thumb img {
+  display: block;
+  width: 100%;
+  height: auto;
 }
 
 .robot-lists {
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
+  padding: 0 var(--space-4) var(--space-4);
 }
 
 .robot-row {
   display: flex;
   align-items: center;
   gap: var(--space-8);
-  /* Figma 에서 이 줄은 24 고정이고 배지(26)가 위아래로 1px 씩 넘친다. */
-  height: 24px;
+  height: 26px;
   padding: 0 var(--space-8);
   border-radius: var(--radius-card);
   background-color: var(--bg-surface-default);
@@ -1413,7 +1424,7 @@ button {
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  padding: var(--space-16);
+  padding: 0 var(--space-8);
   border-radius: var(--radius-card);
   background-color: var(--bg-canvas);
 }
@@ -1426,13 +1437,24 @@ button {
   min-height: 68px;
 }
 
-/* 캡슐이 알약 하나에서 "아이콘 + 세로선" 형태로 바뀌었다. */
+/*
+ * 레일은 "선 18 · 표식 24 · 남은 선" 순서다. 표식이 18 만큼 내려가 있어야
+ * 카드 첫 줄(Meta Row)의 한가운데와 높이가 맞는다.
+ * 대기 단계에는 표식이 없다 — 선만 처음부터 끝까지 지난다.
+ */
 .rail-capsule {
   flex: none;
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 28px;
+}
+
+.rail-stub {
+  flex: none;
+  width: 8px;
+  height: 18px;
+  background-color: var(--chart-track);
 }
 
 .rail-mark {
@@ -1443,14 +1465,11 @@ button {
   width: 24px;
   height: 24px;
   border-radius: var(--radius-container);
-  background-color: var(--chart-track);
-  color: var(--fg-secondary);
+  background-color: var(--status-normal-icon);
+  color: var(--fg-primary);
 }
 
-.is-running .rail-mark {
-  background-color: var(--bg-accent);
-  color: var(--fg-inverse);
-}
+.is-running .rail-mark { background-color: var(--bg-accent); }
 
 .rail-line {
   flex: 1 1 auto;
@@ -1459,31 +1478,63 @@ button {
   background-color: var(--chart-track);
 }
 
-.timeline-item:last-child .rail-line { background-color: transparent; }
-
+/* Figma 의 Step 프레임이다 — 카드 위 8 · 아래 4 가 곧 카드 사이 간격 12 가 된다. */
 .step-wrap {
   flex: 1 1 auto;
   min-width: 0;
-  padding-bottom: var(--space-16);
+  padding: var(--space-8) 0 var(--space-4);
 }
 
 .step-card {
   display: flex;
   flex-direction: column;
   gap: var(--space-8);
-  padding: var(--space-12) var(--space-4) var(--space-12) var(--space-12);
-  border-radius: var(--radius-container);
+  padding: var(--space-12) var(--space-8);
+  border-radius: var(--radius-card);
   background-color: var(--chart-track);
 }
 
-.step-title-row {
+/*
+ * 수행중인 단계만 AI 패널과 같은 계열의 세로 그라데이션이 깔리고 테두리가 생긴다.
+ * 테두리는 inset 그림자다 — CSS border 는 카드 높이를 2 늘린다.
+ */
+.is-running .step-card {
+  background-image: linear-gradient(
+    180deg,
+    rgb(54 178 223 / 10%) 0%,
+    rgb(90 142 228 / 30%) 55%,
+    rgb(104 148 230 / 50%) 90%,
+    rgb(117 152 232 / 60%) 95%,
+    var(--alert-default-glow-primary) 100%
+  );
+  box-shadow: inset 0 0 0 var(--border-width-thin) var(--border-focus);
+}
+
+/* 머리는 두 줄이 붙어 있다 — 번호·시각 줄 위, 지점 이름 줄 아래. */
+.step-head {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.step-meta-row {
   display: flex;
   align-items: center;
   gap: var(--space-8);
-  padding-right: var(--space-2);
+  min-height: 20px;
 }
 
-/* 단계 번호가 새로 생겼다. */
+/* 시각과 소요는 오른쪽으로 밀린다. */
+.step-times {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-8);
+}
+
+/* 단계 번호. 수행중일 때만 파란 면이 된다. */
 .step-no {
   flex: none;
   display: flex;
@@ -1492,8 +1543,21 @@ button {
   width: 20px;
   height: 20px;
   border-radius: var(--radius-card);
-  background-color: var(--bg-surface-selected);
+  background-color: var(--bg-surface-default);
   color: var(--fg-tertiary);
+}
+
+.is-running .step-no {
+  background-color: var(--bg-accent);
+  color: var(--fg-primary);
+}
+
+.step-title-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  min-height: 24px;
+  padding-right: var(--space-2);
 }
 
 .step-title {
@@ -1502,16 +1566,7 @@ button {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  color: var(--fg-secondary);
-}
-
-.is-running .step-title { color: var(--fg-primary); }
-
-.step-meta-row {
-  display: flex;
-  align-items: center;
-  gap: var(--space-8);
-  padding-right: var(--space-8);
+  color: var(--fg-primary);
 }
 
 .step-time { color: var(--fg-tertiary); }

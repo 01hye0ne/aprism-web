@@ -106,10 +106,11 @@
     }
   ];
 
+  // 상태 배지는 Figma 에서 사라졌다 — 레일 표식과 카드 면이 그 역할을 한다.
   var STATE = {
-    done: { klass: "is-done", badge: "badge-normal", label: "완료", icon: "var(--ic-check)" },
-    running: { klass: "is-running", badge: "badge-info", label: "수행중", icon: "var(--ic-play-sm)" },
-    pending: { klass: "is-pending", badge: "badge-idle", label: "대기", icon: null }
+    done: { klass: "is-done", icon: "var(--ic-check)" },
+    running: { klass: "is-running", icon: "var(--ic-play-sm)" },
+    pending: { klass: "is-pending", icon: null }
   };
 
   function el(tag, klass, text) {
@@ -123,40 +124,40 @@
     return node;
   }
 
-  function badge(klass, label) {
-    var node = el("span", "badge " + klass + " t-label-2");
-    node.appendChild(el("span", "badge-dot"));
-    node.appendChild(document.createTextNode(label));
-    return node;
-  }
-
   function stepNode(step, index) {
     var meta = STATE[step.state];
 
-    var mark = el("span", "rail-mark");
+    // 레일 — 선 18, (표식), 남은 선. 대기 단계에는 표식이 없다.
+    var capsule = el("span", "rail-capsule");
+    capsule.appendChild(el("span", "rail-stub"));
     if (meta.icon) {
+      var mark = el("span", "rail-mark");
       var icon = el("span", "i i-14");
       icon.style.setProperty("--i", meta.icon);
       mark.appendChild(icon);
+      capsule.appendChild(mark);
     }
-    var capsule = el("span", "rail-capsule");
-    capsule.appendChild(mark);
     capsule.appendChild(el("span", "rail-line"));
 
+    // 머리 첫 줄 — 번호는 왼쪽, 시각과 소요는 오른쪽으로 밀린다.
+    var metaRow = el("div", "step-meta-row");
+    metaRow.appendChild(el("span", "step-no t-label-1", String(index + 1)));
+    var times = el("span", "step-times");
+    if (step.time) {
+      times.appendChild(el("span", "t-caption step-time num", step.time));
+      times.appendChild(el("span", "t-caption step-duration", step.duration));
+    }
+    metaRow.appendChild(times);
+
     var titleRow = el("div", "step-title-row");
-    titleRow.appendChild(el("span", "step-no t-label-1", String(index + 1)));
-    titleRow.appendChild(el("span", "t-label-1 step-title", step.title));
-    titleRow.appendChild(badge(meta.badge, meta.label));
+    titleRow.appendChild(el("span", "t-title-2 step-title", step.title));
+
+    var head = el("div", "step-head");
+    head.appendChild(metaRow);
+    head.appendChild(titleRow);
 
     var card = el("div", "step-card");
-    card.appendChild(titleRow);
-
-    if (step.time) {
-      var metaRow = el("div", "step-meta-row");
-      metaRow.appendChild(el("span", "t-caption step-time num", step.time));
-      metaRow.appendChild(el("span", "t-caption step-duration", step.duration));
-      card.appendChild(metaRow);
-    }
+    card.appendChild(head);
 
     if (step.desc) {
       card.appendChild(el("p", "t-caption step-desc", step.desc));

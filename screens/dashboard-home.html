@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/static/woff2/SUIT.css" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" />
   <link rel="stylesheet" href="../assets/css/tokens.css?v=8ae74359" />
-  <link rel="stylesheet" href="../assets/css/app-shell.css?v=26cd712d" />
+  <link rel="stylesheet" href="../assets/css/app-shell.css?v=9942b345" />
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
@@ -39,13 +39,15 @@
     </span>
 
     <div class="status-bar-right">
-      <div class="status-bar-profile">
-        <div class="account-chip">
-          <span class="avatar"><span class="i i-14" style="--i:var(--ic-user)"></span></span>
-          <span class="t-label-2">김현수 · 관제운영</span>
-        </div>
-        <span class="signal-bars" role="img" aria-label="통신 신호 강함"><i></i><i></i><i></i><i></i></span>
+      <div class="account-chip">
+        <span class="i i-16" style="--i:var(--ic-user)" aria-hidden="true"></span>
+        <span class="t-label-2">홍길동</span>
+        <span class="t-label-2 account-sep" aria-hidden="true">|</span>
+        <span class="t-label-2">관제운영</span>
       </div>
+      <span class="signal-chip" role="img" aria-label="통신 신호 강함">
+        <span class="signal-bars"><i></i><i></i><i></i><i></i></span>
+      </span>
       <span class="utc-clock">
         <span class="i i-16" style="--i:var(--ic-clock)"></span>
         <span class="t-caption num">2026-08-26T10:11:24Z</span>
@@ -202,8 +204,8 @@
                   <button type="button" class="robot-card" data-robot="0" aria-pressed="true">
                     <span class="label">
                       <span class="t-label-1 robot-id">로봇명</span>
-                      <span class="robot-thumb" aria-hidden="true"></span>
                     </span>
+                    <span class="robot-thumb" aria-hidden="true"><img src="../assets/img/robot-graphic.svg" alt="" /></span>
                     <span class="robot-lists">
                       <span class="robot-row">
                         <span class="t-caption">Mission</span>
@@ -230,8 +232,8 @@
                   <button type="button" class="robot-card" data-robot="1" aria-pressed="false">
                     <span class="label">
                       <span class="t-label-1 robot-id">로봇명</span>
-                      <span class="robot-thumb" aria-hidden="true"></span>
                     </span>
+                    <span class="robot-thumb" aria-hidden="true"><img src="../assets/img/robot-graphic.svg" alt="" /></span>
                     <span class="robot-lists">
                       <span class="robot-row">
                         <span class="t-caption">Mission</span>
@@ -258,8 +260,8 @@
                   <button type="button" class="robot-card" data-robot="2" aria-pressed="false">
                     <span class="label">
                       <span class="t-label-1 robot-id">로봇명</span>
-                      <span class="robot-thumb" aria-hidden="true"></span>
                     </span>
+                    <span class="robot-thumb" aria-hidden="true"><img src="../assets/img/robot-graphic.svg" alt="" /></span>
                     <span class="robot-lists">
                       <span class="robot-row">
                         <span class="t-caption">Mission</span>
@@ -321,6 +323,6 @@
 
 
 <script src="../assets/js/theme.js?v=dcf8f460"></script>
-<script src="../assets/js/screen.js?v=088e66e9"></script>
+<script src="../assets/js/screen.js?v=6d522772"></script>
 </body>
 </html>
