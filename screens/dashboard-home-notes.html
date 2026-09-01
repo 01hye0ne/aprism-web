@@ -240,11 +240,20 @@
     <code>0% border/focus</code> → <code>25% alert/default/edge</code> →
     <code>46.2% alert/default/glow-Primary</code> → <code>72.1% border/focus</code> →
     <code>100% alert/default/edge</code> 입니다.
-    CSS <code>border</code> 로는 그라데이션을 못 그려서 <strong>2px 막대를 얹었습니다</strong>
-    (<code>::before</code>). 패널이 <code>overflow: hidden</code> 이라 모서리에 맞춰 잘립니다.
+    CSS <code>border</code> 로는 그라데이션 색을 못 줍니다. 그래서
+    <strong>모양은 진짜 <code>border-top</code> 으로 잡고, 그 테두리 영역만 마스크로 남겨
+    그라데이션을 통과시킵니다</strong> (<code>::before</code> 에서 border-box 와 padding-box 를 XOR).
     덤으로 닫힘 높이가 <strong>70 → 68</strong> 로 Figma 와 같아졌습니다 —
-    CSS <code>border</code> 는 높이를 늘리는데 Figma 의 inside stroke 는 그렇지 않습니다.
+    <code>::before</code> 는 절대배치라 높이를 늘리지 않습니다.
     <strong>Default 만 그라데이션</strong>이고 Warning · Critical · Safe 는 단색입니다.
+  </p>
+  <p>
+    <strong>모서리도 이 방식이라야 맞습니다.</strong> 처음에는 곧은 2px 막대를 얹고
+    <code>overflow: hidden</code> 으로 잘랐는데, 그러면 라운드 구간에서 선이 뭉툭하게 끊깁니다.
+    Figma 는 위쪽만 있는 stroke 를 <strong>라운드를 따라 휘면서 가늘어지게</strong> 그리고,
+    브라우저의 <code>border-top</code> 도 인접 변(0px)과 만나며 같은 테이퍼를 그립니다.
+    실측으로 대조하니 Figma 와 web 모두 패널 위에서 <strong>약 5px</strong> 내려간 지점에서
+    선이 사라집니다(라운드 8px).
   </p>
   <p>
     <strong>열림 상태의 구조도 같이 맞췄습니다.</strong> 패널 패딩이 24 → <strong>4</strong> 이고
