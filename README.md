@@ -40,3 +40,15 @@ python -m http.server 8000
 - 색상은 `assets/css/base.css`의 semantic 토큰을 사용하고 raw hex를 컴포넌트에 직접 넣지 않습니다.
 - Dark/Light는 별도 페이지를 만들지 않고 `data-theme` 속성으로 전환합니다.
 - 감지 상태는 위험(Danger) / 주의(Warning) / 안전(Safe) 세 단계를 유지합니다.
+
+## 에셋 캐시
+
+CSS 나 JS 를 고친 뒤에는 커밋 전에 한 번 실행한다.
+
+```
+python tools/stamp-assets.py
+```
+
+HTML 의 `<link>` `<script>` 에 파일 내용 해시를 `?v=` 로 붙인다.
+HTML 만 새로 배포되고 브라우저가 예전 CSS 를 쓰면 레이아웃이 무너지는데, 그걸 막는다.
+해시는 내용에서 나오므로 파일을 안 고치면 캐시가 그대로 유지된다.
