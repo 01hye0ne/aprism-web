@@ -105,6 +105,18 @@ button {
   display: flex;
 }
 
+/*
+ * GNB 오른쪽 전체가 bg/surface/default 면이다(Figma 의 Container 1844).
+ * Site Context Panel 자체에는 fill 이 없고 이 면이 비쳐 보인다.
+ * 지도 영역은 Two Column 이 bg/canvas 로 다시 덮는다.
+ */
+.content-surface {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  background-color: var(--bg-surface-default);
+}
+
 /* ---------- Status Bar ---------- */
 .status-bar {
   flex: 0 0 auto;
@@ -195,7 +207,7 @@ button {
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  padding: var(--space-16) var(--space-4);
+  padding: var(--space-8) 0 var(--space-20);
   overflow-y: auto;
 }
 
@@ -212,23 +224,36 @@ button {
   align-items: center;
   justify-content: center;
   gap: var(--space-4);
-  width: 68px;
-  padding: var(--space-8) 0;
-  border-radius: var(--radius-container);
-  color: var(--fg-secondary);
+  width: 70px;
+  /* Figma 에서 항목은 64 고정이고 내용(36+4+18=58)이 그 안에 들어간다.
+     padding 8 을 그대로 주면 74 가 되어 간격이 벌어진다. */
+  height: 64px;
+  padding: 0;
+  color: var(--fg-disabled);
   text-align: center;
   text-decoration: none;
   cursor: pointer;
 }
 
-.gnb-item:hover { background-color: var(--bg-interactive-hover); }
-
-.gnb-item[aria-current="page"] {
-  background-color: var(--bg-accent);
-  color: var(--fg-inverse);
+/* 면은 항목 전체가 아니라 아이콘을 감싼 36x36 상자에만 들어간다.
+   라벨은 상자 밖에 있고 색만 바뀐다. */
+.gnb-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-control-md);
+  height: var(--size-control-md);
+  border-radius: var(--radius-control);
 }
 
-.gnb-item span:last-child {
+.gnb-item:hover:not([aria-current="page"]) .gnb-icon {
+  background-color: var(--bg-interactive-hover);
+}
+
+.gnb-item[aria-current="page"] { color: var(--fg-primary); }
+.gnb-item[aria-current="page"] .gnb-icon { background-color: var(--bg-accent); }
+
+.gnb-item > span:last-child {
   font-size: var(--font-size-12);
   line-height: var(--font-line-height-18);
 }

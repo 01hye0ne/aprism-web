@@ -59,289 +59,294 @@
     <nav class="gnb-rail" aria-label="전역 내비게이션">
       <div class="gnb-items">
         <a class="gnb-item" href="#" aria-current="page">
-          <span class="i i-20" style="--i:var(--ic-home)"></span><span>관제</span>
+          <span class="gnb-icon"><span class="i i-20" style="--i:var(--ic-home)"></span></span><span>관제</span>
         </a>
-        <a class="gnb-item" href="#"><span class="i i-20" style="--i:var(--ic-shield)"></span><span>안전진단</span></a>
-        <a class="gnb-item" href="#"><span class="i i-20" style="--i:var(--ic-bot)"></span><span>로봇</span></a>
-        <a class="gnb-item" href="#"><span class="i i-20" style="--i:var(--ic-cpu)"></span><span>AI</span></a>
-        <a class="gnb-item" href="#"><span class="i i-20" style="--i:var(--ic-calendar)"></span><span>스케줄러</span></a>
-        <a class="gnb-item" href="#"><span class="i i-20" style="--i:var(--ic-message)"></span><span>Delta</span></a>
-        <a class="gnb-item" href="#"><span class="i i-20" style="--i:var(--ic-document)"></span><span>보고서</span></a>
-        <a class="gnb-item" href="#"><span class="i i-20" style="--i:var(--ic-users)"></span><span>계정관리</span></a>
+        <a class="gnb-item" href="#"><span class="gnb-icon"><span class="i i-20" style="--i:var(--ic-shield)"></span></span><span>안전진단</span></a>
+        <a class="gnb-item" href="#"><span class="gnb-icon"><span class="i i-20" style="--i:var(--ic-bot)"></span></span><span>로봇</span></a>
+        <a class="gnb-item" href="#"><span class="gnb-icon"><span class="i i-20" style="--i:var(--ic-cpu)"></span></span><span>AI</span></a>
+        <a class="gnb-item" href="#"><span class="gnb-icon"><span class="i i-20" style="--i:var(--ic-calendar)"></span></span><span>스케줄러</span></a>
+        <a class="gnb-item" href="#"><span class="gnb-icon"><span class="i i-20" style="--i:var(--ic-message)"></span></span><span>Delta</span></a>
+        <a class="gnb-item" href="#"><span class="gnb-icon"><span class="i i-20" style="--i:var(--ic-document)"></span></span><span>보고서</span></a>
+        <a class="gnb-item" href="#"><span class="gnb-icon"><span class="i i-20" style="--i:var(--ic-users)"></span></span><span>계정관리</span></a>
       </div>
-      <a class="gnb-item" href="#"><span class="i i-20" style="--i:var(--ic-settings)"></span><span>환경설정</span></a>
+      <a class="gnb-item" href="#"><span class="gnb-icon"><span class="i i-20" style="--i:var(--ic-settings)"></span></span><span>환경설정</span></a>
     </nav>
 
-    <!-- ---------- Site Context Panel ---------- -->
-    <aside class="context-panel" aria-label="사이트 컨텍스트">
-      <section class="panel-section">
-        <p class="t-overline section-label">SITE</p>
-        <h1 class="t-heading-3">지하발전소 B3</h1>
-        <div class="select-field t-body-3" role="button" tabindex="0">
-          <span>터빈 2 / Unit 03</span>
-          <span class="i i-16" style="--i:var(--ic-chevron-down)"></span>
-        </div>
-      </section>
+    <!-- ---------- Container · bg/surface/default 면 ---------- -->
+    <div class="content-surface">
 
-      <section class="panel-section">
-        <p class="t-overline section-label">운영 모드</p>
-        <span class="badge badge-mode t-label-2"><span class="badge-dot"></span>진행 중</span>
-      </section>
-    </aside>
-
-    <!-- ---------- Main ---------- -->
-    <main class="main">
-      <div class="two-col">
-
-        <!-- ---------- Map Panel ---------- -->
-        <section class="map-panel" aria-label="설비 배치도">
-          <div class="map-canvas">
-            <span class="badge badge-info badge-marker t-label-2 map-marker">
-              <span class="badge-dot"></span>Robot 02
-            </span>
-
-            <div class="map-tools">
-              <button type="button" class="icon-button" aria-label="확대">
-                <span class="i i-20" style="--i:var(--ic-zoom-in)"></span>
-              </button>
-              <button type="button" class="icon-button" aria-label="로봇 추적">
-                <span class="i i-20" style="--i:var(--ic-target)"></span>
-              </button>
-              <button type="button" class="icon-button is-active" aria-label="영상 리플레이">
-                <span class="i i-20" style="--i:var(--ic-play)"></span>
-              </button>
-            </div>
+      <!-- ---------- Site Context Panel ---------- -->
+      <aside class="context-panel" aria-label="사이트 컨텍스트">
+        <section class="panel-section">
+          <p class="t-overline section-label">SITE</p>
+          <h1 class="t-heading-3">지하발전소 B3</h1>
+          <div class="select-field t-body-3" role="button" tabindex="0">
+            <span>터빈 2 / Unit 03</span>
+            <span class="i i-16" style="--i:var(--ic-chevron-down)"></span>
           </div>
-
-          <!-- AI Assist Panel -->
-          <section class="ai-bar" aria-label="AI 운영 지원">
-            <span class="ai-thumb" aria-hidden="true"></span>
-            <p class="ai-message">터빈2에 주의 1건.</p>
-          </section>
         </section>
 
-        <!-- ---------- Robot / Mission Panel ---------- -->
-        <div class="floating">
-          <section class="right-panel" aria-label="로봇 · 미션">
+        <section class="panel-section">
+          <p class="t-overline section-label">운영 모드</p>
+          <span class="badge badge-mode t-label-2"><span class="badge-dot"></span>진행 중</span>
+        </section>
+      </aside>
 
-            <!-- 카드 1 · 로봇 -->
-            <div class="panel-card">
-              <div class="panel-header">
-                <div class="texts">
-                  <h2 class="t-heading-3">전체 미션명</h2>
-                  <p class="t-caption">3대 연결 · 1대 수행 중</p>
-                </div>
-                <button type="button" class="btn btn-primary">미션 관리</button>
-              </div>
+      <!-- ---------- Main ---------- -->
+      <main class="main">
+        <div class="two-col">
 
-              <div class="robot-strip">
-                <article class="robot-card is-selected">
-                  <div class="label">
-                    <p class="t-label-1 robot-id">로봇명</p>
-                    <span class="robot-thumb" aria-hidden="true"></span>
-                  </div>
-                  <div class="robot-lists">
-                    <div class="robot-row">
-                      <span class="t-caption">Mission</span>
-                      <span class="badge badge-info t-label-2"><span class="badge-dot"></span>수행중</span>
-                    </div>
-                    <div class="robot-row">
-                      <span class="t-caption">Battery</span>
-                      <span class="battery">
-                        <span class="battery-body"><span class="battery-fill" style="width:78%"></span></span>
-                        <span class="battery-tip"></span>
-                        <span class="t-caption num">78%</span>
-                      </span>
-                    </div>
-                    <div class="robot-row">
-                      <span class="t-caption">Signal</span>
-                      <span class="battery">
-                        <span class="signal-bars"><i></i><i></i><i></i><i></i></span>
-                        <span class="t-caption">Strong</span>
-                      </span>
-                    </div>
-                  </div>
-                </article>
+          <!-- ---------- Map Panel ---------- -->
+          <section class="map-panel" aria-label="설비 배치도">
+            <div class="map-canvas">
+              <span class="badge badge-info badge-marker t-label-2 map-marker">
+                <span class="badge-dot"></span>Robot 02
+              </span>
 
-                <article class="robot-card">
-                  <div class="label">
-                    <p class="t-label-1 robot-id">로봇명</p>
-                    <span class="robot-thumb" aria-hidden="true"></span>
-                  </div>
-                  <div class="robot-lists">
-                    <div class="robot-row">
-                      <span class="t-caption">Mission</span>
-                      <span class="badge badge-info t-label-2"><span class="badge-dot"></span>수행중</span>
-                    </div>
-                    <div class="robot-row">
-                      <span class="t-caption">Battery</span>
-                      <span class="battery">
-                        <span class="battery-body"><span class="battery-fill" style="width:78%"></span></span>
-                        <span class="battery-tip"></span>
-                        <span class="t-caption num">78%</span>
-                      </span>
-                    </div>
-                    <div class="robot-row">
-                      <span class="t-caption">Signal</span>
-                      <span class="battery">
-                        <span class="signal-bars"><i></i><i></i><i></i><i></i></span>
-                        <span class="t-caption">Strong</span>
-                      </span>
-                    </div>
-                  </div>
-                </article>
-
-                <article class="robot-card">
-                  <div class="label">
-                    <p class="t-label-1 robot-id">로봇명</p>
-                    <span class="robot-thumb" aria-hidden="true"></span>
-                  </div>
-                  <div class="robot-lists">
-                    <div class="robot-row">
-                      <span class="t-caption">Mission</span>
-                      <span class="badge badge-info t-label-2"><span class="badge-dot"></span>수행중</span>
-                    </div>
-                    <div class="robot-row">
-                      <span class="t-caption">Battery</span>
-                      <span class="battery">
-                        <span class="battery-body"><span class="battery-fill" style="width:78%"></span></span>
-                        <span class="battery-tip"></span>
-                        <span class="t-caption num">78%</span>
-                      </span>
-                    </div>
-                    <div class="robot-row">
-                      <span class="t-caption">Signal</span>
-                      <span class="battery">
-                        <span class="signal-bars"><i></i><i></i><i></i><i></i></span>
-                        <span class="t-caption">Strong</span>
-                      </span>
-                    </div>
-                  </div>
-                </article>
+              <div class="map-tools">
+                <button type="button" class="icon-button" aria-label="확대">
+                  <span class="i i-20" style="--i:var(--ic-zoom-in)"></span>
+                </button>
+                <button type="button" class="icon-button" aria-label="로봇 추적">
+                  <span class="i i-20" style="--i:var(--ic-target)"></span>
+                </button>
+                <button type="button" class="icon-button is-active" aria-label="영상 리플레이">
+                  <span class="i i-20" style="--i:var(--ic-play)"></span>
+                </button>
               </div>
             </div>
 
-            <!-- 카드 2 · 미션 -->
-            <div class="panel-card is-fill">
-              <div class="mission-header">
-                <p class="t-overline section-label">전체 미션명</p>
-
-                <div class="progress-bar">
-                  <div class="progress-meta">
-                    <span class="progress-title t-title-1">
-                      <span class="badge-dot"></span><span>현재 수행명</span>
-                    </span>
-                    <span class="progress-values t-caption">
-                      <span class="num">3 / 5</span><span class="num">00%</span>
-                    </span>
-                  </div>
-                  <div class="progress-track" role="img" aria-label="5단계 중 3단계 완료">
-                    <span class="is-done"></span><span class="is-done"></span><span class="is-done"></span>
-                    <span></span><span></span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="timeline">
-                <article class="timeline-item is-done">
-                  <span class="rail-capsule">
-                    <span class="rail-mark"><span class="i i-14" style="--i:var(--ic-check)"></span></span>
-                    <span class="rail-line"></span>
-                  </span>
-                  <div class="step-wrap"><div class="step-card">
-                    <div class="step-title-row">
-                      <span class="step-no t-label-1">1</span>
-                      <span class="t-label-1 step-title">waypoint name</span>
-                      <span class="badge badge-normal t-label-2"><span class="badge-dot"></span>완료</span>
-                    </div>
-                    <div class="step-meta-row">
-                      <span class="t-caption step-time num">10:08 – 10:24</span>
-                      <span class="t-caption step-duration">16분</span>
-                    </div>
-                  </div></div>
-                </article>
-
-                <article class="timeline-item is-running">
-                  <span class="rail-capsule">
-                    <span class="rail-mark"><span class="i i-14" style="--i:var(--ic-play-sm)"></span></span>
-                    <span class="rail-line"></span>
-                  </span>
-                  <div class="step-wrap"><div class="step-card">
-                    <div class="step-title-row">
-                      <span class="step-no t-label-1">2</span>
-                      <span class="t-label-1 step-title">waypoint name</span>
-                      <span class="badge badge-info t-label-2"><span class="badge-dot"></span>수행중</span>
-                    </div>
-                    <div class="step-meta-row">
-                      <span class="t-caption step-time num">10:08 – 10:24</span>
-                      <span class="t-caption step-duration">16분</span>
-                    </div>
-                    <p class="t-caption step-desc">압력·온도 센서 판독 중. 기준값 대비 편차를 실시간 비교합니다.압력·온도 센서 판독 중. 기준값 대비 편차를 실시간 비교합니다.압력·온도 센서 판독 중. 기준값 대비 편차를 실시간 비교합니다.</p>
-                  </div></div>
-                </article>
-
-                <article class="timeline-item is-pending">
-                  <span class="rail-capsule"><span class="rail-mark"></span><span class="rail-line"></span></span>
-                  <div class="step-wrap"><div class="step-card">
-                    <div class="step-title-row">
-                      <span class="step-no t-label-1">3</span>
-                      <span class="t-label-1 step-title">waypoint name</span>
-                      <span class="badge badge-idle t-label-2"><span class="badge-dot"></span>대기</span>
-                    </div>
-                  </div></div>
-                </article>
-
-                <article class="timeline-item is-pending">
-                  <span class="rail-capsule"><span class="rail-mark"></span><span class="rail-line"></span></span>
-                  <div class="step-wrap"><div class="step-card">
-                    <div class="step-title-row">
-                      <span class="step-no t-label-1">4</span>
-                      <span class="t-label-1 step-title">waypoint name</span>
-                      <span class="badge badge-idle t-label-2"><span class="badge-dot"></span>대기</span>
-                    </div>
-                  </div></div>
-                </article>
-
-                <article class="timeline-item is-pending">
-                  <span class="rail-capsule"><span class="rail-mark"></span><span class="rail-line"></span></span>
-                  <div class="step-wrap"><div class="step-card">
-                    <div class="step-title-row">
-                      <span class="step-no t-label-1">5</span>
-                      <span class="t-label-1 step-title">waypoint name</span>
-                      <span class="badge badge-idle t-label-2"><span class="badge-dot"></span>대기</span>
-                    </div>
-                  </div></div>
-                </article>
-
-                <article class="timeline-item is-pending">
-                  <span class="rail-capsule"><span class="rail-mark"></span><span class="rail-line"></span></span>
-                  <div class="step-wrap"><div class="step-card">
-                    <div class="step-title-row">
-                      <span class="step-no t-label-1">6</span>
-                      <span class="t-label-1 step-title">waypoint name</span>
-                      <span class="badge badge-idle t-label-2"><span class="badge-dot"></span>대기</span>
-                    </div>
-                  </div></div>
-                </article>
-
-                <article class="timeline-item is-pending">
-                  <span class="rail-capsule"><span class="rail-mark"></span><span class="rail-line"></span></span>
-                  <div class="step-wrap"><div class="step-card">
-                    <div class="step-title-row">
-                      <span class="step-no t-label-1">7</span>
-                      <span class="t-label-1 step-title">waypoint name</span>
-                      <span class="badge badge-idle t-label-2"><span class="badge-dot"></span>대기</span>
-                    </div>
-                  </div></div>
-                </article>
-              </div>
-            </div>
-
+            <!-- AI Assist Panel -->
+            <section class="ai-bar" aria-label="AI 운영 지원">
+              <span class="ai-thumb" aria-hidden="true"></span>
+              <p class="ai-message">터빈2에 주의 1건.</p>
+            </section>
           </section>
-        </div>
 
-      </div>
-    </main>
+          <!-- ---------- Robot / Mission Panel ---------- -->
+          <div class="floating">
+            <section class="right-panel" aria-label="로봇 · 미션">
+
+              <!-- 카드 1 · 로봇 -->
+              <div class="panel-card">
+                <div class="panel-header">
+                  <div class="texts">
+                    <h2 class="t-heading-3">전체 미션명</h2>
+                    <p class="t-caption">3대 연결 · 1대 수행 중</p>
+                  </div>
+                  <button type="button" class="btn btn-primary">미션 관리</button>
+                </div>
+
+                <div class="robot-strip">
+                  <article class="robot-card is-selected">
+                    <div class="label">
+                      <p class="t-label-1 robot-id">로봇명</p>
+                      <span class="robot-thumb" aria-hidden="true"></span>
+                    </div>
+                    <div class="robot-lists">
+                      <div class="robot-row">
+                        <span class="t-caption">Mission</span>
+                        <span class="badge badge-info t-label-2"><span class="badge-dot"></span>수행중</span>
+                      </div>
+                      <div class="robot-row">
+                        <span class="t-caption">Battery</span>
+                        <span class="battery">
+                          <span class="battery-body"><span class="battery-fill" style="width:78%"></span></span>
+                          <span class="battery-tip"></span>
+                          <span class="t-caption num">78%</span>
+                        </span>
+                      </div>
+                      <div class="robot-row">
+                        <span class="t-caption">Signal</span>
+                        <span class="battery">
+                          <span class="signal-bars"><i></i><i></i><i></i><i></i></span>
+                          <span class="t-caption">Strong</span>
+                        </span>
+                      </div>
+                    </div>
+                  </article>
+
+                  <article class="robot-card">
+                    <div class="label">
+                      <p class="t-label-1 robot-id">로봇명</p>
+                      <span class="robot-thumb" aria-hidden="true"></span>
+                    </div>
+                    <div class="robot-lists">
+                      <div class="robot-row">
+                        <span class="t-caption">Mission</span>
+                        <span class="badge badge-info t-label-2"><span class="badge-dot"></span>수행중</span>
+                      </div>
+                      <div class="robot-row">
+                        <span class="t-caption">Battery</span>
+                        <span class="battery">
+                          <span class="battery-body"><span class="battery-fill" style="width:78%"></span></span>
+                          <span class="battery-tip"></span>
+                          <span class="t-caption num">78%</span>
+                        </span>
+                      </div>
+                      <div class="robot-row">
+                        <span class="t-caption">Signal</span>
+                        <span class="battery">
+                          <span class="signal-bars"><i></i><i></i><i></i><i></i></span>
+                          <span class="t-caption">Strong</span>
+                        </span>
+                      </div>
+                    </div>
+                  </article>
+
+                  <article class="robot-card">
+                    <div class="label">
+                      <p class="t-label-1 robot-id">로봇명</p>
+                      <span class="robot-thumb" aria-hidden="true"></span>
+                    </div>
+                    <div class="robot-lists">
+                      <div class="robot-row">
+                        <span class="t-caption">Mission</span>
+                        <span class="badge badge-info t-label-2"><span class="badge-dot"></span>수행중</span>
+                      </div>
+                      <div class="robot-row">
+                        <span class="t-caption">Battery</span>
+                        <span class="battery">
+                          <span class="battery-body"><span class="battery-fill" style="width:78%"></span></span>
+                          <span class="battery-tip"></span>
+                          <span class="t-caption num">78%</span>
+                        </span>
+                      </div>
+                      <div class="robot-row">
+                        <span class="t-caption">Signal</span>
+                        <span class="battery">
+                          <span class="signal-bars"><i></i><i></i><i></i><i></i></span>
+                          <span class="t-caption">Strong</span>
+                        </span>
+                      </div>
+                    </div>
+                  </article>
+                </div>
+              </div>
+
+              <!-- 카드 2 · 미션 -->
+              <div class="panel-card is-fill">
+                <div class="mission-header">
+                  <p class="t-overline section-label">전체 미션명</p>
+
+                  <div class="progress-bar">
+                    <div class="progress-meta">
+                      <span class="progress-title t-title-1">
+                        <span class="badge-dot"></span><span>현재 수행명</span>
+                      </span>
+                      <span class="progress-values t-caption">
+                        <span class="num">3 / 5</span><span class="num">00%</span>
+                      </span>
+                    </div>
+                    <div class="progress-track" role="img" aria-label="5단계 중 3단계 완료">
+                      <span class="is-done"></span><span class="is-done"></span><span class="is-done"></span>
+                      <span></span><span></span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="timeline">
+                  <article class="timeline-item is-done">
+                    <span class="rail-capsule">
+                      <span class="rail-mark"><span class="i i-14" style="--i:var(--ic-check)"></span></span>
+                      <span class="rail-line"></span>
+                    </span>
+                    <div class="step-wrap"><div class="step-card">
+                      <div class="step-title-row">
+                        <span class="step-no t-label-1">1</span>
+                        <span class="t-label-1 step-title">waypoint name</span>
+                        <span class="badge badge-normal t-label-2"><span class="badge-dot"></span>완료</span>
+                      </div>
+                      <div class="step-meta-row">
+                        <span class="t-caption step-time num">10:08 – 10:24</span>
+                        <span class="t-caption step-duration">16분</span>
+                      </div>
+                    </div></div>
+                  </article>
+
+                  <article class="timeline-item is-running">
+                    <span class="rail-capsule">
+                      <span class="rail-mark"><span class="i i-14" style="--i:var(--ic-play-sm)"></span></span>
+                      <span class="rail-line"></span>
+                    </span>
+                    <div class="step-wrap"><div class="step-card">
+                      <div class="step-title-row">
+                        <span class="step-no t-label-1">2</span>
+                        <span class="t-label-1 step-title">waypoint name</span>
+                        <span class="badge badge-info t-label-2"><span class="badge-dot"></span>수행중</span>
+                      </div>
+                      <div class="step-meta-row">
+                        <span class="t-caption step-time num">10:08 – 10:24</span>
+                        <span class="t-caption step-duration">16분</span>
+                      </div>
+                      <p class="t-caption step-desc">압력·온도 센서 판독 중. 기준값 대비 편차를 실시간 비교합니다.압력·온도 센서 판독 중. 기준값 대비 편차를 실시간 비교합니다.압력·온도 센서 판독 중. 기준값 대비 편차를 실시간 비교합니다.</p>
+                    </div></div>
+                  </article>
+
+                  <article class="timeline-item is-pending">
+                    <span class="rail-capsule"><span class="rail-mark"></span><span class="rail-line"></span></span>
+                    <div class="step-wrap"><div class="step-card">
+                      <div class="step-title-row">
+                        <span class="step-no t-label-1">3</span>
+                        <span class="t-label-1 step-title">waypoint name</span>
+                        <span class="badge badge-idle t-label-2"><span class="badge-dot"></span>대기</span>
+                      </div>
+                    </div></div>
+                  </article>
+
+                  <article class="timeline-item is-pending">
+                    <span class="rail-capsule"><span class="rail-mark"></span><span class="rail-line"></span></span>
+                    <div class="step-wrap"><div class="step-card">
+                      <div class="step-title-row">
+                        <span class="step-no t-label-1">4</span>
+                        <span class="t-label-1 step-title">waypoint name</span>
+                        <span class="badge badge-idle t-label-2"><span class="badge-dot"></span>대기</span>
+                      </div>
+                    </div></div>
+                  </article>
+
+                  <article class="timeline-item is-pending">
+                    <span class="rail-capsule"><span class="rail-mark"></span><span class="rail-line"></span></span>
+                    <div class="step-wrap"><div class="step-card">
+                      <div class="step-title-row">
+                        <span class="step-no t-label-1">5</span>
+                        <span class="t-label-1 step-title">waypoint name</span>
+                        <span class="badge badge-idle t-label-2"><span class="badge-dot"></span>대기</span>
+                      </div>
+                    </div></div>
+                  </article>
+
+                  <article class="timeline-item is-pending">
+                    <span class="rail-capsule"><span class="rail-mark"></span><span class="rail-line"></span></span>
+                    <div class="step-wrap"><div class="step-card">
+                      <div class="step-title-row">
+                        <span class="step-no t-label-1">6</span>
+                        <span class="t-label-1 step-title">waypoint name</span>
+                        <span class="badge badge-idle t-label-2"><span class="badge-dot"></span>대기</span>
+                      </div>
+                    </div></div>
+                  </article>
+
+                  <article class="timeline-item is-pending">
+                    <span class="rail-capsule"><span class="rail-mark"></span><span class="rail-line"></span></span>
+                    <div class="step-wrap"><div class="step-card">
+                      <div class="step-title-row">
+                        <span class="step-no t-label-1">7</span>
+                        <span class="t-label-1 step-title">waypoint name</span>
+                        <span class="badge badge-idle t-label-2"><span class="badge-dot"></span>대기</span>
+                      </div>
+                    </div></div>
+                  </article>
+                </div>
+              </div>
+
+            </section>
+          </div>
+
+        </div>
+      </main>
+
+    </div>
 
   </div>
 </div>
