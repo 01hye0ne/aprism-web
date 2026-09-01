@@ -26,23 +26,25 @@
 :root {
   /* ---------- Primitive · 모드 없음 ---------- */
 
-  /* Neutral */
+  /* Neutral
+   * 순수 무채색에서 쿨 슬레이트(약한 파랑 틴트) 램프로 교체됐다 — gray/0 만 순백 유지.
+   * Figma Primitive 컬렉션 실측 그대로다. Semantic 바인딩은 이번에 손대지 않았다. */
   --color-gray-0: #FFFFFF;
-  --color-gray-50: #F7F7F8;
-  --color-gray-100: #F0F1F2;
-  --color-gray-200: #E4E6E7;
-  --color-gray-300: #D2D4D6;
-  --color-gray-400: #B2B4B7;
-  --color-gray-450: #ADAFB1;
-  --color-gray-500: #86888B;
-  --color-gray-600: #5D6063;
-  --color-gray-650: #55575A;
-  --color-gray-700: #4B4D4F;
-  --color-gray-750: #414345;
-  --color-gray-800: #353638;
-  --color-gray-850: #292A2C;
-  --color-gray-900: #1F2021;
-  --color-gray-950: #151617;
+  --color-gray-50: #F7F8FA;
+  --color-gray-100: #F0F1F5;
+  --color-gray-200: #E0E3E9;
+  --color-gray-300: #D1D5DE;
+  --color-gray-400: #AFB7C8;
+  --color-gray-450: #9EA8BB;
+  --color-gray-500: #667085;
+  --color-gray-600: #4E576A;
+  --color-gray-650: #3F485C;
+  --color-gray-700: #373F4E;
+  --color-gray-750: #2C3443;
+  --color-gray-800: #202838;
+  --color-gray-850: #151C26;
+  --color-gray-900: #0A0E15;
+  --color-gray-950: #070A10;
 
   /* Main */
   --color-main-50: #EFF6FE;
