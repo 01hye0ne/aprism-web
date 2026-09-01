@@ -13,7 +13,7 @@
   <link rel="stylesheet" href="../assets/css/app-shell.css" />
   <style>
     *, *::before, *::after { box-sizing: border-box; }
-    html, body { margin: 0; padding: 0; }
+    html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
 
     body {
       background-color: var(--bg-canvas);
@@ -23,133 +23,9 @@
     }
 
     h1, h2, h3, p { margin: 0; }
-
-    /* 검토용 도구. 디자인에 없는 요소라 화면 위에 별도 바로 둔다. */
-    :root { --review-bar: 36px; }
-    .app { --app-height: calc(100vh - var(--review-bar)); }
-
-    .review-bar {
-      position: sticky;
-      top: 0;
-      z-index: 20;
-      height: var(--review-bar);
-      display: flex;
-      align-items: center;
-      gap: var(--space-16);
-      padding: 0 var(--space-12);
-      background-color: var(--bg-container);
-      border-bottom: var(--border-width-thin) solid var(--border-subtle);
-      font-size: var(--font-size-12);
-      line-height: var(--font-line-height-18);
-      color: var(--fg-tertiary);
-    }
-
-    .review-bar .crumb { display: flex; align-items: center; gap: var(--space-8); }
-    .review-bar .crumb b { color: var(--fg-secondary); font-weight: 500; }
-    .review-bar .spacer { flex: 1 1 auto; }
-
-    .review-bar a,
-    .review-bar button {
-      display: inline-flex;
-      align-items: center;
-      height: 24px;
-      padding: 0 var(--space-8);
-      border: 0;
-      border-radius: var(--radius-control);
-      background: transparent;
-      color: var(--fg-tertiary);
-      font: inherit;
-      text-decoration: none;
-      cursor: pointer;
-      white-space: nowrap;
-    }
-
-    .review-bar a:hover,
-    .review-bar button:hover {
-      background-color: var(--bg-interactive-hover);
-      color: var(--fg-primary);
-    }
-
-    /* 퍼블리싱 노트 */
-    .notes {
-      max-width: 880px;
-      margin: 0 auto;
-      padding: var(--space-64) var(--space-24) 96px;
-      font-size: var(--font-size-14);
-      line-height: var(--font-line-height-22);
-      color: var(--fg-secondary);
-    }
-
-    .notes h2 {
-      margin-bottom: var(--space-8);
-      font-size: var(--font-size-24);
-      line-height: var(--font-line-height-32);
-      letter-spacing: -0.01em;
-      color: var(--fg-primary);
-    }
-
-    .notes h3 {
-      margin: var(--space-40) 0 var(--space-12);
-      font-size: var(--font-size-16);
-      line-height: var(--font-line-height-24);
-      color: var(--fg-primary);
-    }
-
-    .notes p + p { margin-top: var(--space-12); }
-    .notes .lead { margin-bottom: var(--space-8); }
-
-    .notes table {
-      width: 100%;
-      margin-top: var(--space-12);
-      border-collapse: collapse;
-      font-size: var(--font-size-13);
-      line-height: var(--font-line-height-20);
-    }
-
-    .notes th,
-    .notes td {
-      padding: var(--space-8) var(--space-12);
-      border-bottom: var(--border-width-thin) solid var(--border-subtle);
-      text-align: left;
-      vertical-align: top;
-    }
-
-    .notes th { color: var(--fg-tertiary); font-weight: 500; white-space: nowrap; }
-
-    .notes code {
-      font-family: var(--font-family-mono);
-      font-size: 0.92em;
-      color: var(--fg-primary);
-    }
-
-    .notes ul { margin: var(--space-8) 0 0; padding-left: 1.1em; }
-    .notes li { margin-bottom: var(--space-4); }
-    .notes strong { color: var(--fg-primary); font-weight: 600; }
-
-    .notes .eyebrow {
-      font-family: var(--font-family-mono);
-      font-size: var(--font-size-12);
-      font-weight: 500;
-      letter-spacing: 0.09em;
-      text-transform: uppercase;
-      color: var(--fg-brand);
-      margin-bottom: var(--space-8);
-    }
   </style>
 </head>
 <body>
-
-<!-- ---------- 검토 도구 · 디자인 아님 ---------- -->
-<div class="review-bar">
-  <span class="crumb">
-    <a href="../index.html">← 목록</a>
-    <b>04.1 통합 관제 메인</b>
-    <span>Figma UI_00_Design System · 399:6225</span>
-  </span>
-  <span class="spacer"></span>
-  <a href="#notes">퍼블리싱 노트</a>
-  <button type="button" data-theme-toggle><span data-theme-label>Dark</span></button>
-</div>
 
 <!-- ============================================================
      Template / 04.1 Dashboard Home · 1922   (node 399:6225)
@@ -470,98 +346,6 @@
   </div>
 </div>
 
-<!-- ---------- 퍼블리싱 노트 ---------- -->
-<section class="notes" id="notes">
-  <p class="eyebrow">Publishing Notes</p>
-  <h2>Figma 기준으로 다시 맞췄습니다</h2>
-  <p class="lead">
-    화면이 <strong>UI_99_작업화면에서 UI_00_Design System 안(node 399:6225)</strong>으로 옮겨졌고,
-    구조가 크게 바뀌었습니다. 디자인 시스템도 컬렉션 구성이 달라져서 <code>tokens.css</code>를 다시 만들었습니다.
-  </p>
-
-  <h3>1. 화면에서 바뀐 것</h3>
-  <table>
-    <tr><th>항목</th><th>이전</th><th>현재</th></tr>
-    <tr><td>Status Bar</td><td>GNB 오른쪽, 1842</td><td><strong>전체 폭</strong>, 로고가 안으로 들어옴</td></tr>
-    <tr><td>GNB Rail</td><td>78 (HUG)</td><td>76 (<code>size/gnb/rail</code>과 일치)</td></tr>
-    <tr><td>Context Panel</td><td>SITE · 운영 모드 · 퀵 액션</td><td>퀵 액션 <strong>삭제</strong></td></tr>
-    <tr><td>Right Panel</td><td>360, 카드 1개</td><td><strong>420</strong>, 카드 2개로 분리</td></tr>
-    <tr><td>Robot Card</td><td>101 폭, 세로 나열</td><td>168 폭, 썸네일 + Mission/Battery/Signal 행</td></tr>
-    <tr><td>Progress Bar</td><td>연속 막대</td><td><strong>5칸 분할 막대</strong></td></tr>
-    <tr><td>Timeline</td><td>알약 캡슐, 4개</td><td>번호 + 아이콘/세로선, 7개</td></tr>
-    <tr><td>AI 영역</td><td>지도 위 588×240 그라데이션 면</td><td>지도 하단 <strong>얇은 알림 바</strong></td></tr>
-    <tr><td>지도 도구</td><td>좌하단</td><td>우상단</td></tr>
-    <tr><td>Panel Actions</td><td>수동 조작 / 미션 관리</td><td><strong>삭제</strong> (미션 관리는 헤더로 이동)</td></tr>
-  </table>
-  <p>
-    도면 도형 5개도 사라져서 지도는 빈 캔버스입니다. 아이콘 에셋도 27개에서 18개로 줄었습니다.
-  </p>
-
-  <h3>2. 디자인 시스템에서 바뀐 것</h3>
-  <p>
-    <strong>Component 컬렉션이 없어지고</strong> <code>button/*</code> 32개가 Semantic으로 들어왔습니다.
-    컬렉션 구성이 <code>Primitive(111) · Semantic(122) · Texts(7)</code>이 되었습니다.
-  </p>
-  <ul>
-    <li><strong>main 램프가 11단계로 재설계</strong>됐습니다 (50~950). 이전은 7단계였습니다.</li>
-    <li><strong>원색 3개가 바뀌었습니다</strong> — <code>danger/500 #F03918 → #FF383C</code>,
-      <code>safe/300 #5FD382 → #34C759</code>, <code>warning/500 #EECE1B → #FFCC00</code></li>
-    <li><code>size/panel/right</code> 360 → <strong>420</strong>, <code>space/2</code> 추가</li>
-    <li><code>bg/container</code> Dark가 gray/850 → gray/800, <code>bg/brand</code> Dark가 main/500 → main/600</li>
-    <li>Dark의 상태 아이콘 3개가 300 → <strong>500</strong>으로 (원색을 그대로 쓰는 방향)</li>
-    <li><strong>Texts 컬렉션</strong>(문자열 7개)이 새로 생겼습니다. 화면 문구용이라 CSS로는 내보내지 않았습니다.</li>
-  </ul>
-
-  <h3>3. 확인이 필요한 지점</h3>
-  <ul>
-    <li>
-      <strong><code>button/*</code> 32개의 Light와 Dark 값이 전부 같습니다.</strong>
-      Component 컬렉션에 있을 때는 별칭 하나(<code>bg/inverse</code> 등)가 모드를 알아서 따라갔는데,
-      Semantic으로 옮기면서 두 모드에 Light 값이 같이 들어갔습니다. 눈에 띄는 두 곳입니다 —
-      <code>button/primary/bg/default</code>가 <code>gray/950</code>이라 <code>bg/canvas</code>와 같은 색이고,
-      <code>button/secondary/bg/default</code>가 <code>gray/0</code>이라 어두운 화면 위에 흰 버튼이 놓입니다.
-      <strong>의도한 것인지 확인 부탁드립니다.</strong> Figma를 그대로 따랐습니다.
-    </li>
-    <li>
-      <strong><code>input/border/*</code> · <code>navigation/item/*</code> · <code>table/row/*</code> 10개가
-      이관 없이 사라졌습니다.</strong> Text Field · Select · Nav Item · GNB Rail Item · Table Row의
-      바인딩 확인이 필요합니다. 여기서는 대응하는 Semantic(<code>border/control</code> 등)을 직접 씁니다.
-    </li>
-    <li>
-      <strong>Robot Card의 Mission/Battery/Signal 라벨이 raw white입니다.</strong> 토큰이 아니라서
-      Light 모드에서는 흰 면 위 흰 글자가 됩니다. 여기서는 <code>fg/secondary</code>로 두었습니다.
-    </li>
-    <li>
-      <strong><code>Gradient/Main</code>의 방향이 뒤집혔습니다.</strong> 코어가 오른쪽 끝이고 왼쪽으로 감쇠합니다.
-      나머지 셋은 여전히 코어가 왼쪽입니다. 또 최소 알파가 0이 아니라 0.1이라 완전히 사라지지 않습니다.
-      (이 화면에서는 그라데이션을 쓰지 않아 눈에 띄지 않습니다.)
-    </li>
-    <li>
-      <strong>Text Style 이름과 실제 굵기가 어긋납니다.</strong>
-      <code>Heading/3/SemiBold</code>와 <code>Label/1/SemiBold</code>는 실제 ExtraBold,
-      <code>Title/1/SemiBold</code>는 실제 Bold입니다. 실제 굵기를 따랐습니다.
-    </li>
-    <li>
-      <strong><code>Mission Timeline Iist</code></strong> — <code>List</code>의 <code>l</code>이 대문자
-      <code>I</code>입니다. 지난번에도 남아 있던 오타입니다.
-    </li>
-    <li>진행률이 여전히 <code>3 / 5</code> · <code>00%</code>입니다. 3/5는 60%입니다.</li>
-  </ul>
-
-  <h3>4. 그대로 둔 것 · 코드에서 정한 것</h3>
-  <p>
-    <strong>문구는 한 글자도 바꾸지 않았습니다.</strong>
-    <code>로봇명</code> ×3, <code>waypoint name</code> ×7, <code>전체 미션명</code>, <code>00%</code>,
-    채워지지 않은 사각형 자리 모두 Figma 그대로입니다.
-  </p>
-  <p>
-    무엇이 늘어나는지는 코드에서 정했습니다 — 고정 폭은
-    <strong>GNB(76) · Context Panel(240) · Right Panel(420)</strong> 셋뿐이고 지도가 나머지를 흡수합니다.
-    우측 패널은 높이를 채우고 <strong>타임라인만 스크롤</strong>합니다. 웨이포인트가 7개로 늘어난 지금은
-    이게 없으면 아래쪽이 잘립니다. 로봇 카드는 대수 상한이 미정이라 132px 아래로는 줄지 않고
-    그보다 좁아지면 가로로 스크롤합니다.
-  </p>
-</section>
 
 <script src="../assets/js/theme.js"></script>
 </body>
