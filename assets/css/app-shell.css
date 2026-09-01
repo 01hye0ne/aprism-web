@@ -38,6 +38,7 @@ button {
   --ic-play: url(../icons/icon-play.svg);
   --ic-check: url(../icons/icon-check.svg);
   --ic-play-sm: url(../icons/icon-play-sm.svg);
+  --ic-arrow-right: url(../icons/icon-arrow-right.svg);
 }
 
 /* ---------- 아이콘 ---------- */
@@ -72,6 +73,7 @@ button {
  *   Title/1/SemiBold   -> Bold(700)
  */
 .t-overline  { font-size: var(--font-size-13); line-height: var(--font-line-height-18); font-weight: 500; letter-spacing: 0.04em; }
+.t-heading-1 { font-size: var(--font-size-32); line-height: var(--font-line-height-40); font-weight: 700; letter-spacing: -0.02em; }
 .t-heading-3 { font-size: var(--font-size-20); line-height: var(--font-line-height-28); font-weight: 800; letter-spacing: -0.01em; }
 .t-title-1   { font-size: var(--font-size-18); line-height: var(--font-line-height-26); font-weight: 700; }
 .t-label-1   { font-size: var(--font-size-14); line-height: var(--font-line-height-20); font-weight: 800; }
@@ -453,16 +455,73 @@ button {
 }
 
 /* ---------- AI Assist Panel ---------- */
-/* 큰 그라데이션 면에서 지도 하단의 얇은 알림 바로 바뀌었다. */
-.ai-bar {
+/*
+ * Figma 의 Emphasis 속성이 closed / opened 두 Variant 를 갖는다.
+ * 평상시 closed, hover 하면 opened 로 연다.
+ * 키보드로도 열려야 하므로 :focus-within 을 같이 건다.
+ *
+ * 두 상태를 모두 DOM 에 두고 grid-template-rows 0fr <-> 1fr 로 여닫는다.
+ * height:auto 는 전환이 안 되지만 이 방식은 된다.
+ *
+ * 배경은 Gradient/Main 을 세로로 눕힌 것이다. Paint Style 에 transform 이 걸려 있어
+ * stop 위치가 토큰 정의와 달라서 이 자리의 실측값을 그대로 쓴다.
+ */
+.ai-panel {
   flex: none;
   display: flex;
-  align-items: center;
-  gap: var(--space-16);
+  flex-direction: column;
+  gap: var(--space-20);
   padding: var(--space-16);
   border-top: var(--border-width-strong) solid var(--border-focus);
   border-radius: var(--radius-container);
-  background-color: var(--bg-surface-default);
+  overflow: hidden;
+  cursor: pointer;
+  /* 기본값(origin: padding-box, repeat)이면 테두리 영역에 타일 아래끝이 반복돼
+     상단 2px 에 가장 밝은 stop 이 줄로 나타난다. border-box 로 늘려 덮는다. */
+  background-origin: border-box;
+  background-repeat: no-repeat;
+  background-image: linear-gradient(
+    180deg,
+    rgb(54 149 223 / 10%) 0%,
+    rgb(90 142 228 / 29%) 82.2%,
+    rgb(104 148 230 / 56.2%) 95.7%,
+    rgb(117 152 232 / 90%) 100%
+  );
+  transition: padding 180ms ease, border-top-color 180ms ease;
+}
+
+.ai-panel:hover,
+.ai-panel:focus-within {
+  padding: var(--space-24);
+  border-top-color: transparent;
+}
+
+.ai-panel:focus-visible {
+  outline: var(--border-width-strong) solid var(--border-focus);
+  outline-offset: -2px;
+}
+
+.ai-fold {
+  display: grid;
+  transition: grid-template-rows 180ms ease, opacity 140ms ease;
+}
+
+.ai-fold > * { min-height: 0; overflow: hidden; }
+
+.ai-fold-closed { grid-template-rows: 1fr; opacity: 1; }
+.ai-fold-open { grid-template-rows: 0fr; opacity: 0; }
+
+.ai-panel:hover .ai-fold-closed,
+.ai-panel:focus-within .ai-fold-closed { grid-template-rows: 0fr; opacity: 0; }
+
+.ai-panel:hover .ai-fold-open,
+.ai-panel:focus-within .ai-fold-open { grid-template-rows: 1fr; opacity: 1; }
+
+/* closed */
+.ai-closed {
+  display: flex;
+  align-items: center;
+  gap: var(--space-16);
 }
 
 /* Figma 에 채워지지 않은 채 남아 있는 자리다. */
@@ -473,12 +532,78 @@ button {
   border: var(--border-width-thin) solid var(--fg-primary);
 }
 
-.ai-message {
+.ai-closed-text {
   font-size: var(--font-size-24);
   line-height: var(--font-line-height-32);
   font-weight: 600;
   letter-spacing: -0.01em;
+  color: #ffffff;
+}
+
+/* opened */
+.ai-opened {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+}
+
+.ai-message {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.ai-eyebrow { color: var(--fg-tertiary); }
+.ai-line-1 { color: #ffffff; }
+.ai-line-2 { color: rgb(255 255 255 / 55%); }
+
+.ai-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-8);
+}
+
+.ai-chip {
+  padding: var(--space-4) var(--space-8);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background-color: var(--bg-accent);
   color: var(--fg-primary);
+  cursor: pointer;
+}
+
+/* 입력창은 불투명 면을 깔아 어느 stop 위에서도 대비를 보장한다(컴포넌트 설명). */
+.ai-input {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  padding: var(--space-8) var(--space-8) var(--space-8) var(--space-16);
+  border: var(--border-width-thin) solid var(--border-default);
+  border-radius: var(--radius-control);
+  background-color: var(--bg-surface-default);
+  color: var(--fg-tertiary);
+}
+
+.ai-input > span:first-child { flex: 1 1 auto; min-width: 0; }
+
+.ai-send {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-control-sm);
+  height: var(--size-control-sm);
+  border: 0;
+  border-radius: var(--radius-control);
+  background-color: var(--button-accent-bg-default);
+  color: var(--button-accent-fg-default);
+  cursor: pointer;
+}
+
+.ai-send:hover { background-color: var(--button-accent-bg-hover); }
+
+/* 움직임을 줄이도록 설정한 환경에서는 전환 없이 바로 바뀐다. */
+@media (prefers-reduced-motion: reduce) {
+  .ai-panel, .ai-fold { transition: none; }
 }
 
 /* ---------- Right Panel ---------- */

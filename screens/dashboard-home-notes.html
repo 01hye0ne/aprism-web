@@ -199,6 +199,22 @@
     <li>진행률이 여전히 <code>3 / 5</code> · <code>00%</code>입니다. 3/5는 60%입니다.</li>
   </ul>
 
+  <h3>4. AI(Delta) 요약 — closed / opened</h3>
+  <p>
+    <code>AI Assist Panel</code>의 <code>Emphasis</code> 속성(<code>closed</code> · <code>opened</code>)을
+    <strong>평상시 closed, hover 하면 opened</strong>로 연결했습니다. 마우스가 없는 환경도 있어서
+    <code>:focus-within</code>을 같이 걸었습니다 — 패널에 탭으로 들어가도 열립니다.
+  </p>
+  <p>
+    두 상태를 모두 DOM에 두고 <code>grid-template-rows</code>를 <code>0fr ↔ 1fr</code>로 여닫습니다.
+    <code>height: auto</code>는 전환이 안 되지만 이 방식은 됩니다.
+    <code>prefers-reduced-motion</code>이 켜진 환경에서는 전환 없이 바로 바뀝니다.
+  </p>
+  <p>
+    닫힌 상태의 2px 상단 테두리(<code>border/focus</code>)는 열릴 때 <strong>투명해집니다</strong> —
+    Figma의 opened에는 테두리가 없지만, 폭을 0으로 만들면 여닫을 때 2px씩 튀어서 색만 없앴습니다.
+  </p>
+
   <h3>4. 그대로 둔 것 · 코드에서 정한 것</h3>
   <p>
     <strong>문구는 한 글자도 바꾸지 않았습니다.</strong>

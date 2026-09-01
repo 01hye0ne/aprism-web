@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/static/woff2/SUIT.css" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" />
   <link rel="stylesheet" href="../assets/css/tokens.css?v=1d75b47d" />
-  <link rel="stylesheet" href="../assets/css/app-shell.css?v=76ea976d" />
+  <link rel="stylesheet" href="../assets/css/app-shell.css?v=fe7c40a8" />
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
@@ -116,10 +116,39 @@
               </div>
             </div>
 
-            <!-- AI Assist Panel -->
-            <section class="ai-bar" aria-label="AI 운영 지원">
-              <span class="ai-thumb" aria-hidden="true"></span>
-              <p class="ai-message">터빈2에 주의 1건.</p>
+            <!-- AI Assist Panel · Emphasis=closed 기본, hover 시 opened -->
+            <section class="ai-panel" tabindex="0" aria-label="Delta AI 요약">
+
+              <div class="ai-fold ai-fold-closed">
+                <div><div class="ai-closed">
+                  <span class="ai-thumb" aria-hidden="true"></span>
+                  <p class="ai-closed-text">터빈2에 주의 1건.</p>
+                </div></div>
+              </div>
+
+              <div class="ai-fold ai-fold-open">
+                <div><div class="ai-opened">
+                  <div class="ai-message">
+                    <p class="t-caption ai-eyebrow">DELTA</p>
+                    <p class="t-heading-1 ai-line-1">터빈2에 주의 1건.</p>
+                    <p class="t-heading-1 ai-line-2">무엇을 확인해 드릴까요?</p>
+                  </div>
+
+                  <div class="ai-suggestions">
+                    <button type="button" class="ai-chip t-label-2">Spiral Casing 압력 추이 보여줘</button>
+                    <button type="button" class="ai-chip t-label-2">이 설비 최근 결함 3건</button>
+                    <button type="button" class="ai-chip t-label-2">재진단 예약해줘</button>
+                  </div>
+
+                  <div class="ai-input">
+                    <span class="t-body-2">무엇이든 물어보세요</span>
+                    <button type="button" class="ai-send" aria-label="보내기">
+                      <span class="i i-16" style="--i:var(--ic-arrow-right)"></span>
+                    </button>
+                  </div>
+                </div></div>
+              </div>
+
             </section>
           </section>
 
