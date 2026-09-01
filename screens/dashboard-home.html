@@ -9,8 +9,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/static/woff2/SUIT.css" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" />
-  <link rel="stylesheet" href="../assets/css/tokens.css?v=7529e56c" />
-  <link rel="stylesheet" href="../assets/css/app-shell.css?v=9942b345" />
+  <link rel="stylesheet" href="../assets/css/tokens.css?v=0d02f188" />
+  <link rel="stylesheet" href="../assets/css/app-shell.css?v=e26ae03a" />
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
@@ -39,15 +39,53 @@
     </span>
 
     <div class="status-bar-right">
-      <div class="account-chip">
-        <span class="i i-16" style="--i:var(--ic-user)" aria-hidden="true"></span>
-        <span class="t-label-2">홍길동</span>
-        <span class="t-label-2 account-sep" aria-hidden="true">|</span>
-        <span class="t-label-2">관제운영</span>
+      <!-- Account · 누르면 계정 메뉴가 내려온다 (Figma Account 컴포넌트 Opened) -->
+      <div class="status-menu" data-status-menu>
+        <button type="button" class="account-chip" data-menu-trigger
+                aria-haspopup="true" aria-expanded="false">
+          <span class="i i-16" style="--i:var(--ic-user)" aria-hidden="true"></span>
+          <span class="t-label-2">홍길동</span>
+          <span class="t-label-2 account-sep" aria-hidden="true">|</span>
+          <span class="t-label-2">관제운영</span>
+        </button>
+        <div class="dropdown-menu account-menu" role="menu" aria-label="계정" hidden>
+          <a class="menu-item" role="menuitem" href="#">
+            <span class="i i-16" style="--i:var(--ic-user)" aria-hidden="true"></span>
+            <span class="t-label-2">내 계정 정보</span>
+          </a>
+          <a class="menu-item" role="menuitem" href="#">
+            <span class="i i-16" style="--i:var(--ic-lock)" aria-hidden="true"></span>
+            <span class="t-label-2">비밀번호 변경</span>
+          </a>
+          <a class="menu-item" role="menuitem" href="#">
+            <span class="i i-16" style="--i:var(--ic-power)" aria-hidden="true"></span>
+            <span class="t-label-2">로그아웃</span>
+          </a>
+        </div>
       </div>
-      <span class="signal-chip" role="img" aria-label="통신 신호 강함">
-        <span class="signal-bars"><i></i><i></i><i></i><i></i></span>
-      </span>
+
+      <!-- Signal · 누르면 서버·네트워크 상태가 내려온다 (Figma Signal 컴포넌트 Opened) -->
+      <div class="status-menu" data-status-menu>
+        <button type="button" class="signal-chip" data-menu-trigger
+                aria-haspopup="true" aria-expanded="false" aria-label="통신 상태">
+          <span class="signal-bars"><i></i><i></i><i></i><i></i></span>
+        </button>
+        <div class="dropdown-menu signal-menu" role="menu" aria-label="통신 상태" hidden>
+          <div class="menu-item" role="menuitem">
+            <span class="t-label-2">AI Server</span>
+            <span class="badge badge-normal t-caption"><span class="badge-dot"></span>Online</span>
+          </div>
+          <div class="menu-item" role="menuitem">
+            <span class="t-label-2">DB server</span>
+            <span class="badge badge-normal t-caption"><span class="badge-dot"></span>Online</span>
+          </div>
+          <div class="menu-item" role="menuitem">
+            <span class="t-label-2">Network</span>
+            <span class="signal-bars menu-signal"><i></i><i></i><i></i><i></i></span>
+          </div>
+        </div>
+      </div>
+
       <span class="utc-clock">
         <span class="i i-16" style="--i:var(--ic-clock)"></span>
         <span class="t-caption num">2026-08-26T10:11:24Z</span>
@@ -209,7 +247,7 @@
                     <span class="robot-lists">
                       <span class="robot-row">
                         <span class="t-caption">Mission</span>
-                        <span class="badge badge-info t-label-2"><span class="badge-dot"></span>수행중</span>
+                        <span class="badge badge-info t-caption"><span class="badge-dot"></span>수행중</span>
                       </span>
                       <span class="robot-row">
                         <span class="t-caption">Battery</span>
@@ -237,7 +275,7 @@
                     <span class="robot-lists">
                       <span class="robot-row">
                         <span class="t-caption">Mission</span>
-                        <span class="badge badge-idle t-label-2"><span class="badge-dot"></span>대기</span>
+                        <span class="badge badge-idle t-caption"><span class="badge-dot"></span>대기</span>
                       </span>
                       <span class="robot-row">
                         <span class="t-caption">Battery</span>
@@ -265,7 +303,7 @@
                     <span class="robot-lists">
                       <span class="robot-row">
                         <span class="t-caption">Mission</span>
-                        <span class="badge badge-idle t-label-2"><span class="badge-dot"></span>대기</span>
+                        <span class="badge badge-idle t-caption"><span class="badge-dot"></span>대기</span>
                       </span>
                       <span class="robot-row">
                         <span class="t-caption">Battery</span>
@@ -323,6 +361,6 @@
 
 
 <script src="../assets/js/theme.js?v=dcf8f460"></script>
-<script src="../assets/js/screen.js?v=6d522772"></script>
+<script src="../assets/js/screen.js?v=45a01425"></script>
 </body>
 </html>

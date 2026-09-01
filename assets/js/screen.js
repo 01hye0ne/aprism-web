@@ -57,6 +57,60 @@
   })();
 
   // ------------------------------------------------------------------
+  // Status Bar 드롭다운 — Account · Signal
+  // Figma Account / Signal 컴포넌트의 Closed <-> Opened 를 클릭으로 전환한다.
+  // 한 번에 하나만 열리고, 바깥 클릭이나 Esc 로 닫힌다.
+  // ------------------------------------------------------------------
+  (function () {
+    var menus = Array.prototype.slice.call(document.querySelectorAll("[data-status-menu]"));
+    if (!menus.length) {
+      return;
+    }
+
+    function set(menu, open) {
+      var trigger = menu.querySelector("[data-menu-trigger]");
+      var dropdown = menu.querySelector(".dropdown-menu");
+      trigger.setAttribute("aria-expanded", open ? "true" : "false");
+      dropdown.hidden = !open;
+    }
+
+    function closeAll(except) {
+      menus.forEach(function (menu) {
+        if (menu !== except) {
+          set(menu, false);
+        }
+      });
+    }
+
+    menus.forEach(function (menu) {
+      var trigger = menu.querySelector("[data-menu-trigger]");
+
+      trigger.addEventListener("click", function (event) {
+        event.stopPropagation();
+        var open = trigger.getAttribute("aria-expanded") === "true";
+        closeAll(menu);
+        set(menu, !open);
+      });
+
+      menu.addEventListener("keydown", function (event) {
+        if (event.key === "Escape" && trigger.getAttribute("aria-expanded") === "true") {
+          set(menu, false);
+          trigger.focus();
+        }
+      });
+    });
+
+    document.addEventListener("click", function (event) {
+      var inside = menus.some(function (menu) {
+        return menu.contains(event.target);
+      });
+      if (!inside) {
+        closeAll(null);
+      }
+    });
+  })();
+
+  // ------------------------------------------------------------------
   // 로봇 선택 -> 아래 waypoint 목록이 바뀐다
   //
   // Figma 에는 타임라인이 하나뿐이라 나머지 두 대의 내용은 여기서 지었다.

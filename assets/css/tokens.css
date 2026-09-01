@@ -81,7 +81,7 @@
   --color-warning-700: #8C7400;
   --color-warning-900: #383116;
 
-  /* Alpha · 발광과 scrim. glow/Primary 는 불투명 원색, Secondary 는 반투명이다. */
+  /* Alpha · 발광 · 오버레이. glow/Primary 는 불투명 원색, Secondary 는 반투명이다. */
   --color-alpha-glow-primary-default: #89B9ED;
   --color-alpha-glow-primary-danger: #FFA69A;
   --color-alpha-glow-primary-safe: #72F494;
@@ -90,8 +90,17 @@
   --color-alpha-glow-secondary-danger: rgb(240 57 24 / 55%);
   --color-alpha-glow-secondary-safe: rgb(29 166 127 / 40%);
   --color-alpha-glow-secondary-warning: rgb(238 206 27 / 50%);
-  --color-alpha-scrim-dark: rgb(0 0 0 / 60%);
-  --color-alpha-scrim-light: rgb(23 23 25 / 50%);
+  /* 반투명 오버레이. scrim/* 이 이 램프로 대체됐다.
+   * 이름의 Light/Dark 는 모드가 아니라 계열이다 — 밝은 면 위(흰색 알파) / 어두운 면 위(그레이 램프 알파).
+   * 숫자는 불투명도 힌트다. Dark/200·400·500·600 은 gray/300·600·900·950 를 각각 40·40·50·60% 로 깐 것이다. */
+  --color-alpha-light-0: rgb(255 255 255 / 0%);
+  --color-alpha-light-500: rgb(255 255 255 / 50%);
+  --color-alpha-light-600: rgb(255 255 255 / 60%);
+  --color-alpha-light-1000: #FFFFFF;
+  --color-alpha-dark-200: rgb(209 213 222 / 40%);
+  --color-alpha-dark-400: rgb(78 87 106 / 40%);
+  --color-alpha-dark-500: rgb(10 14 21 / 50%);
+  --color-alpha-dark-600: rgb(7 10 16 / 60%);
 
   /* Font size */
   --font-size-12: 12px;
@@ -215,16 +224,17 @@
   --bg-interactive-brand-pressed: var(--color-main-300);
   --bg-interactive-critical-hover: var(--color-danger-800);
   --bg-interactive-critical-pressed: var(--color-danger-900);
-  --bg-interactive-hover: var(--color-gray-100);
+  --bg-interactive-hover: var(--color-gray-0);
   --bg-interactive-inverse-hover: var(--color-gray-750);
   --bg-interactive-inverse-pressed: var(--color-gray-700);
   --bg-interactive-pressed: var(--color-gray-200);
   --bg-inverse: var(--color-gray-950);
   --bg-navigation: var(--color-gray-0);
-  --bg-overlay: var(--color-alpha-scrim-light);
-  --bg-surface-alpha: var(--color-alpha-scrim-light);
-  --bg-surface-default: var(--color-gray-0);
+  --bg-overlay: var(--color-alpha-dark-600);
+  --bg-surface-default: var(--color-gray-50);
   --bg-surface-disabled: var(--color-gray-100);
+  --bg-surface-overlay-dark: var(--color-alpha-dark-200);
+  --bg-surface-overlay-light: var(--color-alpha-light-500);
   --bg-surface-raised: var(--color-gray-0);
   --bg-surface-selected: var(--color-main-100);
   --bg-surface-subtle: var(--color-gray-100);
@@ -361,16 +371,17 @@
   --bg-interactive-brand-pressed: var(--color-main-300);
   --bg-interactive-critical-hover: var(--color-danger-300);
   --bg-interactive-critical-pressed: var(--color-danger-100);
-  --bg-interactive-hover: var(--color-gray-700);
+  --bg-interactive-hover: var(--color-gray-500);
   --bg-interactive-inverse-hover: var(--color-gray-100);
   --bg-interactive-inverse-pressed: var(--color-gray-200);
   --bg-interactive-pressed: var(--color-gray-700);
   --bg-inverse: var(--color-gray-0);
   --bg-navigation: var(--color-gray-900);
-  --bg-overlay: var(--color-alpha-scrim-dark);
-  --bg-surface-alpha: var(--color-alpha-scrim-light);
+  --bg-overlay: var(--color-alpha-dark-600);
   --bg-surface-default: var(--color-gray-800);
   --bg-surface-disabled: var(--color-gray-750);
+  --bg-surface-overlay-dark: var(--color-alpha-dark-500);
+  --bg-surface-overlay-light: var(--color-alpha-dark-400);
   --bg-surface-raised: var(--color-gray-750);
   --bg-surface-selected: var(--color-gray-700);
   --bg-surface-subtle: var(--color-gray-750);
@@ -461,67 +472,19 @@
   --status-warning-icon: var(--color-warning-500);
 }
 
-/* ---------- Gradient ---------- */
-/*
- * 배경색을 stop 에 넣지 않고 같은 색의 불투명도만 낮춘다.
- * Paint Style 은 모드를 갖지 않으므로 이 방식만 Light·Dark 양쪽에서 성립한다.
- *
- * Gradient/Main 의 방향이 뒤집혔다 — 코어가 오른쪽 끝(100%)에 있고 왼쪽으로 감쇠한다.
- * 나머지 셋은 여전히 코어가 왼쪽(0%)이다. 또한 Main 은 최소 알파가 0 이 아니라 0.1 이라
- * 완전히 사라지지 않고 옅은 파란 막이 남는다. 넷 다 Figma 실측 그대로 옮겼다.
- */
-
-:root {
-  --gradient-main: linear-gradient(90deg,
-    rgb(54 149 223 / 10.0%) 0%,
-    rgb(54 149 223 / 10.0%) 25%,
-    rgb(54 149 223 / 10.0%) 50%,
-    rgb(54 149 223 / 10.0%) 70%,
-    rgb(90 142 228 / 29.0%) 84%,
-    rgb(104 148 230 / 56.2%) 93%,
-    rgb(117 152 232 / 90.0%) 100%
-  );
-  --gradient-danger: linear-gradient(90deg,
-    rgb(244 70 63 / 90.0%) 0%,
-    rgb(242 65 46 / 56.2%) 7%,
-    rgb(240 57 24 / 29.0%) 16%,
-    rgb(217 92 0 / 8.9%) 30%,
-    rgb(217 92 0 / 1.0%) 50%,
-    rgb(217 92 0 / 0.0%) 75%,
-    rgb(217 92 0 / 0.0%) 100%
-  );
-  --gradient-warning: linear-gradient(90deg,
-    rgb(247 205 54 / 90.0%) 0%,
-    rgb(242 206 44 / 56.2%) 7%,
-    rgb(238 206 27 / 29.0%) 16%,
-    rgb(255 193 126 / 8.9%) 30%,
-    rgb(255 193 126 / 1.0%) 50%,
-    rgb(255 193 126 / 0.0%) 75%,
-    rgb(255 193 126 / 0.0%) 100%
-  );
-  --gradient-safe: linear-gradient(90deg,
-    rgb(31 177 140 / 90.0%) 0%,
-    rgb(22 173 134 / 56.2%) 7%,
-    rgb(29 166 127 / 29.0%) 16%,
-    rgb(0 166 134 / 8.9%) 30%,
-    rgb(0 166 134 / 1.0%) 50%,
-    rgb(0 166 134 / 0.0%) 75%,
-    rgb(0 166 134 / 0.0%) 100%
-  );
-}
-
 /*
  * 확인이 필요한 지점
  *   - button/* 32개의 Light·Dark 값이 동일하다 (위 Dark 블록 주석 참조)
  *   - input/border/* · navigation/item/* · table/row/* 10개는 여전히 없다.
  *   - bg/surface/selected Dark 가 gray/700 이라 bg/interactive/pressed 와 값이 같다.
- *   - bg/surface/alpha 는 두 모드가 같은 어두운 scrim 이다 — Figma 그대로다.
- *     선택된 로봇 카드에서만 Light 에서 밝은 쪽으로 뒤집는다(app-shell.css).
+ *   - bg/surface/alpha 는 없어졌다. overlay-light(밝은 유리) · overlay-dark(어두운 유리)로 갈렸고
+ *     둘 다 모드별 값을 갖는다. 우측 미션 패널이 overlay-light + backdrop blur 로 유리처럼 뜬다.
+ *   - alpha 컬렉션에 Light/Dark 반투명 램프가 생겼다(scrim/* 대체). bg/overlay 는 alpha/Dark/600.
  *   - 이름 정리를 Figma 에 반영했다 — color/warning/100 2 -> 200, bg/Safe -> bg/safe,
  *     radius/Chart -> radius/chart, alert/Default/* -> alert/default/*,
  *     alpha/glow/*/Default -> */default.
- *   - 아래 Gradient 넷은 Paint Style 을 옮긴 것인데, AI Assist Panel 이 새 컴포넌트로
- *     바뀌면서 더 이상 쓰이지 않는다. 다른 화면에서 쓸 수 있어 남겨 둔다.
+ *   - Gradient/* Paint Style 넷은 AI Assist Panel 이 새 컴포넌트로 바뀌며 쓰이지 않게 돼
+ *     제거했다. AI 패널 그라데이션은 app-shell.css .ai-panel 이 직접 그린다.
  *   - Text Style 이름과 실제 굵기가 어긋난다.
  *       Typography/Heading/3/SemiBold -> 실제 ExtraBold
  *       Typography/Label/1/SemiBold   -> 실제 ExtraBold
