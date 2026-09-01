@@ -181,6 +181,51 @@
   </p>
 
   <p>
+    <strong>Progress Bar 칸의 발광을 빠뜨렸다가 채웠습니다.</strong>
+    채워진 칸마다 아래 변에서 위로 번지는 <code>INNER_SHADOW</code>가 있습니다
+    (<code>offset 0/-4 · blur 4 · spread 0</code>). 대기 칸에는 없습니다.
+  </p>
+  <table>
+    <tr><th>칸</th><th>면</th><th>발광</th></tr>
+    <tr><td>완료</td><td><code>bg/Safe</code></td><td><code>alert/safe/glow-Primary</code> <code>#72F494</code></td></tr>
+    <tr><td>수행중</td><td><code>bg/brand</code></td><td><code>alert/Default/glow-Primary</code> <code>#89B9ED</code></td></tr>
+    <tr><td>실패</td><td><code>bg/critical</code></td><td><code>alert/danger/glow-Primary</code> <code>#FFA69A</code></td></tr>
+    <tr><td>대기</td><td>빗금 <code>fg/disabled</code></td><td>없음</td></tr>
+  </table>
+  <p>
+    <strong><code>실패</code> Variant 는 화면에 아직 쓰이지 않습니다.</strong>
+    CSS 자리(<code>.is-failed</code>)만 만들어 뒀습니다.
+  </p>
+
+  <p>
+    <strong>AI Assist Panel 은 Type 이 넷입니다</strong> — Default · Warning · Critical · Safe.
+    구조는 같고 그라데이션 · 발광 · 위 테두리 색만 다릅니다. 넷 다 CSS 에 넣어 뒀고
+    (<code>.is-warning</code> · <code>.is-critical</code> · <code>.is-safe</code>),
+    화면은 Default 를 씁니다. Spectrum 색도 계열을 따라갑니다.
+  </p>
+  <table>
+    <tr><th>Type</th><th>끝 stop</th><th>발광</th><th>위 테두리</th></tr>
+    <tr><td>Default</td><td><code>alert/Default/glow-Primary</code></td><td><code>alert/Default/glow-Secondary</code></td><td><code>border/focus</code></td></tr>
+    <tr><td>Warning</td><td><code>#F7CD36</code> (raw)</td><td><code>alert/warning/glow-Secondary</code></td><td><code>status/warning/border</code></td></tr>
+    <tr><td>Critical</td><td><code>#F4463F</code> (raw)</td><td><code>alert/danger/glow-Secondary</code></td><td><code>status/critical/border</code></td></tr>
+    <tr><td>Safe</td><td><code>#1FB18C</code> (raw)</td><td><code>alert/safe/glow-Secondary</code></td><td><strong><code>chart/positive</code></strong></td></tr>
+  </table>
+  <p><strong>둘만 확인 부탁드립니다.</strong></p>
+  <ul>
+    <li>
+      <strong>Safe 만 테두리가 <code>chart/positive</code>입니다.</strong>
+      나머지 셋은 <code>border/focus</code> · <code>status/…/border</code>입니다.
+      <code>status/normal/border</code>가 맞아 보입니다.
+    </li>
+    <li>
+      <strong>마지막 stop 이 Default 만 토큰에 묶여 있습니다.</strong> 나머지 셋은 raw 값이고,
+      그 값이 각 계열의 <code>glow-Primary</code>와도 다릅니다
+      (<code>#F7CD36</code> ≠ <code>#F8EBAE</code>, <code>#F4463F</code> ≠ <code>#FFA69A</code>,
+      <code>#1FB18C</code> ≠ <code>#72F494</code>). 지금은 Figma 실측 그대로 옮겼습니다.
+    </li>
+  </ul>
+
+  <p>
     화면이 컴포넌트(<code>478:17275</code>)가 되면서 노드가 잠깐 읽히지 않아,
     구조는 끊기기 전 실측 덤프로 먼저 맞추고 나중에 새 노드로 다시 대조했습니다.
     <strong>지금은 Figma 렌더와 나란히 비교해 확인했습니다.</strong>
