@@ -1028,10 +1028,10 @@ button {
   display: flex;
   align-items: center;
   gap: var(--space-8);
-  color: var(--fg-primary);
+  color: var(--status-info-fg);
 }
 
-.progress-title .badge-dot { background-color: var(--fg-secondary); }
+.progress-title .badge-dot { background-color: var(--status-info-icon); }
 
 .progress-title > span:last-child {
   overflow: hidden;
@@ -1045,21 +1045,38 @@ button {
   color: var(--fg-secondary);
 }
 
-/* 연속 막대에서 단계 수만큼 나뉜 막대로 바뀌었다. */
+/*
+ * 단계 수만큼 나뉜 막대다. 칸마다 상태가 셋이다 —
+ * 완료 bg/Safe · 수행중 bg/brand · 대기는 2px 선을 2px 간격으로 깐 빗금(fg/disabled).
+ * Figma 는 칸 하나에 선 37개를 넣어 두었는데 반복 배경 하나로 같은 그림이 된다.
+ */
 .progress-track {
   display: flex;
-  gap: var(--space-2);
+  gap: var(--space-4);
   height: 12px;
 }
 
 .progress-track span {
   flex: 1 1 0;
   min-width: 0;
-  border-radius: var(--radius-card);
-  background-color: var(--chart-track);
+  overflow: hidden;
+  border-radius: var(--radius-chart);
+  background-image: repeating-linear-gradient(
+    90deg,
+    var(--fg-disabled) 0 2px,
+    transparent 2px 4px
+  );
 }
 
-.progress-track span.is-done { background-color: var(--bg-brand); }
+.progress-track span.is-done {
+  background-image: none;
+  background-color: var(--bg-safe);
+}
+
+.progress-track span.is-running {
+  background-image: none;
+  background-color: var(--bg-brand);
+}
 
 /* ---------- Mission Timeline ---------- */
 .timeline {

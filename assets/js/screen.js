@@ -196,10 +196,11 @@
       count.textContent = done + " / " + total;
       percent.textContent = Math.round((done / total) * 100) + "%";
 
+      // 칸과 단계는 1:1 이다. 칸 색이 그 단계의 상태를 그대로 따른다.
       track.textContent = "";
-      for (var i = 0; i < total; i += 1) {
-        track.appendChild(el("span", i < done ? "is-done" : ""));
-      }
+      robot.steps.forEach(function (step) {
+        track.appendChild(el("span", STATE[step.state].klass));
+      });
       track.setAttribute("aria-label", total + "단계 중 " + done + "단계 완료");
 
       timeline.textContent = "";

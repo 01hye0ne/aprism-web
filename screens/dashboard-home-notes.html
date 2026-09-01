@@ -160,12 +160,36 @@
   </ul>
 
   <p>
-    <strong>작업 중 Figma 노드(399:6225)가 중간에 읽히지 않게 됐습니다.</strong>
-    파일을 편집 중이셨던 것 같습니다. 구조·수치는 끊기기 전에 받아 둔 실측 덤프로 맞췄고,
-    AI 바는 컴포넌트(<code>478:11782</code>) 쪽에서 다시 확인했습니다.
-    렌더 실측은 Figma 수치와 전부 일치합니다 — 패널 240/44/108/84 · Two Column 1600 ·
-    Map Panel 1164 · Map Canvas 1124×829 · Right Panel 420.
-    <strong>최종 화면은 한 번 봐 주세요.</strong>
+    <strong>Progress Bar 도 바뀌어 반영했습니다.</strong> 칸 색이 셋으로 갈렸습니다.
+  </p>
+  <table>
+    <tr><th>칸 상태</th><th>표현</th></tr>
+    <tr><td>완료</td><td><code>bg/Safe</code> 초록</td></tr>
+    <tr><td>수행중</td><td><code>bg/brand</code> 파랑</td></tr>
+    <tr><td>대기</td><td>2px 선을 2px 간격으로 깐 빗금(<code>fg/disabled</code>)</td></tr>
+  </table>
+  <p>
+    칸 사이 간격이 2 → <strong>4</strong>, 모서리가 <code>radius/card</code> →
+    <strong><code>radius/Chart</code>(2)</strong>가 되었습니다.
+    제목과 점도 <code>fg/primary</code>·<code>fg/secondary</code>에서
+    <code>status/info/fg</code>·<code>status/info/icon</code>으로 바뀌었습니다.
+    Figma 는 칸 하나에 선 37개를 넣어 두었는데, 여기서는 반복 배경 하나로 같은 그림을 그립니다.
+  </p>
+  <p>
+    <strong>칸은 단계와 1:1 입니다.</strong> 로봇을 바꾸면 칸 수와 색이 같이 바뀝니다 —
+    1번 <code>초록 3 · 파랑 1 · 빗금 3</code>, 2번 <code>초록 5</code>, 3번 <code>빗금 4</code>.
+  </p>
+
+  <p>
+    화면이 컴포넌트(<code>478:17275</code>)가 되면서 노드가 잠깐 읽히지 않아,
+    구조는 끊기기 전 실측 덤프로 먼저 맞추고 나중에 새 노드로 다시 대조했습니다.
+    <strong>지금은 Figma 렌더와 나란히 비교해 확인했습니다.</strong>
+    패널 240/44/108/84 · Two Column 1600 · Map Panel 1164 · Map Canvas 1124×829 ·
+    Right Panel 420 · Mission 292/636 — 전부 일치합니다.
+  </p>
+  <p>
+    남는 차이는 문서에 적어 둔 둘뿐입니다 — 로봇 카드 폭(Figma 는 168 고정이라 3번째가 잘리고,
+    여기서는 셋 다 들어가게 나눕니다)과 타임라인 내용(로봇별로 다르게 지었습니다).
   </p>
 
   <h3>2. 지난 업데이트 — 갭 · 라운드</h3>
