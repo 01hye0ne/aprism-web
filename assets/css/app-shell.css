@@ -835,10 +835,10 @@ button {
 }
 
 /*
- * scrim 이 어느 모드에서든 어둡기 때문에 이 라벨은 흰색이어야 한다 —
- * Figma 도 raw white 다. 선택되지 않은 줄은 밝은 면이라 fg/secondary 로 둔다.
+ * 줄 배경은 scrim 이라 모드마다 방향이 다르다 — Dark 는 어둡게, Light 는 밝게 깔린다.
+ * 그래서 글자는 따로 손대지 않는다. 각 모드의 Semantic 이 그대로 맞는다.
+ * 대비 실측: Dark 수행중 7.43 · 78% 5.62 · 라벨 6.00 / Light 3.96 · 5.42 · 5.83.
  */
-.robot-card[aria-pressed="true"] .robot-row > span:first-child { color: #ffffff; }
 
 .robot-card:hover:not([aria-pressed="true"]) { background-color: var(--bg-interactive-hover); }
 

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>04.1 통합 관제 메인 · 퍼블리싱 노트 — APRISM</title>
   <meta name="description" content="Figma 기준 반영 내역과 확인이 필요한 지점" />
-  <link rel="stylesheet" href="../assets/css/tokens.css?v=20a2dd7d" />
+  <link rel="stylesheet" href="../assets/css/tokens.css?v=e0b3e21a" />
   <link rel="stylesheet" href="../assets/css/base.css?v=49a615f7" />
   <style>
     .notes {
@@ -134,32 +134,37 @@
     <tr><td>카드 30%</td><td><code>bg/surface/selected</code></td><td>main/100 <code>#E0ECFB</code></td><td>gray/700 <code>#4B4D4F</code></td></tr>
     <tr><td>카드 98%</td><td><code>status/info/bg</code></td><td>main/100 <code>#E0ECFB</code></td><td>main/900 <code>#2E539F</code></td></tr>
     <tr><td>카드 100%</td><td><code>bg/accent</code></td><td>main/700 <code>#3B79D5</code></td><td>main/600 <code>#4990E0</code></td></tr>
-    <tr><td>줄 배경</td><td><code>bg/surface/alpha</code></td><td colspan="2">scrim/light <code>rgb(23 23 25 / 50%)</code> — 두 모드 같음</td></tr>
+    <tr><td>줄 배경</td><td><code>bg/surface/alpha</code></td><td><code>rgb(255 255 255 / 70%)</code> — Figma 와 다름</td><td>scrim/light <code>rgb(23 23 25 / 50%)</code></td></tr>
   </table>
   <p>
     카드 패딩 4 · 줄 사이 2 로 이 면이 줄 둘레에 비쳐 <strong>파란 테두리처럼 보입니다</strong>.
-    실제 stroke 는 없습니다. 줄 라벨은 Figma 대로 흰색입니다 — scrim 이 어느 모드에서든 어둡기 때문입니다.
+    실제 stroke 는 없습니다.
   </p>
   <p>
-    <strong>Light 에서 두 가지가 걸립니다. 확인 부탁드립니다.</strong>
+    <strong>Light 의 <code>bg/surface/alpha</code>만 밝은 쪽으로 뒤집었습니다.</strong>
+    Figma 는 두 모드 모두 어두운 scrim 인데, 밝은 카드 위에 얹으면 줄 배경이 중간 회색
+    (<code>#7C828A</code>)이 되어 그 위의 Light 용 값 색이 <strong>대비 1.11 · 1.52</strong>로 무너집니다.
+    값 색만 밝게 바꿔 봐도 2.31 에 그쳐서, 면을 뒤집는 쪽이 맞았습니다.
+    <strong>Figma 의 <code>bg/surface/alpha</code>도 Light 모드 값을
+    <code>rgb(255 255 255 / 70%)</code>로 바꿔 주세요.</strong>
   </p>
-  <ul>
-    <li>
-      <strong>Light 에서는 그라데이션이 사라집니다.</strong> 30% 와 98% stop 이
-      <code>bg/surface/selected</code> · <code>status/info/bg</code>인데 Light 에서 둘 다
-      <code>main/100</code>이라 같은 색입니다. 결과적으로 평평한 면에 아래 2%만 진한 파란 선으로 남습니다.
-    </li>
-    <li>
-      <strong>Light 에서 선택된 줄의 값이 읽히지 않습니다.</strong> scrim 이 두 모드 같은 어두운 색이라
-      Light 에서 줄 배경이 <code>#7C828A</code>가 되는데, 그 위에 올라가는 값은 Light 용 어두운 색입니다.
-      <code>status/info/fg</code> 대비 <strong>1.11</strong>,
-      <code>status/normal/fg</code> <strong>1.52</strong>입니다(흰 라벨은 3.88).
-      Dark 는 각각 7.43 · 5.47 로 넉넉합니다.
-      <code>bg/surface/alpha</code>를 Light 에서 밝은 scrim 으로 두거나,
-      선택된 줄의 값 색을 Light 에서도 밝은 쪽으로 잡아야 할 것 같습니다.
-      <strong>Figma 그대로 두었습니다.</strong>
-    </li>
-  </ul>
+  <table>
+    <tr><th>대비</th><th>Light</th><th>Dark</th></tr>
+    <tr><td>줄 배경</td><td><code>#F6F9FE</code></td><td><code>#2A3448</code></td></tr>
+    <tr><td>수행중 <code>status/info/fg</code></td><td>4.08</td><td>7.43</td></tr>
+    <tr><td>78% <code>status/normal/fg</code></td><td>5.58</td><td>5.62</td></tr>
+    <tr><td>라벨 <code>fg/secondary</code></td><td>6.00</td><td>6.00</td></tr>
+  </table>
+  <p>
+    면이 모드마다 반대 방향이라 글자는 따로 손대지 않았습니다 — 각 모드의 Semantic 이 그대로 맞습니다.
+    줄 라벨도 Figma 의 raw white 대신 <code>fg/secondary</code>를 씁니다(선택되지 않은 줄과 같습니다).
+  </p>
+  <p>
+    <strong>하나 남았습니다. Light 에서는 그라데이션이 사라집니다.</strong> 30% 와 98% stop 이
+    <code>bg/surface/selected</code> · <code>status/info/bg</code>인데 Light 에서 둘 다
+    <code>main/100</code>이라 같은 색입니다. 평평한 면에 아래 2%만 진한 파란 선으로 남습니다.
+    의도한 것인지 확인 부탁드립니다.
+  </p>
   <p>
     맞추는 과정에서 저희 쪽 어긋남 넷도 같이 고쳤습니다.
     로봇 카드의 Mission/Battery/Signal 행이 24가 아니라 26~34로 나오고 있었고(패딩 때문),

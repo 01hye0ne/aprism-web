@@ -195,7 +195,13 @@
   --bg-navigation: var(--color-gray-0);
   --bg-overlay: var(--color-alpha-scrim-light);
   --bg-surface-default: var(--color-gray-0);
-  --bg-surface-alpha: var(--color-alpha-scrim-light);
+  /*
+   * Figma 와 다르다. Figma 는 Light 도 Dark 와 같은 어두운 scrim 인데,
+   * 밝은 카드 위에 얹으면 줄 배경이 중간 회색(#7C828A)이 되어 그 위의 Light 용
+   * 값 색이 대비 1.1~1.5 로 무너진다. 밝은 쪽으로 뒤집으라는 지시를 받아 여기서 정했다.
+   * Figma 의 bg/surface/alpha 도 Light 모드 값을 이걸로 바꿔야 한다.
+   */
+  --bg-surface-alpha: rgb(255 255 255 / 70%);
   --bg-surface-disabled: var(--color-gray-100);
   --bg-surface-raised: var(--color-gray-0);
   --bg-surface-selected: var(--color-main-100);
@@ -347,7 +353,7 @@
   --bg-navigation: var(--color-gray-900);
   --bg-overlay: var(--color-alpha-scrim-dark);
   --bg-surface-default: var(--color-gray-800);
-  /* Light 와 값이 같다 — 어두운 scrim 이라 어느 모드에서든 위에 흰 글자를 올린다. */
+  /* Dark 는 Figma 값 그대로다. Light 만 밝은 쪽으로 뒤집었다(위 주석). */
   --bg-surface-alpha: var(--color-alpha-scrim-light);
   --bg-surface-disabled: var(--color-gray-750);
   --bg-surface-raised: var(--color-gray-750);
