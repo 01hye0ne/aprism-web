@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/static/woff2/SUIT.css" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" />
   <link rel="stylesheet" href="../assets/css/tokens.css?v=1d75b47d" />
-  <link rel="stylesheet" href="../assets/css/app-shell.css?v=4ef4c1e6" />
+  <link rel="stylesheet" href="../assets/css/app-shell.css?v=77977014" />
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
@@ -77,6 +77,12 @@
 
       <!-- ---------- Site Context Panel ---------- -->
       <aside class="context-panel" aria-label="사이트 컨텍스트">
+        <div class="panel-collapse">
+          <button type="button" aria-label="사이트 패널 접기">
+            <span class="i i-20" style="--i:var(--ic-panel-left)"></span>
+          </button>
+        </div>
+
         <section class="panel-section">
           <p class="t-overline section-label">SITE</p>
           <h1 class="t-heading-3">지하발전소 B3</h1>
@@ -168,7 +174,10 @@
                     <h2 class="t-heading-3">전체 미션명</h2>
                     <p class="t-caption">3대 연결 · 1대 수행 중</p>
                   </div>
-                  <button type="button" class="btn btn-primary">미션 관리</button>
+                  <div class="buttons">
+                    <button type="button" class="btn btn-primary">미션 관리</button>
+                    <button type="button" class="btn btn-danger">비상정지</button>
+                  </div>
                 </div>
 
                 <div class="robot-strip">
@@ -208,21 +217,21 @@
                     <div class="robot-lists">
                       <div class="robot-row">
                         <span class="t-caption">Mission</span>
-                        <span class="badge badge-info t-label-2"><span class="badge-dot"></span>수행중</span>
+                        <span class="badge badge-idle t-label-2"><span class="badge-dot"></span>대기</span>
                       </div>
                       <div class="robot-row">
                         <span class="t-caption">Battery</span>
-                        <span class="battery">
-                          <span class="battery-body"><span class="battery-fill" style="width:78%"></span></span>
+                        <span class="battery is-critical">
+                          <span class="battery-body"><span class="battery-fill" style="width:18%"></span></span>
                           <span class="battery-tip"></span>
-                          <span class="t-caption num">78%</span>
+                          <span class="t-caption num">18%</span>
                         </span>
                       </div>
                       <div class="robot-row">
                         <span class="t-caption">Signal</span>
-                        <span class="battery">
-                          <span class="signal-bars"><i></i><i></i><i></i><i></i></span>
-                          <span class="t-caption">Strong</span>
+                        <span class="battery is-warning">
+                          <span class="signal-bars" data-level="2"><i></i><i></i><i></i><i></i></span>
+                          <span class="t-caption">Weak</span>
                         </span>
                       </div>
                     </div>
@@ -236,21 +245,21 @@
                     <div class="robot-lists">
                       <div class="robot-row">
                         <span class="t-caption">Mission</span>
-                        <span class="badge badge-info t-label-2"><span class="badge-dot"></span>수행중</span>
+                        <span class="badge badge-idle t-label-2"><span class="badge-dot"></span>대기</span>
                       </div>
                       <div class="robot-row">
                         <span class="t-caption">Battery</span>
-                        <span class="battery">
-                          <span class="battery-body"><span class="battery-fill" style="width:78%"></span></span>
+                        <span class="battery is-warning">
+                          <span class="battery-body"><span class="battery-fill" style="width:35%"></span></span>
                           <span class="battery-tip"></span>
-                          <span class="t-caption num">78%</span>
+                          <span class="t-caption num">35%</span>
                         </span>
                       </div>
                       <div class="robot-row">
                         <span class="t-caption">Signal</span>
                         <span class="battery">
-                          <span class="signal-bars"><i></i><i></i><i></i><i></i></span>
-                          <span class="t-caption">Strong</span>
+                          <span class="signal-bars" data-level="3"><i></i><i></i><i></i><i></i></span>
+                          <span class="t-caption">Good</span>
                         </span>
                       </div>
                     </div>

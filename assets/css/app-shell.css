@@ -33,6 +33,7 @@ button {
   --ic-users: url(../icons/icon-users.svg);
   --ic-settings: url(../icons/icon-settings.svg);
   --ic-chevron-down: url(../icons/icon-chevron-down.svg);
+  --ic-panel-left: url(../icons/icon-panel-left.svg);
   --ic-zoom-in: url(../icons/icon-zoom-in.svg);
   --ic-target: url(../icons/icon-target.svg);
   --ic-play: url(../icons/icon-play.svg);
@@ -111,11 +112,16 @@ button {
  * GNB 오른쪽 전체가 bg/surface/default 면이다(Figma 의 Container 1844).
  * Site Context Panel 자체에는 fill 이 없고 이 면이 비쳐 보인다.
  * 지도 영역은 Two Column 이 bg/canvas 로 다시 덮는다.
+ *
+ * 위쪽 두 모서리만 둥글다(radius/container). 아래는 radius/none 이다 —
+ * 화면 바닥에 닿는 변이라 깎지 않는다.
  */
 .content-surface {
   flex: 1 1 auto;
   min-width: 0;
   display: flex;
+  border-radius: var(--radius-container) var(--radius-container) 0 0;
+  overflow: hidden;
   background-color: var(--bg-surface-default);
 }
 
@@ -154,10 +160,13 @@ button {
   gap: var(--space-8);
 }
 
+/* Figma 는 36 고정이고 stroke 가 안쪽으로 그려진다.
+   CSS border 는 높이에 더해지므로 높이를 못 박아 상태바가 64 로 유지되게 한다. */
 .account-chip {
   display: flex;
   align-items: center;
   gap: var(--space-8);
+  height: var(--size-control-md);
   padding: 6px var(--space-12) 6px var(--space-8);
   border: var(--border-width-thin) solid var(--border-subtle);
   border-radius: var(--radius-card);
@@ -176,13 +185,15 @@ button {
   color: var(--fg-tertiary);
 }
 
+/* 색은 감싼 쪽에서 정한다 — 로봇 카드에서는 .battery 의 상태색을 그대로 받는다. */
 .signal-bars {
   display: flex;
   align-items: flex-end;
   gap: 2px;
   height: 14px;
-  color: var(--status-normal-fg);
 }
+
+.status-bar-profile .signal-bars { color: var(--status-normal-fg); }
 
 .signal-bars i {
   width: 3px;
@@ -194,6 +205,13 @@ button {
 .signal-bars i:nth-child(2) { height: 8px; }
 .signal-bars i:nth-child(3) { height: 11px; }
 .signal-bars i:nth-child(4) { height: 14px; }
+
+/* 꺼진 칸은 트랙 색으로 남는다. */
+.signal-bars[data-level="3"] i:nth-child(n+4),
+.signal-bars[data-level="2"] i:nth-child(n+3),
+.signal-bars[data-level="1"] i:nth-child(n+2) {
+  background-color: var(--chart-track);
+}
 
 .utc-clock {
   display: flex;
@@ -266,9 +284,30 @@ button {
   display: flex;
   flex-direction: column;
   gap: var(--space-20);
-  padding: var(--space-16);
+  padding: var(--space-8) var(--space-12);
   overflow-y: auto;
 }
+
+/* 패널을 접는 자리다. Figma 에는 아이콘만 있고 동작은 걸려 있지 않다. */
+.panel-collapse {
+  flex: none;
+  display: flex;
+  justify-content: flex-end;
+  height: var(--size-icon-20);
+}
+
+.panel-collapse button {
+  display: inline-flex;
+  width: var(--size-icon-20);
+  height: var(--size-icon-20);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--fg-secondary);
+  cursor: pointer;
+}
+
+.panel-collapse button:hover { color: var(--fg-primary); }
 
 .panel-section {
   flex: none;
@@ -376,6 +415,14 @@ button {
 
 .btn-secondary:hover { background-color: var(--button-secondary-bg-hover); }
 
+.btn-danger {
+  background-color: var(--button-danger-bg-default);
+  color: var(--button-danger-fg-default);
+}
+
+.btn-danger:hover { background-color: var(--button-danger-bg-hover); }
+.btn-danger:active { background-color: var(--button-danger-bg-pressed); }
+
 .icon-button {
   display: inline-flex;
   align-items: center;
@@ -396,11 +443,12 @@ button {
 }
 
 /* ---------- Main ---------- */
+/* Figma 의 Margin 프레임이다. 여백이 8 에서 4 로 줄었다. */
 .main {
   flex: 1 1 auto;
   min-width: 0;
   display: flex;
-  padding: var(--space-8);
+  padding: var(--space-4);
 }
 
 .two-col {
@@ -412,6 +460,11 @@ button {
 }
 
 /* ---------- Map Panel ---------- */
+/*
+ * 테두리가 새로 생겼다(border/default, 1px). 면은 여전히 없다.
+ * Figma 의 stroke 는 align=INSIDE 라 안쪽 폭을 깎지 않는다 —
+ * border 로 그리면 지도가 1120 이 아니라 1118 이 된다. inset shadow 가 같은 뜻이다.
+ */
 .map-panel {
   flex: 1 1 auto;
   min-width: 0;
@@ -420,6 +473,7 @@ button {
   gap: var(--space-16);
   padding: var(--space-20);
   border-radius: var(--radius-card);
+  box-shadow: inset 0 0 0 var(--border-width-thin) var(--border-default);
 }
 
 .map-canvas {
@@ -470,7 +524,10 @@ button {
   flex: none;
   display: flex;
   flex-direction: column;
-  gap: var(--space-20);
+  /* 두 상태가 DOM 에 함께 있고 한 번에 하나만 펼쳐진다.
+     여기에 gap 을 주면 접힌 쪽의 몫까지 더해져 닫힘 높이가 68 이 아니라 88 이 된다.
+     Figma 의 gap 20 은 opened 안쪽 간격이라 .ai-opened 가 갖는다. */
+  gap: 0;
   padding: var(--space-16);
   border-top: var(--border-width-strong) solid var(--border-focus);
   border-radius: var(--radius-container);
@@ -648,15 +705,18 @@ button {
 .floating {
   flex: 0 0 auto;
   display: flex;
-  padding: var(--space-16);
+  padding: var(--space-8);
 }
 
 .right-panel {
   flex: 0 0 var(--size-panel-right);
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: var(--space-8);
   min-height: 0;
+  /* 이게 없으면 로봇 카드 3장의 min-content(425)가 바닥이 되어
+     420 을 넘어선다. 카드는 robot-strip 안에서 가로 스크롤로 처리한다. */
+  min-width: 0;
 }
 
 .panel-card {
@@ -678,7 +738,14 @@ button {
   display: flex;
   align-items: flex-start;
   gap: var(--space-8);
-  padding: var(--space-20) var(--space-16);
+  padding: var(--space-20) var(--space-12);
+}
+
+/* 버튼이 둘로 늘었다 — 미션 관리(primary) · 비상정지(danger). */
+.panel-header .buttons {
+  flex: none;
+  display: flex;
+  gap: var(--space-8);
 }
 
 .panel-header .texts {
@@ -702,7 +769,7 @@ button {
   display: flex;
   gap: var(--space-4);
   padding: var(--space-4);
-  border-radius: var(--radius-container);
+  border-radius: var(--radius-card);
   background-color: var(--bg-canvas);
   overflow-x: auto;
   scrollbar-width: thin;
@@ -715,7 +782,7 @@ button {
   flex-direction: column;
   gap: var(--space-8);
   padding: var(--space-4);
-  border-radius: var(--radius-container);
+  border-radius: var(--radius-card);
 }
 
 .robot-card.is-selected { background-color: var(--bg-surface-selected); }
@@ -752,8 +819,9 @@ button {
   display: flex;
   align-items: center;
   gap: var(--space-8);
-  min-height: 24px;
-  padding: var(--space-4) var(--space-8);
+  /* Figma 에서 이 줄은 24 고정이고 배지(26)가 위아래로 1px 씩 넘친다. */
+  height: 24px;
+  padding: 0 var(--space-8);
   border-radius: var(--radius-card);
   background-color: var(--bg-surface-default);
 }
@@ -769,13 +837,22 @@ button {
   color: var(--fg-secondary);
 }
 
-/* 배터리 — 단자가 붙은 형태로 바뀌었다. */
+/* 배터리 — 단자가 붙은 형태로 바뀌었다.
+   Figma 에서 몸통 26 과 단자 2 는 붙어 있고, 간격 4 는 몸통과 % 사이에만 있다. */
 .battery {
   display: flex;
   align-items: center;
   gap: var(--space-4);
   color: var(--status-normal-fg);
 }
+
+.battery-tip { margin-left: calc(var(--space-4) * -1); }
+
+/* 잔량에 따라 게이지와 수치의 색이 갈린다(게이지는 icon, 글자는 fg 토큰이다). */
+.battery.is-warning { color: var(--status-warning-fg); }
+.battery.is-critical { color: var(--status-critical-fg); }
+.battery.is-warning .battery-fill { background-color: var(--status-warning-icon); }
+.battery.is-critical .battery-fill { background-color: var(--status-critical-icon); }
 
 .battery-body {
   position: relative;
@@ -868,7 +945,7 @@ button {
   display: flex;
   flex-direction: column;
   padding: var(--space-16);
-  border-radius: var(--radius-container);
+  border-radius: var(--radius-card);
   background-color: var(--bg-canvas);
   scrollbar-width: thin;
 }
