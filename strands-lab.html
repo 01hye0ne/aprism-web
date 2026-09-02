@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>APRISM — Strands 검토</title>
+<meta name="description" content="React Bits 의 Strands 애니메이션을 APRISM 화면에 쓸 수 있는지 판단하기 위한 검토 페이지" />
+<style>
+  :root {
+    color-scheme: dark;
+    --ui-bg: #14161a;
+    --ui-surface: #1c1f24;
+    --ui-raised: #23272d;
+    --ui-border: #2d323a;
+    --ui-fg: #e6e8ec;
+    --ui-dim: #9aa1ad;
+    --ui-faint: #6e7682;
+    --ui-accent: #6f99f5;
+    --ui-ok: #57c08a;
+    --ui-flag: #ffb454;
+    --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    --sans: "SUIT Variable", "Pretendard", -apple-system, "Segoe UI", system-ui, sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--ui-bg); color: var(--ui-fg); font-family: var(--sans); font-size: 14px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1280px; margin: 0 auto; padding: 36px 24px 90px; }
+
+  header.doc { border-bottom: 1px solid var(--ui-border); padding-bottom: 22px; margin-bottom: 26px; }
+  .eyebrow { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ui-accent); margin: 0 0 8px; font-weight: 600; }
+  h1 { margin: 0 0 10px; font-size: 25px; }
+  .sub { margin: 0; color: var(--ui-dim); max-width: 74ch; }
+  .back { display: inline-block; margin-bottom: 18px; color: var(--ui-faint); text-decoration: none; font-size: 12.5px; }
+  .back:hover { color: var(--ui-fg); }
+
+  section { margin-top: 44px; }
+  h2 { font-size: 17px; margin: 0 0 6px; }
+  .note { color: var(--ui-dim); margin: 0 0 18px; max-width: 80ch; font-size: 13px; }
+  a { color: var(--ui-accent); }
+
+  .verdict { border: 1px solid var(--ui-border); border-left: 3px solid var(--ui-ok); border-radius: 6px; background: var(--ui-surface); padding: 16px 18px; margin-bottom: 26px; }
+  .verdict h2 { margin: 0 0 8px; font-size: 15px; }
+  .verdict p { margin: 0 0 10px; color: var(--ui-dim); font-size: 13px; max-width: 82ch; }
+  .verdict p:last-child { margin-bottom: 0; }
+  .verdict.flag { border-left-color: var(--ui-flag); }
+  code { font-family: var(--mono); font-size: 12px; background: var(--ui-raised); padding: 1px 5px; border-radius: 3px; color: var(--ui-fg); }
+  b { color: var(--ui-fg); font-weight: 600; }
+  ul.tight { margin: 0 0 10px; padding-left: 18px; color: var(--ui-dim); font-size: 13px; }
+  ul.tight li { margin-bottom: 5px; }
+
+  /* ---------- 무대 ---------- */
+  /* 문서가 준 사용 예시 그대로 — width 100% · height 600 · position relative */
+  .stage-frame { position: relative; border: 1px solid var(--ui-border); border-radius: 8px; overflow: hidden; }
+  .stage-frame.on-dark { background: #050607; }
+  .stage-frame.on-light { background: #eff6fe; }
+  .stage-frame.on-panel {
+    background:
+      linear-gradient(180deg, rgb(54 178 223 / 10%) 0%, rgb(90 142 228 / 30%) 55%,
+                              rgb(104 148 230 / 50%) 90%, #89b9ed 100%);
+  }
+  .stage { width: 100%; height: 600px; position: relative; }
+  .strands-container { position: relative; width: 100%; height: 100%; background: transparent; }
+  .strands-container canvas { display: block; width: 100%; height: 100%; }
+  .stage-fps { position: absolute; right: 12px; bottom: 10px; font-family: var(--mono); font-size: 11px; color: rgb(255 255 255 / 45%); pointer-events: none; text-shadow: 0 1px 3px rgb(0 0 0 / 70%); }
+  .stage-fail { padding: 60px 24px; text-align: center; color: var(--ui-dim); font-size: 13px; }
+
+  /* ---------- 조작 ---------- */
+  .bar { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 22px; align-items: center; }
+  button.act { font: inherit; font-size: 12.5px; padding: 6px 13px; border-radius: 5px; border: 1px solid var(--ui-border); background: var(--ui-raised); color: var(--ui-fg); cursor: pointer; }
+  button.act:hover { border-color: var(--ui-accent); }
+  button.act[aria-pressed="true"] { border-color: var(--ui-accent); color: var(--ui-accent); }
+  .bar .spacer { flex: 1 1 auto; }
+  .bar .hint { font-size: 12px; color: var(--ui-faint); }
+
+  .controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 8px 20px; }
+  .ctl { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; align-items: center; border-bottom: 1px solid var(--ui-border); padding: 7px 0; }
+  .ctl label { font-family: var(--mono); font-size: 12px; }
+  .ctl .val { font-family: var(--mono); font-size: 12px; color: var(--ui-accent); text-align: right; }
+  .ctl input[type="range"] { grid-column: 1 / -1; width: 100%; margin: 4px 0 0; accent-color: var(--ui-accent); }
+  .ctl input[type="checkbox"] { justify-self: end; accent-color: var(--ui-accent); }
+  .swatches { display: flex; gap: 8px; align-items: center; }
+  .swatches input[type="color"] { width: 42px; height: 26px; padding: 0; border: 1px solid var(--ui-border); border-radius: 4px; background: none; cursor: pointer; }
+
+  pre { font-family: var(--mono); font-size: 12px; line-height: 1.65; background: var(--ui-surface); border: 1px solid var(--ui-border); border-radius: 6px; padding: 14px 16px; overflow-x: auto; margin: 0; color: var(--ui-dim); }
+  pre b { color: var(--ui-fg); font-weight: 400; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--ui-border); vertical-align: top; }
+  th { color: var(--ui-faint); font-weight: 600; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; }
+  td.k { font-family: var(--mono); color: var(--ui-fg); white-space: nowrap; }
+  td.d { color: var(--ui-dim); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <a class="back" href="./index.html">← 목록으로</a>
+
+  <header class="doc">
+    <p class="eyebrow">Foundations · 외부 컴포넌트 검토</p>
+    <h1>Strands 검토</h1>
+    <p class="sub">
+      React Bits 의 <b>Strands</b> 애니메이션입니다. 무료·공개라 레지스트리에서 <b>실제 소스를 받아왔고</b>,
+      아래 무대는 그 소스의 <b>셰이더를 한 글자도 바꾸지 않고</b> 돌린 것입니다.
+    </p>
+  </header>
+
+  <!-- ============================================================ -->
+  <div class="verdict">
+    <h2>됩니다 — 셰이더가 전부라 React 없이도 그대로 돌아갑니다</h2>
+    <p>
+      <code>reactbits.dev/r/Strands-JS-CSS.json</code> 에서 받은 소스를 뜯어보니
+      <b>내용물은 WebGL2 프래그먼트 셰이더 두 개</b>이고, React 부분은 캔버스를 만들고 uniform 을 넘기는
+      껍데기 120 줄입니다. 의존성 <code>ogl@^1.0.11</code> 도 그 껍데기에만 쓰입니다.
+    </p>
+    <p>
+      그래서 <b>셰이더는 원본 그대로 두고 껍데기만 순수 WebGL2 로 옮겼습니다.</b>
+      React 도 번들러도 <code>ogl</code> 도 필요 없고, 지금의 정적 HTML 구조를 건드리지 않습니다.
+      화면에 나오는 그림은 원본과 같은 계산 결과입니다.
+    </p>
+  </div>
+
+  <div class="verdict flag">
+    <h2>라이선스는 확인이 필요합니다</h2>
+    <p>
+      React Bits 는 <b>MIT + Commons Clause</b> 입니다. 웹사이트·제품에 <b>쓰는 것은 상업적 이용까지 허용</b>되지만,
+      <b>컴포넌트 자체를 팔거나 재배포하는 것은 금지</b>이고 조항에 <b>“이식한 것(ported version)”까지 명시</b>돼 있습니다.
+    </p>
+    <p>
+      <code>aprism-web</code> 은 <b>공개 저장소</b>입니다. 화면에 쓰는 것은 문제가 없지만,
+      옮긴 소스가 공개 저장소에 그대로 올라가 있는 상태를 저작자가 “이식본 재배포”로 볼 여지가 있습니다.
+      저작권 표시는 파일 안에 넣어두었습니다. <b>검토 뒤 판단해 주세요</b> — 걸리면 저장소를 비공개로 돌리거나
+      이 페이지만 빼는 선택지가 있습니다.
+    </p>
+  </div>
+
+  <!-- ============================================================ -->
+  <section style="margin-top:0">
+    <h2>주신 설정 그대로</h2>
+    <p class="note">
+      <code>colors</code> 3개 · <code>count 3</code> · <code>speed 0.5</code> … 문서에 적어주신 값이 기본값입니다.
+      바탕을 바꿔가며 우리 화면에 얹었을 때를 봅니다 — 캔버스는 투명이라 뒤가 그대로 비칩니다.
+    </p>
+
+    <div class="stage-frame on-dark" id="frame">
+      <div class="stage">
+        <div class="strands-container" id="mount"></div>
+      </div>
+      <span class="stage-fps" id="fps"></span>
+    </div>
+
+    <div class="bar">
+      <button type="button" class="act" id="bg-dark" aria-pressed="true">어두운 바탕</button>
+      <button type="button" class="act" id="bg-light">밝은 바탕</button>
+      <button type="button" class="act" id="bg-panel">AI 패널 위</button>
+      <span class="spacer"></span>
+      <button type="button" class="act" id="reset">주신 설정으로</button>
+      <button type="button" class="act" id="preset-aprism">APRISM 색으로</button>
+      <button type="button" class="act" id="copy">JSX 복사</button>
+      <span class="hint" id="copy-hint"></span>
+    </div>
+
+    <div class="controls" id="controls"></div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section>
+    <h2>받아온 것</h2>
+    <p class="note">레지스트리 JSON 을 그대로 읽은 결과입니다.</p>
+    <table>
+      <tr><th>항목</th><th>값</th></tr>
+      <tr><td class="k">name</td><td class="d">Strands-JS-CSS · <code>registry:component</code></td></tr>
+      <tr><td class="k">dependencies</td><td class="d"><code>ogl@^1.0.11</code> — 캔버스 껍데기에만 쓰입니다</td></tr>
+      <tr><td class="k">registryDependencies</td><td class="d">없음</td></tr>
+      <tr><td class="k">files</td><td class="d"><code>Strands.jsx</code> 10,163 바이트 · <code>Strands.css</code> 183 바이트</td></tr>
+      <tr><td class="k">내용물</td><td class="d">프래그먼트 셰이더 둘 — 가닥(FRAG)과 유리구슬(GLASS_FRAG). 둘 다 원본 그대로 옮겼습니다.</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>React 프로젝트였다면</h2>
+    <p class="note">이 저장소가 React 였다면 아래 두 줄이면 끝났습니다. 지금은 껍데기만 옮겨서 같은 결과를 냅니다.</p>
+    <pre><b>npx shadcn@latest add @react-bits/Strands-JS-CSS
+npm i ogl</b></pre>
+  </section>
+
+</div>
+
+<script>
+/* =============================================================
+   Strands — React Bits
+   https://reactbits.dev/animations/strands
+   Copyright (c) 2026 David Haz — MIT + Commons Clause License Condition v1.0
+
+   셰이더(VERT · FRAG · GLASS_FRAG)와 기본값은 레지스트리 소스
+   https://reactbits.dev/r/Strands-JS-CSS.json 그대로다.
+   React + ogl 껍데기만 순수 WebGL2 로 옮겼다 — 이 저장소에는 빌드 단계가 없다.
+   ============================================================= */
+(function () {
+  "use strict";
+
+  var MAX_STRANDS = 12;
+  var MAX_COLORS = 8;
+
+  /* ---------- 원본 셰이더 ---------- */
+  var VERT = `#version 300 es
+in vec2 position;
+void main() {
+  gl_Position = vec4(position, 0.0, 1.0);
+}
+`;
+
+  var FRAG = `#version 300 es
+precision highp float;
+
+uniform float uTime;
+uniform vec2 uResolution;
+uniform vec3 uColors[${MAX_COLORS}];
+uniform int uColorCount;
+uniform int uStrandCount;
+uniform float uSpeed;
+uniform float uAmplitude;
+uniform float uWaviness;
+uniform float uThickness;
+uniform float uGlow;
+uniform float uTaper;
+uniform float uSpread;
+uniform float uHueShift;
+uniform float uIntensity;
+uniform float uOpacity;
+uniform float uScale;
+uniform float uSaturation;
+
+out vec4 fragColor;
+
+const float PI = 3.14159265;
+
+vec3 spectrum(float t) {
+  return 0.5 + 0.5 * cos(2.0 * PI * (t + vec3(0.00, 0.33, 0.67)));
+}
+
+vec3 samplePalette(float t) {
+  t = fract(t);
+  float scaled = t * float(uColorCount);
+  int idx = int(floor(scaled));
+  float blend = fract(scaled);
+  int nextIdx = idx + 1;
+  if (nextIdx >= uColorCount) nextIdx = 0;
+  return mix(uColors[idx], uColors[nextIdx], blend);
+}
+
+vec3 strandColor(float t) {
+  if (uColorCount > 0) return samplePalette(t);
+  return spectrum(t);
+}
+
+void main() {
+  vec2 uv = (gl_FragCoord.xy - 0.5 * uResolution) / uResolution.y;
+  uv /= max(uScale, 0.0001);
+
+  float e = 0.06 + uIntensity * 0.94;
+  float env = pow(max(cos(uv.x * PI * 1.3), 0.0), uTaper);
+
+  vec3 col = vec3(0.0);
+
+  for (int i = 0; i < ${MAX_STRANDS}; i++) {
+    if (i >= uStrandCount) break;
+
+    float fi = float(i);
+    float ph = fi * 1.7 * uSpread;
+    float freq = (2.0 + fi * 0.35) * uWaviness;
+    float spd = 1.4 + fi * 1.2;
+
+    float tt = uTime * uSpeed;
+    float w = sin(uv.x * freq + tt * spd + ph) * 0.60
+            + sin(uv.x * freq * 1.1 - tt * spd * 0.7 + ph * 1.7) * 0.40;
+
+    float amp = (0.1 + 0.02 * e) * env * uAmplitude;
+    float y = w * amp;
+
+    float d = abs(uv.y - y);
+    float thick = (0.001 + 0.05 * e) * (0.35 + env) * uThickness;
+    float g = thick / (d + thick * 0.45);
+    g = g * g;
+
+    float h = fi / float(uStrandCount) + uv.x * 0.30 + uTime * 0.04 + uHueShift;
+    col += strandColor(h) * g * env;
+  }
+
+  col *= 0.45 + 0.7 * e;
+  col = 1.0 - exp(-col * uGlow);
+
+  float gray = dot(col, vec3(0.2126, 0.7152, 0.0722));
+  col = max(mix(vec3(gray), col, uSaturation), 0.0);
+
+  float lum = max(max(col.r, col.g), col.b);
+  float alpha = clamp(lum, 0.0, 1.0) * uOpacity;
+
+  fragColor = vec4(col * uOpacity, alpha);
+}
+`;
+
+  var GLASS_FRAG = `#version 300 es
+precision highp float;
+
+uniform sampler2D uScene;
+uniform vec2 uResolution;
+uniform float uRadius;
+uniform float uRefraction;
+uniform float uDispersion;
+
+out vec4 fragColor;
+
+vec2 toUv(vec2 p) {
+  return p * (uResolution.y / uResolution) + 0.5;
+}
+
+void main() {
+  vec2 p = (gl_FragCoord.xy - 0.5 * uResolution) / uResolution.y;
+  float d = length(p);
+  float r = uRadius;
+
+  float edge = fwidth(d) * 1.5;
+  float mask = 1.0 - smoothstep(r - edge, r + edge, d);
+  if (mask <= 0.0) {
+    fragColor = vec4(0.0);
+    return;
+  }
+
+  // sphere height: 0 at the rim, 1 at the center
+  float z = sqrt(max(r * r - d * d, 0.0)) / r;
+  float nd = d / r; // 0 at the center, 1 at the rim
+
+  // refraction is confined to a narrow band near the rim; the rest stays undistorted
+  vec2 dir = d > 0.0 ? p / d : vec2(0.0);
+  float lens = smoothstep(0.85, 1.0, nd) * pow(nd, 6.0);
+  vec2 offset = -dir * lens * uRefraction * 0.15;
+  vec2 disp = -dir * lens * uDispersion * 0.012;
+
+  vec3 light;
+  light.r = texture(uScene, toUv(p + offset - disp)).r;
+  light.g = texture(uScene, toUv(p + offset)).g;
+  light.b = texture(uScene, toUv(p + offset + disp)).b;
+
+  // neutral fresnel rim (no color tint so the glass stays clear)
+  float fres = pow(1.0 - z, 3.0);
+  vec3 rim = vec3(1.0) * fres * 0.18;
+
+  // specular highlight from the upper-left
+  vec2 lightDir = normalize(vec2(-0.55, 0.6));
+  float spec = pow(max(dot(p / max(r, 1e-4), lightDir), 0.0), 6.0);
+  spec *= smoothstep(r, r * 0.55, d);
+
+  vec3 emissive = light + rim + vec3(spec) * 0.4;
+  float emissiveA = clamp(max(max(emissive.r, emissive.g), emissive.b), 0.0, 1.0);
+
+  // almost clear glass body: only a faint neutral darkening, mostly near the rim
+  float bodyA = 0.05 + fres * 0.05;
+
+  // composite emissive light over the clear body (premultiplied)
+  float outA = emissiveA + bodyA * (1.0 - emissiveA);
+  vec3 outRGB = emissive;
+
+  outRGB *= mask;
+  outA *= mask;
+
+  fragColor = vec4(outRGB, outA);
+}
+`;
+
+  /* ---------- 주신 설정 = 기본값 ---------- */
+  var DEFAULTS = {
+    colors: ["#F97316", "#7C3AED", "#06B6D4"],
+    count: 3,
+    speed: 0.5,
+    amplitude: 1,
+    waviness: 1,
+    thickness: 0.7,
+    glow: 2.6,
+    taper: 3,
+    spread: 1,
+    hueShift: 0,
+    intensity: 0.6,
+    saturation: 1.5,
+    opacity: 1,
+    scale: 1.5,
+    glass: false,
+    refraction: 1,
+    dispersion: 1,
+    glassSize: 1
+  };
+
+  var state = JSON.parse(JSON.stringify(DEFAULTS));
+
+  /* ---------- 껍데기 · ogl 이 하던 일 ---------- */
+  var mount = document.getElementById("mount");
+  var canvas = document.createElement("canvas");
+  var gl = canvas.getContext("webgl2", {
+    alpha: true,
+    premultipliedAlpha: true,
+    antialias: true
+  });
+
+  if (!gl) {
+    mount.outerHTML = '<p class="stage-fail">이 브라우저에서 WebGL2 를 쓸 수 없어 무대를 그리지 못했습니다.</p>';
+    return;
+  }
+
+  mount.appendChild(canvas);
+  canvas.style.backgroundColor = "transparent";
+  gl.clearColor(0, 0, 0, 0);
+  gl.enable(gl.BLEND);
+  gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+
+  function build(fragSrc) {
+    function compile(type, src) {
+      var sh = gl.createShader(type);
+      gl.shaderSource(sh, src);
+      gl.compileShader(sh);
+      if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) {
+        throw new Error(gl.getShaderInfoLog(sh));
+      }
+      return sh;
+    }
+    var prog = gl.createProgram();
+    gl.attachShader(prog, compile(gl.VERTEX_SHADER, VERT));
+    gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, fragSrc));
+    gl.linkProgram(prog);
+    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
+      throw new Error(gl.getProgramInfoLog(prog));
+    }
+    return prog;
+  }
+
+  var progMain = build(FRAG);
+  var progGlass = build(GLASS_FRAG);
+
+  // ogl 의 Triangle — 화면을 덮는 삼각형 하나
+  var vbo = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+  [progMain, progGlass].forEach(function (prog) {
+    var loc = gl.getAttribLocation(prog, "position");
+    gl.useProgram(prog);
+    gl.enableVertexAttribArray(loc);
+    gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+  });
+
+  function uniforms(prog, names) {
+    var out = {};
+    names.forEach(function (n) { out[n] = gl.getUniformLocation(prog, n); });
+    return out;
+  }
+  var UM = uniforms(progMain, ["uTime", "uResolution", "uColors", "uColorCount", "uStrandCount",
+    "uSpeed", "uAmplitude", "uWaviness", "uThickness", "uGlow", "uTaper", "uSpread",
+    "uHueShift", "uIntensity", "uOpacity", "uScale", "uSaturation"]);
+  var UG = uniforms(progGlass, ["uScene", "uResolution", "uRadius", "uRefraction", "uDispersion"]);
+
+  // ogl 의 RenderTarget — glass 를 켜면 가닥을 여기 먼저 그린다
+  var rtTex = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, rtTex);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  var rtFbo = gl.createFramebuffer();
+  gl.bindFramebuffer(gl.FRAMEBUFFER, rtFbo);
+  gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, rtTex, 0);
+  gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+
+  // ogl 의 Color — 16진수를 0~1 로만 옮긴다(감마 변환 없음)
+  function hexToRgb(hex) {
+    var m = /^#?([0-9a-f]{6})$/i.exec(hex || "#ffffff");
+    var v = m ? parseInt(m[1], 16) : 0xffffff;
+    return [((v >> 16) & 255) / 255, ((v >> 8) & 255) / 255, (v & 255) / 255];
+  }
+
+  function buildPalette(colors) {
+    var filled = colors && colors.length ? colors : ["#ffffff"];
+    var out = new Float32Array(MAX_COLORS * 3);
+    for (var i = 0; i < MAX_COLORS; i++) {
+      var c = hexToRgb(filled[i] !== undefined ? filled[i] : filled[filled.length - 1]);
+      out[i * 3] = c[0]; out[i * 3 + 1] = c[1]; out[i * 3 + 2] = c[2];
+    }
+    return out;
+  }
+
+  // 원본 Renderer 의 기본 dpr 은 1 이다 — 캔버스 픽셀 수를 CSS 크기와 같게 둔다
+  var W = 0, H = 0;
+  function resize() {
+    var w = mount.offsetWidth;
+    var h = mount.offsetHeight;
+    if (w === W && h === H) return;
+    W = w; H = h;
+    canvas.width = w;
+    canvas.height = h;
+    gl.bindTexture(gl.TEXTURE_2D, rtTex);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, w, h, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+  }
+  window.addEventListener("resize", resize);
+
+  /* ---------- 조작판 ---------- */
+  var NUMS = [
+    { k: "count",      min: 1,   max: 12,  step: 1 },
+    { k: "speed",      min: 0,   max: 3,   step: 0.01 },
+    { k: "amplitude",  min: 0,   max: 4,   step: 0.01 },
+    { k: "waviness",   min: 0,   max: 4,   step: 0.01 },
+    { k: "thickness",  min: 0.05, max: 4,  step: 0.01 },
+    { k: "glow",       min: 0,   max: 8,   step: 0.05 },
+    { k: "taper",      min: 0,   max: 10,  step: 0.05 },
+    { k: "spread",     min: 0,   max: 4,   step: 0.01 },
+    { k: "hueShift",   min: 0,   max: 1,   step: 0.005 },
+    { k: "intensity",  min: 0,   max: 1,   step: 0.01 },
+    { k: "saturation", min: 0,   max: 3,   step: 0.01 },
+    { k: "opacity",    min: 0,   max: 1,   step: 0.01 },
+    { k: "scale",      min: 0.2, max: 4,   step: 0.01 },
+    { k: "refraction", min: 0,   max: 4,   step: 0.01 },
+    { k: "dispersion", min: 0,   max: 4,   step: 0.01 },
+    { k: "glassSize",  min: 0.2, max: 2,   step: 0.01 }
+  ];
+
+  var host = document.getElementById("controls");
+  var readouts = {};
+
+  // 색 셋
+  (function () {
+    var d = document.createElement("div");
+    d.className = "ctl";
+    d.innerHTML = '<label>colors</label><span class="val"></span>' +
+      '<span class="swatches" style="grid-column:1/-1;margin-top:4px">' +
+      DEFAULTS.colors.map(function (c, i) {
+        return '<input type="color" data-ci="' + i + '" value="' + c + '" />';
+      }).join("") + "</span>";
+    host.appendChild(d);
+    d.querySelectorAll("input[type=color]").forEach(function (inp) {
+      inp.addEventListener("input", function () {
+        state.colors[parseInt(inp.dataset.ci, 10)] = inp.value;
+      });
+    });
+    d._swatches = d.querySelectorAll("input[type=color]");
+    readouts.colors = d;
+  })();
+
+  NUMS.forEach(function (n) {
+    var d = document.createElement("div");
+    d.className = "ctl";
+    d.innerHTML = '<label for="c-' + n.k + '">' + n.k + '</label>' +
+      '<span class="val" id="v-' + n.k + '">' + DEFAULTS[n.k] + "</span>" +
+      '<input type="range" id="c-' + n.k + '" min="' + n.min + '" max="' + n.max +
+      '" step="' + n.step + '" value="' + DEFAULTS[n.k] + '" />';
+    host.appendChild(d);
+    var input = d.querySelector("input");
+    readouts[n.k] = d.querySelector(".val");
+    input.addEventListener("input", function () {
+      state[n.k] = parseFloat(input.value);
+      readouts[n.k].textContent = input.value;
+    });
+    n.input = input;
+  });
+
+  (function () {
+    var d = document.createElement("div");
+    d.className = "ctl";
+    d.innerHTML = '<label for="c-glass">glass</label><input type="checkbox" id="c-glass" />';
+    host.appendChild(d);
+    var input = d.querySelector("input");
+    input.addEventListener("change", function () { state.glass = input.checked; });
+    DEFAULTS._glassInput = input;
+  })();
+
+  function apply(vals) {
+    Object.keys(vals).forEach(function (k) { state[k] = vals[k]; });
+    NUMS.forEach(function (n) {
+      if (vals[n.k] === undefined) return;
+      n.input.value = vals[n.k];
+      readouts[n.k].textContent = String(vals[n.k]);
+    });
+    if (vals.colors) {
+      state.colors = vals.colors.slice();
+      readouts.colors._swatches.forEach(function (inp, i) {
+        if (vals.colors[i]) inp.value = vals.colors[i];
+      });
+    }
+    if (vals.glass !== undefined) DEFAULTS._glassInput.checked = vals.glass;
+  }
+
+  document.getElementById("reset").addEventListener("click", function () {
+    apply(JSON.parse(JSON.stringify(DEFAULTS)));
+  });
+
+  // APRISM 의 alert/Default 계열 — AI 패널이 쓰는 색이다
+  document.getElementById("preset-aprism").addEventListener("click", function () {
+    apply({ colors: ["#36B2DF", "#5A8EE4", "#A8CBF3"], saturation: 1.1, glow: 2.2 });
+  });
+
+  var frame = document.getElementById("frame");
+  [["bg-dark", "on-dark"], ["bg-light", "on-light"], ["bg-panel", "on-panel"]].forEach(function (pair) {
+    document.getElementById(pair[0]).addEventListener("click", function () {
+      frame.className = "stage-frame " + pair[1];
+      ["bg-dark", "bg-light", "bg-panel"].forEach(function (id) {
+        document.getElementById(id).setAttribute("aria-pressed", id === pair[0] ? "true" : "false");
+      });
+    });
+  });
+
+  var hint = document.getElementById("copy-hint");
+  document.getElementById("copy").addEventListener("click", function () {
+    var lines = ["<Strands"];
+    lines.push('  colors={["' + state.colors.join('","') + '"]}');
+    NUMS.forEach(function (n) { lines.push("  " + n.k + "={" + state[n.k] + "}"); });
+    lines.push("  glass={" + state.glass + "}");
+    lines.push("/>");
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(lines.join("\n")).then(function () {
+        hint.textContent = "복사했습니다";
+        setTimeout(function () { hint.textContent = ""; }, 1800);
+      });
+    }
+  });
+
+  /* ---------- 그리기 ---------- */
+  var fpsEl = document.getElementById("fps");
+  var frames = 0, fpsAt = performance.now();
+
+  function draw(t) {
+    requestAnimationFrame(draw);
+    resize();
+    if (!W || !H) return;
+
+    gl.useProgram(progMain);
+    gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+    var loc = gl.getAttribLocation(progMain, "position");
+    gl.enableVertexAttribArray(loc);
+    gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+
+    gl.uniform1f(UM.uTime, t * 0.001);
+    gl.uniform2f(UM.uResolution, W, H);
+    gl.uniform3fv(UM.uColors, buildPalette(state.colors));
+    gl.uniform1i(UM.uColorCount, Math.min(state.colors.length, MAX_COLORS));
+    gl.uniform1i(UM.uStrandCount, Math.min(Math.max(Math.round(state.count), 1), MAX_STRANDS));
+    gl.uniform1f(UM.uSpeed, state.speed);
+    gl.uniform1f(UM.uAmplitude, state.amplitude);
+    gl.uniform1f(UM.uWaviness, state.waviness);
+    gl.uniform1f(UM.uThickness, state.thickness);
+    gl.uniform1f(UM.uGlow, state.glow);
+    gl.uniform1f(UM.uTaper, state.taper);
+    gl.uniform1f(UM.uSpread, state.spread);
+    gl.uniform1f(UM.uHueShift, state.hueShift);
+    gl.uniform1f(UM.uIntensity, state.intensity);
+    gl.uniform1f(UM.uOpacity, state.opacity);
+    gl.uniform1f(UM.uScale, state.scale);
+    gl.uniform1f(UM.uSaturation, state.saturation);
+
+    if (state.glass) {
+      gl.bindFramebuffer(gl.FRAMEBUFFER, rtFbo);
+      gl.viewport(0, 0, W, H);
+      gl.clear(gl.COLOR_BUFFER_BIT);
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+      gl.viewport(0, 0, W, H);
+      gl.clear(gl.COLOR_BUFFER_BIT);
+      gl.useProgram(progGlass);
+      var lg = gl.getAttribLocation(progGlass, "position");
+      gl.enableVertexAttribArray(lg);
+      gl.vertexAttribPointer(lg, 2, gl.FLOAT, false, 0, 0);
+      gl.activeTexture(gl.TEXTURE0);
+      gl.bindTexture(gl.TEXTURE_2D, rtTex);
+      gl.uniform1i(UG.uScene, 0);
+      gl.uniform2f(UG.uResolution, W, H);
+      gl.uniform1f(UG.uRadius, 0.46 * state.glassSize);
+      gl.uniform1f(UG.uRefraction, state.refraction);
+      gl.uniform1f(UG.uDispersion, state.dispersion);
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
+    } else {
+      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+      gl.viewport(0, 0, W, H);
+      gl.clear(gl.COLOR_BUFFER_BIT);
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
+    }
+
+    frames++;
+    var now = performance.now();
+    if (now - fpsAt > 500) {
+      fpsEl.textContent = Math.round(frames * 1000 / (now - fpsAt)) + " fps";
+      frames = 0;
+      fpsAt = now;
+    }
+  }
+  requestAnimationFrame(draw);
+})();
+</script>
+</body>
+</html>
