@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>APRISM — Grain Wave 검토</title>
+<meta name="description" content="React Bits Pro 의 Grain Wave 배경 효과를 APRISM 화면에 쓸 수 있는지 판단하기 위한 검토 페이지" />
+<style>
+  :root {
+    color-scheme: dark;
+    --ui-bg: #14161a;
+    --ui-surface: #1c1f24;
+    --ui-raised: #23272d;
+    --ui-border: #2d323a;
+    --ui-fg: #e6e8ec;
+    --ui-dim: #9aa1ad;
+    --ui-faint: #6e7682;
+    --ui-accent: #6f99f5;
+    --ui-flag: #ffb454;
+    --ui-stop: #f0705f;
+    --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    --sans: "SUIT Variable", "Pretendard", -apple-system, "Segoe UI", system-ui, sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--ui-bg); color: var(--ui-fg); font-family: var(--sans); font-size: 14px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1280px; margin: 0 auto; padding: 36px 24px 90px; }
+
+  header.doc { border-bottom: 1px solid var(--ui-border); padding-bottom: 22px; margin-bottom: 28px; }
+  .eyebrow { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ui-accent); margin: 0 0 8px; font-weight: 600; }
+  h1 { margin: 0 0 10px; font-size: 25px; }
+  .sub { margin: 0; color: var(--ui-dim); max-width: 74ch; }
+  .back { display: inline-block; margin-bottom: 18px; color: var(--ui-faint); text-decoration: none; font-size: 12.5px; }
+  .back:hover { color: var(--ui-fg); }
+
+  section { margin-top: 44px; }
+  h2 { font-size: 17px; margin: 0 0 6px; }
+  .note { color: var(--ui-dim); margin: 0 0 18px; max-width: 80ch; font-size: 13px; }
+
+  /* ---------- 판정 ---------- */
+  .verdict { border: 1px solid var(--ui-border); border-left: 3px solid var(--ui-stop); border-radius: 6px; background: var(--ui-surface); padding: 16px 18px; margin-bottom: 26px; }
+  .verdict h2 { margin: 0 0 8px; font-size: 15px; }
+  .verdict p { margin: 0 0 10px; color: var(--ui-dim); font-size: 13px; max-width: 80ch; }
+  .verdict p:last-child { margin-bottom: 0; }
+  .verdict code, .note code, td code { font-family: var(--mono); font-size: 12px; background: var(--ui-raised); padding: 1px 5px; border-radius: 3px; color: var(--ui-fg); }
+  .blockers { margin: 0 0 10px; padding-left: 18px; color: var(--ui-dim); font-size: 13px; }
+  .blockers li { margin-bottom: 5px; }
+  .blockers b { color: var(--ui-fg); font-weight: 600; }
+
+  /* ---------- 무대 ---------- */
+  .stage { position: relative; border: 1px solid var(--ui-border); border-radius: 8px; overflow: hidden; background: #000; }
+  .stage canvas { display: block; width: 100%; height: 420px; }
+  .stage-note { position: absolute; left: 12px; bottom: 10px; font-family: var(--mono); font-size: 11px; color: rgb(255 255 255 / 45%); letter-spacing: .02em; pointer-events: none; text-shadow: 0 1px 3px rgb(0 0 0 / 70%); }
+  .stage-fps { position: absolute; right: 12px; bottom: 10px; font-family: var(--mono); font-size: 11px; color: rgb(255 255 255 / 45%); pointer-events: none; text-shadow: 0 1px 3px rgb(0 0 0 / 70%); }
+  .stage-fail { padding: 40px 24px; text-align: center; color: var(--ui-dim); font-size: 13px; }
+
+  /* ---------- 조작 ---------- */
+  .bar { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 22px; align-items: center; }
+  button.act { font: inherit; font-size: 12.5px; padding: 6px 13px; border-radius: 5px; border: 1px solid var(--ui-border); background: var(--ui-raised); color: var(--ui-fg); cursor: pointer; }
+  button.act:hover { border-color: var(--ui-accent); }
+  button.act[aria-pressed="true"] { border-color: var(--ui-accent); color: var(--ui-accent); }
+  .bar .spacer { flex: 1 1 auto; }
+  .bar .hint { font-size: 12px; color: var(--ui-faint); }
+
+  .controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 10px 20px; }
+  .ctl { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; align-items: center; border-bottom: 1px solid var(--ui-border); padding: 7px 0; }
+  .ctl label { font-family: var(--mono); font-size: 12px; color: var(--ui-fg); }
+  .ctl .val { font-family: var(--mono); font-size: 12px; color: var(--ui-accent); text-align: right; }
+  .ctl .desc { grid-column: 1 / -1; font-size: 11.5px; color: var(--ui-faint); margin-top: -2px; }
+  .ctl input[type="range"] { grid-column: 1 / -1; width: 100%; margin: 4px 0 0; accent-color: var(--ui-accent); }
+  .ctl input[type="color"] { grid-column: 1 / -1; width: 100%; height: 26px; margin-top: 4px; padding: 0; border: 1px solid var(--ui-border); border-radius: 4px; background: none; cursor: pointer; }
+
+  /* ---------- 표 · 코드 ---------- */
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--ui-border); vertical-align: top; }
+  th { color: var(--ui-faint); font-weight: 600; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; }
+  td.k { font-family: var(--mono); color: var(--ui-fg); white-space: nowrap; }
+  td.d { color: var(--ui-dim); }
+
+  pre { font-family: var(--mono); font-size: 12px; line-height: 1.65; background: var(--ui-surface); border: 1px solid var(--ui-border); border-radius: 6px; padding: 14px 16px; overflow-x: auto; margin: 0; color: var(--ui-dim); }
+  pre b { color: var(--ui-fg); font-weight: 400; }
+
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 900px) { .cols { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <a class="back" href="./index.html">← 목록으로</a>
+
+  <header class="doc">
+    <p class="eyebrow">Foundations · 외부 컴포넌트 검토</p>
+    <h1>Grain Wave 검토</h1>
+    <p class="sub">
+      React Bits Pro 의 <b>Grain Wave</b> 배경 효과를 APRISM 화면에 쓸 수 있는지 판단하기 위한 페이지입니다.
+      아래 무대는 <b>공개된 문서의 17개 속성만 보고 다시 만든 것</b>이고, 정품 컴포넌트의 소스가 아닙니다.
+    </p>
+  </header>
+
+  <!-- ============================================================ -->
+  <div class="verdict">
+    <h2>지금 이 저장소에는 그대로 넣을 수 없습니다</h2>
+    <p>문서대로 <code>npx shadcn@latest add @reactbits-starter/grain-wave-tw</code> 를 돌려봤고, 세 군데서 막힙니다.</p>
+    <ul class="blockers">
+      <li><b>라이선스 키가 없습니다.</b> 환경변수에도, 저장소에도 없습니다.
+        키를 넣을 <code>.env.local</code> 의 변수 이름은 Pro 문서 안쪽에 있어 밖에서는 확인되지 않습니다.</li>
+      <li><b>레지스트리 주소를 모릅니다.</b> 이름만 물고 실행하면
+        <code>Unknown registry "@reactbits-starter"</code> 로 끊깁니다.
+        주소 역시 로그인해야 보이는 쪽에 있습니다.</li>
+      <li><b>이 저장소는 정적 HTML 입니다.</b> shadcn CLI 는 React + TypeScript 프로젝트를 전제합니다 —
+        <code>package.json</code> · <code>tsconfig.json</code> · <code>components.json</code> 이 모두 있어야 하는데
+        <code>aprism-web</code> 에는 빌드 단계 자체가 없습니다.</li>
+    </ul>
+    <p>
+      앞의 둘은 <b>키와 레지스트리 주소만 주시면 바로 풀립니다.</b> 셋째는 판단이 필요합니다 —
+      정품을 쓰려면 이 저장소에 React 와 번들러를 들여야 하고, 그건 지금의 “파일 열면 바로 보이는” 구조를 바꾸는 일입니다.
+    </p>
+  </div>
+
+  <!-- ============================================================ -->
+  <section style="margin-top:0">
+    <h2>다시 만든 결과</h2>
+    <p class="note">
+      문서에 적힌 속성 이름 · 기본값 · 설명을 그대로 따라 WebGL 로 구현했습니다. 빌드 단계가 필요 없습니다.
+      <b>정품과 픽셀 단위로 같다고는 말할 수 없습니다</b> — 소스를 볼 수 없어 파형을 쌓고 그레인을 뿌리는 방식은 제 해석입니다.
+      쓸 만한지, 아니면 정품을 들여야 할지 여기서 판단해 주세요.
+    </p>
+
+    <div class="stage">
+      <canvas id="stage"></canvas>
+      <span class="stage-note">재현 · WebGL2 · 정품 소스 아님</span>
+      <span class="stage-fps" id="fps"></span>
+    </div>
+
+    <div class="bar">
+      <button type="button" class="act" id="reset">기본값으로</button>
+      <button type="button" class="act" id="preset-aprism">APRISM 색으로</button>
+      <button type="button" class="act" id="toggle-bg" aria-pressed="false">밝은 배경</button>
+      <button type="button" class="act" id="pause" aria-pressed="false">멈춤</button>
+      <span class="spacer"></span>
+      <button type="button" class="act" id="copy">속성 복사</button>
+      <span class="hint" id="copy-hint"></span>
+    </div>
+
+    <div class="controls" id="controls"></div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section>
+    <h2>문서에 적힌 속성</h2>
+    <p class="note">
+      <a href="https://pro.reactbits.dev/docs/components/grain-wave" style="color:var(--ui-accent)">pro.reactbits.dev/docs/components/grain-wave</a>
+      에서 읽은 표 그대로입니다. 위 조작판의 순서·기본값이 이것과 같습니다.
+    </p>
+    <div class="cols">
+      <table>
+        <tr><th>이름</th><th>기본값</th><th>설명</th></tr>
+        <tr><td class="k">width</td><td class="k">"100%"</td><td class="d">폭</td></tr>
+        <tr><td class="k">height</td><td class="k">"100%"</td><td class="d">높이</td></tr>
+        <tr><td class="k">speed</td><td class="k">0.5</td><td class="d">애니메이션 속도 배수</td></tr>
+        <tr><td class="k">waveCount</td><td class="k">25</td><td class="d">파형 줄 개수</td></tr>
+        <tr><td class="k">waveAmplitude</td><td class="k">0.85</td><td class="d">파형 진폭</td></tr>
+        <tr><td class="k">waveFrequency</td><td class="k">4</td><td class="d">가로 파형 주기</td></tr>
+        <tr><td class="k">lineThickness</td><td class="k">0.2</td><td class="d">선 두께</td></tr>
+        <tr><td class="k">grainIntensity</td><td class="k">50</td><td class="d">그레인 · 디더 세기</td></tr>
+        <tr><td class="k">startColor</td><td class="k">"#ff6666"</td><td class="d">시작 색(위쪽 파형)</td></tr>
+      </table>
+      <table>
+        <tr><th>이름</th><th>기본값</th><th>설명</th></tr>
+        <tr><td class="k">endColor</td><td class="k">"#6666ff"</td><td class="d">끝 색(아래쪽 파형)</td></tr>
+        <tr><td class="k">lightBackground</td><td class="k">"#ffffff"</td><td class="d">밝은 모드 배경색</td></tr>
+        <tr><td class="k">darkBackground</td><td class="k">"#000000"</td><td class="d">어두운 모드 배경색</td></tr>
+        <tr><td class="k">brightness</td><td class="k">1</td><td class="d">전체 밝기</td></tr>
+        <tr><td class="k">speedVariation</td><td class="k">0.006</td><td class="d">줄 사이 속도 차이</td></tr>
+        <tr><td class="k">waveWidth</td><td class="k">3.5</td><td class="d">파형이 퍼지는 가로 폭</td></tr>
+        <tr><td class="k">scale</td><td class="k">0.6</td><td class="d">전체 배율</td></tr>
+        <tr><td class="k">className</td><td class="k">""</td><td class="d">추가 CSS 클래스</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section>
+    <h2>정품을 들이려면</h2>
+    <p class="note">키와 레지스트리 주소를 받으면 이 순서로 진행합니다. 지금은 1·2 번에서 멈춰 있습니다.</p>
+    <pre><b># 1. 라이선스 키 — 변수 이름은 Pro 문서에서 확인이 필요합니다</b>
+.env.local
+  REACTBITS_...=&lt;라이선스 키&gt;
+
+<b># 2. components.json 에 레지스트리 등록 — 주소도 확인이 필요합니다</b>
+{
+  "registries": {
+    "@reactbits-starter": "&lt;레지스트리 주소&gt;"
+  }
+}
+
+<b># 3. 설치</b>
+npx shadcn@latest add @reactbits-starter/grain-wave-tw
+
+<b># 4. 이 저장소에 없는 것 — 셋 다 새로 들여야 합니다</b>
+package.json · tsconfig.json · React 런타임과 번들러</pre>
+  </section>
+
+</div>
+
+<script>
+/* =============================================================
+   Grain Wave · 재현
+   문서에 적힌 속성 이름과 기본값을 그대로 쓴다.
+   정품 소스를 볼 수 없어 파형을 쌓고 그레인을 뿌리는 방식은 여기서 정한 것이다.
+   ============================================================= */
+(function () {
+  "use strict";
+
+  // 문서의 표 그대로 — 순서 · 이름 · 기본값
+  var PROPS = [
+    { k: "speed",          min: 0,    max: 3,    step: 0.01, def: 0.5,   desc: "애니메이션 속도 배수" },
+    { k: "waveCount",      min: 1,    max: 80,   step: 1,    def: 25,    desc: "파형 줄 개수" },
+    { k: "waveAmplitude",  min: 0,    max: 3,    step: 0.01, def: 0.85,  desc: "파형 진폭" },
+    { k: "waveFrequency",  min: 0,    max: 16,   step: 0.1,  def: 4,     desc: "가로 파형 주기" },
+    { k: "lineThickness",  min: 0.01, max: 1,    step: 0.01, def: 0.2,   desc: "선 두께" },
+    { k: "grainIntensity", min: 0,    max: 150,  step: 1,    def: 50,    desc: "그레인 · 디더 세기" },
+    { k: "brightness",     min: 0,    max: 2,    step: 0.01, def: 1,     desc: "전체 밝기" },
+    { k: "speedVariation", min: 0,    max: 0.15, step: 0.001, def: 0.006, desc: "줄 사이 속도 차이" },
+    { k: "waveWidth",      min: 0.2,  max: 10,   step: 0.05, def: 3.5,   desc: "파형이 퍼지는 가로 폭" },
+    { k: "scale",          min: 0.1,  max: 2,    step: 0.01, def: 0.6,   desc: "전체 배율" }
+  ];
+  var COLORS = [
+    { k: "startColor",      def: "#ff6666", desc: "시작 색(위쪽 파형)" },
+    { k: "endColor",        def: "#6666ff", desc: "끝 색(아래쪽 파형)" },
+    { k: "darkBackground",  def: "#000000", desc: "어두운 모드 배경색" },
+    { k: "lightBackground", def: "#ffffff", desc: "밝은 모드 배경색" }
+  ];
+
+  var state = {};
+  PROPS.forEach(function (p) { state[p.k] = p.def; });
+  COLORS.forEach(function (c) { state[c.k] = c.def; });
+
+  var canvas = document.getElementById("stage");
+  var gl = canvas.getContext("webgl2", { antialias: false, alpha: false });
+
+  if (!gl) {
+    canvas.outerHTML = '<p class="stage-fail">이 브라우저에서 WebGL2 를 쓸 수 없어 무대를 그리지 못했습니다.</p>';
+    return;
+  }
+
+  var VERT = [
+    "#version 300 es",
+    "in vec2 p;",
+    "void main(){ gl_Position = vec4(p, 0.0, 1.0); }"
+  ].join("\n");
+
+  var FRAG = [
+    "#version 300 es",
+    "precision highp float;",
+    "out vec4 outColor;",
+    "uniform vec2  uRes;",
+    "uniform float uTime;",
+    "uniform float uSpeed, uCount, uAmp, uFreq, uThick, uGrain;",
+    "uniform float uBright, uSpeedVar, uWidth, uScale;",
+    "uniform vec3  uStart, uEnd, uBg;",
+    "",
+    "float hash21(vec2 p){",
+    "  p = fract(p * vec2(123.34, 456.21));",
+    "  p += dot(p, p + 45.32);",
+    "  return fract(p.x * p.y);",
+    "}",
+    "",
+    "void main(){",
+    "  vec2 uv = (gl_FragCoord.xy - 0.5 * uRes) / uRes.y;",
+    "  uv /= max(uScale, 0.01);",
+    "",
+    "  float n = max(uCount, 1.0);",
+    "  float acc = 0.0;",
+    "  vec3  col = vec3(0.0);",
+    "",
+    "  for (int i = 0; i < 128; i++) {",
+    "    if (float(i) >= n) break;",
+    "    float t = (n > 1.0) ? float(i) / (n - 1.0) : 0.5;",
+    "",
+    // 줄마다 속도를 조금씩 달리해서 시간이 갈수록 위상이 벌어진다
+    "    float ph = uTime * uSpeed * (1.0 + float(i) * uSpeedVar);",
+    "",
+    "    float x   = uv.x / max(uWidth, 0.001);",
+    // 가운데가 부풀고 바깥으로 잦아드는 봉우리
+    "    float env = exp(-x * x * 2.2);",
+    // t=0 이 위쪽이다 — 문서가 startColor 를 "위쪽 파형" 이라고 적었다.
+    // gl_FragCoord.y 는 위로 갈수록 커지므로 부호를 뒤집는다.
+    "    float y0  = (0.5 - t) * 1.25;",
+    "    float w   = sin(x * uFreq * 3.14159265 + ph + t * 4.0) * uAmp * env * 0.5;",
+    "",
+    "    float d    = abs(uv.y - (y0 + w));",
+    "    float line = 1.0 - smoothstep(0.0, uThick * 0.25, d);",
+    "",
+    "    acc += line;",
+    "    col += mix(uStart, uEnd, t) * line;",
+    "  }",
+    "",
+    "  vec3  c = acc > 0.0 ? col / acc : vec3(0.0);",
+    "  float a = clamp(acc, 0.0, 1.0) * uBright;",
+    "",
+    // 그레인 — 픽셀마다 흩뿌려 매끈한 계조를 부순다
+    "  float g = hash21(gl_FragCoord.xy + fract(uTime) * 100.0) - 0.5;",
+    "  a = clamp(a + g * (uGrain / 100.0), 0.0, 1.0);",
+    "",
+    "  outColor = vec4(mix(uBg, c, a), 1.0);",
+    "}"
+  ].join("\n");
+
+  function compile(type, src) {
+    var sh = gl.createShader(type);
+    gl.shaderSource(sh, src);
+    gl.compileShader(sh);
+    if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) {
+      throw new Error(gl.getShaderInfoLog(sh));
+    }
+    return sh;
+  }
+
+  var prog = gl.createProgram();
+  gl.attachShader(prog, compile(gl.VERTEX_SHADER, VERT));
+  gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, FRAG));
+  gl.linkProgram(prog);
+  if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
+    throw new Error(gl.getProgramInfoLog(prog));
+  }
+  gl.useProgram(prog);
+
+  var buf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+  var loc = gl.getAttribLocation(prog, "p");
+  gl.enableVertexAttribArray(loc);
+  gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+
+  var U = {};
+  ["uRes", "uTime", "uSpeed", "uCount", "uAmp", "uFreq", "uThick", "uGrain",
+   "uBright", "uSpeedVar", "uWidth", "uScale", "uStart", "uEnd", "uBg"].forEach(function (n) {
+    U[n] = gl.getUniformLocation(prog, n);
+  });
+
+  function rgb(hex) {
+    var m = /^#?([0-9a-f]{6})$/i.exec(hex);
+    var v = m ? parseInt(m[1], 16) : 0;
+    return [((v >> 16) & 255) / 255, ((v >> 8) & 255) / 255, (v & 255) / 255];
+  }
+
+  function resize() {
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var w = Math.round(canvas.clientWidth * dpr);
+    var h = Math.round(canvas.clientHeight * dpr);
+    if (canvas.width !== w || canvas.height !== h) {
+      canvas.width = w;
+      canvas.height = h;
+      gl.viewport(0, 0, w, h);
+    }
+  }
+
+  // ---------- 조작판 ----------
+  var host = document.getElementById("controls");
+
+  function row(inner) {
+    var d = document.createElement("div");
+    d.className = "ctl";
+    d.innerHTML = inner;
+    host.appendChild(d);
+    return d;
+  }
+
+  var readouts = {};
+
+  PROPS.forEach(function (p) {
+    var d = row(
+      '<label for="c-' + p.k + '">' + p.k + '</label>' +
+      '<span class="val" id="v-' + p.k + '"></span>' +
+      '<span class="desc">' + p.desc + '</span>' +
+      '<input type="range" id="c-' + p.k + '" min="' + p.min + '" max="' + p.max + '" step="' + p.step + '" value="' + p.def + '" />'
+    );
+    var input = d.querySelector("input");
+    readouts[p.k] = d.querySelector(".val");
+    input.addEventListener("input", function () {
+      state[p.k] = parseFloat(input.value);
+      readouts[p.k].textContent = input.value;
+    });
+    readouts[p.k].textContent = String(p.def);
+    p.input = input;
+  });
+
+  COLORS.forEach(function (c) {
+    var d = row(
+      '<label for="c-' + c.k + '">' + c.k + '</label>' +
+      '<span class="val" id="v-' + c.k + '">' + c.def + '</span>' +
+      '<span class="desc">' + c.desc + '</span>' +
+      '<input type="color" id="c-' + c.k + '" value="' + c.def + '" />'
+    );
+    var input = d.querySelector("input");
+    readouts[c.k] = d.querySelector(".val");
+    input.addEventListener("input", function () {
+      state[c.k] = input.value;
+      readouts[c.k].textContent = input.value;
+    });
+    c.input = input;
+  });
+
+  // ---------- 버튼 ----------
+  var light = false;
+  var paused = false;
+
+  function setAll(vals) {
+    PROPS.forEach(function (p) {
+      if (vals[p.k] === undefined) return;
+      state[p.k] = vals[p.k];
+      p.input.value = vals[p.k];
+      readouts[p.k].textContent = String(vals[p.k]);
+    });
+    COLORS.forEach(function (c) {
+      if (vals[c.k] === undefined) return;
+      state[c.k] = vals[c.k];
+      c.input.value = vals[c.k];
+      readouts[c.k].textContent = vals[c.k];
+    });
+  }
+
+  document.getElementById("reset").addEventListener("click", function () {
+    var d = {};
+    PROPS.forEach(function (p) { d[p.k] = p.def; });
+    COLORS.forEach(function (c) { d[c.k] = c.def; });
+    setAll(d);
+  });
+
+  // APRISM 의 alert/Default 계열 — AI 패널이 쓰는 색이다
+  document.getElementById("preset-aprism").addEventListener("click", function () {
+    setAll({
+      startColor: "#36b2df",
+      endColor: "#8cacf7",
+      darkBackground: "#070a10",
+      lightBackground: "#eff6fe",
+      waveCount: 32,
+      brightness: 0.9,
+      grainIntensity: 42
+    });
+  });
+
+  var bgBtn = document.getElementById("toggle-bg");
+  bgBtn.addEventListener("click", function () {
+    light = !light;
+    bgBtn.setAttribute("aria-pressed", light ? "true" : "false");
+    bgBtn.textContent = light ? "어두운 배경" : "밝은 배경";
+  });
+
+  var pauseBtn = document.getElementById("pause");
+  pauseBtn.addEventListener("click", function () {
+    paused = !paused;
+    pauseBtn.setAttribute("aria-pressed", paused ? "true" : "false");
+    pauseBtn.textContent = paused ? "다시 재생" : "멈춤";
+  });
+
+  var hint = document.getElementById("copy-hint");
+  document.getElementById("copy").addEventListener("click", function () {
+    var lines = ["<GrainWave"];
+    PROPS.forEach(function (p) { lines.push("  " + p.k + "={" + state[p.k] + "}"); });
+    COLORS.forEach(function (c) { lines.push("  " + c.k + '="' + state[c.k] + '"'); });
+    lines.push("/>");
+    var text = lines.join("\n");
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text).then(function () {
+        hint.textContent = "복사했습니다";
+        setTimeout(function () { hint.textContent = ""; }, 1800);
+      });
+    }
+  });
+
+  // ---------- 그리기 ----------
+  var t0 = performance.now();
+  var clock = 0;
+  var last = t0;
+  var frames = 0;
+  var fpsAt = t0;
+  var fpsEl = document.getElementById("fps");
+
+  function frame(now) {
+    var dt = (now - last) / 1000;
+    last = now;
+    if (!paused) clock += dt;
+
+    resize();
+
+    gl.uniform2f(U.uRes, canvas.width, canvas.height);
+    gl.uniform1f(U.uTime, clock);
+    gl.uniform1f(U.uSpeed, state.speed);
+    gl.uniform1f(U.uCount, state.waveCount);
+    gl.uniform1f(U.uAmp, state.waveAmplitude);
+    gl.uniform1f(U.uFreq, state.waveFrequency);
+    gl.uniform1f(U.uThick, state.lineThickness);
+    gl.uniform1f(U.uGrain, state.grainIntensity);
+    gl.uniform1f(U.uBright, state.brightness);
+    gl.uniform1f(U.uSpeedVar, state.speedVariation);
+    gl.uniform1f(U.uWidth, state.waveWidth);
+    gl.uniform1f(U.uScale, state.scale);
+    gl.uniform3fv(U.uStart, rgb(state.startColor));
+    gl.uniform3fv(U.uEnd, rgb(state.endColor));
+    gl.uniform3fv(U.uBg, rgb(light ? state.lightBackground : state.darkBackground));
+
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+    frames++;
+    if (now - fpsAt > 500) {
+      fpsEl.textContent = Math.round(frames * 1000 / (now - fpsAt)) + " fps";
+      frames = 0;
+      fpsAt = now;
+    }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
