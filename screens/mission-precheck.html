@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>사전 점검 — APRISM</title>
+  <meta name="description" content="APRISM 공장 환경점검 로봇 관제 대시보드 메인 화면 퍼블리싱" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/static/woff2/SUIT.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" />
+  <link rel="stylesheet" href="../assets/css/tokens.css?v=0d02f188" />
+  <link rel="stylesheet" href="../assets/css/app-shell.css?v=3a8b8292" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
+
+    body {
+      background-color: var(--bg-canvas);
+      color: var(--fg-primary);
+      font-family: var(--font-family-sans);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    h1, h2, h3, p { margin: 0; }
+  </style>
+</head>
+<body>
+
+
+<!-- ============================================================
+     Template / 04.1 Dashboard Home · 1922   (node 399:6225)
+     ============================================================ -->
+<div class="app">
+
+  <!-- ---------- Status Bar · 전체 폭 ---------- -->
+  <header class="status-bar">
+    <span class="status-bar-logo">
+      <span class="i" style="--i:var(--ic-brand-mark)" role="img" aria-label="APRISM"></span>
+    </span>
+
+    <div class="status-bar-right">
+      <!-- Account · 누르면 계정 메뉴가 내려온다 (Figma Account 컴포넌트 Opened) -->
+      <div class="status-menu" data-status-menu>
+        <button type="button" class="account-chip" data-menu-trigger
+                aria-haspopup="true" aria-expanded="false">
+          <span class="i i-16" style="--i:var(--ic-user)" aria-hidden="true"></span>
+          <span class="t-label-2">홍길동</span>
+          <span class="t-label-2 account-sep" aria-hidden="true">|</span>
+          <span class="t-label-2">관제운영</span>
+        </button>
+        <div class="dropdown-menu account-menu" role="menu" aria-label="계정" hidden>
+          <a class="menu-item" role="menuitem" href="#">
+            <span class="i i-16" style="--i:var(--ic-user)" aria-hidden="true"></span>
+            <span class="t-label-2">내 계정 정보</span>
+          </a>
+          <a class="menu-item" role="menuitem" href="#">
+            <span class="i i-16" style="--i:var(--ic-lock)" aria-hidden="true"></span>
+            <span class="t-label-2">비밀번호 변경</span>
+          </a>
+          <a class="menu-item" role="menuitem" href="#">
+            <span class="i i-16" style="--i:var(--ic-power)" aria-hidden="true"></span>
+            <span class="t-label-2">로그아웃</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Signal · 누르면 서버·네트워크 상태가 내려온다 (Figma Signal 컴포넌트 Opened) -->
+      <div class="status-menu" data-status-menu>
+        <button type="button" class="signal-chip" data-menu-trigger
+                aria-haspopup="true" aria-expanded="false" aria-label="통신 상태">
+          <span class="signal-bars"><i></i><i></i><i></i><i></i></span>
+        </button>
+        <div class="dropdown-menu signal-menu" role="menu" aria-label="통신 상태" hidden>
+          <div class="menu-item" role="menuitem">
+            <span class="t-label-2">AI Server</span>
+            <span class="badge badge-normal t-caption"><span class="badge-dot"></span>Online</span>
+          </div>
+          <div class="menu-item" role="menuitem">
+            <span class="t-label-2">DB server</span>
+            <span class="badge badge-normal t-caption"><span class="badge-dot"></span>Online</span>
+          </div>
+          <div class="menu-item" role="menuitem">
+            <span class="t-label-2">Network</span>
+            <span class="signal-bars menu-signal"><i></i><i></i><i></i><i></i></span>
+          </div>
+        </div>
+      </div>
+
+      <span class="utc-clock">
+        <span class="i i-16" style="--i:var(--ic-clock)"></span>
+        <span class="t-caption num">2026-08-26T10:11:24Z</span>
+      </span>
+    </div>
+  </header>
+
+  <div class="app-content">
+
+    <!-- ---------- GNB Rail ---------- -->
+    <nav class="gnb-rail" aria-label="전역 내비게이션">
+      <div class="gnb-items">
+        <a class="gnb-item" href="#" aria-current="page">
+          <span class="gnb-icon"><span class="i i-20" style="--i:var(--ic-home)"></span></span><span>관제</span>
+        </a>
+        <a class="gnb-item" href="#"><span class="gnb-icon"><span class="i i-20" style="--i:var(--ic-shield)"></span></span><span>안전진단</span></a>
+        <a class="gnb-item" href="#"><span class="gnb-icon"><span class="i i-20" style="--i:var(--ic-bot)"></span></span><span>로봇</span></a>
+        <a class="gnb-item" href="#"><span class="gnb-icon"><span class="i i-20" style="--i:var(--ic-cpu)"></span></span><span>AI</span></a>
+        <a class="gnb-item" href="#"><span class="gnb-icon"><span class="i i-20" style="--i:var(--ic-calendar)"></span></span><span>스케줄러</span></a>
+        <a class="gnb-item" href="#"><span class="gnb-icon"><span class="i i-20" style="--i:var(--ic-message)"></span></span><span>Delta</span></a>
+        <a class="gnb-item" href="#"><span class="gnb-icon"><span class="i i-20" style="--i:var(--ic-document)"></span></span><span>보고서</span></a>
+        <a class="gnb-item" href="#"><span class="gnb-icon"><span class="i i-20" style="--i:var(--ic-users)"></span></span><span>계정관리</span></a>
+      </div>
+      <a class="gnb-item" href="#"><span class="gnb-icon"><span class="i i-20" style="--i:var(--ic-settings)"></span></span><span>환경설정</span></a>
+    </nav>
+
+    <!-- ---------- Container · bg/surface/default 면 ---------- -->
+    <div class="content-surface">
+
+      <!-- ---------- Site Context Panel ---------- -->
+      <aside class="context-panel" id="site-panel" aria-label="사이트 컨텍스트">
+
+        <div class="panel-head">
+          <p class="t-overline section-label">SITE</p>
+          <button type="button" data-panel-toggle
+                  aria-expanded="true" aria-controls="site-panel" aria-label="사이트 패널 접기">
+            <span class="i i-20" style="--i:var(--ic-panel-left)"></span>
+          </button>
+        </div>
+
+        <!-- 사이트 이름과 터빈 선택. bg/accent 면 위에 놓인다. -->
+        <div class="site-block">
+          <h1 class="t-heading-3">지하발전소 B3</h1>
+          <div class="field-select" data-select>
+            <button type="button" class="select-field t-body-3" data-select-trigger
+                    aria-haspopup="listbox" aria-expanded="false" aria-label="터빈 선택">
+              <span data-select-value>터빈 2 / Unit 03</span>
+              <span class="i i-16" style="--i:var(--ic-chevron-down)" aria-hidden="true"></span>
+            </button>
+            <ul class="field-menu" role="listbox" aria-label="터빈 선택" hidden>
+              <li class="field-option" role="option">터빈 1 / Unit 01</li>
+              <li class="field-option" role="option" aria-selected="true">터빈 2 / Unit 03</li>
+              <li class="field-option" role="option">터빈 3 / Unit 05</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="panel-body">
+          <section class="panel-section">
+            <p class="t-overline section-label">운영 모드</p>
+            <span class="badge badge-mode t-label-2"><span class="badge-dot"></span>미션 없음</span>
+          </section>
+
+          <section class="panel-section">
+            <p class="t-overline section-label">퀵 액션</p>
+            <div class="quick-actions">
+              <button type="button" data-goto="mission-setup.html">미션 생성</button>
+              <button type="button">수동 조작</button>
+              <button type="button">안전진단</button>
+              <button type="button">보고서</button>
+            </div>
+          </section>
+        </div>
+
+      </aside>
+
+      <!-- ---------- Main ---------- -->
+      <main class="main">
+        <div class="two-col">
+
+          <!-- ---------- Map Panel ---------- -->
+          <section class="map-panel" aria-label="설비 배치도">
+            <div class="map-canvas">
+              <span class="badge badge-info badge-marker t-label-2 map-marker">
+                <span class="badge-dot"></span>Robot 02
+              </span>
+
+              <div class="map-tools">
+                <button type="button" class="icon-button" aria-label="확대">
+                  <span class="i i-20" style="--i:var(--ic-zoom-in)"></span>
+                </button>
+                <button type="button" class="icon-button" aria-label="로봇 추적">
+                  <span class="i i-20" style="--i:var(--ic-target)"></span>
+                </button>
+                <button type="button" class="icon-button is-active" aria-label="영상 리플레이">
+                  <span class="i i-20" style="--i:var(--ic-play)"></span>
+                </button>
+              </div>
+            </div>
+
+          </section>
+
+          <!-- ---------- Mission Panel · 사전 점검 ---------- -->
+          <div class="floating">
+            <section class="right-panel" aria-label="사전 점검">
+              <div class="panel-card is-fill mission-panel">
+
+                <div class="mp-header">
+                  <h2 class="t-heading-3">사전 점검</h2>
+                  <p class="t-caption">서버에서 자동 확인 중 · 미션 시작 대기</p>
+                </div>
+
+                <div class="mp-divider"></div>
+
+                <div class="mp-scroll">
+                  <div class="precheck-list" data-precheck>
+                    <div class="precheck-head">
+                      <span class="label">점검 항목</span>
+                      <span class="tag-running" data-precheck-tag>Running</span>
+                    </div>
+                    <div class="precheck-row is-running is-active" data-precheck-row data-done-meta="4s">
+                      <span class="i i-20" style="--i:var(--ic-loading)" aria-hidden="true"></span>
+                      <span class="label">Manager</span>
+                      <span class="meta is-plain">확인중..</span>
+                    </div>
+                    <div class="precheck-row is-pending" data-precheck-row data-done-meta="5s">
+                      <span class="i i-20" style="--i:var(--ic-loading)" aria-hidden="true"></span>
+                      <span class="label">Spot</span>
+                      <span class="meta is-plain">대기</span>
+                    </div>
+                    <div class="precheck-row is-pending" data-precheck-row data-done-meta="3s">
+                      <span class="i i-20" style="--i:var(--ic-loading)" aria-hidden="true"></span>
+                      <span class="label">Battery</span>
+                      <span class="meta is-plain">대기</span>
+                    </div>
+                    <div class="precheck-row is-pending" data-precheck-row data-done-meta="2s">
+                      <span class="i i-20" style="--i:var(--ic-loading)" aria-hidden="true"></span>
+                      <span class="label">Mission</span>
+                      <span class="meta is-plain">대기</span>
+                    </div>
+                  </div>
+
+                  <div class="inline-notice">
+                    <span class="i i-20" style="--i:var(--ic-info)" aria-hidden="true"></span>
+                    <span class="body">
+                      <span class="title">점검이 끝나면 자동으로 시작합니다</span>
+                      <span class="desc">네 항목이 모두 정상일 때만 로봇이 기동합니다.</span>
+                    </span>
+                  </div>
+                </div>
+
+                <div class="mp-actions">
+                  <button type="button" class="btn-line is-cancel" data-goto="mission-setup.html">취소</button>
+                  <button type="button" class="btn-line is-start" data-goto="dashboard-home.html" disabled>미션 시작</button>
+                </div>
+              </div>
+            </section>
+          </div>
+
+        </div>
+      </main>
+
+    </div>
+
+  </div>
+</div>
+
+
+<script src="../assets/js/theme.js?v=dcf8f460"></script>
+<script src="../assets/js/screen.js?v=29a4d4b1"></script>
+</body>
+</html>

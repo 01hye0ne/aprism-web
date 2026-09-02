@@ -6,7 +6,7 @@
   <title>APRISM — 화면 퍼블리싱</title>
   <meta name="description" content="APRISM 공장 환경점검 로봇 관제 대시보드 화면 퍼블리싱" />
   <link rel="stylesheet" href="./assets/css/tokens.css?v=0d02f188" />
-  <link rel="stylesheet" href="./assets/css/base.css?v=49a615f7" />
+  <link rel="stylesheet" href="./assets/css/base.css?v=ab1249b4" />
 </head>
 <body>
   <header class="site-header">
@@ -30,40 +30,60 @@
     </section>
 
     <section class="screens" aria-labelledby="screens-title">
-      <h2 id="screens-title">화면 목록</h2>
-      <ul class="screen-list">
-        <li class="screen-card">
-          <span class="screen-status">Change Set</span>
-          <a class="screen-name" href="./figma-sync.html">Figma 반영 목록</a>
-          <span class="screen-desc">확정된 값을 디자인 시스템에 옮기기 위한 변경 목록과 변경 로그.</span>
-        </li>
-        <li class="screen-card">
-          <span class="screen-status">Foundations</span>
-          <a class="screen-name" href="./tone-lab.html">톤 실험실</a>
-          <span class="screen-desc">색온도와 층위 간격을 조정하며 실제 화면과 대비 기준으로 검증하는 도구.</span>
-        </li>
-        <li class="screen-card">
-          <span class="screen-status">Foundations</span>
-          <a class="screen-name" href="./type-lab.html">데이터 서체 검토</a>
-          <span class="screen-desc">수치·코드 표기에 모노스페이스가 필요한지 판단하는 비교 페이지.</span>
-        </li>
-        <li class="screen-card">
-          <span class="screen-status">Foundations</span>
-          <a class="screen-name" href="./tokens.html">Primitive 톤 감사</a>
-          <span class="screen-desc">현재 램프의 명도, 색온도, 대비 검증과 확인이 필요한 지점.</span>
-        </li>
-        <li class="screen-card">
-          <span class="screen-status">Screen 04.1</span>
-          <a class="screen-name" href="./screens/dashboard-home.html">통합 관제 메인</a>
-          <span class="screen-desc">GNB · 사이트 컨텍스트 · 지도 · 로봇/미션 패널. 구조 검토용이며 GUI 는 작업 전입니다.
-            <a href="./screens/dashboard-home-notes.html">퍼블리싱 노트</a></span>
-        </li>
-        <li class="screen-card is-empty">
-          <span class="screen-status">준비 중</span>
-          <span class="screen-name">다음 화면</span>
-          <span class="screen-desc">Figma 프레임 링크를 받으면 추가합니다.</span>
-        </li>
-      </ul>
+      <h2 id="screens-title">진입점</h2>
+
+      <div class="screen-group">
+        <h3>화면</h3>
+        <ul class="screen-list">
+          <li class="screen-card">
+            <span class="screen-status">Screen 04.1</span>
+            <a class="screen-name" href="./screens/mission-setup.html">통합 관제 메인 · 미션 설정</a>
+            <span class="screen-desc">같은 셸, 우측 패널이 미션 생성 폼(이름 · 대상 · 로봇 · 점검 항목 · 스케줄러) 상태입니다.</span>
+          </li>
+          <li class="screen-card">
+            <span class="screen-status">Screen 04.1</span>
+            <a class="screen-name" href="./screens/mission-precheck.html">통합 관제 메인 · 사전 점검</a>
+            <span class="screen-desc">같은 셸, 우측 패널이 미션 시작 전 자동 점검(Manager · Spot · Battery · Mission) 진행 상태입니다.</span>
+          </li>
+          <li class="screen-card">
+            <span class="screen-status">Screen 04.1</span>
+            <a class="screen-name" href="./screens/dashboard-home.html">통합 관제 메인 · 미션 모니터링</a>
+            <span class="screen-desc">GNB · 사이트 컨텍스트 · 지도 · 로봇/미션 패널. 우측 패널은 미션 진행 모니터링 상태입니다.
+              <a href="./screens/dashboard-home-notes.html">퍼블리싱 노트</a></span>
+          </li>
+          <li class="screen-card is-empty">
+            <span class="screen-status">준비 중</span>
+            <span class="screen-name">다음 화면</span>
+            <span class="screen-desc">Figma 프레임 링크를 받으면 추가합니다.</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="screen-group">
+        <h3>피그마 문서</h3>
+        <ul class="screen-list">
+          <li class="screen-card">
+            <span class="screen-status">Change Set</span>
+            <a class="screen-name" href="./figma-sync.html">Figma 반영 목록</a>
+            <span class="screen-desc">확정된 값을 디자인 시스템에 옮기기 위한 변경 목록과 변경 로그.</span>
+          </li>
+          <li class="screen-card">
+            <span class="screen-status">Foundations</span>
+            <a class="screen-name" href="./tone-lab.html">톤 실험실</a>
+            <span class="screen-desc">색온도와 층위 간격을 조정하며 실제 화면과 대비 기준으로 검증하는 도구.</span>
+          </li>
+          <li class="screen-card">
+            <span class="screen-status">Foundations</span>
+            <a class="screen-name" href="./type-lab.html">데이터 서체 검토</a>
+            <span class="screen-desc">수치·코드 표기에 모노스페이스가 필요한지 판단하는 비교 페이지.</span>
+          </li>
+          <li class="screen-card">
+            <span class="screen-status">Foundations</span>
+            <a class="screen-name" href="./tokens.html">Primitive 톤 감사</a>
+            <span class="screen-desc">현재 램프의 명도, 색온도, 대비 검증과 확인이 필요한 지점.</span>
+          </li>
+        </ul>
+      </div>
     </section>
   </main>
 

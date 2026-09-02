@@ -278,4 +278,163 @@
     initial.setAttribute("aria-pressed", "true");
     render(Number(initial.getAttribute("data-robot")));
   })();
+
+  // ------------------------------------------------------------------
+  // 화면 이동 — [data-goto] 버튼을 누르면 같은 폴더의 그 페이지로 간다.
+  // disabled 인 버튼은 무시한다(사전 점검이 끝나야 "미션 시작" 이 열린다).
+  // ------------------------------------------------------------------
+  (function () {
+    var buttons = Array.prototype.slice.call(document.querySelectorAll("[data-goto]"));
+    buttons.forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        if (btn.disabled) { return; }
+        window.location.href = btn.getAttribute("data-goto");
+      });
+    });
+  })();
+
+  // ------------------------------------------------------------------
+  // 미션 설정 폼 — 체크박스 · 스위치 · Select 드롭다운
+  // 퍼블리싱용이라 값은 화면 안에서만 바뀐다.
+  // ------------------------------------------------------------------
+  (function () {
+    // 체크박스: 클릭 / Space / Enter 로 토글, "N개 선택" 갱신
+    var rows = Array.prototype.slice.call(document.querySelectorAll('.check-row[role="checkbox"]'));
+    var countEl = document.querySelector(".check-group-head .count");
+
+    function refreshCount() {
+      if (!countEl) { return; }
+      var n = document.querySelectorAll('.check-row[aria-checked="true"]').length;
+      countEl.textContent = n + "개 선택";
+    }
+
+    rows.forEach(function (row) {
+      function toggle() {
+        row.setAttribute("aria-checked", row.getAttribute("aria-checked") === "true" ? "false" : "true");
+        refreshCount();
+      }
+      row.addEventListener("click", toggle);
+      row.addEventListener("keydown", function (event) {
+        if (event.key === " " || event.key === "Enter") { event.preventDefault(); toggle(); }
+      });
+    });
+
+    // 스위치
+    Array.prototype.slice.call(document.querySelectorAll('.switch[role="switch"]')).forEach(function (sw) {
+      sw.addEventListener("click", function () {
+        sw.setAttribute("aria-checked", sw.getAttribute("aria-checked") === "true" ? "false" : "true");
+      });
+    });
+
+    // Select 드롭다운
+    var selects = Array.prototype.slice.call(document.querySelectorAll("[data-select]"));
+
+    function closeSelects(except) {
+      selects.forEach(function (sel) {
+        if (sel === except) { return; }
+        sel.removeAttribute("data-open");
+        sel.querySelector("[data-select-trigger]").setAttribute("aria-expanded", "false");
+        sel.querySelector(".field-menu").hidden = true;
+      });
+    }
+
+    selects.forEach(function (sel) {
+      var trigger = sel.querySelector("[data-select-trigger]");
+      var menu = sel.querySelector(".field-menu");
+      var valueEl = sel.querySelector("[data-select-value]");
+      var options = Array.prototype.slice.call(sel.querySelectorAll(".field-option"));
+
+      trigger.addEventListener("click", function (event) {
+        event.stopPropagation();
+        var open = sel.hasAttribute("data-open");
+        closeSelects(sel);
+        if (open) {
+          sel.removeAttribute("data-open");
+          trigger.setAttribute("aria-expanded", "false");
+          menu.hidden = true;
+        } else {
+          sel.setAttribute("data-open", "");
+          trigger.setAttribute("aria-expanded", "true");
+          menu.hidden = false;
+        }
+      });
+
+      options.forEach(function (opt) {
+        opt.addEventListener("click", function () {
+          valueEl.textContent = opt.textContent;
+          options.forEach(function (o) { o.removeAttribute("aria-selected"); });
+          opt.setAttribute("aria-selected", "true");
+          sel.removeAttribute("data-open");
+          trigger.setAttribute("aria-expanded", "false");
+          menu.hidden = true;
+        });
+      });
+
+      sel.addEventListener("keydown", function (event) {
+        if (event.key === "Escape" && sel.hasAttribute("data-open")) {
+          sel.removeAttribute("data-open");
+          trigger.setAttribute("aria-expanded", "false");
+          menu.hidden = true;
+          trigger.focus();
+        }
+      });
+    });
+
+    if (selects.length) {
+      document.addEventListener("click", function (event) {
+        var inside = selects.some(function (sel) { return sel.contains(event.target); });
+        if (!inside) { closeSelects(null); }
+      });
+    }
+  })();
+
+  // ------------------------------------------------------------------
+  // 사전 점검 — 항목이 하나씩 통과한다. 넷이 다 통과하면
+  // "미션 시작" 이 열리고, 잠시 뒤 자동으로 미션 모니터링으로 넘어간다.
+  // (Figma 안내: "점검이 끝나면 자동으로 시작합니다")
+  // ------------------------------------------------------------------
+  (function () {
+    var list = document.querySelector("[data-precheck]");
+    if (!list) { return; }
+
+    var pending = Array.prototype.slice.call(list.querySelectorAll("[data-precheck-row]"));
+    var tag = list.querySelector("[data-precheck-tag]");
+    var startBtn = document.querySelector(".btn-line.is-start");
+    var STEP = 1400;
+
+    function complete(row) {
+      row.classList.remove("is-running", "is-active", "is-pending");
+      row.classList.add("is-done");
+      var icon = row.querySelector(".i");
+      if (icon) { icon.style.setProperty("--i", "var(--ic-delta)"); }
+      var meta = row.querySelector(".meta");
+      if (meta) {
+        meta.textContent = row.getAttribute("data-done-meta") || "";
+        meta.classList.remove("is-plain");
+      }
+    }
+
+    function tick() {
+      var next = pending.shift();
+      if (!next) {
+        if (tag) { tag.textContent = "완료"; }
+        if (startBtn) { startBtn.disabled = false; }
+        window.setTimeout(function () {
+          window.location.href = "dashboard-home.html";
+        }, 1600);
+        return;
+      }
+      complete(next);
+      // 다음 대기 항목을 "확인 중" 으로 승격
+      if (pending[0]) {
+        pending[0].classList.remove("is-pending");
+        pending[0].classList.add("is-running", "is-active");
+        var m = pending[0].querySelector(".meta");
+        if (m) { m.textContent = "확인중.."; }
+      }
+      window.setTimeout(tick, STEP);
+    }
+
+    window.setTimeout(tick, STEP);
+  })();
 })();

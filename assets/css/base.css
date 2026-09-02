@@ -129,6 +129,19 @@ body {
   font-weight: 600;
 }
 
+.screen-group + .screen-group {
+  margin-top: var(--space-32);
+}
+
+.screen-group h3 {
+  margin: 0 0 var(--space-12);
+  font-size: var(--font-size-13);
+  line-height: var(--font-line-height-18);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--fg-secondary);
+}
+
 .screen-list {
   display: grid;
   gap: var(--space-12);
