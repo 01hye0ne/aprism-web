@@ -29,6 +29,28 @@
       apply(!panel.classList.contains("is-open"));
     });
 
+    // closed 상태의 [확인] — 주의 알림을 받았다는 응답. 누르면 화면·패널을 일반(파란) 상태로
+    // 되돌리고, 알림 문구를 일반 안내 멘트로 바꾼다.
+    var ack = panel.querySelector("[data-ai-ack]");
+    if (ack) {
+      var NORMAL_TEXT = "무엇을 도와드릴까요?";
+      ack.addEventListener("click", function () {
+        panel.classList.remove("is-warning");
+        var twoCol = panel.closest(".two-col");
+        if (twoCol) {
+          twoCol.classList.remove("is-warning");
+        }
+        var msg = panel.querySelector(".ai-message-text");
+        if (msg) {
+          msg.textContent = NORMAL_TEXT;
+        }
+        var headline = panel.querySelector(".ai-headline");
+        if (headline) {
+          headline.textContent = NORMAL_TEXT;
+        }
+      });
+    }
+
     // 펼친 상태에서 Esc 로 닫는다. 닫은 뒤 초점은 버튼에 남긴다.
     panel.addEventListener("keydown", function (event) {
       if (event.key === "Escape" && panel.classList.contains("is-open")) {

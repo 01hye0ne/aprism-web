@@ -718,7 +718,10 @@ button {
   transform: translate(-50%, -50%);
 }
 
-/* 지도 도구가 좌하단에서 우상단으로 옮겨졌다. */
+/*
+ * 지도 도구 레일 — Figma Map Tool Rail(330:5822). 좌하단에서 우상단으로 옮겼다.
+ * gray/800(#202838) 면 + gray/700(#373F4E) 1px, radius 8, padding·gap 8.
+ */
 .map-tools {
   position: absolute;
   right: 0;
@@ -727,14 +730,24 @@ button {
   flex-direction: column;
   gap: var(--space-8);
   padding: var(--space-8);
-  border: var(--border-width-thin) solid var(--border-subtle);
-  border-radius: var(--radius-pill);
-  background-color: var(--bg-surface-default);
+  border: var(--border-width-thin) solid var(--color-gray-700);
+  border-radius: var(--radius-container);
+  background-color: var(--color-gray-800);
 }
 
-.map-tools .icon-button.is-active {
-  background-color: var(--button-primary-bg-default);
-  color: var(--button-primary-fg-default);
+/*
+ * 확대·로봇 추적은 Ghost(투명), 리플레이만 Secondary —
+ * gray/650(#3F485C) 면 + gray/600(#4E576A) 1px 로 한 단계 도드라진다.
+ */
+.map-tools .icon-button.is-secondary {
+  border: var(--border-width-thin) solid var(--color-gray-600);
+  background-color: var(--color-gray-650);
+  color: var(--fg-primary);
+}
+
+.map-tools .icon-button.is-secondary:hover {
+  background-color: var(--color-gray-600);
+  color: var(--fg-primary);
 }
 
 /* ---------- AI Assist Panel ---------- */
@@ -1069,13 +1082,51 @@ button {
 .ai-panel.is-open .ai-fold-closed { grid-template-rows: 0fr; opacity: 0; }
 .ai-panel.is-open .ai-fold-open { grid-template-rows: 1fr; opacity: 1; }
 
-/* closed — Figma "Message": Typography/Body/2/Regular (16/24), gray/50. */
+/*
+ * closed — Figma "Message"(121:647): 한 줄 메시지 + 우측 [확인] 버튼, gap 8, 세로 가운데.
+ * 확인은 경고를 받았다는 응답이므로 주의 상태에서만 뜬다(일반 상태에선 숨긴다).
+ */
+.ai-message {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+}
+
+/* Typography/Body/2/Regular (16/24), gray/50. 한 줄만 — 넘치면 말줄임(…). */
 .ai-message-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-size: var(--font-size-16);
   line-height: var(--font-line-height-24);
   font-weight: var(--font-weight-regular);
   color: var(--color-gray-50);
 }
+
+/* [확인] — Figma Acknowledge Button: 흰 면(secondary) + 어두운 라벨, 32h, radius 4, Label/2 (13/18/500). */
+.ai-ack {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--size-control-sm);
+  padding: 0 var(--space-12);
+  border: 0;
+  border-radius: var(--radius-control);
+  background-color: var(--button-secondary-bg-default);
+  color: var(--button-secondary-fg-default);
+  font-family: inherit;
+  font-size: var(--font-size-13);
+  line-height: var(--font-line-height-18);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+}
+
+.ai-ack:hover { background-color: var(--button-secondary-bg-hover); }
+
+.ai-panel:not(.is-warning) .ai-ack { display: none; }
 
 /* opened — Figma "Texts": 내용 프레임 + 입력창, gap 4. */
 .ai-opened {
@@ -1147,7 +1198,7 @@ button {
   font-weight: var(--font-weight-regular);
 }
 
-/* Send — accent 버튼(main/700 면, 흰 아이콘). arrow-right 16. */
+/* Send — 흰 면 버튼(secondary), 어두운 arrow-right 16. Figma 432:7275 (Accent 인스턴스 fill 을 #FFFFFF 로 덮음). */
 .ai-send {
   flex: none;
   display: inline-flex;
@@ -1157,12 +1208,12 @@ button {
   height: var(--size-control-sm);
   border: 0;
   border-radius: var(--radius-control);
-  background-color: var(--button-accent-bg-default);
-  color: var(--button-accent-fg-default);
+  background-color: var(--button-secondary-bg-default);
+  color: var(--button-secondary-fg-default);
   cursor: pointer;
 }
 
-.ai-send:hover { background-color: var(--button-accent-bg-hover); }
+.ai-send:hover { background-color: var(--button-secondary-bg-hover); }
 
 /* ---------- 주의(Warning) 알림 상태 ----------
  * Figma 478:17275 — 일반 상태와 다른 건 딱 둘이다:
@@ -1171,11 +1222,58 @@ button {
  * 로봇 카드·타임라인·상태바 등 나머지는 그대로다.
  * (Critical·Safe 도 같은 방식으로 .is-critical / .is-safe 만 추가하면 된다.)
  */
+/*
+ * 테두리엔 얇은 경고색 선만 남기고(고른 빛번짐 없음), 그 라인을 따라
+ * 별똥별 하나가 돈다 — 밝은 머리 + 뒤로 길게 사라지는 꼬리(warn-edge-comet).
+ * conic 의 대부분은 투명하고, 머리 직전(약 300~360°) 구간만 꼬리로 차오른다.
+ * 머리 바로 앞(0~3°)은 곧장 투명 — 진행 방향은 시계방향이다.
+ */
+@property --warn-glow-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
 .two-col.is-warning {
   box-shadow:
-    0 0 0 1px rgb(248 235 174),
-    0 0 6px 3px rgb(238 206 27 / 50%),
-    0 0 20px -5px rgb(248 235 174);
+    0 0 0 1px rgb(248 235 174 / 60%),
+    0 0 8px -3px rgb(238 206 27 / 30%);
+}
+
+.two-col.is-warning::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  border-radius: inherit;
+  padding: var(--border-width-strong);
+  background: conic-gradient(
+    from var(--warn-glow-angle),
+    #fff6d6 0deg,
+    rgb(247 205 54 / 0) 3deg,
+    rgb(247 205 54 / 0) 296deg,
+    rgb(247 205 54 / 0.12) 320deg,
+    rgb(247 205 54 / 0.5) 344deg,
+    #f7cd36 356deg,
+    #fff6d6 360deg
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  filter:
+    drop-shadow(0 0 3px rgb(247 205 54 / 0.7))
+    drop-shadow(0 0 7px rgb(238 206 27 / 0.45));
+  animation: warn-edge-comet 6s linear infinite;
+}
+
+@keyframes warn-edge-comet {
+  to { --warn-glow-angle: 360deg; }
 }
 
 .ai-panel.is-warning .ai-box {
@@ -1216,6 +1314,8 @@ button {
   /* 흐르는 상단선·Spectrum 은 장식이다 — 멈춘다. */
   .ai-box::before, .ai-spectrum, .ai-spectrum::before { animation: none; }
   .ai-spectrum { transform: none; }
+  /* 엣지 글로우는 정적 box-shadow 만 남기고, 라인을 도는 빛은 뺀다. */
+  .two-col.is-warning::after { display: none; }
   /* 걷기 리그도 멈춘다 — 기본 포즈로 선다. */
   .robot-thumb.is-walking .rd-bob,
   .robot-thumb.is-walking .rd-hip,
@@ -1788,21 +1888,25 @@ input.field-box { outline: 0; }
 }
 
 /*
- * Selected 는 단색이 아니라 세로 그라데이션이다.
- *   5%·55%  bg/surface/overlay-dark   어두운 유리(Dark 10 14 21 / 50%, Light 은 밝은 알파)
- *   98%     main/900                  #2E539F
+ * Selected — Figma Robot-state=Selected(427:5788). 중심에서 퍼지는 방사형이다.
+ *   Figma 는 circle 이지만 카드에서 원 테두리가 도드라져 세로로 눌린 타원(150% 80%)으로 편다.
+ *   at 50% 38%
+ *   5%·45%  bg/surface/overlay-dark   어두운 유리(Dark 10 14 21 / 50%, Light 은 밝은 알파)
+ *   95%     main/900                  #2E539F
  *   100%    main/700                  #3B79D5
- * 파란 가장자리는 그라데이션 블리드가 아니라 main/600 1px 실선이다.
- * border 대신 inset box-shadow 로 그어 비선택 카드와 크기를 맞춘다.
+ * 가장자리는 main/500(#6AA7E7) 1px 실선 + 안쪽으로 번지는 main/400(#89B9ED) 발광.
+ * border 대신 inset box-shadow 두 겹으로 그어 비선택 카드와 크기를 맞춘다.
  * overlay-dark 가 모드별 값을 가지므로 예전의 Light 전용 뒤집기 규칙은 필요 없다.
  */
 .robot-card[aria-pressed="true"] {
-  box-shadow: inset 0 0 0 var(--border-width-thin) var(--color-main-600);
-  background-image: linear-gradient(
-    180deg,
+  box-shadow:
+    inset 0 0 0 var(--border-width-thin) var(--color-main-500),
+    inset 0 0 4px 1px var(--color-main-400);
+  background-image: radial-gradient(
+    ellipse 150% 80% at 50% 38%,
     var(--bg-surface-overlay-dark) 5%,
-    var(--bg-surface-overlay-dark) 55%,
-    var(--color-main-900) 98%,
+    var(--bg-surface-overlay-dark) 45%,
+    var(--color-main-900) 95%,
     var(--color-main-700) 100%
   );
 }

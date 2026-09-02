@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/static/woff2/SUIT.css" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" />
   <link rel="stylesheet" href="../assets/css/tokens.css?v=0d02f188" />
-  <link rel="stylesheet" href="../assets/css/app-shell.css?v=3a8b8292" />
+  <link rel="stylesheet" href="../assets/css/app-shell.css?v=1561c1c8" />
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
@@ -236,7 +236,7 @@
                 <button type="button" class="icon-button" aria-label="로봇 추적">
                   <span class="i i-20" style="--i:var(--ic-target)"></span>
                 </button>
-                <button type="button" class="icon-button is-active" aria-label="영상 리플레이">
+                <button type="button" class="icon-button is-secondary" aria-label="영상 리플레이">
                   <span class="i i-20" style="--i:var(--ic-play)"></span>
                 </button>
               </div>
@@ -263,7 +263,10 @@
                 <span class="ai-spectrum" aria-hidden="true"></span>
 
                 <div class="ai-fold ai-fold-closed">
-                  <div><p class="ai-message-text">현재 지하발전소 B3 터빈2 NG 1건이 발견 되었습니다. Spiral Casing Pr. 기준값 87이하 측정값 90으로 3정도 높습니다. 4% 미만으로 다음 검사에서 추이를 보겠습니다.</p></div>
+                  <div><div class="ai-message">
+                    <p class="ai-message-text">현재 지하발전소 B3 터빈2 NG 1건이 발견 되었습니다. Spiral Casing Pr. 기준값 87이하 측정값 90으로 3정도 높습니다. 4% 미만으로 다음 검사에서 추이를 보겠습니다.</p>
+                    <button type="button" class="ai-ack" data-ai-ack>확인</button>
+                  </div></div>
                 </div>
 
                 <div class="ai-fold ai-fold-open">
@@ -480,6 +483,6 @@
 
 
 <script src="../assets/js/theme.js?v=dcf8f460"></script>
-<script src="../assets/js/screen.js?v=29a4d4b1"></script>
+<script src="../assets/js/screen.js?v=b7a28b73"></script>
 </body>
 </html>
