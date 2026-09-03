@@ -757,8 +757,17 @@ button {
  */
 @media (max-width: 1600px) {
   .two-col { grid-template-columns: minmax(0, 1fr) 308px; }
-  .two-col > .map-panel { grid-column: 1; }
   .two-col > .floating { grid-column: 2; }
+
+  /*
+   * 지도 칸이 이제 트랙 하나라 subgrid 로는 컬럼이 하나뿐이다.
+   * 그러면 4컬럼짜리 AI 패널이 암묵적 칸을 만들며 다시 폭을 다 먹는다.
+   * 여기서는 지도 칸을 직접 9등분한다 — AI 패널 4/9 비율은 그대로다.
+   */
+  .two-col > .map-panel {
+    grid-column: 1;
+    grid-template-columns: repeat(9, minmax(0, 1fr));
+  }
 }
 
 .two-col::before {
@@ -778,18 +787,27 @@ button {
  */
 .map-panel {
   min-width: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: var(--space-16);
+  /*
+   * 부모(.two-col)의 컬럼을 그대로 물려받는다 — 지도 칸이 차지한 9개다.
+   * subgrid 라 안쪽 칸 경계가 바깥 그리드와 같은 자리에 떨어진다.
+   * (패딩 8 은 첫 칸과 끝 칸에서만 깎여서 2~8번 경계는 정확히 맞는다.)
+   * subgrid 를 못 쓰는 브라우저는 위 줄이 남아 9등분으로 근사한다 — 1px 안쪽 차이다.
+   */
+  display: grid;
+  grid-template-columns: repeat(9, minmax(0, 1fr));
+  grid-template-columns: subgrid;
+  grid-template-rows: minmax(0, 1fr);
+  column-gap: var(--grid-gutter);
   /* Figma Map Panel(89:576) 은 padding 8 — 우측 패널(.floating)과 같아야 한다(예전엔 20). */
   padding: var(--space-8);
   border-radius: var(--radius-card);
 }
 
+/* 지도는 칸 전체를 쓴다. AI 패널이 그 위에 겹쳐 뜬다(예전엔 아래에 쌓여 지도를 밀었다). */
 .map-canvas {
   position: relative;
-  flex: 1 1 auto;
+  grid-row: 1;
+  grid-column: 1 / -1;
   min-height: 0;
 }
 
@@ -844,9 +862,16 @@ button {
  * 스펙트럼 파형·흐르는 상단선·alert Type 변형은 이 컴포넌트에 없다.
  * 직전 구현(스펙트럼 버전)은 _backup/ai-panel-spectrum-*.html 에 스냅샷.
  */
+/*
+ * 가로로 너무 길게 깔린다는 의견이 있어 4컬럼으로 줄였다 — 지도 9컬럼의 절반 이하다.
+ * 지도 위에 겹쳐 뜬다(.ai-box 가 backdrop blur 라 우측 미션 패널과 같은 유리로 읽힌다).
+ * 폭을 바꾸려면 아래 span 숫자 하나만 고치면 컬럼 경계에 그대로 붙는다.
+ */
 .ai-panel {
   position: relative;
-  flex: none;
+  grid-row: 1;
+  grid-column: 1 / span 4;
+  align-self: end;
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
@@ -1175,12 +1200,18 @@ button {
 }
 
 /* Typography/Body/2/Regular (16/24), gray/50. 한 줄만 — 넘치면 말줄임(…). */
+/*
+ * 닫힘 상태의 한 줄 요약. 패널이 4컬럼으로 좁아지면서 한 줄로는 문장 앞부분밖에
+ * 안 남아서 두 줄까지 보여준다. 나머지는 펼쳐서 본다(오른쪽 토글).
+ */
 .ai-message-text {
   flex: 1 1 auto;
   min-width: 0;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
   font-size: var(--font-size-16);
   line-height: var(--font-line-height-24);
   font-weight: var(--font-weight-regular);
