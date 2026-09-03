@@ -27,7 +27,13 @@
 
   // 배율은 "칸을 채우는 배율"(cover)을 1 로 보고 그 위로만 키운다 —
   // 그보다 작아지면 지도 밖 빈자리가 생긴다.
-  var MAX_ZOOM = 6;
+  var MAX_ZOOM = 4;
+
+  // 그림을 구워 두는 크기의 상한(긴 변). GPU 텍스처 한계가 보통 8192 다.
+  var MAX_RASTER_PX = 8192;
+
+  // 배율이 멎고 이만큼 지나면 그림을 그 배율로 다시 굽는다.
+  var SETTLE_MS = 140;
   var WHEEL_STEP = 1.0015;   // deltaY 1 당 배율. 트랙패드와 휠 둘 다 자연스러운 값.
   var BUTTON_STEP = 1.5;
 
@@ -38,6 +44,8 @@
   var cover = 0;      // 칸을 채우는 배율. 0 이면 아직 재기 전이다.
   var zoom = 1;       // cover 대비 배수
   var x = 0, y = 0;   // 판의 왼쪽 위 모서리 자리
+  var raster = 0;     // 지금 그림이 구워져 있는 배율
+  var settle = null;
 
   function scale() { return cover * zoom; }
 
@@ -57,8 +65,32 @@
     y = (view.clientHeight - MAP_H * k) / 2;
   }
 
+  /*
+   * 왜 두 단계인가 —
+   * transform: scale() 만으로 키우면 브라우저는 그림을 제 크기(1716)로 한 번 굽고
+   * 그 비트맵을 GPU 가 늘린다. 벡터인데도 확대하면 뭉개진다.
+   * 굴리는 동안에는 그 방식이 빠르니 그대로 쓰고, 손을 떼면 그 배율로 다시 구워
+   * 또렷하게 만든다. transform 의 배율은 그때 1 로 돌아온다.
+   */
+  function bake() {
+    var k = scale();
+    var capped = Math.min(k, MAX_RASTER_PX / MAP_W, MAX_RASTER_PX / MAP_H);
+    if (Math.abs(capped - raster) < 0.001) { return; }
+    raster = capped;
+    image.style.width = MAP_W * raster + "px";
+    image.style.height = MAP_H * raster + "px";
+    draw();
+  }
+
+  function later() {
+    if (settle) { clearTimeout(settle); }
+    settle = setTimeout(function () { settle = null; bake(); }, SETTLE_MS);
+  }
+
   function draw() {
-    plane.style.transform = "translate3d(" + x + "px," + y + "px,0) scale(" + scale() + ")";
+    // 구워진 배율과의 차이만 transform 이 맡는다. 멎어 있을 때는 늘 1 이다.
+    var k = raster ? scale() / raster : scale();
+    plane.style.transform = "translate3d(" + x + "px," + y + "px,0) scale(" + k + ")";
   }
 
   // 창 크기가 바뀌면 cover 를 다시 잡는다. 보고 있던 지점은 그대로 둔다.
@@ -95,6 +127,7 @@
     x = px - mx * nk;
     y = py - my * nk;
     clamp();
+    bake();
     draw();
   }
 
@@ -121,6 +154,7 @@
     // deltaMode 가 줄(1)·쪽(2)이면 픽셀로 환산한다 — 파이어폭스가 줄 단위로 준다.
     var d = event.deltaY * (event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? 100 : 1);
     zoomAt(zoom * Math.pow(WHEEL_STEP, -d), p.x, p.y);
+    later();
   }, { passive: false });
 
   // 끌어서 이동. 버튼 위에서 시작한 것은 무시한다.
@@ -164,6 +198,7 @@
     zoomIn.addEventListener("click", function () {
       var f = focus();
       zoomAt(zoom * BUTTON_STEP, f.x, f.y);
+      bake();
     });
   }
 
@@ -183,6 +218,7 @@
         y = f.y - ROBOT.y * k;
       }
       clamp();
+      bake();
       draw();
     });
   }

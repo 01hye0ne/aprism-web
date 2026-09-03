@@ -822,7 +822,11 @@ button {
   will-change: transform;
 }
 
-/* 제 크기로 두고 배율은 transform 이 준다 — 벡터라 아무리 키워도 또렷하다. */
+/*
+ * 크기는 map.js 가 정한다 — 배율만큼 실제로 키워 놓아야 벡터가 그 배율로 다시 구워진다.
+ * transform: scale() 만으로 키우면 제 크기로 구운 비트맵을 늘리는 것이라 뭉개진다.
+ * 첫 그림이 실릴 때까지의 값만 여기 둔다.
+ */
 .map-image {
   display: block;
   width: 1716px;
