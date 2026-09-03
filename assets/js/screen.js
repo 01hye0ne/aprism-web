@@ -225,10 +225,12 @@
   function stepNode(step, index) {
     var meta = STATE[step.state];
 
-    // 레일 — 선 18, (표식), 남은 선. 대기 단계에는 표식이 없다.
+    // 레일 — 선 18, (표식), 남은 선.
+    // 대기 단계에는 표식이 없고 머리 선도 없다 — 점선 하나가 처음부터 끝까지 지난다.
+    // 머리 선은 표식을 18 만큼 내려 카드 첫 줄 한가운데에 맞추는 몫이라 표식과 짝이다.
     var capsule = el("span", "rail-capsule");
-    capsule.appendChild(el("span", "rail-stub"));
     if (meta.icon) {
+      capsule.appendChild(el("span", "rail-stub"));
       var mark = el("span", "rail-mark");
       var icon = el("span", "i i-14");
       icon.style.setProperty("--i", meta.icon);

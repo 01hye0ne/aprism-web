@@ -2668,7 +2668,7 @@ input.field-box { outline: 0; }
 /*
  * 레일은 "선 18 · 표식 24 · 남은 선" 순서다. 표식이 18 만큼 내려가 있어야
  * 카드 첫 줄(Meta Row)의 한가운데와 높이가 맞는다.
- * 대기 단계에는 표식이 없다 — 선만 처음부터 끝까지 지난다.
+ * 대기 단계에는 표식이 없고 머리 선도 없다 — 점선 하나가 처음부터 끝까지 지난다.
  */
 .rail-capsule {
   flex: none;
@@ -2705,6 +2705,24 @@ input.field-box { outline: 0; }
   width: 8px;
   min-height: 0;
   background-color: var(--chart-track);
+}
+
+/*
+ * 아직 지나지 않은 구간은 점선이다 — Figma Mission Timeline Item 의
+ * Running 은 표식 아래부터, Pending 은 처음부터 끝까지 점선입니다.
+ * 지나온 실선은 8 폭 chart/track, 점선은 2 폭 border/default 에
+ * 2 켜고 6 쉬는 무늬(주기 8)다. Figma dashPattern [2, 6] · strokeWeight 2 그대로다.
+ * strokeCap 이 NONE 이라 점은 각지게 둔다.
+ */
+.is-running .rail-line,
+.is-pending .rail-line {
+  width: 2px;
+  background-color: transparent;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    var(--border-default) 0 2px,
+    transparent 2px 8px
+  );
 }
 
 /* Figma 의 Step 프레임이다 — 카드 위 8 · 아래 4 가 곧 카드 사이 간격 12 가 된다. */

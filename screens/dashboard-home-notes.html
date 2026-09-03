@@ -634,6 +634,35 @@
     <strong>마지막 단계의 레일 선도 끝까지 이어집니다.</strong> 전에는 마지막만 선을 지웠는데
     Figma 는 대기 단계 모두 선이 처음부터 끝까지 지납니다.
   </p>
+  <p>
+    <strong>아직 지나지 않은 구간은 점선입니다</strong>(<code>539:15650</code> 실측).
+    <code>Mission Timeline Item</code> 의 <code>Status</code> 변형마다 레일이 다릅니다.
+  </p>
+  <table>
+    <tr><th>Status</th><th>레일</th></tr>
+    <tr><td><code>Done</code></td><td>머리 선 8×18 <b>실선</b> · 표식 24 · 남은 선 8 <b>실선</b>
+      (<code>chart/track</code>)</td></tr>
+    <tr><td><code>Running</code></td><td>머리 선 8×18 실선 · 표식 24 ·
+      <b>아래는 점선</b></td></tr>
+    <tr><td><code>Pending</code></td><td>표식도 머리 선도 없이 <b>처음부터 끝까지 점선</b></td></tr>
+  </table>
+  <p>
+    점선은 <b>2 폭 · <code>border/default</code> · 2 켜고 6 쉼</b> 입니다
+    (Figma <code>dashPattern [2, 6]</code> · <code>strokeWeight 2</code> 그대로).
+    지나온 실선은 <b>8 폭 · <code>chart/track</code></b> 이라 <b>굵기와 색이 함께 바뀝니다</b> —
+    지나온 길이 굵고 밝고, 남은 길은 가늘고 어둡습니다.
+    <code>strokeCap</code> 이 <code>NONE</code> 이라 점은 각지게 뒀습니다.
+  </p>
+  <p>
+    CSS 는 <code>repeating-linear-gradient</code> 한 줄입니다 —
+    <code>border/default 0 2px, transparent 2px 8px</code>. 화면에서 재보니
+    세로 무늬가 <b>2 · 6</b>, 폭이 <b>2</b> 로 Figma 와 같습니다.
+  </p>
+  <p>
+    <b>대기 단계에서는 머리 선(<code>rail-stub</code>)을 없앴습니다.</b> 머리 선은 표식을 18 만큼
+    내려 카드 첫 줄 한가운데에 맞추는 몫이라 <b>표식과 짝</b>입니다 — 표식이 없는 대기 단계에
+    남겨 두면 점선이 위에서 한 번 끊깁니다.
+  </p>
 
   <p><strong>로봇 카드에 로봇 그림이 들어왔습니다.</strong> 빈 자리로 두었던 곳입니다.</p>
   <ul>
