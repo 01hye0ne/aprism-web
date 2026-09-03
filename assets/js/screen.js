@@ -42,10 +42,22 @@
     var orb = (mark && window.PrismOrb) ? window.PrismOrb.mount(mark, { palette: severity() }) : null;
 
     // closed 상태의 [확인] — 주의 알림을 받았다는 응답. 누르면 화면·패널을 일반(파란) 상태로
-    // 되돌리고, 알림 문구를 일반 안내 멘트로 바꾼다.
+    // 되돌리고, 두 줄을 일반 상태 멘트로 바꾼다.
+    //
+    // 첫 줄은 인사, 둘째 줄이 본문이다(닫힘 16/24, 펼침 20/32 — 크기는 CSS 가 정한다).
+    // 닫힘·펼침 두 판에 같은 클래스가 하나씩 있어서 넷을 다 바꾼다.
     var ack = panel.querySelector("[data-ai-ack]");
     if (ack) {
-      var NORMAL_TEXT = "무엇을 도와드릴까요?";
+      var NORMAL_LINE_1 = "안녕하세요, 김현수 님.";
+      var NORMAL_LINE_2 = "인계된 알림 3건과 진행 예정인 미션 1건이 있어요. 먼저 살펴볼까요?";
+
+      function setLines(one, two) {
+        Array.prototype.slice.call(panel.querySelectorAll(".ai-line-1"))
+          .forEach(function (el) { el.textContent = one; });
+        Array.prototype.slice.call(panel.querySelectorAll(".ai-line-2"))
+          .forEach(function (el) { el.textContent = two; });
+      }
+
       ack.addEventListener("click", function () {
         panel.classList.remove("is-warning");
         if (orb) { orb.setPalette(severity()); }
@@ -53,14 +65,7 @@
         if (twoCol) {
           twoCol.classList.remove("is-warning");
         }
-        var msg = panel.querySelector(".ai-message-text");
-        if (msg) {
-          msg.textContent = NORMAL_TEXT;
-        }
-        var headline = panel.querySelector(".ai-headline");
-        if (headline) {
-          headline.textContent = NORMAL_TEXT;
-        }
+        setLines(NORMAL_LINE_1, NORMAL_LINE_2);
       });
     }
 
