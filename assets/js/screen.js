@@ -422,7 +422,8 @@
     var pending = Array.prototype.slice.call(list.querySelectorAll("[data-precheck-row]"));
     var tag = list.querySelector("[data-precheck-tag]");
     var startBtn = document.querySelector(".btn-line.is-start");
-    var STEP = 1400;
+    // 간격은 CSS 가 정한다(--precheck-step) — 게이지가 차는 시간과 같은 값이어야 한다.
+    var STEP = parseFloat(getComputedStyle(list).getPropertyValue("--precheck-step")) || 1400;
 
     function complete(row) {
       row.classList.remove("is-running", "is-active", "is-pending");
