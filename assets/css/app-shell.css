@@ -2533,33 +2533,44 @@ input.field-box { outline: 0; }
 .step-card {
   display: flex;
   flex-direction: column;
-  gap: var(--space-8);
+  gap: var(--space-4);
   padding: var(--space-12) var(--space-8);
   border-radius: var(--radius-card);
-  background-color: var(--chart-track);
+  background-color: var(--bg-surface-subtle);
 }
 
 /*
- * 수행중인 단계만 AI 패널과 같은 계열의 세로 그라데이션이 깔리고 테두리가 생긴다.
- * 테두리는 inset 그림자다 — CSS border 는 카드 높이를 2 늘린다.
+ * 수행중인 단계는 파란 면이 통째로 깔린다(Figma Step Card / Property 1=ing).
+ * Figma 에서 변수로 묶이지 않은 raw 그라데이션이라 원시 토큰으로 적는다 —
+ * 위 main/700(#3B79D5) 에서 아래 main/600(#4990E0) 으로 내려간다.
+ * 예전의 반투명 그라데이션 + 테두리는 없어졌다.
  */
 .is-running .step-card {
   background-image: linear-gradient(
     180deg,
-    rgb(54 178 223 / 10%) 0%,
-    rgb(90 142 228 / 30%) 55%,
-    rgb(104 148 230 / 50%) 90%,
-    rgb(117 152 232 / 60%) 95%,
-    var(--alert-default-glow-primary) 100%
+    var(--color-main-700) 0%,
+    var(--color-main-600) 100%
   );
-  box-shadow: inset 0 0 0 var(--border-width-thin) var(--border-focus);
+  /*
+   * 파란 면은 테마가 바뀌어도 같은 색이라 글자도 고정한다.
+   * Figma 는 여기 fg/primary 를 걸어 뒀는데 Light 모드에서 그게 검정(#070A10)이 되어
+   * 파란 면 위에 검은 글자가 온다. Dark 와 같은 gray/50 으로 두 모드 모두 맞춘다.
+   * (Figma 쪽도 정리가 필요하다 — 검토 노트에 적어 뒀다.)
+   */
+  --step-on-blue: var(--color-gray-50);
 }
 
-/* 머리는 두 줄이 붙어 있다 — 번호·시각 줄 위, 지점 이름 줄 아래. */
+.is-running .step-no,
+.is-running .step-time,
+.is-running .step-duration,
+.is-running .step-title,
+.is-running .step-desc { color: var(--step-on-blue); }
+
+/* 머리 두 줄 — 번호·시각 줄 위, 지점 이름 줄 아래. Figma 는 세 덩이 모두 gap 4 다. */
 .step-head {
   display: flex;
   flex-direction: column;
-  gap: 0;
+  gap: var(--space-4);
 }
 
 .step-meta-row {
@@ -2579,7 +2590,7 @@ input.field-box { outline: 0; }
   gap: var(--space-8);
 }
 
-/* 단계 번호. 수행중일 때만 파란 면이 된다. */
+/* 단계 번호. 수행중일 때는 파란 카드 위라 어두운 스크림이 깔린다. */
 .step-no {
   flex: none;
   display: flex;
@@ -2593,9 +2604,10 @@ input.field-box { outline: 0; }
 }
 
 .is-running .step-no {
-  background-color: var(--bg-accent);
-  color: var(--fg-primary);
+  /* Figma 는 bg/overlay 를 60% 로 얹는다 — 렌더에서 재보니 #070A10 60% 다. */
+  background-color: var(--bg-overlay);
 }
+
 
 .step-title-row {
   display: flex;
