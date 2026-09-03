@@ -65,6 +65,9 @@ Figma 쪽 같은 값은 `Grid / Content 12` · `Grid / Base 4` 스타일입니�
 
 - 색상은 `assets/css/base.css`의 semantic 토큰을 사용하고 raw hex를 컴포넌트에 직접 넣지 않습니다.
 - 화면을 나누는 폭은 그리드에서 가져옵니다 — `.col-*` 로 쓰고 px 를 직접 적지 않습니다.
+- Figma 에서 내보낸 파일은 **`assets/source/` 에 그냥 둡니다.** 쓸 때 제자리로 옮깁니다
+  (아이콘 → `assets/icons/`, 그림 → `assets/img/`, 자리표시자 → `assets/figma/`).
+  거기 남아 있는 파일은 아직 안 쓰는 파일입니다. 자세한 건 [assets/source/README.md](./assets/source/README.md).
 - Dark/Light는 별도 페이지를 만들지 않고 `data-theme` 속성으로 전환합니다.
 - 감지 상태는 위험(Danger) / 주의(Warning) / 안전(Safe) 세 단계를 유지합니다.
 
