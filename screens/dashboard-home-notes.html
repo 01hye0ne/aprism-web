@@ -96,7 +96,65 @@
     구조가 크게 바뀌었습니다. 디자인 시스템도 컬렉션 구성이 달라져서 <code>tokens.css</code>를 다시 만들었습니다.
   </p>
 
-  <h3>1. 디자인 시스템 동기화 · Waypoint 카드</h3>
+  <h3>1. AI 패널 — Delta 그래픽 자리에 맞춰 구조를 다시 짰습니다</h3>
+  <p><b>두 state 의 배치가 달라졌습니다.</b></p>
+  <table>
+    <tr><th></th><th>이전</th><th>현재 (Figma 121:665)</th></tr>
+    <tr><td>닫힘</td><td>헤더(DELTA+태그) 위 · 메시지 아래</td>
+        <td><b>가로 배치</b> — 왼쪽에 Delta 기둥(원 60 + 이름), 오른쪽에 태그 줄 + 메시지</td></tr>
+    <tr><td>펼침</td><td>같은 헤더 + 상자</td>
+        <td>Delta(원 24 + 이름)가 <b>헤더 줄 안으로</b> 들어가고 상자가 아래 전체</td></tr>
+  </table>
+  <p>
+    여닫을 때 DOM 을 옮기지 않으려고 <b>이름 붙인 격자 칸</b>으로 담았습니다 —
+    닫힘은 <code>"delta header" / "delta box"</code>, 펼침은 <code>"delta header" / "box box"</code> 입니다.
+    Delta 기둥 폭은 Figma 와 같은 <b>92</b>(원 60 + 좌우 16), 펼침에서는 <b>79</b>(원 24 + 4 + 이름)입니다.
+  </p>
+  <p>
+    <b>그래픽 자리는 원 외곽선으로 잡아 뒀습니다.</b> Figma 에도 아직 자리표시자(<code>#D9D9D9</code> 2px)만
+    놓여 있어서 그대로 옮겼습니다 — 닫힘 <b>48</b>, 펼침 <b>19</b> 입니다.
+    그래픽이 나오면 <code>.ai-delta-mark</code> 안의 <code>&lt;i&gt;</code> 만 그림으로 갈면
+    크기·자리는 그대로 맞습니다.
+  </p>
+
+  <p><b>메시지가 두 줄이 되었습니다.</b> 컴포넌트 속성도 인사 · 브리핑 · AI Name 셋으로 갈라졌습니다.</p>
+  <table>
+    <tr><th>줄</th><th>닫힘</th><th>펼침</th></tr>
+    <tr><td>인사</td><td colspan="2"><code>Body/3</code> (14/22) — 스타일 위에 <b>Bold 로 덮여</b> 있습니다</td></tr>
+    <tr><td>브리핑</td><td><code>Body/3</code> (14/22) Regular</td><td><b><code>Body/1</code> (20/32) SemiBold</b></td></tr>
+  </table>
+  <p>
+    <code>Body/1</code> 은 이름이 Regular 인데 <b>스타일 자체가 SemiBold</b> 입니다 —
+    이전 구현은 Regular 로 그리고 있었습니다.
+  </p>
+
+  <p><b>흐르는 상단선은 걷어냈습니다.</b> Figma stroke 가 네 변으로 바뀌었습니다.</p>
+  <ul>
+    <li><b>상자</b> — 1px 흰 광택 그라데이션(<code>90deg</code>, 투명도 20/50/20/80/50). <b>네 변 모두</b>입니다.</li>
+    <li><b>입력창</b> — 1px 파란 5-stop 그라데이션. <b>예전 상단선이 쓰던 무늬가 여기로 왔습니다.</b>
+      주의 상태에서는 경고 계열로 갈아탑니다.</li>
+  </ul>
+  <p>
+    CSS <code>border</code> 는 그라데이션을 못 받아서, 둘 다 <code>padding 1</code> 짜리 판에
+    <code>content-box XOR border-box</code> 마스크로 테두리 띠만 남겼습니다.
+  </p>
+
+  <p><b>같이 바로잡은 것 둘</b></p>
+  <ul>
+    <li><b>[확인]·보내기 버튼이 secondary 였습니다.</b> Figma 는 <code>button/primary</code>(흰 면 + 어두운 글자)입니다.
+      디자인 시스템 동기화로 secondary 의 Dark 값이 회색 면이 되면서 눈에 띄었습니다.</li>
+    <li><b>글자색을 <code>fg/primary</code> 로 바꿨습니다.</b> 이전에는 <code>gray/50</code>(흰색)으로 박혀 있었는데,
+      상자가 반투명이라 <b>Light 모드에서 밝은 면 위 흰 글자</b>가 됐습니다. Figma 도 전부 <code>fg/primary</code> 입니다.</li>
+  </ul>
+
+  <p><b>Figma 와 다르게 둔 것</b></p>
+  <ul>
+    <li><b>닫힘 태그 줄 높이</b> — Figma 34, 여기 <b>44</b> 입니다. Figma 의 토글은 36×20 인데
+      누르는 자리로 쓰기엔 낮아서 36×36 을 그대로 뒀습니다.</li>
+    <li><b>Spectrum</b> — Figma 에 없는 층입니다. 이전대로 닫힘 상태에만 깔아 뒀습니다.</li>
+  </ul>
+
+  <h3>2. 디자인 시스템 동기화 · Waypoint 카드</h3>
 
   <p><b>Semantic 130개를 전부 대조해 53건을 맞췄습니다.</b> 지금은 어긋나는 값이 없습니다.</p>
   <table>
@@ -160,7 +218,7 @@
     그래서 수행중 카드 높이도 설명 줄 수에 따라 달라집니다(Figma 129 · 여기 112).
   </p>
 
-  <h3>2. 로봇개 비율을 고친 파일로 걷기 리그를 다시 짰습니다</h3>
+  <h3>3. 로봇개 비율을 고친 파일로 걷기 리그를 다시 짰습니다</h3>
   <p>
     주신 <code>dog.svg</code> 를 <code>assets/img/robot-dog.svg</code> 로 옮기고,
     그 파일의 도형 그대로 걷기 리그를 다시 만들었습니다. <b>모션은 손대지 않았습니다</b> —
@@ -209,7 +267,7 @@
     걷기 리그처럼 위상이 어긋나야 보이는 것이라, 앉은 자세에서는 빼고 그렸습니다 — 그림은 같습니다.
   </p>
 
-  <h3>3. 12컬럼 그리드를 깔았습니다</h3>
+  <h3>4. 12컬럼 그리드를 깔았습니다</h3>
   <p>
     Figma 에 레이아웃 그리드가 하나도 없어서 새로 정했습니다. 대시보드에서 가장 흔한
     <b>12컬럼</b>, 거터 <b>16</b> 입니다. 컬럼 폭은 고정하지 않고 <b>거터만 고정하고 남는 폭을 12로 나눕니다</b> —
@@ -323,7 +381,7 @@
     지도 135px 을 내주는 것보다 낫다고 봤습니다. 수행중·대기 카드의 여섯 라벨이 모두 온전히 들어갑니다.
   </p>
 
-  <h3>4. 엣지 글로우를 React Bits 의 BorderGlow 로 바꿨습니다</h3>
+  <h3>5. 엣지 글로우를 React Bits 의 BorderGlow 로 바꿨습니다</h3>
   <p>
     주의 상태에서 테두리를 도는 빛을 <b>React Bits 의 BorderGlow</b> 로 바꿨습니다.
     원본은 <b>커서가 테두리에 가까워지면 그 방향으로 켜지는</b> 컴포넌트인데,
@@ -376,7 +434,7 @@
     정리는 저장소 루트 <code>THIRD-PARTY.md</code> 에 있습니다.
   </p>
 
-  <h3>5. 우측 패널 · Status Bar 업데이트</h3>
+  <h3>6. 우측 패널 · Status Bar 업데이트</h3>
 
   <p><strong>Status Bar 가 64 → 60 으로 낮아졌습니다.</strong> Right 프레임의 패딩이 줄고 칩이 작아졌습니다.</p>
   <table>
@@ -452,7 +510,7 @@
       셋 다 8 로 두었습니다.</li>
   </ul>
 
-  <h3>6. AI 패널 일렁임 — 선 · Spectrum · 배경</h3>
+  <h3>7. AI 패널 일렁임 — 선 · Spectrum · 배경</h3>
   <p>
     Siri · Gemini 처럼 패널이 가만히 있지 않도록 세 층을 움직였습니다.
     <strong>모두 한 방향으로만 흐르는 무한 루프</strong>라 갔다가 되돌아오지 않습니다.
@@ -538,7 +596,7 @@
     그 자리를 입력창이 차지합니다.
   </p>
 
-  <h3>7. 이번 업데이트 — 사이트 패널 · AI 바 · 토큰</h3>
+  <h3>8. 이번 업데이트 — 사이트 패널 · AI 바 · 토큰</h3>
 
   <p><strong>사이트 패널이 세 덩이로 나뉘었습니다.</strong> 패널 자체에는 여백이 없고 각 덩이가 자기 여백을 갖습니다.</p>
   <table>
@@ -669,7 +727,7 @@
     여기서는 셋 다 들어가게 나눕니다)과 타임라인 내용(로봇별로 다르게 지었습니다).
   </p>
 
-  <h3>8. AI 패널 디테일</h3>
+  <h3>9. AI 패널 디테일</h3>
   <p>퍼블리싱에서 빠져 있던 세 가지를 채웠습니다.</p>
   <table>
     <tr><th>부분</th><th>이전</th><th>현재</th></tr>
@@ -717,7 +775,7 @@
     raw white 인 것도 마찬가지입니다 — Light 에서 밝은 면 위 흰 글자가 됩니다.
   </p>
 
-  <h3>9. Figma 정리 — 이름 · 설명 · 토큰 바인딩</h3>
+  <h3>10. Figma 정리 — 이름 · 설명 · 토큰 바인딩</h3>
   <p>
     작업하면서 눈에 걸린 것들을 Figma 에서 직접 정리했습니다.
     <strong>published 라이브러리라 Publish 를 해야 다른 파일에 반영됩니다.</strong>
@@ -781,7 +839,7 @@
     </li>
   </ul>
 
-  <h3>10. 지난 업데이트 — 갭 · 라운드</h3>
+  <h3>11. 지난 업데이트 — 갭 · 라운드</h3>
   <p>
     Figma에서 간격과 모서리 값을 고치신 것을 반영했습니다. 실제로 바뀐 값입니다.
   </p>
@@ -858,7 +916,7 @@
     상태바가 64가 아니라 66이었습니다(Figma의 안쪽 stroke는 높이를 늘리지 않는데 CSS border는 늘립니다).
   </p>
 
-  <h3>11. 화면에서 바뀐 것</h3>
+  <h3>12. 화면에서 바뀐 것</h3>
   <table>
     <tr><th>항목</th><th>이전</th><th>현재</th></tr>
     <tr><td>Status Bar</td><td>GNB 오른쪽, 1842</td><td><strong>전체 폭</strong>, 로고가 안으로 들어옴</td></tr>
@@ -876,7 +934,7 @@
     도면 도형 5개도 사라져서 지도는 빈 캔버스입니다. 아이콘 에셋도 27개에서 18개로 줄었습니다.
   </p>
 
-  <h3>12. 디자인 시스템에서 바뀐 것</h3>
+  <h3>13. 디자인 시스템에서 바뀐 것</h3>
   <p>
     <strong>Component 컬렉션이 없어지고</strong> <code>button/*</code> 32개가 Semantic으로 들어왔습니다.
     컬렉션 구성이 <code>Primitive(111) · Semantic(122) · Texts(7)</code>이 되었습니다.
@@ -891,7 +949,7 @@
     <li><strong>Texts 컬렉션</strong>(문자열 7개)이 새로 생겼습니다. 화면 문구용이라 CSS로는 내보내지 않았습니다.</li>
   </ul>
 
-  <h3>13. 확인이 필요한 지점</h3>
+  <h3>14. 확인이 필요한 지점</h3>
   <ul>
     <li>
       <strong>AI Assist Panel 의 <code>Contrast Scrim</code> 이 비어 있습니다.</strong>
@@ -976,7 +1034,7 @@
     </li>
   </ul>
 
-  <h3>14. AI(Delta) 요약 — closed / opened</h3>
+  <h3>15. AI(Delta) 요약 — closed / opened</h3>
   <p>
     <code>AI Assist Panel</code>의 <code>Emphasis</code> 속성(<code>closed</code> · <code>opened</code>)을
     <strong>우측 상단 토글 버튼</strong>으로 전환합니다. 기본은 closed 입니다.
@@ -993,7 +1051,7 @@
     Figma의 opened에는 테두리가 없지만, 폭을 0으로 만들면 여닫을 때 2px씩 튀어서 색만 없앴습니다.
   </p>
 
-  <h3>15. 붙인 동작 — 패널 접기 · 로봇 선택</h3>
+  <h3>16. 붙인 동작 — 패널 접기 · 로봇 선택</h3>
   <p>
     <strong>사이트 패널 접기.</strong> 우상단 <code>panel-left</code> 버튼으로 여닫습니다.
     <strong>접힌 모습은 Figma에 없어서 여기서 정했습니다</strong> — 버튼만 남는
@@ -1025,12 +1083,12 @@
     타임라인은 <code>assets/js/screen.js</code> 안의 <code>ROBOTS</code> 배열에서 그립니다.
   </p>
 
-  <h3>16. 그대로 둔 것 · 코드에서 정한 것</h3>
+  <h3>17. 그대로 둔 것 · 코드에서 정한 것</h3>
   <p>
     <strong>문구는 자리표시자 그대로 둡니다.</strong>
     <code>로봇명</code> ×3, <code>waypoint name</code>, <code>전체 미션명</code>,
     채워지지 않은 사각형 자리 모두 Figma 그대로입니다.
-    진행률(<code>00%</code>)만 계산 값으로 바뀌었습니다 — 아래 13번을 봐 주세요.
+    진행률(<code>00%</code>)만 계산 값으로 바뀌었습니다 — 아래 14번을 봐 주세요.
   </p>
   <p>
     <strong>스크롤바도 토큰으로 맞췄습니다.</strong> Figma 에 없는 부분이라 코드에서 정했습니다 —

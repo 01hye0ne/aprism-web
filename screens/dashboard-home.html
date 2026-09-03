@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/static/woff2/SUIT.css" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" />
   <link rel="stylesheet" href="../assets/css/tokens.css?v=3be2ee40" />
-  <link rel="stylesheet" href="../assets/css/app-shell.css?v=22f6aeb4" />
+  <link rel="stylesheet" href="../assets/css/app-shell.css?v=12e9e5bc" />
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
@@ -249,14 +249,17 @@
             <!-- AI Assist Panel · Figma UI_00 Design System 121:665 (state=closed 기본, 우측 토글로 opened) -->
             <section class="ai-panel is-warning" data-ai-panel aria-label="Delta AI 요약">
 
+              <!-- Delta — 그래픽 자리(원은 Figma 자리표시자) + 이름. 닫힘은 왼쪽 기둥, 펼침은 헤더 줄. -->
+              <div class="ai-delta">
+                <span class="ai-delta-mark" aria-hidden="true"><i></i></span>
+                <span class="ai-delta-label">DELTA</span>
+              </div>
+
               <div class="ai-header">
-                <div class="ai-delta">
-                  <span class="ai-delta-label">DELTA</span>
-                  <span class="ai-tag">
-                    <span class="i i-16" aria-hidden="true"></span>
-                    원인 분석 완료 · 후보 1건 확인
-                  </span>
-                </div>
+                <span class="ai-tag">
+                  <span class="i i-16" aria-hidden="true"></span>
+                  원인 분석 완료 · 후보 1건 확인
+                </span>
                 <button type="button" class="ai-toggle" data-ai-toggle
                         aria-expanded="false" aria-controls="ai-box" aria-label="요약 펼치기">
                   <span class="i i-20" style="--i:var(--ic-chevron-down)"></span>
@@ -268,7 +271,10 @@
 
                 <div class="ai-fold ai-fold-closed">
                   <div><div class="ai-message">
-                    <p class="ai-message-text">현재 지하발전소 B3 터빈2 NG 1건이 발견 되었습니다. Spiral Casing Pr. 기준값 87이하 측정값 90으로 3정도 높습니다. 4% 미만으로 다음 검사에서 추이를 보겠습니다.</p>
+                    <div class="ai-lines">
+                      <p class="ai-line-1">안녕하세요. 홍길동 님</p>
+                      <p class="ai-line-2">지하발전소 B3 터빈2 에서 NG 1건이 발견되었습니다.</p>
+                    </div>
                     <button type="button" class="ai-ack" data-ai-ack>확인</button>
                   </div></div>
                 </div>
@@ -276,7 +282,10 @@
                 <div class="ai-fold ai-fold-open">
                   <div><div class="ai-opened">
                     <div class="ai-content">
-                      <p class="ai-headline">현재 지하발전소 B3 터빈2 NG 1건이 발견 되었습니다. Spiral Casing Pr. 기준값 87이하 측정값 90으로 3정도 높습니다. 4% 미만으로 다음 검사에서 추이를 보겠습니다.</p>
+                      <div class="ai-lines">
+                        <p class="ai-line-1">안녕하세요. 홍길동 님</p>
+                        <p class="ai-headline">지하발전소 B3 터빈2 에서 NG 1건이 발견되었습니다.</p>
+                      </div>
                       <div class="ai-suggestions">
                         <button type="button" class="ai-chip">Spiral Casing 압력 추이 보여줘</button>
                         <button type="button" class="ai-chip">이 설비 최근 결함 3건</button>

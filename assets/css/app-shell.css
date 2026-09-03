@@ -867,35 +867,97 @@ button {
  * 지도 위에 겹쳐 뜬다(.ai-box 가 backdrop blur 라 우측 미션 패널과 같은 유리로 읽힌다).
  * 폭을 바꾸려면 아래 span 숫자 하나만 고치면 컬럼 경계에 그대로 붙는다.
  */
+/*
+ * 두 state 의 배치가 다르다. 격자 한 판에 이름 붙인 칸으로 담는다 —
+ * 여닫을 때 DOM 을 옮기지 않아도 Delta 기둥이 제자리를 찾는다.
+ *   닫힘  "delta header" / "delta box"  — Delta 가 왼쪽에서 두 줄을 다 차지한다
+ *   펼침  "delta header" / "box   box"  — Delta 가 헤더 줄로 올라온다
+ */
 .ai-panel {
   position: relative;
   grid-row: 1;
   grid-column: 1 / span 4;
   align-self: end;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
+  display: grid;
+  /* 60 원 + 좌우 16 = Figma 기둥 폭 92. */
+  grid-template-columns: 92px minmax(0, 1fr);
+  grid-template-areas:
+    "delta header"
+    "delta box";
 }
 
-.ai-panel.is-open { gap: 0; }
+.ai-panel.is-open {
+  /*
+   * fit-content(0) 이라야 첫 열이 Delta 내용(원 24 + 4 + 이름)만큼만 잡힌다.
+   * auto 로 두면 두 칸을 걸친 .ai-box 의 max-content 가 이 열까지 밀어 올려
+   * DELTA 가 한가운데로 밀려난다.
+   */
+  grid-template-columns: fit-content(0) minmax(0, 1fr);
+  grid-template-areas:
+    "delta header"
+    "box   box";
+  column-gap: var(--space-12);
+  align-items: center;
+}
 
-/* Figma "Header" — padding 8, 좌우 끝 정렬. 지도 위라 면은 투명하다. */
+/* Figma 닫힘 "Toggle"(padding 4) · 펼침 "Header"(padding 2/8) — 태그 왼쪽, 토글 오른쪽. */
 .ai-header {
+  grid-area: header;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-8);
-  padding: var(--space-8);
+  padding: var(--space-4);
   border-radius: var(--radius-control);
 }
 
-/* Figma "Delta" 인스턴스 — "DELTA" 라벨 + 분석결과 태그, gap 12. */
+.ai-panel.is-open .ai-header { padding: var(--space-2) var(--space-8); }
+
+/*
+ * Figma "Delta" — 그래픽 자리와 이름.
+ *   닫힘  원 60 위, 이름 아래. 좌우 16 을 더해 기둥 폭이 92 가 된다.
+ *   펼침  원 24 옆에 이름. 헤더 줄 왼쪽에 눕는다.
+ */
 .ai-delta {
+  grid-area: delta;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-8);
+  padding: 0 var(--space-16);
+}
+
+.ai-panel.is-open .ai-delta {
+  flex-direction: row;
+  gap: var(--space-4);
+  padding: 0;
+}
+
+/*
+ * 그래픽 자리표시자. Figma 엔 아직 원 외곽선(#D9D9D9 2px)만 놓여 있다 —
+ * 토큰이 아니라 Figma 기본 회색이라 그대로 적는다.
+ * 그래픽이 나오면 안쪽 <i> 를 그림으로 갈면 크기·자리는 그대로 맞는다.
+ */
+.ai-delta-mark {
+  flex: none;
   display: flex;
   align-items: center;
-  gap: var(--space-12);
-  min-width: 0;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
 }
+
+.ai-delta-mark i {
+  display: block;
+  width: 48px;
+  height: 48px;
+  border: var(--border-width-strong) solid #d9d9d9;
+  border-radius: var(--radius-pill);
+}
+
+.ai-panel.is-open .ai-delta-mark { width: 24px; height: 24px; }
+.ai-panel.is-open .ai-delta-mark i { width: 19px; height: 19px; }
 
 /* Typography/Title/2/SemiBold (16/24/700), gray/50. */
 .ai-delta-label {
@@ -903,7 +965,7 @@ button {
   font-size: var(--font-size-16);
   line-height: var(--font-line-height-24);
   font-weight: var(--font-weight-bold);
-  color: var(--color-gray-50);
+  color: var(--fg-primary);
 }
 
 /*
@@ -965,10 +1027,15 @@ button {
  *   radius 8. backdrop blur 5 는 우측 미션 패널과 맞춘 것(Figma 엔 없음).
  * 위쪽 선은 정적 1px 대신 이전 구현의 "흐르는 상단선"을 쓴다(아래 ::before).
  */
+/*
+ * 글자색은 fg/primary 를 쓴다. 상자는 반투명이라 뒤에 깔린 지도 밝기를 그대로 받는데,
+ * 흰색으로 박아 두면 Light 모드에서 밝은 면 위 흰 글자가 된다. Figma 도 fg/primary 다.
+ */
 .ai-box {
+  grid-area: box;
   position: relative;
   overflow: hidden;
-  padding: var(--space-20) var(--space-16);
+  padding: var(--space-8);
   border-radius: var(--radius-container);
   background-image: linear-gradient(
     180deg,
@@ -987,26 +1054,24 @@ button {
    * 흐르는 상단선. Figma stroke 의 5-stop 을 200% 폭 안에 좌우 대칭으로 이어 붙여
    * 반복해도 이음매가 없다. 그 위를 좁고 밝은 섬광 둘이 어긋나게 훑는다.
    */
-  --ai-line-base: linear-gradient(
+  /* Figma stroke — 흰색 90deg 광택(a20/50/20/80/50). 네 변 모두 1px 이다. */
+  --ai-box-edge: linear-gradient(
     90deg,
-    var(--border-focus) 0%,
-    var(--alert-default-edge) 12.5%,
-    var(--alert-default-glow-primary) 23.1%,
-    var(--border-focus) 36.05%,
-    var(--alert-default-edge) 50%,
-    var(--border-focus) 63.95%,
-    var(--alert-default-glow-primary) 76.9%,
-    var(--alert-default-edge) 87.5%,
-    var(--border-focus) 100%
+    rgb(255 255 255 / 20%) 0%,
+    rgb(255 255 255 / 50%) 25%,
+    rgb(255 255 255 / 20%) 46%,
+    rgb(255 255 255 / 80%) 72%,
+    rgb(255 255 255 / 50%) 100%
   );
-  --ai-line-spark: color-mix(in srgb, var(--fg-primary) 80%, var(--alert-default-glow-primary));
-  --ai-line-spark-image: linear-gradient(
+
+  /* 입력창 stroke — 파란 5-stop. 예전 "흐르는 상단선"이 쓰던 무늬가 여기로 왔다. */
+  --ai-input-edge: linear-gradient(
     90deg,
-    transparent 0%,
-    var(--ai-line-spark) 42%,
-    var(--fg-primary) 50%,
-    var(--ai-line-spark) 58%,
-    transparent 100%
+    var(--color-main-700) 0%,
+    var(--color-main-300) 25%,
+    var(--color-main-400) 46%,
+    var(--color-main-700) 72%,
+    var(--color-main-300) 100%
   );
 
   /* Spectrum 막대 색 — 밝은 glow-primary 대신 채도 높고 명도 낮은 main/600. */
@@ -1016,44 +1081,24 @@ button {
 .ai-panel.is-open .ai-box { padding: var(--space-4); }
 
 /*
- * 위쪽 2px 선. Figma stroke 가 가로 그라데이션이라 border 색으로는 못 준다.
- * 모양은 border-top 으로 잡고(라운드를 따라 테이퍼진다) border-box XOR padding-box
- * 마스크로 테두리 영역만 남겨 그라데이션을 통과시킨다.
- *   아래: 5-stop 무늬. 한 칸(패널 두 폭)만 밀면 제자리 — 이음매 없음.
- *   위:   좁은 섬광 하나. 한 번 훑고 잠깐 쉬었다 다시 온다.
+ * 1px 그라데이션 테두리 — Figma stroke(INSIDE 1, 90deg 흰 광택). 네 변 모두다.
+ * CSS border 는 그라데이션을 못 받으므로, padding 1 짜리 판을 깔고
+ * content-box XOR border-box 마스크로 테두리 띠만 남긴다.
+ * (예전 "흐르는 상단선"은 Figma 가 네 변 stroke 로 바뀌면서 걷어냈다.)
  */
 .ai-box::before {
   content: "";
   position: absolute;
-  inset: 0 0 auto;
-  height: 24px;
+  inset: 0;
   z-index: 1;
   pointer-events: none;
-  box-sizing: border-box;
-  border-radius: var(--radius-container) var(--radius-container) 0 0;
-  border-top: var(--border-width-strong) solid transparent;
-  background-origin: border-box;
-  background-image: var(--ai-line-spark-image), var(--ai-line-spark-image), var(--ai-line-base);
-  background-size: 26% 100%, 26% 100%, 200% 100%;
-  background-repeat: no-repeat, no-repeat, repeat-x;
-  -webkit-mask-image: linear-gradient(#000 0 0), linear-gradient(#000 0 0);
-  -webkit-mask-clip: padding-box, border-box;
+  border-radius: inherit;
+  padding: var(--border-width-thin);
+  background: var(--ai-box-edge);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
-  mask-image: linear-gradient(#000 0 0), linear-gradient(#000 0 0);
-  mask-clip: padding-box, border-box;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   mask-composite: exclude;
-  animation: ai-line 6s linear infinite;
-}
-
-/*
- * 무늬는 시간에 정비례해 등속을 지키고, 섬광 둘은 서로 어긋나게 훑는다 —
- * 첫째가 0~62% 구간을, 둘째가 38~100% 구간을 지나 섬광이 끊기지 않는다.
- */
-@keyframes ai-line {
-  0% { background-position: -35.1% 0, -35.1% 0, 0 0; }
-  38% { background-position: 69.2% 0, -35.1% 0, 76% 0; }
-  62% { background-position: 135.1% 0, 30.8% 0, 124% 0; }
-  100% { background-position: 135.1% 0, 135.1% 0, 200% 0; }
 }
 
 /*
@@ -1190,13 +1235,40 @@ button {
 .ai-panel.is-open .ai-fold-open { grid-template-rows: 1fr; opacity: 1; }
 
 /*
- * closed — Figma "Message"(121:647): 한 줄 메시지 + 우측 [확인] 버튼, gap 8, 세로 가운데.
+ * closed — Figma "Message": 두 줄 + 우측 [확인] 버튼, gap 4, 아래 정렬(counterAxis MAX).
  * 확인은 경고를 받았다는 응답이므로 주의 상태에서만 뜬다(일반 상태에선 숨긴다).
  */
 .ai-message {
   display: flex;
-  align-items: center;
-  gap: var(--space-8);
+  align-items: flex-end;
+  gap: var(--space-4);
+}
+
+/* Figma "Texts" — 인사 줄 위, 브리핑 줄 아래. gap 4. */
+.ai-lines {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* 인사 — Body/3(14/22) 인데 Bold 로 덮여 있다. */
+.ai-line-1 {
+  margin: 0;
+  font-size: var(--font-size-14);
+  line-height: var(--font-line-height-22);
+  font-weight: var(--font-weight-bold);
+  color: var(--fg-primary);
+}
+
+/* 브리핑(닫힘) — Body/3 Regular. 펼치면 아래 .ai-headline 로 커진다. */
+.ai-line-2 {
+  margin: 0;
+  font-size: var(--font-size-14);
+  line-height: var(--font-line-height-22);
+  font-weight: var(--font-weight-regular);
+  color: var(--fg-primary);
 }
 
 /* Typography/Body/2/Regular (16/24), gray/50. 한 줄만 — 넘치면 말줄임(…). */
@@ -1228,8 +1300,8 @@ button {
   padding: 0 var(--space-12);
   border: 0;
   border-radius: var(--radius-control);
-  background-color: var(--button-secondary-bg-default);
-  color: var(--button-secondary-fg-default);
+  background-color: var(--button-primary-bg-default);
+  color: var(--button-primary-fg-default);
   font-family: inherit;
   font-size: var(--font-size-13);
   line-height: var(--font-line-height-18);
@@ -1237,7 +1309,7 @@ button {
   cursor: pointer;
 }
 
-.ai-ack:hover { background-color: var(--button-secondary-bg-hover); }
+.ai-ack:hover { background-color: var(--button-primary-bg-hover); }
 
 .ai-panel:not(.is-warning) .ai-ack { display: none; }
 
@@ -1248,21 +1320,26 @@ button {
   gap: var(--space-4);
 }
 
-/* Figma #568:34609 — 헤드라인 + 추천, padding 20/16/12, gap 16. */
+/* Figma 내용 프레임 — 헤드라인 + 추천, padding 20/12/12/12, gap 12. */
 .ai-content {
   display: flex;
   flex-direction: column;
-  gap: var(--space-16);
-  padding: var(--space-20) var(--space-16) var(--space-12);
+  gap: var(--space-12);
+  padding: var(--space-20) var(--space-12) var(--space-12);
 }
 
-/* Typography/Body/1/Regular (20/32), gray/50. Figma Headline 은 좌우 4 인셋. */
+/* Figma "Headline" — 좌우 4 인셋, 안쪽 두 줄은 gap 4. */
+.ai-content .ai-lines { padding: 0 var(--space-4); }
+
+/*
+ * 브리핑(펼침) — Typography/Body/1 (20/32). 이름은 Regular 인데 스타일 자체가 SemiBold 다.
+ */
 .ai-headline {
-  padding: 0 var(--space-4);
+  margin: 0;
   font-size: var(--font-size-20);
   line-height: var(--font-line-height-32);
-  font-weight: var(--font-weight-regular);
-  color: var(--color-gray-50);
+  font-weight: var(--font-weight-semibold);
+  color: var(--fg-primary);
 }
 
 /* Figma "Suggestions" — row wrap, gap 8. */
@@ -1278,7 +1355,7 @@ button {
   border: 0;
   border-radius: var(--radius-pill);
   background-color: var(--bg-surface-overlay-dark);
-  color: var(--color-gray-50);
+  color: var(--fg-primary);
   font-size: var(--font-size-13);
   line-height: var(--font-line-height-18);
   font-weight: var(--font-weight-medium);
@@ -1288,10 +1365,25 @@ button {
 .ai-chip:hover { background-color: var(--bg-surface-overlay-light); }
 
 /*
- * Input — 이전 구현 스타일. 테두리 없이 반투명 유리(bg/surface/overlay-dark) 면.
- * padding 8/8/8/16, gap 8, radius 4. (Figma 의 파란 그라데이션 테두리는 쓰지 않는다.)
+ * Input — 반투명 유리 면(bg/surface/overlay-dark) + 1px 파란 그라데이션 테두리.
+ * padding 8/8/8/16, gap 8, radius 4. 테두리는 상자와 같은 마스크 수법이다.
  */
+.ai-input::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  padding: var(--border-width-thin);
+  background: var(--ai-input-edge);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+}
+
 .ai-input {
+  position: relative;
   display: flex;
   align-items: center;
   gap: var(--space-8);
@@ -1321,12 +1413,12 @@ button {
   height: var(--size-control-sm);
   border: 0;
   border-radius: var(--radius-control);
-  background-color: var(--button-secondary-bg-default);
-  color: var(--button-secondary-fg-default);
+  background-color: var(--button-primary-bg-default);
+  color: var(--button-primary-fg-default);
   cursor: pointer;
 }
 
-.ai-send:hover { background-color: var(--button-secondary-bg-hover); }
+.ai-send:hover { background-color: var(--button-primary-bg-hover); }
 
 /* ---------- 주의(Warning) 알림 상태 ----------
  * Figma 478:17275 — 일반 상태와 다른 건 딱 둘이다:
@@ -1515,15 +1607,14 @@ button {
 
 .ai-panel.is-warning .ai-tag .i { --i: var(--ic-warning); }
 
-/* 상단 흐르는 선·Spectrum 도 경고 계열로. (커스텀 프로퍼티가 .ai-box 에 있어 여기서 덮는다.) */
+/* 입력창 테두리·Spectrum 도 경고 계열로. (커스텀 프로퍼티가 .ai-box 에 있어 여기서 덮는다.) */
 .ai-panel.is-warning .ai-box {
-  --ai-line-base: linear-gradient(90deg,
+  --ai-input-edge: linear-gradient(90deg,
     var(--status-warning-border) 0%,
     #f7cd36 25%,
-    var(--status-warning-border) 50%,
-    #f7cd36 75%,
-    var(--status-warning-border) 100%);
-  --ai-line-spark: color-mix(in srgb, var(--fg-primary) 80%, #f7cd36);
+    var(--color-warning-500) 46%,
+    var(--status-warning-border) 72%,
+    #f7cd36 100%);
   --ai-spectrum-color: #c9a52e;
 }
 
@@ -1531,8 +1622,8 @@ button {
 @media (prefers-reduced-motion: reduce) {
   .ai-panel, .ai-fold, .ai-toggle, .ai-toggle .i,
   .context-panel, .panel-section { transition: none; }
-  /* 흐르는 상단선·Spectrum 은 장식이다 — 멈춘다. */
-  .ai-box::before, .ai-spectrum, .ai-spectrum::before { animation: none; }
+  /* Spectrum 은 장식이다 — 멈춘다. (상단선은 이제 안 움직인다.) */
+  .ai-spectrum, .ai-spectrum::before { animation: none; }
   .ai-spectrum { transform: none; }
   /* 엣지 글로우는 정적 box-shadow 만 남기고, 도는 빛은 뺀다. */
   .two-col.is-warning { animation: none; }
