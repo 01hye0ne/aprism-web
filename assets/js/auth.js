@@ -46,13 +46,14 @@
 
   // ---------- 로그인 ----------
   //
-  // 붙일 인증이 없는 퍼블리싱 화면이라 값을 확인하지 않고 관제 화면으로 넘긴다.
+  // 붙일 인증이 없는 퍼블리싱 화면이라 값을 확인하지 않고 다음 화면으로 넘긴다.
+  // 들어오면 바로 미션을 짜는 흐름이라 미션 설정으로 간다.
   // 서버가 붙으면 이 자리가 요청으로 바뀐다.
   var form = document.querySelector("[data-login-form]");
   if (form) {
     form.addEventListener("submit", function (event) {
       event.preventDefault();
-      location.href = "./dashboard-home.html";
+      location.href = "./mission-setup.html";
     });
   }
 })();
