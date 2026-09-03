@@ -1,5 +1,5 @@
 /* =============================================================
- * 주의(Warning) 엣지 글로우 — Strands 를 테두리에 감은 것
+ * AI 패널 위쪽 선 위의 빛 — Strands 를 선 위에 눕힌 것
  *
  * 셰이더 본문(spectrum · samplePalette · strandColor · 가닥 누적 · 톤매핑)은
  * React Bits 의 Strands 원본 그대로다.
@@ -7,13 +7,15 @@
  *   Copyright (c) 2026 David Haz — MIT + Commons Clause License Condition v1.0
  *   라이선스 정리는 저장소 루트 THIRD-PARTY.md 를 볼 것.
  *
- * 고친 것은 좌표 하나뿐이다. 원본은 uv 를 화면 가운데 기준으로 잡아 가닥이
- * 가로로 곧게 지나가는데, 여기서는
- *   uv.x <- 라운드 사각형 둘레를 따라간 위치(0~1)
- *   uv.y <- 테두리 중심선에서 떨어진 거리
- * 로 바꿔서 가닥이 테두리를 감고 돈다. 나머지 계산은 손대지 않았다.
+ * 고친 것은 좌표 하나뿐이다.
+ *   uv.x <- 패널 가로 위치(그대로다. 양 끝에서 원본처럼 스스로 꺼진다)
+ *   uv.y <- "선에서 안쪽으로 얼마나 들어왔나"(px). 라운드 코너에서는
+ *           코너 원까지의 거리라 가닥이 코너를 따라 휜다.
+ * 세로만 픽셀 단위로 눌러 담아 가닥이 화면이 아니라 선 위에 눕는다.
+ * 가닥을 쌓고 톤매핑하는 계산은 손대지 않았다.
  *
- * 값은 디자이너가 strands-lab.html 에서 맞춘 것이고, 색만 경고 계열로 바꿨다.
+ * 값은 디자이너가 strands-lab.html 에서 맞춘 것이다.
+ * 색은 패널 상태를 따라간다 — 기본은 파랑, 주의(Warning)는 경고 계열.
  * ============================================================= */
 (function () {
   "use strict";
@@ -21,9 +23,8 @@
   var MAX_STRANDS = 12;
   var MAX_COLORS = 8;
 
-  /* 디자이너가 맞춘 값. 색은 warning 램프 — 500(진한) · 300(중간) · 200(옅은) */
+  /* 디자이너가 맞춘 값 */
   var CONF = {
-    colors: ["#FFCC00", "#EEDA6B", "#F8EBAE"],
     count: 2,
     speed: 1.29,
     amplitude: 0.24,
@@ -38,13 +39,19 @@
     opacity: 1,
     scale: 1.5,
 
-    /* 테두리에 감으면서 생긴 값들 */
-    radius: 8,     // .two-col 의 border-radius (--radius-container)
+    /* 선 위에 눕히면서 생긴 값들 */
+    radius: 8,     // .ai-box 의 border-radius (--radius-container)
     ring: 2,       // 선 두께 (--border-width-strong)
-    band: 7,       // 빛이 번지는 반경(px). 이 밖은 계산하지 않고 버린다
-    lap: 6,        // 한 바퀴 도는 데 걸리는 초 — 예전 별똥별과 같다
-    spanX: 5.2,    // 둘레 한 바퀴를 uv.x 로 편 폭. 클수록 빛나는 구간이 짧다
-    spanY: 0.32    // 번짐 반경을 uv.y 로 편 폭
+    bias: 2,       // 가닥이 쉬는 자리 — 선 중심에서 안쪽으로 몇 px
+    reach: 18,     // 여기까지만 계산한다(px). 밖은 버린다
+    unitY: 100,    // uv 한 칸에 해당하는 세로 픽셀. 작을수록 빛이 얇아진다
+    spanX: 1.1     // 패널 폭을 uv.x 로 편 폭. 1.155 를 넘으면 양 끝이 잘린다
+  };
+
+  /* 패널 상태별 색. 기본은 Gradient/Main, 주의는 warning 램프(500·300·200). */
+  var PALETTES = {
+    "default": ["#36B2DF", "#5A8EE4", "#A8CBF3"],
+    warning: ["#FFCC00", "#EEDA6B", "#F8EBAE"]
   };
 
   var VERT = "#version 300 es\n" +
@@ -56,10 +63,9 @@
     "precision highp float;",
     "out vec4 fragColor;",
     "",
-    "uniform vec2  uRes;",
+    "uniform float uW, uH;",
     "uniform float uTime;",
-    "uniform vec2  uHalf;",
-    "uniform float uRadius, uRing, uBand, uLap, uSpanX, uSpanY;",
+    "uniform float uRadius, uRing, uBias, uReach, uUnitY, uSpanX;",
     "",
     "uniform vec3  uColors[" + MAX_COLORS + "];",
     "uniform int   uColorCount;",
@@ -69,7 +75,6 @@
     "uniform float uScale, uSaturation;",
     "",
     "const float PI = 3.14159265;",
-    "const float HALF_PI = 1.57079633;",
     "",
     /* ---- 여기부터 원본 그대로 ---- */
     "vec3 spectrum(float t) {",
@@ -92,47 +97,27 @@
     "}",
     /* ---- 원본 그대로 끝 ---- */
     "",
-    // 라운드 사각형 외곽선까지의 부호 있는 거리
-    "float sdRoundBox(vec2 p, vec2 c, float r) {",
-    "  vec2 q = abs(p) - c;",
-    "  return length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - r;",
-    "}",
-    "",
-    // 둘레 위치 — 위쪽 가운데에서 시계방향으로 잰 길이
-    "float perimeter(vec2 p, float cx, float cy, float qa, float P) {",
-    "  if (abs(p.x) <= cx) {",
-    "    if (p.y > 0.0) return (p.x >= 0.0) ? p.x : P + p.x;",
-    "    return cx + 2.0 * qa + 2.0 * cy + (cx - p.x);",
-    "  }",
-    "  if (abs(p.y) <= cy) {",
-    "    if (p.x > 0.0) return cx + qa + (cy - p.y);",
-    "    return 3.0 * cx + 3.0 * qa + 2.0 * cy + (p.y + cy);",
-    "  }",
-    "  vec2 c = vec2(cx * sign(p.x), cy * sign(p.y));",
-    "  float ang = atan(p.y - c.y, p.x - c.x);",
-    "  if (p.x > 0.0 && p.y > 0.0) return cx + qa * (1.0 - ang / HALF_PI);",
-    "  if (p.x > 0.0)              return cx + qa + 2.0 * cy + qa * (-ang / HALF_PI);",
-    "  if (p.y < 0.0)              return 3.0 * cx + 2.0 * qa + 2.0 * cy + qa * ((-HALF_PI - ang) / HALF_PI);",
-    "  return 3.0 * cx + 3.0 * qa + 4.0 * cy + qa * ((PI - ang) / HALF_PI);",
-    "}",
-    "",
     "void main() {",
-    "  vec2 p = gl_FragCoord.xy - 0.5 * uRes;",
-    "  float cx = max(uHalf.x - uRadius, 0.0);",
-    "  float cy = max(uHalf.y - uRadius, 0.0);",
+    "  float x  = gl_FragCoord.x;",
+    "  float yd = uH - gl_FragCoord.y;",          // 박스 위 변에서 아래로 잰 거리
     "",
-    // 선은 안쪽으로 그린다 — 중심선이 외곽선에서 ring/2 만큼 안쪽이다
-    "  float dc = sdRoundBox(p, vec2(cx, cy), uRadius) + uRing * 0.5;",
-    "  if (abs(dc) > uBand) { fragColor = vec4(0.0); return; }",
+    // 선 중심선에서 안쪽으로 잰 깊이. 코너에서는 코너 원까지의 거리다.
+    "  float rc = uRadius - uRing * 0.5;",
+    "  float dIn;",
+    "  if (x < uRadius) {",
+    "    if (yd > uRadius) { fragColor = vec4(0.0); return; }",   // 왼쪽 변엔 선이 없다
+    "    dIn = rc - length(vec2(x, yd) - vec2(uRadius, uRadius));",
+    "  } else if (x > uW - uRadius) {",
+    "    if (yd > uRadius) { fragColor = vec4(0.0); return; }",
+    "    dIn = rc - length(vec2(x, yd) - vec2(uW - uRadius, uRadius));",
+    "  } else {",
+    "    dIn = yd - uRing * 0.5;",
+    "  }",
     "",
-    "  float qa = HALF_PI * uRadius;",
-    "  float P  = 4.0 * cx + 4.0 * cy + 4.0 * qa;",
-    "  float t  = perimeter(p, cx, cy, qa, P) / P;",
+    "  float dy = dIn - uBias;",
+    "  if (abs(dy) > uReach) { fragColor = vec4(0.0); return; }",
     "",
-    // 빛나는 창이 테두리를 돈다 — 예전 별똥별이 하던 일이다
-    "  float x = fract(t - uTime / uLap) - 0.5;",
-    "",
-    "  vec2 uv = vec2(x * uSpanX, dc / uBand * uSpanY);",
+    "  vec2 uv = vec2((x / uW - 0.5) * uSpanX, dy / uUnitY);",
     "  uv /= max(uScale, 0.0001);",
     "",
     /* ---- 여기부터 다시 원본 그대로 ---- */
@@ -179,17 +164,20 @@
     /* ---- 원본 그대로 끝 ---- */
   ].join("\n");
 
-  var canvas = document.querySelector("[data-edge-strands]");
+  var canvas = document.querySelector("[data-ai-line-strands]");
   if (!canvas) return;
 
-  var host = canvas.parentElement;
+  var box = canvas.parentElement;
+  var panel = box.closest(".ai-panel");
+  if (!panel) return;
+
   var gl = canvas.getContext("webgl2", {
     alpha: true,
     premultipliedAlpha: true,
     antialias: false
   });
 
-  // WebGL2 를 못 쓰면 CSS 별똥별(.two-col::after)이 그대로 남는다.
+  // WebGL2 를 못 쓰면 CSS 섬광(.ai-box::before)이 그대로 남는다.
   if (!gl) return;
 
   function compile(type, src) {
@@ -228,7 +216,7 @@
   gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
 
   var U = {};
-  ["uRes", "uTime", "uHalf", "uRadius", "uRing", "uBand", "uLap", "uSpanX", "uSpanY",
+  ["uW", "uH", "uTime", "uRadius", "uRing", "uBias", "uReach", "uUnitY", "uSpanX",
    "uColors", "uColorCount", "uStrandCount", "uSpeed", "uAmplitude", "uWaviness",
    "uThickness", "uGlow", "uTaper", "uSpread", "uHueShift", "uIntensity",
    "uOpacity", "uScale", "uSaturation"].forEach(function (n) {
@@ -247,41 +235,49 @@
     }
     return out;
   }
-  var PALETTE = palette(CONF.colors);
+
+  var PACKED = {};
+  Object.keys(PALETTES).forEach(function (k) { PACKED[k] = palette(PALETTES[k]); });
+
+  var tone = "";
+  function setTone(name) {
+    if (name === tone) return;
+    tone = name;
+    gl.uniform3fv(U.uColors, PACKED[name]);
+    gl.uniform1i(U.uColorCount, Math.min(PALETTES[name].length, MAX_COLORS));
+  }
 
   // 값이 안 변하니 한 번만 넘긴다
-  gl.uniform3fv(U.uColors, PALETTE);
-  gl.uniform1i(U.uColorCount, Math.min(CONF.colors.length, MAX_COLORS));
   gl.uniform1i(U.uStrandCount, Math.min(Math.max(Math.round(CONF.count), 1), MAX_STRANDS));
   [["uSpeed", "speed"], ["uAmplitude", "amplitude"], ["uWaviness", "waviness"],
    ["uThickness", "thickness"], ["uGlow", "glow"], ["uTaper", "taper"],
    ["uSpread", "spread"], ["uHueShift", "hueShift"], ["uIntensity", "intensity"],
    ["uOpacity", "opacity"], ["uScale", "scale"], ["uSaturation", "saturation"],
-   ["uRadius", "radius"], ["uRing", "ring"], ["uBand", "band"], ["uLap", "lap"],
-   ["uSpanX", "spanX"], ["uSpanY", "spanY"]].forEach(function (pair) {
+   ["uRadius", "radius"], ["uRing", "ring"], ["uBias", "bias"], ["uReach", "reach"],
+   ["uUnitY", "unitY"], ["uSpanX", "spanX"]].forEach(function (pair) {
     gl.uniform1f(U[pair[0]], CONF[pair[1]]);
   });
 
-  // 여기까지 왔으면 캔버스가 그린다 — CSS 별똥별은 물러난다
-  host.classList.add("has-edge-strands");
+  // 여기까지 왔으면 캔버스가 그린다 — CSS 섬광 둘은 물러난다
+  panel.classList.add("has-line-strands");
 
   var W = 0, H = 0;
   function resize() {
-    // 원본 Renderer 의 기본 dpr 이 1 이다. 링 하나 그리자고 화면 네 배를
+    // 원본 Renderer 의 기본 dpr 이 1 이다. 선 하나 그리자고 화면 네 배를
     // 칠할 이유가 없어서 여기서도 1 로 둔다.
-    var w = Math.round(host.clientWidth);
-    var h = Math.round(host.clientHeight);
+    var w = Math.round(box.clientWidth);
+    var h = Math.round(canvas.clientHeight);
     if (w === W && h === H) return;
     W = w; H = h;
     canvas.width = w;
     canvas.height = h;
     gl.viewport(0, 0, w, h);
-    gl.uniform2f(U.uRes, w, h);
-    gl.uniform2f(U.uHalf, w * 0.5, h * 0.5);
+    gl.uniform1f(U.uW, w);
+    gl.uniform1f(U.uH, h);
   }
 
   if (window.ResizeObserver) {
-    new ResizeObserver(resize).observe(host);
+    new ResizeObserver(resize).observe(box);
   } else {
     window.addEventListener("resize", resize);
   }
@@ -292,6 +288,7 @@
   function paint(seconds) {
     resize();
     if (!W || !H) return;
+    setTone(panel.classList.contains("is-warning") ? "warning" : "default");
     gl.uniform1f(U.uTime, seconds);
     gl.clear(gl.COLOR_BUFFER_BIT);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
@@ -304,11 +301,8 @@
 
   function start() {
     if (raf) return;
-    // 움직임을 줄이라고 했으면 한 장만 그리고 멈춘다 — 빛은 남고 돌지 않는다.
-    if (reduce && reduce.matches) {
-      paint(CONF.lap * 0.25);
-      return;
-    }
+    // 움직임을 줄이라고 했으면 한 장만 그리고 멈춘다 — 빛은 남고 일렁이지 않는다.
+    if (reduce && reduce.matches) { paint(0); return; }
     raf = requestAnimationFrame(loop);
   }
 
@@ -318,26 +312,23 @@
     raf = 0;
   }
 
-  // 주의 상태일 때만 돈다. 화면 밖으로 나가면 쉰다.
-  function sync() {
-    if (host.classList.contains("is-warning")) start();
-    else { stop(); gl.clear(gl.COLOR_BUFFER_BIT); }
-  }
-
-  new MutationObserver(sync).observe(host, { attributes: true, attributeFilter: ["class"] });
+  // 화면 밖으로 나가거나 탭이 가려지면 쉰다.
   if (window.IntersectionObserver) {
     new IntersectionObserver(function (entries) {
-      if (entries[0].isIntersecting) sync();
+      if (entries[0].isIntersecting) start();
       else stop();
-    }).observe(host);
+    }).observe(box);
   }
   document.addEventListener("visibilitychange", function () {
     if (document.hidden) stop();
-    else sync();
+    else start();
   });
   if (reduce && reduce.addEventListener) {
-    reduce.addEventListener("change", function () { stop(); sync(); });
+    reduce.addEventListener("change", function () { stop(); start(); });
   }
+  // 상태(주의 <-> 기본)가 바뀌면 색만 갈아탄다 — 멈춰 있을 때도 한 장 다시 그린다.
+  new MutationObserver(function () { if (!raf) paint(0); })
+    .observe(panel, { attributes: true, attributeFilter: ["class"] });
 
-  sync();
+  start();
 })();

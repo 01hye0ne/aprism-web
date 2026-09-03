@@ -950,6 +950,43 @@ button {
 }
 
 /*
+ * 그 선 위에 눕는 빛 — React Bits 의 Strands 셰이더다.
+ * (assets/js/ai-line-strands.js · 라이선스는 THIRD-PARTY.md)
+ *
+ * 캔버스가 살아나면 .ai-panel 에 has-line-strands 가 붙고,
+ * 어두운 테마에서는 위 섬광 둘이 물러난다(무늬는 그대로 흐른다).
+ * WebGL2 를 못 쓰면 아무것도 바뀌지 않고 섬광 둘이 그대로 남는다.
+ *
+ * 높이 24 는 빛이 닿는 데까지다 — 셰이더가 선에서 18px 밖은 계산도 안 한다.
+ * .ai-box 가 overflow:hidden 이라 라운드 코너 밖으로는 새지 않는다.
+ */
+.ai-line-strands {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 24px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+/*
+ * 밝은 테마에서는 이 빛이 밝은 면에 묻힌다 — 더하는 빛이라 흰 바탕에서는
+ * 실측으로도 패널 면과 거의 구분이 안 된다(선 아래 181,235,254 : 면 215,231,247).
+ * 그래서 밝은 쪽에서는 섬광 둘을 그대로 두고, 셰이더는 옅은 윤기로만 남긴다.
+ */
+:root:not([data-theme="light"]) .ai-panel.has-line-strands .ai-box::before {
+  background-image: var(--ai-line-base);
+  background-size: 200% 100%;
+  background-repeat: repeat-x;
+  animation-name: ai-line-base;
+}
+
+/* 무늬 한 칸(패널 두 폭)만 밀면 제자리 — 이음매가 없다. */
+@keyframes ai-line-base {
+  from { background-position: 0 0; }
+  to { background-position: 200% 0; }
+}
+
+/*
  * Spectrum 파형 — closed 상태에서만 .ai-box 안쪽 아래 변에 깐다(opened 는 입력창 자리라 숨긴다).
  * 선 수백 개를 반복 마스크(선 2px · 간격 2px) 하나로 대신하고, 안쪽 높이 곡선만 움직인다.
  * 선마다 세로 그라데이션(위 투명 -> 아래 불투명)이 걸려 있어 mask 로 같은 감쇠를 준다.
@@ -1224,29 +1261,10 @@ button {
  */
 /*
  * 테두리엔 얇은 경고색 선만 남기고(고른 빛번짐 없음), 그 라인을 따라
- * 빛 하나가 돈다.
- *
- * 도는 빛은 두 가지로 그린다.
- *   1) .edge-strands 캔버스 — React Bits 의 Strands 셰이더를 테두리에 감은 것.
- *      WebGL2 가 되면 이쪽이 그리고, .two-col 에 has-edge-strands 가 붙는다.
- *      (assets/js/edge-strands.js · 라이선스는 THIRD-PARTY.md)
- *   2) 아래 conic 별똥별 — WebGL2 를 못 쓸 때 남는 그림이다.
- *      conic 의 대부분은 투명하고, 머리 직전(약 300~360°) 구간만 꼬리로 차오른다.
- *      머리 바로 앞(0~3°)은 곧장 투명 — 진행 방향은 시계방향이다.
+ * 별똥별 하나가 돈다 — 밝은 머리 + 뒤로 길게 사라지는 꼬리(warn-edge-comet).
+ * conic 의 대부분은 투명하고, 머리 직전(약 300~360°) 구간만 꼬리로 차오른다.
+ * 머리 바로 앞(0~3°)은 곧장 투명 — 진행 방향은 시계방향이다.
  */
-.edge-strands {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  display: none;
-  pointer-events: none;
-}
-
-.two-col.is-warning .edge-strands { display: block; }
-
-/* 캔버스가 살아 있으면 CSS 별똥별은 물러난다. */
-.two-col.has-edge-strands::after { display: none; }
-
 @property --warn-glow-angle {
   syntax: "<angle>";
   inherits: false;
@@ -1330,11 +1348,11 @@ button {
 @media (prefers-reduced-motion: reduce) {
   .ai-panel, .ai-fold, .ai-toggle, .ai-toggle .i,
   .context-panel, .panel-section { transition: none; }
-  /* 흐르는 상단선·Spectrum 은 장식이다 — 멈춘다. */
+  /* 흐르는 상단선·Spectrum 은 장식이다 — 멈춘다.
+     (선 위의 빛은 ai-line-strands.js 가 한 장만 그리고 멈춘다.) */
   .ai-box::before, .ai-spectrum, .ai-spectrum::before { animation: none; }
   .ai-spectrum { transform: none; }
-  /* 엣지 글로우는 정적 box-shadow 만 남기고, 라인을 도는 빛은 뺀다.
-     (캔버스 쪽은 edge-strands.js 가 한 장만 그리고 멈춘다.) */
+  /* 엣지 글로우는 정적 box-shadow 만 남기고, 라인을 도는 빛은 뺀다. */
   .two-col.is-warning::after { display: none; }
   /* 걷기 리그도 멈춘다 — 기본 포즈로 선다. */
   .robot-thumb.is-walking .rd-bob,

@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/static/woff2/SUIT.css" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" />
   <link rel="stylesheet" href="../assets/css/tokens.css?v=f65510a7" />
-  <link rel="stylesheet" href="../assets/css/app-shell.css?v=2d4256e6" />
+  <link rel="stylesheet" href="../assets/css/app-shell.css?v=1eda2c03" />
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
@@ -222,9 +222,6 @@
         <!-- 주의(Warning) 알림 상태 예시 — Figma 478:17275. 일반 상태로 되돌리려면 is-warning 두 곳을 뺀다. -->
         <div class="two-col is-warning">
 
-          <!-- 테두리를 도는 빛. Strands 셰이더를 둘레에 감았다(edge-strands.js). -->
-          <canvas class="edge-strands" data-edge-strands aria-hidden="true"></canvas>
-
           <!-- ---------- Map Panel ---------- -->
           <section class="map-panel" aria-label="설비 배치도">
             <div class="map-canvas">
@@ -263,6 +260,8 @@
               </div>
 
               <div class="ai-box" id="ai-box">
+                <!-- 위쪽 선 위에 눕는 빛. Strands 셰이더다(ai-line-strands.js). -->
+                <canvas class="ai-line-strands" data-ai-line-strands aria-hidden="true"></canvas>
                 <span class="ai-spectrum" aria-hidden="true"></span>
 
                 <div class="ai-fold ai-fold-closed">
@@ -487,6 +486,6 @@
 
 <script src="../assets/js/theme.js?v=dcf8f460"></script>
 <script src="../assets/js/screen.js?v=57149181"></script>
-<script src="../assets/js/edge-strands.js?v=48774547"></script>
+<script src="../assets/js/ai-line-strands.js?v=a05ff559"></script>
 </body>
 </html>
