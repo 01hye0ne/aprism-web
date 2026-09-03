@@ -834,8 +834,15 @@ button {
  */
 .map-tools {
   position: absolute;
-  right: 0;
   top: 0;
+  /*
+   * 우측 패널과의 사이를 8 로 맞춘다 — 패널이 위·오른쪽에 두는 여백과 같은 값이다.
+   *
+   * 레일은 .map-canvas(지도 패딩 안쪽) 기준이라 right:0 이면
+   * 지도 패딩 8 + 거터 16 + 패널 패딩 8 = 32 가 벌어진다. 앞의 둘만큼 밖으로 내보내면
+   * 패널 패딩 8 만 남는다. 1600 breakpoint 에서도 거터가 같아 식이 그대로 산다.
+   */
+  right: calc(-1 * (var(--space-8) + var(--grid-gutter)));
   display: flex;
   flex-direction: column;
   gap: var(--space-8);
