@@ -9,7 +9,7 @@
 
 | 항목 | 쓰는 곳 | 라이선스 | 제품에 넣어 팔 때 |
 |---|---|---|---|
-| React Bits — Strands | AI 패널 위쪽 선 · `strands-lab.html` | MIT + Commons Clause | **가능** · 조건 있음 |
+| React Bits — Strands | `strands-lab.html` | MIT + Commons Clause | **가능** · 조건 있음 |
 | JetBrains Mono | 수치·코드 표기 | SIL OFL 1.1 | 가능 |
 | IBM Plex Sans / Mono | 실험실 페이지 비교용 | SIL OFL 1.1 | 가능 |
 | SUIT Variable | 화면 전체 본문 서체 | **확인 필요** | 확인 후 판단 |
@@ -20,21 +20,15 @@
 
 ## React Bits — Strands
 
-- **쓰는 곳** — 두 곳입니다.
-  - `assets/js/ai-line-strands.js` — 대시보드 **AI 패널 위쪽 선 위의 빛**. 실제 화면에 쓰입니다.
-  - `strands-lab.html` — 값을 맞춰보는 검토용 페이지.
+- **쓰는 곳** — `strands-lab.html` (검토용 페이지). 아직 실제 화면에는 얹지 않았습니다.
 - **출처** — <https://reactbits.dev/animations/strands> · 레지스트리 `https://reactbits.dev/r/Strands-JS-CSS.json`
 - **저작자** — Copyright (c) 2026 David Haz
 - **라이선스** — MIT + Commons Clause License Condition v1.0
 
 원본은 React 컴포넌트이고 `ogl` 에 의존합니다. 이 저장소에는 빌드 단계가 없어서
 **프래그먼트 셰이더는 원본 그대로 두고 캔버스·uniform 껍데기만 순수 WebGL2 로 옮겼습니다.**
-AI 패널 쪽은 여기에 더해 **uv 좌표만 고쳤습니다** — `uv.y` 를 "선에서 안쪽으로 몇 px"로
-바꿔 가닥을 선 위에 눕혔습니다(`uv.x` 는 원본 그대로 가로 위치입니다).
-가닥을 쌓고 톤매핑하는 계산은 손대지 않았습니다.
-
-저작권 표시는 `strands-lab.html` 과 `assets/js/ai-line-strands.js` 양쪽 머리에 들어 있습니다 —
-라이선스가 요구하는 사항이라 **다른 곳에 또 옮겨 쓸 때도 같이 따라가야 합니다.**
+저작권 표시는 `strands-lab.html` 의 스크립트 머리에 들어 있습니다 —
+라이선스가 요구하는 사항이라 **화면에 옮겨 쓸 때도 같이 따라가야 합니다.**
 
 **판매해도 됩니다.** 라이선스가 그 경우를 명시합니다.
 
@@ -124,7 +118,7 @@ CDN 이 죽으면 서체가 무너지고, 사용자 브라우저가 외부에 �
 
 - [ ] **SUIT 라이선스 전문 확보** — 가장 넓게 쓰이는 자산입니다
 - [ ] **아이콘 26개의 출처 확인** — 자체 제작인지, 어떤 세트를 바탕으로 했는지
-- [x] Strands 를 실제 화면에 얹을 때 **저작권 주석이 함께 따라갔는지** — `ai-line-strands.js` 머리에 있음
+- [ ] Strands 를 실제 화면에 얹는다면 **저작권 주석이 함께 따라갔는지**
 - [ ] 웹폰트 **자체 호스팅**으로 전환 (CDN 의존 · 외부 요청 제거)
 - [ ] 배포 빌드에서 `assets/robot-dog/` · `_backup/` 제외
 - [ ] 디자인 시스템을 **따로 떼어 파는 계획**이 생기면 Strands 조항 재검토
