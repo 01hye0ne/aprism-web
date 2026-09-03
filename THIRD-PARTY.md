@@ -9,6 +9,7 @@
 
 | 항목 | 쓰는 곳 | 라이선스 | 제품에 넣어 팔 때 |
 |---|---|---|---|
+| React Bits — BorderGlow | 주의 상태 엣지 글로우 | MIT + Commons Clause | **가능** · 조건 있음 |
 | React Bits — Strands | `strands-lab.html` | MIT + Commons Clause | **가능** · 조건 있음 |
 | JetBrains Mono | 수치·코드 표기 | SIL OFL 1.1 | 가능 |
 | IBM Plex Sans / Mono | 실험실 페이지 비교용 | SIL OFL 1.1 | 가능 |
@@ -18,17 +19,33 @@
 
 ---
 
-## React Bits — Strands
+## React Bits
 
-- **쓰는 곳** — `strands-lab.html` (검토용 페이지). 아직 실제 화면에는 얹지 않았습니다.
-- **출처** — <https://reactbits.dev/animations/strands> · 레지스트리 `https://reactbits.dev/r/Strands-JS-CSS.json`
 - **저작자** — Copyright (c) 2026 David Haz
 - **라이선스** — MIT + Commons Clause License Condition v1.0
+- 두 컴포넌트를 씁니다. 라이선스 조건은 둘 다 같습니다.
 
-원본은 React 컴포넌트이고 `ogl` 에 의존합니다. 이 저장소에는 빌드 단계가 없어서
-**프래그먼트 셰이더는 원본 그대로 두고 캔버스·uniform 껍데기만 순수 WebGL2 로 옮겼습니다.**
-저작권 표시는 `strands-lab.html` 의 스크립트 머리에 들어 있습니다 —
-라이선스가 요구하는 사항이라 **화면에 옮겨 쓸 때도 같이 따라가야 합니다.**
+### BorderGlow — 실제 화면에 쓰입니다
+
+- **쓰는 곳** — 대시보드 **주의(Warning) 상태 엣지 글로우**. `assets/css/app-shell.css` 안입니다.
+- **출처** — <https://reactbits.dev/components/border-glow> · 레지스트리 `https://reactbits.dev/r/BorderGlow-JS-CSS.json`
+- 원본은 React 컴포넌트지만 **움직임이 전부 CSS 에 있습니다.** JSX 가 하는 일은
+  포인터 위치를 읽어 `--cursor-angle` · `--edge-proximity` 두 변수를 쓰는 것뿐입니다.
+  그래서 **CSS 는 그대로 옮기고 JSX 는 안 가져왔습니다** — 대신 `--edge-proximity` 를 100 에 묶고
+  `--cursor-angle` 을 CSS 키프레임으로 6초에 한 바퀴 돌립니다.
+- **원본과 다르게 둔 것** — 팔레트를 warning 램프로 바꿨고(원본 기본값은 보라·분홍·하늘),
+  안쪽 면을 물들이는 층은 뺐습니다(지도 위에 색 얼룩이 상시로 뜨게 됩니다).
+  테두리 링은 지도 때문에 원본의 배경색 덮기 대신 마스크로 잡았습니다 — 결과는 같습니다.
+
+### Strands — 검토용입니다
+
+- **쓰는 곳** — `strands-lab.html` (검토용 페이지). 실제 화면에는 얹지 않았습니다.
+- **출처** — <https://reactbits.dev/animations/strands> · 레지스트리 `https://reactbits.dev/r/Strands-JS-CSS.json`
+- 원본은 `ogl` 에 의존합니다. 이 저장소에는 빌드 단계가 없어서
+  **프래그먼트 셰이더는 원본 그대로 두고 캔버스·uniform 껍데기만 순수 WebGL2 로 옮겼습니다.**
+
+저작권 표시는 `app-shell.css` 의 엣지 글로우 블록 머리와 `strands-lab.html` 의 스크립트 머리에
+들어 있습니다 — 라이선스가 요구하는 사항이라 **다른 곳에 또 옮겨 쓸 때도 같이 따라가야 합니다.**
 
 **판매해도 됩니다.** 라이선스가 그 경우를 명시합니다.
 
@@ -41,7 +58,7 @@
 
 **금지되는 것은 컴포넌트 자체를 파는 것**입니다. 즉 팔리는 물건이 컴포넌트일 때입니다.
 
-- Strands 가 들어간 UI 킷 · 템플릿 · 컴포넌트 라이브러리를 판매
+- 이 컴포넌트들이 들어간 UI 킷 · 템플릿 · 컴포넌트 라이브러리를 판매
 - 고객사에 재사용 가능한 컴포넌트 파일로 넘기는 것
 - 이식본을 우리 것인 양 배포하는 것
 
@@ -118,10 +135,10 @@ CDN 이 죽으면 서체가 무너지고, 사용자 브라우저가 외부에 �
 
 - [ ] **SUIT 라이선스 전문 확보** — 가장 넓게 쓰이는 자산입니다
 - [ ] **아이콘 26개의 출처 확인** — 자체 제작인지, 어떤 세트를 바탕으로 했는지
-- [ ] Strands 를 실제 화면에 얹는다면 **저작권 주석이 함께 따라갔는지**
+- [x] React Bits 를 실제 화면에 얹을 때 **저작권 주석이 함께 따라갔는지** — `app-shell.css` 엣지 글로우 블록 머리에 있음
 - [ ] 웹폰트 **자체 호스팅**으로 전환 (CDN 의존 · 외부 요청 제거)
 - [ ] 배포 빌드에서 `assets/robot-dog/` · `_backup/` 제외
-- [ ] 디자인 시스템을 **따로 떼어 파는 계획**이 생기면 Strands 조항 재검토
+- [ ] 디자인 시스템을 **따로 떼어 파는 계획**이 생기면 React Bits 조항 재검토
 
 ---
 
