@@ -1258,6 +1258,7 @@ button {
 /*
  * 닫힘 두 줄 — 인사·브리핑 모두 Typography/Body/2 (16/24) Regular 이다.
  * 닫힘이 답답해 보인다고 해서 14/22 에서 키운 값이다(상자 패딩도 8 -> 12).
+ * 크기만 정한다 — 강약은 아래 .ai-line-1 / .ai-line-2 가 두 상태 모두 맡는다.
  */
 .ai-line-1,
 .ai-line-2 {
@@ -1339,6 +1340,18 @@ button {
   font-weight: var(--font-weight-semibold);
   color: var(--fg-primary);
 }
+
+/*
+ * 두 줄의 결 — 첫 줄(인사)은 한 단계 물러나고(80%),
+ * 둘째 줄(브리핑)을 볼드로 세운다. 닫힘·펼침 둘 다 같다.
+ *
+ * Figma 는 두 줄을 같은 굵기·같은 농도로 둔다. 읽힐 때 정보가 들어있는 쪽은
+ * 둘째 줄이라 그쪽으로 눈이 가게 해 달라는 지시에 따른 벗어남이다.
+ *
+ * .ai-headline 다음에 놓았다 — 상세도가 같아서 펼침의 SemiBold 를 덮으려면 뒤에 와야 한다.
+ */
+.ai-line-1 { opacity: 0.8; }
+.ai-line-2 { font-weight: var(--font-weight-bold); }
 
 /* Figma "Suggestions" — row wrap, gap 8. */
 .ai-suggestions {
