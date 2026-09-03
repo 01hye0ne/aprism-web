@@ -12,6 +12,7 @@
 | `icon-*.svg` | `assets/icons/` — 옮긴 뒤 `tools/inline-icons.py` 로 CSS 에 인라인됩니다(`--ic-이름`) |
 | 화면에 쓰는 그림 | `assets/img/` |
 | Figma 자리표시자 | `assets/figma/` |
+| Claude Design 핸드오프 번들 | `assets/<이름>/` — 화면은 참조하지 않는 원본이고, 옮긴 결과만 씁니다 |
 
 옮기고 나면 여기서는 없어집니다. **여기 남아 있는 파일 = 아직 안 쓰는 파일** 입니다.
 

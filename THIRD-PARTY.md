@@ -15,7 +15,7 @@
 | IBM Plex Sans / Mono | 실험실 페이지 비교용 | SIL OFL 1.1 | 가능 |
 | SUIT Variable | 화면 전체 본문 서체 | **확인 필요** | 확인 후 판단 |
 | 아이콘 26개 | 화면 전반 | 자체 제작 추정 · **확인 필요** | 확인 후 판단 |
-| Claude Design 핸드오프 번들 | `assets/robot-dog/` | 작업 자료 · 배포 안 됨 | 해당 없음 |
+| Claude Design 핸드오프 번들 | `assets/robot-dog/` · `assets/prism-orb/` | 작업 자료 · 배포 안 됨 | 해당 없음 |
 
 ---
 
@@ -112,6 +112,10 @@ CDN 이 죽으면 서체가 무너지고, 사용자 브라우저가 외부에 �
 
 라이선스 문제가 없는 것들입니다. 기록만 남깁니다.
 
+- `assets/js/prism-orb.js` — Delta 의 오브. Claude Design 핸드오프(`assets/prism-orb/`)의
+  프로토타입을 옮긴 것입니다. **원본은 three.js 를 esm.sh 에서 불러 쓰지만 이쪽은 안 씁니다** —
+  셰이더는 그대로 두고 three 가 하던 일(기하 · 행렬 · 렌더타깃)만 순수 WebGL2 로 다시 썼습니다.
+  **저장소에도 화면에도 three.js 는 들어오지 않습니다.**
 - `assets/img/robot-graphic.svg` — Figma 의 `Robot-Graphic` 내보내기
 - `assets/figma/map-temp.svg` — Figma 지도 자리표시자
 - `assets/css/tokens.css` — Figma 변수에서 옮긴 디자인 토큰
@@ -121,10 +125,13 @@ CDN 이 죽으면 서체가 무너지고, 사용자 브라우저가 외부에 �
 
 ## 배포되지 않는 작업 자료
 
-- `assets/robot-dog/` — Claude Design(claude.ai/design) 핸드오프 번들입니다.
-  로봇 걷는 모션을 만들 때 쓴 원본 프로젝트로, **퍼블리싱된 화면은 이 폴더를 참조하지 않습니다.**
+- `assets/robot-dog/` · `assets/prism-orb/` — Claude Design(claude.ai/design) 핸드오프 번들입니다.
+  각각 로봇 걷는 모션과 Delta 오브를 만들 때 쓴 원본 프로젝트로,
+  **퍼블리싱된 화면은 이 폴더들을 참조하지 않습니다.**
 - 그 안의 `project/support.js` 는 Claude Design 런타임 생성물이고
   `unpkg.com` 에서 React · Babel 을 불러옵니다. **이 저장소의 화면과는 무관합니다.**
+  오브 원본(`assets/prism-orb/project/Prism Orb.dc.html`)이 불러오는 three.js 도 마찬가지입니다 —
+  화면이 쓰는 것은 그걸 옮긴 `assets/js/prism-orb.js` 이고, 거기엔 외부 의존이 없습니다.
 - `_backup/` — 작업 중 남긴 백업본입니다.
 - `assets/source/` — Figma 에서 내보낸 파일을 그냥 두는 곳입니다.
   쓰는 파일은 `assets/icons/` · `assets/img/` 등 제자리로 옮겨지므로,
@@ -140,7 +147,7 @@ CDN 이 죽으면 서체가 무너지고, 사용자 브라우저가 외부에 �
 - [ ] **아이콘 26개의 출처 확인** — 자체 제작인지, 어떤 세트를 바탕으로 했는지
 - [x] React Bits 를 실제 화면에 얹을 때 **저작권 주석이 함께 따라갔는지** — `app-shell.css` 엣지 글로우 블록 머리에 있음
 - [ ] 웹폰트 **자체 호스팅**으로 전환 (CDN 의존 · 외부 요청 제거)
-- [ ] 배포 빌드에서 `assets/robot-dog/` · `_backup/` · `assets/source/` 제외
+- [ ] 배포 빌드에서 `assets/robot-dog/` · `assets/prism-orb/` · `_backup/` · `assets/source/` 제외
 - [ ] 디자인 시스템을 **따로 떼어 파는 계획**이 생기면 React Bits 조항 재검토
 
 ---

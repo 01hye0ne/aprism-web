@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/static/woff2/SUIT.css" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" />
   <link rel="stylesheet" href="../assets/css/tokens.css?v=3be2ee40" />
-  <link rel="stylesheet" href="../assets/css/app-shell.css?v=5211f266" />
+  <link rel="stylesheet" href="../assets/css/app-shell.css?v=2d33a0f0" />
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
@@ -249,7 +249,8 @@
             <!-- AI Assist Panel · Figma UI_00 Design System 121:665 (state=closed 기본, 우측 토글로 opened) -->
             <section class="ai-panel is-warning" data-ai-panel aria-label="Delta AI 요약">
 
-              <!-- Delta — 그래픽 자리(원은 Figma 자리표시자) + 이름. 닫힘은 왼쪽 기둥, 펼침은 헤더 줄. -->
+              <!-- Delta — 그래픽 자리 + 이름. 닫힘은 왼쪽 기둥, 펼침은 헤더 줄.
+                   prism-orb.js 가 .ai-delta-mark 안에 캔버스를 붙인다. <i> 원은 오브가 못 뜰 때 남는 자리표시자다. -->
               <div class="ai-delta">
                 <span class="ai-delta-mark" aria-hidden="true"><i></i></span>
                 <span class="ai-delta-label">DELTA</span>
@@ -496,7 +497,8 @@
 
 
 <script src="../assets/js/theme.js?v=dcf8f460"></script>
-<script src="../assets/js/screen.js?v=870476f5"></script>
+<script src="../assets/js/prism-orb.js?v=7770760f"></script>
+<script src="../assets/js/screen.js?v=06ef284d"></script>
 <script src="../assets/js/grid-overlay.js?v=164e4f2a"></script>
 </body>
 </html>

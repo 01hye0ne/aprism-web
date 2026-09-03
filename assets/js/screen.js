@@ -29,6 +29,18 @@
       apply(!panel.classList.contains("is-open"));
     });
 
+    // Delta 얼굴 — Prism Orb 를 그래픽 자리에 붙인다. 색은 패널의 심각도를 따라간다.
+    // WebGL2 를 못 쓰면 mount 가 null 을 주고, 자리표시자 원이 그대로 남는다.
+    function severity() {
+      if (panel.classList.contains("is-critical")) { return "critical"; }
+      if (panel.classList.contains("is-warning")) { return "warning"; }
+      if (panel.classList.contains("is-safe")) { return "safe"; }
+      return "info";
+    }
+
+    var mark = panel.querySelector(".ai-delta-mark");
+    var orb = (mark && window.PrismOrb) ? window.PrismOrb.mount(mark, { palette: severity() }) : null;
+
     // closed 상태의 [확인] — 주의 알림을 받았다는 응답. 누르면 화면·패널을 일반(파란) 상태로
     // 되돌리고, 알림 문구를 일반 안내 멘트로 바꾼다.
     var ack = panel.querySelector("[data-ai-ack]");
@@ -36,6 +48,7 @@
       var NORMAL_TEXT = "무엇을 도와드릴까요?";
       ack.addEventListener("click", function () {
         panel.classList.remove("is-warning");
+        if (orb) { orb.setPalette(severity()); }
         var twoCol = panel.closest(".two-col");
         if (twoCol) {
           twoCol.classList.remove("is-warning");

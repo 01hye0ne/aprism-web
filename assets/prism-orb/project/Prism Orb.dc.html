@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet" />
+<style>
+  html, body { margin: 0; padding: 0; background: #0b0a0e; }
+  a { color: #cfc9d6; text-decoration: none; }
+  a:hover { color: #fff; }
+  @keyframes orbBreathe { 0%, 100% { opacity: .45; transform: scale(1); } 50% { opacity: .75; transform: scale(1.06); } }
+</style>
+</helmet>
+<div style="position: relative; width: 100%; min-height: 100vh; background: radial-gradient(120% 90% at 50% 45%, #14121a 0%, #0d0c11 60%, #08080b 100%); display: grid; place-items: center; overflow: hidden; font-family: 'DM Sans', Helvetica, sans-serif; color: #e8e4ee;">
+  <div style="position: absolute; width: 52vmin; height: 52vmin; border-radius: 50%; background: radial-gradient(circle, rgba(190,190,205,.14) 0%, rgba(150,150,170,.06) 45%, rgba(0,0,0,0) 70%); filter: blur(22px); animation: orbBreathe 6s ease-in-out infinite;"></div>
+  <div ref="{{ mount }}" style="position: relative; width: 68vmin; height: 68vmin;"></div>
+  <div style="position: absolute; bottom: 5vmin; display: flex; flex-direction: column; align-items: center; gap: 10px;">
+    <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: rgba(232,228,238,.42);">{{ caption }}</div>
+    <div style="width: 44px; height: 1px; background: linear-gradient(90deg, rgba(232,228,238,0), rgba(232,228,238,.4), rgba(232,228,238,0));"></div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{
+  &quot;shape&quot;: { &quot;editor&quot;: &quot;enum&quot;, &quot;options&quot;: [&quot;icosahedron&quot;, &quot;shard&quot;, &quot;dodecahedron&quot;, &quot;octahedron&quot;, &quot;prism&quot;], &quot;default&quot;: &quot;icosahedron&quot;, &quot;tsType&quot;: &quot;string&quot; },
+  &quot;palette&quot;: { &quot;editor&quot;: &quot;enum&quot;, &quot;options&quot;: [&quot;critical&quot;, &quot;warning&quot;, &quot;safe&quot;, &quot;info&quot;], &quot;default&quot;: &quot;info&quot;, &quot;tsType&quot;: &quot;string&quot; },
+  &quot;glass&quot;: { &quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Look&quot; },
+  &quot;bevel&quot;: { &quot;editor&quot;: &quot;range&quot;, &quot;min&quot;: 0, &quot;max&quot;: 1, &quot;step&quot;: 0.02, &quot;default&quot;: 0.4, &quot;tsType&quot;: &quot;number&quot;, &quot;section&quot;: &quot;Look&quot; },
+  &quot;coreBlur&quot;: { &quot;editor&quot;: &quot;range&quot;, &quot;min&quot;: 0, &quot;max&quot;: 0.14, &quot;step&quot;: 0.005, &quot;default&quot;: 0.05, &quot;tsType&quot;: &quot;number&quot;, &quot;section&quot;: &quot;Look&quot; },
+  &quot;refraction&quot;: { &quot;editor&quot;: &quot;range&quot;, &quot;min&quot;: 0, &quot;max&quot;: 0.4, &quot;step&quot;: 0.01, &quot;default&quot;: 0.16, &quot;tsType&quot;: &quot;number&quot;, &quot;section&quot;: &quot;Look&quot; },
+  &quot;dispersion&quot;: { &quot;editor&quot;: &quot;range&quot;, &quot;min&quot;: 0, &quot;max&quot;: 1, &quot;step&quot;: 0.02, &quot;default&quot;: 0.35, &quot;tsType&quot;: &quot;number&quot;, &quot;section&quot;: &quot;Look&quot; },
+  &quot;showEdges&quot;: { &quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Look&quot; },
+  &quot;glow&quot;: { &quot;editor&quot;: &quot;range&quot;, &quot;min&quot;: 0, &quot;max&quot;: 2, &quot;step&quot;: 0.05, &quot;default&quot;: 1, &quot;tsType&quot;: &quot;number&quot;, &quot;section&quot;: &quot;Look&quot; },
+  &quot;hueShift&quot;: { &quot;editor&quot;: &quot;range&quot;, &quot;min&quot;: 0, &quot;max&quot;: 1, &quot;step&quot;: 0.01, &quot;default&quot;: 0, &quot;tsType&quot;: &quot;number&quot;, &quot;section&quot;: &quot;Look&quot; },
+  &quot;speed&quot;: { &quot;editor&quot;: &quot;range&quot;, &quot;min&quot;: 0.1, &quot;max&quot;: 3, &quot;step&quot;: 0.05, &quot;default&quot;: 1, &quot;tsType&quot;: &quot;number&quot;, &quot;section&quot;: &quot;Motion&quot; },
+  &quot;caption&quot;: { &quot;editor&quot;: &quot;text&quot;, &quot;default&quot;: &quot;prism core / listening&quot;, &quot;tsType&quot;: &quot;string&quot; }
+}">
+const PALETTES = {
+  critical: { a: [0.64, 0.24, 0.30], b: [0.30, 0.20, 0.20], c: [0.6, 0.6, 0.6], d: [0.00, 0.16, 0.32] },
+  warning:  { a: [0.72, 0.50, 0.24], b: [0.24, 0.26, 0.18], c: [0.6, 0.6, 0.6], d: [0.05, 0.12, 0.36] },
+  safe:     { a: [0.26, 0.60, 0.44], b: [0.22, 0.26, 0.22], c: [0.6, 0.6, 0.6], d: [0.32, 0.04, 0.20] },
+  info:     { a: [0.28, 0.42, 0.74], b: [0.24, 0.24, 0.20], c: [0.6, 0.6, 0.6], d: [0.38, 0.22, 0.04] }
+};
+
+const PAL_FN = `
+  uniform vec3 uA, uB, uC, uD;
+  vec3 pal(float t) { return uA + uB * cos(6.28318 * (uC * t + uD)); }
+`;
+
+const VERT = `
+  varying vec3 vViewPos;
+  varying vec3 vLocal;
+  varying vec3 vSphereN;
+  varying vec3 vNorm;
+  void main() {
+    vLocal = position;
+    vSphereN = normalMatrix * normalize(position);
+    vNorm = normalMatrix * normal;
+    vec4 mv = modelViewMatrix * vec4(position, 1.0);
+    vViewPos = mv.xyz;
+    gl_Position = projectionMatrix * mv;
+  }
+`;
+
+/* Inner light core: soft colour clouds that drift — this is what gets refracted. */
+const CORE_FRAG = `
+  precision highp float;
+  uniform float uTime, uShift;
+  ${PAL_FN}
+  varying vec3 vViewPos;
+  varying vec3 vLocal;
+  varying vec3 vSphereN;
+  varying vec3 vNorm;
+  void main() {
+    vec3 N = normalize(vLocal);
+    vec3 V = normalize(-vViewPos);
+    float t = 0.30 + 0.42 * N.y + 0.16 * sin(N.x * 2.3 + uTime * 0.5)
+            + 0.10 * sin(N.z * 3.1 - uTime * 0.37) + uShift;
+    vec3 col = pal(t) * 1.25;
+    col += pal(t + 0.18) * 0.45 * smoothstep(0.1, 0.9, 0.5 + 0.5 * sin(N.y * 4.0 + uTime * 0.6));
+    float edge = 1.0 - clamp(dot(normalize(vLocal), V), 0.0, 1.0);
+    float falloff = pow(clamp(1.0 - edge, 0.0, 1.0), 2.2);
+    col *= 0.6 + 1.3 * falloff;
+    // white only at the hot centre, colour everywhere else
+    col = mix(col, vec3(1.6), pow(falloff, 6.0) * 0.85);
+    gl_FragColor = vec4(col * falloff, falloff);
+  }
+`;
+
+/* Separable gaussian used to melt the core into formless light. */
+const BLUR_FRAG = `
+  precision highp float;
+  uniform sampler2D uSrc;
+  uniform vec2 uDir;
+  varying vec2 vUv;
+  void main() {
+    vec4 s = texture2D(uSrc, vUv) * 0.1964;
+    s += (texture2D(uSrc, vUv + uDir * 1.4) + texture2D(uSrc, vUv - uDir * 1.4)) * 0.1748;
+    s += (texture2D(uSrc, vUv + uDir * 3.3) + texture2D(uSrc, vUv - uDir * 3.3)) * 0.1213;
+    s += (texture2D(uSrc, vUv + uDir * 5.3) + texture2D(uSrc, vUv - uDir * 5.3)) * 0.0658;
+    s += (texture2D(uSrc, vUv + uDir * 7.4) + texture2D(uSrc, vUv - uDir * 7.4)) * 0.0299;
+    gl_FragColor = s;
+  }
+`;
+
+const QUAD_VERT = `
+  varying vec2 vUv;
+  void main() { vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }
+`;
+
+/* Faceted glass shell: screen-space refraction of the core with chromatic dispersion. */
+const SHELL_FRAG = `
+  precision highp float;
+  uniform float uTime, uGlow, uShift, uGlass, uRefract, uDisp, uBlur, uBevel;
+  uniform vec2 uRes;
+  uniform sampler2D uTex;
+  uniform sampler2D uSoftTex;
+  ${PAL_FN}
+  varying vec3 vViewPos;
+  varying vec3 vLocal;
+  varying vec3 vSphereN;
+  varying vec3 vNorm;
+
+  vec4 samp(vec2 uv, vec2 off, float k) {
+    return texture2D(uTex, clamp(uv + off * k, vec2(0.002), vec2(0.998)));
+  }
+
+  // wide poisson-ish blur so the core reads as light, not a solid body
+  vec4 soft(vec2 uv, vec2 off, float k, float r) {
+    vec4 s = samp(uv, off, k) * 0.16;
+    s += samp(uv, off + vec2( r,     0.0), k) * 0.105;
+    s += samp(uv, off + vec2(-r,     0.0), k) * 0.105;
+    s += samp(uv, off + vec2( 0.0,   r  ), k) * 0.105;
+    s += samp(uv, off + vec2( 0.0,  -r  ), k) * 0.105;
+    s += samp(uv, off + vec2( r*0.7, r*0.7), k) * 0.085;
+    s += samp(uv, off + vec2(-r*0.7, r*0.7), k) * 0.085;
+    s += samp(uv, off + vec2( r*0.7,-r*0.7), k) * 0.085;
+    s += samp(uv, off + vec2(-r*0.7,-r*0.7), k) * 0.085;
+    s += samp(uv, off + vec2( r*1.9, 0.0), k) * 0.0225;
+    s += samp(uv, off + vec2(-r*1.9, 0.0), k) * 0.0225;
+    s += samp(uv, off + vec2( 0.0, r*1.9), k) * 0.0225;
+    s += samp(uv, off + vec2( 0.0,-r*1.9), k) * 0.0225;
+    return s;
+  }
+
+  void main() {
+    // beveled geometry carries true smooth normals; hard-faceted geometry uses screen-space flat normals
+    vec3 N = uBevel > 0.5
+      ? normalize(vNorm)
+      : normalize(cross(dFdx(vViewPos), dFdy(vViewPos)));
+    vec3 V = normalize(-vViewPos);
+    if (dot(N, V) < 0.0) N = -N;
+    float ndv = clamp(dot(N, V), 0.0, 1.0);
+    float fres = pow(1.0 - ndv, 2.4);
+
+    vec3 L1 = normalize(vec3(-0.45, 0.85, 0.55));
+    vec3 L2 = normalize(vec3(0.75, -0.35, 0.40));
+    float d1 = max(dot(N, L1), 0.0);
+    float d2 = max(dot(N, L2), 0.0);
+
+    float spread = 0.34 * N.x + 0.30 * N.y + 0.12 * fres;
+    float band = 0.08 * sin(uTime * 0.11) + uShift;
+    float t = 0.38 + clamp(spread, -0.28, 0.28) + band;
+    vec3 tint = pal(t) * 0.6 + pal(t + 0.04) * 0.4;
+
+    float lum = clamp(0.16 + 0.85 * pow(d1, 1.3) + 0.32 * pow(d2, 2.0), 0.0, 1.0);
+    vec3 solid = mix(vec3(0.024, 0.022, 0.030), tint, smoothstep(0.13, 0.55, lum));
+    solid = mix(solid, vec3(1.0), smoothstep(0.80, 1.0, lum) * 0.12);
+
+    vec3 col = solid;
+    float a = 1.0;
+
+    if (uGlass > 0.5) {
+      vec2 uv = gl_FragCoord.xy / uRes;
+      vec3 R = refract(-V, N, 1.0 / 1.45);
+      vec2 off = R.xy * uRefract * (0.55 + 0.75 * fres);
+      float rad = uBlur;
+      vec4 r = texture2D(uSoftTex, clamp(uv + off * (1.0 - uDisp), vec2(0.002), vec2(0.998)));
+      vec4 g = texture2D(uSoftTex, clamp(uv + off, vec2(0.002), vec2(0.998)));
+      vec4 b = texture2D(uSoftTex, clamp(uv + off * (1.0 + uDisp), vec2(0.002), vec2(0.998)));
+      vec4 blur = soft(uv, off, 1.0, rad);
+      vec3 refr = vec3(r.r, g.g, b.b) * 0.6 + blur.rgb * 0.4;
+      float mask = smoothstep(0.005, 0.45, (r.a + g.a + b.a) / 3.0);
+      float bleed = clamp(blur.a * 3.2, 0.0, 1.0);
+      vec3 bleedCol = blur.rgb / max(blur.a, 0.02);
+
+      vec3 glassBody = mix(solid * 0.9, solid * 0.35 + bleedCol * 0.75, bleed * 0.8);
+      glassBody += refr * (0.9 + 0.5 * ndv) * mask;
+      glassBody += tint * 0.12 * lum;
+      col = glassBody;
+      a = clamp(0.46 + 0.54 * pow(fres, 1.1) + mask * 0.35 + bleed * 0.25, 0.0, 1.0);
+      if (!gl_FrontFacing) { col *= 0.55; a *= 0.5; }
+    } else if (!gl_FrontFacing) {
+      col *= 0.55;
+    }
+
+    vec3 H = normalize(L1 + V);
+    col += vec3(1.0) * pow(max(dot(N, H), 0.0), 72.0) * 0.26;
+    col += pal(t + 0.15) * pow(fres, 2.0) * 0.55 * uGlow;
+
+
+    gl_FragColor = vec4(col, a);
+  }
+`;
+
+class Component extends DCLogic {
+  mount = React.createRef();
+
+  renderVals() {
+    return { mount: this.mount, caption: this.props.caption ?? "prism core / listening" };
+  }
+
+  componentDidMount() { this.boot(); }
+
+  componentDidUpdate() {
+    if (!this.three) return;
+    this.applyGeometry();
+    this.applyMaterial();
+  }
+
+  componentWillUnmount() {
+    this.dead = true;
+    cancelAnimationFrame(this.raf);
+    if (this.ro) this.ro.disconnect();
+    if (this.three) {
+      this.three.rt.dispose();
+      this.three.rtA.dispose();
+      this.three.rtB.dispose();
+      this.three.renderer.dispose();
+    }
+  }
+
+  async boot() {
+    const THREE = await import("https://esm.sh/three@0.160.1");
+    if (this.dead || !this.mount.current) return;
+    const host = this.mount.current;
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.setClearColor(0x000000, 0);
+    host.appendChild(renderer.domElement);
+    Object.assign(renderer.domElement.style, { width: "100%", height: "100%", display: "block" });
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 100);
+    camera.position.set(0, 0, 5.4);
+
+    const uniforms = {
+      uTime: { value: 0 }, uGlow: { value: 1 }, uShift: { value: 0 }, uGlass: { value: 1 },
+      uRefract: { value: 0.16 }, uDisp: { value: 0.35 }, uBlur: { value: 0.05 }, uBevel: { value: 0.35 },
+      uRes: { value: new THREE.Vector2(1, 1) }, uTex: { value: null }, uSoftTex: { value: null },
+      uA: { value: new THREE.Vector3() }, uB: { value: new THREE.Vector3() },
+      uC: { value: new THREE.Vector3() }, uD: { value: new THREE.Vector3() }
+    };
+
+    const rtOpts = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat };
+    const rt = new THREE.WebGLRenderTarget(1, 1, rtOpts);
+    const rtA = new THREE.WebGLRenderTarget(1, 1, rtOpts);
+    const rtB = new THREE.WebGLRenderTarget(1, 1, rtOpts);
+    uniforms.uTex.value = rt.texture;
+    uniforms.uSoftTex.value = rtB.texture;
+
+    const blurUniforms = { uSrc: { value: null }, uDir: { value: new THREE.Vector2() } };
+    const blurQuad = new THREE.Mesh(
+      new THREE.PlaneGeometry(2, 2),
+      new THREE.ShaderMaterial({ vertexShader: QUAD_VERT, fragmentShader: BLUR_FRAG, uniforms: blurUniforms, depthTest: false, transparent: true })
+    );
+    const blurScene = new THREE.Scene();
+    blurScene.add(blurQuad);
+    const blurCam = new THREE.Camera();
+
+    const shellMat = (side) => new THREE.ShaderMaterial({
+      vertexShader: VERT, fragmentShader: SHELL_FRAG, uniforms,
+      side, transparent: true, depthWrite: false
+    });
+    const material = shellMat(THREE.FrontSide);
+    const backMat = shellMat(THREE.BackSide);
+    const coreMat = new THREE.ShaderMaterial({
+      vertexShader: VERT, fragmentShader: CORE_FRAG, uniforms,
+      side: THREE.DoubleSide, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending
+    });
+
+    const group = new THREE.Group();
+    const mesh = new THREE.Mesh(new THREE.IcosahedronGeometry(1.15, 0), material);
+    mesh.renderOrder = 3;
+    const backMesh = new THREE.Mesh(mesh.geometry, backMat);
+    backMesh.renderOrder = 1;
+    const edges = new THREE.LineSegments(
+      new THREE.EdgesGeometry(mesh.geometry, 1),
+      new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.22, depthWrite: false })
+    );
+    edges.renderOrder = 4;
+    const core = new THREE.Mesh(new THREE.IcosahedronGeometry(0.44, 1), coreMat);
+    core.renderOrder = 0;
+    const halo = new THREE.Mesh(new THREE.IcosahedronGeometry(0.82, 2), coreMat);
+    halo.renderOrder = 0;
+    core.add(halo);
+    group.add(backMesh, mesh, edges);
+    scene.add(core);
+    scene.add(group);
+
+    this.three = { THREE, renderer, scene, camera, group, mesh, backMesh, backMat, edges, core, material, uniforms, rt, rtA, rtB, blurScene, blurCam, blurUniforms, clock: new THREE.Clock() };
+    this.applyGeometry();
+    this.applyMaterial();
+
+    const resize = () => {
+      const w = host.clientWidth || 1, h = host.clientHeight || 1;
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      const dpr = renderer.getPixelRatio();
+      const pw = Math.max(2, Math.floor(w * dpr)), ph = Math.max(2, Math.floor(h * dpr));
+      rt.setSize(pw, ph);
+      const bw = Math.max(2, Math.floor(pw / 4)), bh = Math.max(2, Math.floor(ph / 4));
+      rtA.setSize(bw, bh);
+      rtB.setSize(bw, bh);
+      this.blurSize = { bw, bh };
+      uniforms.uRes.value.set(pw, ph);
+    };
+    resize();
+    this.ro = new ResizeObserver(resize);
+    this.ro.observe(host);
+
+    const tick = () => {
+      if (this.dead) return;
+      const T = this.three.clock.getElapsedTime();
+      const s = this.props.speed ?? 1;
+      const glass = this.props.glass ?? true;
+      uniforms.uTime.value = T;
+
+      group.quaternion.setFromEuler(new THREE.Euler(T * 0.62 * s, T * 0.41 * s, T * 0.27 * s));
+      group.position.y = Math.sin(T * 0.8) * 0.05;
+      core.scale.setScalar(1 + Math.sin(T * 0.9) * 0.07);
+
+      if (glass) {
+        core.visible = true; mesh.visible = false; backMesh.visible = false; edges.visible = false;
+        renderer.setRenderTarget(rt);
+        renderer.clear();
+        renderer.render(scene, camera);
+
+        const spread = (this.props.coreBlur ?? 0.05) * 9.0;
+        blurUniforms.uSrc.value = rt.texture;
+        blurUniforms.uDir.value.set(spread / (this.blurSize?.bw || 1) * 4, 0);
+        renderer.setRenderTarget(rtA);
+        renderer.clear();
+        renderer.render(blurScene, blurCam);
+        blurUniforms.uSrc.value = rtA.texture;
+        blurUniforms.uDir.value.set(0, spread / (this.blurSize?.bh || 1) * 4);
+        renderer.setRenderTarget(rtB);
+        renderer.clear();
+        renderer.render(blurScene, blurCam);
+
+        renderer.setRenderTarget(null);
+        core.visible = false; mesh.visible = true; backMesh.visible = true; edges.visible = true;
+      } else {
+        core.visible = false; mesh.visible = true; backMesh.visible = false; edges.visible = false;
+      }
+      renderer.render(scene, camera);
+      this.raf = requestAnimationFrame(tick);
+    };
+    tick();
+  }
+
+  applyGeometry() {
+    const { THREE, mesh, backMesh, edges } = this.three;
+    const shape = this.props.shape ?? "icosahedron";
+    let g;
+    if (shape === "icosahedron") g = new THREE.IcosahedronGeometry(1.15, 0);
+    else if (shape === "dodecahedron") g = new THREE.DodecahedronGeometry(1.15, 0);
+    else if (shape === "prism") g = new THREE.CylinderGeometry(0.95, 0.95, 1.5, 7, 1);
+    else if (shape === "octahedron") g = new THREE.OctahedronGeometry(1.3, 1);
+    else {
+      g = new THREE.IcosahedronGeometry(1.15, 1);
+      const p = g.attributes.position;
+      const seen = new Map();
+      for (let i = 0; i < p.count; i++) {
+        const k = [p.getX(i), p.getY(i), p.getZ(i)].map((v) => v.toFixed(3)).join(",");
+        let j = seen.get(k);
+        if (j === undefined) {
+          const n = Math.sin(i * 12.9898) * 43758.5453;
+          j = 0.82 + 0.3 * (n - Math.floor(n));
+          seen.set(k, j);
+        }
+        p.setXYZ(i, p.getX(i) * j, p.getY(i) * j, p.getZ(i) * j);
+      }
+    }
+    const bevel = this.props.bevel ?? 0.35;
+    const flat = g.index ? g.toNonIndexed() : g;
+    const final = bevel > 0.001 ? this.bevelize(flat, bevel) : flat;
+    if (final !== flat) flat.dispose();
+
+    mesh.geometry.dispose();
+    mesh.geometry = final;
+    backMesh.geometry = final;
+    edges.visible = bevel <= 0.001;
+    if (edges.visible) {
+      edges.geometry.dispose();
+      edges.geometry = new THREE.EdgesGeometry(final, 1);
+    }
+
+  }
+
+  /* Real beveled solid: reproject a dense sphere onto the polyhedron's face planes
+     with a soft p-norm, so edges are physically rounded off rather than shaded round. */
+  bevelize(flatGeo, bevel) {
+    const { THREE } = this.three;
+    const pos = flatGeo.attributes.position;
+    const planes = [];
+    const a = new THREE.Vector3(), b = new THREE.Vector3(), c = new THREE.Vector3();
+    const ab = new THREE.Vector3(), ac = new THREE.Vector3(), n = new THREE.Vector3();
+    for (let i = 0; i < pos.count; i += 3) {
+      a.fromBufferAttribute(pos, i); b.fromBufferAttribute(pos, i + 1); c.fromBufferAttribute(pos, i + 2);
+      ab.subVectors(b, a); ac.subVectors(c, a);
+      n.crossVectors(ab, ac).normalize();
+      if (n.dot(a) < 0) n.negate();
+      const d = n.dot(a);
+      if (d <= 1e-4) continue;
+      if (!planes.some((p) => p.n.dot(n) > 0.999)) planes.push({ n: n.clone(), d });
+    }
+    if (!planes.length) return flatGeo;
+
+    const k = Math.min(Math.max(bevel, 0), 1);
+    const p = Math.pow(2, 9.8 - 2.5 * k); // ~890 at 0 (hairline) · ~158 at 1 (widest fillet)
+    const geo = new THREE.IcosahedronGeometry(1, 5);
+    const vp = geo.attributes.position;
+    const dir = new THREE.Vector3();
+    for (let i = 0; i < vp.count; i++) {
+      dir.fromBufferAttribute(vp, i).normalize();
+      let sum = 0;
+      for (const pl of planes) {
+        const dp = dir.dot(pl.n);
+        if (dp > 0) sum += Math.pow(dp / pl.d, p);
+      }
+      const s = sum > 0 ? Math.pow(sum, -1 / p) : 1;
+      vp.setXYZ(i, dir.x * s, dir.y * s, dir.z * s);
+    }
+    geo.computeVertexNormals();
+    return geo;
+  }
+
+  applyMaterial() {
+    const { uniforms, edges } = this.three;
+    const p = PALETTES[this.props.palette ?? "info"] || PALETTES.info;
+    uniforms.uA.value.set(...p.a);
+    uniforms.uB.value.set(...p.b);
+    uniforms.uC.value.set(...p.c);
+    uniforms.uD.value.set(...p.d);
+    uniforms.uGlow.value = this.props.glow ?? 1;
+    uniforms.uShift.value = this.props.hueShift ?? 0;
+    uniforms.uRefract.value = this.props.refraction ?? 0.16;
+    uniforms.uDisp.value = this.props.dispersion ?? 0.35;
+    uniforms.uBlur.value = (this.props.coreBlur ?? 0.05) * 0.6;
+    uniforms.uBevel.value = (this.props.bevel ?? 0.35) > 0.001 ? 1 : 0;
+    const glass = this.props.glass ?? true;
+    uniforms.uGlass.value = glass ? 1 : 0;
+    edges.material.opacity = glass && (this.props.bevel ?? 0.35) <= 0.001 ? (this.props.showEdges ?? true ? 0.16 : 0) : 0;
+  }
+}
+</script>
+</body>
+</html>
