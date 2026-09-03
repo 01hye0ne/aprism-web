@@ -1037,7 +1037,7 @@ button {
   grid-area: box;
   position: relative;
   overflow: hidden;
-  padding: var(--space-8);
+  padding: var(--space-12);
   border-radius: var(--radius-container);
   background-image: linear-gradient(
     180deg,
@@ -1255,20 +1255,15 @@ button {
   gap: var(--space-4);
 }
 
-/* 인사 — Body/3(14/22) 인데 Bold 로 덮여 있다. */
-.ai-line-1 {
-  margin: 0;
-  font-size: var(--font-size-14);
-  line-height: var(--font-line-height-22);
-  font-weight: var(--font-weight-bold);
-  color: var(--fg-primary);
-}
-
-/* 브리핑(닫힘) — Body/3 Regular. 펼치면 아래 .ai-headline 로 커진다. */
+/*
+ * 닫힘 두 줄 — 인사·브리핑 모두 Typography/Body/2 (16/24) Regular 이다.
+ * 닫힘이 답답해 보인다고 해서 14/22 에서 키운 값이다(상자 패딩도 8 -> 12).
+ */
+.ai-line-1,
 .ai-line-2 {
   margin: 0;
-  font-size: var(--font-size-14);
-  line-height: var(--font-line-height-22);
+  font-size: var(--font-size-16);
+  line-height: var(--font-line-height-24);
   font-weight: var(--font-weight-regular);
   color: var(--fg-primary);
 }
@@ -1334,7 +1329,8 @@ button {
 .ai-content .ai-lines { padding: 0 var(--space-4); }
 
 /*
- * 브리핑(펼침) — Typography/Body/1 (20/32). 이름은 Regular 인데 스타일 자체가 SemiBold 다.
+ * 펼침 두 줄 — 인사·브리핑 모두 Typography/Body/1 (20/32).
+ * 이름은 Regular 인데 스타일 자체가 SemiBold 다.
  */
 .ai-headline {
   margin: 0;
