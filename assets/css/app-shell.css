@@ -2546,18 +2546,24 @@ input.field-box { outline: 0; }
  * 예전의 반투명 그라데이션 + 테두리는 없어졌다.
  */
 .is-running .step-card {
+  /*
+   * Figma 는 main/700 -> main/600 인데 한 단계씩 낮췄다.
+   * 그 면 위에서 흰 글자가 3.22~3.82 라 12px 시각·설명 글자가 AA(4.5)에 한참 못 미친다.
+   * main/900 -> main/800 이면 5.38~6.50 이라 카드 어디서나 통과한다.
+   * (검은 글자로 두면 원래 면에서도 4.88~5.80 으로 통과하지만, 짙은 파랑 위 검은 글자라
+   *  숫자와 달리 눈으로는 뭉개져 보인다 — 세 안을 그려 보고 고른 것이다.)
+   */
   background-image: linear-gradient(
     180deg,
-    var(--color-main-700) 0%,
-    var(--color-main-600) 100%
+    var(--color-main-900) 0%,
+    var(--color-main-800) 100%
   );
   /*
    * 파란 면은 테마가 바뀌어도 같은 색이라 글자도 고정한다.
    * Figma 는 여기 fg/primary 를 걸어 뒀는데 Light 모드에서 그게 검정(#070A10)이 되어
-   * 파란 면 위에 검은 글자가 온다. Dark 와 같은 gray/50 으로 두 모드 모두 맞춘다.
-   * (Figma 쪽도 정리가 필요하다 — 검토 노트에 적어 뒀다.)
+   * 파란 면 위에 검은 글자가 온다.
    */
-  --step-on-blue: var(--color-gray-50);
+  --step-on-blue: var(--color-gray-0);
 }
 
 .is-running .step-no,
