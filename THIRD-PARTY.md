@@ -38,6 +38,8 @@
   테두리 링은 지도 때문에 원본의 배경색 덮기 대신 마스크로 잡았습니다 — 결과는 같습니다.
   번지는 거리는 **두 배**로 키웠습니다(`glowRadius` 40 → 80). 그림자 스택의 구성과 비율은
   원본 그대로고 흐림 반경에 `--edge-glow-reach`(2)를 곱합니다.
+  색은 warning 램프에서 **Delta 오브(`assets/js/prism-orb.js`)의 `PALETTES.warning`** 으로
+  옮겼습니다 — 오브 · Spectrum · 엣지 글로우가 같은 팔레트에서 나옵니다.
 
 ### Strands — 검토용입니다
 

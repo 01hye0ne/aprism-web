@@ -48,8 +48,10 @@
     // 닫힘·펼침 두 판에 같은 클래스가 하나씩 있어서 넷을 다 바꾼다.
     var ack = panel.querySelector("[data-ai-ack]");
     if (ack) {
-      var NORMAL_LINE_1 = "안녕하세요, 김현수 님.";
+      var NORMAL_LINE_1 = "안녕하세요, 홍길동 님.";
       var NORMAL_LINE_2 = "인계된 알림 3건과 진행 예정인 미션 1건이 있어요. 먼저 살펴볼까요?";
+      // 태그도 같이 바꾼다 — 주의 상태 문구가 그대로 남으면 새 멘트와 안 맞는다.
+      var NORMAL_TAG = "인계 알림 3건 · 예정 미션 1건";
 
       function setLines(one, two) {
         Array.prototype.slice.call(panel.querySelectorAll(".ai-line-1"))
@@ -66,6 +68,8 @@
           twoCol.classList.remove("is-warning");
         }
         setLines(NORMAL_LINE_1, NORMAL_LINE_2);
+        var tag = panel.querySelector("[data-ai-tag-text]");
+        if (tag) { tag.textContent = NORMAL_TAG; }
       });
     }
 

@@ -649,6 +649,22 @@ button {
   color: var(--fg-secondary);
 }
 
+/*
+ * Figma Badge-미션(566:19149) — state 마다 면·테두리·점·글자가 함께 바뀐다.
+ *   없음 · 대기   bg/surface/subtle + border/default + fg/secondary  (위 .badge-mode 기본값)
+ *   진행          status/info/*
+ *   완료          status/normal/*      실패 · 중지  status/critical/*
+ * 화면마다 다른 state 를 쓴다 — 미션 설정 없음 · 사전 점검 대기 · 모니터링 진행.
+ * 완료·실패·중지가 필요해지면 아래와 같은 꼴로 두 줄씩 더하면 된다.
+ *
+ * 면·테두리는 Mode Badge 일 때만 붙인다. .badge-info 단독은 로봇 카드의 "수행중" 처럼
+ * 면 없는 배지에도 쓰이기 때문이다.
+ */
+.badge-mode.badge-info {
+  background-color: var(--status-info-bg);
+  border-color: var(--status-info-border);
+}
+
 .badge-info { color: var(--status-info-fg); }
 .badge-info .badge-dot { background-color: var(--status-info-icon); }
 .badge-normal { color: var(--status-normal-fg); }
@@ -1491,7 +1507,8 @@ button {
  * (원본 계산식을 그대로 남겨 뒀으니 --edge-proximity 를 포인터로 몰면 호버 동작이 그대로 산다.)
  *
  * 원본과 다르게 둔 것 셋:
- *   1) 팔레트 — 원본 기본값은 보라·분홍·하늘이다. 주의 상태에 쓸 것이라 warning 램프로 바꿨다.
+ *   1) 팔레트 — 원본 기본값은 보라·분홍·하늘이다. Delta 오브(prism-orb.js)의
+ *      PALETTES.warning 한 바퀴로 바꿨다 — 오브 · Spectrum · 엣지 글로우가 같은 색에서 나온다.
  *   2) 바깥 번짐 — .two-col 이 overflow:hidden 이라 테두리 밖 그림자는 잘린다. 안쪽 번짐만 남는다.
  *   3) 안쪽 면을 물들이는 층(원본 ::after) 은 뺐다 — --edge-proximity 를 100 에 묶으면
  *      지도 위에 색 도는 얼룩이 항상 떠 있게 된다. 관제 화면에서는 지도가 먼저다.
@@ -1519,28 +1536,39 @@ button {
    */
   --edge-glow-reach: 2;
 
-  /* glowColor "40 80 80" — hsl(40deg 80% 80%). warning/200 과 거의 같은 톤이다. */
-  --glow-color: hsl(40deg 80% 80% / 100%);
-  --glow-color-60: hsl(40deg 80% 80% / 60%);
-  --glow-color-50: hsl(40deg 80% 80% / 50%);
-  --glow-color-40: hsl(40deg 80% 80% / 40%);
-  --glow-color-30: hsl(40deg 80% 80% / 30%);
-  --glow-color-20: hsl(40deg 80% 80% / 20%);
-  --glow-color-10: hsl(40deg 80% 80% / 10%);
+  /*
+   * 빛 색 — Delta 오브 팔레트의 가장 밝은 자리(#F2B020 = hsl(41 89% 54%))에서 가져와
+   * 빛으로 읽히도록 명도만 80% 로 올렸다. 원본 glowColor 는 hsl(40 80% 80%) 이었다 —
+   * 거의 같은 자리인데, 이제 출처가 오브다.
+   */
+  --glow-color: hsl(41deg 89% 80% / 100%);
+  --glow-color-60: hsl(41deg 89% 80% / 60%);
+  --glow-color-50: hsl(41deg 89% 80% / 50%);
+  --glow-color-40: hsl(41deg 89% 80% / 40%);
+  --glow-color-30: hsl(41deg 89% 80% / 30%);
+  --glow-color-20: hsl(41deg 89% 80% / 20%);
+  --glow-color-10: hsl(41deg 89% 80% / 10%);
 
-  /* colors=[warning/200, warning/300, warning/500] 을 원본 buildGradientVars 에 넣은 값 */
-  --gradient-one: radial-gradient(at 80% 55%, #f8ebae 0px, transparent 50%);
-  --gradient-two: radial-gradient(at 69% 34%, #eeda6b 0px, transparent 50%);
-  --gradient-three: radial-gradient(at 8% 6%, #ffcc00 0px, transparent 50%);
-  --gradient-four: radial-gradient(at 41% 38%, #f8ebae 0px, transparent 50%);
-  --gradient-five: radial-gradient(at 86% 85%, #eeda6b 0px, transparent 50%);
-  --gradient-six: radial-gradient(at 82% 18%, #ffcc00 0px, transparent 50%);
-  --gradient-seven: radial-gradient(at 51% 4%, #eeda6b 0px, transparent 50%);
-  --gradient-base: linear-gradient(#f8ebae 0 100%);
+  /*
+   * 테두리에 깔리는 색 얼룩(원본 buildGradientVars). 전에는 warning 램프
+   * (200 · 300 · 500)의 옅은 노랑 셋이었다. 지금은 Delta 오브 팔레트
+   * (PALETTES.warning) 한 바퀴의 여덟 stop 을 여덟 층에 그대로 나눠 얹는다 —
+   * 오브 · Spectrum · 엣지 글로우가 같은 색에서 나온다.
+   * 밝은 금빛을 넓은 자리에, 탄 주황·자두를 구석에 둬서 선이 탁해지지 않게 했다.
+   */
+  --gradient-one: radial-gradient(at 80% 55%, #eec242 0px, transparent 50%);
+  --gradient-two: radial-gradient(at 69% 34%, #cbad61 0px, transparent 50%);
+  --gradient-three: radial-gradient(at 8% 6%, #d38210 0px, transparent 50%);
+  --gradient-four: radial-gradient(at 41% 38%, #f2b020 0px, transparent 50%);
+  --gradient-five: radial-gradient(at 86% 85%, #9c7d6b 0px, transparent 50%);
+  --gradient-six: radial-gradient(at 82% 18%, #a5521a 0px, transparent 50%);
+  --gradient-seven: radial-gradient(at 51% 4%, #7d4f5a 0px, transparent 50%);
+  --gradient-base: linear-gradient(#f2b020 0 100%);
 
+  /* 빛이 지나가지 않는 쪽에 남는 상시 링. 이것도 오브 팔레트의 금빛에서 뽑았다. */
   box-shadow:
-    0 0 0 1px rgb(248 235 174 / 60%),
-    0 0 8px -3px rgb(238 206 27 / 30%);
+    0 0 0 1px rgb(238 194 66 / 60%),
+    0 0 8px -3px rgb(242 176 32 / 30%);
   animation: edge-glow-spin 6s linear infinite;
 }
 
