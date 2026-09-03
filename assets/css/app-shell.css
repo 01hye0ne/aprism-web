@@ -2184,7 +2184,7 @@ input.field-box { outline: 0; }
  */
 .robot-thumb {
   flex: none;
-  /* viewBox(0 -3 95 85)가 발 밑 빈 공간을 잘라내서 발이 thumb 바닥에 닿는다.
+  /* viewBox(0 -3 85 85)가 발 밑 빈 공간을 잘라내서 발이 thumb 바닥에 닿는다.
      카드 gap 0 이라 thumb 바로 아래가 .robot-lists — 리스트 위를 걷는 모습이 된다. */
   height: 72px;
   overflow: hidden;
@@ -2218,10 +2218,11 @@ input.field-box { outline: 0; }
   margin-top: 16px;
 }
 
+/* 관절 위치. 오른쪽 다리는 몸통이 10 짧아지면서 같이 10 왼쪽으로 왔다(74 -> 64, 89 -> 79). */
 .robot-dog .rd-hip-l { transform-origin: 14px 34px; }
-.robot-dog .rd-hip-r { transform-origin: 74px 35px; }
+.robot-dog .rd-hip-r { transform-origin: 64px 35px; }
 .robot-dog .rd-knee-l { transform-origin: 29px 55.5px; }
-.robot-dog .rd-knee-r { transform-origin: 89px 56.5px; }
+.robot-dog .rd-knee-r { transform-origin: 79px 56.5px; }
 
 .robot-thumb.is-walking .robot-dog {
   --rd-dur: 1.6s;
@@ -2232,7 +2233,7 @@ input.field-box { outline: 0; }
 
 .robot-thumb.is-walking .rd-bob {
   transform-box: view-box;
-  transform-origin: 47px 40px;
+  transform-origin: 42px 40px;
   animation: rd-bob calc(var(--rd-dur) / 4) ease-in-out infinite;
 }
 
