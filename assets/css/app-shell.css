@@ -740,6 +740,13 @@ button {
   display: grid;
   grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
   column-gap: var(--grid-gutter);
+  /*
+   * 줄은 하나이고 컨테이너 높이를 그대로 쓴다.
+   * 이걸 안 적으면 암묵적 줄이 auto 라 제일 긴 항목(타임라인)만큼 늘어난다.
+   * 그러면 지도 칸도 같이 늘어나서 아래에 붙은 AI 패널이 잘려 나간다.
+   * minmax(0, 1fr) 이라야 내용보다 작아질 수 있고, 그래야 안쪽에서 스크롤이 받는다.
+   */
+  grid-template-rows: minmax(0, 1fr);
 }
 
 /*
