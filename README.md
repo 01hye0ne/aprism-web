@@ -35,6 +35,11 @@ python -m http.server 8000
 `main` 브랜치에 push하면 GitHub Pages에 반영됩니다.
 배포 주소는 저장소 설정(Settings → Pages)에서 확인할 수 있습니다.
 
+## 외부 자산과 라이선스
+
+남의 것을 쓰는 곳과 그 조건은 [THIRD-PARTY.md](./THIRD-PARTY.md) 에 정리해 두었습니다.
+**제품을 판매하기 전에 그 문서의 점검표를 확인하세요** — 확인이 필요한 항목이 둘 남아 있습니다.
+
 ## 작업 규칙
 
 - 색상은 `assets/css/base.css`의 semantic 토큰을 사용하고 raw hex를 컴포넌트에 직접 넣지 않습니다.
