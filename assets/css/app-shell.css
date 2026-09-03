@@ -736,7 +736,7 @@ button {
   border-radius: var(--radius-container);
   background-color: var(--bg-canvas);
 
-  /* 12컬럼 그리드가 여기서부터다. 지도 9 + 미션 3 으로 나눈다(폭은 마크업의 .col-* 에서). */
+  /* 12컬럼 그리드가 여기서부터다. 지도 8 + 미션 4 로 나눈다(폭은 마크업의 .col-* 에서). */
   display: grid;
   grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
   column-gap: var(--grid-gutter);
@@ -751,22 +751,22 @@ button {
 
 /*
  * 그리드가 버티는 하한 — 1600 이다.
- * 그 아래에서는 3컬럼이 미션 패널 내용보다 좁아진다. 그래서 패널을 1600 에서 갖는 폭
- * (3컬럼 = 308)에 세우고 지도가 남는 폭을 갖는다. 경계에서 값이 같아 튀지 않는다.
+ * 그 아래에서는 4컬럼이 미션 패널 내용보다 좁아진다. 그래서 패널을 1600 에서 갖는 폭
+ * (4컬럼 = 416)에 세우고 지도가 남는 폭을 갖는다. 경계에서 값이 같아 튀지 않는다.
  * 컬럼이 아니라 폭으로 서는 구간이라 여기서는 그리드가 화면 분할을 정하지 않는다.
  */
 @media (max-width: 1600px) {
-  .two-col { grid-template-columns: minmax(0, 1fr) 308px; }
+  .two-col { grid-template-columns: minmax(0, 1fr) 416px; }
   .two-col > .floating { grid-column: 2; }
 
   /*
    * 지도 칸이 이제 트랙 하나라 subgrid 로는 컬럼이 하나뿐이다.
    * 그러면 4컬럼짜리 AI 패널이 암묵적 칸을 만들며 다시 폭을 다 먹는다.
-   * 여기서는 지도 칸을 직접 9등분한다 — AI 패널 4/9 비율은 그대로다.
+   * 여기서는 지도 칸을 직접 8등분한다 — AI 패널이 지도의 절반이 된다.
    */
   .two-col > .map-panel {
     grid-column: 1;
-    grid-template-columns: repeat(9, minmax(0, 1fr));
+    grid-template-columns: repeat(8, minmax(0, 1fr));
   }
 }
 
@@ -788,13 +788,13 @@ button {
 .map-panel {
   min-width: 0;
   /*
-   * 부모(.two-col)의 컬럼을 그대로 물려받는다 — 지도 칸이 차지한 9개다.
+   * 부모(.two-col)의 컬럼을 그대로 물려받는다 — 지도 칸이 차지한 8개다.
    * subgrid 라 안쪽 칸 경계가 바깥 그리드와 같은 자리에 떨어진다.
    * (패딩 8 은 첫 칸과 끝 칸에서만 깎여서 2~8번 경계는 정확히 맞는다.)
-   * subgrid 를 못 쓰는 브라우저는 위 줄이 남아 9등분으로 근사한다 — 1px 안쪽 차이다.
+   * subgrid 를 못 쓰는 브라우저는 위 줄이 남아 8등분으로 근사한다 — 1px 안쪽 차이다.
    */
   display: grid;
-  grid-template-columns: repeat(9, minmax(0, 1fr));
+  grid-template-columns: repeat(8, minmax(0, 1fr));
   grid-template-columns: subgrid;
   grid-template-rows: minmax(0, 1fr);
   column-gap: var(--grid-gutter);
@@ -863,7 +863,8 @@ button {
  * 직전 구현(스펙트럼 버전)은 _backup/ai-panel-spectrum-*.html 에 스냅샷.
  */
 /*
- * 가로로 너무 길게 깔린다는 의견이 있어 4컬럼으로 줄였다 — 지도 9컬럼의 절반 이하다.
+ * 가로로 너무 길게 깔린다는 의견이 있어 4컬럼으로 줄였다 — 지도 8컬럼의 절반이다.
+ * (바깥 그리드의 4번 컬럼 선에 붙는 것이라 미션 패널을 3 -> 4 로 넓혀도 폭은 그대로다.)
  * 지도 위에 겹쳐 뜬다(.ai-box 가 backdrop blur 라 우측 미션 패널과 같은 유리로 읽힌다).
  * 폭을 바꾸려면 아래 span 숫자 하나만 고치면 컬럼 경계에 그대로 붙는다.
  */
