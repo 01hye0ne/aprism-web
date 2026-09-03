@@ -796,14 +796,45 @@ button {
   }
 }
 
-.two-col::before {
-  content: "";
+/*
+ * 지도 — Figma "Map"(538:12727) 을 통째로 내보낸 SVG 한 장이다.
+ * 예전에는 .two-col::before 의 배경 이미지였는데, 휠로 확대·축소하려면
+ * 움직일 요소가 있어야 해서 실제 노드로 바꿨다. 움직임은 assets/js/map.js.
+ *
+ * 창(.map-view)은 .two-col 전체를 덮는다 — 우측 미션 패널 뒤까지 지도가 깔려야
+ * 반투명한 패널 면이 지도 위에 뜬 유리로 읽힌다(Figma 도 지도 프레임이 1716 로 더 넓다).
+ * 손이 닿는 자리는 .map-canvas 뿐이라 패널 위에서 휠을 굴려도 지도는 가만히 있다.
+ */
+.map-view {
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: center / cover no-repeat url(../figma/map-temp.svg);
+  overflow: hidden;
   pointer-events: none;
+  background-color: var(--bg-canvas);
 }
+
+.map-plane {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+  will-change: transform;
+}
+
+/* 제 크기로 두고 배율은 transform 이 준다 — 벡터라 아무리 키워도 또렷하다. */
+.map-image {
+  display: block;
+  width: 1716px;
+  height: 967px;
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+/* 지도 칸에서만 잡힌다. 도구 레일 위에서는 화살표 그대로. */
+.map-canvas { cursor: grab; touch-action: none; }
+.map-canvas.is-panning { cursor: grabbing; }
+.map-canvas .map-tools { cursor: default; }
 
 /* ---------- Map Panel ---------- */
 /*

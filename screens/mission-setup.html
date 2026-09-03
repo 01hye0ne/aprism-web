@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/static/woff2/SUIT.css" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" />
   <link rel="stylesheet" href="../assets/css/tokens.css?v=3be2ee40" />
-  <link rel="stylesheet" href="../assets/css/app-shell.css?v=5310145c" />
+  <link rel="stylesheet" href="../assets/css/app-shell.css?v=ebde0085" />
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
@@ -166,19 +166,22 @@
       <!-- ---------- Main ---------- -->
       <main class="main">
         <div class="two-col">
+          <!-- 지도 — Figma "Map" 538:12727. 휠 확대·드래그 이동은 assets/js/map.js -->
+          <span class="map-view" data-map aria-hidden="true">
+            <span class="map-plane">
+              <img class="map-image" src="../assets/figma/map-temp.svg" alt="" draggable="false" />
+            </span>
+          </span>
+
 
           <!-- ---------- Map Panel ---------- -->
           <section class="map-panel col-9" aria-label="설비 배치도">
             <div class="map-canvas">
-              <span class="badge badge-info badge-marker t-label-2 map-marker">
-                <span class="badge-dot"></span>Robot 02
-              </span>
-
               <div class="map-tools">
-                <button type="button" class="icon-button" aria-label="확대">
+                <button type="button" class="icon-button" data-map-zoom-in aria-label="확대">
                   <span class="i i-20" style="--i:var(--ic-zoom-in)"></span>
                 </button>
-                <button type="button" class="icon-button" aria-label="로봇 추적">
+                <button type="button" class="icon-button" data-map-track aria-label="로봇 추적">
                   <span class="i i-20" style="--i:var(--ic-target)"></span>
                 </button>
                 <button type="button" class="icon-button is-secondary" aria-label="영상 리플레이">
@@ -299,6 +302,7 @@
 
 <script src="../assets/js/theme.js?v=dcf8f460"></script>
 <script src="../assets/js/screen.js?v=9a1a6b74"></script>
+<script src="../assets/js/map.js?v=36369325"></script>
 <script src="../assets/js/grid-overlay.js?v=164e4f2a"></script>
 </body>
 </html>

@@ -345,6 +345,61 @@
     걷기 리그처럼 위상이 어긋나야 보이는 것이라, 앉은 자세에서는 빼고 그렸습니다 — 그림은 같습니다.
   </p>
 
+  <h3>3-0. 지도 — 2차 임시 맵 · 휠로 확대·축소</h3>
+  <p>
+    <code>Map</code>(<code>538:12727</code>)을 통째로 내보내 넣었습니다.
+    레이어가 <b>여덟 겹</b>으로 나뉘어 있고 SVG 에도 <code>id</code> 로 그대로 남습니다 —
+    <code>Layer_Ground</code> · <code>Aisles</code> · <code>Structure</code> ·
+    <code>Equipment</code> · <code>Routes</code> · <code>Waypoints</code> ·
+    <code>Robots</code> · <code>Zone_Labels</code>.
+    <code>Layer_StatusMarkers</code> 는 <b>Figma 에서 숨김</b>이라 내보내기에 없습니다.
+  </p>
+  <p>
+    글자는 <b>패스로 굳어져</b> 나옵니다. <code>&lt;img&gt;</code> 안의 SVG 는 페이지 서체를
+    못 쓰기 때문에 <code>&lt;text&gt;</code> 로 남으면 한글이 기본 서체로 떨어집니다.
+    Figma 내보내기가 알아서 외곽선으로 바꿔 줍니다(<code>&lt;text&gt;</code> 0개 확인).
+  </p>
+  <p>
+    <b>내보내기가 화면 전체를 감싸서 나옵니다.</b> <code>Screen</code> ·
+    <code>Template</code> · <code>Container</code> 껍데기와 배경 사각형이 붙습니다.
+    <code>&lt;g id="Map"&gt;</code> 부분만 떼어내고 <code>viewBox</code> 를 지도 내용의 실제
+    범위로 다시 잡았습니다 — <code>-319 13 1716 967</code> 입니다.
+    Map 프레임은 <code>clipsContent = false</code> 라 내용이 프레임 밖으로 나가는데,
+    그 범위가 마침 <b>정확히 1716 × 967</b> 이라 잘리는 것 없이 다 들어옵니다.
+  </p>
+  <p><b>움직임</b> — <code>assets/js/map.js</code> 입니다.</p>
+  <table>
+    <tr><th>동작</th><th>결과</th></tr>
+    <tr><td>휠</td><td>커서 밑의 지점을 붙잡고 확대·축소</td></tr>
+    <tr><td>끌기</td><td>이동. 도구 레일 위에서 시작한 것은 무시</td></tr>
+    <tr><td><b>확대</b> 버튼</td><td>보이는 지도 한가운데를 잡고 1.5배</td></tr>
+    <tr><td><b>로봇 추적</b> 버튼</td><td>수행 중인 R-01 을 한가운데로(1.8배) · 다시 누르면 전체 보기</td></tr>
+  </table>
+  <p>
+    <b>배율의 바닥은 "칸을 채우는 배율"</b>입니다. 그보다 작아지면 지도 밖 빈자리가 보이므로
+    거기서 멈춥니다. 위로는 <b>6배</b>까지고, 벡터라 아무리 키워도 또렷합니다.
+    이동도 지도가 늘 창을 덮도록 가둡니다.
+  </p>
+  <p>
+    <b>지도가 보이는 창과 손이 닿는 자리가 다릅니다.</b>
+    창(<code>.map-view</code>)은 <code>.two-col</code> 전체를 덮습니다 —
+    우측 미션 패널 뒤까지 지도가 깔려야 반투명한 패널 면이 지도 위에 뜬 유리로 읽힙니다
+    (Figma 도 지도 프레임이 1716 로 두 칸보다 넓습니다).
+    손이 닿는 자리는 <code>.map-canvas</code> 뿐이라 <b>패널 위에서 휠을 굴려도 지도는 가만히</b> 있고,
+    확대·추적의 기준점도 그 칸의 한가운데입니다.
+  </p>
+  <p>
+    <b>지도 위 <code>Robot 02</code> 배지를 뺐습니다.</b> 2차 맵의
+    <code>Layer_Robots</code> 가 로봇마다 이름표(<code>주행 중 · R-01</code> 등)를
+    직접 그려서 겹쳤습니다.
+  </p>
+  <p>
+    나중에 <b>레이어를 켜고 끄거나 로봇을 실제로 움직이려면</b>
+    <code>&lt;img&gt;</code> 를 인라인 <code>&lt;svg&gt;</code> 로 바꾸기만 하면 됩니다 —
+    레이어 <code>id</code> 가 그대로 있어서 그때부터는 CSS·JS 로 집을 수 있습니다.
+    지금은 HTML 을 165KB 불리지 않으려고 <code>&lt;img&gt;</code> 로 뒀습니다.
+  </p>
+
   <h3>3-1. 운영 모드 뱃지가 화면마다 다릅니다</h3>
   <p>
     세 화면이 모두 <code>미션 없음</code> 이었습니다. Figma
