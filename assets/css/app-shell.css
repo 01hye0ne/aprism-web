@@ -1224,10 +1224,29 @@ button {
  */
 /*
  * 테두리엔 얇은 경고색 선만 남기고(고른 빛번짐 없음), 그 라인을 따라
- * 별똥별 하나가 돈다 — 밝은 머리 + 뒤로 길게 사라지는 꼬리(warn-edge-comet).
- * conic 의 대부분은 투명하고, 머리 직전(약 300~360°) 구간만 꼬리로 차오른다.
- * 머리 바로 앞(0~3°)은 곧장 투명 — 진행 방향은 시계방향이다.
+ * 빛 하나가 돈다.
+ *
+ * 도는 빛은 두 가지로 그린다.
+ *   1) .edge-strands 캔버스 — React Bits 의 Strands 셰이더를 테두리에 감은 것.
+ *      WebGL2 가 되면 이쪽이 그리고, .two-col 에 has-edge-strands 가 붙는다.
+ *      (assets/js/edge-strands.js · 라이선스는 THIRD-PARTY.md)
+ *   2) 아래 conic 별똥별 — WebGL2 를 못 쓸 때 남는 그림이다.
+ *      conic 의 대부분은 투명하고, 머리 직전(약 300~360°) 구간만 꼬리로 차오른다.
+ *      머리 바로 앞(0~3°)은 곧장 투명 — 진행 방향은 시계방향이다.
  */
+.edge-strands {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: none;
+  pointer-events: none;
+}
+
+.two-col.is-warning .edge-strands { display: block; }
+
+/* 캔버스가 살아 있으면 CSS 별똥별은 물러난다. */
+.two-col.has-edge-strands::after { display: none; }
+
 @property --warn-glow-angle {
   syntax: "<angle>";
   inherits: false;
@@ -1314,7 +1333,8 @@ button {
   /* 흐르는 상단선·Spectrum 은 장식이다 — 멈춘다. */
   .ai-box::before, .ai-spectrum, .ai-spectrum::before { animation: none; }
   .ai-spectrum { transform: none; }
-  /* 엣지 글로우는 정적 box-shadow 만 남기고, 라인을 도는 빛은 뺀다. */
+  /* 엣지 글로우는 정적 box-shadow 만 남기고, 라인을 도는 빛은 뺀다.
+     (캔버스 쪽은 edge-strands.js 가 한 장만 그리고 멈춘다.) */
   .two-col.is-warning::after { display: none; }
   /* 걷기 리그도 멈춘다 — 기본 포즈로 선다. */
   .robot-thumb.is-walking .rd-bob,
