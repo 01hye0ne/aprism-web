@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>스플래시 — APRISM</title>
+  <meta name="description" content="APRISM 공장 환경점검 로봇 관제 시스템 진입 화면" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/static/woff2/SUIT.css" />
+  <link rel="stylesheet" href="../assets/css/tokens.css?v=3be2ee40" />
+  <link rel="stylesheet" href="../assets/css/app-shell.css?v=5211f266" />
+  <link rel="stylesheet" href="../assets/css/auth.css?v=1fe3a65c" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
+
+    body {
+      background-color: var(--bg-canvas);
+      color: var(--fg-primary);
+      font-family: var(--font-family-sans);
+      -webkit-font-smoothing: antialiased;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ============================================================
+     UI_01 / CM-01 스플래시   (node 630:3480)
+     락업 + 태그라인 한 덩어리가 화면 한가운데 선다.
+     잠깐 머문 뒤 로그인으로 넘어간다 — 아무 데나 누르면 바로 넘어간다.
+     ============================================================ -->
+<div class="auth auth-splash" data-splash>
+
+  <div class="brand-block">
+    <span class="brand-lockup i" role="img" aria-label="APRISM"></span>
+
+    <div class="brand-tagline">
+      <p class="brand-title t-heading-1">공장 환경점검 로봇 관제 시스템</p>
+      <p class="brand-sub t-label-1">Autonomous Plant Inspection &amp; Robot Supervision</p>
+    </div>
+  </div>
+
+</div>
+
+<script src="../assets/js/theme.js?v=dcf8f460"></script>
+<script src="../assets/js/auth.js?v=5ff8e5a0"></script>
+</body>
+</html>
