@@ -857,6 +857,25 @@ button {
 .btn-danger:active { background-color: var(--button-danger-bg-pressed); }
 
 /*
+ * Figma Button Type=Ghost — 면 없이 글자만. 인스턴스에 fill 이 안 걸려 있다.
+ * (변수 button/ghost/bg/default 는 있지만 Default 상태는 투명하게 그려진다.)
+ *
+ * hover 는 Figma 가 gray/100 인데 Light · Dark 값이 같아서 Dark 에서 흰 판이 된다.
+ * 이 화면 다른 유리 위 hover(.ai-chip · .modal-close)와 같은 overlay-light 로 뒀다.
+ */
+.btn-ghost {
+  background-color: transparent;
+  color: var(--button-ghost-fg-default);
+}
+
+.btn-ghost:hover { background-color: var(--bg-surface-overlay-light); }
+
+.btn-ghost:focus-visible {
+  outline: var(--border-width-strong) solid var(--border-focus);
+  outline-offset: 1px;
+}
+
+/*
  * Figma Button Size=Medium — 36 높이, 좌우 16, Label/1 (14/20/800).
  * .btn 기본은 Size=Small (32 · 13/18/500) 이다.
  */
@@ -2642,21 +2661,65 @@ input.field-box { outline: 0; }
  * 연결 대수는 데이터라서 상한이 정해지지 않았다("3대 연결" 은 값이다).
  * 카드는 폭을 나눠 갖되 132px 아래로는 줄지 않고, 그보다 좁아지면 가로로 스크롤한다.
  */
+/*
+ * Figma "Robot list"(558:13332) — 바와 카드 줄이 한 덩이다.
+ * 예전에는 카드 줄만 있었고 대수는 헤더 부제에 있었다.
+ * 이제 대수가 바로 내려오고 그 오른쪽에 [로봇 더보기]가 붙는다.
+ */
+.robot-list {
+  flex: none;
+  min-width: 0;
+  border-radius: var(--radius-card);
+  overflow: hidden;
+}
+
+/* Figma "veiw modal" — 36 높이, bg/surface/subtle, padding 2/4/2/12, gap 12. */
+.robot-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  padding: var(--space-2) var(--space-4) var(--space-2) var(--space-12);
+  background-color: var(--bg-surface-subtle);
+}
+
+/* 아이콘 16 + 대수 둘, 사이 4. Figma 는 가운뎃점 없이 두 덩이를 띄워 둔다. */
+.robot-counts {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin: 0;
+  overflow: hidden;
+  color: var(--fg-tertiary);
+  white-space: nowrap;
+}
+
+.robot-counts .i { flex: none; }
+.robot-counts span { overflow: hidden; text-overflow: ellipsis; }
+
+.robot-bar .btn { flex: none; }
+
 .robot-strip {
   flex: none;
   display: flex;
   gap: var(--space-4);
   padding: var(--space-4);
-  border-radius: var(--radius-card);
   background-color: var(--bg-surface-overlay-dark);
   overflow-x: auto;
 }
 
 /* Figma Robot Card 의 Type=Default / Selected 다. 차이는 카드 면 하나뿐이다. */
 .robot-card {
-  flex: 1 1 0;
-  /* 그리드 3컬럼 패널 안에서 셋이 나눠 갖는다. 예전 하한 132 는 이제 안 들어간다. */
-  min-width: 0;
+  /*
+   * Figma 그대로 132 고정이다. 늘어나지도 줄어들지도 않는다 —
+   * 카드 안 세 줄(Mission · Battery · Signal)이 이 폭에 맞춰져 있어
+   * 좁히면 막대와 값이 붙는다.
+   *
+   * 패널이 3컴럼(1920 에서 364)이라 세 대만 놓여도
+   * 132*3 + 4*2 = 412 가 되어 넘친다. 세 대부터 스크롤바가 생긴다.
+   */
+  flex: 0 0 132px;
   display: flex;
   flex-direction: column;
   gap: 0;
@@ -3284,8 +3347,17 @@ input.field-box { outline: 0; }
   background-clip: content-box;
 }
 
+/*
+ * 로봇 줄만 색을 따로 준다 — Figma 가 이 막대를 fg/tertiary 로 그렸다
+ * (다른 스크롤 영역은 border/default 다). 두께와 자리는 공통값 그대로다 —
+ * 트랙 12 안에 4 짜리 막대가 들고, 위에 strip 패딩 4 가 더해져
+ * 카드 밑에서 8, 막대 아래로 4 가 된다. Figma 와 같다.
+ */
+.robot-strip::-webkit-scrollbar-thumb { background-color: var(--fg-tertiary); }
+
+.robot-strip::-webkit-scrollbar-thumb:hover { background-color: var(--fg-secondary); }
+
 .timeline::-webkit-scrollbar-thumb:hover,
-.robot-strip::-webkit-scrollbar-thumb:hover,
 .context-panel::-webkit-scrollbar-thumb:hover,
 .gnb-rail::-webkit-scrollbar-thumb:hover {
   background-color: var(--border-strong);
@@ -3300,4 +3372,6 @@ input.field-box { outline: 0; }
     scrollbar-width: thin;
     scrollbar-color: var(--border-default) transparent;
   }
+
+  .robot-strip { scrollbar-color: var(--fg-tertiary) transparent; }
 }

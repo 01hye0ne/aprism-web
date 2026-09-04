@@ -408,7 +408,7 @@
   --button-focus-border: var(--color-main-700);
   --button-ghost-bg-hover: var(--color-gray-100);
   --button-ghost-bg-pressed: var(--color-gray-200);
-  --button-ghost-fg-default: var(--color-main-700);
+  --button-ghost-fg-default: var(--color-main-500);
   --button-ghost-fg-disabled: var(--color-gray-400);
   --button-ghost-fg-pressed: var(--color-gray-950);
   --button-primary-bg-default: var(--color-gray-0);

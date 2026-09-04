@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>04.1 통합 관제 메인 · 퍼블리싱 노트 — APRISM</title>
   <meta name="description" content="Figma 기준 반영 내역과 확인이 필요한 지점" />
-  <link rel="stylesheet" href="../assets/css/tokens.css?v=9d8f4480" />
+  <link rel="stylesheet" href="../assets/css/tokens.css?v=e254913d" />
   <link rel="stylesheet" href="../assets/css/base.css?v=0f3be04f" />
   <style>
     .notes {
@@ -926,6 +926,87 @@
     <li><strong>단계 카드 오른쪽 여백</strong> — Figma 는 대기만 4 이고 완료·수행중은 8 입니다.
       셋 다 8 로 두었습니다.</li>
   </ul>
+
+  <h3>6-2. 로봇 줄 — 바가 생기고 카드가 옆으로 스크롤됩니다 (558:13332)</h3>
+  <p>
+    <strong>대수가 헤더에서 내려왔습니다.</strong> 전에는 제목 아래 부제였는데,
+    이제 카드 줄 바로 위에 <b>바</b>가 하나 생기고 거기로 옮겨갔습니다.
+    그 오른쪽이 <b>[로봇 더보기]</b> 자리입니다.
+  </p>
+  <table>
+    <tr><th>부분</th><th>값</th></tr>
+    <tr><td>바</td><td>36 높이 · <code>bg/surface/subtle</code> · padding <code>2/4/2/12</code> · gap 12</td></tr>
+    <tr><td>대수</td><td>bot 아이콘 16 + <code>3대 연결</code> + <code>1대 수행 중</code>,
+      사이 4 · <code>fg/tertiary</code> 12/18</td></tr>
+    <tr><td>[로봇 더보기]</td><td>Button <b>Type=Ghost, Size=Small</b> — 32 높이 · 좌우 12 ·
+      13/18 Medium · <code>button/ghost/fg/default</code></td></tr>
+    <tr><td>카드</td><td><b>132 고정</b> · 사이 4</td></tr>
+    <tr><td>스크롤 막대</td><td>4 두께 · <code>fg/tertiary</code> · 카드 밑에서 <b>8</b></td></tr>
+  </table>
+  <p>
+    <strong>가운뎃점을 뺐습니다.</strong> 전에는 <code>3대 연결 · 1대 수행 중</code> 한 줄이었는데
+    Figma 는 <b>두 덩이를 4 만큼 띄워</b> 놓습니다. 점 대신 여백이 가릅니다.
+  </p>
+  <p>
+    <strong>카드가 132 고정이라 세 대만 놓아도 넘칩니다.</strong>
+    <code>132×3 + 4×2 = 412</code> 인데 패널 안쪽이 <b>1920 에서 364</b> 입니다
+    (패널 폭이 3컬럼 유동값이라 Figma 의 420 보다 좁습니다).
+    그래서 <b>세 대부터 스크롤바가 생깁니다</b> — 말씀하신 대로입니다.
+    카드를 줄이면 안 되는 이유는 안쪽 세 줄(Mission · Battery · Signal)이
+    이 폭에 맞춰져 있어서입니다. 좁히면 <b>막대와 값이 붙습니다.</b>
+  </p>
+  <p>
+    <strong>스크롤 막대는 브라우저 것을 그대로 씁니다</strong>(<code>overflow-x: auto</code>).
+    Figma 는 사각형 하나로 그려 뒀지만 직접 그리면 <b>드래그·휠·키보드가 전부 사라집니다.</b>
+    색만 <code>fg/tertiary</code> 로 맞췄습니다 — 다른 스크롤 영역(타임라인 · 사이트 패널 ·
+    GNB)은 <code>border/default</code> 라 여기만 밝습니다.
+    두께와 자리는 공통값 그대로인데 <b>Figma 와 우연히 같습니다</b> —
+    트랙 12 안에 4 짜리 막대가 들고, 위에 strip 패딩 4 가 더해져
+    <b>카드 밑 8 · 막대 아래 4</b> 가 됩니다. 실측으로 확인했습니다.
+  </p>
+  <p>
+    <strong>[로봇 더보기]는 아직 아무 일도 안 합니다.</strong> 여러 대 리스트가
+    <b>모달로 뜨는 자리</b>인데 그 내용을 아직 못 받았습니다.
+    자리는 <code>[data-robot-more]</code> 로 잡아 뒀습니다.
+  </p>
+
+  <p><b>Ghost 버튼을 새로 만들었습니다</b></p>
+  <p>
+    <code>.btn</code> 계열에 Primary · Secondary · Danger 만 있었습니다.
+    <b>인스턴스에 fill 이 안 걸려 있어</b> 면 없이 글자만 그립니다.
+    <b>hover 는 Figma 를 안 따랐습니다</b> — Figma 가 <code>gray/100</code> 인데
+    Light · Dark 값이 같아서 <b>Dark 에서 흰 판</b>이 됩니다.
+    이 화면 다른 유리 위 hover(<code>.ai-chip</code> · 모달 닫기)와 같은
+    <code>bg/surface/overlay-light</code> 로 뒀습니다.
+  </p>
+
+  <p><b>토큰 하나가 또 어긋나 있었습니다 — 고쳤습니다</b></p>
+  <p>
+    <code>button/ghost/fg/default</code> 의 <b>Dark 값</b>이 Figma 는
+    <code>color/main/500</code>(<code>#6AA7E7</code>)인데 <code>tokens.css</code> 에는
+    <code>color/main/700</code>(<code>#3B79D5</code>)으로 들어 있었습니다.
+    안 고치면 어두운 바 위에 진한 파랑 글자가 얹힙니다.
+    Light 값(<code>main/700</code>)은 맞아서 그대로입니다.
+    <b>이 토큰을 쓰는 곳은 지금 이 버튼뿐</b>이라 다른 화면에 영향은 없습니다.
+    (<code>status/critical/fg</code> 에 이어 두 번째입니다 — Dark 값만 어긋납니다.)
+  </p>
+
+  <p><b>확인이 필요한 지점 둘</b></p>
+  <p>
+    <strong>E-STOP 이 이 카드에서 빠졌습니다.</strong> Figma 의 새 로봇 카드 헤더에는
+    <b>제목만</b> 있고, E-STOP 은 <b>아래 미션 카드(558:13342)의 헤더</b>로 옮겨가
+    이름도 <code>수행로봇 E-STOP</code> 이 됐습니다. 옆에 <code>수행로봇 자동복귀</code> 도
+    새로 생겼습니다(모달 섹션의 <code>Modal-자동복귀</code> 와 짝입니다).
+    <strong>지금은 옮기지 않고 원래 자리에 두었습니다</strong> —
+    빼면 화면에서 긴급정지를 누를 곳이 사라지고,
+    옮기려면 그 카드의 진행 막대까지 같이 손대야 해서 이번 범위를 넘습니다.
+  </p>
+  <p>
+    <strong>둘째·셋째 카드 값이 Figma 와 다릅니다.</strong> Figma 는
+    2번 <code>대기 / 18% 충전 / Good</code>, 3번 <code>완료 / 78% 충전 / Weak</code> 인데
+    화면은 2번 <code>대기 / 18% 충전 / Weak</code>, 3번 <code>대기 / 35% / Good</code> 입니다.
+    <b>표본 값이라 이번에 건드리지 않았습니다.</b> 맞출지 말씀해 주세요.
+  </p>
 
   <h3>7. Spectrum 막대 색 — Delta 오브와 같은 팔레트</h3>
   <p>
