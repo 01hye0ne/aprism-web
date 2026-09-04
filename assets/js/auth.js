@@ -79,6 +79,12 @@
     var next = pwForm.querySelector("[data-pwx-new]");
     var confirm = pwForm.querySelector("[data-pwx-confirm]");
     var submit = pwForm.querySelector("[data-pwx-submit]");
+    var confirmField = pwForm.querySelector("[data-pwx-confirm-field]");
+    var confirmHelp = pwForm.querySelector("[data-pwx-confirm-help]");
+
+    // 확인 칸을 한 번 떠난 적이 있는지. 치는 도중에 "다르다"고 하면 첫 글자부터 빨개진다 —
+    // 한 번 떠난 뒤부터만 말하고, 그다음부터는 고치는 대로 실시간으로 따라간다.
+    var confirmTouched = false;
 
     // 로그인에서 넘어왔으면 그때 친 아이디가 남아 있다. 없으면 견줄 것이 없다.
     var userId = "";
@@ -129,12 +135,26 @@
         row.classList.toggle("is-met", met);
         if (!met) { all = false; }
       });
-      submit.disabled = !(all && current.value.length > 0 && pw === confirm.value);
+
+      var matched = pw === confirm.value;
+      var showError = confirmTouched && confirm.value.length > 0 && !matched;
+      confirmField.classList.toggle("is-error", showError);
+      confirmHelp.hidden = !showError;
+      confirm.setAttribute("aria-invalid", showError ? "true" : "false");
+
+      submit.disabled = !(all && current.value.length > 0 && matched);
     };
 
     [current, next, confirm].forEach(function (input) {
       input.addEventListener("input", check);
     });
+
+    // 확인 칸을 떠나는 순간부터 어긋난 것을 말한다. 새 비밀번호 쪽을 고쳐도 다시 본다.
+    confirm.addEventListener("blur", function () {
+      confirmTouched = true;
+      check();
+    });
+
     check();
 
     // 붙일 서버가 없는 퍼블리싱 화면이라 값을 보내지 않고 다음 화면으로 넘긴다.

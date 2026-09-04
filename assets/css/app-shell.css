@@ -2006,6 +2006,40 @@ input.field-box { outline: 0; }
 .field-select[data-open] .field-box .i { transform: rotate(180deg); }
 .field-box .i { transition: transform 140ms ease; }
 
+/*
+ * Text Field 의 Helper 줄과 State=Error — Figma Text Field(49:138) 실측.
+ *
+ * 컴포넌트는 "Label Row · Field · Helper" 세 줄이 gap 8 로 쌓인 것이고,
+ * Helper 는 Caption(12/18)이다. 평소 fg/tertiary 이고 State=Error 에서만 색이 바뀐다.
+ * 지금 화면들은 Helper 를 안 쓰다가 비밀번호 변경 화면에서 처음 쓴다 — 그래서
+ * 안내문으로 늘 띄우지 않고 어긋났을 때만 보인다(hidden 을 JS 가 여닫는다).
+ *
+ * Error 에서 Default 와 다른 것은 셋뿐이다:
+ *   테두리   1px border/default  ->  2px status/critical/border
+ *   칸 끝    없음                ->  20 짜리 warning 아이콘(status/critical/icon)
+ *   Helper   fg/tertiary         ->  status/critical/fg
+ * 칸 높이는 36 그대로다(box-sizing: border-box 라 테두리가 굵어져도 안 밀린다).
+ */
+.field-helper {
+  margin: 0;
+  color: var(--fg-tertiary);
+}
+
+.field.is-error .field-box {
+  border-width: var(--border-width-strong);
+  border-color: var(--status-critical-border);
+}
+
+.field.is-error .field-helper { color: var(--status-critical-fg); }
+
+/* 칸 끝 경고 아이콘 — Figma 는 Trailing Icon 다음 자리에 따로 둔다(Error 에서만 보인다). */
+.field-alert { display: none; }
+
+.field.is-error .field-alert {
+  display: inline-block;
+  color: var(--status-critical-icon);
+}
+
 /* Select 드롭다운 — status bar 메뉴(.dropdown-menu)와 같은 결. */
 .field-select { position: relative; }
 

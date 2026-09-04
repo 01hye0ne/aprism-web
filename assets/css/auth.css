@@ -205,9 +205,18 @@
 .login-fields input::placeholder { color: var(--fg-tertiary); }
 
 /* 입력칸 안을 눌러도 테두리가 반응하게 — 포커스는 칸 전체에 준다. */
-.login-fields .field-box:focus-within {
+.login-fields .field:not(.is-error) .field-box:focus-within {
   border-color: var(--border-focus);
   outline: var(--border-width-thin) solid var(--border-focus);
+}
+
+/*
+ * 어긋난 칸은 눌러도 빨강을 지킨다 — Figma 는 Focus 와 Error 가 따로 있는 변형이라
+ * 둘이 겹쳤을 때의 그림이 없다. 틀렸다는 사실이 먼저라 색은 Error 쪽을 두고,
+ * 포커스 테두리만 같은 빨강으로 얹어 어디에 있는지는 잃지 않게 했다.
+ */
+.login-fields .field.is-error .field-box:focus-within {
+  outline: var(--border-width-thin) solid var(--status-critical-border);
 }
 
 /* 비밀번호 보기 — Figma 는 eye-off 를 장식으로만 두었다. 실제 토글로 만들었다. */
