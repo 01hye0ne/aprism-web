@@ -2280,6 +2280,41 @@ input.field-box { outline: 0; }
 .precheck-row.is-done .i { color: var(--status-normal-fg); }
 .precheck-row.is-running .i,
 .precheck-row.is-pending .i { color: var(--color-gray-450); }
+
+.precheck-row .label {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: var(--font-size-14);
+  line-height: var(--font-line-height-20);
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--fg-secondary);
+}
+
+/* 완료 시 초 표시 — Figma Typography/Mono/Label, 항상 행 우측에 붙는다. */
+.precheck-row .meta {
+  flex: none;
+  margin-left: auto;
+  text-align: right;
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-12);
+  line-height: var(--font-line-height-18);
+  font-weight: 500;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--fg-tertiary);
+}
+
+/* "확인중.." · "대기" 처럼 아직 초가 없는 상태 — 모노가 아닌 본문 텍스트. */
+.precheck-row .meta.is-plain {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-14);
+  line-height: var(--font-line-height-22);
+  font-weight: 400;
+  letter-spacing: normal;
+  text-transform: none;
+  color: var(--fg-tertiary);
+}
 /*
  * 확인 중 표시 — 로딩 스피너가 아니라 게이지다. 12칸 눈금이 초록으로 차오른다.
  * 눈금은 Figma 568:24244 의 12점 링(점 지름 2.5 · 링 반지름 7.085).
@@ -2311,15 +2346,17 @@ input.field-box { outline: 0; }
 @keyframes precheck-fill { to { --precheck-fill: 360deg; } }
 
 /* ── Inline Notice (Severity=Info) ─────────────────────────
- * Figma — bg #6AA7E7, padding 12, gap 8, radius 4. glow 없음(Alert Banner 와 구분).
+ * Figma 558:12469 — status/info 토큰 사용, border 1px, padding 12, gap 8, radius 4.
+ * glow 없음(Alert Banner 와 구분).
  */
 .inline-notice {
   display: flex;
   gap: var(--space-8);
   padding: var(--space-12);
   border-radius: var(--radius-card);
-  background-color: #6aa7e7;
-  color: #1e2d4d;
+  border: var(--border-width-thin) solid var(--status-info-border);
+  background-color: var(--status-info-bg);
+  color: var(--status-info-fg);
 }
 
 .inline-notice .i { flex: none; margin-top: var(--space-4); }
@@ -2327,8 +2364,8 @@ input.field-box { outline: 0; }
 .inline-notice .body { display: flex; flex-direction: column; gap: var(--space-4); }
 
 .inline-notice .title {
-  font-size: var(--font-size-18);
-  line-height: var(--font-line-height-26);
+  font-size: var(--font-size-16);
+  line-height: var(--font-line-height-24);
   font-weight: 700;
 }
 
