@@ -1134,11 +1134,8 @@ button {
   backdrop-filter: blur(5px);
   transition: padding 180ms ease;
 
-  /*
-   * 흐르는 상단선. Figma stroke 의 5-stop 을 200% 폭 안에 좌우 대칭으로 이어 붙여
-   * 반복해도 이음매가 없다. 그 위를 좁고 밝은 섬광 둘이 어긋나게 훑는다.
-   */
-  /* Figma stroke — 흰색 90deg 광택(a20/50/20/80/50). 네 변 모두 1px 이다. */
+  /* Figma stroke — 흰색 90deg 광택(a20/50/20/80/50). 네 변 모두 1px 이다.
+     움직임이 꺼졌을 때 남을 모습이라 값을 그대로 둔다. */
   --ai-box-edge: linear-gradient(
     90deg,
     rgb(255 255 255 / 20%) 0%,
@@ -1146,6 +1143,34 @@ button {
     rgb(255 255 255 / 20%) 46%,
     rgb(255 255 255 / 80%) 72%,
     rgb(255 255 255 / 50%) 100%
+  );
+
+  /*
+   * 흐르는 무늬 — 위 다섯 stop 을 200% 폭 안에 좌우 대칭으로 이어 붙인 것이다.
+   * 0% 와 100% 가 같은 값(a20)이라 한 칸을 밀면 제자리다 — 반복해도 이음매가 없다.
+   * 예전 "흐르는 상단선"이 쓰던 짜임 그대로고, 색만 Figma 의 사면 stroke 로 갈았다.
+   */
+  --ai-box-edge-flow: linear-gradient(
+    90deg,
+    rgb(255 255 255 / 20%) 0%,
+    rgb(255 255 255 / 50%) 12.5%,
+    rgb(255 255 255 / 20%) 23.1%,
+    rgb(255 255 255 / 80%) 36.05%,
+    rgb(255 255 255 / 50%) 50%,
+    rgb(255 255 255 / 80%) 63.95%,
+    rgb(255 255 255 / 20%) 76.9%,
+    rgb(255 255 255 / 50%) 87.5%,
+    rgb(255 255 255 / 20%) 100%
+  );
+
+  /* 무늬 위를 훑는 좁은 섬광. 가운데가 가장 희고 양끝이 투명하다. */
+  --ai-box-edge-spark: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgb(255 255 255 / 55%) 42%,
+    rgb(255 255 255 / 95%) 50%,
+    rgb(255 255 255 / 55%) 58%,
+    transparent 100%
   );
 
   /* 입력창 stroke — 파란 5-stop. 예전 "흐르는 상단선"이 쓰던 무늬가 여기로 왔다. */
@@ -1178,7 +1203,16 @@ button {
  * 1px 그라데이션 테두리 — Figma stroke(INSIDE 1, 90deg 흰 광택). 네 변 모두다.
  * CSS border 는 그라데이션을 못 받으므로, padding 1 짜리 판을 깔고
  * content-box XOR border-box 마스크로 테두리 띠만 남긴다.
- * (예전 "흐르는 상단선"은 Figma 가 네 변 stroke 로 바뀌면서 걷어냈다.)
+ *
+ * 예전 "흐르는 상단선"의 짜임을 이 사면 링으로 옮겼다 — 무늬 한 겹에 섬광 둘이다.
+ * 무늬는 상자 두 폭(200%)이 한 칸이고 6초에 정확히 한 칸을 민다. 등속이라 안 튄다.
+ * 섬광 둘은 서로 어긋나게 훑는다 — 첫째가 0~62% 구간을, 둘째가 38~100% 구간을 맡아
+ * 빛이 끊기지 않는다.
+ *
+ * 가로로 흐른다. 상자가 559x76 이라 세로 변은 1px 폭이고, 무늬가 지나갈 때
+ * 색만 같이 바뀐다. 빛이 테두리를 한 바퀴 도는 conic 으로도 짤 수 있지만,
+ * 이렇게 납작한 상자에서는 각속도가 일정해도 호 길이가 안 맞아
+ * 긴 변 한가운데서 기다가 모서리에서 튄다(가운데 38px/rad 대 모서리 2094px/rad).
  */
 .ai-box::before {
   content: "";
@@ -1188,11 +1222,36 @@ button {
   pointer-events: none;
   border-radius: inherit;
   padding: var(--border-width-thin);
-  background: var(--ai-box-edge);
+  /* padding box 가 아니라 상자 전체를 기준으로 재야 200% 셈이 맞는다. */
+  background-origin: border-box;
+  background-image:
+    var(--ai-box-edge-spark),
+    var(--ai-box-edge-spark),
+    var(--ai-box-edge-flow);
+  background-size: 26% 100%, 26% 100%, 200% 100%;
+  background-repeat: no-repeat, no-repeat, repeat-x;
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
   mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   mask-composite: exclude;
+  animation: ai-box-edge-run 6s linear infinite;
+}
+
+/*
+ * 무늬(셋째 층)는 시간에 정비례해 0 -> -200% 를 지난다 — 등속이라 안 튄다.
+ * 부호가 음수인 게 핵심이다. 층이 상자보다 넓으면(200%) background-position 의 백분율은
+ * 남는 자리(W - 2W = -W)에 곱해지므로, 양수를 주면 무늬가 왼쪽으로 간다.
+ * 예전 상단선이 그랬는데 섬광은 오른쪽으로 가고 있어서 둘이 반대로 흘렀다 — 여기서 맞췄다.
+ *
+ * 섬광 둘(첫째·둘째)은 -35.1% 에서 135.1% 사이를 지난다. 폭이 26% 라 남는 자리가 74% 이고,
+ * 그래서 -35.1% 면 왼쪽 밖, 135.1% 면 오른쪽 밖이다 — 상자를 완전히 벗어난 자리다.
+ * 첫째가 0~62% 구간을, 둘째가 38~100% 구간을 맡아 빛이 끊기지 않는다.
+ */
+@keyframes ai-box-edge-run {
+  0%   { background-position: -35.1% 0, -35.1% 0, 0 0; }
+  38%  { background-position: 69.2% 0, -35.1% 0, -76% 0; }
+  62%  { background-position: 135.1% 0, 30.8% 0, -124% 0; }
+  100% { background-position: 135.1% 0, 135.1% 0, -200% 0; }
 }
 
 /*
@@ -1740,7 +1799,13 @@ button {
 @media (prefers-reduced-motion: reduce) {
   .ai-panel, .ai-fold, .ai-toggle, .ai-toggle .i,
   .context-panel, .panel-section { transition: none; }
-  /* Spectrum 은 장식이다 — 멈춘다. (상단선은 이제 안 움직인다.) */
+  /* 테두리는 흐르지 않고 Figma 의 정적 stroke 로 선다. */
+  .ai-box::before {
+    animation: none;
+    background-image: var(--ai-box-edge);
+    background-size: 100% 100%;
+  }
+  /* Spectrum 은 장식이다 — 멈춘다. */
   .ai-spectrum, .ai-spectrum::before { animation: none; }
   .ai-spectrum { transform: none; }
   /* 한 쌍을 태어난 자리에 세워 두고 나머지는 뺀다. 통째로 감추면 이 설정을 켠 사람에게만
