@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/static/woff2/SUIT.css" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" />
   <link rel="stylesheet" href="../assets/css/tokens.css?v=e254913d" />
-  <link rel="stylesheet" href="../assets/css/app-shell.css?v=ba69d07d" />
+  <link rel="stylesheet" href="../assets/css/app-shell.css?v=cbbc7b5a" />
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
@@ -316,12 +316,10 @@
 
               <!-- 카드 1 · 로봇 -->
               <div class="panel-card">
+                <!-- Figma 558:13671 — 헤더에 제목만 남았다. 비상정지는 아래 웨이포인트 패널로 갔다. -->
                 <div class="panel-header">
                   <div class="texts">
                     <h2 class="t-heading-3">전체 미션명</h2>
-                  </div>
-                  <div class="buttons">
-                    <button type="button" class="btn btn-danger" data-modal-open="estop">E-STOP</button>
                   </div>
                 </div>
 
@@ -650,7 +648,12 @@
               <!-- 카드 2 · 미션 -->
               <div class="panel-card is-fill">
                 <div class="mission-header">
-                  <p class="t-overline section-label">전체 미션명</p>
+                  <!-- Figma "[변경] 수행로봇 제어"(558:13671) — 이름이 늘어나고
+                       제어 버튼이 오른쪽 끝에 붙는다. Button Size=xSmall(24). -->
+                  <div class="mission-controls">
+                    <p class="t-overline section-label">전체 미션명</p>
+                    <button type="button" class="btn is-xs btn-danger" data-modal-open="estop">수행로봇 E-STOP</button>
+                  </div>
 
                   <div class="progress-bar">
                     <div class="progress-meta">

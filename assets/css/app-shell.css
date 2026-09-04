@@ -876,6 +876,15 @@ button {
 }
 
 /*
+ * Figma Button Size=xSmall — 24 높이, 좌우 8. 글자는 Small 과 같은 13/18/500 이다.
+ * 24 는 토큰이 없다 — --size-control 은 lg 40 · md 36 · sm 32 까지만 있다.
+ */
+.btn.is-xs {
+  height: 24px;
+  padding: 0 var(--space-8);
+}
+
+/*
  * Figma Button Size=Medium — 36 높이, 좌우 16, Label/1 (14/20/800).
  * .btn 기본은 Size=Small (32 · 13/18/500) 이다.
  */
@@ -2093,19 +2102,13 @@ button {
   min-height: 0;
 }
 
+/* Figma Header(558:13671) — padding 20/12/16/12 이다. 아래만 16 이라 높이가 64 다. */
 .panel-header {
   flex: none;
   display: flex;
   align-items: flex-start;
   gap: var(--space-8);
-  padding: var(--space-20) var(--space-12);
-}
-
-/* 버튼이 둘로 늘었다 — 미션 관리(primary) · 비상정지(danger). */
-.panel-header .buttons {
-  flex: none;
-  display: flex;
-  gap: var(--space-8);
+  padding: var(--space-20) var(--space-12) var(--space-16);
 }
 
 .panel-header .texts {
@@ -3003,13 +3006,36 @@ input.field-box { outline: 0; }
 }
 
 /* ---------- Progress Bar ---------- */
+/* Figma Mission Header(558:13671) — 같은 20/12/16/12 다. */
 .mission-header {
   flex: none;
   display: flex;
   flex-direction: column;
   gap: var(--space-8);
-  padding: var(--space-20) var(--space-12);
+  padding: var(--space-20) var(--space-12) var(--space-16);
 }
+
+/*
+ * Figma "[변경] 수행로봇 제어"(558:13671) — 미션 이름이 왼쪽에서 늘어나고
+ * 수행로봇 제어 버튼이 오른쪽 끝에 붙는다. 사이 8.
+ * 비상정지가 위 로봇 카드 헤더에서 여기로 내려왔다.
+ */
+.mission-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+}
+
+.mission-controls .section-label {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mission-controls .btn { flex: none; }
 
 .progress-bar {
   display: flex;
