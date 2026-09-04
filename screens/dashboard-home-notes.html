@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>04.1 통합 관제 메인 · 퍼블리싱 노트 — APRISM</title>
   <meta name="description" content="Figma 기준 반영 내역과 확인이 필요한 지점" />
-  <link rel="stylesheet" href="../assets/css/tokens.css?v=3be2ee40" />
+  <link rel="stylesheet" href="../assets/css/tokens.css?v=9d8f4480" />
   <link rel="stylesheet" href="../assets/css/base.css?v=0f3be04f" />
   <style>
     .notes {
@@ -1392,6 +1392,74 @@
     Light 에서 <strong>밝은 쪽으로 뒤집히므로</strong>(<code>rgba(209 213 222 / 40%)</code>)
     친 글자가 <code>rgb(7 10 16)</code> 로 또렷합니다 —
     9번에 적어 둔 캡슐·헤드라인의 Light 대비 문제는 여기엔 없습니다.
+  </p>
+
+  <h3>9-3. 모달 — 두 자리에 붙였습니다 (71:492)</h3>
+  <p>
+    <code>Modal</code> 컴포넌트를 그대로 옮기고 <strong>문구만 자리에 맞게</strong> 갈았습니다.
+    짜임은 하나고 두 곳에서 뜹니다.
+  </p>
+  <table>
+    <tr><th>부르는 곳</th><th>제목</th><th>타이머</th><th>버튼</th></tr>
+    <tr><td>상태바 · 계정 메뉴 <b>[로그아웃]</b><br />(세 화면 모두)</td>
+        <td>로그아웃 할까요?</td><td><b>35s</b></td><td>취소 · <b>로그아웃</b></td></tr>
+    <tr><td>미션 모니터링 우측 <b>[E-STOP]</b></td>
+        <td>로봇명 NA를 중지하시겠습니까?</td><td><b>없음</b></td><td>취소 · <b>중지하기</b></td></tr>
+  </table>
+  <p>
+    <strong>타이머는 컴포넌트의 <code>Show Timer</code> 스위치입니다.</strong>
+    로그아웃은 켜고, E-STOP 은 껐습니다 — <b>재촉할 일이 아니라 되묻는 자리</b>라서입니다.
+    긴급정지는 늦어서 문제가 되는 게 아니라 잘못 눌러서 문제가 됩니다.
+  </p>
+  <p>
+    <strong>Figma 는 <code>00s</code> 한 칸입니다. 실제로 줄어들게 뒀습니다</strong> —
+    멈춘 숫자는 고장으로 읽힙니다. <b><code>0s</code> 가 되면 그대로 로그인 화면으로 나갑니다.</b>
+    세는 것을 보여 놓고 아무 일도 안 일어나면 그게 더 이상합니다.
+  </p>
+  <p>
+    <strong>이름은 상태바 계정 칩에서 가져옵니다.</strong> 주신 문구는
+    <code>김현수 · 관제운영</code> 이었는데 같은 화면 상태바가 <code>홍길동 | 관제운영</code> 이라
+    <b>한 화면에 두 사람이 뜹니다.</b> 칩을 읽어 채우게 해서 늘 같이 갑니다 —
+    칩 이름을 바꾸면 모달도 따라옵니다.
+  </p>
+  <p>
+    <strong>로봇 이름은 주신 문구 그대로 <code>로봇명 NA</code> 입니다.</strong>
+    지금 로봇 카드 셋이 다 <code>로봇명</code> 이라는 자리표시자라 가져올 진짜 이름이 없습니다.
+    <code>[data-modal-robot]</code> 한 칸만 채우면 되게 잘라 뒀습니다.
+  </p>
+
+  <p><b>Figma 에 없어서 여기서 정한 것</b></p>
+  <ul>
+    <li><b>뒤를 덮는 scrim.</b> 컴포넌트가 카드 하나로만 그려져 있습니다.
+      <code>alpha/dark/600</code> 을 깔았습니다 — 카드 흐림이 20 이라
+      <b>뒤가 다 비치면 글이 안 읽힙니다.</b></li>
+    <li><b>Button Size=Medium.</b> 푸터 버튼이 36 · 좌우 16 · Label/1(14/20/800) 인데
+      <code>.btn</code> 기본은 Size=Small(32 · 13/18/500) 이었습니다.
+      <code>.btn.is-md</code> 를 더했습니다.</li>
+    <li><b>닫는 길 넷.</b> [취소] · 닫기(×) · 바탕 클릭 · <code>Esc</code>.
+      Figma 에는 × 만 그려져 있습니다.</li>
+  </ul>
+  <p>
+    <strong>초점은 <code>.app</code> 에 <code>inert</code> 를 걸어 가둡니다.</strong>
+    직접 짠 탭 트랩보다 새는 구멍이 없습니다 — 모달이 떠 있는 동안 뒤 화면은
+    탭으로도 스크린리더로도 안 닿습니다. 닫으면 <b>부른 자리로 초점이 돌아갑니다</b>.
+    계정 메뉴에서 불렀으면 그 사이 메뉴가 접히므로 <b>메뉴를 여는 칩</b>으로 보냅니다 —
+    안 보이는 곳에 초점을 두면 다음 탭이 화면 맨 앞에서 다시 시작합니다.
+  </p>
+  <p>
+    <strong>[중지하기]는 닫기만 합니다.</strong> 서버가 없는 퍼블리싱이라
+    "정지됨" 화면이 아직 없습니다. <code>[data-modal-confirm]</code> 에 갈 곳을 적으면
+    거기로 갑니다 — 로그아웃은 <code>login.html</code> 이 적혀 있습니다.
+  </p>
+
+  <p><b>토큰 하나가 Figma 와 어긋나 있었습니다 — 고쳤습니다</b></p>
+  <p>
+    타이머 색을 맞추다 찾았습니다. <code>status/critical/fg</code> 의 <b>Dark 값</b>이
+    Figma 는 <code>color/danger/200</code>(<code>#FFA69A</code>)인데
+    <code>tokens.css</code> 에는 <code>color/danger/300</code>(<code>#FF6B72</code>)으로 들어 있었습니다.
+    Figma 값으로 고쳤고, <b>같은 토큰을 쓰던 세 곳이 같이 바뀝니다</b> —
+    모달 타이머 · Text Field 의 Error Helper(비밀번호 변경 화면) ·
+    배터리 위험 상태입니다. Light 값(<code>danger/700</code>)은 맞아서 그대로입니다.
   </p>
 
   <h3>10. Figma 정리 — 이름 · 설명 · 토큰 바인딩</h3>

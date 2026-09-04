@@ -9,8 +9,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/static/woff2/SUIT.css" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" />
-  <link rel="stylesheet" href="../assets/css/tokens.css?v=3be2ee40" />
-  <link rel="stylesheet" href="../assets/css/app-shell.css?v=4bc9a967" />
+  <link rel="stylesheet" href="../assets/css/tokens.css?v=9d8f4480" />
+  <link rel="stylesheet" href="../assets/css/app-shell.css?v=368c1fc4" />
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
@@ -58,10 +58,10 @@
             <span class="i i-16" style="--i:var(--ic-lock)" aria-hidden="true"></span>
             <span class="t-label-2">비밀번호 변경</span>
           </a>
-          <a class="menu-item" role="menuitem" href="#">
+          <button type="button" class="menu-item" role="menuitem" data-modal-open="logout">
             <span class="i i-16" style="--i:var(--ic-power)" aria-hidden="true"></span>
             <span class="t-label-2">로그아웃</span>
-          </a>
+          </button>
         </div>
       </div>
 
@@ -359,9 +359,40 @@
 </div>
 
 
+<!-- ============================================================
+     Modal · Figma UI_00 Design System 71:492
+     로그아웃 확인. Show Timer=true — 남은 시간이 0 이 되면 그대로 나간다.
+     ============================================================ -->
+<div class="modal-scrim" data-modal="logout" hidden>
+  <div class="modal" role="alertdialog" aria-modal="true"
+       aria-labelledby="m-logout-title" aria-describedby="m-logout-desc">
+
+    <div class="modal-head">
+      <div class="modal-titles">
+        <h2 class="t-heading-3" id="m-logout-title">로그아웃 할까요?</h2>
+        <span class="t-title-1 modal-timer num" data-modal-timer="35" aria-live="off">35s</span>
+      </div>
+      <button type="button" class="icon-button modal-close" data-modal-dismiss aria-label="닫기">
+        <span class="i i-16" style="--i:var(--ic-close)" aria-hidden="true"></span>
+      </button>
+    </div>
+
+    <div class="modal-body" id="m-logout-desc">
+      <p class="t-body-2 modal-desc-1"><span data-modal-user>홍길동 · 관제운영</span> 세션이 종료되고 로그인 화면으로 돌아갑니다.</p>
+      <p class="t-body-2 modal-desc-2">진행 중인 정기 순회 #248은 중단되지 않으며, 다시 로그인하면 이어서 관제할 수 있습니다.</p>
+    </div>
+
+    <div class="modal-foot">
+      <button type="button" class="btn is-md btn-secondary" data-modal-dismiss>취소</button>
+      <button type="button" class="btn is-md btn-danger" data-modal-confirm="login.html">로그아웃</button>
+    </div>
+
+  </div>
+</div>
+
 <script src="../assets/js/theme.js?v=dcf8f460"></script>
 <script src="../assets/js/prism-orb.js?v=03386460"></script>
-<script src="../assets/js/screen.js?v=b72b6f01"></script>
+<script src="../assets/js/screen.js?v=0d5610f4"></script>
 <script src="../assets/js/map.js?v=90aa04ab"></script>
 <script src="../assets/js/grid-overlay.js?v=164e4f2a"></script>
 </body>

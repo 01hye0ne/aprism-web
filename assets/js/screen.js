@@ -163,6 +163,165 @@
   })();
 
   // ------------------------------------------------------------------
+  // 모달 — Figma "Modal" 71:492
+  //
+  // 두 자리에서 뜬다. 문구만 다르고 짜임은 같다.
+  //   logout  계정 메뉴의 [로그아웃] — 타이머 있음(35s), 0 이 되면 그대로 나간다
+  //   estop   우측 패널의 [E-STOP]  — 타이머 없음
+  //
+  // 초점은 .app 에 inert 를 걸어 가둔다. 모달이 떠 있는 동안 뒤 화면은
+  // 탭으로도 스크린리더로도 닿지 않는다 — 직접 짠 탭 트랩보다 새는 구멍이 없다.
+  // ------------------------------------------------------------------
+  (function () {
+    var scrims = Array.prototype.slice.call(document.querySelectorAll("[data-modal]"));
+    if (!scrims.length) {
+      return;
+    }
+
+    var app = document.querySelector(".app");
+    var open = null;
+    var lastFocus = null;
+    var tick = null;
+
+    function stopTimer() {
+      if (tick) {
+        window.clearInterval(tick);
+        tick = null;
+      }
+    }
+
+    function close() {
+      if (!open) {
+        return;
+      }
+      stopTimer();
+      open.hidden = true;
+      open = null;
+      if (app) {
+        app.inert = false;
+      }
+      // 초점을 부른 자리로 돌린다. 계정 메뉴 항목처럼 그 사이 닫혀서 사라진
+      // 자리면 그 메뉴를 여는 칩으로 보낸다 — 안 보이는 곳에 초점을 두면
+      // 다음 탭이 화면 맨 앞에서 다시 시작한다.
+      var back = lastFocus;
+      if (back && back.offsetParent === null) {
+        var owner = back.closest ? back.closest("[data-status-menu]") : null;
+        back = owner ? owner.querySelector("[data-menu-trigger]") : null;
+      }
+      if (back && back.focus) {
+        back.focus();
+      }
+      lastFocus = null;
+    }
+
+    function confirm(scrim) {
+      var button = scrim.querySelector("[data-modal-confirm]");
+      var to = button ? button.getAttribute("data-modal-confirm") : "";
+      close();
+      // 갈 곳이 적혀 있으면 간다. E-STOP 처럼 비어 있으면 닫기만 한다 —
+      // 서버가 없는 퍼블리싱이라 "정지됨" 화면이 아직 없다.
+      if (to) {
+        window.location.href = to;
+      }
+    }
+
+    // 타이머 — Figma 는 "00s" 한 칸이다. 여기서는 실제로 줄어들게 두었다.
+    // 멈춘 숫자는 고장으로 읽힌다.
+    function startTimer(scrim) {
+      var el = scrim.querySelector("[data-modal-timer]");
+      if (!el) {
+        return;
+      }
+      var left = Number(el.getAttribute("data-modal-timer")) || 0;
+      el.textContent = left + "s";
+      tick = window.setInterval(function () {
+        left -= 1;
+        el.textContent = (left > 0 ? left : 0) + "s";
+        if (left <= 0) {
+          confirm(scrim);
+        }
+      }, 1000);
+    }
+
+    // 로그아웃 문구의 이름은 상태바 계정 칩에서 가져온다 —
+    // 같은 화면에 두 이름이 뜨면 누구의 세션인지가 흐려진다.
+    function fillUser(scrim) {
+      var slot = scrim.querySelector("[data-modal-user]");
+      var chip = document.querySelector(".account-chip");
+      if (!slot || !chip) {
+        return;
+      }
+      var parts = Array.prototype.slice.call(chip.querySelectorAll(".t-label-2"))
+        .map(function (el) { return el.textContent.trim(); })
+        .filter(function (t) { return t && t !== "|"; });
+      if (parts.length) {
+        slot.textContent = parts.join(" · ");
+      }
+    }
+
+    function show(name) {
+      var scrim = scrims.filter(function (s) { return s.getAttribute("data-modal") === name; })[0];
+      if (!scrim || open) {
+        return;
+      }
+      lastFocus = document.activeElement;
+      // 계정 메뉴에서 부른 경우 그 메뉴를 접는다 — scrim 뒤에 열린 채로 남으면
+      // 모달을 닫았을 때 메뉴가 다시 나타난다.
+      Array.prototype.slice.call(document.querySelectorAll("[data-menu-trigger]"))
+        .forEach(function (trigger) {
+          if (trigger.getAttribute("aria-expanded") !== "true") { return; }
+          trigger.setAttribute("aria-expanded", "false");
+          var owner = trigger.closest("[data-status-menu]");
+          var dropdown = owner && owner.querySelector(".dropdown-menu");
+          if (dropdown) { dropdown.hidden = true; }
+        });
+      fillUser(scrim);
+      scrim.hidden = false;
+      open = scrim;
+      if (app) {
+        app.inert = true;
+      }
+      var first = scrim.querySelector("[data-modal-dismiss]:not(.modal-close)") ||
+                  scrim.querySelector("[data-modal-dismiss]");
+      if (first) {
+        first.focus();
+      }
+      startTimer(scrim);
+    }
+
+    Array.prototype.slice.call(document.querySelectorAll("[data-modal-open]"))
+      .forEach(function (trigger) {
+        trigger.addEventListener("click", function (event) {
+          event.preventDefault();
+          show(trigger.getAttribute("data-modal-open"));
+        });
+      });
+
+    scrims.forEach(function (scrim) {
+      Array.prototype.slice.call(scrim.querySelectorAll("[data-modal-dismiss]"))
+        .forEach(function (b) { b.addEventListener("click", close); });
+
+      var go = scrim.querySelector("[data-modal-confirm]");
+      if (go) {
+        go.addEventListener("click", function () { confirm(scrim); });
+      }
+
+      // 바탕을 누르면 닫는다. 카드 안쪽 클릭은 여기까지 안 온다.
+      scrim.addEventListener("click", function (event) {
+        if (event.target === scrim) {
+          close();
+        }
+      });
+    });
+
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape" && open) {
+        close();
+      }
+    });
+  })();
+
+  // ------------------------------------------------------------------
   // 로봇 선택 -> 아래 waypoint 목록이 바뀐다
   //
   // Figma 에는 타임라인이 하나뿐이라 나머지 두 대의 내용은 여기서 지었다.

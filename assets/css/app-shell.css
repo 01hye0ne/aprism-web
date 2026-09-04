@@ -35,6 +35,7 @@ button {
   --ic-check: url("data:image/svg+xml,%3Csvg preserveAspectRatio=%22none%22 overflow=%22visible%22 style=%22display: block;%22 width=%2214%22 height=%2214%22 viewBox=%220 0 14 14%22 fill=%22none%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cg id=%22Icon%22%3E%3Cpath id=%22Vector%22 d=%22M2.56667 6.3C2.18007 6.6866 2.18007 7.3134 2.56667 7.7L4.18579 9.31912C4.96683 10.1002 6.23317 10.1002 7.01421 9.31912L11.4333 4.9C11.8199 4.5134 11.8199 3.8866 11.4333 3.5C11.0467 3.1134 10.4199 3.1134 10.0333 3.5L5.6 7.93333L3.96667 6.3C3.58007 5.9134 2.95327 5.9134 2.56667 6.3Z%22 fill=%22%23151617%22/%3E%3C/g%3E%3C/svg%3E");
   --ic-chevron-down: url("data:image/svg+xml,%3Csvg preserveAspectRatio=%22none%22 overflow=%22visible%22 style=%22display: block;%22 width=%2216%22 height=%2216%22 viewBox=%220 0 16 16%22 fill=%22none%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cg id=%22Chevron%22%3E%3Cpath id=%22Vector%22 d=%22M3.37333 6.04C2.98305 6.43028 2.98305 7.06305 3.37333 7.45333L7.10623 11.1862C7.49675 11.5768 8.12992 11.5768 8.52044 11.1862L12.2533 7.45333C12.6436 7.06305 12.6436 6.43028 12.2533 6.04C11.8631 5.64972 11.2303 5.64972 10.84 6.04L7.81333 9.06667L4.78667 6.04C4.39639 5.64972 3.76361 5.64972 3.37333 6.04Z%22 fill=%22%235D6063%22/%3E%3C/g%3E%3C/svg%3E");
   --ic-clock: url("data:image/svg+xml,%3Csvg preserveAspectRatio=%22none%22 overflow=%22visible%22 style=%22display: block;%22 width=%2216%22 height=%2216%22 viewBox=%220 0 16 16%22 fill=%22none%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cg id=%22Icon%22%3E%3Cpath id=%22Vector%22 fill-rule=%22evenodd%22 clip-rule=%22evenodd%22 d=%22M8 1.33333C6.23189 1.33333 4.5362 2.03571 3.28595 3.28595C2.03571 4.5362 1.33333 6.23189 1.33333 8C1.33333 9.76811 2.03571 11.4638 3.28595 12.714C4.5362 13.9643 6.23189 14.6667 8 14.6667C9.76811 14.6667 11.4638 13.9643 12.714 12.714C13.9643 11.4638 14.6667 9.76811 14.6667 8C14.6667 6.23189 13.9643 4.5362 12.714 3.28595C11.4638 2.03571 9.76811 1.33333 8 1.33333ZM8 3.33333C8.61284 3.33333 9.21967 3.45404 9.78586 3.68856C10.352 3.92308 10.8665 4.26683 11.2998 4.70017C11.7332 5.13351 12.0769 5.64796 12.3114 6.21414C12.546 6.78033 12.6667 7.38716 12.6667 8C12.6667 8.61284 12.546 9.21967 12.3114 9.78586C12.0769 10.352 11.7332 10.8665 11.2998 11.2998C10.8665 11.7332 10.352 12.0769 9.78586 12.3114C9.21967 12.546 8.61284 12.6667 8 12.6667C7.38716 12.6667 6.78033 12.546 6.21414 12.3114C5.64796 12.0769 5.13351 11.7332 4.70017 11.2998C4.26683 10.8665 3.92308 10.352 3.68856 9.78586C3.45404 9.21967 3.33333 8.61284 3.33333 8C3.33333 7.38716 3.45404 6.78033 3.68856 6.21414C3.92308 5.64796 4.26683 5.13351 4.70017 4.70017C5.13351 4.26683 5.64796 3.92308 6.21414 3.68856C6.78033 3.45404 7.38716 3.33333 8 3.33333ZM7.4 5C7.4 4.66863 7.66863 4.4 8 4.4C8.33137 4.4 8.6 4.66863 8.6 5V7C8.6 7.55228 8.15228 8 7.6 8H7.4V5ZM7.4 8H10.4C10.7314 8 11 8.26863 11 8.6C11 8.93137 10.7314 9.2 10.4 9.2H8.4C7.84772 9.2 7.4 8.75228 7.4 8.2V8Z%22 fill=%22%2386888B%22/%3E%3C/g%3E%3C/svg%3E");
+  --ic-close: url("data:image/svg+xml,%3Csvg width=%2224%22 height=%2224%22 viewBox=%220 0 24 24%22 fill=%22none%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cpath d=%22M18.1929 7.50711C18.5834 7.11659 18.5834 6.48342 18.1929 6.0929L17.9071 5.80711C17.5166 5.41659 16.8834 5.41659 16.4929 5.80711L12 10.3L7.50711 5.80711C7.11658 5.41659 6.48342 5.41659 6.09289 5.80711L5.8071 6.0929C5.41658 6.48342 5.41658 7.11659 5.80711 7.50711L10.3 12L5.80711 16.4929C5.41658 16.8834 5.41658 17.5166 5.80711 17.9071L6.09289 18.1929C6.48342 18.5834 7.11658 18.5834 7.50711 18.1929L12 13.7L16.4929 18.1929C16.8834 18.5834 17.5166 18.5834 17.9071 18.1929L18.1929 17.9071C18.5834 17.5166 18.5834 16.8834 18.1929 16.4929L13.7 12L18.1929 7.50711Z%22 fill=%22%23070A10%22/%3E%3C/svg%3E");
   --ic-cpu: url("data:image/svg+xml,%3Csvg preserveAspectRatio=%22none%22 overflow=%22visible%22 style=%22display: block;%22 width=%2220%22 height=%2220%22 viewBox=%220 0 20 20%22 fill=%22none%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cg id=%22Icon / cpu%22%3E%3Cpath id=%22Vector%22 fill-rule=%22evenodd%22 clip-rule=%22evenodd%22 d=%22M5 6C5 5.44772 5.44772 5 6 5H14C14.5523 5 15 5.44772 15 6V14C15 14.5523 14.5523 15 14 15H6C5.44772 15 5 14.5523 5 14V6ZM7.91667 8.91667C7.91667 8.36438 8.36438 7.91667 8.91667 7.91667H11.0833C11.6356 7.91667 12.0833 8.36438 12.0833 8.91667V11.0833C12.0833 11.6356 11.6356 12.0833 11.0833 12.0833H8.91667C8.36438 12.0833 7.91667 11.6356 7.91667 11.0833V8.91667ZM7.08333 2.33333C7.08333 1.96514 7.38181 1.66667 7.75 1.66667C8.11819 1.66667 8.41667 1.96514 8.41667 2.33333V3.5C8.41667 3.86819 8.11819 4.16667 7.75 4.16667C7.38181 4.16667 7.08333 3.86819 7.08333 3.5V2.33333ZM11.5833 2.33333C11.5833 1.96514 11.8818 1.66667 12.25 1.66667C12.6182 1.66667 12.9167 1.96514 12.9167 2.33333V3.5C12.9167 3.86819 12.6182 4.16667 12.25 4.16667C11.8818 4.16667 11.5833 3.86819 11.5833 3.5V2.33333ZM7.08333 16.5C7.08333 16.1318 7.38181 15.8333 7.75 15.8333C8.11819 15.8333 8.41667 16.1318 8.41667 16.5V17.6667C8.41667 18.0349 8.11819 18.3333 7.75 18.3333C7.38181 18.3333 7.08333 18.0349 7.08333 17.6667V16.5ZM11.5833 16.5C11.5833 16.1318 11.8818 15.8333 12.25 15.8333C12.6182 15.8333 12.9167 16.1318 12.9167 16.5V17.6667C12.9167 18.0349 12.6182 18.3333 12.25 18.3333C11.8818 18.3333 11.5833 18.0349 11.5833 17.6667V16.5ZM1.66667 7.75C1.66667 7.38181 1.96514 7.08333 2.33333 7.08333H3.5C3.86819 7.08333 4.16667 7.38181 4.16667 7.75C4.16667 8.11819 3.86819 8.41667 3.5 8.41667H2.33333C1.96514 8.41667 1.66667 8.11819 1.66667 7.75ZM1.66667 12.25C1.66667 11.8818 1.96514 11.5833 2.33333 11.5833H3.5C3.86819 11.5833 4.16667 11.8818 4.16667 12.25C4.16667 12.6182 3.86819 12.9167 3.5 12.9167H2.33333C1.96514 12.9167 1.66667 12.6182 1.66667 12.25ZM15.8333 7.75C15.8333 7.38181 16.1318 7.08333 16.5 7.08333H17.6667C18.0349 7.08333 18.3333 7.38181 18.3333 7.75C18.3333 8.11819 18.0349 8.41667 17.6667 8.41667H16.5C16.1318 8.41667 15.8333 8.11819 15.8333 7.75ZM15.8333 12.25C15.8333 11.8818 16.1318 11.5833 16.5 11.5833H17.6667C18.0349 11.5833 18.3333 11.8818 18.3333 12.25C18.3333 12.6182 18.0349 12.9167 17.6667 12.9167H16.5C16.1318 12.9167 15.8333 12.6182 15.8333 12.25Z%22 fill=%22%23151617%22/%3E%3C/g%3E%3C/svg%3E");
   --ic-delta: url("data:image/svg+xml,%3Csvg width=%2220%22 height=%2220%22 viewBox=%220 0 20 20%22 fill=%22none%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cg clip-path=%22url(%23clip0_551_9079)%22%3E%3Cpath fill-rule=%22evenodd%22 clip-rule=%22evenodd%22 d=%22M9.99984 1.66675C7.7897 1.66675 5.67008 2.54472 4.10728 4.10752C2.54448 5.67033 1.6665 7.78994 1.6665 10.0001C1.6665 12.2102 2.54448 14.3298 4.10728 15.8926C5.67008 17.4554 7.7897 18.3334 9.99984 18.3334C12.21 18.3334 14.3296 17.4554 15.8924 15.8926C17.4552 14.3298 18.3332 12.2102 18.3332 10.0001C18.3332 7.78994 17.4552 5.67033 15.8924 4.10752C14.3296 2.54472 12.21 1.66675 9.99984 1.66675ZM9.37361 13.293C8.98309 13.6835 8.34992 13.6835 7.9594 13.293L5.54028 10.8739C5.14975 10.4833 5.14975 9.85017 5.54028 9.45964L5.62606 9.37386C6.01659 8.98333 6.64975 8.98333 7.04028 9.37385L7.9594 10.293C8.34992 10.6835 8.98309 10.6835 9.37361 10.293L12.9594 6.70719C13.3499 6.31666 13.9831 6.31666 14.3736 6.70719L14.4594 6.79297C14.8499 7.1835 14.8499 7.81666 14.4594 8.20719L9.37361 13.293Z%22 fill=%22%236AA7E7%22/%3E%3C/g%3E%3Cdefs%3E%3CclipPath id=%22clip0_551_9079%22%3E%3Crect width=%2220%22 height=%2220%22 fill=%22white%22/%3E%3C/clipPath%3E%3C/defs%3E%3C/svg%3E");
   --ic-document: url("data:image/svg+xml,%3Csvg preserveAspectRatio=%22none%22 overflow=%22visible%22 style=%22display: block;%22 width=%2220%22 height=%2220%22 viewBox=%220 0 20 20%22 fill=%22none%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cg id=%22Icon / document%22%3E%3Cpath id=%22Vector%22 fill-rule=%22evenodd%22 clip-rule=%22evenodd%22 d=%22M3.75 2.66667C3.75 2.11438 4.19772 1.66667 4.75 1.66667H11.2525C11.5177 1.66667 11.772 1.77202 11.9596 1.95956L15.9571 5.95711C16.1446 6.14464 16.25 6.399 16.25 6.66421V17.3333C16.25 17.8856 15.8023 18.3333 15.25 18.3333H4.75C4.19772 18.3333 3.75 17.8856 3.75 17.3333V2.66667ZM6.25 6.58333C6.25 6.16912 6.58579 5.83333 7 5.83333H9.66667C10.0809 5.83333 10.4167 6.16912 10.4167 6.58333C10.4167 6.99755 10.0809 7.33333 9.66667 7.33333H7C6.58579 7.33333 6.25 6.99755 6.25 6.58333ZM6.25 9.91667C6.25 9.50245 6.58579 9.16667 7 9.16667H13C13.4142 9.16667 13.75 9.50245 13.75 9.91667C13.75 10.3309 13.4142 10.6667 13 10.6667H7C6.58579 10.6667 6.25 10.3309 6.25 9.91667ZM6.25 13.25C6.25 12.8358 6.58579 12.5 7 12.5H13C13.4142 12.5 13.75 12.8358 13.75 13.25C13.75 13.6642 13.4142 14 13 14H7C6.58579 14 6.25 13.6642 6.25 13.25Z%22 fill=%22%23151617%22/%3E%3C/g%3E%3C/svg%3E");
@@ -333,6 +334,106 @@ button {
   color: var(--fg-tertiary);
 }
 
+/* ---------- Modal ---------- */
+/*
+ * Figma "Modal" 71:492 — 480 폭, 세로 auto.
+ *   프레임  padding 20/16 · gap 20 · radius 8 · bg/surface/overlay-light ·
+ *           border/subtle 1px · 배경 흐림 20
+ *   Header  제목(Heading/3) + 타이머(Title/1, status/critical/fg) + 닫기(Ghost/Small 32)
+ *   Body    두 줄 — 첫 줄 fg/secondary, 둘째 줄 fg/primary (둘 다 Body/2)
+ *   Footer  오른쪽 정렬, gap 8, Button Size=Medium 둘 (Secondary · Danger)
+ *
+ * 뒤를 덮는 scrim 은 Figma 에 없다 — 컴포넌트가 카드 하나로만 그려져 있다.
+ * 여기서 정한 값이다(alpha/dark/600). 흐림이 20 이라 뒤가 다 비치면 글이 안 읽힌다.
+ */
+.modal-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-20);
+  background-color: var(--color-alpha-dark-600);
+}
+
+.modal-scrim[hidden] { display: none; }
+
+.modal {
+  width: 480px;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+  padding: var(--space-20) var(--space-16);
+  border: var(--border-width-thin) solid var(--border-subtle);
+  border-radius: var(--radius-container);
+  background-color: var(--bg-surface-overlay-light);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+}
+
+.modal-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+}
+
+/* 제목과 타이머가 한 덩이로 왼쪽에 붙고, 닫기가 오른쪽 끝으로 밀린다. */
+.modal-titles {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+}
+
+.modal-titles h2 { margin: 0; color: var(--fg-primary); }
+
+/* 남은 시간 — Figma 는 status/critical/fg 다. 빨강이라야 "곧 일어난다"로 읽힌다. */
+.modal-timer { flex: none; color: var(--status-critical-fg); }
+
+/*
+ * Figma 는 Icon Button Ghost/Small(32)이다 — .icon-button 기본은 36 이다.
+ * 상세도를 맞춰 두 클래스를 같이 쓴다. .modal-close 만으로는 뒤에 오는
+ * .icon-button 규칙과 상세도가 같아 순서에 밀린다.
+ */
+.icon-button.modal-close {
+  flex: none;
+  width: var(--space-32);
+  height: var(--space-32);
+}
+
+.modal-close:hover { background-color: rgb(255 255 255 / 12%); }
+
+.modal-close:focus-visible {
+  outline: var(--border-width-strong) solid var(--border-focus);
+  outline-offset: 1px;
+}
+
+.modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.modal-body p { margin: 0; }
+
+/* 두 줄의 결이 다르다 — 무슨 일이 일어나는지(흐림)와 무엇이 남는지(또렷함). */
+.modal-desc-1 { color: var(--fg-secondary); }
+.modal-desc-2 { color: var(--fg-primary); }
+
+.modal-foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-8);
+}
+
+.modal-foot .btn:focus-visible {
+  outline: var(--border-width-strong) solid var(--border-focus);
+  outline-offset: 1px;
+}
+
 /* ---------- Status Bar 드롭다운 (Account · Signal) ---------- */
 /*
  * Figma Account / Signal 컴포넌트의 Opened 상태다. 칩 아래 4px 띄우고 메뉴가 내려온다.
@@ -363,14 +464,20 @@ button {
 .account-menu { left: 0; min-width: 100%; }
 .signal-menu { right: 0; width: 162px; }
 
+/* <a> 와 <button> 이 섞인다 — 로그아웃만 실제 동작이라 버튼이다. 기본 버튼 꼴을 지운다. */
 .menu-item {
   display: flex;
   align-items: center;
   gap: var(--space-8);
+  width: 100%;
   height: 36px;
   padding: var(--space-8) var(--space-12);
+  border: 0;
   border-radius: var(--radius-chart);
+  background: transparent;
   color: var(--fg-primary);
+  font: inherit;
+  text-align: left;
   text-decoration: none;
   cursor: pointer;
 }
@@ -731,6 +838,19 @@ button {
 }
 
 .btn-danger:hover { background-color: var(--button-danger-bg-hover); }
+.btn-danger:active { background-color: var(--button-danger-bg-pressed); }
+
+/*
+ * Figma Button Size=Medium — 36 높이, 좌우 16, Label/1 (14/20/800).
+ * .btn 기본은 Size=Small (32 · 13/18/500) 이다.
+ */
+.btn.is-md {
+  height: var(--size-control-md);
+  padding: 0 var(--space-16);
+  font-size: var(--font-size-14);
+  line-height: var(--font-line-height-20);
+  font-weight: 800;
+}
 .btn-danger:active { background-color: var(--button-danger-bg-pressed); }
 
 .icon-button {
