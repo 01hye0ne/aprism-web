@@ -1550,8 +1550,8 @@ button {
  *
  * 전에는 이 자리가 1·3·6·15·26·50px 짜리 흐린 그림자 여섯 겹이었다(도달 82px).
  * 흐린 번짐은 "빛"이지 "선"이 아니라서 두 겹을 겹쳐도 단차가 안 보였다 —
- * 그래서 번짐을 버리고 또렷한 선으로 바꿨다. 멀리까지 가는 몫은 이제
- * 정지한 번짐이 아니라 안으로 달려가는 선(--ripple-reach)이 맡는다.
+ * 그래서 번짐을 버리고 또렷한 선으로 바꿨다. 도달 거리도 82 에서 20 으로 줄였다 —
+ * 테두리에 붙은 띠지 지도를 가로지르는 선이 아니다.
  *
  * 원본과 다르게 둔 것:
  *   1) 팔레트 — 원본 기본값은 보라·분홍·하늘이다. Delta 오브(prism-orb.js)의
@@ -1563,26 +1563,29 @@ button {
  */
 
 /*
- * 안으로 달려가는 선. 2초 한 바퀴 중 앞 55% 만 달리고 나머지는 쉰다.
+ * 안으로 달려가는 선. 2초 한 바퀴 중 앞 40%(800ms) 만 달리고 나머지는 쉰다.
  * 나가는 곳(2px)은 서 있는 선과 같은 자리다 — 거기서 떨어져 나오는 것처럼 보이라고.
  * 안으로 들어갈수록 사각형이 되니 모서리도 같이 편다.
  */
 @keyframes edge-ripple-1 {
   0%   { inset: 2px; border-radius: 6px; opacity: 1; }
-  55%  { inset: var(--ripple-reach); border-radius: 0; opacity: 0; }
+  40%  { inset: var(--ripple-reach); border-radius: 0; opacity: 0; }
   100% { inset: var(--ripple-reach); border-radius: 0; opacity: 0; }
 }
 
 /* 두 번째("근")는 조금 약하다. 심장도 두 번째 박동이 작다. */
 @keyframes edge-ripple-2 {
   0%   { inset: 2px; border-radius: 6px; opacity: 0.7; }
-  55%  { inset: var(--ripple-reach); border-radius: 0; opacity: 0; }
+  40%  { inset: var(--ripple-reach); border-radius: 0; opacity: 0; }
   100% { inset: var(--ripple-reach); border-radius: 0; opacity: 0; }
 }
 
 .two-col.is-warning {
-  /* 선이 달려 들어가는 거리. 예전 흐린 번짐의 도달 거리(82px)를 대신하는 값이다. */
-  --ripple-reach: 44px;
+  /*
+   * 선이 달려 들어가는 거리. 44 에서 20 으로 좁혔다 — 지도 위로 너무 깊이 들어왔다.
+   * 테두리에 붙은 띠로 읽혀야 하고, 지도 안쪽까지 선이 지나가면 배치도를 읽는 데 걸린다.
+   */
+  --ripple-reach: 20px;
 
   /*
    * 선 색 — Delta 오브 팔레트의 가장 밝은 자리(#F2B020 = hsl(41 89% 54%))에서 가져와
