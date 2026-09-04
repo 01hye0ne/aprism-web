@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/static/woff2/SUIT.css" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" />
   <link rel="stylesheet" href="../assets/css/tokens.css?v=3be2ee40" />
-  <link rel="stylesheet" href="../assets/css/app-shell.css?v=b2bc1a06" />
+  <link rel="stylesheet" href="../assets/css/app-shell.css?v=05408b8b" />
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
@@ -416,8 +416,11 @@
                       </span>
                       <span class="robot-row">
                         <span class="t-caption">Battery</span>
-                        <span class="battery is-critical">
-                          <span class="battery-body"><span class="battery-fill" style="width:18%"></span></span>
+                        <span class="battery is-critical is-charging">
+                          <span class="battery-body">
+                            <span class="battery-fill" style="width:18%"></span>
+                            <span class="i battery-bolt" style="--i:var(--ic-bolt)" aria-hidden="true"></span>
+                          </span>
                           <span class="battery-tip"></span>
                           <span class="t-caption num">18%</span>
                         </span>
@@ -446,8 +449,11 @@
                       </span>
                       <span class="robot-row">
                         <span class="t-caption">Battery</span>
-                        <span class="battery is-warning">
-                          <span class="battery-body"><span class="battery-fill" style="width:35%"></span></span>
+                        <span class="battery is-warning is-charging">
+                          <span class="battery-body">
+                            <span class="battery-fill" style="width:35%"></span>
+                            <span class="i battery-bolt" style="--i:var(--ic-bolt)" aria-hidden="true"></span>
+                          </span>
                           <span class="battery-tip"></span>
                           <span class="t-caption num">35%</span>
                         </span>
