@@ -1428,6 +1428,50 @@
     <code>[data-modal-robot]</code> 한 칸만 채우면 되게 잘라 뒀습니다.
   </p>
 
+  <p><b>설명 두 줄은 같은 색입니다 — Figma 에서 벗어난 자리입니다</b></p>
+  <p>
+    Figma 는 첫 줄 <code>fg/secondary</code>, 둘째 줄 <code>fg/primary</code> 입니다.
+    그대로 옮겼더니 <strong>둘째 줄이 제목과 똑같은 색</strong>이 됩니다 — 제목도
+    <code>fg/primary</code> 입니다. 사이에 낀 첫 줄만 어두워서 밝기가
+    <b>밝음 → 어두움 → 밝음</b> 으로 되돌아옵니다.
+    <strong>시선이 제목에서 셋째 줄로 건너뛰고 첫 줄을 나중에 주워 읽습니다.</strong>
+  </p>
+  <p>
+    뿌리는 <strong>같은 토큰이 두 뜻으로 쓰인 것</strong>입니다 —
+    헤더에서 <code>fg/primary</code> 는 "이건 제목이다"이고,
+    본문에서는 "이 줄이 더 중요하다"입니다. 뜻이 다른 두 신호가 바로 붙어 있으니 위계가 흔들립니다.
+  </p>
+  <table>
+    <tr><th></th><th>첫 줄</th><th>둘째 줄</th><th>시선</th></tr>
+    <tr><td>Figma</td><td><code>fg/secondary</code></td><td><code>fg/primary</code></td>
+        <td>제목 → <b>건너뜀</b> → 둘째 줄 → 되돌아옴</td></tr>
+    <tr><td><b>지금</b></td><td><code>fg/secondary</code></td><td><b><code>fg/secondary</code></b></td>
+        <td><b>제목 → 본문 → 버튼</b>, 한 방향</td></tr>
+  </table>
+  <p>
+    <strong>위계가 없어지는 게 아니라 제자리로 갑니다.</strong>
+    무슨 일이 일어나는지가 먼저, 그 대가가 뒤 — <b>순서와 문장</b>이 이미 그 일을 합니다.
+    색까지 얹으니 두 채널이 겹쳐 흔들린 것입니다.
+    본문 두 줄은 간격으로도 이미 한 덩이입니다(줄 사이 8, 헤더와는 20).
+  </p>
+  <p>
+    <b>확인 모달에서 시선이 마지막에 닿아야 할 곳은 빨간 버튼입니다.</b>
+    본문에 밝은 줄이 하나 있으면 그 무게를 나눠 가집니다.
+  </p>
+  <p>
+    <b>첫 줄을 밝히고 둘째를 어둡게 하는 안(뒤집기)도 흐름은 깨끗해집니다.</b>
+    안 쓴 이유는 <strong>두 화면에서 뜻이 갈리기 때문</strong>입니다 —
+    E-STOP 은 첫 줄이 위험(전원 차단)이라 강조가 맞지만, 로그아웃은 첫 줄이
+    "세션이 종료됩니다"라서 안심시키는 둘째 줄이 묻힙니다.
+    화면마다 규칙이 달라지면 컴포넌트로 안 굳습니다.
+  </p>
+  <p>
+    <strong>클래스 <code>.modal-desc-1</code> · <code>.modal-desc-2</code> 는 남겨 뒀습니다</strong> —
+    역할이 다른 두 줄이라는 표시이고, 되돌릴 자리이기도 합니다.
+    <b>Figma 컴포넌트(71:492)의 둘째 Description 도 <code>fg/secondary</code> 로 같이 바꿔야</b>
+    다음에 컴포넌트를 다시 읽을 때 되돌아오지 않습니다.
+  </p>
+
   <p><b>Figma 에 없어서 여기서 정한 것</b></p>
   <ul>
     <li><b>뒤를 덮는 scrim.</b> 컴포넌트가 카드 하나로만 그려져 있습니다.
