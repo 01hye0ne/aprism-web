@@ -1282,9 +1282,34 @@
     한 줄이라 높이에 손을 안 댑니다. 실측 <strong>48.0</strong> 으로 같습니다.
   </p>
   <p>
-    <strong>초점 링은 <code>input</code> 이 아니라 칸 전체에 두릅니다</strong>
-    (<code>.ai-input:focus-within</code>). <code>input</code> 에 두르면 칸의 파란 그라데이션
-    테두리 안쪽에 링이 하나 더 생겨 <strong>테두리가 두 겹</strong>으로 보입니다.
+    <strong>초점 링을 따로 두르지 않습니다.</strong> 처음에는 칸 바깥에
+    <code>outline 2px</code> 을 얹었는데, 칸이 이미 <strong>그라데이션 테두리를 갖고 있어</strong>
+    링이 두 겹으로 보였습니다. 지금은 <strong>그 테두리 자체가 초점 링</strong>입니다 —
+    <code>1px → 2px</code> 로 두꺼워집니다.
+  </p>
+  <table>
+    <tr><th></th><th>쉴 때</th><th>초점</th></tr>
+    <tr><td>테두리</td><td><code>1px</code> 그라데이션</td><td><strong><code>2px</code> 같은 그라데이션</strong></td></tr>
+    <tr><td>면</td><td><code>bg/surface/overlay-dark</code></td><td><strong><code>bg/surface/overlay-light</code></strong></td></tr>
+  </table>
+  <p>
+    <strong>색은 알림을 따라갑니다 — 새로 쓴 값이 없습니다.</strong> 테두리 무늬가
+    <code>--ai-input-edge</code> 인데 이 변수는 <code>.ai-panel.is-warning</code> 에서 이미
+    노란 무늬로 덮입니다. 그 변수를 그대로 굵히기만 하니
+    <strong>일반은 파란 링, 주의는 노란 링</strong>이 됩니다.
+    Critical · Safe 를 붙일 때도 이 변수만 덮으면 링이 따라옵니다.
+  </p>
+  <p>
+    <strong>두께만으로는 신호가 약해서 면도 한 단계 들어 올립니다</strong>
+    (캡슐 hover 와 같은 짝입니다). 링이 아니라 면이라 <strong>겹으로 안 읽힙니다.</strong>
+    실측 — 쉴 때 테두리 <code>1px</code>·면 <code>#21304a</code>,
+    초점에서 테두리 <code>2px</code>·면 <code>#405273</code> 입니다(Dark).
+  </p>
+  <p>
+    <strong>투명한 <code>outline</code> 하나는 남겨 뒀습니다.</strong> Windows 고대비 같은
+    강제 색상 모드에서는 그라데이션 테두리가 통째로 지워집니다 — 그러면 초점이 어디 있는지
+    안 보입니다. 투명 outline 은 <strong>그 모드에서만 시스템 색으로 칠해지고</strong>
+    일반 화면에서는 안 보이므로 링이 두 겹이 되지 않습니다.
   </p>
   <p>
     <strong>덤으로 접힌 판의 탭 순서를 고쳤습니다.</strong> 여닫이는 두 판을 DOM 에 두고
