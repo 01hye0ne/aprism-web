@@ -512,6 +512,56 @@
         { title: "waypoint name", state: "pending" },
         { title: "waypoint name", state: "pending" }
       ]
+    },
+    {
+      // 9 · 완료 · 88% · Strong
+      current: "순회 완료",
+      steps: [
+        { title: "waypoint name", state: "done", time: "05:10 – 05:29", duration: "19분" },
+        { title: "waypoint name", state: "done", time: "05:29 – 05:46", duration: "17분" },
+        { title: "waypoint name", state: "done", time: "05:46 – 06:03", duration: "17분" },
+        { title: "waypoint name", state: "done", time: "06:03 – 06:20", duration: "17분" },
+        { title: "waypoint name", state: "done", time: "06:20 – 06:41", duration: "21분" }
+      ]
+    },
+    {
+      // 10 · 대기 · 29% · Weak — 신호가 약해 보내지 못한다
+      current: "대기 중",
+      steps: [
+        { title: "waypoint name", state: "pending" },
+        { title: "waypoint name", state: "pending" },
+        { title: "waypoint name", state: "pending" },
+        { title: "waypoint name", state: "pending" },
+        { title: "waypoint name", state: "pending" },
+        { title: "waypoint name", state: "pending" }
+      ]
+    },
+    {
+      // 11 · 수행중 · 71% · Strong — 막바지에 가까워졌다
+      current: "현재 수행명",
+      steps: [
+        { title: "waypoint name", state: "done", time: "09:40 – 09:58", duration: "18분" },
+        { title: "waypoint name", state: "done", time: "09:58 – 10:12", duration: "14분" },
+        { title: "waypoint name", state: "done", time: "10:12 – 10:29", duration: "17분" },
+        {
+          title: "Switchgear Room Thermal Scan",
+          state: "running",
+          time: "10:29 – 10:44",
+          duration: "15분",
+          desc: "배전반 발열을 훑는 중. 기준보다 높은 지점을 표시합니다."
+        },
+        { title: "waypoint name", state: "pending" }
+      ]
+    },
+    {
+      // 12 · 대기 · 55% 충전 · Good
+      current: "충전 중",
+      steps: [
+        { title: "waypoint name", state: "pending" },
+        { title: "waypoint name", state: "pending" },
+        { title: "waypoint name", state: "pending" },
+        { title: "waypoint name", state: "pending" }
+      ]
     }
   ];
 
