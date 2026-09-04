@@ -1191,6 +1191,13 @@ button {
   );
 
   /*
+   * 초점 면 — 알림 팔레트의 가장 어두운 자리다. 반투명 scrim 이 아니라 솔리드라
+   * 뒤에 깔린 그라데이션이 안 비친다(칠 때 글자 뒤가 조용해야 한다).
+   * .ai-tag 글자색이 쓰는 짝과 같은 두 값이다 — 일반 #1E2D4D, 주의 #383116.
+   */
+  --ai-input-focus-bg: var(--color-main-950);
+
+  /*
    * Spectrum 막대 색 — Delta 오브와 같은 팔레트다.
    *
    * prism-orb.js 의 코사인 팔레트를 그대로 훑은 값이다.
@@ -1596,8 +1603,15 @@ button {
 
 .ai-input:focus-within::before { padding: var(--border-width-strong); }
 
+/*
+ * 어두운 솔리드 위라 글자를 밝은 쪽으로 뒤집는다.
+ * Light 에서 fg/primary 는 거의 검정이라 이 면에 그대로 얹으면 안 읽힌다.
+ */
+.ai-input:focus-within .ai-input-ph { color: var(--color-gray-50); }
+.ai-input:focus-within .ai-input-ph::placeholder { color: var(--color-gray-400); }
+
 .ai-input:focus-within {
-  background-color: var(--bg-surface-overlay-light);
+  background-color: var(--ai-input-focus-bg);
   /*
    * 강제 색상 모드(Windows 고대비)에서는 그라데이션 테두리가 통째로 지워진다.
    * 투명 outline 은 그 모드에서만 시스템 색으로 칠해져 초점 표시가 남는다.
@@ -1833,6 +1847,7 @@ button {
     var(--color-warning-500) 46%,
     var(--status-warning-border) 72%,
     #f7cd36 100%);
+  --ai-input-focus-bg: var(--color-warning-900);
   /* PALETTES.warning 을 같은 방식으로 훑은 값. */
   --ai-spectrum-ramp:
     #F2B020 0%, #D38210 12.5%, #A5521A 25%, #813D39 37.5%, #7D4F5A 50%,
