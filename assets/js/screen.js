@@ -191,6 +191,49 @@
   })();
 
   // ------------------------------------------------------------------
+  // 로봇 선택 모달 안쪽 — 카드 고르기 · 이름 거르기 (Figma 734:8981)
+  //
+  // 카드에 data-robot 을 안 쓴다. 그 이름은 우측 패널의 로봇 띠가 이미 쓰고 있어서
+  // 같이 붙이면 띠 선택이 모달 카드까지 집는다.
+  // ------------------------------------------------------------------
+  (function () {
+    var box = document.querySelector("[data-modal='robots']");
+    if (!box) {
+      return;
+    }
+
+    var picks = Array.prototype.slice.call(box.querySelectorAll("[data-robot-pick]"));
+
+    picks.forEach(function (card) {
+      card.addEventListener("click", function () {
+        picks.forEach(function (other) {
+          other.setAttribute("aria-pressed", other === card ? "true" : "false");
+        });
+      });
+    });
+
+    // 이름으로 거르기. 지금은 카드 이름이 모두 자리표시자("로봇명")라
+    // 다 남거나 다 사라지지만, 진짜 이름이 들어오면 그대로 걸린다.
+    var search = box.querySelector("[data-robot-search]");
+    var empty = box.querySelector("[data-robot-empty]");
+
+    if (search) {
+      search.addEventListener("input", function () {
+        var q = search.value.trim().toLowerCase();
+        var shown = 0;
+        picks.forEach(function (card) {
+          var name = card.querySelector(".robot-id");
+          var text = (name ? name.textContent : "").toLowerCase();
+          var hit = !q || text.indexOf(q) >= 0;
+          card.hidden = !hit;
+          if (hit) { shown += 1; }
+        });
+        if (empty) { empty.hidden = shown > 0; }
+      });
+    }
+  })();
+
+  // ------------------------------------------------------------------
   // 모달 — Figma "Modal" 71:492
   //
   // 두 자리에서 뜬다. 문구만 다르고 짜임은 같다.

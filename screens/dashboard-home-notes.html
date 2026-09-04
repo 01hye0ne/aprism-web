@@ -1860,6 +1860,49 @@
     배터리 위험 상태입니다. Light 값(<code>danger/700</code>)은 맞아서 그대로입니다.
   </p>
 
+  <h3>9-4. 로봇 선택 모달 (734:8981)</h3>
+  <p>
+    로봇 줄의 <b>[로봇 더보기]</b> 로 엽니다. <strong>같은 모달 껍데기인데 폭이 다릅니다</strong> —
+    <code>744</code> 입니다(다른 모달은 480). 카드를 <b>넉 장씩</b> 놓아야 해서입니다.
+  </p>
+  <table>
+    <tr><th>부분</th><th>값</th></tr>
+    <tr><td>카드 판</td><td>516 높이 · 면 <code>bg/surface/overlay-dark</code> ·
+      테두리 <code>border/strong</code> 1px · radius 4 · 안쪽 4</td></tr>
+    <tr><td>격자</td><td><b>4열</b> · 가로 사이 <code>4</code> · <b>세로 사이 <code>16</code></b></td></tr>
+    <tr><td>카드</td><td>Figma 168 — 화면 실측 <b>169</b></td></tr>
+    <tr><td>검색</td><td>Text Field <b>Size=Small</b> — 32 · 좌우 12 · 13/20</td></tr>
+    <tr><td>버튼</td><td>취소(Secondary) · <b>선택(Primary — 흰 면)</b></td></tr>
+  </table>
+  <p>
+    <strong>머리가 다릅니다.</strong> 다른 모달은 제목 옆에 타이머가 붙는데
+    여기는 <b>제목 아래 부제</b>가 깔립니다(<code>fg/tertiary</code> 16/24).
+    <code>.modal-titles.is-stacked</code> 로 세로로 세웠고 닫기는 오른쪽 끝 그대로입니다.
+  </p>
+  <p>
+    <strong>열두 장이 판보다 깁니다</strong>(<code>634</code> / <code>516</code>) — <b>세로로 스크롤</b>합니다.
+    Figma 는 여기도 사각형 하나로 막대를 그려 뒀지만, 로봇 줄과 같은 이유로
+    브라우저 것을 쓰고 <b>색만 <code>fg/tertiary</code></b> 로 맞췄습니다.
+  </p>
+  <p>
+    <strong>검색은 이름으로 거릅니다.</strong> 다만 <b>카드 이름이 모두 자리표시자
+    (<code>로봇명</code>)</b>라 지금은 다 남거나 다 사라집니다 — 진짜 이름이 들어오면 그대로 걸립니다.
+    <b>결과가 없을 때만</b> "찾는 이름이 없습니다." 한 줄이 뜹니다(Figma 에 없는 상태라 여기서 정했습니다).
+  </p>
+  <p>
+    <strong>카드에 <code>data-robot</code> 을 안 붙였습니다.</strong> 그 이름은
+    우측 패널의 로봇 띠가 이미 쓰고 있어서, 같이 붙이면 <b>띠 선택 로직이 모달 카드까지 집습니다.</b>
+    <code>data-robot-pick</code> 으로 갈라 뒀습니다.
+  </p>
+  <p>
+    <strong>[선택]은 닫기만 합니다.</strong> 모달 안에서 고른 것이 <b>패널 띠로 넘어가지 않습니다</b> —
+    모달은 12대, 띠는 8대라 어느 카드가 어느 카드인지 이어 줄 근거가 없습니다.
+    진짜 로봇 목록이 생기면 그때 이으면 됩니다.
+  </p>
+  <p>
+    <code>search</code> 아이콘을 새로 넣었습니다(<code>27:45</code>).
+  </p>
+
   <h3>10. Figma 정리 — 이름 · 설명 · 토큰 바인딩</h3>
   <p>
     작업하면서 눈에 걸린 것들을 Figma 에서 직접 정리했습니다.
