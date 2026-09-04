@@ -1563,15 +1563,15 @@ button {
  */
 
 /*
- * 두근 — 선 하나가 1px 에서 안쪽으로 6px 까지 두꺼워지면서 사라진다.
+ * 두근 — 선 하나가 3px 에서 안쪽으로 8px 까지 두꺼워지면서 사라진다.
  * 자리는 안 옮긴다. 바깥 모서리는 붙박이고 안쪽 모서리만 밀려 들어간다.
  *
  * 앞서는 선이 통째로 안으로 미끄러졌는데, 그러면 테두리에서 떨어져 나와
  * 지도 위를 지나가는 별개의 선이 된다. 지금은 테두리가 안으로 두꺼워졌다
  * 사그라드는 것이라 눈이 테두리에서 안 떠난다.
  *
- * 고르게(linear) 늘린다. "1번이 3px 일 때 2번 시작"을 시간으로 그대로 옮기려면
- * 두께와 시간이 비례해야 한다 — 1->6 중 3px 은 자란 구간의 40% 지점이고,
+ * 고르게(linear) 늘린다. "1번이 얼마쯤 자랐을 때 2번 시작"을 시간으로 그대로 옮기려면
+ * 두께와 시간이 비례해야 한다 — 자란 구간의 40% 지점(3->8 중 5px)이 그 자리고,
  * 자라는 데 640ms 를 쓰니 2번의 delay 가 256ms 다. ease 를 넣으면 이 셈이 깨진다.
  */
 @keyframes edge-pulse {
@@ -1581,9 +1581,13 @@ button {
 }
 
 .two-col.is-warning {
-  /* 선이 자라는 폭. 태어날 때 1px, 사그라들 때 6px. 전부 테두리에서 8px 안쪽에서 끝난다. */
-  --pulse-from: 1px;
-  --pulse-to: 6px;
+  /*
+   * 선이 자라는 폭. 태어날 때 3px, 사그라들 때 8px — 두 끝을 나란히 2px 씩 올렸다.
+   * 자라는 폭(5px)은 그대로라 아래 40% 셈이 안 깨진다.
+   * 선이 2px 에서 시작하니 전부 테두리에서 10px 안쪽에서 끝난다.
+   */
+  --pulse-from: 3px;
+  --pulse-to: 8px;
   /*
    * 선 색 — Delta 오브 팔레트의 가장 밝은 자리(#F2B020 = hsl(41 89% 54%))에서 가져와
    * 빛으로 읽히도록 명도만 80% 로 올렸다. 원본 glowColor 는 hsl(40 80% 80%) 이었다 —
@@ -1683,7 +1687,7 @@ button {
   position: absolute;
   inset: 2px;
   border-radius: calc(var(--radius-container) - 2px);
-  box-shadow: inset 0 0 0 4px var(--glow-color-60);
+  box-shadow: inset 0 0 0 6px var(--glow-color-60);
   opacity: 0;
   /*
    * 2초 한 바퀴(약 30bpm)다. 사람 맥박(60~70)의 절반쯤인데, 박동으로 읽히게 하는 건
@@ -1694,7 +1698,7 @@ button {
   animation: edge-pulse 2s linear infinite;
 }
 
-/* 2번 줄 — 1번이 3px 까지 자랐을 때 똑같이 시작한다. 위 주석의 256ms 가 그 지점이다. */
+/* 2번 줄 — 1번이 자란 구간의 40%(5px)까지 왔을 때 똑같이 시작한다. 그 자리가 256ms 다. */
 .two-col.is-warning > .edge-light::after {
   animation-delay: 256ms;
 }
