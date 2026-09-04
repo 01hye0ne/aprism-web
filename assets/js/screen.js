@@ -222,6 +222,40 @@
     return node;
   }
 
+  /*
+   * 점선 레일의 마디를 이어 붙인다.
+   *
+   * 점선은 .rail-line 마다 따로 그려지고(무늬는 CSS mask 다 — app-shell.css 참고),
+   * 무늬(점 2 · 빈 6 · 주기 8)가 요소 맨 위에서 다시 시작한다. 칸 높이가 8 의 배수가
+   * 아니라서 — 화면에서 재 보니 대기 칸이 84, 수행 칸이 82 다 — 칸이 바뀔 때마다 리듬이 깨진다.
+   *   84 = 8*10 + 4  ->  점이 2px 남고 다음 칸이 곧바로 점을 찍어 사이가 6 이 아니라 2 가 된다
+   *   82 = 8*10 + 2  ->  점끼리 붙어 4px 짜리 긴 점이 된다
+   *
+   * CSS 만으로는 못 고친다. 앞 칸이 얼마나 높은지를 뒤 칸이 알 방법이 없다.
+   * 그래서 첫 점선을 기준으로 삼고, 그 아래 선들은 내려온 거리만큼 무늬를 밀어 준다.
+   * 첫 점선은 안 민다 — 표식 바로 밑이 잘린 점으로 시작하면 그게 더 눈에 띈다.
+   */
+  var RAIL_DASH = 8;
+
+  function phaseRails(timeline) {
+    var lines = Array.prototype.slice.call(
+      timeline.querySelectorAll(".is-running .rail-line, .is-pending .rail-line")
+    );
+    if (!lines.length) { return; }
+    // 스크롤을 걷어낸 내용 좌표계로 옮긴다.
+    var base = timeline.getBoundingClientRect().top - timeline.scrollTop;
+    var origin = null;
+    lines.forEach(function (line) {
+      var y = line.getBoundingClientRect().top - base;
+      if (origin === null) { origin = y; }
+      var shift = (y - origin) % RAIL_DASH;
+      var pos = "0 " + (-shift).toFixed(2) + "px";
+      // background-position 이 아니라 mask-position 이다 — 무늬는 mask 로 도려낸다.
+      line.style.maskPosition = pos;
+      line.style.webkitMaskPosition = pos;
+    });
+  }
+
   function stepNode(step, index) {
     var meta = STATE[step.state];
 
@@ -309,6 +343,12 @@
         timeline.appendChild(stepNode(step, i));
       });
       timeline.scrollTop = 0;
+      phaseRails(timeline);
+    }
+
+    // 폭이 바뀌면 제목이 다르게 접혀 칸 높이가 달라진다 — 무늬를 다시 맞춘다.
+    if (window.ResizeObserver) {
+      new ResizeObserver(function () { phaseRails(timeline); }).observe(timeline);
     }
 
     cards.forEach(function (card) {
