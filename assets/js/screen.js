@@ -368,6 +368,65 @@
         { title: "waypoint name", state: "pending" },
         { title: "waypoint name", state: "pending" }
       ]
+    },
+    {
+      // 4 · 완료 · 92% · Strong — 끝까지 돌고 돌아왔다
+      current: "순회 완료",
+      steps: [
+        { title: "waypoint name", state: "done", time: "07:20 – 07:38", duration: "18분" },
+        { title: "waypoint name", state: "done", time: "07:38 – 07:59", duration: "21분" },
+        { title: "waypoint name", state: "done", time: "07:59 – 08:14", duration: "15분" },
+        { title: "waypoint name", state: "done", time: "08:14 – 08:33", duration: "19분" },
+        { title: "waypoint name", state: "done", time: "08:33 – 08:47", duration: "14분" },
+        { title: "waypoint name", state: "done", time: "08:47 – 09:06", duration: "19분" }
+      ]
+    },
+    {
+      // 5 · 수행중 · 64% · Good — 첫 구간을 지나는 중이다
+      current: "현재 수행명",
+      steps: [
+        { title: "waypoint name", state: "done", time: "10:02 – 10:17", duration: "15분" },
+        {
+          title: "Generator Bearing Vibration",
+          state: "running",
+          time: "10:17 – 10:31",
+          duration: "14분",
+          desc: "진동 스펙트럼을 모으는 중. 기준 대비 과대치를 찾습니다."
+        },
+        { title: "waypoint name", state: "pending" },
+        { title: "waypoint name", state: "pending" },
+        { title: "waypoint name", state: "pending" }
+      ]
+    },
+    {
+      // 6 · 대기 · 8% 충전 · Weak — 배터리가 바닥이라 못 나간다
+      current: "충전 중",
+      steps: [
+        { title: "waypoint name", state: "pending" },
+        { title: "waypoint name", state: "pending" },
+        { title: "waypoint name", state: "pending" }
+      ]
+    },
+    {
+      // 7 · 완료 · 96% 충전 · Strong — 도킹에서 다음 미션을 기다린다
+      current: "순회 완료",
+      steps: [
+        { title: "waypoint name", state: "done", time: "06:05 – 06:24", duration: "19분" },
+        { title: "waypoint name", state: "done", time: "06:24 – 06:41", duration: "17분" },
+        { title: "waypoint name", state: "done", time: "06:41 – 07:02", duration: "21분" },
+        { title: "waypoint name", state: "done", time: "07:02 – 07:16", duration: "14분" }
+      ]
+    },
+    {
+      // 8 · 대기 · 47% · Good — 불러온 미션이 있고 시작 전이다
+      current: "대기 중",
+      steps: [
+        { title: "waypoint name", state: "pending" },
+        { title: "waypoint name", state: "pending" },
+        { title: "waypoint name", state: "pending" },
+        { title: "waypoint name", state: "pending" },
+        { title: "waypoint name", state: "pending" }
+      ]
     }
   ];
 
