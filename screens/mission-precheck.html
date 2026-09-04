@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/static/woff2/SUIT.css" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" />
   <link rel="stylesheet" href="../assets/css/tokens.css?v=e254913d" />
-  <link rel="stylesheet" href="../assets/css/app-shell.css?v=4f5dac9a" />
+  <link rel="stylesheet" href="../assets/css/app-shell.css?v=eda23993" />
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
@@ -291,13 +291,17 @@
                     </div>
                   </div>
 
-                  <div class="inline-notice">
-                    <span class="i i-16" style="--i:var(--ic-info)" aria-hidden="true"></span>
-                    <span class="body">
-                      <span class="title">점검이 끝나면 자동으로 시작합니다</span>
-                      <span class="desc">네 항목이 모두 정상일 때만 로봇이 기동합니다.</span>
-                    </span>
-                  </div>
+                </div>
+
+                <!-- 안내는 스크롤 밖, 버튼 바로 위에 붙인다.
+                     목록 밑에 두면 남는 자리가 카드 아래 끝에 몰려 "내용이 모자란" 것으로 읽힌다.
+                     위아래 두 덩이 사이에 두면 같은 여백이 "간격"으로 읽힌다. -->
+                <div class="inline-notice">
+                  <span class="i i-16" style="--i:var(--ic-info)" aria-hidden="true"></span>
+                  <span class="body">
+                    <span class="title">점검이 끝나면 자동으로 시작합니다</span>
+                    <span class="desc">네 항목이 모두 정상일 때만 로봇이 기동합니다.</span>
+                  </span>
                 </div>
 
                 <div class="mp-actions">

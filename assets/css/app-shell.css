@@ -2251,6 +2251,12 @@ button {
   padding-bottom: var(--space-8);
 }
 
+/* 스크롤 밖으로 나온 안내 — 버튼 바로 위에 붙는다(8 띄움). */
+.mission-panel > .inline-notice {
+  flex: none;
+  margin-bottom: var(--space-8);
+}
+
 /* Figma "Header" — padding 20/12, gap 8. */
 .mp-header {
   flex: none;
