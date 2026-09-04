@@ -2274,7 +2274,7 @@ button {
   flex: none;
   height: var(--border-width-thin);
   margin: 0 var(--space-4);
-  background-color: var(--color-gray-700);
+  background-color: var(--border-subtle);
 }
 
 /* ── Form 묶음 (Mission-Setting) ─────────────────────────────
@@ -2285,8 +2285,8 @@ button {
   flex-direction: column;
   gap: var(--space-16);
   padding: var(--space-16) var(--space-12);
-  border: var(--border-width-thin) solid var(--color-gray-600);
   border-radius: var(--radius-card);
+  /* Figma "Mission Form" — 테두리 없이 면만 있다(예전 gray/600 1px 을 뺐다). */
   background-color: var(--bg-surface-overlay-dark);
 }
 
@@ -2521,12 +2521,12 @@ input.field-box { outline: 0; }
 .switch[aria-checked="true"] .knob { transform: translateX(16px); background-color: #ffffff; }
 
 /* ── 요약 (예상 소요시간 · Way-point) ──────────────────────── */
+/* Figma "Spacer" — 면이 거의 검정(gray/950)에서 bg/surface/subtle 로 올라왔고 테두리가 빠졌다. */
 .mp-summary {
   display: flex;
   flex-direction: column;
-  border: var(--border-width-thin) solid var(--color-gray-600);
   border-radius: var(--radius-card);
-  background-color: var(--color-gray-950);
+  background-color: var(--bg-surface-subtle);
   overflow: hidden;
 }
 
@@ -2535,10 +2535,11 @@ input.field-box { outline: 0; }
   align-items: center;
   gap: var(--space-8);
   padding: var(--space-8) var(--space-8) var(--space-8) var(--space-12);
-  border-bottom: var(--border-width-thin) solid var(--color-gray-650);
+  /* Figma 는 아래 변만 1px, border/default 다 — 마지막 줄에도 그어져 있다. */
+  border-bottom: var(--border-width-thin) solid var(--border-default);
 }
 
-.sum-row:last-child { border-bottom: 0; }
+/* 마지막 줄의 선을 지우지 않는다 — Figma 가 네 변 중 아래만, 모든 줄에 긋는다. */
 
 .sum-row .i { flex: none; color: var(--color-gray-450); }
 
@@ -2588,8 +2589,8 @@ input.field-box { outline: 0; }
 
   display: flex;
   flex-direction: column;
-  border: var(--border-width-thin) solid var(--color-gray-600);
   border-radius: var(--radius-card);
+  /* Figma "사전 점검 항목" — 테두리 없이 면만 있다. */
   background-color: var(--bg-surface-overlay-dark);
   overflow: hidden;
 }
@@ -2599,7 +2600,7 @@ input.field-box { outline: 0; }
   align-items: center;
   gap: var(--space-12);
   padding: var(--space-8) var(--space-4) var(--space-8) var(--space-12);
-  background-color: var(--color-gray-750);
+  background-color: var(--bg-surface-subtle);
 }
 
 .precheck-head .label {
@@ -2635,11 +2636,11 @@ input.field-box { outline: 0; }
   align-items: center;
   gap: var(--space-8);
   padding: var(--space-12) var(--space-8) var(--space-12) var(--space-12);
-  border-bottom: var(--border-width-thin) solid var(--color-gray-650);
+  border-bottom: var(--border-width-thin) solid var(--border-default);
 }
 
-.precheck-row:last-child { border-bottom: 0; }
-.precheck-row.is-active { background-color: var(--color-gray-750); }
+/* 마지막 줄도 선을 남긴다 — Figma 가 네 줄 모두 아래 변에 긋는다. */
+.precheck-row.is-active { background-color: var(--border-subtle); }
 
 .precheck-row .i { flex: none; }
 .precheck-row.is-done .i { color: var(--status-normal-fg); }
