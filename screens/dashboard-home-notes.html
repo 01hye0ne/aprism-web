@@ -787,6 +787,44 @@
     남겨 두면 점선이 위에서 한 번 끊깁니다.
   </p>
 
+  <h3>6-0. Status Bar 여백 — 다시 맞췄습니다 (402:9246)</h3>
+  <p>
+    <strong>바깥 여백이 좌우 대칭이 아니게 됐습니다.</strong>
+    Status Bar 프레임의 패딩이 <code>0/12/0/0</code> 입니다 — <b>왼쪽 0, 오른쪽만 12</b>.
+  </p>
+  <table>
+    <tr><th>부분</th><th>이전(web)</th><th>현재(Figma 402:9246)</th></tr>
+    <tr><td>Status Bar</td><td>패딩 <code>0 4</code></td><td><strong><code>0 12 0 0</code></strong></td></tr>
+    <tr><td>Right 프레임</td><td>패딩 <code>8</code> (사면)</td><td><strong><code>8 0</code></strong> — 좌우가 빠졌습니다</td></tr>
+    <tr><td>Account 칩</td><td>26 높이</td><td><strong>28 높이</strong></td></tr>
+    <tr><td>Signal 칩</td><td>26 높이</td><td>26 그대로</td></tr>
+  </table>
+  <p>
+    <strong>왼쪽이 0 이라야 로고 기둥이 아래 GNB 레일과 같은 선에서 시작합니다.</strong>
+    둘 다 76 인데 전에는 로고만 4 들어가 있어서 반 픽셀도 아닌 4 만큼 어긋나 있었습니다.
+    오른쪽 12 는 Right 프레임에서 빠진 좌우 8 을 대신합니다 —
+    <b>합이 16 에서 12 로 줄어</b> 오른쪽 덩이가 화면 끝에 조금 더 붙습니다.
+  </p>
+  <p>
+    <strong>Account 만 28 인 이유</strong>는 두 칩의 셈이 달라서가 아닙니다.
+    패딩과 내용을 더하면 <b>둘 다 26</b> 입니다(<code>4+18+4</code>, <code>6+14+6</code>).
+    Account 쪽만 <b>stroke 를 레이아웃에 넣는 설정</b>이라 위아래로 1px 씩 더 붙어 28 이 됩니다.
+    CSS 는 <code>border-box</code> 라 그 값을 그대로 쓰면 두 칩 다 Figma 와 같은 자리에 그려집니다 —
+    Account 는 글자 줄이 위에서 5, Signal 은 막대가 위에서 6 입니다.
+  </p>
+  <p>
+    실측으로 맞춘 값입니다 — 로고 <code>0,0 76×60</code>,
+    Right <code>8×44</code>, Account <code>28</code>, Signal <code>26</code>,
+    오른쪽 끝에서 <code>12</code>.
+  </p>
+  <p>
+    <strong>오른쪽 덩이가 Figma 보다 약 15 넓습니다.</strong> 이번 여백과는 무관한
+    이전부터의 차이입니다 — 시각 글자에 <code>tabular-nums</code>(<code>.num</code>)를 걸어
+    <b>숫자 폭을 고정</b>했기 때문입니다. 안 걸면 초가 넘어갈 때마다 글자가 들썩입니다.
+    Figma 의 Type 패널에는 이 항목이 없어 Figma 쪽은 좁게 나옵니다.
+    <b>SPACE_BETWEEN 배치라 오른쪽 끝은 그대로 맞습니다</b> — 덩이가 왼쪽으로 조금 더 벌어질 뿐입니다.
+  </p>
+
   <h3>6-1. 점선이 중간중간 일정하지 않던 것 — 원인 둘, 고침 둘</h3>
   <p>
     <b>"도트 간격이 일정하지 않다"</b> 는 확인해 보니 서로 다른 원인 둘이 겹친 것이었습니다.

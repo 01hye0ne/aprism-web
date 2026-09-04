@@ -212,12 +212,16 @@ button {
 }
 
 /* ---------- Status Bar ---------- */
+/*
+ * Figma 402:9246 — 바깥 패딩이 0/12/0/0 이다. 좌우 4 씩이 아니라 오른쪽만 12 다.
+ * 왼쪽이 0 이라야 로고 기둥(76)이 아래 GNB 레일과 같은 선에서 시작한다.
+ */
 .status-bar {
   flex: 0 0 auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 var(--space-4);
+  padding: 0 var(--space-12) 0 0;
 }
 
 .status-bar-logo {
@@ -234,24 +238,30 @@ button {
   color: var(--fg-primary);
 }
 
-/* Figma 의 Right 프레임이다 — 패딩이 14/16 에서 8 로 줄어 상태바가 64 -> 60 이 됐다. */
+/*
+ * Figma 의 Right 프레임이다 — 패딩이 14/16 에서 8 로 줄어 상태바가 64 -> 60 이 됐고,
+ * 이번에 좌우 8 이 빠져 8/0/8/0 이 됐다. 오른쪽 여백은 Status Bar 의 12 가 준다.
+ */
 .status-bar-right {
   display: flex;
   align-items: center;
   gap: var(--space-8);
-  padding: var(--space-8);
+  padding: var(--space-8) 0;
 }
 
 /*
- * Account 와 Signal 이 같은 칩이 되었다. Figma stroke 는 안쪽으로 그려지는데
- * CSS border 는 높이에 더해지므로 높이를 26 으로 못 박는다.
- * 이제 둘 다 <button> 이라 눌러서 메뉴를 연다 — 기본 버튼 꼴을 지운다.
+ * Account 와 Signal 이 같은 칩이 되었다. 둘 다 <button> 이라 눌러서 메뉴를 연다 —
+ * 기본 버튼 꼴을 지운다.
+ *
+ * 높이는 못 박는다. 두 칩이 Figma 에서 다른 값이다 — Account 28, Signal 26.
+ * 패딩과 내용은 같은 셈인데(4+18+4 = 26, 6+14+6 = 26) Account 쪽만
+ * stroke 를 레이아웃에 넣어서 위아래 1px 씩 더 붙는다.
+ * CSS 는 border-box 라 그 값을 그대로 쓰면 두 칩 다 Figma 와 같은 자리에 그려진다.
  */
 .account-chip,
 .signal-chip {
   display: flex;
   align-items: center;
-  height: 26px;
   border: var(--border-width-thin) solid var(--border-subtle);
   border-radius: var(--radius-card);
   background-color: var(--bg-surface-subtle);
@@ -274,6 +284,7 @@ button {
 
 .account-chip {
   gap: var(--space-8);
+  height: 28px;
   padding: var(--space-4) var(--space-12) var(--space-4) var(--space-8);
   color: var(--fg-primary);
 }
@@ -284,6 +295,7 @@ button {
 .account-sep { color: var(--fg-tertiary); }
 
 .signal-chip {
+  height: 26px;
   padding: 6px var(--space-8);
   color: var(--status-normal-fg);
 }
