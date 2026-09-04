@@ -17,10 +17,18 @@
       return;
     }
 
+    // 접힌 판은 opacity 0 + overflow hidden 이라 눈에는 안 보이지만 DOM 에는 남는다.
+    // inert 를 걸어 탭 순서와 스크린리더에서도 빼 준다 — 안 그러면 안 보이는 입력칸에
+    // 초점이 들어가 글자를 치게 된다(캡슐·보내기 버튼도 같은 문제였다).
+    var foldClosed = panel.querySelector(".ai-fold-closed");
+    var foldOpen = panel.querySelector(".ai-fold-open");
+
     function apply(open) {
       panel.classList.toggle("is-open", open);
       button.setAttribute("aria-expanded", open ? "true" : "false");
       button.setAttribute("aria-label", open ? "요약 접기" : "요약 펼치기");
+      if (foldClosed) { foldClosed.inert = open; }
+      if (foldOpen) { foldOpen.inert = !open; }
     }
 
     apply(false);

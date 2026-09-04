@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/static/woff2/SUIT.css" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" />
   <link rel="stylesheet" href="../assets/css/tokens.css?v=3be2ee40" />
-  <link rel="stylesheet" href="../assets/css/app-shell.css?v=05408b8b" />
+  <link rel="stylesheet" href="../assets/css/app-shell.css?v=ee1db901" />
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
@@ -238,7 +238,8 @@
                     </div>
 
                     <div class="ai-input">
-                      <span class="ai-input-ph">무엇이든 물어보세요</span>
+                      <input type="text" class="ai-input-ph" placeholder="무엇이든 물어보세요"
+                             aria-label="Delta 에게 묻기" autocomplete="off" data-ai-ask />
                       <button type="button" class="ai-send" aria-label="보내기">
                         <span class="i i-16" style="--i:var(--ic-arrow-right)"></span>
                       </button>
@@ -318,7 +319,7 @@
 
 <script src="../assets/js/theme.js?v=dcf8f460"></script>
 <script src="../assets/js/prism-orb.js?v=03386460"></script>
-<script src="../assets/js/screen.js?v=41174bed"></script>
+<script src="../assets/js/screen.js?v=b72b6f01"></script>
 <script src="../assets/js/map.js?v=90aa04ab"></script>
 <script src="../assets/js/grid-overlay.js?v=164e4f2a"></script>
 </body>

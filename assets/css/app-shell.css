@@ -1561,13 +1561,37 @@ button {
   color: var(--fg-secondary);
 }
 
-/* placeholder — Body/3 (14/22), fg/secondary. */
+/*
+ * 치는 칸 — Figma 엔 안내 문구 한 줄만 그려져 있다. 실제 <input> 으로 뒀다.
+ * 안내 문구는 Body/3 (14/22) fg/secondary 그대로고, 친 글자만 fg/primary 로 올라온다
+ * (.ai-line-* 와 같은 색이다 — 안 그러면 친 글자가 안내 문구와 같은 농도로 읽힌다).
+ * 칸 높이는 이 줄이 아니라 오른쪽 보내기 버튼(32)이 정한다. 22 -> input 이어도 그대로다.
+ */
 .ai-input-ph {
   flex: 1 1 auto;
   min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--fg-primary);
+  font-family: inherit;
   font-size: var(--font-size-14);
   line-height: var(--font-line-height-22);
   font-weight: var(--font-weight-regular);
+}
+
+.ai-input-ph::placeholder { color: var(--fg-secondary); opacity: 1; }
+
+/*
+ * 초점 링은 input 이 아니라 칸 전체에 두른다 — input 에 두르면 칸의 파란 그라데이션
+ * 테두리 안쪽에 링이 하나 더 생겨 두 겹으로 보인다.
+ */
+.ai-input-ph:focus { outline: none; }
+
+.ai-input:focus-within {
+  outline: var(--border-width-strong) solid var(--border-focus);
+  outline-offset: 1px;
 }
 
 /* Send — 흰 면 버튼(secondary), 어두운 arrow-right 16. Figma 432:7275 (Accent 인스턴스 fill 을 #FFFFFF 로 덮음). */
