@@ -2898,7 +2898,11 @@ input.field-box { outline: 0; }
   background-color: var(--bg-surface-subtle);
 }
 
-/* 아이콘 16 + 대수 둘, 사이 4. Figma 는 가운뎃점 없이 두 덩이를 띄워 둔다. */
+/*
+ * 아이콘 16 + 연결 대수 + 수행 대수 배지, 사이 4.
+ * Figma 710:24540 에서 수행 대수가 맨 글자에서 Badge(Info · Emphasis=Text)로 바뀌었다 —
+ * 점이 붙으면서 줄 높이가 18 에서 26 이 된다. 바 높이(36)는 그대로다.
+ */
 .robot-counts {
   flex: 1 1 auto;
   min-width: 0;

@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/static/woff2/SUIT.css" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" />
   <link rel="stylesheet" href="../assets/css/tokens.css?v=e254913d" />
-  <link rel="stylesheet" href="../assets/css/app-shell.css?v=b08c6b8e" />
+  <link rel="stylesheet" href="../assets/css/app-shell.css?v=16676936" />
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
@@ -328,10 +328,11 @@
                 <div class="robot-list">
 
                   <div class="robot-bar">
+                    <!-- Figma 710:24540 — 수행 대수가 맨 글자에서 Badge(Info · Emphasis=Text)로 바뀌었다. -->
                     <p class="robot-counts t-caption">
                       <span class="i i-16" style="--i:var(--ic-bot)" aria-hidden="true"></span>
                       <span>8대 연결</span>
-                      <span>2대 수행 중</span>
+                      <span class="badge badge-info t-caption"><span class="badge-dot"></span>2대 수행중</span>
                     </p>
                     <button type="button" class="btn btn-ghost" data-modal-open="robots" data-robot-more>로봇 더보기</button>
                   </div>
