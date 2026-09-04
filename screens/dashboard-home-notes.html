@@ -1210,9 +1210,9 @@
   <table>
     <tr><th>화면</th><th>상태</th><th>태그</th></tr>
     <tr><td>미션 설정</td><td><strong>Info(파랑)</strong> — <code>.ai-panel</code></td>
-        <td>지난 순회 기준 · 추천 4건</td></tr>
+        <td>인계 알림 3건 · 예정 미션 1건</td></tr>
     <tr><td>사전 점검</td><td><strong>Info(파랑)</strong> — <code>.ai-panel</code></td>
-        <td>사전 점검 진행 중 · 4개 항목</td></tr>
+        <td>인계 알림 3건 · 예정 미션 1건</td></tr>
     <tr><td>미션 모니터링</td><td><strong>Warning(노랑)</strong> — <code>.ai-panel.is-warning</code></td>
         <td>원인 분석 완료 · 후보 1건 확인</td></tr>
   </table>
@@ -1236,15 +1236,26 @@
     <code>prism-orb.js</code> 를 추가했습니다 — 없으면 자리표시자 원만 남습니다.
   </p>
   <p>
-    <strong>멘트는 제가 썼습니다.</strong> Figma 본문은 <code>DELTA의 분석 결과를 입력하세요.</code>
-    라는 자리표시 문장이라 화면별로 쓸 수 없습니다. 세 화면이 이어졌을 때
-    <strong>같은 상대와 이어서 말하는 것</strong>으로 읽히게 인사 한 줄 + 본문 한 줄 형태를 지켰습니다.
-    <strong>본문은 펼침(20/32)에서 한 줄에 들어가는 길이로 잘랐습니다</strong> —
-    넘치면 마지막 두 글자만 다음 줄로 떨어집니다.
+    <strong>멘트는 세 화면이 하나입니다.</strong> 처음에는 화면마다 다르게 썼는데
+    (설정은 점검항목 추천, 점검은 진행 상황) <strong>같은 문구로 통일했습니다</strong> —
+    <code>screen.js</code> 의 <code>NORMAL_LINE_1</code> · <code>NORMAL_LINE_2</code> 그대로,
+    관제 화면에서 [확인]을 누른 뒤 나오는 그 문구입니다.
+  </p>
+  <table>
+    <tr><td>인사</td><td>안녕하세요, 홍길동 님.</td></tr>
+    <tr><td>본문</td><td>인계된 알림 3건과 진행 예정인 미션 1건이 있어요. 먼저 살펴볼까요?</td></tr>
+  </table>
+  <p>
+    Figma 본문이 <code>DELTA의 분석 결과를 입력하세요.</code> 라는 자리표시 문장이라
+    어차피 화면에 쓸 수 없습니다. <strong>태그도 같이 <code>NORMAL_TAG</code> 로 맞췄습니다</strong> —
+    "추천 4건" 같은 화면별 태그를 남겨 두면 본문의 "알림 3건 · 미션 1건" 과 숫자가 어긋납니다.
+    <strong>캡슐 세 개만 화면별로 다릅니다</strong> — 저 문구는 Delta 가 하는 말이고
+    캡슐은 운영자가 물을 만한 말이라 화면 맥락을 따라가는 편이 맞습니다.
   </p>
   <p>
-    확정된 문안이 오면 두 화면의 <code>.ai-line-1</code> · <code>.ai-line-2</code> 와
-    <code>[data-ai-tag-text]</code>, 캡슐 세 개만 갈면 됩니다.
+    닫힘·펼침 모두 <strong>본문이 한 줄에 들어갑니다</strong>(펼침 20/32 에서 실측).
+    문안을 갈 때는 이 길이를 넘지 않는지 보셔야 합니다 — 넘치면 마지막 몇 글자만
+    다음 줄로 떨어집니다.
   </p>
 
   <h3>10. Figma 정리 — 이름 · 설명 · 토큰 바인딩</h3>
