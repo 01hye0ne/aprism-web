@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>스플래시 · 로그인 · 퍼블리싱 노트 — APRISM</title>
+  <title>스플래시 · 로그인 · 비밀번호 변경 · 퍼블리싱 노트 — APRISM</title>
   <meta name="description" content="진입 화면 Figma 기준 반영 내역과 고친 지점" />
   <link rel="stylesheet" href="../assets/css/tokens.css?v=3be2ee40" />
   <link rel="stylesheet" href="../assets/css/base.css?v=0f3be04f" />
@@ -245,9 +245,100 @@
       관제실 기준이 1920 이라 별도 화면을 그리는 대신 무너지지만 않게 했습니다.</li>
   </ul>
 
+
+  <h3>12. 비밀번호 변경 강제 화면 (677:7468)</h3>
+  <p>
+    비밀번호 사용 기간이 만료된 계정이 보는 화면입니다. 브랜드 면 · 카드 · 입력칸 · Help 는
+    로그인과 같은 부품이라 <b>새로 만든 것은 넷</b>입니다 — 경고 알림, 규칙 네 줄,
+    Danger 버튼, 카드 밑 링크.
+  </p>
+
+  <h3>12-1. 카드가 오른쪽 칸의 가운데에 섭니다</h3>
+  <p>
+    로그인 카드는 브랜드 면 끝에서 <b>9 만 띄우고 왼쪽에 붙는데</b>, 이 화면은 다릅니다.
+    오른쪽 칸 <code>1129..1921</code>(792) 안에서 카드가 <code>1291..1759</code>(468) 라
+    <b>양옆이 162 로 같습니다.</b> 가운데 정렬로 두고, 왼쪽 9 는 그대로 둔 채
+    오른쪽 패딩을 0 으로 잡아 <b>1290.5</b> 에 세웠습니다(Figma 1291).
+  </p>
+
+  <h3>12-2. 알림은 Header 안입니다 — 블록이 아닙니다</h3>
+  <p>
+    <code>Inline Notice</code> 가 카드의 독립 블록처럼 보이지만 <code>Header</code>(677:7067)의
+    <b>세 번째 자식</b>입니다. 그래서 부제와의 간격이 블록 간격 40 이 아니라 <b>8</b> 입니다
+    (제목 y0 → 부제 y48 → 알림 y78, 둘 다 8).
+  </p>
+
+  <h3>12-3. 규칙 네 줄은 상태를 가집니다</h3>
+  <p>
+    Figma 스냅숏은 <b>첫 줄만 초록</b>(<code>status/normal/fg</code>)이고 나머지 셋은
+    <b>회색</b>(<code>fg/disabled</code>)입니다. 글자는 넷 다 <code>fg/secondary</code> 로 같습니다.
+    체크 아이콘 색으로 <b>채워진 줄과 아닌 줄을 가르는 화면</b>이라는 뜻이라, 친 값에 따라
+    네 줄을 실시간으로 켜고 끕니다. 비어 있는 첫 화면에서는 넷 다 회색입니다 —
+    Figma 스냅숏은 4자 이상을 이미 친 상태를 그린 것입니다.
+  </p>
+  <table>
+    <tr><th>규칙</th><th>여기서 보는 것</th></tr>
+    <tr><td>4자 이상</td><td>길이</td></tr>
+    <tr><td>영문 · 숫자 · 특수문자 중 2종 이상</td><td>세 갈래 중 섞인 갈래 수</td></tr>
+    <tr><td>아이디와 3자 이상 연속 일치 금지</td><td><b>로그인에서 친 아이디</b>의 3글자 창을 훑습니다</td></tr>
+    <tr><td>최근 비밀번호와 중복 금지</td><td><b>위 칸의 현재 비밀번호</b>와 같은지</td></tr>
+  </table>
+  <p>
+    셋째 줄은 이 화면에 아이디 칸이 없어서 볼 값이 없습니다. 그래서 로그인에서 넘어올 때
+    <b>친 아이디만</b> <code>sessionStorage</code> 에 남깁니다(비밀번호는 남기지 않습니다).
+    바로 이 주소로 들어와 아이디를 모르면 <b>어길 것이 없어 통과</b>로 봅니다.
+  </p>
+  <p>
+    넷째 줄의 "최근"은 이 화면이 아는 범위가 <b>현재 비밀번호 한 칸뿐</b>입니다.
+    그 이전 이력은 서버가 볼 자리입니다.
+  </p>
+
+  <h3>12-4. 버튼은 Danger 이고, Figma 는 Disabled 상태로 그려져 있습니다</h3>
+  <p>
+    <code>Type=Danger, Size=Large, State=Disabled</code> 입니다. 규칙을 채우기 전 상태를
+    그려 둔 것으로 보고, <b>네 줄이 다 켜지고 새 비밀번호 두 번이 같을 때</b> 열리게 했습니다.
+    열린 모습은 같은 컴포넌트의 <code>State=Default</code>(<code>button/danger/bg/default</code>)입니다.
+    <code>hover</code> 는 Figma 에 변형이 없어 다른 버튼들과 맞춰 더했습니다
+    (<code>button/danger/bg/hover</code> 는 이미 토큰에 있습니다).
+  </p>
+
+  <h3>12-5. "다른 계정으로 로그인" 은 카드 밖입니다</h3>
+  <p>
+    이름이 <code>Copyright</code> 인데 내용은 링크이고, 로그인의 저작권 줄과 달리
+    <b>카드 안이 아니라 카드 밖</b>입니다 — 카드 하단 904.5 에서 <b>20 아래</b>인 924.5 에,
+    카드 폭 기준 가운데로 놓여 있습니다. 색도 <code>fg/brand</code> 라 링크로 보고
+    <code>login.html</code> 로 걸었습니다.
+  </p>
+
+  <h3>12-6. 현재 비밀번호 칸의 점 여덟 개는 placeholder 로 내렸습니다</h3>
+  <p>
+    Figma 는 <code>Value</code> 자리에 <code>••••••••</code> 를 <code>fg/primary</code> 로
+    적어 두었습니다. 나머지 두 칸이 안내 문구인 것과 같은 자리라 <b>친 값이 아니라 목업</b>으로 보고,
+    위 6번과 같은 규칙으로 <b>"현재 비밀번호를 입력하세요" placeholder</b> 로 바꿨습니다.
+  </p>
+
+  <h3>12-7. 같이 고친 것</h3>
+  <ul>
+    <li><b>눈 아이콘이 한 칸에서만 먹었습니다.</b> <code>auth.js</code> 가
+      <code>querySelector</code> 로 첫 하나만 잡고 있었습니다. 이 화면은 칸이 셋이라
+      <code>querySelectorAll</code> 로 바꿨습니다 — 로그인 쪽 동작은 그대로입니다.</li>
+    <li><b>카드가 창보다 커질 수 있습니다.</b> 로그인 카드는 613 인데 이 카드는 825 입니다.
+      <code>.auth</code> 가 <code>overflow:hidden</code> 이라 낮은 화면에서 잘리므로,
+      카드가 앉는 칸만 세로로 스크롤되게 했습니다.</li>
+  </ul>
+
+  <h3>12-8. 흐름</h3>
+  <p>
+    붙일 서버가 없어서 값을 보내지 않고 <code>mission-setup.html</code> 로 넘깁니다 — 로그인과 같은 자리입니다.
+    <b>로그인에서 이 화면으로 보내는 분기는 넣지 않았습니다</b> — 지금 로그인은 여전히
+    바로 미션 설정으로 갑니다. 만료 계정을 여기로 보내는 조건은 서버가 정할 자리라
+    말씀 주시면 그때 잇겠습니다.
+  </p>
+
 </section>
     <p class="notes open" style="max-width:880px;margin:0 auto;padding:0 var(--space-20) 64px">
       <a class="screen-name" href="./login.html">로그인 보기 →</a>
+      <a class="screen-name" href="./password-expired.html">비밀번호 변경 보기</a>
       <a class="screen-name" href="./splash.html?hold=0">스플래시 보기</a>
       <a class="screen-name" href="../index.html">목록으로</a>
     </p>

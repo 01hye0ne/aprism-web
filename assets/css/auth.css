@@ -125,10 +125,14 @@
 .auth-panel {
   flex: 1 1 auto;
   min-width: 0;
+  min-height: 0;
   display: flex;
   align-items: center;
   justify-content: flex-start;
   padding: var(--space-24) var(--space-24) var(--space-24) 9px;
+  /* .auth 가 overflow:hidden 이라, 카드가 창보다 큰 낮은 화면에서는
+     자르는 대신 이 칸만 세로로 스크롤한다(로그인의 468x613 보다 큰 카드가 생기면서 필요해졌다). */
+  overflow-y: auto;
 }
 
 /*
@@ -329,6 +333,111 @@
   outline: var(--border-width-strong) solid var(--border-focus);
   outline-offset: 2px;
 }
+
+/*
+ * 위험(Danger) 변형 — 비밀번호 변경 강제 화면(677:7468)의 "변경하고 시작하기".
+ * 모양은 위 기본값과 같고 색만 button/danger 로 간다. Figma 는 Default · Disabled
+ * 둘만 그려 뒀다 — hover 는 다른 버튼들과 맞춰 여기서 더했다(button/danger/bg/hover 는
+ * 이미 토큰에 있다).
+ */
+.login-submit.is-danger {
+  border-color: transparent;
+  background-color: var(--button-danger-bg-default);
+  color: var(--button-danger-fg-default);
+}
+
+.login-submit.is-danger:hover { background-color: var(--button-danger-bg-hover); }
+.login-submit.is-danger:active { background-color: var(--button-danger-bg-pressed); }
+
+/* 규칙을 다 채우기 전에는 눌러도 반응이 없다 — Figma 실측 그대로 State=Disabled. */
+.login-submit.is-danger:disabled {
+  background-color: var(--button-danger-bg-disabled);
+  color: var(--button-danger-fg-disabled);
+  cursor: not-allowed;
+}
+
+/*
+ * 비밀번호 변경 화면은 카드가 오른쪽 칸의 가운데에 선다 — 로그인처럼 왼쪽에 붙지 않는다.
+ * Figma 실측: 오른쪽 칸 1129..1921(792), 카드 1291..1759(468)로 양쪽이 162 로 같다.
+ * 왼쪽 9 만 두고 오른쪽 패딩을 0 으로 두면 1129..1920 의 한가운데가 1290.5 라
+ * Figma 의 1291 과 0.5 안쪽에서 맞는다.
+ */
+.auth-panel.is-centered {
+  justify-content: center;
+  padding-right: 0;
+}
+
+/*
+ * 카드 아래 링크 — "다른 계정으로 로그인"(677:7433). 로그인 화면의 Copyright 와 달리
+ * 카드 안이 아니라 카드 밖, 20 아래에 따로 놓인 글줄이다(카드 하단 904.5 + 20 = 924.5).
+ * 그래서 .login-card 를 감싸는 세로 스택을 하나 더 두고, 카드 폭에 맞춰 가운데 정렬한다.
+ */
+.auth-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-20);
+}
+
+.auth-switch {
+  margin: 0;
+  color: var(--fg-brand);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.auth-switch:hover { text-decoration: underline; }
+
+.auth-switch:focus-visible {
+  outline: var(--border-width-thin) solid var(--border-focus);
+  outline-offset: 2px;
+}
+
+/*
+ * 비밀번호 규칙 안내(677:7410) — 줄 색은 넷 다 fg/secondary 로 같고, 체크 아이콘만
+ * 채워진 줄과 아닌 줄로 갈린다. Figma 스냅숏이 그 두 색을 다 그려 뒀다:
+ * 첫 줄 status/normal/fg(초록) · 나머지 셋 fg/disabled(회색).
+ * 그래서 아이콘 기본값을 회색으로 두고 .is-met 일 때만 초록으로 올린다.
+ */
+.pw-rules {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pw-rule {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  padding: var(--space-4) 0;
+  color: var(--fg-secondary);
+}
+
+.pw-rule .i {
+  color: var(--fg-disabled);
+  transition: color 120ms ease;
+}
+
+.pw-rule.is-met .i { color: var(--status-normal-fg); }
+
+@media (prefers-reduced-motion: reduce) {
+  .pw-rule .i { transition: none; }
+}
+
+/*
+ * Inline Notice — Severity=Warning(677:7838). 기본 .inline-notice 는
+ * Severity=Info 색(#6AA7E7)이라 여기서 경고 톤으로 덮는다. 다른 화면의
+ * .ai-panel.is-warning 과 같은 토큰 조합이다 — 태두리만 이 컴포넌트에서 새로 붙는다.
+ */
+.inline-notice.is-warning {
+  border: var(--border-width-thin) solid var(--status-warning-border);
+  background-color: var(--status-warning-bg);
+  color: var(--status-warning-fg);
+}
+
+.inline-notice.is-warning .i { color: var(--status-warning-icon); }
 
 /* Figma "Help" — Divider + 문의 문구, gap 16. */
 .login-help {
