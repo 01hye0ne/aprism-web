@@ -190,6 +190,64 @@
               </div>
             </div>
 
+            <!-- AI Assist Panel · Figma UI_00 Design System 121:665.
+                 Severity 는 기본(Info, 파랑)이다 — 미션 모니터링에서만 is-warning 으로 간다.
+                 closed 의 [확인]은 주의 알림을 받았다는 응답이라 파란 상태에는 없다. -->
+            <section class="ai-panel" data-ai-panel aria-label="Delta AI 요약">
+
+              <div class="ai-delta">
+                <span class="ai-delta-mark" aria-hidden="true"><i></i></span>
+                <span class="ai-delta-label">DELTA</span>
+              </div>
+
+              <div class="ai-header">
+                <span class="ai-tag">
+                  <span class="i i-16" aria-hidden="true"></span>
+                  <span data-ai-tag-text>사전 점검 진행 중 · 4개 항목</span>
+                </span>
+                <button type="button" class="ai-toggle" data-ai-toggle
+                        aria-expanded="false" aria-controls="ai-box" aria-label="요약 펼치기">
+                  <span class="i i-20" style="--i:var(--ic-chevron-down)"></span>
+                </button>
+              </div>
+
+              <div class="ai-box" id="ai-box">
+                <span class="ai-spectrum" aria-hidden="true"></span>
+
+                <div class="ai-fold ai-fold-closed">
+                  <div><div class="ai-message">
+                    <div class="ai-lines">
+                      <p class="ai-line-1">안녕하세요, 홍길동 님</p>
+                      <p class="ai-line-2">네 가지 항목을 확인하고 있어요. 모두 정상이면 바로 미션을 시작합니다.</p>
+                    </div>
+                  </div></div>
+                </div>
+
+                <div class="ai-fold ai-fold-open">
+                  <div><div class="ai-opened">
+                    <div class="ai-content">
+                      <div class="ai-lines">
+                        <p class="ai-headline ai-line-1">안녕하세요, 홍길동 님</p>
+                        <p class="ai-headline ai-line-2">네 가지 항목을 확인하고 있어요. 모두 정상이면 바로 미션을 시작합니다.</p>
+                      </div>
+                      <div class="ai-suggestions">
+                        <button type="button" class="ai-chip">점검이 실패하면 어떻게 돼?</button>
+                        <button type="button" class="ai-chip">ROBOT 02 상태 보여줘</button>
+                        <button type="button" class="ai-chip">각 항목이 무엇을 보는 거야?</button>
+                      </div>
+                    </div>
+
+                    <div class="ai-input">
+                      <span class="ai-input-ph">무엇이든 물어보세요</span>
+                      <button type="button" class="ai-send" aria-label="보내기">
+                        <span class="i i-16" style="--i:var(--ic-arrow-right)"></span>
+                      </button>
+                    </div>
+                  </div></div>
+                </div>
+              </div>
+            </section>
+
           </section>
 
           <!-- ---------- Mission Panel · 사전 점검 ---------- -->
@@ -259,6 +317,7 @@
 
 
 <script src="../assets/js/theme.js?v=dcf8f460"></script>
+<script src="../assets/js/prism-orb.js?v=03386460"></script>
 <script src="../assets/js/screen.js?v=41174bed"></script>
 <script src="../assets/js/map.js?v=90aa04ab"></script>
 <script src="../assets/js/grid-overlay.js?v=164e4f2a"></script>

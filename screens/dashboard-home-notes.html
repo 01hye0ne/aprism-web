@@ -1201,6 +1201,52 @@
     raw white 인 것도 마찬가지입니다 — Light 에서 밝은 면 위 흰 글자가 됩니다.
   </p>
 
+  <h3>9-1. Delta 를 미션 설정 · 사전 점검에도 놓았습니다 — 파란 상태</h3>
+  <p>
+    <strong>Delta 가 관제 화면에만 있었습니다.</strong> 미션을 만들고 점검하는 두 화면에는 없다가
+    모니터링에 들어와야 나타나니, 운영자 입장에서는 <strong>사고가 나야 등장하는 존재</strong>가 됩니다.
+    같은 패널을 세 화면에 이어 두고 <strong>심각도만 바뀌게</strong> 했습니다.
+  </p>
+  <table>
+    <tr><th>화면</th><th>상태</th><th>태그</th></tr>
+    <tr><td>미션 설정</td><td><strong>Info(파랑)</strong> — <code>.ai-panel</code></td>
+        <td>지난 순회 기준 · 추천 4건</td></tr>
+    <tr><td>사전 점검</td><td><strong>Info(파랑)</strong> — <code>.ai-panel</code></td>
+        <td>사전 점검 진행 중 · 4개 항목</td></tr>
+    <tr><td>미션 모니터링</td><td><strong>Warning(노랑)</strong> — <code>.ai-panel.is-warning</code></td>
+        <td>원인 분석 완료 · 후보 1건 확인</td></tr>
+  </table>
+  <p>
+    <strong>파랑이 Figma 의 기본값입니다.</strong> 컴포넌트(121:665)에 그려져 있는 유일한 모습이
+    이 파란 상태이고, 노랑은 이 시스템에서 얹은 심각도 변형입니다. 그래서 새로 만든 두 화면은
+    <strong>클래스를 하나도 안 붙인 <code>.ai-panel</code></strong> 그대로입니다 — 파랑을 위해
+    따로 쓴 CSS 가 없습니다.
+  </p>
+  <p>
+    <strong>닫힘 상태의 [확인] 버튼은 두 화면에 안 넣었습니다.</strong> Figma 파란 상태에는 있지만,
+    이 시스템에서 [확인]은 <strong>주의 알림을 받았다는 응답</strong>입니다 — 누르면 노랑이 파랑으로
+    돌아갑니다. 설정·점검 화면에는 받을 알림이 없어서 누를 것이 없습니다.
+    (CSS 에도 <code>.ai-panel:not(.is-warning) .ai-ack { display: none }</code> 이 이미 있어
+    넣어도 안 보이지만, 마크업에서 아예 뺐습니다.)
+  </p>
+  <p>
+    <strong>Delta 오브 색은 클래스를 따라갑니다.</strong> <code>screen.js</code> 의
+    <code>severity()</code> 가 패널 클래스를 읽어 팔레트를 고르므로,
+    두 화면은 <code>PALETTES.info</code> 로 뜹니다. 두 화면에
+    <code>prism-orb.js</code> 를 추가했습니다 — 없으면 자리표시자 원만 남습니다.
+  </p>
+  <p>
+    <strong>멘트는 제가 썼습니다.</strong> Figma 본문은 <code>DELTA의 분석 결과를 입력하세요.</code>
+    라는 자리표시 문장이라 화면별로 쓸 수 없습니다. 세 화면이 이어졌을 때
+    <strong>같은 상대와 이어서 말하는 것</strong>으로 읽히게 인사 한 줄 + 본문 한 줄 형태를 지켰습니다.
+    <strong>본문은 펼침(20/32)에서 한 줄에 들어가는 길이로 잘랐습니다</strong> —
+    넘치면 마지막 두 글자만 다음 줄로 떨어집니다.
+  </p>
+  <p>
+    확정된 문안이 오면 두 화면의 <code>.ai-line-1</code> · <code>.ai-line-2</code> 와
+    <code>[data-ai-tag-text]</code>, 캡슐 세 개만 갈면 됩니다.
+  </p>
+
   <h3>10. Figma 정리 — 이름 · 설명 · 토큰 바인딩</h3>
   <p>
     작업하면서 눈에 걸린 것들을 Figma 에서 직접 정리했습니다.
