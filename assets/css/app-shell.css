@@ -1951,7 +1951,37 @@ button {
  * 원뿔 마스크는 뺐다 — 이제 네 변에 오브 색이 다 돈다. 이 선은 안 뛴다.
  * 뛰는 건 안으로 달려가는 선이고 테두리는 자리를 지킨다. 둘 다 움직이면 테두리가 흔들려 보인다.
  */
-.two-col.is-warning::after {
+/*
+ * 위험(Critical) — E-STOP 이 걸린 상태다. 짜임은 주의와 같고 색만 다르다.
+ * 값은 같은 방식으로 뽑았다 — PALETTES.critical 한 바퀴를 여덟 등분한 stop 이다.
+ * 자리(radial 좌표)도 주의와 같게 둬서 두 상태가 같은 무늬로 읽힌다.
+ */
+.two-col.is-critical {
+  --pulse-from: 3px;
+  --pulse-to: 8px;
+
+  /* 팔레트의 기준 자리(#F05937 = hsl(11 86% 58%))에서 명도만 80% 로 올린 값. */
+  --glow-color: hsl(11deg 86% 80% / 100%);
+  --glow-color-60: hsl(11deg 86% 80% / 60%);
+  --glow-color-40: hsl(11deg 86% 80% / 40%);
+  --glow-color-20: hsl(11deg 86% 80% / 20%);
+
+  --gradient-one: radial-gradient(at 80% 55%, #d96f5e 0px, transparent 50%);
+  --gradient-two: radial-gradient(at 69% 34%, #a3687b 0px, transparent 50%);
+  --gradient-three: radial-gradient(at 8% 6%, #d9321d 0px, transparent 50%);
+  --gradient-four: radial-gradient(at 41% 38%, #f05937 0px, transparent 50%);
+  --gradient-five: radial-gradient(at 86% 85%, #6d487c 0px, transparent 50%);
+  --gradient-six: radial-gradient(at 82% 18%, #a3121e 0px, transparent 50%);
+  --gradient-seven: radial-gradient(at 51% 4%, #572262 0px, transparent 50%);
+  --gradient-base: linear-gradient(#f05937 0 100%);
+
+  box-shadow:
+    0 0 0 1px rgb(217 111 94 / 60%),
+    0 0 8px -3px rgb(240 89 55 / 30%);
+}
+
+.two-col.is-warning::after,
+.two-col.is-critical::after {
   content: "";
   position: absolute;
   inset: 0;
@@ -1990,7 +2020,8 @@ button {
  * 달려가는 선 둘을 담는 자리. .two-col 의 상자와 정확히 겹쳐야
  * 아래 키프레임의 inset 이 테두리에서 잰 거리가 된다.
  */
-.two-col.is-warning > .edge-light {
+.two-col.is-warning > .edge-light,
+.two-col.is-critical > .edge-light {
   display: block;
   inset: 0;
   z-index: 3;
@@ -2005,7 +2036,9 @@ button {
  * 여기 적은 box-shadow 는 애니메이션이 꺼졌을 때 남을 모습이다(아래 reduced-motion).
  */
 .two-col.is-warning > .edge-light::before,
-.two-col.is-warning > .edge-light::after {
+.two-col.is-warning > .edge-light::after,
+.two-col.is-critical > .edge-light::before,
+.two-col.is-critical > .edge-light::after {
   content: "";
   position: absolute;
   inset: 2px;
@@ -2022,7 +2055,8 @@ button {
 }
 
 /* 2번 줄 — 1번이 자란 구간의 40%(5px)까지 왔을 때 똑같이 시작한다. 그 자리가 256ms 다. */
-.two-col.is-warning > .edge-light::after {
+.two-col.is-warning > .edge-light::after,
+.two-col.is-critical > .edge-light::after {
   animation-delay: 256ms;
 }
 
@@ -2060,6 +2094,42 @@ button {
     #9C7D6B 62.5%, #CBAD61 75%, #EEC242 87.5%, #F2B020 100%;
 }
 
+/*
+ * AI 패널 위험 변형 — Figma paint style "Gradient/Danger" 를 그대로 옮겼다
+ * (0% #D95C00@10 · 55% #F03918@20 · 90% #F2412E@40 · 95% #F4463F@60 · 100% #F4463F).
+ * 주의가 Gradient/Warning 을 쓰는 것과 같은 자리다.
+ */
+.ai-panel.is-critical .ai-box {
+  background-image: linear-gradient(
+    180deg,
+    rgb(217 92 0 / 10%) 0%,
+    rgb(240 57 24 / 20%) 55%,
+    rgb(242 65 46 / 40%) 90%,
+    rgb(244 70 63 / 60%) 95%,
+    rgb(244 70 63) 100%
+  );
+  box-shadow: inset 0 -8px 20px -8px rgb(240 57 24 / 50%);
+
+  --ai-input-edge: linear-gradient(90deg,
+    var(--status-critical-border) 0%,
+    #f4463f 25%,
+    var(--color-danger-500) 46%,
+    var(--status-critical-border) 72%,
+    #f4463f 100%);
+  /* PALETTES.critical 을 같은 방식으로 훑은 값. */
+  --ai-spectrum-ramp:
+    #F05937 0%, #D9321D 12.5%, #A3121E 25%, #6D0B3B 37.5%, #572262 50%,
+    #6D487C 62.5%, #A3687B 75%, #D96F5E 87.5%, #F05937 100%;
+}
+
+/* 태그는 alert/danger 짝을 그대로 쓴다 — 주의 쪽이 하드코딩이라 여기서는 토큰으로 뒀다. */
+.ai-panel.is-critical .ai-tag {
+  background-color: var(--alert-danger-bg);
+  color: var(--alert-danger-fg);
+}
+
+.ai-panel.is-critical .ai-tag .i { --i: var(--ic-warning); }
+
 /* 움직임을 줄이도록 설정한 환경에서는 전환 없이 바로 바뀐다. */
 @media (prefers-reduced-motion: reduce) {
   .ai-panel, .ai-fold, .ai-toggle, .ai-toggle .i,
@@ -2075,8 +2145,10 @@ button {
   .ai-spectrum { transform: none; }
   /* 한 쌍을 태어난 자리에 세워 두고 나머지는 뺀다. 통째로 감추면 이 설정을 켠 사람에게만
      1px 테두리 말고는 아무것도 안 남는다 — 주의 상태가 안 보이는 것과 같다. */
-  .two-col.is-warning > .edge-light::before { animation: none; opacity: 1; }
-  .two-col.is-warning > .edge-light::after { animation: none; display: none; }
+  .two-col.is-warning > .edge-light::before,
+  .two-col.is-critical > .edge-light::before { animation: none; opacity: 1; }
+  .two-col.is-warning > .edge-light::after,
+  .two-col.is-critical > .edge-light::after { animation: none; display: none; }
   /* 사전 점검 게이지는 차오르지 않고 바로 꽉 찬 채로 선다 —
      대기(빈 링) · 확인중(찬 링) · 완료(체크) 구분은 그대로 남는다. */
   .precheck-row.is-running .i { animation: none; --precheck-fill: 360deg; }

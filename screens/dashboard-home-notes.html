@@ -1704,9 +1704,66 @@
     안 보이는 곳에 초점을 두면 다음 탭이 화면 맨 앞에서 다시 시작합니다.
   </p>
   <p>
-    <strong>[중지하기]는 닫기만 합니다.</strong> 서버가 없는 퍼블리싱이라
-    "정지됨" 화면이 아직 없습니다. <code>[data-modal-confirm]</code> 에 갈 곳을 적으면
-    거기로 갑니다 — 로그아웃은 <code>login.html</code> 이 적혀 있습니다.
+    <strong>[중지하기]를 누르면 Delta 가 위험(critical)으로 넘어갑니다.</strong>
+    화면 테두리도 같이 빨개집니다.
+  </p>
+  <table>
+    <tr><th></th><th>값</th></tr>
+    <tr><td>첫 줄</td><td>비상정지 발동 — 로봇 구동이 차단되었습니다</td></tr>
+    <tr><td>둘째 줄</td><td>현장 안전을 확인한 뒤 해제 절차를 진행하세요.</td></tr>
+    <tr><td>태그</td><td><b>비상정지 발동 · 해제 절차 필요</b> — 못 받아서 제가 썼습니다</td></tr>
+  </table>
+  <p>
+    <strong>두 줄이 제 자리에 들어갔습니다.</strong> 이 패널은 첫 줄이 상황,
+    둘째 줄이 할 일입니다(둘째 줄만 볼드입니다). 모달의
+    <code>현재 상태 문구 → 권장 조치</code> 와 같은 짜임이라 순서를 그대로 옮겼습니다.
+  </p>
+  <p>
+    <strong>[확인] 버튼은 안 뜹니다.</strong> 주의 상태에서만 나오게 돼 있는데,
+    <b>비상정지는 눌러서 지울 수 있는 게 아니라서</b> 그대로 맞습니다 —
+    해제하려면 현장 확인이 먼저입니다.
+  </p>
+  <p>
+    <strong>모달과 패널은 직접 안 엮었습니다.</strong> 서로 다른 닫힘(IIFE)이라
+    <code>document</code> 에 <code>aprism:estop</code> 이벤트를 쏘고 패널이 받습니다 —
+    앞으로 다른 자리에서도 같은 상태를 부를 수 있습니다.
+  </p>
+  <p>
+    로그아웃처럼 <b>갈 곳이 있는 모달</b>은 <code>[data-modal-confirm]</code> 에 주소를 적습니다
+    (<code>login.html</code>). <b>그 자리에서 상태만 바꾸는 모달</b>은
+    <code>[data-modal-then]</code> 에 이름을 적습니다 — 지금 <code>estop</code> 과
+    <code>recall</code> 둘입니다.
+  </p>
+
+  <p><b>위험(critical) 색은 어디서 왔나</b></p>
+  <table>
+    <tr><th>층</th><th>출처</th></tr>
+    <tr><td>상자 그라데이션</td><td>Figma paint style <b><code>Gradient/Danger</code></b> 그대로</td></tr>
+    <tr><td>태그</td><td><code>alert/danger/bg</code> · <code>alert/danger/fg</code></td></tr>
+    <tr><td>입력창 테두리</td><td><code>status/critical/border</code> · <code>danger/500</code></td></tr>
+    <tr><td>Spectrum · 엣지 글로우</td><td><b><code>PALETTES.critical</code></b> 한 바퀴를 여덟 등분</td></tr>
+  </table>
+  <p>
+    <strong>주의 상태를 만들 때 쓴 방법을 그대로 다시 썼습니다.</strong>
+    오브의 코사인 팔레트를 여덟 번 훑어 stop 으로 굳히는 방식인데,
+    같은 스크립트로 주의 값을 다시 뽑아 보니 <b>지금 CSS 에 있는 여덟 색과 한 자리도 안 틀립니다</b> —
+    그래서 위험 값도 믿고 씁니다.
+  </p>
+  <table>
+    <tr><th></th><th>주의</th><th>위험</th></tr>
+    <tr><td>기준 색</td><td><code>#F2B020</code></td><td><b><code>#F05937</code></b></td></tr>
+    <tr><td>선 색</td><td><code>hsl(41 89% 80%)</code></td><td><b><code>hsl(11 86% 80%)</code></b></td></tr>
+    <tr><td>바깥 링</td><td><code>#EEC242</code> 60%</td><td><b><code>#D96F5E</code> 60%</b></td></tr>
+  </table>
+  <p>
+    <strong>얼룩의 자리(radial 좌표)는 주의와 같게 뒀습니다.</strong> 색만 갈리고 무늬는 같아서
+    <b>두 상태가 같은 것의 다른 세기</b>로 읽힙니다. 두께·박자(2초)도 그대로입니다 —
+    <b>급을 올리는 축은 색 하나</b>입니다.
+  </p>
+  <p>
+    엣지 글로우의 짜임 규칙은 <code>.two-col.is-warning</code> 과 나눠 씁니다.
+    선택자만 넓혔고 <b>움직임 규칙은 한 벌</b>입니다 —
+    <code>prefers-reduced-motion</code> 처리도 같이 따라갑니다.
   </p>
 
   <p><b>토큰 하나가 Figma 와 어긋나 있었습니다 — 고쳤습니다</b></p>

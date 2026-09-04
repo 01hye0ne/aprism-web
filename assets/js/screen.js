@@ -54,6 +54,37 @@
     //
     // 첫 줄은 인사, 둘째 줄이 본문이다(닫힘 16/24, 펼침 20/32 — 크기는 CSS 가 정한다).
     // 닫힘·펼침 두 판에 같은 클래스가 하나씩 있어서 넷을 다 바꾼다.
+    var twoCol = panel.closest(".two-col");
+
+    // 첫 줄은 인사·상황, 둘째 줄이 본문이다(닫힘 16/24, 펼침 20/32 — 크기는 CSS 가 정한다).
+    // 닫힘·펼침 두 판에 같은 클래스가 하나씩 있어서 넷을 다 바꾼다.
+    function setLines(one, two) {
+      Array.prototype.slice.call(panel.querySelectorAll(".ai-line-1"))
+        .forEach(function (el) { el.textContent = one; });
+      Array.prototype.slice.call(panel.querySelectorAll(".ai-line-2"))
+        .forEach(function (el) { el.textContent = two; });
+    }
+
+    function setTag(text) {
+      var tag = panel.querySelector("[data-ai-tag-text]");
+      if (tag) { tag.textContent = text; }
+    }
+
+    // 심각도를 한 자리에서 갈아 끼운다 — 패널·화면(엣지 글로우)·오브 셋이 같이 간다.
+    function setSeverity(level) {
+      ["is-warning", "is-critical", "is-safe"].forEach(function (cls) {
+        panel.classList.remove(cls);
+        if (twoCol) { twoCol.classList.remove(cls); }
+      });
+      if (level) {
+        panel.classList.add("is-" + level);
+        if (twoCol) { twoCol.classList.add("is-" + level); }
+      }
+      if (orb) { orb.setPalette(severity()); }
+    }
+
+    // closed 상태의 [확인] — 주의 알림을 받았다는 응답. 누르면 화면·패널을 일반(파란) 상태로
+    // 되돌리고, 두 줄을 일반 상태 멘트로 바꿔다.
     var ack = panel.querySelector("[data-ai-ack]");
     if (ack) {
       var NORMAL_LINE_1 = "안녕하세요, 홍길동 님.";
@@ -61,25 +92,22 @@
       // 태그도 같이 바꾼다 — 주의 상태 문구가 그대로 남으면 새 멘트와 안 맞는다.
       var NORMAL_TAG = "인계 알림 3건 · 예정 미션 1건";
 
-      function setLines(one, two) {
-        Array.prototype.slice.call(panel.querySelectorAll(".ai-line-1"))
-          .forEach(function (el) { el.textContent = one; });
-        Array.prototype.slice.call(panel.querySelectorAll(".ai-line-2"))
-          .forEach(function (el) { el.textContent = two; });
-      }
-
       ack.addEventListener("click", function () {
-        panel.classList.remove("is-warning");
-        if (orb) { orb.setPalette(severity()); }
-        var twoCol = panel.closest(".two-col");
-        if (twoCol) {
-          twoCol.classList.remove("is-warning");
-        }
+        setSeverity(null);
         setLines(NORMAL_LINE_1, NORMAL_LINE_2);
-        var tag = panel.querySelector("[data-ai-tag-text]");
-        if (tag) { tag.textContent = NORMAL_TAG; }
+        setTag(NORMAL_TAG);
       });
     }
+
+    // E-STOP 모달에서 [중지하기] 를 누르면 위험(critical) 로 간다.
+    // 모달 쪽과 직접 엮히지 않고 문서 이벤트로 받는다 — 둘은 다른 닫힘이고,
+    // 앞으로 다른 자리에서도 같은 상태를 불러야 할 수 있다.
+    document.addEventListener("aprism:estop", function () {
+      setSeverity("critical");
+      setLines("비상정지 발동 — 로봇 구동이 차단되었습니다",
+               "현장 안전을 확인한 뒤 해제 절차를 진행하세요.");
+      setTag("비상정지 발동 · 해제 절차 필요");
+    });
 
     // 펼친 상태에서 Esc 로 닫는다. 닫은 뒤 초점은 버튼에 남긴다.
     panel.addEventListener("keydown", function (event) {
@@ -225,6 +253,11 @@
       if (then === "recall") {
         var recall = document.querySelector("[data-recall-button]");
         if (recall) { recall.disabled = true; }
+      }
+
+      // 비상정지는 Delta 를 위험(critical)으로 넘긴다. 패널 쪽이 듣는다.
+      if (then === "estop") {
+        document.dispatchEvent(new CustomEvent("aprism:estop"));
       }
 
       // 갈 곳이 적혀 있으면 간다. E-STOP 처럼 비어 있으면 닫기만 한다 —
