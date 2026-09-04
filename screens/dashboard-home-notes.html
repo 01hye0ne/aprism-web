@@ -1053,9 +1053,40 @@
     실측으로 <b>로봇 카드 헤더 64 · 웨이포인트 머리 118</b> — Figma 와 같습니다.
   </p>
   <p>
-    <strong>옆의 <code>수행로봇 자동복귀</code>(Secondary xSmall)는 안 붙였습니다.</strong>
-    Figma 에 같이 생겼지만 이번에 옮겨 달라고 하신 건 비상정지뿐이고,
-    이 버튼이 여는 <code>Modal-자동복귀</code>(<code>737:13500</code>)의 문구를 아직 못 받았습니다.
+    <strong>옆의 <code>수행로봇 자동복귀</code>(Secondary xSmall)도 같이 붙였습니다.</strong>
+    Figma 순서대로 <b>자동복귀가 왼쪽, 비상정지가 오른쪽</b>입니다.
+  </p>
+
+  <p><b>자동복귀 모달 (737:13500)</b></p>
+  <p>
+    문구가 Figma 에 다 들어 있어서 <strong>모달까지 붙였습니다.</strong>
+  </p>
+  <table>
+    <tr><th></th><th>값</th></tr>
+    <tr><td>제목</td><td>로봇 <b>R-01</b>을 자동복귀 하시겠습니까?</td></tr>
+    <tr><td>타이머</td><td><code>Show Timer=false</code> — 없음</td></tr>
+    <tr><td>설명</td><td><code>Show 권장조치=false</code> — <b>한 문단</b></td></tr>
+    <tr><td>버튼</td><td>취소(Secondary) · <b>자동복귀 시작(Type=Accent)</b></td></tr>
+  </table>
+  <p>
+    <strong><code>Type=Accent</code> 를 새로 만들었습니다</strong> — 파란 면에 흰 글자입니다.
+    <code>Primary</code> 는 <b>흰 면</b>이라 다른 것입니다(모달 닫기·[확인]이 그쪽입니다).
+  </p>
+  <p>
+    <strong>[자동복귀 시작]을 누르면 그 버튼이 꺼집니다.</strong>
+    모달 문구가 <b>"복귀 중에는 자동복귀 버튼이 비활성화됩니다"</b> 라고 그대로 약속하고 있어서,
+    지어낸 동작이 아니라 <b>적혀 있는 대로</b> 따라 한 것입니다.
+    <code>:disabled</code> 색은 <code>button/*/bg|fg/disabled</code> 토큰입니다 —
+    <code>.btn</code> 계열에 없던 상태라 같이 채웠습니다.
+  </p>
+
+  <p><b>E-STOP 모달 설명이 한 문단으로 줄었습니다</b></p>
+  <p>
+    Figma 의 <code>Modal-E-STOP</code>(<code>737:13559</code>)도 <code>Show 권장조치=false</code> 입니다.
+    처음 주셨을 때 <code>/</code> 로 나눠 주셔서 두 줄로 뒀는데,
+    <strong>컴포넌트에는 한 칸에 두 문장이 붙어 있습니다.</strong> Figma 대로 합쳤습니다 —
+    실측 높이가 <b>198</b> 로 Figma 196 과 같아집니다(테두리 2 차이).
+    두 줄 색을 통일해 둔 터라 <b>바뀌는 건 줄 사이 8 뿐</b>입니다.
   </p>
 
   <p><b>확인이 필요한 지점 둘</b></p>

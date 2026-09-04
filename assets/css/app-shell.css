@@ -857,6 +857,36 @@ button {
 .btn-danger:active { background-color: var(--button-danger-bg-pressed); }
 
 /*
+ * Figma Button Type=Accent — 파란 면 + 흰 글자. Primary 는 흰 면이라 따로 있다.
+ */
+.btn-accent {
+  background-color: var(--button-accent-bg-default);
+  color: var(--button-accent-fg-default);
+}
+
+.btn-accent:hover { background-color: var(--button-accent-bg-hover); }
+.btn-accent:active { background-color: var(--button-accent-bg-pressed); }
+
+/* 비활성 — 자동복귀를 누르면 돌아오는 동안 그 버튼이 꺼진다. */
+.btn:disabled { cursor: default; }
+
+.btn-secondary:disabled {
+  background-color: var(--button-secondary-bg-disabled);
+  border-color: var(--button-secondary-border-disabled);
+  color: var(--button-secondary-fg-disabled);
+}
+
+.btn-accent:disabled {
+  background-color: var(--button-accent-bg-disabled);
+  color: var(--button-accent-fg-disabled);
+}
+
+.btn-danger:disabled {
+  background-color: var(--button-danger-bg-disabled);
+  color: var(--button-danger-fg-disabled);
+}
+
+/*
  * Figma Button Type=Ghost — 면 없이 글자만. 인스턴스에 fill 이 안 걸려 있다.
  * (변수 button/ghost/bg/default 는 있지만 Default 상태는 투명하게 그려진다.)
  *

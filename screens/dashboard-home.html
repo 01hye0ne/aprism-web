@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/static/woff2/SUIT.css" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" />
   <link rel="stylesheet" href="../assets/css/tokens.css?v=e254913d" />
-  <link rel="stylesheet" href="../assets/css/app-shell.css?v=cbbc7b5a" />
+  <link rel="stylesheet" href="../assets/css/app-shell.css?v=8b41f51d" />
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
@@ -652,6 +652,7 @@
                        제어 버튼이 오른쪽 끝에 붙는다. Button Size=xSmall(24). -->
                   <div class="mission-controls">
                     <p class="t-overline section-label">전체 미션명</p>
+                    <button type="button" class="btn is-xs btn-secondary" data-modal-open="recall" data-recall-button>수행로봇 자동복귀</button>
                     <button type="button" class="btn is-xs btn-danger" data-modal-open="estop">수행로봇 E-STOP</button>
                   </div>
 
@@ -733,9 +734,9 @@
       </button>
     </div>
 
+    <!-- Figma 737:13559 는 Show 권장조치=false 라 설명이 한 문단이다. -->
     <div class="modal-body" id="m-estop-desc">
-      <p class="t-body-2 modal-desc-1">긴급중지시 로봇의 즉시 모터 전원이 차단됩니다.</p>
-      <p class="t-body-2 modal-desc-2">미션 재개시 시스템 관리자의 로봇 자세 / 안전 점검 확인이 필요합니다.</p>
+      <p class="t-body-2 modal-desc-1">긴급중지시 로봇의 즉시 모터 전원이 차단됩니다. 미션 재개시 시스템 관리자의 로봇 자세 / 안전 점검 확인이 필요합니다.</p>
     </div>
 
     <div class="modal-foot">
@@ -746,9 +747,38 @@
   </div>
 </div>
 
+<!-- ============================================================
+     Modal · Figma UI_00 Design System 737:13500 (Modal-자동복귀)
+     Show Timer=false · Show 권장조치=false — 설명 한 문단이다.
+     ============================================================ -->
+<div class="modal-scrim" data-modal="recall" hidden>
+  <div class="modal" role="alertdialog" aria-modal="true"
+       aria-labelledby="m-recall-title" aria-describedby="m-recall-desc">
+
+    <div class="modal-head">
+      <div class="modal-titles">
+        <h2 class="t-heading-3" id="m-recall-title">로봇 <span data-modal-robot>R-01</span>을 자동복귀 하시겠습니까?</h2>
+      </div>
+      <button type="button" class="icon-button modal-close" data-modal-dismiss aria-label="닫기">
+        <span class="i i-16" style="--i:var(--ic-close)" aria-hidden="true"></span>
+      </button>
+    </div>
+
+    <div class="modal-body" id="m-recall-desc">
+      <p class="t-body-2 modal-desc-1">확인 시 진행 중인 미션이 즉시 중단되고 로봇이 시작지점(도킹 스테이션)으로 복귀합니다. 복귀 중에는 자동복귀 버튼이 비활성화됩니다.</p>
+    </div>
+
+    <div class="modal-foot">
+      <button type="button" class="btn is-md btn-secondary" data-modal-dismiss>취소</button>
+      <button type="button" class="btn is-md btn-accent" data-modal-confirm data-modal-then="recall">자동복귀 시작</button>
+    </div>
+
+  </div>
+</div>
+
 <script src="../assets/js/theme.js?v=dcf8f460"></script>
 <script src="../assets/js/prism-orb.js?v=03386460"></script>
-<script src="../assets/js/screen.js?v=8ac86729"></script>
+<script src="../assets/js/screen.js?v=29c064d2"></script>
 <script src="../assets/js/map.js?v=90aa04ab"></script>
 <script src="../assets/js/grid-overlay.js?v=164e4f2a"></script>
 </body>

@@ -217,7 +217,16 @@
     function confirm(scrim) {
       var button = scrim.querySelector("[data-modal-confirm]");
       var to = button ? button.getAttribute("data-modal-confirm") : "";
+      var then = button ? button.getAttribute("data-modal-then") : null;
       close();
+
+      // 자동복귀는 모달 문구가 그대로 약속한 일을 한다 —
+      // "복귀 중에는 자동복귀 버튼이 비활성화됩니다".
+      if (then === "recall") {
+        var recall = document.querySelector("[data-recall-button]");
+        if (recall) { recall.disabled = true; }
+      }
+
       // 갈 곳이 적혀 있으면 간다. E-STOP 처럼 비어 있으면 닫기만 한다 —
       // 서버가 없는 퍼블리싱이라 "정지됨" 화면이 아직 없다.
       if (to) {
