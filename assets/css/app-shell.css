@@ -948,11 +948,12 @@ button {
   grid-column: 1 / span 5;
   align-self: end;
   /*
-   * 아래 여백 20 — .map-panel 의 padding 8 위에 12 를 더한 값이다.
+   * 아래 · 왼쪽 여백 20 — .map-panel 의 padding 8 위에 12 를 더한 값이다.
    * .map-panel 의 padding 은 못 건드린다. 우측 패널(.floating)과 같아야 하고,
    * subgrid 의 2~8번 칸 경계가 그 8 에 맞춰져 있다.
    */
   margin-bottom: var(--space-12);
+  margin-left: var(--space-12);
   display: grid;
   /* 60 원 + 좌우 16 = Figma 기둥 폭 92. */
   grid-template-columns: 92px minmax(0, 1fr);
