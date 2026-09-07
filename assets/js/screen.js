@@ -980,7 +980,9 @@
       }
       var read = readCard(node);
 
-      nameSlot.textContent = "Robot " + (index < 9 ? "0" : "") + (index + 1);
+      // 이름은 아직 자리표시자다 — 카드도 Drawer 도 한 이름(Robot 00)으로 맞춰 뒀다.
+      // 진짜 이름 규칙이 정해지면 여기 한 줄과 카드 라벨만 바꾸면 된다.
+      nameSlot.textContent = "Robot 00";
       whereSlot.textContent = detail.where || "";
 
       slots.state.textContent = read.state;

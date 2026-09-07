@@ -2841,9 +2841,14 @@ input.field-box { outline: 0; }
 
 .inline-notice .body { display: flex; flex-direction: column; gap: var(--space-4); }
 
+/*
+ * 제목이 본문보다 두 급 커서(16/24 vs 14/22) 짧은 알림 한 장 안에서 혼자 튀었다.
+ * 크기는 본문과 같게 두고 굵기(700)로만 제목임을 남긴다.
+ * Figma Inline Notice 는 아직 16/24 다 — 컴포넌트 쪽도 같이 내려야 한다.
+ */
 .inline-notice .title {
-  font-size: var(--font-size-16);
-  line-height: var(--font-line-height-24);
+  font-size: var(--font-size-14);
+  line-height: var(--font-line-height-22);
   font-weight: 700;
 }
 
@@ -3731,6 +3736,12 @@ input.field-box { outline: 0; }
   background-color: var(--bg-surface-overlay-dark);
 }
 
+/*
+ * 본문이 넘칠 때 칸이 눌리면 안 된다 — 특히 [수동조작] 처럼 높이가 정해진 것이
+ * 찌그러진다. 세로는 줄이지 않고 스크롤이 받는다.
+ */
+.rd-body > * { flex: none; }
+
 .rd-body::-webkit-scrollbar { width: 12px; }
 .rd-body::-webkit-scrollbar-track { background: transparent; }
 
@@ -3754,7 +3765,6 @@ input.field-box { outline: 0; }
  * 실제 스틸을 주시면 background-image 한 줄만 바꾸면 된다.
  */
 .rd-cam {
-  flex: none;
   position: relative;
   height: 176px;
   padding: var(--space-8) 10px;
@@ -3788,7 +3798,6 @@ input.field-box { outline: 0; }
 
 /* ── 정보 행 — Figma Status, 행 36, padding 8, 라벨/값 13/20 ── */
 .rd-kv {
-  flex: none;
   margin: 0;
   border-radius: var(--radius-card);
   border: var(--border-width-thin) solid var(--border-subtle);
@@ -3825,7 +3834,6 @@ input.field-box { outline: 0; }
 
 /* ── 최근 이벤트 — Figma Events, 머리글 12/18 600, 행 34, padding 8/12 ── */
 .rd-events {
-  flex: none;
   display: flex;
   flex-direction: column;
   gap: var(--space-4);

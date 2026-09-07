@@ -2076,12 +2076,19 @@
     <tr><td>[수동조작]</td><td>컴포넌트 <b>Secondary</b> / 정의서 글 <b>Accent</b></td><td>Secondary</td><td><b>두 문서가 다릅니다.</b> 컴포넌트를 따랐습니다 — 어느 쪽인지 정해 주세요</td></tr>
     <tr><td>[수동조작] 동작</td><td>없음</td><td>누르면 아무 일도 없음</td><td>눌렀을 때 무엇이 열리는지 정의서에 없습니다</td></tr>
     <tr><td>알림 제목</td><td><code>오류명</code></td><td><code>통신 불안정</code></td><td>자리표시자로 읽었습니다</td></tr>
-    <tr><td>Drawer 이름</td><td><code>Robot 04</code></td><td><code>Robot 01~12</code></td><td>카드는 아직 <code>로봇명</code> 자리표시자입니다 — 이름을 주시면 한 곳에서 맞춥니다</td></tr>
+    <tr><td>로봇 이름</td><td><code>Robot 04</code> · <code>로봇명</code></td><td><b><code>Robot 00</code></b></td><td>카드 24장 · Drawer 제목 · E-STOP 모달까지 <b>한 이름</b>으로 맞췄습니다. 아직 자리표시자입니다</td></tr>
+    <tr><td>알림 제목 크기</td><td>16/24</td><td><b>14/22</b></td><td>짧은 알림 한 장에서 제목만 두 급 커서 혼자 튀었습니다. 굵기(700)로만 제목임을 남겼습니다 — <b>Figma 컴포넌트도 같이 내려야 합니다</b></td></tr>
     <tr><td>끊긴 로봇 상세</td><td>—</td><td>열 수 없음</td><td>2번이 "더블클릭 · 우클릭 불가" 라 <b>끊긴 이유를 볼 길이 없습니다</b>. 예외를 두는 게 맞을지 봐 주세요</td></tr>
   </table>
   <p>
     <code>--ic-map-pin</code> 아이콘을 새로 넣었습니다(Figma <code>30:12</code>, 33개째).
     <code>Inline Notice</code> 는 info 판뿐이었는데 <b>주의 · 위험 판</b>을 더했습니다.
+  </p>
+  <p>
+    <strong>본문 칸이 눌리지 않게 막아 뒀습니다.</strong> 내용이 넘칠 때 flex 가
+    칸을 줄이면서 <code>[수동조작]</code> 처럼 <b>높이가 정해진 것이 찌그러졌습니다</b>.
+    <code>.rd-body > * { flex: none }</code> 한 줄로 세로는 줄이지 않고
+    스크롤이 받게 했습니다 — 본문을 300 으로 조여도 버튼은 32 를 지킵니다.
   </p>
 
   <h3>10. Figma 정리 — 이름 · 설명 · 토큰 바인딩</h3>
