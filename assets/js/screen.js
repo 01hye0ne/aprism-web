@@ -212,6 +212,47 @@
       });
     });
 
+    // 모달과 우측 띠는 같은 열두 대를 본다 — 순번(0..11)이 같은 카드끼리 짝이다.
+    // 띠 카드는 data-robot, 모달 카드는 data-robot-pick 으로 이름만 다르다.
+    function panelCard(index) {
+      return document.querySelector(".robot-strip .robot-card[data-robot='" + index + "']");
+    }
+
+    // 열 때 띠에서 고른 것을 모달로 가져온다 — 안 그러면 늘 첫 장이 골라진 채로 열린다.
+    function syncFromPanel() {
+      var current = document.querySelector(".robot-strip .robot-card[aria-pressed='true']");
+      if (!current) { return; }
+      var index = current.getAttribute("data-robot");
+      picks.forEach(function (card) {
+        card.setAttribute("aria-pressed", card.getAttribute("data-robot-pick") === index ? "true" : "false");
+      });
+    }
+
+    var opener = document.querySelector("[data-robot-more]");
+    if (opener) {
+      opener.addEventListener("click", syncFromPanel);
+    }
+
+    // [선택] — 모달에서 고른 것을 띠에 그대로 옮긴다.
+    // 띠 카드를 직접 누른다. 선택 표시와 아래 타임라인 갱신을 그쪽이 이미 하고 있어서,
+    // 같은 일을 여기서 다시 짜면 두 곳이 갈라진다.
+    var confirmButton = box.querySelector("[data-modal-confirm]");
+    if (confirmButton) {
+      confirmButton.addEventListener("click", function () {
+        var picked = picks.filter(function (card) {
+          return card.getAttribute("aria-pressed") === "true";
+        })[0];
+        if (!picked) { return; }
+        var target = panelCard(picked.getAttribute("data-robot-pick"));
+        if (!target) { return; }
+        target.click();
+        // 고른 카드가 띠 밖에 있으면 보이는 자리로 끌어온다(셋만 보인다).
+        if (target.scrollIntoView) {
+          target.scrollIntoView({ block: "nearest", inline: "center" });
+        }
+      });
+    }
+
     // 이름으로 거르기. 지금은 카드 이름이 모두 자리표시자("로봇명")라
     // 다 남거나 다 사라지지만, 진짜 이름이 들어오면 그대로 걸린다.
     var search = box.querySelector("[data-robot-search]");
