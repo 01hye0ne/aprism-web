@@ -2076,10 +2076,21 @@
     <tr><td>[수동조작]</td><td>컴포넌트 <b>Secondary</b> / 정의서 글 <b>Accent</b></td><td>Secondary</td><td><b>두 문서가 다릅니다.</b> 컴포넌트를 따랐습니다 — 어느 쪽인지 정해 주세요</td></tr>
     <tr><td>[수동조작] 동작</td><td>없음</td><td>누르면 아무 일도 없음</td><td>눌렀을 때 무엇이 열리는지 정의서에 없습니다</td></tr>
     <tr><td>알림 제목</td><td><code>오류명</code></td><td><code>통신 불안정</code></td><td>자리표시자로 읽었습니다</td></tr>
-    <tr><td>로봇 이름</td><td><code>Robot 04</code> · <code>로봇명</code></td><td><b><code>Robot 00</code></b></td><td>카드 24장 · Drawer 제목 · E-STOP 모달까지 <b>한 이름</b>으로 맞췄습니다. 아직 자리표시자입니다</td></tr>
+    <tr><td>로봇 이름</td><td><code>Robot 04</code> · <code>로봇명</code></td><td><b><code>Robot 01~12</code></b></td><td>대수만큼 번호를 답니다. 이름은 <b>카드에만</b> 있고 Drawer 제목 · E-STOP 모달은 고른 카드에서 읽습니다</td></tr>
     <tr><td>알림 제목 크기</td><td>16/24</td><td><b>14/22</b></td><td>짧은 알림 한 장에서 제목만 두 급 커서 혼자 튀었습니다. 굵기(700)로만 제목임을 남겼습니다 — <b>Figma 컴포넌트도 같이 내려야 합니다</b></td></tr>
     <tr><td>끊긴 로봇 상세</td><td>—</td><td>열 수 없음</td><td>2번이 "더블클릭 · 우클릭 불가" 라 <b>끊긴 이유를 볼 길이 없습니다</b>. 예외를 두는 게 맞을지 봐 주세요</td></tr>
   </table>
+  <p>
+    <strong>이름은 카드 한 곳에만 적습니다.</strong> Drawer 제목도 E-STOP 모달 제목도
+    <b>지금 고른 카드의 라벨을 그대로 읽습니다</b> — 상태·배터리·신호와 같은 원칙입니다.
+    이름 규칙이 정해지면 카드 24장만 고치면 나머지가 따라옵니다.
+  </p>
+  <p>
+    <strong>조사도 번호를 따라갑니다.</strong> E-STOP 제목이
+    <code>Robot 08를</code> 처럼 어긋나서, 끝자리를 읽는 소리에 맞춰 갈아 끼웁니다 —
+    <code>02 · 04 · 05 · 09</code> 는 <b>를</b>, 나머지는 <b>을</b> 입니다
+    (일 · 삼 · 육 · 칠 · 팔 · 영은 받침이 있습니다).
+  </p>
   <p>
     <code>--ic-map-pin</code> 아이콘을 새로 넣었습니다(Figma <code>30:12</code>, 33개째).
     <code>Inline Notice</code> 는 info 판뿐이었는데 <b>주의 · 위험 판</b>을 더했습니다.

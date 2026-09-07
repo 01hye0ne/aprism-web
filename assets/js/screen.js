@@ -384,6 +384,28 @@
       }
     }
 
+    // E-STOP 모달 제목의 로봇 이름 — 지금 고른 로봇을 그대로 부른다.
+    // 이름이 카드에만 있어서(자리표시자다) 모달에 따로 적어 두지 않는다.
+    function fillRobot(scrim) {
+      var slot = scrim.querySelector("[data-modal-robot]");
+      var chosen = document.querySelector(".robot-strip .robot-card[aria-pressed='true']");
+      var label = chosen && chosen.querySelector(".robot-id");
+      if (!slot || !label) {
+        return;
+      }
+      var name = label.textContent.trim();
+      slot.textContent = name;
+
+      // 조사도 같이 바꾼다 — 이름이 숫자로 끝나서 읽는 소리에 받침이 있을 때가 있다.
+      // 01(일) · 03(삼) · 06(육) · 07(칠) · 08(팔) · 00(영) 은 받침이 있어 "을",
+      // 02(이) · 04(사) · 05(오) · 09(구) 는 없어서 "를" 이다.
+      var particle = scrim.querySelector("[data-modal-particle]");
+      if (particle) {
+        var last = name.slice(-1);
+        particle.textContent = "2459".indexOf(last) >= 0 ? "를" : "을";
+      }
+    }
+
     function show(name) {
       var scrim = scrims.filter(function (s) { return s.getAttribute("data-modal") === name; })[0];
       if (!scrim || open) {
@@ -401,6 +423,7 @@
           if (dropdown) { dropdown.hidden = true; }
         });
       fillUser(scrim);
+      fillRobot(scrim);
       scrim.hidden = false;
       open = scrim;
       if (app) {
@@ -980,9 +1003,8 @@
       }
       var read = readCard(node);
 
-      // 이름은 아직 자리표시자다 — 카드도 Drawer 도 한 이름(Robot 00)으로 맞춰 뒀다.
-      // 진짜 이름 규칙이 정해지면 여기 한 줄과 카드 라벨만 바꾸면 된다.
-      nameSlot.textContent = "Robot 00";
+      // 이름도 카드에서 읽는다 — 카드 라벨만 고치면 Drawer 가 따라온다.
+      nameSlot.textContent = text(node.querySelector(".robot-id"));
       whereSlot.textContent = detail.where || "";
 
       slots.state.textContent = read.state;
