@@ -614,6 +614,10 @@ button {
   outline: none;
 }
 
+/* Figma Menu Item-Icon State=Hover — 면이 밝아지는 만큼 아이콘도 fg/primary 로 올라간다. */
+.menu-item:hover .i,
+.menu-item:focus-visible .i { color: var(--fg-primary); }
+
 .menu-item .i {
   flex: none;
   color: var(--fg-secondary);
@@ -672,8 +676,15 @@ button {
   border-radius: var(--radius-control);
 }
 
+/*
+ * Figma GNB Rail Item State=Hover — 면 bg/container, 아이콘 fg/primary, 라벨 fg/secondary.
+ * 면만 밝히고 글자·아이콘을 그대로 두면 fg/disabled 가 밝은 면에 얹혀 안 보인다.
+ */
+.gnb-item:hover:not([aria-current="page"]) { color: var(--fg-secondary); }
+
 .gnb-item:hover:not([aria-current="page"]) .gnb-icon {
-  background-color: var(--bg-interactive-hover);
+  background-color: var(--bg-container);
+  color: var(--fg-primary);
 }
 
 .gnb-item[aria-current="page"] { color: var(--fg-primary); }

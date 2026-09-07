@@ -406,11 +406,22 @@
   --button-danger-fg-default: var(--color-gray-0);
   --button-danger-fg-disabled: var(--color-gray-400);
   --button-focus-border: var(--color-main-700);
-  --button-ghost-bg-hover: var(--color-gray-100);
-  --button-ghost-bg-pressed: var(--color-gray-200);
+  /*
+   * Ghost 의 면·눌린 글자색은 Figma 에서 Light 값 그대로였다 —
+   * button/ghost/bg/hover · bg/pressed · fg/pressed 세 개가 Dark 모드 값을
+   * 받지 못했다(둘 다 gray/100 · gray/200 · gray/950). 어두운 화면에서
+   * 흰 면 위에 흰 아이콘이 얹혀 아이콘이 사라졌다(지도 조작 버튼).
+   *
+   * Dark 값은 Figma 가 다른 hover 에서 쓰는 것과 같게 맞췄다 —
+   * Menu Item-Icon · Robot-card 의 Hover 면이 모두 bg/interactive/hover 다.
+   * pressed 는 bg/interactive/pressed 를 따른다.
+   * Figma 변수도 같이 고쳐야 한다.
+   */
+  --button-ghost-bg-hover: var(--color-gray-500);
+  --button-ghost-bg-pressed: var(--color-gray-700);
   --button-ghost-fg-default: var(--color-main-500);
   --button-ghost-fg-disabled: var(--color-gray-400);
-  --button-ghost-fg-pressed: var(--color-gray-950);
+  --button-ghost-fg-pressed: var(--color-gray-50);
   --button-primary-bg-default: var(--color-gray-0);
   --button-primary-bg-disabled: var(--color-gray-600);
   --button-primary-bg-hover: var(--color-gray-200);
