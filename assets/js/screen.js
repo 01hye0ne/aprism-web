@@ -203,6 +203,7 @@
 
     picks.forEach(function (card) {
       card.addEventListener("click", function () {
+        if (card.hasAttribute("data-robot-offline")) { return; }
         picks.forEach(function (other) {
           other.setAttribute("aria-pressed", other === card ? "true" : "false");
         });
@@ -334,6 +335,7 @@
       if (then === "recall") {
         var recall = document.querySelector("[data-recall-button]");
         if (recall) { recall.disabled = true; }
+        document.dispatchEvent(new CustomEvent("aprism:recall"));
       }
 
       // 비상정지는 Delta 를 위험(critical)으로 넘긴다. 패널 쪽이 듣는다.
@@ -603,6 +605,130 @@
     }
   ];
 
+  /*
+   * 로봇 상세 Drawer 의 값 — Figma "Drawer / 로봇 상세" 778:11895.
+   *
+   * 여기 적은 것은 카드에서 읽을 수 없는 것들뿐이다.
+   * 상태 · 배터리 · 신호는 카드 DOM 에서 그대로 읽는다 — 정의서 3번이
+   * "Drawer 값은 로봇 실시간 상태를 그대로 표시" 라, 같은 값을 두 곳에
+   * 적어 두면 언젠가 어긋난다. 한 곳(카드)만 고치면 Drawer 도 따라온다.
+   *
+   * 자리 · 시각 · 이벤트는 Figma 의 자리표시자를 본떠 지었다(서버가 없다).
+   * dbm 은 신호 등급과 짝이 맞게 골랐다 — Strong ≥ −55, Good ≥ −67, Weak < −70.
+   */
+  var DETAILS = [
+    {
+      where: "터빈 2 / Unit 01 · SPOT-DD-0206 · 192.168.10.59",
+      dbm: -47, last: "10:24:02 (방금)", odom: "X 41.2 / Y 18.6", dock: "DOCK_Station_01",
+      events: [
+        { text: "터빈2 순회 미션 시작", time: "10:04" },
+        { text: "Spiral Casing 판독 완료", time: "09:52" },
+        { text: "도킹 해제 · 자율주행 전환", time: "09:12" }
+      ]
+    },
+    {
+      // Figma 에 그려진 그 로봇이다 — 알림 문구도 컴포넌트 값 그대로 옮겼다.
+      where: "터빈 2 / Unit 03 · SPOT-DD-0209 · 192.168.10.62",
+      dbm: -78, last: "10:22:41 (2분 전)", odom: "X 12.8 / Y 44.1", dock: "DOCK_Station_02",
+      notice: {
+        title: "통신 불안정",
+        desc: "RSSI −78dBm. 10:18부터 3회 재접속했습니다. 통신을 점검하기 전에는 새 미션을 배정할 수 없습니다."
+      },
+      events: [
+        { text: "재접속 3회 실패 · RSSI −78", time: "10:22", tone: "warning" },
+        { text: "신호 약함 감지 · 미션 일시정지", time: "10:18", tone: "warning" },
+        { text: "터빈2 순회 미션 시작", time: "10:04" }
+      ]
+    },
+    {
+      where: "터빈 3 / Unit 02 · SPOT-DD-0211 · 192.168.10.64",
+      dbm: -58, last: "10:23:19 (1분 전)", odom: "X 63.5 / Y 07.4", dock: "DOCK_Station_02",
+      events: [
+        { text: "충전 시작 · 35%", time: "10:11" },
+        { text: "도킹 완료", time: "10:09" }
+      ]
+    },
+    {
+      where: "터빈 1 / Unit 04 · SPOT-DD-0203 · 192.168.10.55",
+      dbm: -51, last: "10:23:47 (1분 전)", odom: "X 08.1 / Y 22.9", dock: "DOCK_Station_01",
+      events: [
+        { text: "순회 6구간 완료 · 이상 없음", time: "09:06" },
+        { text: "터빈1 순회 미션 시작", time: "07:20" }
+      ]
+    },
+    {
+      where: "터빈 3 / Unit 01 · SPOT-DD-0214 · 192.168.10.67",
+      dbm: -61, last: "10:24:05 (방금)", odom: "X 27.6 / Y 51.3", dock: "DOCK_Station_03",
+      events: [
+        { text: "Generator Bearing 진동 수집 중", time: "10:17" },
+        { text: "터빈3 순회 미션 시작", time: "10:02" }
+      ]
+    },
+    {
+      where: "터빈 4 / Unit 02 · SPOT-DD-0216 · 192.168.10.69",
+      dbm: -74, last: "10:21:58 (3분 전)", odom: "X 55.0 / Y 33.7", dock: "DOCK_Station_03",
+      notice: {
+        title: "배터리 부족",
+        desc: "잔량 8%. 충전이 끝날 때까지 미션을 배정할 수 없습니다."
+      },
+      events: [
+        { text: "저전압 경고 · 8%", time: "10:12", tone: "warning" },
+        { text: "충전 시작", time: "10:10" },
+        { text: "긴급 복귀 · 도킹", time: "10:07" }
+      ]
+    },
+    {
+      where: "터빈 1 / Unit 02 · SPOT-DD-0201 · 192.168.10.53",
+      dbm: -49, last: "10:23:52 (방금)", odom: "X 03.4 / Y 11.2", dock: "DOCK_Station_01",
+      events: [
+        { text: "충전 96% · 대기 전환", time: "09:41" },
+        { text: "순회 4구간 완료", time: "07:16" }
+      ]
+    },
+    {
+      where: "터빈 2 / Unit 05 · SPOT-DD-0210 · 192.168.10.63",
+      dbm: -63, last: "10:23:30 (1분 전)", odom: "X 38.9 / Y 26.5", dock: "DOCK_Station_02",
+      events: [
+        { text: "미션 배정 대기", time: "10:15" },
+        { text: "자가 점검 통과", time: "10:13" }
+      ]
+    },
+    {
+      where: "터빈 3 / Unit 04 · SPOT-DD-0215 · 192.168.10.68",
+      dbm: -53, last: "10:24:00 (방금)", odom: "X 71.2 / Y 48.0", dock: "DOCK_Station_03",
+      events: [
+        { text: "순회 5구간 완료 · 이상 없음", time: "06:03" },
+        { text: "터빈3 순회 미션 시작", time: "05:10" }
+      ]
+    },
+    {
+      // 연결이 끊긴 로봇 — 정의서 1·2번의 예외가 걸리는 자리다.
+      where: "터빈 4 / Unit 05 · SPOT-DD-0218 · 192.168.10.71",
+      dbm: null, last: "09:58:12 (26분 전)", odom: "X 84.7 / Y 19.3", dock: "DOCK_Station_04",
+      events: [
+        { text: "연결 끊김 · 응답 없음", time: "09:58", tone: "critical" },
+        { text: "재접속 5회 실패", time: "09:56", tone: "warning" },
+        { text: "신호 약함 감지", time: "09:47", tone: "warning" }
+      ]
+    },
+    {
+      where: "터빈 1 / Unit 01 · SPOT-DD-0200 · 192.168.10.52",
+      dbm: -45, last: "10:24:07 (방금)", odom: "X 19.5 / Y 05.8", dock: "DOCK_Station_01",
+      events: [
+        { text: "Switchgear Room 열화상 촬영 중", time: "10:19" },
+        { text: "터빈1 순회 미션 시작", time: "10:06" }
+      ]
+    },
+    {
+      where: "터빈 4 / Unit 01 · SPOT-DD-0217 · 192.168.10.70",
+      dbm: -60, last: "10:23:41 (1분 전)", odom: "X 47.3 / Y 60.1", dock: "DOCK_Station_04",
+      events: [
+        { text: "충전 시작 · 55%", time: "10:20" },
+        { text: "도킹 완료", time: "10:18" }
+      ]
+    }
+  ];
+
   // 상태 배지는 Figma 에서 사라졌다 — 레일 표식과 카드 면이 그 역할을 한다.
   var STATE = {
     done: { klass: "is-done", icon: "var(--ic-check)" },
@@ -752,6 +878,8 @@
 
     cards.forEach(function (card) {
       card.addEventListener("click", function () {
+        // 정의서 1번 — "연결 끊김 로봇은 클릭 불가". 선택도 타임라인도 그대로 둔다.
+        if (card.hasAttribute("data-robot-offline")) { return; }
         cards.forEach(function (other) {
           other.setAttribute("aria-pressed", other === card ? "true" : "false");
         });
@@ -762,6 +890,227 @@
     var initial = cards.filter(function (c) { return c.getAttribute("aria-pressed") === "true"; })[0] || cards[0];
     initial.setAttribute("aria-pressed", "true");
     render(Number(initial.getAttribute("data-robot")));
+  })();
+
+  // ------------------------------------------------------------------
+  // 로봇 상세 Drawer — Figma "Drawer / 로봇 상세" 778:11895
+  // 동작은 정의서(UI_99 862:42223) 를 그대로 따른다.
+  //
+  //   1  카드 1회 클릭       선택만 바뀐다 (위 블록이 한다)
+  //   2  더블클릭 · 우클릭    Drawer 가 열린다. 선택은 건드리지 않는다.
+  //                         이미 열려 있으면 그 로봇 값으로 갈아 끼운다.
+  //   3  값                 카드에서 읽을 수 있는 것은 카드에서 읽는다.
+  //                         최근 이벤트는 최신순으로 세운다.
+  //   4  닫기               [✕] 와 ESC 뿐이다. 밖을 눌러도 열려 있다.
+  //   5  알림               자동복귀 · 비상정지 때 알림이 뜨고 이벤트가 쌓인다.
+  //
+  // 모달이 아니다 — 배경막도 없고 뒤 화면에 inert 도 걸지 않는다.
+  // 지도와 미션 패널을 그대로 쓰면서 옆에서 값을 읽는 자리다.
+  // ------------------------------------------------------------------
+  (function () {
+    var drawer = document.querySelector("[data-robot-drawer]");
+    var cards = Array.prototype.slice.call(document.querySelectorAll(".robot-strip [data-robot]"));
+    if (!drawer || !cards.length) {
+      return;
+    }
+
+    var slots = {};
+    Array.prototype.slice.call(drawer.querySelectorAll("[data-rd]")).forEach(function (node) {
+      slots[node.getAttribute("data-rd")] = node;
+    });
+    var nameSlot = drawer.querySelector("[data-rd-name]");
+    var whereSlot = drawer.querySelector("[data-rd-where]");
+    var notice = drawer.querySelector("[data-rd-notice]");
+    var noticeTitle = drawer.querySelector("[data-rd-notice-title]");
+    var noticeDesc = drawer.querySelector("[data-rd-notice-desc]");
+    var eventList = drawer.querySelector("[data-rd-events]");
+    var closeButton = drawer.querySelector("[data-rd-close]");
+
+    var current = null;
+
+    function card(index) {
+      return document.querySelector(".robot-strip .robot-card[data-robot='" + index + "']");
+    }
+
+    function text(node) {
+      return node ? node.textContent.trim() : "";
+    }
+
+    // 카드 배지 · 신호 등급을 Drawer 의 말로 옮긴다.
+    var STATES = { "수행중": "미션 수행 중", "대기": "대기 중", "완료": "순회 완료", "끊김": "연결 끊김" };
+    var SIGNALS = { Strong: "강함", Good: "보통", Weak: "약함", "끊김": "끊김" };
+
+    /*
+     * 정의서 3번 — "Drawer 값은 로봇 실시간 상태를 그대로 표시".
+     * 상태 · 배터리 · 신호는 카드가 이미 들고 있다. 여기서 다시 적어 두면
+     * 언젠가 두 값이 어긋나므로 카드 DOM 에서 그대로 읽는다.
+     */
+    function readCard(node) {
+      var rows = node.querySelectorAll(".robot-row");
+      var badge = text(node.querySelector(".badge"));
+      var battery = rows[1] ? rows[1].querySelector(".battery") : null;
+      var percent = text(rows[1] ? rows[1].querySelector(".num") : null);
+      var level = text(rows[2] ? rows[2].querySelector(".t-caption:last-child") : null);
+      var charging = !!(battery && battery.classList.contains("is-charging"));
+      var number = parseInt(percent, 10);
+
+      return {
+        state: STATES[badge] || badge,
+        // 충전 중이면 그렇게, 아니면 30% 이하일 때만 충전이 필요하다고 적는다.
+        battery: percent + (charging ? " · 충전 중" : (number <= 30 ? " · 충전 필요" : "")),
+        signal: SIGNALS[level] || level
+      };
+    }
+
+    // 새 이벤트의 시각. 화면의 mock 시계가 10:24 언저리라 그 뒤로 한 칸씩 붙인다.
+    var clock = 10 * 60 + 24;
+    function nextTime() {
+      clock += 1;
+      var h = Math.floor(clock / 60) % 24;
+      var m = clock % 60;
+      return (h < 10 ? "0" : "") + h + ":" + (m < 10 ? "0" : "") + m;
+    }
+
+    function fill(index) {
+      var node = card(index);
+      var detail = DETAILS[index] || {};
+      var robot = ROBOTS[index] || {};
+      if (!node) {
+        return;
+      }
+      var read = readCard(node);
+
+      nameSlot.textContent = "Robot " + (index < 9 ? "0" : "") + (index + 1);
+      whereSlot.textContent = detail.where || "";
+
+      slots.state.textContent = read.state;
+      // \ubbf8\uc158\uc740 \uc218\ud589 \uc911\uc77c \ub54c\ub9cc \uc788\ub2e4. ROBOTS[].current \ub294 \ub300\uae30 \u00b7 \ubcf5\uadc0 \u00b7 \ucda9\uc804 \uac19\uc740
+      // \uc0c1\ud0dc \ubb38\uad6c\ub3c4 \ub2f4\uace0 \uc788\uc5b4\uc11c, \uadf8\ub300\ub85c \uc4f0\uba74 \ubc14\ub85c \uc717\uc904\uacfc \uac19\uc740 \ub9d0\uc744 \ub450 \ubc88 \uc801\uac8c \ub41c\ub2e4.
+      slots.mission.textContent = read.state === "\ubbf8\uc158 \uc218\ud589 \uc911" ? (robot.current || "\u2014") : "\u2014";
+      slots.battery.textContent = read.battery;
+      slots.last.textContent = detail.last || "\u2014";
+      // Figma 는 "약함 · −78dBm" 이다. 끊긴 로봇은 셀 값이 없다.
+      slots.signal.textContent = read.signal + (detail.dbm === null || detail.dbm === undefined
+        ? "" : " · \u2212" + Math.abs(detail.dbm) + "dBm");
+      slots.odom.textContent = detail.odom || "\u2014";
+      slots.dock.textContent = detail.dock || "\u2014";
+
+      if (detail.notice) {
+        notice.hidden = false;
+        notice.classList.toggle("is-critical", detail.notice.tone === "critical");
+        notice.classList.toggle("is-warning", detail.notice.tone !== "critical");
+        noticeTitle.textContent = detail.notice.title;
+        noticeDesc.textContent = detail.notice.desc;
+      } else {
+        notice.hidden = true;
+      }
+
+      // 정의서 3번 — 최근 이벤트는 최신순이다. 데이터 순서에 기대지 않고 여기서 세운다.
+      eventList.textContent = "";
+      (detail.events || []).slice()
+        .sort(function (a, b) { return a.time < b.time ? 1 : (a.time > b.time ? -1 : 0); })
+        .forEach(function (item) {
+          var row = el("li", "rd-event" + (item.tone ? " is-" + item.tone : ""));
+          row.appendChild(el("span", "t-caption rd-event-text", item.text));
+          row.appendChild(el("span", "t-caption num rd-event-time", item.time));
+          eventList.appendChild(row);
+        });
+    }
+
+    function open(index) {
+      var node = card(index);
+      // 정의서 1·2번 — 연결이 끊긴 로봇은 열리지 않는다.
+      if (!node || node.hasAttribute("data-robot-offline")) {
+        return;
+      }
+      fill(index);
+      drawer.hidden = false;
+      current = index;
+      if (closeButton) {
+        closeButton.focus();
+      }
+    }
+
+    function close() {
+      if (drawer.hidden) {
+        return;
+      }
+      var back = current === null ? null : card(current);
+      drawer.hidden = true;
+      current = null;
+      if (back && back.focus) {
+        back.focus();
+      }
+    }
+
+    cards.forEach(function (node) {
+      var index = Number(node.getAttribute("data-robot"));
+      // 더블클릭 — 선택은 앞선 클릭이 이미 했다. 여기서 다시 건드리지 않는다.
+      node.addEventListener("dblclick", function (event) {
+        event.preventDefault();
+        open(index);
+      });
+      // 우클릭 — 선택을 아예 지나친다. 브라우저 메뉴는 띠 위에서 막는다.
+      node.addEventListener("contextmenu", function (event) {
+        event.preventDefault();
+        open(index);
+      });
+    });
+
+    if (closeButton) {
+      closeButton.addEventListener("click", close);
+    }
+
+    // ESC 로 닫는다. 모달이 떠 있으면 그쪽이 먼저다 — 위에 있는 것부터 닫힌다.
+    document.addEventListener("keydown", function (event) {
+      if (event.key !== "Escape" || drawer.hidden) {
+        return;
+      }
+      if (document.querySelector("[data-modal]:not([hidden])")) {
+        return;
+      }
+      close();
+    });
+
+    /*
+     * 정의서 5번 — "일시정지 · 자동복귀 시 Drawer 에 Alert 노출, [최근 이벤트]에 이력 추가".
+     * 알림은 DETAILS 에 쌓는다. Drawer 가 닫혀 있어도 남았다가 다음에 열 때 보인다.
+     * 화면에 "일시정지" 버튼은 없다 — 미션을 멈추는 자리가 E-STOP 이라 그 자리를 썼다.
+     */
+    function raise(next, item) {
+      var chosen = document.querySelector(".robot-strip .robot-card[aria-pressed='true']");
+      if (!chosen) {
+        return;
+      }
+      var index = Number(chosen.getAttribute("data-robot"));
+      var detail = DETAILS[index];
+      if (!detail) {
+        return;
+      }
+      detail.notice = next;
+      detail.events = (detail.events || []).concat([
+        { text: item.text, time: nextTime(), tone: item.tone }
+      ]);
+      if (current === index) {
+        fill(index);
+      }
+    }
+
+    document.addEventListener("aprism:estop", function () {
+      raise({
+        tone: "critical",
+        title: "비상정지 발동",
+        desc: "모터 전원이 차단되었습니다. 자세·안전 점검을 마친 뒤에 해제할 수 있습니다."
+      }, { text: "비상정지 발동 · 모터 전원 차단", tone: "critical" });
+    });
+
+    document.addEventListener("aprism:recall", function () {
+      raise({
+        tone: "warning",
+        title: "자동복귀 중",
+        desc: "진행 중이던 미션을 중단하고 도킹 스테이션으로 복귀합니다. 복귀가 끝나면 대기 상태가 됩니다."
+      }, { text: "자동복귀 시작 · 도킹 스테이션 이동", tone: "warning" });
+    });
   })();
 
   // ------------------------------------------------------------------

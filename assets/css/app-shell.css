@@ -45,6 +45,7 @@ button {
   --ic-home: url("data:image/svg+xml,%3Csvg preserveAspectRatio=%22none%22 overflow=%22visible%22 style=%22display: block;%22 width=%2220%22 height=%2220%22 viewBox=%220 0 20 20%22 fill=%22none%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cg id=%22Icon / home%22%3E%3Cpath id=%22Vector%22 d=%22M9.33937 2.41469C9.71708 2.0823 10.2829 2.0823 10.6606 2.41469L17.0616 8.04751C17.504 8.43687 17.2286 9.16667 16.6393 9.16667C16.2862 9.16667 16 9.45287 16 9.80592V16.9167C16 17.469 15.5523 17.9167 15 17.9167H12.6667C12.1144 17.9167 11.6667 17.469 11.6667 16.9167V13.0833C11.6667 12.531 11.219 12.0833 10.6667 12.0833H9.33333C8.78105 12.0833 8.33333 12.531 8.33333 13.0833V16.9167C8.33333 17.4689 7.88562 17.9167 7.33333 17.9167H5C4.44772 17.9167 4 17.469 4 16.9167V9.80592C4 9.45287 3.7138 9.16667 3.36074 9.16667C2.77137 9.16667 2.49598 8.43687 2.93843 8.04751L9.33937 2.41469Z%22 fill=%22%23151617%22/%3E%3C/g%3E%3C/svg%3E");
   --ic-info: url("data:image/svg+xml,%3Csvg width=%2220%22 height=%2220%22 viewBox=%220 0 20 20%22 fill=%22none%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cpath fill-rule=%22evenodd%22 clip-rule=%22evenodd%22 d=%22M10 0C4.4772 0 0 4.4772 0 10C0 15.5228 4.4772 20 10 20C15.5228 20 20 15.5228 20 10C20 4.4772 15.5228 0 10 0ZM10 3.5C10.8284 3.5 11.5 4.1716 11.5 5C11.5 5.8284 10.8284 6.5 10 6.5C9.1716 6.5 8.5 5.8284 8.5 5C8.5 4.1716 9.1716 3.5 10 3.5ZM8.75 9C8.75 8.3096 9.3096 7.75 10 7.75C10.6904 7.75 11.25 8.3096 11.25 9V15C11.25 15.6904 10.6904 16.25 10 16.25C9.3096 16.25 8.75 15.6904 8.75 15V9Z%22 fill=%22%231E2D4D%22/%3E%3C/svg%3E");
   --ic-lock: url("data:image/svg+xml,%3Csvg width=%2224%22 height=%2224%22 viewBox=%220 0 24 24%22 fill=%22none%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cpath d=%22M12 2C9 2 6.8 4.3 6.8 7.3V9.4C6.8 9.95228 7.24772 10.4 7.8 10.4H8.8C9.35228 10.4 9.8 9.95228 9.8 9.4V7.3C9.8 5.9 10.8 4.9 12 4.9C13.2 4.9 14.2 5.9 14.2 7.3V9.4C14.2 9.95228 14.6477 10.4 15.2 10.4H16.2C16.7523 10.4 17.2 9.95228 17.2 9.4V7.3C17.2 4.3 15 2 12 2ZM4.5 11.4C4.5 10.8477 4.94772 10.4 5.5 10.4H18.5C19.0523 10.4 19.5 10.8477 19.5 11.4V21C19.5 21.5523 19.0523 22 18.5 22H5.5C4.94772 22 4.5 21.5523 4.5 21V11.4Z%22 fill=%22%23070A10%22/%3E%3C/svg%3E");
+  --ic-map-pin: url("data:image/svg+xml,%3Csvg width=%2224%22 height=%2224%22 viewBox=%220 0 24 24%22 fill=%22none%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cpath fill-rule=%22evenodd%22 clip-rule=%22evenodd%22 d=%22M12 2C7.9 2 4.5 5.4 4.5 9.5C4.5 14.4887 9.51617 20.0124 11.3439 21.8595C11.7097 22.2292 12.2903 22.2292 12.6561 21.8595C14.4838 20.0124 19.5 14.4887 19.5 9.5C19.5 5.4 16.1 2 12 2ZM12 6.6C11.606 6.6 11.2159 6.6776 10.8519 6.82836C10.488 6.97913 10.1573 7.2001 9.87868 7.47868C9.6001 7.75726 9.37913 8.08797 9.22836 8.45195C9.0776 8.81593 9 9.20603 9 9.6C9 9.99397 9.0776 10.3841 9.22836 10.7481C9.37913 11.112 9.6001 11.4427 9.87868 11.7213C10.1573 11.9999 10.488 12.2209 10.8519 12.3716C11.2159 12.5224 11.606 12.6 12 12.6C12.394 12.6 12.7841 12.5224 13.1481 12.3716C13.512 12.2209 13.8427 11.9999 14.1213 11.7213C14.3999 11.4427 14.6209 11.112 14.7716 10.7481C14.9224 10.3841 15 9.99397 15 9.6C15 9.20603 14.9224 8.81593 14.7716 8.45195C14.6209 8.08797 14.3999 7.75726 14.1213 7.47868C13.8427 7.2001 13.512 6.97913 13.1481 6.82836C12.7841 6.6776 12.394 6.6 12 6.6Z%22 fill=%22%23070A10%22/%3E%3C/svg%3E");
   --ic-message: url("data:image/svg+xml,%3Csvg preserveAspectRatio=%22none%22 overflow=%22visible%22 style=%22display: block;%22 width=%2220%22 height=%2220%22 viewBox=%220 0 20 20%22 fill=%22none%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cg id=%22Icon / message%22%3E%3Cpath id=%22Vector%22 d=%22M2.08333 3.5C2.08333 2.94772 2.53105 2.5 3.08333 2.5H16.9167C17.469 2.5 17.9167 2.94772 17.9167 3.5V13.1667C17.9167 13.719 17.469 14.1667 16.9167 14.1667H8.71707C8.47003 14.1667 8.23173 14.2581 8.0481 14.4234L5.83563 16.4146C5.19211 16.9938 4.16667 16.5371 4.16667 15.6713V15.1667C4.16667 14.6144 3.71895 14.1667 3.16667 14.1667H3.08333C2.53105 14.1667 2.08333 13.719 2.08333 13.1667V3.5Z%22 fill=%22%23151617%22/%3E%3C/g%3E%3C/svg%3E");
   --ic-panel-left: url("data:image/svg+xml,%3Csvg width=%2220%22 height=%2220%22 viewBox=%220 0 20 20%22 fill=%22none%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cg id=%22Icon / panel-left%22%3E%3Cpath id=%22Vector%22 fill-rule=%22evenodd%22 clip-rule=%22evenodd%22 d=%22M15.4167 2.5C16.5673 2.5 17.5 3.43274 17.5 4.58333V15.4167C17.5 16.5673 16.5673 17.5 15.4167 17.5H4.58333C3.50472 17.5 2.61735 16.6803 2.51058 15.6299C2.50345 15.5598 2.5 15.4886 2.5 15.4167V4.58333C2.5 3.50472 3.31967 2.61735 4.37012 2.51058C4.44021 2.50345 4.51136 2.5 4.58333 2.5H15.4167ZM8.25033 15.0002C8.25033 15.5524 8.69804 16.0002 9.25033 16.0002H15C15.5523 16.0002 16.0002 15.5523 16.0002 15V5C16.0002 4.44772 15.5523 3.99984 15 3.99984H9.25032C8.69804 3.99984 8.25033 4.44755 8.25033 4.99984V15.0002Z%22 fill=%22%23B2B4B7%22/%3E%3C/g%3E%3C/svg%3E");
   --ic-play-sm: url("data:image/svg+xml,%3Csvg preserveAspectRatio=%22none%22 overflow=%22visible%22 style=%22display: block;%22 width=%2214%22 height=%2214%22 viewBox=%220 0 14 14%22 fill=%22none%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cg id=%22Icon%22%3E%3Cpath id=%22Vector%22 d=%22M3.5 3.81869C3.5 3.03906 4.35256 2.55929 5.01898 2.9639L10.2588 6.14521C10.9001 6.53461 10.9001 7.46539 10.2588 7.85479L5.01898 11.0361C4.35255 11.4407 3.5 10.9609 3.5 10.1813V3.81869Z%22 fill=%22%23151617%22/%3E%3C/g%3E%3C/svg%3E");
@@ -324,7 +325,8 @@ button {
 /* 꺼진 칸은 트랙 색으로 남는다. */
 .signal-bars[data-level="3"] i:nth-child(n+4),
 .signal-bars[data-level="2"] i:nth-child(n+3),
-.signal-bars[data-level="1"] i:nth-child(n+2) {
+.signal-bars[data-level="1"] i:nth-child(n+2),
+.signal-bars[data-level="0"] i {
   background-color: var(--chart-track);
 }
 
@@ -910,6 +912,10 @@ button {
 .badge-normal { color: var(--status-normal-fg); }
 .badge-normal .badge-dot { background-color: var(--status-normal-icon); }
 .badge-idle { color: var(--fg-secondary); }
+
+/* 연결 끊김 — Figma 에 없는 판이다. 다른 배지와 같은 짜임에 위험 계열 색만 얹었다. */
+.badge-danger { color: var(--status-critical-fg); }
+.badge-danger .badge-dot { background-color: var(--status-critical-icon); }
 
 /* 지도 위 로봇 마커. 면과 경계가 있고 좌우 패딩이 8 이다(Marker Badge 48:58). */
 .badge-marker {
@@ -3621,3 +3627,273 @@ input.field-box { outline: 0; }
 
   .robot-strip { scrollbar-color: var(--fg-tertiary) transparent; }
 }
+
+/* ---------- 로봇 상세 Drawer ---------- */
+/*
+ * Figma "Drawer / 로봇 상세" 778:11895 — 400 폭, padding 4, radius 8,
+ * bg/surface/overlay-light + background blur 20.
+ *
+ * 모달이 아니다. 정의서(862:42223) 4번이 "Drawer 밖 영역 클릭시 열림 유지" 라
+ * 배경막(scrim)도 없고 뒤 화면에 inert 도 걸지 않는다 — 지도와 미션 패널을
+ * 그대로 쓰면서 옆에서 값을 읽는 자리다. 닫는 길은 [✕] 와 ESC 둘뿐이다.
+ *
+ * 자리 — 우측 패널(.floating) 바로 왼쪽에 붙인다(right: 100%).
+ * 미션 패널을 가리지 않아야 해서(정의서 2번 "지도·미션 패널은 유지")
+ * 패널 폭이 그리드 따라 변해도 늘 그 왼쪽에 서도록 % 로 잡았다.
+ */
+.floating { position: relative; }
+
+.robot-drawer {
+  position: absolute;
+  top: var(--space-8);
+  bottom: var(--space-8);
+  right: 100%;
+  z-index: 20;
+  width: 400px;
+  max-width: calc(100vw - 420px);
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-4);
+  border-radius: var(--radius-container);
+  background-color: var(--bg-surface-overlay-light);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+}
+
+.robot-drawer[hidden] { display: none; }
+
+/* ── 헤더 — Figma Header, padding 20/12/16/12, gap 8 ── */
+.rd-head {
+  flex: none;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-8);
+  padding: var(--space-20) var(--space-12) var(--space-16);
+}
+
+.rd-titles {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.rd-name { margin: 0; color: var(--fg-primary); }
+
+/* 자리 줄 — map-pin 16 + "구역 / 유닛 · 시리얼 · IP". 길면 줄임표로 접는다. */
+.rd-where {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin: 0;
+  min-width: 0;
+  color: var(--fg-tertiary);
+}
+
+.rd-where span:last-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.icon-button.rd-close {
+  flex: none;
+  width: 28px;
+  height: 28px;
+}
+
+.rd-close:hover { background-color: rgb(255 255 255 / 12%); }
+
+.rd-close:focus-visible {
+  outline: var(--border-width-strong) solid var(--border-focus);
+  outline-offset: 1px;
+}
+
+.rd-divider {
+  flex: none;
+  height: var(--border-width-thin);
+  background-color: var(--border-subtle);
+}
+
+/* ── 본문 — Figma Body, padding 8, gap 16, bg/surface/overlay-dark ──
+ * Figma 는 높이가 hug 지만 화면 높이가 정해져 있어 여기서 스크롤을 받는다. */
+.rd-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+  padding: var(--space-8);
+  border-radius: var(--radius-card);
+  background-color: var(--bg-surface-overlay-dark);
+}
+
+.rd-body::-webkit-scrollbar { width: 12px; }
+.rd-body::-webkit-scrollbar-track { background: transparent; }
+
+.rd-body::-webkit-scrollbar-thumb {
+  border: 4px solid transparent;
+  border-radius: 999px;
+  background-color: var(--fg-tertiary);
+  background-clip: content-box;
+}
+
+.rd-body::-webkit-scrollbar-thumb:hover { background-color: var(--fg-secondary); }
+
+@supports not selector(::-webkit-scrollbar) {
+  .rd-body { scrollbar-width: thin; scrollbar-color: var(--fg-tertiary) transparent; }
+}
+
+/* ── LIVE 카메라 ──
+ * Figma 는 사진 한 장이 채워져 있다. 그 사진은 가져오지 않았다 — 출처를 모르는
+ * 제3자 이미지를 공개 저장소에 올릴 수 없어서다. 자리와 크기(176)·라운드·테두리·
+ * LIVE 배지는 Figma 그대로 두고 면만 카메라가 꺼진 듯한 어두운 그라디언트로 채웠다.
+ * 실제 스틸을 주시면 background-image 한 줄만 바꾸면 된다.
+ */
+.rd-cam {
+  flex: none;
+  position: relative;
+  height: 176px;
+  padding: var(--space-8) 10px;
+  border-radius: var(--radius-card);
+  border: var(--border-width-thin) solid var(--border-subtle);
+  background-color: var(--color-gray-950);
+  background-image:
+    repeating-linear-gradient(180deg, rgb(255 255 255 / 4%) 0 1px, transparent 1px 4px),
+    linear-gradient(180deg, transparent 55%, rgb(10 14 21 / 80%) 100%),
+    radial-gradient(85% 55% at 50% 105%, rgb(140 152 175 / 45%) 0%, transparent 70%),
+    radial-gradient(60% 40% at 50% -10%, rgb(78 87 106 / 40%) 0%, transparent 70%);
+  overflow: hidden;
+}
+
+.rd-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--color-gray-0);
+  font-size: 10px;
+  line-height: 14px;
+  font-weight: 600;
+}
+
+.rd-live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #ff383c;
+}
+
+/* ── 정보 행 — Figma Status, 행 36, padding 8, 라벨/값 13/20 ── */
+.rd-kv {
+  flex: none;
+  margin: 0;
+  border-radius: var(--radius-card);
+  border: var(--border-width-thin) solid var(--border-subtle);
+  background-color: var(--bg-surface-overlay-dark);
+  overflow: hidden;
+}
+
+.rd-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-12);
+  min-height: var(--size-control-md);
+  padding: var(--space-8);
+  border-bottom: var(--border-width-thin) solid var(--border-subtle);
+}
+
+.rd-row:last-child { border-bottom: 0; }
+
+.rd-row dt {
+  flex: none;
+  margin: 0;
+  color: var(--fg-tertiary);
+}
+
+.rd-row dd {
+  margin: 0;
+  min-width: 0;
+  text-align: right;
+  color: var(--fg-primary);
+}
+
+.rd-manual { width: 100%; }
+
+/* ── 최근 이벤트 — Figma Events, 머리글 12/18 600, 행 34, padding 8/12 ── */
+.rd-events {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.rd-events-head {
+  margin: 0;
+  color: var(--fg-tertiary);
+  font-weight: 600;
+}
+
+.rd-event-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-radius: var(--radius-card);
+  border: var(--border-width-thin) solid var(--border-subtle);
+  background-color: var(--bg-surface-overlay-dark);
+  overflow: hidden;
+}
+
+.rd-event {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 34px;
+  padding: var(--space-8) var(--space-12);
+  border-bottom: var(--border-width-thin) solid var(--border-subtle);
+}
+
+.rd-event:last-child { border-bottom: 0; }
+
+.rd-event-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  color: var(--fg-tertiary);
+}
+
+/* 주의로 남은 이벤트만 색을 얻는다 — Figma 도 위 두 줄만 warning/fg 다. */
+.rd-event.is-warning .rd-event-text { color: var(--status-warning-fg); }
+.rd-event.is-critical .rd-event-text { color: var(--status-critical-fg); }
+
+.rd-event-time {
+  flex: none;
+  color: var(--fg-tertiary);
+  font-family: var(--font-family-mono);
+  font-weight: 500;
+}
+
+/* ── Inline Notice 의 주의·위험 판 ──
+ * 기존 판은 info 하나뿐이었다. Drawer 알림(정의서 5번)이 주의로 뜬다. */
+.inline-notice.is-warning {
+  border-color: var(--status-warning-border);
+  background-color: var(--status-warning-bg);
+  color: var(--status-warning-fg);
+}
+
+.inline-notice.is-critical {
+  border-color: var(--status-critical-border);
+  background-color: var(--status-critical-bg);
+  color: var(--status-critical-fg);
+}
+
+/* ── 연결이 끊긴 로봇 카드 ──
+ * 정의서 1·2번 — "연결 끊김 로봇은 클릭 불가 · 더블클릭 · 우클릭 불가".
+ * 눌리지 않는다는 것이 눌러 보기 전에 보여야 해서 면을 낮추고 커서를 바꾼다. */
+.robot-card.is-offline {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
