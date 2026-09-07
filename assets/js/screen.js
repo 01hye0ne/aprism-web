@@ -49,11 +49,7 @@
     var mark = panel.querySelector(".ai-delta-mark");
     var orb = (mark && window.PrismOrb) ? window.PrismOrb.mount(mark, { palette: severity() }) : null;
 
-    // closed 상태의 [확인] — 주의 알림을 받았다는 응답. 누르면 화면·패널을 일반(파란) 상태로
-    // 되돌리고, 두 줄을 일반 상태 멘트로 바꾼다.
-    //
-    // 첫 줄은 인사, 둘째 줄이 본문이다(닫힘 16/24, 펼침 20/32 — 크기는 CSS 가 정한다).
-    // 닫힘·펼침 두 판에 같은 클래스가 하나씩 있어서 넷을 다 바꾼다.
+    // 화면 전체(엣지 글로우)도 같이 물들어야 해서 바깥 .two-col 을 잡아 둔다.
     var twoCol = panel.closest(".two-col");
 
     // 첫 줄은 인사·상황, 둘째 줄이 본문이다(닫힘 16/24, 펼침 20/32 — 크기는 CSS 가 정한다).
@@ -83,8 +79,9 @@
       if (orb) { orb.setPalette(severity()); }
     }
 
-    // closed 상태의 [확인] — 주의 알림을 받았다는 응답. 누르면 화면·패널을 일반(파란) 상태로
-    // 되돌리고, 두 줄을 일반 상태 멘트로 바꿔다.
+    // closed 상태의 [확인] — 알림을 받았다는 응답. 주의(warning)·위험(critical) 둘 다에서
+    // 같은 자리에 나오고, 누르면 화면·패널을 일반(파란) 상태로 되돌리며 두 줄을 일반 멘트로
+    // 바꾼다. 심각도마다 다르게 굴 이유가 없다 — 어느 쪽이든 "봤다" 는 한 가지 뜻이다.
     var ack = panel.querySelector("[data-ai-ack]");
     if (ack) {
       var NORMAL_LINE_1 = "안녕하세요, 홍길동 님.";

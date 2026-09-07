@@ -1782,7 +1782,9 @@ button {
 
 .ai-ack:hover { background-color: var(--button-primary-bg-hover); }
 
-.ai-panel:not(.is-warning) .ai-ack { display: none; }
+/* [확인] 은 알림을 받았다는 응답이라 알림 상태(주의·위험)에서만 나온다.
+   일반(파란) 상태에는 받을 알림이 없어 감춘다. */
+.ai-panel:not(.is-warning):not(.is-critical) .ai-ack { display: none; }
 
 /* opened — Figma "Texts": 내용 프레임 + 입력창, gap 4. */
 .ai-opened {

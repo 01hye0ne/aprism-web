@@ -1965,6 +1965,37 @@
     마지막 장을 눌러 <code>충전 중</code> 으로 바뀌는 것까지 확인했습니다.
   </p>
 
+  <h3>9-6. [확인] 을 위험 상태에도 냈습니다</h3>
+  <p>
+    <strong>주의에서만 보이던 버튼입니다.</strong> CSS 한 줄이
+    <code>.ai-panel:not(.is-warning) .ai-ack { display: none }</code> 였습니다 —
+    주의 상태만 알림으로 치던 규칙이라, E-STOP 으로 위험(critical) 이 되면
+    <b>버튼이 사라져 되돌아올 길이 없었습니다</b>.
+  </p>
+  <p>
+    <strong>조건을 "알림 상태냐" 로 바꿨습니다</strong> —
+    <code>:not(.is-warning):not(.is-critical)</code>. 일반(파란) 상태에는 받을 알림이
+    없으니 그대로 감춥니다. <b>버튼 모양·자리·동작은 주의와 완전히 같습니다</b> —
+    흰 면 32h, 닫힘 판 오른쪽 끝, 누르면 일반 상태 멘트로 돌아갑니다.
+    심각도마다 다르게 굴 이유가 없습니다. 어느 쪽이든 <b>"봤다"</b> 는 한 가지 뜻입니다.
+  </p>
+  <table>
+    <tr><th>상태</th><th>[확인]</th></tr>
+    <tr><td>일반(파랑)</td><td><code>display: none</code></td></tr>
+    <tr><td>주의(노랑)</td><td><code>flex</code> · 32h · 흰 면 <code>#FFFFFF</code> / 글자 <code>#070A10</code></td></tr>
+    <tr><td><b>위험(빨강)</b></td><td><b><code>flex</code> · 같은 값</b></td></tr>
+  </table>
+  <p>
+    <strong>흐름이 닫혔습니다.</strong> 주의 → [확인] → 일반, E-STOP → 위험 → [확인] → 일반.
+    이제 화면을 새로 고치지 않아도 처음으로 돌아옵니다.
+  </p>
+  <p>
+    <strong>Figma 에는 위험 상태의 패널이 없습니다.</strong> AI Assist Panel
+    (<code>121:665</code>)에 그려진 것은 파란 판 하나뿐이고, 주의·위험은 여기서 만든
+    상태입니다. <b>버튼 자체는 Figma 의 Acknowledge Button 값 그대로</b>이니
+    나중에 위험 판을 그리실 때 이 값과 맞는지 봐 주세요.
+  </p>
+
   <h3>10. Figma 정리 — 이름 · 설명 · 토큰 바인딩</h3>
   <p>
     작업하면서 눈에 걸린 것들을 Figma 에서 직접 정리했습니다.
