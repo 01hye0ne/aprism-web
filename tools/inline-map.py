@@ -21,11 +21,13 @@ except Exception:
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SVG = os.path.join(ROOT, "assets", "figma", "map-temp.svg")
-PAGE = os.path.join(ROOT, "screens", "dashboard-home.html")
+# 지도를 쓰는 화면 전부. 표시(<!-- map:start --> ~ <!-- map:end -->)가 있는 곳만 건드린다.
+PAGES = ["dashboard-home.html", "mission-setup.html", "mission-precheck.html"]
 
 START = "<!-- map:start -->"
 END = "<!-- map:end -->"
 PREFIX = "map-"
+LF = "\n"
 
 
 def prefixed(svg):
@@ -46,18 +48,20 @@ def main():
     body = body.replace(
         "<svg ", '<svg class="map-image" aria-hidden="true" preserveAspectRatio="none" ', 1)
 
-    page = io.open(PAGE, encoding="utf-8").read()
-    if START not in page or END not in page:
-        raise SystemExit("HTML 에 %s / %s 표시가 없다" % (START, END))
+    for name in PAGES:
+        path = os.path.join(ROOT, "screens", name)
+        page = io.open(path, encoding="utf-8").read()
+        if START not in page or END not in page:
+            raise SystemExit("%s 에 %s / %s 표시가 없다" % (name, START, END))
 
-    head = page[:page.index(START) + len(START)]
-    tail = page[page.index(END):]
-    out = head + "\n" + body + "\n              " + tail
-    if out == page:
-        print("그대로")
-        return
-    io.open(PAGE, "w", encoding="utf-8", newline="").write(out)
-    print("inlined  screens/dashboard-home.html (%.0f KB)" % (len(body) / 1024.0))
+        head = page[:page.index(START) + len(START)]
+        tail = page[page.index(END):]
+        out = head + LF + body + LF + "              " + tail
+        if out == page:
+            print("그대로   screens/" + name)
+            continue
+        io.open(path, "w", encoding="utf-8", newline="").write(out)
+        print("inlined  screens/%s (%.0f KB)" % (name, len(body) / 1024.0))
     print("이어서:  python tools/stamp-assets.py")
 
 
