@@ -1877,12 +1877,17 @@ button {
   inset: 0;
   pointer-events: none;
   border-radius: inherit;
-  padding: var(--border-width-thin);
   background: var(--ai-input-edge);
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
   mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   mask-composite: exclude;
+  /*
+   * 쉴 때는 선이 없다. padding 이 0 이면 안쪽 칸과 바깥 칸이 같아져
+   * 서로 지워지고 아무것도 안 남는다 — 초점에서 2 로 벌리면 그만큼이 선이 된다.
+   * 그래서 선을 켜고 끄는 데 규칙이 하나뿐이고, 색도 --ai-input-edge 하나를 따라간다.
+   */
+  padding: 0;
   transition: padding 120ms ease;
 }
 
@@ -1922,11 +1927,13 @@ button {
 .ai-input-ph::placeholder { color: var(--fg-secondary); opacity: 1; }
 
 /*
- * 초점 — 링을 새로 두르지 않는다. 이 칸이 원래 갖고 있는 그라데이션 테두리를
- * 1px -> 2px 로 키우는 것이 곧 초점 링이다. 그래서 링은 늘 하나뿐이고,
- * 색은 --ai-input-edge 를 그대로 쓰므로 알림 색을 따라간다
- * (일반은 파랑, .ai-panel.is-warning 에서 노랑으로 덮인다).
- * 면도 한 단계 들어 올려 두께 변화만으로는 약한 신호를 보탠다.
+ * 초점 — 이때만 선이 생긴다. 쉴 때는 어두운 면만 있고 테두리가 없다.
+ * 링을 따로 두르지 않고 그라데이션 테두리를 0 -> 2px 로 벌린다.
+ * 그래서 링은 늘 하나뿐이고, 색은 --ai-input-edge 를 그대로 쓰므로
+ * 알림 색을 따라간다(일반은 파랑, .ai-panel.is-warning 에서 노랑으로 덮인다).
+ * 면도 한 단계 들어 올려 신호를 보탠다.
+ *
+ * Figma(121:665) 는 쉴 때도 1px 그라데이션 테두리를 그린다 — 뺀 것은 여기 판단이다.
  */
 .ai-input-ph:focus { outline: none; }
 

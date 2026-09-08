@@ -1604,13 +1604,20 @@
   </p>
   <p>
     <strong>초점 링을 따로 두르지 않습니다.</strong> 처음에는 칸 바깥에
-    <code>outline 2px</code> 을 얹었는데, 칸이 이미 <strong>그라데이션 테두리를 갖고 있어</strong>
-    링이 두 겹으로 보였습니다. 지금은 <strong>그 테두리 자체가 초점 링</strong>입니다 —
-    <code>1px → 2px</code> 로 두꺼워집니다.
+    <code>outline 2px</code> 을 얹었는데, 칸이 <strong>그라데이션 테두리를 갖고 있어</strong>
+    링이 두 겹으로 보였습니다. 지금은 <strong>그 테두리 자체가 초점 링</strong>입니다.
+  </p>
+  <p>
+    <strong>쉴 때는 선이 아예 없습니다.</strong> 처음엔 1px 테두리가 늘 있었는데,
+    <b>가만히 있는 칸에 선이 있으면 이미 눌러 놓은 것처럼 읽혀</b> 뺐습니다.
+    이제 <b>선이 있다 = 지금 여기에 친다</b> 한 가지 뜻입니다.
+    <code>0 → 2px</code> 로 벌어지며 생깁니다 — 테두리를 그리는
+    <code>::before</code> 의 <code>padding</code> 하나만 움직이므로 규칙이 하나뿐입니다.
+    <b>Figma(121:665) 는 쉴 때도 1px 을 그립니다 — 뺀 것은 여기 판단입니다.</b>
   </p>
   <table>
     <tr><th></th><th>쉴 때</th><th>초점</th></tr>
-    <tr><td>테두리</td><td><code>1px</code> 그라데이션</td><td><strong><code>2px</code> 같은 그라데이션</strong></td></tr>
+    <tr><td>테두리</td><td><b>없음</b></td><td><strong><code>2px</code> 그라데이션</strong></td></tr>
     <tr><td>면</td><td><code>bg/surface/overlay-dark</code> (반투명)</td>
         <td><strong>알림 팔레트의 가장 어두운 자리 (솔리드)</strong></td></tr>
   </table>
