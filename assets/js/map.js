@@ -32,6 +32,28 @@
   // 그림을 구워 두는 크기의 상한(긴 변). GPU 텍스처 한계가 보통 8192 다.
   var MAX_RASTER_PX = 8192;
 
+  /*
+   * 확대해도 커지지 않는 것들 — 글자와 뱃지.
+   *
+   * 지도를 키우면 그림만 커져야 한다. 이름표와 상태 뱃지까지 같이 커지면
+   * 화면이 금세 글자로 덮인다. 그래서 그 그룹에는 배율의 역수를 걸어
+   * 화면에서의 크기를 붙들어 둔다.
+   *
+   * 두 가지 규칙이 있다.
+   *   이름표 · 웨이포인트 뱃지 · 로봇 번호 — zoom 1 에서 보이던 크기 그대로 얼린다.
+   *   로봇 상태 뱃지 — Delta 태그와 같은 높이(26)로 줄인 뒤 얼린다.
+   *     Figma 에서 수행 중인 로봇 것만 45 로 그려져 있어 혼자 크게 떴다.
+   *     넷을 한 크기로 맞춘다 — 같은 컴포넌트가 자리마다 다른 크기일 이유가 없다.
+   */
+  var BADGE_PX = 26;
+  var FROZEN = [
+    "[id^='map-Robot_Status_Badge']",   // 로봇 상태 뱃지 — 유일하게 크기도 줄인다
+    "[id^='map-Robot_ID_Label']",       // R-01 같은 로봇 번호
+    "[id^='map-DS_Step']",              // 웨이포인트 순번 칩 (1 · 2 · 3 · 4)
+    "[id^='map-DS_Mission_Badge']",     // 웨이포인트 상태 뱃지
+    "[id^='map-WP_Label']"              // WP-01 같은 웨이포인트 이름
+  ].join(", ");
+
   // 배율이 멎고 이만큼 지나면 그림을 그 배율로 다시 굽는다.
   var SETTLE_MS = 140;
   var WHEEL_STEP = 1.0015;   // deltaY 1 당 배율. 트랙패드와 휠 둘 다 자연스러운 값.
@@ -87,10 +109,57 @@
     settle = setTimeout(function () { settle = null; bake(); }, SETTLE_MS);
   }
 
+  /*
+   * 얼려 둘 그룹을 한 번만 모은다. 각자의 bbox 한가운데를 축으로 삼아
+   * translate -> scale -> translate 로 제자리에서 줄인다.
+   * getBBox() 는 그려진 뒤라야 값이 나와서 여기서 한 번만 잰다.
+   */
+  var pins = [];
+  function collect() {
+    if (pins.length || !image.querySelector) { return; }
+    var found = [];
+    var zone = image.querySelector("#map-Layer_Zone_Labels");
+    if (zone) {
+      Array.prototype.slice.call(zone.children).forEach(function (g) { found.push(g); });
+    }
+    Array.prototype.slice.call(image.querySelectorAll(FROZEN))
+      .forEach(function (g) { found.push(g); });
+
+    found.forEach(function (g) {
+      var box;
+      try { box = g.getBBox(); } catch (e) { return; }
+      if (!box || !box.height) { return; }
+      pins.push({
+        el: g,
+        cx: box.x + box.width / 2,
+        cy: box.y + box.height / 2,
+        h: box.height,
+        // 상태 뱃지만 Delta 태그 높이로 맞춘다. 나머지는 제 크기 그대로다.
+        badge: g.id.indexOf("map-Robot_Status_Badge") === 0
+      });
+    });
+  }
+
+  // 배율이 바뀔 때만 다시 쓴다 — 끌어 옮기는 동안에는 크기가 그대로다.
+  var pinnedAt = 0;
+  function freeze() {
+    var k = scale();
+    if (!k || Math.abs(k - pinnedAt) < 0.0001) { return; }
+    pinnedAt = k;
+    pins.forEach(function (p) {
+      // 이름표는 zoom 1 의 크기(=cover 배)로, 뱃지는 화면에서 BADGE_PX 로.
+      var s = p.badge ? (BADGE_PX / (p.h * k)) : (cover / k);
+      p.el.setAttribute("transform",
+        "translate(" + p.cx + " " + p.cy + ") scale(" + s + ") translate(" + (-p.cx) + " " + (-p.cy) + ")");
+    });
+  }
+
   function draw() {
     // 구워진 배율과의 차이만 transform 이 맡는다. 멎어 있을 때는 늘 1 이다.
     var k = raster ? scale() / raster : scale();
     plane.style.transform = "translate3d(" + x + "px," + y + "px,0) scale(" + k + ")";
+    collect();
+    freeze();
   }
 
   // 창 크기가 바뀌면 cover 를 다시 잡는다. 보고 있던 지점은 그대로 둔다.

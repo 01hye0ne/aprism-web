@@ -2247,6 +2247,67 @@
     사라집니다(호버가 걸리는 요소도 없습니다).
   </p>
 
+  <h3>9-9. 확대하면 지도 그림만 커집니다</h3>
+  <p>
+    <strong>글자와 뱃지가 같이 커지고 있었습니다.</strong> 지도를 키우면 이름표도
+    상태 뱃지도 함께 부풀어서, 두세 배만 가도 화면이 글자로 덮였습니다.
+    <b>이제 그림만 커집니다.</b>
+  </p>
+
+  <p><strong>먼저 지도를 <code>&lt;img&gt;</code> 에서 인라인 <code>&lt;svg&gt;</code> 로 바꿨습니다.</strong>
+    <code>&lt;img&gt;</code> 로 실은 SVG 는 <b>안쪽 그룹에 손이 닿지 않습니다</b> —
+    이름표 하나하나에 배율을 걸어야 하는데 방법이 없습니다.
+    <code>file://</code> 로 열어도 되어야 해서 <code>fetch</code> 도 못 씁니다.
+    <code>map.js</code> 첫 줄에 <em>"레이어를 켜고 끄려면 &lt;img&gt; 를 인라인 &lt;svg&gt; 로
+    바꾸기만 하면 된다"</em> 고 적어 뒀던 그 자리입니다.
+  </p>
+  <p>
+    <code>python tools/inline-map.py</code> 가 <code>assets/figma/map-temp.svg</code> 를
+    HTML 의 <code>&lt;!-- map:start --&gt;</code> ~ <code>&lt;!-- map:end --&gt;</code> 사이에
+    박아 넣습니다. <b>지도를 다시 내보내면 이 한 줄만 돌리면 됩니다.</b>
+    id 에는 전부 <code>map-</code> 를 붙입니다 — Figma 가 <code>Rectangle 168</code> 같은
+    흔한 이름을 쓰는 바람에 <b>페이지 안의 다른 SVG 와 이미 한 건 부딪히고</b> 있었습니다.
+  </p>
+
+  <p><strong>얼리는 방법은 배율의 역수입니다.</strong> 그룹마다 제 bbox 한가운데를 축으로
+    <code>translate → scale → translate</code> 를 걸어 <b>제자리에서 줄입니다</b>.
+    지도가 <var>k</var> 배로 커지면 그 그룹에는 <code>1/k</code> 를 줘서
+    화면에서의 크기가 변하지 않습니다. 규칙은 둘입니다.
+  </p>
+  <table>
+    <tr><th>무엇</th><th>규칙</th><th>화면 크기</th></tr>
+    <tr><td>로봇 상태 뱃지</td><td><b>Delta 태그와 같은 높이</b>로 맞춘 뒤 얼림</td><td><b>26px</b></td></tr>
+    <tr><td>구역 이름 (터빈 1호기 …)</td><td>zoom 1 에서 보이던 크기 그대로 얼림</td><td>13.5 · 10.9px</td></tr>
+    <tr><td>웨이포인트 순번 칩 · 이름 · 로봇 번호</td><td>같음</td><td>그대로</td></tr>
+  </table>
+
+  <p><strong>상태 뱃지는 크기도 줄였습니다.</strong>
+    Figma 에서 <b>수행 중인 로봇 것만 45 로 그려져</b> 혼자 크게 떴습니다
+    (나머지 셋은 16~17). <b>넷을 한 크기로 맞췄습니다</b> —
+    같은 컴포넌트가 자리마다 다른 크기일 이유가 없습니다.
+    높이는 Delta 태그와 같은 26 입니다.
+  </p>
+  <table>
+    <tr><th></th><th>zoom 1</th><th>zoom 1.5</th><th>zoom 3.4</th></tr>
+    <tr><td>상태 뱃지 4개</td><td>26 / 26 / 26 / 26</td><td>26 / 26 / 26 / 26</td><td>26 / 26 / 26 / 26</td></tr>
+    <tr><td>구역 이름 4개</td><td>13.5 / 13.5 / 10.9 / 10.9</td><td>같음</td><td>같음</td></tr>
+  </table>
+  <p>
+    배율이 바뀔 때만 다시 씁니다 — <b>끌어 옮기는 동안에는 손대지 않습니다</b>.
+    <code>getBBox()</code> 는 그려진 뒤라야 값이 나와서 처음 한 번만 재 두고 씁니다.
+  </p>
+
+  <p><strong>Figma 쪽에서 봐 주셨으면 하는 것이 있습니다.</strong>
+    상태 뱃지 넷의 크기가 45 · 17 · 16 · 16 으로 제각각입니다. 화면에서는 26 으로
+    맞춰 두었지만, <b>컴포넌트 쪽도 한 크기로 정리하시는 게 좋겠습니다</b> —
+    안 그러면 지도를 다시 내보낼 때마다 다시 어긋납니다.
+  </p>
+  <p>
+    HTML 이 82KB 에서 <b>250KB</b> 로 늘었습니다. 지도 SVG 163KB 가 통째로 들어갔습니다 —
+    아이콘을 인라인한 것과 같은 이유(파일로 열어도 보여야 한다)이고,
+    한 번 받으면 캐시에 남습니다.
+  </p>
+
   <h3>10. Figma 정리 — 이름 · 설명 · 토큰 바인딩</h3>
   <p>
     작업하면서 눈에 걸린 것들을 Figma 에서 직접 정리했습니다.
