@@ -46,6 +46,15 @@
    *     넷을 한 크기로 맞춘다 — 같은 컴포넌트가 자리마다 다른 크기일 이유가 없다.
    */
   var BADGE_PX = 26;
+
+  /*
+   * 너무 작게 그려진 표식은 조금 키워서 얼린다.
+   * 확대해도 안 커지게 만들고 나니, Figma 에서 4~6 으로 그려진 것들
+   * (WP-01 이름 4 · 웨이포인트 상태 뱃지 6 · 로봇 번호 둘이 4)이
+   * 어느 배율에서도 읽히지 않게 됐다. 바닥값을 준다.
+   */
+  var LABEL_MIN = 13;   // 구역 이름 — 작은 쪽이 10.8 이었다
+  var MARK_MIN = 12;    // 웨이포인트 · 로봇 번호처럼 지도 위에 흩어진 표식
   var FROZEN = [
     "[id^='map-Robot_Status_Badge']",   // 로봇 상태 뱃지 — 유일하게 크기도 줄인다
     "[id^='map-Robot_ID_Label']",       // R-01 같은 로봇 번호
@@ -115,10 +124,11 @@
    * getBBox() 는 그려진 뒤라야 값이 나와서 여기서 한 번만 잰다.
    */
   var pins = [];
+  var zone = null;
   function collect() {
     if (pins.length || !image.querySelector) { return; }
     var found = [];
-    var zone = image.querySelector("#map-Layer_Zone_Labels");
+    zone = image.querySelector("#map-Layer_Zone_Labels");
     if (zone) {
       Array.prototype.slice.call(zone.children).forEach(function (g) { found.push(g); });
     }
@@ -129,13 +139,15 @@
       var box;
       try { box = g.getBBox(); } catch (e) { return; }
       if (!box || !box.height) { return; }
+      var isBadge = g.id.indexOf("map-Robot_Status_Badge") === 0;
       pins.push({
         el: g,
         cx: box.x + box.width / 2,
         cy: box.y + box.height / 2,
         h: box.height,
-        // 상태 뱃지만 Delta 태그 높이로 맞춘다. 나머지는 제 크기 그대로다.
-        badge: g.id.indexOf("map-Robot_Status_Badge") === 0
+        // 상태 뱃지만 Delta 태그 높이로 못 박는다. 나머지는 제 크기를 쓰되 바닥값이 있다.
+        fixed: isBadge ? BADGE_PX : 0,
+        min: g.parentNode === zone ? LABEL_MIN : MARK_MIN
       });
     });
   }
@@ -147,8 +159,9 @@
     if (!k || Math.abs(k - pinnedAt) < 0.0001) { return; }
     pinnedAt = k;
     pins.forEach(function (p) {
-      // 이름표는 zoom 1 의 크기(=cover 배)로, 뱃지는 화면에서 BADGE_PX 로.
-      var s = p.badge ? (BADGE_PX / (p.h * k)) : (cover / k);
+      // 화면에서 갖고 싶은 높이 — 뱃지는 못 박은 값, 나머지는 제 크기와 바닥값 중 큰 쪽.
+      var want = p.fixed || Math.max(p.h * cover, p.min);
+      var s = want / (p.h * k);
       p.el.setAttribute("transform",
         "translate(" + p.cx + " " + p.cy + ") scale(" + s + ") translate(" + (-p.cx) + " " + (-p.cy) + ")");
     });
