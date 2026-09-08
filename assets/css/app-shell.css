@@ -1224,8 +1224,9 @@ button {
   right: calc(-1 * (var(--space-8) + var(--grid-gutter)));
   display: flex;
   flex-direction: column;
+  /* Figma "Map Tool Rail" 330:5822 — 44x132, padding 4(space/4), gap 8(space/8), radius 8. */
   gap: var(--space-8);
-  padding: var(--space-8);
+  padding: var(--space-4);
   border: var(--border-width-thin) solid var(--color-gray-700);
   border-radius: var(--radius-container);
   background-color: var(--color-gray-800);

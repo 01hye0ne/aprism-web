@@ -479,6 +479,25 @@
     거터를 식에 그대로 쓰기 때문에 <b>1600 breakpoint 에서도 같습니다</b> —
     1440 에서도 레일 오른쪽 1112, 패널 왼쪽 1120 으로 8 입니다.
   </p>
+  <p>
+    <b>레일 안쪽 여백은 4 입니다</b>(Figma <code>Map Tool Rail</code> <code>330:5822</code> —
+    44×132 · padding <code>space/4</code> · gap <code>space/8</code> · radius <code>radius/container</code>).
+    전에는 8 이라 레일이 54 였습니다.
+  </p>
+  <table>
+    <tr><th></th><th>Figma</th><th>화면</th></tr>
+    <tr><td>안쪽 여백</td><td>4</td><td>4</td></tr>
+    <tr><td>버튼 사이</td><td>8</td><td>8</td></tr>
+    <tr><td>폭 × 높이</td><td>44 × 132</td><td><b>46 × 134</b></td></tr>
+    <tr><td>테두리</td><td><b>없음</b></td><td><b>1px <code>gray/700</code></b></td></tr>
+  </table>
+  <p>
+    <b>2 씩 큰 것은 그 테두리입니다.</b> Figma 의 레일에는 stroke 도 effect 도 없고
+    면(<code>bg/surface/default</code>)만 있습니다. 화면 쪽 테두리는 언제 왜 들어갔는지
+    적힌 데가 없어 <b>이번에는 그대로 뒀습니다</b> — 빼면 44×132 로 정확히 맞습니다.
+    면 색도 <code>gray/800</code> 원시값을 직접 쓰고 있는데
+    <code>bg/surface/default</code> 와 같은 값이라 눈에는 차이가 없습니다.
+  </p>
   <table>
     <tr><th>1920 기준</th><th>값</th></tr>
     <tr><td>콘텐츠 폭</td><td>1600</td></tr>
