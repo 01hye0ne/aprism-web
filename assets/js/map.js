@@ -263,12 +263,16 @@
   function glide(nextYaw, nextPitch, nextZoom, recenter) {
     if (!renderer) { return; }
     var from = { yaw: yaw, pitch: pitch, zoom: zoom, t: target.clone() };
-    var at = 0;
+    /*
+     * 프레임 수가 아니라 시간으로 센다.
+     * "19프레임 동안"으로 세면 프레임이 드문 곳에서 가다 말고 어중간한 각도에 멎는다.
+     * 시간으로 세면 프레임이 몇 장 안 나와도 마지막 한 장이 끝 자리에 앉는다.
+     */
+    var began = (window.performance && performance.now) ? performance.now() : Date.now();
     trip = {};
     var mine = trip;
-    (function step() {
-      if (trip !== mine) { return; }
-      at = Math.min(1, at + 1 / 19);              // 약 320ms (60fps)
+
+    function put(at) {
       var e = at < 0.5 ? 2 * at * at : 1 - Math.pow(-2 * at + 2, 2) / 2;
       yaw = from.yaw + (nextYaw - from.yaw) * e;
       pitch = from.pitch + (nextPitch - from.pitch) * e;
@@ -276,9 +280,28 @@
       if (recenter) { target.lerpVectors(from.t, home, e); }
       plan();
       frame();
+    }
+
+    (function step() {
+      if (trip !== mine) { return; }
+      var now = (window.performance && performance.now) ? performance.now() : Date.now();
+      var at = Math.min(1, (now - began) / 320);
+      put(at);
       if (at < 1) { window.requestAnimationFrame(step); }
       else { trip = null; }
     })();
+
+    /*
+     * 보험 하나 — 탭이 뒤에 있는 동안에는 화면을 안 그려서 rAF 가 아예 오지 않는다.
+     * 그러면 위 줄이 한 번 돌고 멈춰 카메라가 가다 만 각도에 남는다.
+     * 타이머는 그때도 오므로 시간이 다 되면 끝 자리에 앉힌다.
+     * 이미 도착했으면(trip 이 비었으면) 아무 일도 하지 않는다.
+     */
+    window.setTimeout(function () {
+      if (trip !== mine) { return; }
+      put(1);
+      trip = null;
+    }, 360);
   }
 
   // 전체 보기 — 처음 각도 · 처음 배율 · 한가운데로 돌아온다.
