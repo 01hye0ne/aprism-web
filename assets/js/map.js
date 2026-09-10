@@ -31,8 +31,25 @@
   var WHEEL_STEP = 1.0015;   // deltaY 1 당 배율. 트랙패드와 휠 둘 다 자연스러운 값.
   var BUTTON_STEP = 1.5;
 
-  // 카메라가 보는 방향. y 를 x·z 보다 낮게 두면 예전 지도처럼 옆면이 보인다.
-  var DIR = [1, 0.85, 1];
+  /*
+   * 카메라가 보는 방향을 각도 둘로 들고 있는다 — 끌어서 돌릴 수 있어야 해서다.
+   *   yaw    바닥에서 도는 각. 0 이면 정면(축에 나란한 평면도)
+   *   pitch  올려다보는 각. 0 이 수평, 90도가 바로 위에서 내려다보는 탑뷰
+   *
+   * 처음 자리는 예전 아이소메트릭 각도와 같다 — (1, 0.85, 1) 을 각도로 옮긴 값이다.
+   * 90도 정각은 쓰지 않는다. 그 자리에서는 "화면 오른쪽"이 정해지지 않아
+   * 카메라가 한 바퀴 뒤집힌다. 89도면 눈으로는 탑뷰이고 셈은 멀쩡하다.
+   */
+  var HOME_YAW = Math.PI / 4;
+  var HOME_PITCH = Math.asin(0.85 / Math.sqrt(1 + 0.85 * 0.85 + 1));
+  var TOP_PITCH = 89 * Math.PI / 180;
+  var MIN_PITCH = 6 * Math.PI / 180;
+  var TURN = 0.006;       // 커서 1px 당 도는 각(rad)
+
+  var yaw = HOME_YAW;
+  var pitch = HOME_PITCH;
+  var dirV = null;
+  var WORLD_UP = null;
 
   /*
    * 다크모드 기술 도면 팔레트.
@@ -74,14 +91,23 @@
   var target = null;      // 카메라가 보는 지점(바닥 위)
   var home = null;        // 처음 자리 — [전체 보기] 가 돌아오는 곳
   var baseSize = 1;       // zoom 1 에서 화면 세로에 담기는 월드 길이
-  var right = null, upOnGround = null;
+  var right = null, upOnGround = null;   // 화면 가로 · 세로에 맞는 월드 방향
   var span = 1;           // 모델 반지름 — 이동 범위를 가두는 데 쓴다
   var THREE = null;
+
+  // 각도에서 방향 셋을 다시 잡는다. 돌릴 때마다 화면의 가로·세로가 달라진다.
+  function orient() {
+    var cp = Math.cos(pitch), sp = Math.sin(pitch);
+    dirV.set(cp * Math.sin(yaw), sp, cp * Math.cos(yaw)).normalize();
+    right.crossVectors(WORLD_UP, dirV).normalize();
+    upOnGround.crossVectors(dirV, right).normalize();
+  }
 
   function frame() {
     if (!renderer) { return; }
     var w = view.clientWidth, h = view.clientHeight;
     if (!w || !h) { return; }
+    orient();
     renderer.setSize(w, h, false);
 
     var halfH = (baseSize / zoom) / 2;
@@ -106,11 +132,8 @@
       .addScaledVector(right, -dx * s)
       .addScaledVector(upOnGround, dy * s);
 
-    camera.position.set(
-      look.x + DIR[0] * span * 4,
-      look.y + DIR[1] * span * 4,
-      look.z + DIR[2] * span * 4
-    );
+    camera.position.copy(look).addScaledVector(dirV, span * 4);
+    camera.up.copy(upOnGround);
     camera.lookAt(look);
     renderer.render(scene, camera);
   }
@@ -126,6 +149,8 @@
     var reach = span * 1.2;
     target.x = Math.min(home.x + reach, Math.max(home.x - reach, target.x));
     target.z = Math.min(home.z + reach, Math.max(home.z - reach, target.z));
+    // 돌린 채로 밀면 위아래로도 새어 나간다. 층 높이 언저리로 묶어 둔다.
+    target.y = Math.min(home.y + span * 0.6, Math.max(home.y - span * 0.3, target.y));
   }
 
   // 커서 밑의 지점이 제자리에 남도록 배율을 바꾼다.
@@ -173,27 +198,39 @@
   }, { passive: false });
 
   // 끌어서 이동. 버튼 위에서 시작한 것은 무시한다.
-  var dragging = false, lastX = 0, lastY = 0, pid = null;
+  var dragging = false, sliding = false, lastX = 0, lastY = 0, pid = null;
 
   hit.addEventListener("pointerdown", function (event) {
-    if (event.button !== 0) { return; }
+    if (event.button !== 0 && event.button !== 1) { return; }
     if (event.target.closest(".map-tools")) { return; }
     dragging = true;
+    // 그냥 끌면 돌아본다. Shift 를 누르거나 가운데 버튼으로 끌면 판이 밀린다.
+    sliding = event.shiftKey || event.button === 1;
     pid = event.pointerId;
     lastX = event.clientX;
     lastY = event.clientY;
     hit.setPointerCapture(pid);
-    hit.classList.add("is-panning");
+    hit.classList.add(sliding ? "is-panning" : "is-turning");
   });
 
   hit.addEventListener("pointermove", function (event) {
     if (!dragging || event.pointerId !== pid || !renderer) { return; }
-    var s = perPixel();
-    target.addScaledVector(right, -(event.clientX - lastX) * s);
-    target.addScaledVector(upOnGround, (event.clientY - lastY) * s);
+    var dx = event.clientX - lastX;
+    var dy = event.clientY - lastY;
+
+    if (sliding) {
+      var s = perPixel();
+      target.addScaledVector(right, -dx * s);
+      target.addScaledVector(upOnGround, dy * s);
+      clamp();
+    } else {
+      // 커서를 따라가는 방향으로 돈다 — 오른쪽으로 끌면 모델이 오른쪽으로 돈다.
+      yaw -= dx * TURN;
+      pitch = Math.min(TOP_PITCH, Math.max(MIN_PITCH, pitch + dy * TURN));
+    }
+
     lastX = event.clientX;
     lastY = event.clientY;
-    clamp();
     plan();
     frame();
   });
@@ -204,6 +241,7 @@
     if (pid !== null && hit.hasPointerCapture(pid)) { hit.releasePointerCapture(pid); }
     pid = null;
     hit.classList.remove("is-panning");
+    hit.classList.remove("is-turning");
   }
 
   hit.addEventListener("pointerup", endDrag);
@@ -217,16 +255,46 @@
     });
   }
 
-  // 전체 보기 — 처음 자리로 돌아온다. 예전에는 "로봇 추적" 이었는데
-  // 따라갈 로봇이 모델에 없어서 이 자리로 바꿨다.
+  /*
+   * 자리 옮기기 — 각도와 배율을 부드럽게 몰고 간다.
+   * 툭 바뀌면 어디를 보고 있었는지 놓친다. 짧게(320ms) 끌고 가면 따라온다.
+   */
+  var trip = null;
+  function glide(nextYaw, nextPitch, nextZoom, recenter) {
+    if (!renderer) { return; }
+    var from = { yaw: yaw, pitch: pitch, zoom: zoom, t: target.clone() };
+    var at = 0;
+    trip = {};
+    var mine = trip;
+    (function step() {
+      if (trip !== mine) { return; }
+      at = Math.min(1, at + 1 / 19);              // 약 320ms (60fps)
+      var e = at < 0.5 ? 2 * at * at : 1 - Math.pow(-2 * at + 2, 2) / 2;
+      yaw = from.yaw + (nextYaw - from.yaw) * e;
+      pitch = from.pitch + (nextPitch - from.pitch) * e;
+      zoom = from.zoom + (nextZoom - from.zoom) * e;
+      if (recenter) { target.lerpVectors(from.t, home, e); }
+      plan();
+      frame();
+      if (at < 1) { window.requestAnimationFrame(step); }
+      else { trip = null; }
+    })();
+  }
+
+  // 전체 보기 — 처음 각도 · 처음 배율 · 한가운데로 돌아온다.
+  // 예전에는 "로봇 추적" 이었는데 따라갈 로봇이 모델에 없어서 이 자리로 바꿨다.
   var reset = document.querySelector("[data-map-track]");
   if (reset) {
     reset.addEventListener("click", function () {
-      if (!renderer) { return; }
-      zoom = 1;
-      target.copy(home);
-      plan();
-      frame();
+      glide(HOME_YAW, HOME_PITCH, 1, true);
+    });
+  }
+
+  // 탑뷰 — 바로 위에서 내려다본다. yaw 도 0 으로 돌려 벽이 화면 축과 나란해진다.
+  var top = document.querySelector("[data-map-top]");
+  if (top) {
+    top.addEventListener("click", function () {
+      glide(0, TOP_PITCH, zoom, false);
     });
   }
 
@@ -310,8 +378,7 @@
     var list = meshes.map(function (item) { return item.mesh; });
 
     spots.forEach(function (spot) {
-      var from = spot.clone().addScaledVector(
-        new THREE.Vector3(DIR[0], DIR[1], DIR[2]).normalize(), span * 4);
+      var from = spot.clone().addScaledVector(dirV, span * 4);
       var dir = new THREE.Vector3().subVectors(spot, from).normalize();
       raycaster.set(from, dir);
       var far = from.distanceTo(spot);
@@ -409,10 +476,11 @@
     // zoom 1 에서 세로로 모델이 다 담기고 조금 남게.
     baseSize = span * 1.7;
 
-    var dir = new THREE.Vector3(DIR[0], DIR[1], DIR[2]).normalize();
-    right = new THREE.Vector3().crossVectors(new THREE.Vector3(0, 1, 0), dir).normalize();
-    // 화면 세로 방향을 바닥에 눕힌 것 — 끌면 판이 미끄러지는 방향이다.
-    upOnGround = new THREE.Vector3().crossVectors(dir, right).normalize();
+    WORLD_UP = new THREE.Vector3(0, 1, 0);
+    dirV = new THREE.Vector3();
+    right = new THREE.Vector3();
+    upOnGround = new THREE.Vector3();
+    orient();
 
     camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.01, span * 40);
 

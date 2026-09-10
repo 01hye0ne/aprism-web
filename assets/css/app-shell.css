@@ -1154,9 +1154,11 @@ button {
   user-select: none;
 }
 
-/* 지도 칸에서만 잡힌다. 도구 레일 위에서는 화살표 그대로. */
+/* 지도 칸에서만 잡힌다. 도구 레일 위에서는 화살표 그대로.
+   그냥 끌면 돌아보고(is-turning), Shift · 가운데 버튼으로 끌면 판이 밀린다(is-panning). */
 .map-canvas { cursor: grab; touch-action: none; }
-.map-canvas.is-panning { cursor: grabbing; }
+.map-canvas.is-turning { cursor: grabbing; }
+.map-canvas.is-panning { cursor: move; }
 .map-canvas .map-tools { cursor: default; }
 
 /* ---------- Map Panel ---------- */
