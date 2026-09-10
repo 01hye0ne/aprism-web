@@ -359,6 +359,11 @@
 
   <h3>3-0. 지도 — 2차 임시 맵 · 휠로 확대·축소</h3>
   <p>
+    <strong>지난 이야기입니다.</strong> 2026-09-10 에 지도가 <b>평면 SVG 에서 3D 모델로</b>
+    바뀌었습니다. 아래 내용(레이어 · <code>viewBox</code> · 배율마다 다시 굽던 방식)은
+    그때까지의 기록입니다 — 지금 도는 것은 <b>9-9</b> 를 보십시오.
+  </p>
+  <p>
     <code>Map</code>(<code>538:12727</code>)을 통째로 내보내 넣었습니다.
     레이어가 <b>여덟 겹</b>으로 나뉘어 있고 SVG 에도 <code>id</code> 로 그대로 남습니다 —
     <code>Layer_Ground</code> · <code>Aisles</code> · <code>Structure</code> ·
@@ -2283,89 +2288,90 @@
     사라집니다(호버가 걸리는 요소도 없습니다).
   </p>
 
-  <h3>9-9. 확대하면 지도 그림만 커집니다</h3>
+  <h3>9-9. 지도를 3D 모델로 바꿨습니다 (APRO 4F)</h3>
   <p>
-    <strong>글자와 뱃지가 같이 커지고 있었습니다.</strong> 지도를 키우면 이름표도
-    상태 뱃지도 함께 부풀어서, 두세 배만 가도 화면이 글자로 덮였습니다.
-    <b>이제 그림만 커집니다.</b>
-  </p>
-
-  <p><strong>먼저 지도를 <code>&lt;img&gt;</code> 에서 인라인 <code>&lt;svg&gt;</code> 로 바꿨습니다.</strong>
-    <code>&lt;img&gt;</code> 로 실은 SVG 는 <b>안쪽 그룹에 손이 닿지 않습니다</b> —
-    이름표 하나하나에 배율을 걸어야 하는데 방법이 없습니다.
-    <code>file://</code> 로 열어도 되어야 해서 <code>fetch</code> 도 못 씁니다.
-    <code>map.js</code> 첫 줄에 <em>"레이어를 켜고 끄려면 &lt;img&gt; 를 인라인 &lt;svg&gt; 로
-    바꾸기만 하면 된다"</em> 고 적어 뒀던 그 자리입니다.
+    <strong>평면 SVG 한 장이던 지도가 실제 3D 모델이 됐습니다.</strong>
+    디자이너가 <code>assets/source/</code> 에 <code>APRO 4F.glb</code> 를 넣어 주셨습니다.
+    <b>파일에는 층의 껍데기만 들어 있습니다</b> — 바깥벽 · 칸막이 몇 장 · 단 하나.
+    19개 덩이 · 삼각형 1,919개, 재질은 검정 하나이고 텍스처 · 조명 · 카메라 · 이름은 없습니다.
   </p>
   <p>
-    <code>python tools/inline-map.py</code> 가 <code>assets/figma/map-temp.svg</code> 를
-    HTML 의 <code>&lt;!-- map:start --&gt;</code> ~ <code>&lt;!-- map:end --&gt;</code> 사이에
-    박아 넣습니다. <b>지도를 쓰는 화면 셋(미션 모니터링 · 미션 설정 · 사전 점검)에
-    한꺼번에 들어갑니다</b> — 세 화면이 같은 지도를 같은 규칙으로 씁니다.
-    <b>지도를 다시 내보내면 이 한 줄만 돌리면 됩니다.</b>
-    id 에는 전부 <code>map-</code> 를 붙입니다 — Figma 가 <code>Rectangle 168</code> 같은
-    흔한 이름을 쓰는 바람에 <b>페이지 안의 다른 SVG 와 이미 한 건 부딪히고</b> 있었습니다.
-  </p>
-
-  <p><strong>얼리는 방법은 배율의 역수입니다.</strong> 그룹마다 제 bbox 한가운데를 축으로
-    <code>translate → scale → translate</code> 를 걸어 <b>제자리에서 줄입니다</b>.
-    지도가 <var>k</var> 배로 커지면 그 그룹에는 <code>1/k</code> 를 줘서
-    화면에서의 크기가 변하지 않습니다. 규칙은 둘입니다.
+    <strong>그래서 지도 위 표식이 전부 없어졌습니다.</strong> 예전 지도가 들고 있던 것들은
+    SVG 안에 그려져 있던 것이라 모델에는 하나도 없습니다.
+    <b>다시 얹지 않기로 정했습니다</b>(2026-09-10) — 지금은 층만 봅니다.
   </p>
   <table>
-    <tr><th>무엇</th><th>규칙</th><th>화면 크기</th></tr>
-    <tr><td>로봇 상태 뱃지</td><td><b>Delta 태그와 같은 높이</b>로 못 박고 얼림</td><td><b>26px</b></td></tr>
-    <tr><td>구역 이름 (터빈 1호기 …)</td><td>제 크기, 단 <b>13 아래로는 안 내려감</b></td><td>13.5 · 13px</td></tr>
-    <tr><td>웨이포인트 순번 칩</td><td>제 크기 (이미 충분함)</td><td>16.4px</td></tr>
-    <tr><td>로봇 번호 · WP 이름 · WP 상태 뱃지</td><td>제 크기, 단 <b>12 아래로는 안 내려감</b></td><td>12px</td></tr>
+    <tr><th>없어진 것</th><th>몇 개</th></tr>
+    <tr><td>구역 이름 (터빈 1호기 · 제어반 A …)</td><td>11</td></tr>
+    <tr><td>웨이포인트 — 순번 칩 · 상태 뱃지 · <code>WP-01</code> 이름</td><td>4 묶음</td></tr>
+    <tr><td>점선 경로</td><td>1</td></tr>
+    <tr><td>로봇과 상태 뱃지 · 로봇 번호</td><td>4 · 4 · 3</td></tr>
+    <tr><td>도킹 스테이션</td><td>1</td></tr>
   </table>
+  <p>
+    <b>같이 사라진 코드</b> — 확대해도 안 커지게 얼려 두던 장치(9-9 이전 판)와
+    <code>tools/inline-map.py</code>, 그리고 <code>assets/figma/map-temp.svg</code> 입니다.
+    <b>지금은 벡터를 배율마다 다시 굽는 일 자체가 없습니다</b> —
+    3D 라 어느 배율에서도 그 자리에서 다시 그려집니다.
+  </p>
 
-  <p><strong>바닥값을 준 이유입니다.</strong> 확대해도 안 커지게 만들고 나니
-    <b>Figma 에서 4~6 으로 그려진 것들이 어느 배율에서도 읽히지 않게</b> 됐습니다.
-    예전에는 확대하면 커져서 읽을 수 있었는데 그 길이 막힌 것입니다.
+  <p><strong>직교(orthographic) 카메라입니다.</strong>
+    예전 지도가 아이소메트릭 평면이었습니다. 원근을 주면 <b>같은 크기의 설비가 자리마다
+    다르게 보여서</b> 배치를 읽기 어렵습니다. 각도를 고정해 두면 확대 · 이동이 예전과
+    똑같이 "판을 밀고 당기는" 느낌으로 남습니다. 각도는 <code>(1, 0.85, 1)</code> —
+    y 를 낮춰 옆면이 보이게 했습니다.
   </p>
   <table>
-    <tr><th>표식</th><th>Figma 가 그린 크기</th><th>지금</th></tr>
-    <tr><td>WP-01 같은 웨이포인트 이름</td><td><b>4.0px</b></td><td>12px</td></tr>
-    <tr><td>웨이포인트 상태 뱃지 (● 대기)</td><td><b>5.9px</b></td><td>12px</td></tr>
-    <tr><td>로봇 번호 (R-02 · R-03)</td><td><b>11.5 / 4.1 / 4.1px</b></td><td>12px</td></tr>
-    <tr><td>구역 이름</td><td>13.5 / 10.8px</td><td>13.5 / 13px</td></tr>
+    <tr><th>조작</th><th>지금</th><th>예전과</th></tr>
+    <tr><td>휠</td><td>확대 · 축소 (커서 밑 지점 고정)</td><td>같음</td></tr>
+    <tr><td>끌기</td><td>이동. 도구 레일 위에서 시작한 것은 무시</td><td>같음</td></tr>
+    <tr><td>[확대] 버튼</td><td>1.5배씩</td><td>같음</td></tr>
+    <tr><td>[전체 보기] 버튼</td><td>처음 자리로</td><td><b>예전엔 "로봇 추적"</b> — 따라갈 로봇이 없어졌습니다</td></tr>
   </table>
   <p>
-    로봇 번호 셋이 <code>11.5 · 4.1 · 4.1</code> 로 서로 달랐던 것처럼,
-    <b>같은 표식이 자리마다 다른 크기</b>인 곳이 여럿입니다. 화면에서는 바닥값으로
-    덮었지만 <b>컴포넌트 쪽도 정리가 필요합니다</b>.
+    <b>모델은 보이는 칸 한가운데에 섭니다.</b> 창(<code>.map-view</code>)은 우측 패널 뒤까지
+    덮기 때문에, 창 한가운데에 맞추면 모델이 패널에 반쯤 가린 자리에 섭니다.
+    카메라가 보는 지점을 <code>.map-canvas</code> 와의 차이만큼 밀어 줍니다 —
+    도구 레일 자리를 잡을 때 쓴 것과 같은 셈입니다.
   </p>
 
-  <p><strong>상태 뱃지는 크기도 줄였습니다.</strong>
-    Figma 에서 <b>수행 중인 로봇 것만 45 로 그려져</b> 혼자 크게 떴습니다
-    (나머지 셋은 16~17). <b>넷을 한 크기로 맞췄습니다</b> —
-    같은 컴포넌트가 자리마다 다른 크기일 이유가 없습니다.
-    높이는 Delta 태그와 같은 26 입니다.
+  <p><strong>면과 모서리를 따로 그립니다.</strong> 모델이 가진 재질은
+    <b>순검정 하나뿐</b>이라 그대로 두면 실루엣만 남습니다.
+    면은 <code>#2C3443</code>, 모서리는 한 단 밝은 <code>#4E576A</code> 선입니다 —
+    예전 평면 지도가 갖고 있던 인상입니다. 조명은 둘(하늘빛 반구 + 방향광 하나)이고,
+    아래쪽을 화면 바탕색으로 두어 바닥으로 갈수록 어두워지게 했습니다.
+  </p>
+
+  <p><strong>모델은 <code>&lt;script&gt;</code> 로 실립니다.</strong>
+    브라우저는 <code>file://</code> 로 연 페이지에서 <code>fetch</code> 로 로컬 파일을 읽는 것을
+    막습니다 — 그냥 열면 지도가 안 뜹니다. 그래서
+    <code>tools/inline-model.py</code> 가 <code>.glb</code> 를 base64 로 바꿔
+    <code>assets/js/map-model.js</code>(235KB)에 담고, 평범한 <code>&lt;script src&gt;</code> 로 싣습니다.
+    <b>아이콘을 CSS 에 인라인한 것과 같은 이유이고 같은 방식입니다.</b>
+    모델을 다시 내보내시면 그 한 줄만 돌리면 됩니다.
+  </p>
+  <p>
+    <b>화면이 도로 가벼워졌습니다</b> — 지도 SVG 163KB 를 세 화면에 박아 두던 것이
+    빠지고, 대신 <b>모델 한 벌을 셋이 나눠 씁니다</b>.
   </p>
   <table>
-    <tr><th></th><th>zoom 1</th><th>zoom 1.5</th><th>zoom 3.4</th></tr>
-    <tr><td>상태 뱃지 4개</td><td>26 / 26 / 26 / 26</td><td>26 / 26 / 26 / 26</td><td>26 / 26 / 26 / 26</td></tr>
-    <tr><td>구역 이름 4개</td><td>13.5 / 13.5 / 13 / 13</td><td>같음</td><td>같음</td></tr>
-    <tr><td>R-01 · WP 뱃지 · WP 이름</td><td>12 / 12 / 12</td><td>같음</td><td>같음</td></tr>
+    <tr><th>화면</th><th>SVG 를 박았을 때</th><th>지금</th></tr>
+    <tr><td>미션 모니터링</td><td>250KB</td><td><b>78KB</b></td></tr>
+    <tr><td>미션 설정</td><td>188KB</td><td><b>19KB</b></td></tr>
+    <tr><td>사전 점검</td><td>186KB</td><td><b>17KB</b></td></tr>
+    <tr><td>공통</td><td>—</td><td><code>map-model.js</code> 235KB (한 벌)</td></tr>
   </table>
-  <p>
-    배율이 바뀔 때만 다시 씁니다 — <b>끌어 옮기는 동안에는 손대지 않습니다</b>.
-    <code>getBBox()</code> 는 그려진 뒤라야 값이 나와서 처음 한 번만 재 두고 씁니다.
-  </p>
 
-  <p><strong>Figma 쪽에서 봐 주셨으면 하는 것이 있습니다.</strong>
-    상태 뱃지 넷의 크기가 45 · 17 · 16 · 16 으로, 로봇 번호 셋이 11.5 · 4.1 · 4.1 로
-    제각각입니다. 화면에서는 26 과 12 로 맞춰 두었지만,
-    <b>컴포넌트 쪽도 한 크기로 정리하시는 게 좋겠습니다</b> —
-    안 그러면 지도를 다시 내보낼 때마다 다시 어긋납니다.
+  <p><strong>three.js 가 처음으로 들어왔습니다 — 그리고 CDN 에서 옵니다.</strong>
+    화면 <code>&lt;head&gt;</code> 의 importmap 이 <code>three</code> 와 <code>three/addons/</code> 를
+    <code>cdn.jsdelivr.net</code> 으로 이어 주고, <code>map.js</code> 가 동적 <code>import()</code> 로
+    가져옵니다. <b>망이 막힌 현장에서는 지도가 안 뜹니다</b>(나머지 화면은 그대로 돕니다).
+    저장소에 넣어 두는 쪽으로 바꿀 수 있지만, 그러면 <code>file://</code> 로 여는 길이 막힙니다 —
+    모듈은 <code>file://</code> 에서 교차 출처로 걸립니다. <b>둘 중 하나는 골라야 합니다.</b>
+    라이선스는 MIT 이고 <code>THIRD-PARTY.md</code> 에 적어 뒀습니다.
   </p>
   <p>
-    화면마다 163KB 씩 늘었습니다(미션 모니터링 82 → 250KB, 미션 설정 25 → 188KB,
-    사전 점검 23 → 186KB). 지도 SVG 가 통째로 들어간 값입니다 —
-    아이콘을 인라인한 것과 같은 이유(파일로 열어도 보여야 한다)입니다.
-    <b>세 벌이 되는 것이 아깝지만</b>, 한 벌만 두고 <code>fetch</code> 로 불러오면
-    <code>file://</code> 에서 막힙니다.
+    Delta 오브는 여전히 three 를 안 씁니다 — 순수 WebGL2 그대로입니다.
   </p>
 
   <h3>10. Figma 정리 — 이름 · 설명 · 토큰 바인딩</h3>

@@ -3,7 +3,7 @@
 `aprism-web` 이 쓰는 남의 것들을 한곳에 모았습니다. 제품 판매를 앞두고 검토받으실 때
 근거가 흩어져 있지 않도록 정리한 문서입니다.
 
-마지막 확인: 2026-09-03
+마지막 확인: 2026-09-10
 
 ## 한눈에
 
@@ -11,11 +11,30 @@
 |---|---|---|---|
 | React Bits — BorderGlow | 주의 상태 엣지 글로우 | MIT + Commons Clause | **가능** · 조건 있음 |
 | React Bits — Strands | `strands-lab.html` | MIT + Commons Clause | **가능** · 조건 있음 |
+| three.js | 지도(3D 모델) 렌더링 | MIT | 가능 |
 | JetBrains Mono | 수치·코드 표기 | SIL OFL 1.1 | 가능 |
 | IBM Plex Sans / Mono | 실험실 페이지 비교용 | SIL OFL 1.1 | 가능 |
 | SUIT Variable | 화면 전체 본문 서체 | **확인 필요** | 확인 후 판단 |
 | 아이콘 26개 | 화면 전반 | 자체 제작 추정 · **확인 필요** | 확인 후 판단 |
 | Claude Design 핸드오프 번들 | `assets/robot-dog/` · `assets/prism-orb/` | 작업 자료 · 배포 안 됨 | 해당 없음 |
+
+---
+
+## three.js
+
+- **저작자** — Copyright © 2010-2024 three.js authors
+- **라이선스** — MIT
+- **쓰는 곳** — 지도입니다. 미션 모니터링 · 미션 설정 · 사전 점검 세 화면에서
+  `assets/model/apro-4f.glb`(APRO 4F 층 모델)를 그립니다. `assets/js/map.js`.
+- **어떻게 들어오나** — 저장소에 넣지 않고 **CDN 에서 불러옵니다.**
+  화면 `<head>` 의 importmap 이 `three` 와 `three/addons/` 를
+  `https://cdn.jsdelivr.net/npm/three@0.160.0/` 으로 이어 주고,
+  `map.js` 가 동적 `import()` 로 가져옵니다.
+  받아 오는 것은 `build/three.module.js` 와 `examples/jsm/loaders/GLTFLoader.js` 둘입니다.
+- **제품에 넣어 팔 때** — MIT 라 조건은 저작권 표시와 라이선스 전문 동봉뿐입니다.
+  다만 **CDN 의존은 정리하는 편이 낫습니다** — 망이 막힌 현장에서는 지도가 안 뜹니다.
+  저장소에 넣고 번들에서 부르는 쪽으로 바꾸면 됩니다(그때는 `file://` 로 여는 길이 막힙니다 —
+  모듈은 `file://` 에서 교차 출처로 걸립니다).
 
 ---
 
@@ -123,9 +142,10 @@ CDN 이 죽으면 서체가 무너지고, 사용자 브라우저가 외부에 �
 - `assets/js/prism-orb.js` — Delta 의 오브. Claude Design 핸드오프(`assets/prism-orb/`)의
   프로토타입을 옮긴 것입니다. **원본은 three.js 를 esm.sh 에서 불러 쓰지만 이쪽은 안 씁니다** —
   셰이더는 그대로 두고 three 가 하던 일(기하 · 행렬 · 렌더타깃)만 순수 WebGL2 로 다시 썼습니다.
-  **저장소에도 화면에도 three.js 는 들어오지 않습니다.**
+  (지도는 2026-09-10 부터 three.js 를 씁니다. 오브는 여전히 안 씁니다 — 위 three.js 항목 참고.)
 - `assets/img/robot-graphic.svg` — Figma 의 `Robot-Graphic` 내보내기
-- `assets/figma/map-temp.svg` — Figma 지도 자리표시자
+- `assets/model/apro-4f.glb` — 지도 3D 모델. **디자이너가 직접 만든 것으로 알고 있습니다 —
+  출처가 다르면 알려 주세요.** `assets/js/map-model.js` 는 이 파일을 base64 로 담은 생성물입니다
 - `assets/css/tokens.css` — Figma 변수에서 옮긴 디자인 토큰
 - 모든 화면 · 컴포넌트 마크업과 스타일
 

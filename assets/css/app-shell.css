@@ -1142,23 +1142,14 @@ button {
   background-color: var(--bg-canvas);
 }
 
-.map-plane {
-  position: absolute;
-  top: 0;
-  left: 0;
-  transform-origin: 0 0;
-  will-change: transform;
-}
-
 /*
- * 크기는 map.js 가 정한다 — 배율만큼 실제로 키워 놓아야 벡터가 그 배율로 다시 구워진다.
- * transform: scale() 만으로 키우면 제 크기로 구운 비트맵을 늘리는 것이라 뭉개진다.
- * 첫 그림이 실릴 때까지의 값만 여기 둔다.
+ * WebGL 캔버스. 크기는 map.js 가 창에 맞춰 정한다 —
+ * 여기서는 창을 그대로 채우는 것만 정해 둔다(캔버스 기본 300x150 을 덮는다).
  */
-.map-image {
+.map-scene {
   display: block;
-  width: 1716px;
-  height: 967px;
+  width: 100%;
+  height: 100%;
   -webkit-user-drag: none;
   user-select: none;
 }
