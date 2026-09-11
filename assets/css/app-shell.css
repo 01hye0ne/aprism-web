@@ -1125,9 +1125,9 @@ button {
 }
 
 /*
- * 지도 — Figma "Map"(538:12727) 을 통째로 내보낸 SVG 한 장이다.
- * 예전에는 .two-col::before 의 배경 이미지였는데, 휠로 확대·축소하려면
- * 움직일 요소가 있어야 해서 실제 노드로 바꿨다. 움직임은 assets/js/map.js.
+ * 지도 — 전주기 맵 3D 모델(assets/model/apro-4f.glb)을 WebGL 로 그린다.
+ * 예전에는 Figma "Map"(538:12727) 을 내보낸 SVG 한 장이었다. 자유롭게 돌려 보려면
+ * 진짜 입체가 있어야 해서 모델로 바꿨다. 카메라와 손놀림은 assets/js/map.js.
  *
  * 창(.map-view)은 .two-col 전체를 덮는다 — 우측 미션 패널 뒤까지 지도가 깔려야
  * 반투명한 패널 면이 지도 위에 뜬 유리로 읽힌다(Figma 도 지도 프레임이 1716 로 더 넓다).
@@ -1155,8 +1155,12 @@ button {
 }
 
 /* 지도 칸에서만 잡힌다. 도구 레일 위에서는 화살표 그대로.
-   그냥 끌면 돌아보고(is-turning), Shift · 가운데 버튼으로 끌면 판이 밀린다(is-panning). */
+   그냥 끌면 돌아보고(is-turning), Shift · 가운데 · 오른쪽 버튼으로 끌거나
+   두 손가락을 대면 판이 밀린다(is-panning).
+   touch-action:none 이라야 손가락 둘로 오므릴 때 브라우저가 페이지를 대신 확대하지 않는다. */
 .map-canvas { cursor: grab; touch-action: none; }
+/* 설비 위에서만 손가락이 된다. 지도에서 누를 수 있는 것은 설비뿐이라는 유일한 표시다. */
+.map-canvas.is-picking { cursor: pointer; }
 .map-canvas.is-turning { cursor: grabbing; }
 .map-canvas.is-panning { cursor: move; }
 .map-canvas .map-tools { cursor: default; }
@@ -1198,6 +1202,285 @@ button {
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
+}
+
+/*
+ * 지도 웨이포인트 쪽지 — 설비 카드와 같은 면·같은 꼬리를 쓴다.
+ * 성격이 같은 것은 같아 보여야 한다. 다른 것은 머리의 칩 색뿐이다.
+ */
+.map-wp {
+  position: absolute;
+  left: var(--x, 50%);
+  top: var(--y, 50%);
+  transform: translate(-50%, calc(-100% - 12px));
+  z-index: 4;
+  min-width: 176px;
+  padding: var(--space-8) var(--space-12) var(--space-12);
+  border: var(--border-width-thin) solid var(--border-default);
+  border-radius: var(--radius-container);
+  background-color: var(--bg-surface-default);
+  box-shadow: 0 8px 24px var(--color-alpha-dark-500, rgba(0, 0, 0, 0.45));
+  cursor: default;
+}
+
+.map-wp::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -5px;
+  width: 8px;
+  height: 8px;
+  transform: translateX(-50%) rotate(45deg);
+  border-right: var(--border-width-thin) solid var(--border-default);
+  border-bottom: var(--border-width-thin) solid var(--border-default);
+  background-color: var(--bg-surface-default);
+}
+
+.map-wp .map-card-tag { color: var(--color-gray-950); }
+.map-wp[data-result="safe"] .map-card-tag { background-color: var(--color-safe-300); }
+.map-wp[data-result="caution"] .map-card-tag { background-color: var(--color-warning-500); }
+.map-wp[data-result="danger"] .map-card-tag {
+  background-color: var(--color-danger-500);
+  color: var(--color-gray-0);
+}
+.map-wp[data-result="current"] .map-card-tag { background-color: var(--color-main-400); }
+.map-wp[data-result="upcoming"] .map-card-tag {
+  background-color: var(--color-gray-600);
+  color: var(--color-gray-0);
+}
+
+.map-wp-read {
+  margin: var(--space-8) 0 0;
+  color: var(--fg-secondary);
+  font-size: var(--font-size-caption, 11px);
+  line-height: 1.5;
+}
+
+.map-wp-more {
+  margin-top: var(--space-8);
+  padding: 2px var(--space-8);
+  font-size: var(--font-size-caption, 11px);
+}
+
+/*
+ * 고른 칸 — 진행 상태(완료·수행·대기)의 색은 건드리지 않는다.
+ * 그 둘은 다른 이야기라 서로 덮으면 안 된다. 고른 표시는 테두리 하나로만 한다.
+ */
+.timeline-item { cursor: pointer; }
+
+.timeline-item.is-selected .step-card {
+  outline: var(--border-width-thin) solid var(--border-brand);
+  outline-offset: 1px;
+}
+
+.timeline-item:focus-visible { outline: none; }
+.timeline-item:focus-visible .step-card {
+  outline: 2px solid var(--border-brand);
+  outline-offset: 1px;
+}
+
+/*
+ * 지도 위의 로봇 — 지금 고른 로봇이 길 위에 선 자리다.
+ *
+ * 3D 가 아니라 HTML 이다. 로봇 그래픽을 우측 카드와 같은 SVG 로 쓸 수 있고,
+ * 배율을 아무리 올려도 또렷하다. 자리(--x · --y)와 크기(--bot-zoom)는 map.js 가
+ * 매 프레임 넣어 준다.
+ *
+ * 가는 쪽은 바닥에 깔리는 시야 부채꼴이 말해 준다(map.js 의 viewFan).
+ * 로봇 그림은 옆모습이라 돌리면 드러눕는다 —
+ * 대신 왼쪽으로 갈 때는 좌우만 뒤집는다(--flip).
+ */
+.map-bot {
+  position: absolute;
+  left: var(--x, 50%);
+  top: var(--y, 50%);
+  transform: translate(-50%, -50%);
+  z-index: 3;
+  display: grid;
+  justify-items: center;
+}
+
+/*
+ * 로봇 표식은 배율을 따라 커진다(--bot-zoom).
+ *
+ * 픽셀 크기로 붙박아 두면 확대할수록 건물만 커지고 로봇은 그대로라, 가까이 갈수록
+ * 점점 작아 보인다. map.js 가 지도 배율에서 이 값을 내 준다.
+ * 이름표는 안 키운다 — 글자는 읽히는 크기면 되고, 커지면 지도를 가린다.
+ */
+.map-bot-hit {
+  display: block;
+  width: calc(52px * var(--bot-zoom, 1));
+  height: calc(52px * var(--bot-zoom, 1));
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+/*
+ * 로봇은 동그라미 하나다. 일러스트를 넣어 봤지만 지도에서는 실루엣이 뭉개지고,
+ * 배율을 낮추면 무슨 그림인지 알 수 없었다. 지도 표식은 "여기 있다"만 말하면 된다.
+ * 가는 쪽은 바닥에 깔리는 시야 부채꼴이 맡는다(map.js 의 viewFan).
+ */
+.map-bot-dot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: calc(20px * var(--bot-zoom, 1));
+  height: calc(20px * var(--bot-zoom, 1));
+  transform: translate(-50%, -50%);
+  border: calc(3px * var(--bot-zoom, 1)) solid var(--bg-canvas);
+  border-radius: 50%;
+  background-color: var(--bot-tint, var(--color-main-600));
+  box-shadow: 0 0 0 calc(1px * var(--bot-zoom, 1)) var(--bot-tint, var(--color-main-600)),
+              0 2px 10px var(--color-alpha-dark-500, rgba(0, 0, 0, 0.5));
+}
+
+/*
+ * 누른 로봇에는 큰 동그라미가 하나 더 생긴다. 30% 로 옅어서 지도를 가리지 않고,
+ * 여러 대 가운데 어느 것을 짚었는지 멀리서도 보인다.
+ */
+.map-bot-halo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: calc(64px * var(--bot-zoom, 1));
+  height: calc(64px * var(--bot-zoom, 1));
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background-color: var(--bot-tint, var(--color-main-600));
+  opacity: 0;
+  transition: opacity 160ms ease;
+}
+
+.map-bot.is-picked .map-bot-halo { opacity: 0.3; }
+
+/* 이름표는 표식만큼은 안 키운다. 글자는 읽히는 크기면 되고, 커지면 지도를 가린다. */
+.map-bot-name {
+  margin-top: 2px;
+  padding: 1px 6px;
+  border-radius: var(--radius-pill, 999px);
+  background-color: var(--bg-surface-default);
+  color: var(--fg-primary);
+  font-size: calc(var(--font-size-caption, 11px) * min(var(--bot-zoom, 1), 1.5));
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+/* 로봇을 누르면 뜨는 상태 쪽지. 설비 카드와 같은 면·같은 줄을 쓴다. */
+.map-bot-tip {
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 50%;
+  min-width: 168px;
+  padding: var(--space-8) var(--space-12) var(--space-12);
+  transform: translateX(-50%);
+  border: var(--border-width-thin) solid var(--border-default);
+  border-radius: var(--radius-container);
+  background-color: var(--bg-surface-default);
+  box-shadow: 0 8px 24px var(--color-alpha-dark-500, rgba(0, 0, 0, 0.45));
+  cursor: default;
+}
+
+.map-bot-tip .map-card-tag { background-color: var(--bot-tint, var(--color-main-600)); }
+
+/*
+ * 설비 카드 — 지도에서 설비 하나를 누르면 그 위에 뜬다.
+ *
+ * 자리는 map.js 가 잡는다. 고른 설비의 꼭대기를 화면 좌표로 옮겨 --x · --y 로 넣어 주고,
+ * 여기서는 그 점 위로 카드를 띄우기만 한다. 카드가 지도 칸 밖으로 나가지 않게
+ * 가두는 것도 map.js 몫이다 — 칸 크기를 아는 쪽이 거기다.
+ *
+ * 지도 위에 뜨는 것이라 우측 미션 패널(.floating)과 같은 유리 면을 쓴다.
+ */
+.map-card {
+  position: absolute;
+  left: var(--x, 50%);
+  top: var(--y, 50%);
+  /* 고른 설비 꼭대기에서 10px 위. 아래 꼬리가 그 자리를 가리킨다. */
+  transform: translate(-50%, calc(-100% - 10px));
+  z-index: 3;
+  min-width: 168px;
+  padding: var(--space-8) var(--space-12) var(--space-12);
+  border: var(--border-width-thin) solid var(--border-default);
+  border-radius: var(--radius-container);
+  background-color: var(--bg-surface-default);
+  box-shadow: 0 8px 24px var(--color-alpha-dark-500, rgba(0, 0, 0, 0.45));
+  cursor: default;
+}
+
+/* 꼬리 — 카드가 어느 덩이를 가리키는지 한 눈에 보이게 한다. */
+.map-card::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -5px;
+  width: 8px;
+  height: 8px;
+  transform: translateX(-50%) rotate(45deg);
+  border-right: var(--border-width-thin) solid var(--border-default);
+  border-bottom: var(--border-width-thin) solid var(--border-default);
+  background-color: var(--bg-surface-default);
+}
+
+.map-card-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  margin-bottom: var(--space-8);
+}
+
+.map-card-tag {
+  padding: 2px var(--space-8);
+  border-radius: var(--radius-pill, 999px);
+  background-color: var(--bg-accent);
+  color: var(--color-gray-0);
+  font-size: var(--font-size-caption, 11px);
+  line-height: 1.4;
+}
+
+.map-card-name {
+  flex: 1 1 auto;
+  color: var(--fg-primary);
+  font-size: var(--font-size-body-2, 13px);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.map-card-close {
+  flex: none;
+  display: inline-flex;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--fg-tertiary, var(--fg-secondary));
+  cursor: pointer;
+}
+
+.map-card-close:hover { color: var(--fg-primary); }
+
+.map-card-rows {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+}
+
+.map-card-rows > div {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-12);
+}
+
+.map-card-rows dt {
+  color: var(--fg-secondary);
+  font-size: var(--font-size-caption, 11px);
+}
+
+.map-card-rows dd {
+  margin: 0;
+  color: var(--fg-primary);
+  font-size: var(--font-size-caption, 11px);
+  font-variant-numeric: tabular-nums;
 }
 
 /*

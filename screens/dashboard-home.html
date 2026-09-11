@@ -19,7 +19,7 @@
   }
   </script>
   <link rel="stylesheet" href="../assets/css/tokens.css?v=0e0a1366" />
-  <link rel="stylesheet" href="../assets/css/app-shell.css?v=d31f4ac5" />
+  <link rel="stylesheet" href="../assets/css/app-shell.css?v=ff9365c0" />
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
@@ -232,7 +232,7 @@
         <!-- 주의(Warning) 알림 상태 예시 — Figma 478:17275. 일반 상태로 되돌리려면 is-warning 두 곳을 뺀다. -->
         <div class="two-col is-warning">
           <span class="map-view" data-map aria-hidden="true">
-            <!-- APRO 4F 3D 모델. 움직임은 assets/js/map.js.
+            <!-- 전주기 맵 3D 모델. 움직임은 assets/js/map.js.
                  모델은 map-model.js 가 base64 로 들고 있고(file:// 에서도 열려야 한다),
                  three.js 는 <head> 의 importmap 이 CDN 으로 이어 준다. -->
             <canvas class="map-scene" data-map-scene></canvas>
@@ -258,6 +258,54 @@
                 <button type="button" class="icon-button is-secondary" aria-label="영상 리플레이">
                   <span class="i i-20" style="--i:var(--ic-play)"></span>
                 </button>
+              </div>
+              <!-- 지도 위의 로봇·웨이포인트·설비 쪽지. 자리와 내용은 모두
+                   assets/js/map.js 가 채운다. 기본은 hidden 이다. -->
+              <!-- 웨이포인트를 누르면 뜨는 쪽지. 자리와 내용은 assets/js/map.js 가 잡는다.
+                   값은 우측 미션 목록의 같은 웨이포인트에서 그대로 읽어 온다. -->
+              <div class="map-wp" data-map-wp hidden>
+                <div class="map-card-head">
+                  <span class="map-card-tag" data-map-wp-chip>정상</span>
+                  <span class="map-card-name" data-map-wp-name>WP-01</span>
+                  <button type="button" class="map-card-close" data-map-wp-close aria-label="닫기">
+                    <span class="i i-16" style="--i:var(--ic-close)" aria-hidden="true"></span>
+                  </button>
+                </div>
+                <p class="map-wp-read" data-map-wp-read></p>
+                <button type="button" class="btn btn-ghost map-wp-more" data-map-wp-more>상세보기</button>
+              </div>
+              <div class="map-bot" data-map-bot hidden>
+                <div class="map-bot-tip" data-map-bot-tip hidden>
+                  <div class="map-card-head">
+                    <span class="map-card-tag" data-map-bot-tag>로봇</span>
+                    <span class="map-card-name" data-map-bot-title>ROBOT 01</span>
+                    <button type="button" class="map-card-close" data-map-bot-close aria-label="닫기">
+                      <span class="i i-16" style="--i:var(--ic-close)" aria-hidden="true"></span>
+                    </button>
+                  </div>
+                  <dl class="map-card-rows" data-map-bot-rows></dl>
+                </div>
+                <button type="button" class="map-bot-hit" data-map-bot-open aria-label="로봇 상태 보기">
+                  <span class="map-bot-halo" aria-hidden="true"></span>
+                  <span class="map-bot-dot" aria-hidden="true"></span>
+                </button>
+                <span class="map-bot-name" data-map-bot-name>ROBOT 01</span>
+              </div>
+              <!-- 설비를 누르면 뜨는 카드. 자리와 내용은 assets/js/map.js 가 잡는다.
+                   기본은 hidden — 아무것도 안 골랐을 때는 지도만 보인다. -->
+              <div class="map-card" data-map-card hidden>
+                <div class="map-card-head">
+                  <span class="map-card-tag" data-map-card-tag>설비</span>
+                  <span class="map-card-name" data-map-card-name>설비</span>
+                  <button type="button" class="map-card-close" data-map-card-close aria-label="닫기">
+                    <span class="i i-16" style="--i:var(--ic-close)" aria-hidden="true"></span>
+                  </button>
+                </div>
+                <dl class="map-card-rows">
+                  <div><dt>상태</dt><dd data-map-card-state>정상</dd></div>
+                  <div><dt>최근 점검</dt><dd data-map-card-seen>09:52</dd></div>
+                  <div><dt>담당 로봇</dt><dd data-map-card-robot>ROBOT 01</dd></div>
+                </dl>
               </div>
             </div>
 
@@ -1411,9 +1459,9 @@
 
 <script src="../assets/js/theme.js?v=dcf8f460"></script>
 <script src="../assets/js/prism-orb.js?v=03386460"></script>
-<script src="../assets/js/screen.js?v=d7c9e155"></script>
-<script src="../assets/js/map-model.js?v=46b63ea3"></script>
-<script src="../assets/js/map.js?v=058937bb"></script>
+<script src="../assets/js/screen.js?v=9eb341fd"></script>
+<script src="../assets/js/map-model.js?v=fb8d7fde"></script>
+<script src="../assets/js/map.js?v=0bdb0db4"></script>
 <script src="../assets/js/grid-overlay.js?v=164e4f2a"></script>
 </body>
 </html>

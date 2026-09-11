@@ -481,14 +481,24 @@
       // State=Running · 78% · Strong
       current: "현재 수행명",
       steps: [
-        { title: "waypoint name", state: "done", time: "09:12 – 09:31", duration: "19분" },
-        { title: "waypoint name", state: "done", time: "09:31 – 09:52", duration: "21분" },
-        { title: "waypoint name", state: "done", time: "09:52 – 10:08", duration: "16분" },
+        {
+          title: "waypoint name", state: "done", time: "09:12 – 09:31", duration: "19분",
+          result: "safe", read: "온도 61.8℃ · 진동 1.9 mm/s"
+        },
+        {
+          title: "waypoint name", state: "done", time: "09:31 – 09:52", duration: "21분",
+          result: "caution", read: "온도 74.2℃ · 진동 3.4 mm/s"
+        },
+        {
+          title: "waypoint name", state: "done", time: "09:52 – 10:08", duration: "16분",
+          result: "safe", read: "온도 63.1℃ · 진동 2.0 mm/s"
+        },
         {
           title: "Thust BRG Cooling Water Flow",
           state: "running",
           time: "10:08 – 10:24",
           duration: "16분",
+          measuring: "냉각수 유량 · 베어링 온도",
           desc: "압력·온도 센서 판독 중. 기준값 대비 편차를 실시간 비교합니다."
         },
         { title: "waypoint name", state: "pending" },
@@ -500,11 +510,16 @@
       // State=Returning · 18% · Weak — 미션을 마치고 복귀 중이다
       current: "복귀 중",
       steps: [
-        { title: "waypoint name", state: "done", time: "08:40 – 08:58", duration: "18분" },
-        { title: "waypoint name", state: "done", time: "08:58 – 09:14", duration: "16분" },
-        { title: "waypoint name", state: "done", time: "09:14 – 09:37", duration: "23분" },
-        { title: "waypoint name", state: "done", time: "09:37 – 09:55", duration: "18분" },
-        { title: "waypoint name", state: "done", time: "09:55 – 10:11", duration: "16분" }
+        { title: "waypoint name", state: "done", time: "08:40 – 08:58", duration: "18분",
+          result: "safe", read: "온도 58.9℃ · 진동 1.4 mm/s" },
+        { title: "waypoint name", state: "done", time: "08:58 – 09:14", duration: "16분",
+          result: "danger", read: "온도 91.6℃ · 진동 6.8 mm/s" },
+        { title: "waypoint name", state: "done", time: "09:14 – 09:37", duration: "23분",
+          result: "caution", read: "온도 72.0℃ · 진동 3.1 mm/s" },
+        { title: "waypoint name", state: "done", time: "09:37 – 09:55", duration: "18분",
+          result: "safe", read: "온도 60.4℃ · 진동 1.7 mm/s" },
+        { title: "waypoint name", state: "done", time: "09:55 – 10:11", duration: "16분",
+          result: "safe", read: "온도 59.2℃ · 진동 1.5 mm/s" }
       ]
     },
     {
@@ -804,6 +819,22 @@
     });
   }
 
+  /*
+   * 웨이포인트 상태는 둘로 나눠 들고 있는다.
+   *
+   *   진행 상태  completed · current · upcoming — 미션이 정하는 것이다
+   *   고른 상태  selected — 사람이 들여다보려고 짚은 것이다
+   *
+   * 둘을 한 자리에 두면 로봇이 다음 칸으로 넘어갈 때 사람이 보던 칸이 튕겨 나간다.
+   * 그래서 currentWaypointId 와 selectedWaypointId 를 따로 둔다.
+   */
+  var WP_STATE = { done: "completed", running: "current", pending: "upcoming" };
+
+  // 미션 하나 안에서만 쓰는 이름이라 순번으로 충분하다. 지도와 목록이 이 값을 나눠 쓴다.
+  function wpId(index) {
+    return "WP-" + (index + 1 < 10 ? "0" : "") + (index + 1);
+  }
+
   function stepNode(step, index) {
     var meta = STATE[step.state];
 
@@ -848,7 +879,22 @@
     var wrap = el("div", "step-wrap");
     wrap.appendChild(card);
 
+    /*
+     * 검사 결과와 측정 요약은 카드에 그리지 않는다. 목록의 생김새는 예전 그대로다.
+     * 대신 값을 속성에 적어 둔다 — 지도 쪽지가 이 자리에서 읽어 간다.
+     * 같은 값을 지도와 목록 두 군데에 적어 두면 언젠가 어긋난다.
+     */
+    var kind = WP_STATE[step.state];
     var item = el("article", "timeline-item " + meta.klass);
+    item.setAttribute("data-waypoint", wpId(index));
+    item.setAttribute("data-wp-state", kind);
+    if (kind === "completed") {
+      item.setAttribute("data-wp-result", step.result || "safe");
+      item.setAttribute("data-wp-read", step.read || "측정 6항목 · 기준 이내");
+    } else if (kind === "current") {
+      item.setAttribute("data-wp-read", step.measuring || "측정 항목 확인 중");
+    }
+    item.setAttribute("tabindex", "0");
     item.appendChild(capsule);
     item.appendChild(wrap);
     return item;
@@ -892,7 +938,81 @@
       });
       timeline.scrollTop = 0;
       phaseRails(timeline);
+
+      /*
+       * 미션이 바뀌면 고른 칸은 놓는다. 앞 미션의 세 번째 칸을 짚어 두었다고
+       * 다음 미션의 세 번째 칸을 짚은 것은 아니다.
+       * 지금 하는 칸은 놓지 않는다 — 그것은 사람이 고른 것이 아니라 미션이 정한 것이다.
+       */
+      var live = robot.steps.reduce(function (found, step, i) {
+        return found || (step.state === "running" ? wpId(i) : null);
+      }, null);
+      timeline.setAttribute("data-current-waypoint", live || "");
+      timeline.removeAttribute("data-selected-waypoint");
+      paintPicked(null);
+
+      // 지도에게 목록이 새로 그려졌다고 알린다. 지도는 이 목록에서 웨이포인트를 읽는다.
+      document.dispatchEvent(new CustomEvent("aprism:mission", {
+        detail: { current: live }
+      }));
     }
+
+    // 고른 칸에만 표시를 남긴다. 진행 상태(completed·current·upcoming)는 건드리지 않는다.
+    function paintPicked(id) {
+      Array.prototype.forEach.call(timeline.querySelectorAll("[data-waypoint]"), function (item) {
+        var on = id && item.getAttribute("data-waypoint") === id;
+        item.classList.toggle("is-selected", !!on);
+        if (on) { item.setAttribute("data-wp-selected", "true"); }
+        else { item.removeAttribute("data-wp-selected"); }
+      });
+    }
+
+    /*
+     * 칸 하나를 고른다. from 은 어디서 눌렀는지다 —
+     * 지도에서 온 것이면 목록을 그 자리로 굴려 주고, 목록에서 온 것이면 지도에 알린다.
+     * 알림을 되돌려 보내지 않는 것은, 두 쪽이 서로를 끝없이 부르는 것을 막기 위해서다.
+     */
+    function pickWaypoint(id, from) {
+      var same = timeline.getAttribute("data-selected-waypoint") === id;
+      var next = (same && from === "panel") ? null : id;   // 같은 칸을 다시 누르면 놓는다
+
+      if (next) { timeline.setAttribute("data-selected-waypoint", next); }
+      else { timeline.removeAttribute("data-selected-waypoint"); }
+      paintPicked(next);
+
+      if (next && from === "map") {
+        var card = timeline.querySelector("[data-waypoint='" + next + "']");
+        // 화면 밖에 있으면 그 자리까지 굴려 준다. 골랐는데 안 보이면 고른 줄을 모른다.
+        if (card && card.scrollIntoView) {
+          card.scrollIntoView({ block: "nearest", behavior: "smooth" });
+        }
+      }
+      if (from !== "map") {
+        document.dispatchEvent(new CustomEvent("aprism:waypoint", {
+          detail: { id: next, from: "panel" }
+        }));
+      }
+    }
+
+    timeline.addEventListener("click", function (event) {
+      var item = event.target.closest("[data-waypoint]");
+      if (!item) { return; }
+      pickWaypoint(item.getAttribute("data-waypoint"), "panel");
+    });
+
+    timeline.addEventListener("keydown", function (event) {
+      if (event.key !== "Enter" && event.key !== " ") { return; }
+      var item = event.target.closest && event.target.closest("[data-waypoint]");
+      if (!item) { return; }
+      event.preventDefault();
+      pickWaypoint(item.getAttribute("data-waypoint"), "panel");
+    });
+
+    // 지도에서 고른 것을 받는다.
+    document.addEventListener("aprism:waypoint", function (event) {
+      if (!event.detail || event.detail.from !== "map") { return; }
+      pickWaypoint(event.detail.id, "map");
+    });
 
     // 폭이 바뀌면 제목이 다르게 접혀 칸 높이가 달라진다 — 무늬를 다시 맞춘다.
     if (window.ResizeObserver) {
