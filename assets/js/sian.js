@@ -713,6 +713,8 @@
       if (event.key === "Escape" && !scrim.hidden) { close(); }
     });
 
+    $("[data-ad-close]", scrim).addEventListener("click", close);
+
     return { open: open };
   })();
 

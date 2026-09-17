@@ -801,6 +801,7 @@
 .ad-scrim { z-index: 110; }
 
 .ad {
+  position: relative;
   width: 1240px;
   max-width: 100%;
   max-height: 100%;
@@ -808,10 +809,21 @@
   display: flex;
   align-items: flex-start;
   gap: 32px;
-  padding: var(--space-20);
+  /* 위 52 — 닫기 버튼(32) 자리. 카드 머리와 겹치지 않게 한 줄을 비운다. */
+  padding: 52px var(--space-20) var(--space-20);
   border-radius: var(--radius-container);
   background-color: var(--bg-surface-default);
 }
+
+/* 닫기 — 다른 모달과 같은 Ghost · Small(32) 아이콘 버튼. 오른쪽 위 12 안쪽. */
+.icon-button.ad-close {
+  position: absolute;
+  top: var(--space-12);
+  right: var(--space-12);
+  color: var(--fg-secondary);
+}
+
+.icon-button.ad-close:hover { color: var(--fg-primary); }
 
 .ad-col { min-width: 0; display: flex; flex-direction: column; gap: var(--space-20); }
 .ad-col.is-left { flex: 0 1 664px; }
