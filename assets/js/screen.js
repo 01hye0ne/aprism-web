@@ -779,8 +779,8 @@
 
   // 상태 배지는 Figma 에서 사라졌다 — 레일 표식과 카드 면이 그 역할을 한다.
   var STATE = {
-    done: { klass: "is-done", icon: "var(--ic-check)" },
-    running: { klass: "is-running", icon: "var(--ic-play-sm)" },
+    done: { klass: "is-done", icon: "var(--ic-check-circle)" },
+    running: { klass: "is-running", icon: "var(--ic-play-circle)" },
     pending: { klass: "is-pending", icon: null }
   };
 
@@ -855,7 +855,7 @@
     if (meta.icon) {
       capsule.appendChild(el("span", "rail-stub"));
       var mark = el("span", "rail-mark");
-      var icon = el("span", "i i-14");
+      var icon = el("span", "i i-24");
       icon.style.setProperty("--i", meta.icon);
       mark.appendChild(icon);
       capsule.appendChild(mark);
