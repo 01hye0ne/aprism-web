@@ -928,6 +928,17 @@
     radial-gradient(ellipse 70% 60% at 50% 55%, var(--color-gray-800), var(--bg-canvas));
 }
 
+/*
+ * 감지 사진 — 디자이너가 준 프레임(assets/img/sian2-detect-frame.webp, 1264x884 = 632x442 @2x).
+ * 사진에 이미 모서리와 테두리가 그려져 있어 프레임 쪽 선은 지운다. 박스 · 라벨은 그 위에 얹는다.
+ */
+.ad-frame.has-photo {
+  border-color: transparent;
+  background: url("../img/sian2-detect-frame.webp") center / cover no-repeat;
+}
+
+.ad-frame.has-photo .ad-cam { color: #fff; text-shadow: 0 1px 2px rgb(0 0 0 / 70%); }
+
 .ad-cam {
   position: absolute;
   top: var(--space-12);
