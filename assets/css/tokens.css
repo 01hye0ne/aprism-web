@@ -342,19 +342,19 @@
   --alert-default-glow-secondary: var(--color-alpha-glow-secondary-default);
   --alert-default-on-edge: var(--color-main-950);
   --alert-danger-bg: var(--color-danger-300);
-  --alert-danger-edge: var(--color-danger-200);
+  --alert-danger-edge: var(--color-danger-300);
   --alert-danger-fg: var(--color-danger-900);
   --alert-danger-glow-primary: var(--color-alpha-glow-primary-danger);
   --alert-danger-glow-secondary: var(--color-alpha-glow-secondary-danger);
   --alert-danger-on-edge: var(--color-gray-950);
   --alert-safe-bg: var(--color-safe-200);
-  --alert-safe-edge: var(--color-safe-100);
+  --alert-safe-edge: var(--color-safe-300);
   --alert-safe-fg: var(--color-safe-900);
   --alert-safe-glow-primary: var(--color-alpha-glow-primary-safe);
   --alert-safe-glow-secondary: var(--color-alpha-glow-secondary-safe);
   --alert-safe-on-edge: var(--color-gray-950);
   --alert-warning-bg: var(--color-warning-300);
-  --alert-warning-edge: var(--color-warning-500);
+  --alert-warning-edge: var(--color-warning-300);
   --alert-warning-fg: var(--color-warning-900);
   --alert-warning-glow-primary: var(--color-alpha-glow-primary-warning);
   --alert-warning-glow-secondary: var(--color-alpha-glow-secondary-warning);
@@ -500,11 +500,12 @@
  *   - 2026-09-18 실측에서 Dark 두 개를 Figma 값으로 되돌렸다.
  *       status/normal/icon  safe/500(#1DA67F) -> safe/300(#34C759)
  *       status/info/icon    main/400(#89B9ED) -> main/500(#6AA7E7)
- *     아직 남은 어긋남 넷은 손대지 않았다(디자이너 확인 대기).
+ *     같은 날 알림 띠지(Alert Banner 의 Edge Accent) 색 셋도 Figma 값으로 되돌렸다.
+ *       alert/danger/edge Dark   danger/200(#FFA69A) -> danger/300(#FF6B72)
+ *       alert/warning/edge Dark  warning/500(#FFCC00) -> warning/300(#EEDA6B)
+ *       alert/safe/edge Dark     safe/100(#E6F6EE) -> safe/300(#34C759)
+ *     아직 남은 어긋남 하나는 손대지 않았다(디자이너 확인 대기).
  *       bg/brand Light        Figma main/500  / 웹 main/600
- *       alert/danger/edge Dark   Figma danger/300  / 웹 danger/200
- *       alert/warning/edge Dark  Figma warning/300 / 웹 warning/500
- *       alert/safe/edge Dark     Figma safe/300    / 웹 safe/100
  *   - status/critical/fg · status/info/fg 는 Figma 에서 fg-Primary · fg-Secondary 둘로 갈렸다.
  *     웹은 아직 하나로 두고 있다.
  *   - Text Style 이름과 실제 굵기가 어긋난다.
