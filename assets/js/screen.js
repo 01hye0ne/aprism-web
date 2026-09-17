@@ -482,24 +482,25 @@
       current: "현재 수행명",
       steps: [
         {
-          title: "waypoint name", state: "done", time: "09:12 – 09:31", duration: "19분",
+          title: "FFU-01 토출구", state: "done", time: "09:12 – 09:31", duration: "19분",
           result: "safe", read: "온도 61.8℃ · 진동 1.9 mm/s"
         },
         {
-          title: "waypoint name", state: "done", time: "09:31 – 09:52", duration: "21분",
+          title: "HEPA Filter 차압계", state: "done", time: "09:31 – 09:52", duration: "21분",
           result: "caution", read: "온도 74.2℃ · 진동 3.4 mm/s"
         },
         {
-          title: "waypoint name", state: "done", time: "09:52 – 10:08", duration: "16분",
+          title: "냉각수 배관 밸브", state: "done", time: "09:52 – 10:08", duration: "16분",
           result: "safe", read: "온도 63.1℃ · 진동 2.0 mm/s"
         },
         {
-          title: "Thust BRG Cooling Water Flow",
+          title: "N₂ 배관 압력계",
           state: "running",
           time: "10:08 – 10:24",
           duration: "16분",
-          measuring: "냉각수 유량 · 베어링 온도",
-          desc: "압력·온도 센서 판독 중. 기준값 대비 편차를 실시간 비교합니다."
+          // 지도 쪽지 본문 — 제목이 압력계로 바뀌어 냉각수 · 베어링 문구와 맞지 않게 됐다.
+          measuring: "압력 · 정상 범위 대비 편차",
+          desc: "압력계 표시값을 자동 판독하고, 정상 운전범위 대비 압력 편차와 변화 추이를 확인합니다."
         },
         { title: "waypoint name", state: "pending" },
         { title: "waypoint name", state: "pending" },
