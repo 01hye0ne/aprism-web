@@ -285,6 +285,7 @@
     var filter = null;
     var picked = 0;
 
+    var dl = $("[data-dl]");
     var line1 = $("[data-dl-line1]");
     var line2 = $("[data-dl-line2]");
     var chips = $("[data-dl-chips]");
@@ -357,7 +358,12 @@
       });
 
       glow(level === "normal" ? null : level);
-      if (orb) { orb.setPalette(level === "normal" ? "info" : level); }
+      // Delta 는 고른 알림의 단계를 입는다 — 위험이 남아 있어도 주의 알림을 고르면 주의(노랑)다.
+      // 화면 테두리(엣지 글로우)는 그대로 전체에서 가장 높은 단계를 따른다.
+      var tone = chosen ? chosen.sev : "normal";
+      dl.classList.toggle("is-warning", tone === "warning");
+      dl.classList.toggle("is-critical", tone === "critical");
+      if (orb) { orb.setPalette(tone === "normal" ? "info" : tone); }
     }
 
     filters.forEach(function (chip) {

@@ -397,14 +397,15 @@
   transition: background 240ms ease;
 }
 
-.sian[data-level="warning"] .dl {
+/* 색은 목록에서 고른 알림의 단계를 따른다(sian.js 가 .is-warning · .is-critical 를 붙인다). */
+.dl.is-warning {
   --dl-a: #ffc17e;
   --dl-b: #f7cd36;
   --dl-c: #f7cd36;
   --ai-input-edge: linear-gradient(90deg, #ffc17e, #f7cd36);
 }
 
-.sian[data-level="critical"] .dl {
+.dl.is-critical {
   --dl-a: #d95c00;
   --dl-b: #f4463f;
   --dl-c: #f4463f;
