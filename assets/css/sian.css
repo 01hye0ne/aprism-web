@@ -676,6 +676,8 @@
  * 왼쪽 4 띠(alert/*-bg) · 글 묶음(사이 6) · 오른쪽 [확인하기](Accent · Medium).
  */
 .ua-card {
+  position: relative;
+  cursor: pointer;
   display: flex;
   align-items: center;
   gap: var(--space-20);
@@ -738,7 +740,29 @@
 .ua-desc { font-size: var(--font-size-13); line-height: var(--font-line-height-20); color: var(--fg-secondary); }
 .ua-meta { font-size: var(--font-size-12); line-height: var(--font-line-height-18); color: var(--fg-tertiary); }
 
-.ua-card .btn { flex: none; }
+/*
+ * [확인하기] — 기본은 숨기고 카드에 올리거나(hover) 초점이 들어오면 나타난다.
+ * 자리를 차지하지 않고 오른쪽 위에 겹쳐 뜬다 — 나타날 때 글이 다시 흐르며 카드 높이가 튀지 않게.
+ * 뒤에 카드 면색 그라데이션을 깔아 겹친 글을 덮는다. 카드 어디를 눌러도 같은 상세가 열린다.
+ */
+.ua-card .btn {
+  position: absolute;
+  top: 50%;
+  right: var(--space-20);
+  transform: translateY(-50%);
+  opacity: 0;
+  pointer-events: none;
+  box-shadow: -32px 0 24px 8px var(--bg-surface-raised);
+  transition: opacity 120ms ease;
+}
+
+.ua-card:hover .btn,
+.ua-card:focus-within .btn {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.ua-card:hover { border-color: var(--border-default); }
 
 .ua-done {
   display: flex;

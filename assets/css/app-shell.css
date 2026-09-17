@@ -3871,7 +3871,8 @@ input.field-box { outline: 0; }
 
 
 /* ---------- 스크롤바 ---------- */
-/* 시안 1 알림 히스토리 목록(.ah-list)도 웨이포인트 목록(.timeline)과 같은 막대를 쓴다. */
+/* 시안 1 알림 히스토리(.ah-list), 시안 2 미확인 알림(.ua) · 알림 상세(.ad) · 단계 모달 본문도
+   웨이포인트 목록(.timeline)과 같은 막대를 쓴다. */
 /*
  * Figma 에 없는 부분이라 Semantic 토큰으로 맞췄다.
  * 막대는 border/default, 손이 닿으면 border/strong 으로 한 단 진해진다.
@@ -3885,6 +3886,9 @@ input.field-box { outline: 0; }
  */
 .timeline::-webkit-scrollbar,
 .ah-list::-webkit-scrollbar,
+.ua::-webkit-scrollbar,
+.ad::-webkit-scrollbar,
+.stage-card .mp-scroll::-webkit-scrollbar,
 .robot-strip::-webkit-scrollbar,
 .context-panel::-webkit-scrollbar,
 .gnb-rail::-webkit-scrollbar {
@@ -3894,6 +3898,9 @@ input.field-box { outline: 0; }
 
 .timeline::-webkit-scrollbar-track,
 .ah-list::-webkit-scrollbar-track,
+.ua::-webkit-scrollbar-track,
+.ad::-webkit-scrollbar-track,
+.stage-card .mp-scroll::-webkit-scrollbar-track,
 .robot-strip::-webkit-scrollbar-track,
 .context-panel::-webkit-scrollbar-track,
 .gnb-rail::-webkit-scrollbar-track,
@@ -3906,6 +3913,9 @@ input.field-box { outline: 0; }
    background-clip: content-box 가 있어야 테두리 자리가 비어 보인다. */
 .timeline::-webkit-scrollbar-thumb,
 .ah-list::-webkit-scrollbar-thumb,
+.ua::-webkit-scrollbar-thumb,
+.ad::-webkit-scrollbar-thumb,
+.stage-card .mp-scroll::-webkit-scrollbar-thumb,
 .robot-strip::-webkit-scrollbar-thumb,
 .context-panel::-webkit-scrollbar-thumb,
 .gnb-rail::-webkit-scrollbar-thumb {
@@ -3927,6 +3937,9 @@ input.field-box { outline: 0; }
 
 .timeline::-webkit-scrollbar-thumb:hover,
 .ah-list::-webkit-scrollbar-thumb:hover,
+.ua::-webkit-scrollbar-thumb:hover,
+.ad::-webkit-scrollbar-thumb:hover,
+.stage-card .mp-scroll::-webkit-scrollbar-thumb:hover,
 .context-panel::-webkit-scrollbar-thumb:hover,
 .gnb-rail::-webkit-scrollbar-thumb:hover {
   background-color: var(--border-strong);
@@ -3936,6 +3949,9 @@ input.field-box { outline: 0; }
 @supports not selector(::-webkit-scrollbar) {
   .timeline,
   .ah-list,
+  .ua,
+  .ad,
+  .stage-card .mp-scroll,
   .robot-strip,
   .context-panel,
   .gnb-rail {

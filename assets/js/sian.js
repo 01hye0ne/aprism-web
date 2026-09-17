@@ -457,8 +457,9 @@
       node.appendChild(text);
       var open = el("button", "btn is-md btn-accent", "확인하기");
       open.type = "button";
-      open.addEventListener("click", function () { detail.open(a, open); });
       node.appendChild(open);
+      // 버튼은 hover 에서만 보인다 — 카드 어디를 눌러도 같은 상세를 연다(초점은 버튼으로 돌아온다).
+      node.addEventListener("click", function () { detail.open(a, open); });
       return node;
     }
 
