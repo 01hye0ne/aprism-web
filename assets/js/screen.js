@@ -654,6 +654,54 @@
   ];
 
   /*
+   * 목록을 스무 칸으로 채운다. Figma 의 "3 / 17" 언저리이고, 이만큼 있어야
+   * 목록 스크롤과 진행 막대의 칸 나눔이 실제 길이로 보인다.
+   *
+   * 지어낸 칸은 마지막 칸의 상태를 이어 간다 — 아직 도는 중이면 대기 칸을,
+   * 이미 다 돈 미션이면 완료 칸을 붙인다. "복귀 중"·"순회 완료" 로봇에 대기 칸을
+   * 붙이면 카드에 적힌 상태와 어긋나기 때문이다.
+   * 완료 칸의 시각은 앞 칸이 끝난 시각에서 이어 붙인다.
+   */
+  var WP_TOTAL = 20;
+  var WP_SPANS = [17, 14, 21, 16, 19, 15, 18, 22, 13, 20];
+
+  function clockAt(mins) {
+    mins = ((mins % 1440) + 1440) % 1440;
+    var h = Math.floor(mins / 60), m = mins % 60;
+    return (h < 10 ? "0" : "") + h + ":" + (m < 10 ? "0" : "") + m;
+  }
+
+  function padSteps(steps, total) {
+    var out = steps.slice();
+    var last = out[out.length - 1];
+    var grow = last && last.state === "done" ? "done" : "pending";
+
+    var clock = 0;
+    if (grow === "done" && last.time) {
+      var end = last.time.split("–")[1].trim().split(":");
+      clock = (+end[0]) * 60 + (+end[1]);
+    }
+
+    for (var i = 0; out.length < total; i += 1) {
+      if (grow === "pending") {
+        out.push({ title: "waypoint name", state: "pending" });
+        continue;
+      }
+      var span = WP_SPANS[i % WP_SPANS.length];
+      out.push({
+        title: "waypoint name", state: "done",
+        time: clockAt(clock) + " – " + clockAt(clock + span), duration: span + "분"
+      });
+      clock += span;
+    }
+    return out;
+  }
+
+  ROBOTS.forEach(function (robot) {
+    robot.steps = padSteps(robot.steps, WP_TOTAL);
+  });
+
+  /*
    * 로봇 상세 Drawer 의 값 — Figma "Drawer / 로봇 상세" 778:11895.
    *
    * 여기 적은 것은 카드에서 읽을 수 없는 것들뿐이다.

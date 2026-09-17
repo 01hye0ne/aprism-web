@@ -3613,9 +3613,13 @@ input.field-box { outline: 0; }
 }
 
 /*
- * 단계 수만큼 나뉜 막대다. 칸마다 상태가 셋이다 —
- * 완료 bg/Safe · 수행중 bg/brand · 대기는 2px 선을 2px 간격으로 깐 빗금(fg/disabled).
- * Figma 는 칸 하나에 선 37개를 넣어 두었는데 반복 배경 하나로 같은 그림이 된다.
+ * 단계 수만큼 나뉜 막대다. 칸마다 상태가 셋이다(Figma Progress Bar / Fill 422:3988) —
+ * 완료 status/normal/icon · 수행중 status/info/icon · 실패 status/critical/icon,
+ * 대기는 1px 선을 2px 간격으로 깐 빗금이다.
+ * Figma 의 빗금은 굵기 40 짜리 가로 선 하나에 dashPattern [1, 2] 를 준 것이다 —
+ * 반복 배경 하나로 같은 그림이 된다.
+ * 빗금 색만 Figma 와 다르다. Figma 는 border/strong 인데 그 값이 Light 에서 gray/0(흰색)이라
+ * 밝은 화면에서 빗금이 사라진다. 그래서 fg/disabled 로 둔다 — Dark 값(gray/600)은 둘이 같다.
  */
 .progress-track {
   display: flex;
@@ -3630,33 +3634,29 @@ input.field-box { outline: 0; }
   border-radius: var(--radius-chart);
   background-image: repeating-linear-gradient(
     90deg,
-    var(--fg-disabled) 0 2px,
-    transparent 2px 4px
+    var(--fg-disabled) 0 1px,
+    transparent 1px 3px
   );
 }
 
 /*
- * 채워진 칸은 아래 변에서 위로 번지는 발광을 갖는다(Figma 의 INNER_SHADOW,
- * offset 0/-4 · blur 4 · spread 0). 색은 계열별 glow-Primary 다.
- * 대기 칸에는 발광이 없다.
+ * 채워진 칸은 단색이다. Figma 에도 아래 변에서 번지는 INNER_SHADOW 가 들어 있지만
+ * 세 Variant 모두 visible=false 로 꺼 둔 것이라 여기서도 걷어냈다.
  */
 .progress-track span.is-done {
   background-image: none;
-  background-color: var(--bg-safe);
-  box-shadow: inset 0 -4px 4px 0 var(--alert-safe-glow-primary);
+  background-color: var(--status-normal-icon);
 }
 
 .progress-track span.is-running {
   background-image: none;
-  background-color: var(--bg-brand);
-  box-shadow: inset 0 -4px 4px 0 var(--alert-default-glow-primary);
+  background-color: var(--status-info-icon);
 }
 
 /* Figma 에 실패 Variant 도 있다. 화면에는 아직 쓰이지 않는다. */
 .progress-track span.is-failed {
   background-image: none;
-  background-color: var(--bg-critical);
-  box-shadow: inset 0 -4px 4px 0 var(--alert-danger-glow-primary);
+  background-color: var(--status-critical-icon);
 }
 
 /* ---------- Mission Timeline ---------- */
