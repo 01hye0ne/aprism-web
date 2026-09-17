@@ -106,6 +106,15 @@
       setTag("비상정지 발동 · 해제 절차 필요");
     });
 
+    // 다른 화면 스크립트(시안 페이지)가 심각도를 바꿀 때 쓴다.
+    // detail = { level: null | "warning" | "critical", line1, line2, tag } — 빈 값은 건너뛴다.
+    document.addEventListener("aprism:severity", function (event) {
+      var d = event.detail || {};
+      setSeverity(d.level || null);
+      if (d.line1 || d.line2) { setLines(d.line1 || "", d.line2 || ""); }
+      if (d.tag) { setTag(d.tag); }
+    });
+
     // 펼친 상태에서 Esc 로 닫는다. 닫은 뒤 초점은 버튼에 남긴다.
     panel.addEventListener("keydown", function (event) {
       if (event.key === "Escape" && panel.classList.contains("is-open")) {

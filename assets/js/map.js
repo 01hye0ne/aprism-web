@@ -2077,7 +2077,15 @@
 
     camera = new THREE.PerspectiveCamera(10, 1, 1, span * 40);
 
-    renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+    /*
+     * data-map-keep 이 붙은 캔버스만 그린 판을 남겨 둔다. 다른 곳(시안 2 의 알림 상세 모달)이
+     * 이 캔버스를 잘라 작은 지도로 옮겨 그리려면 판이 지워지지 않아야 한다.
+     * 메모리를 조금 더 쓰므로 필요한 화면에서만 켠다.
+     */
+    renderer = new THREE.WebGLRenderer({
+      canvas: canvas, antialias: true, alpha: true,
+      preserveDrawingBuffer: canvas.hasAttribute("data-map-keep")
+    });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     renderer.setClearAlpha(0);
 

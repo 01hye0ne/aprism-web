@@ -1,0 +1,1066 @@
+/*
+ * 시안 1 · 2 — 통합 관제 메인 레이아웃 시안 (screens/sian-1.html · sian-2.html)
+ *
+ * app-shell.css 위에 얹는다. 셸(상태바 · GNB · 3D 지도 · 로봇 카드 · 타임라인 · 모달)은
+ * 메인 화면 것을 그대로 쓰고, 여기서는 시안에서 달라진 배치와 새 패널만 정한다.
+ *
+ * Figma UI_00 Design System
+ *   시안 1 (893:37599)  좌측 패널 전환형 — 미션 설정 · 사전 점검 · 모니터링이 왼쪽 420 패널 안에서 바뀐다
+ *   시안 2 (893:42020)  모달형 — 설정 · 점검은 지도 위 모달, 모니터링은 미확인 알림 패널 + 알림 상세 모달
+ *
+ * 단계는 body[data-stage] (setup · precheck · monitor), 알림 단계는 body[data-level]
+ * (normal · warning · critical) 이다. 둘 다 assets/js/sian.js 가 바꾼다.
+ */
+
+.sian [hidden] { display: none !important; }
+
+/* ---------- 상태바 — 로고 옆 층 이름 (Status Bar ver.2) ---------- */
+.status-bar-left {
+  display: flex;
+  align-items: center;
+}
+
+.status-bar-place { color: var(--fg-primary); white-space: nowrap; }
+
+/* ---------- 셸 배치 ---------- */
+/*
+ * Figma Container 안 Margin 프레임 — 위 · 오른쪽 · 아래 8, 왼쪽 0.
+ * 시안 2 의 설정 · 점검 단계에는 왼쪽 패널이 없어서 왼쪽도 8 이 된다(지도 시작 x 84).
+ */
+.sian .main { padding: var(--space-8) var(--space-8) var(--space-8) 0; }
+.sian-2:not([data-stage="monitor"]) .main { padding-left: var(--space-8); }
+
+/*
+ * Two Column — 메인 화면은 12컬럼 그리드였다. 시안은 오른쪽 패널 폭이 고정이라
+ * (시안 1 = 360, 시안 2 = 420) 지도 + 패널 두 칸 flex 로 편다. 안쪽 여백 · 사이 20.
+ */
+.sian .two-col {
+  display: flex;
+  gap: var(--space-20);
+  padding: var(--space-20);
+}
+
+/*
+ * 지도 칸. 메인 화면에서는 부모 그리드를 subgrid 로 물려받았는데 부모가 flex 가 되면
+ * subgrid 가 풀린다 — 9칸을 직접 깐다(시안 2 의 AI 패널이 5칸을 쓴다).
+ * 패딩은 없다. Figma Map Panel 이 Two Column 의 20 안쪽에 바로 붙는다.
+ */
+.sian .two-col > .map-panel {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 0;
+  grid-template-columns: repeat(9, minmax(0, 1fr));
+  column-gap: var(--grid-gutter);
+}
+
+/* 도구 레일은 지도 칸 오른쪽 위에 붙는다. */
+.sian .map-tools { top: 0; right: 0; }
+
+/*
+ * 시안 2 AI 패널 — 지도 칸 왼쪽 아래. 패딩이 없어진 만큼 여백을 Figma 값 20 으로 둔다.
+ * 폭은 9칸 중 6칸 — Figma 는 요약 상자가 565 라 5칸(메인 화면)으로는 좁다.
+ * 설정 · 점검 모달 뒤에는 없다(Figma 도 지도만 있다).
+ */
+.sian .ai-panel { grid-column: 1 / span 6; margin: 0 0 0 var(--space-20); }
+.sian:not([data-stage="monitor"]) .ai-panel { display: none; }
+
+/* 닫힌 요약은 한 줄이다 — 넘치면 말줄임(Figma "… 4% 미만…"). */
+.sian .ai-fold-closed .ai-line-2 { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.sian .two-col > .floating {
+  flex: 0 0 420px;
+  min-width: 0;
+  padding: 0;
+}
+
+.sian-1 .two-col > .floating { flex-basis: 360px; }
+
+/* ---------- 관제 패널 (왼쪽 420) ---------- */
+.sian .context-panel { flex-basis: 420px; overflow: hidden; }
+.sian .context-panel.is-collapsed { flex-basis: calc(var(--size-icon-20) + var(--space-12) * 2); }
+
+/* Figma Header — 45 높이, 아래 border/default 1. */
+.sian .panel-head {
+  height: 45px;
+  border-bottom: var(--border-width-thin) solid var(--border-default);
+}
+
+.sian .context-panel.is-collapsed .panel-head { border-bottom-color: transparent; }
+
+.lp-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 420px;
+  display: flex;
+  flex-direction: column;
+  transition: opacity 140ms ease;
+}
+
+.context-panel.is-collapsed .lp-body { opacity: 0; pointer-events: none; }
+
+.lp-stage {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---------- 미션 설정 · 사전 점검 (시안 1 은 패널, 시안 2 는 모달 안) ---------- */
+/*
+ * Figma Mission-Setting / Mission-Pre-inspection (시안 1) — 패딩 0/8/8/8.
+ * 머리 16/8/8/8 · Title/2 + Caption(fg/tertiary). 본문 사이 12.
+ */
+.sian-1 .mp-stage { padding: 0 var(--space-8) var(--space-8); }
+
+.sian-1 .mp-stage .mp-header { padding: var(--space-16) var(--space-8) var(--space-8); }
+.sian .mp-stage .mp-header p,
+.sian .stage-card .mp-header p { color: var(--fg-tertiary); }
+
+.sian .mp-stage .mp-scroll,
+.sian .stage-card .mp-scroll { gap: var(--space-12); padding-bottom: var(--space-12); }
+
+/* Figma Mission Form — 면 + border/default 1(바깥) · radius 8. 메인 화면은 선을 뺐지만 시안에는 있다. */
+.sian .mp-form {
+  border-radius: var(--radius-container);
+  box-shadow: 0 0 0 var(--border-width-thin) var(--border-default);
+}
+
+/* 사전 점검 항목 묶음 — border/default 1(바깥) · radius 4. */
+.sian .precheck-list { box-shadow: 0 0 0 var(--border-width-thin) var(--border-default); }
+
+/* Checkbox Type=List — 상자가 글 앞에 온다(메인 화면은 뒤였다). */
+.sian .check-row .check-box { order: -1; }
+
+/* 점검 항목 이름 — Figma 시안은 대소문자 그대로다(Manager · Spot). */
+.sian .precheck-row .label { text-transform: none; }
+
+/* 목록 아래는 남는 자리(Spacing)다. 안내와 버튼이 바닥에 붙는다. */
+.sian-1 .mp-scroll.is-spacer { flex: 1 1 auto; }
+
+/* ---------- 시안 2 · 단계 모달 (Modal > Mission-Setting · Mission-Pre-inspection) ---------- */
+/*
+ * 480 폭 · 패딩 20 · 사이 20 · bg/surface/raised · border/subtle · radius 8 · 배경 흐림 20.
+ * 제목 Heading/3 · 부제 Body/2.
+ */
+.stage-scrim { z-index: 90; }
+
+.stage-card {
+  width: 480px;
+  max-width: 100%;
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: var(--space-20);
+  border: var(--border-width-thin) solid var(--border-subtle);
+  border-radius: var(--radius-container);
+  background-color: var(--bg-surface-raised);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+}
+
+.stage-card .mp-header { padding: 0 0 var(--space-20); }
+.stage-card .mp-scroll { flex: 0 1 auto; }
+
+/* ---------- 시안 1 · 알림 히스토리 (Alert History Panel-ver.2) ---------- */
+.ah-wrap {
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  padding: 0 var(--space-8) var(--space-8);
+}
+
+.ah {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header — 16/8/8/8, 사이 8. */
+.ah-head {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  padding: var(--space-16) var(--space-8) var(--space-8);
+}
+
+.ah-title-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+}
+
+.ah-title-row h2 { flex: 1 1 auto; min-width: 0; color: var(--fg-primary); }
+
+/* 조치 필요 N — Badge Emphasis=Text. 색은 지금 가장 높은 단계를 따른다. */
+.ah-need { color: var(--status-info-fg); }
+.ah-need .badge-dot { background-color: var(--status-info-icon); }
+.sian[data-level="warning"] .ah-need { color: var(--status-warning-fg); }
+.sian[data-level="warning"] .ah-need .badge-dot { background-color: var(--status-warning-icon); }
+.sian[data-level="critical"] .ah-need { color: var(--status-critical-fg); }
+.sian[data-level="critical"] .ah-need .badge-dot { background-color: var(--status-critical-icon); }
+
+.ah-filter {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+}
+
+.ah-caps {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  gap: var(--space-8);
+}
+
+/*
+ * 위험 · 주의 캡슐 — Badge Emphasis=Subtle. 26 높이, 패딩 4/12/4/8, 1px 선.
+ * 누르면 그 단계만 거른다(Figma 에는 눌린 모습이 없다 — 선을 두껍게 해서 표시한다).
+ */
+.sev-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4);
+  height: 26px;
+  padding: var(--space-4) var(--space-12) var(--space-4) var(--space-8);
+  border: var(--border-width-thin) solid;
+  border-radius: var(--radius-pill);
+  font-family: inherit;
+  font-size: var(--font-size-13);
+  line-height: var(--font-line-height-18);
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.sev-chip.is-critical {
+  background-color: var(--status-critical-bg);
+  border-color: var(--status-critical-border);
+  color: var(--status-critical-fg);
+}
+
+.sev-chip.is-critical .badge-dot { background-color: var(--status-critical-icon); }
+
+.sev-chip.is-warning {
+  background-color: var(--status-warning-bg);
+  border-color: var(--status-warning-border);
+  color: var(--status-warning-fg);
+}
+
+.sev-chip.is-warning .badge-dot { background-color: var(--status-warning-icon); }
+
+.sev-chip[aria-pressed="true"] { box-shadow: inset 0 0 0 1px currentColor; }
+
+.sev-chip:focus-visible,
+.ah-sort:focus-visible,
+.ah-item:focus-visible {
+  outline: var(--border-width-strong) solid var(--border-focus);
+  outline-offset: -2px;
+}
+
+.ah-sort {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--fg-primary);
+  font-family: inherit;
+  cursor: pointer;
+}
+
+/*
+ * Lists — overlay-dark 면 · border/default 1 · radius 8 · 안쪽 그림자(0 10 8 / 25%).
+ * 바닥에 27 높이 그라데이션이 깔려 목록이 더 있다는 것을 알린다.
+ */
+.ah-list-box {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  border: var(--border-width-thin) solid var(--border-default);
+  border-radius: var(--radius-container);
+  background-color: var(--bg-surface-overlay-dark);
+  box-shadow: inset 0 10px 8px rgb(0 0 0 / 25%);
+  overflow: hidden;
+}
+
+.ah-list-box::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 27px;
+  pointer-events: none;
+  background: linear-gradient(rgb(10 14 21 / 0%), rgb(10 14 21 / 50%));
+}
+
+.ah-list {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/*
+ * Alert History Item-ver2 — 왼쪽 4 색 띠 + 패딩 8/12/8/16(띠 포함) · 안쪽 글 묶음 4.
+ *   위치(아이콘 target 16 + Caption tertiary) · 시각
+ *   제목(아이콘 16 + Label/1)
+ *   조치 상태(Label/2 secondary)
+ * Selected 는 bg/surface/selected.
+ */
+.ah-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  width: 100%;
+  padding: var(--space-12) var(--space-12) var(--space-12) var(--space-12);
+  border: 0;
+  border-left: 4px solid var(--alert-warning-edge);
+  border-bottom: var(--border-width-thin) solid var(--border-default);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.ah-item.is-critical { border-left-color: var(--alert-danger-edge); }
+.ah-item:hover { background-color: var(--bg-interactive-hover); }
+.ah-item[aria-pressed="true"] { background-color: var(--bg-surface-selected); }
+
+.ah-where {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  color: var(--fg-tertiary);
+}
+
+.ah-where > span:nth-child(2) { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.ah-text { display: flex; flex-direction: column; gap: var(--space-4); }
+
+.ah-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  color: var(--fg-primary);
+}
+
+.ah-title .i { flex: none; color: var(--status-warning-icon); }
+.ah-item.is-critical .ah-title .i { color: var(--status-critical-icon); }
+
+.ah-state { color: var(--fg-secondary); }
+
+/* ---------- 시안 1 · Delta (Delta-ver.2) ---------- */
+/*
+ * 패딩 16/12 · 사이 20. 면은 bg/surface/default 위에 바닥으로 짙어지는 단계색 그라데이션
+ * (50% 0 → 85% 10% → 95% 80% → 100%) + 안쪽 그림자(0 -7 8 6 gray/800).
+ * 머리(DELTA) · 두 줄(Body/1) 은 위에, 캡슐 · 조치 버튼 · 입력칸은 바닥에 붙는다.
+ */
+.dl {
+  --dl-a: #36b2df;
+  --dl-b: #7598e8;
+  --dl-c: #89b9ed;
+  --ai-input-edge: linear-gradient(90deg, var(--color-main-400), var(--color-main-600));
+
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+  padding: var(--space-16) var(--space-12);
+  overflow: hidden;
+  background:
+    linear-gradient(180deg,
+      color-mix(in srgb, var(--dl-a) 0%, transparent) 50%,
+      color-mix(in srgb, var(--dl-a) 10%, transparent) 85%,
+      color-mix(in srgb, var(--dl-b) 80%, transparent) 95%,
+      var(--dl-c) 100%),
+    var(--bg-surface-default);
+  box-shadow: inset 0 -7px 8px 6px var(--color-gray-800);
+  transition: background 240ms ease;
+}
+
+.sian[data-level="warning"] .dl {
+  --dl-a: #ffc17e;
+  --dl-b: #f7cd36;
+  --dl-c: #f7cd36;
+  --ai-input-edge: linear-gradient(90deg, #ffc17e, #f7cd36);
+}
+
+.sian[data-level="critical"] .dl {
+  --dl-a: #d95c00;
+  --dl-b: #f4463f;
+  --dl-c: #f4463f;
+  --ai-input-edge: linear-gradient(90deg, #e75120, #f4463f);
+}
+
+.dl-name {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  color: var(--fg-primary);
+}
+
+/* Delta/Size=Small — 24. 오브가 못 뜨면 19 원이 남는다. */
+.ai-delta-mark.dl-mark { width: 24px; height: 24px; }
+.ai-delta-mark.dl-mark i { width: 19px; height: 19px; }
+
+.dl-lines {
+  flex: 0 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: 0 var(--space-4);
+}
+
+/* Body/1 — Figma 스타일 이름은 Regular 인데 값은 20/32 SemiBold 다. */
+.dl-lines p { word-break: keep-all; }
+.dl-line-1 { color: var(--fg-secondary); }
+.dl-line-2 { color: var(--fg-primary); }
+
+.dl-foot {
+  margin-top: auto;
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+}
+
+/* 캡슐 — overlay-dark · pill · 4/12 · Label/2. 넘치면 잘린다(Figma 도 잘려 있다). */
+.dl-chips {
+  display: flex;
+  gap: var(--space-8);
+  overflow: hidden;
+}
+
+.dl-chip {
+  flex: none;
+  height: 26px;
+  padding: var(--space-4) var(--space-12);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background-color: var(--bg-surface-overlay-dark);
+  color: var(--fg-primary);
+  font-family: inherit;
+  font-size: var(--font-size-13);
+  line-height: var(--font-line-height-18);
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.dl-chip:hover { background-color: var(--bg-surface-overlay-light); }
+
+/* 조치 버튼 — Button Size=Medium. 첫째 Primary, 나머지 Secondary. */
+.dl-actions { display: flex; gap: var(--space-8); flex-wrap: wrap; }
+
+/* ---------- 시안 1 · 로봇 카드 넘겨 보기 (Mission-in progress-2) ---------- */
+/*
+ * List — overlay-dark · 패딩 8. 왼쪽 Info(162): 로봇명(Label/1) + 세 줄(26 · 사이 2).
+ * 오른쪽 img(166 · 110): 위 80 에 ‹ 그래픽 › , 아래 24 에 자동복귀 · E-STOP.
+ * 카드는 선택된 한 장만 보인다 — 화살표가 옆 카드를 누른 것과 같이 동작한다.
+ */
+.robot-carousel { position: relative; }
+
+.robot-strip.is-carousel {
+  display: block;
+  padding: var(--space-8);
+  overflow: hidden;
+}
+
+.robot-strip.is-carousel .robot-card { display: none; }
+
+.robot-strip.is-carousel .robot-card[aria-pressed="true"] {
+  display: grid;
+  width: 100%;
+  grid-template-columns: 162px minmax(0, 1fr);
+  grid-template-rows: auto 1fr;
+  grid-template-areas:
+    "label thumb"
+    "lists thumb";
+  column-gap: var(--space-8);
+  row-gap: var(--space-8);
+  box-shadow: none;
+  background: none;
+  cursor: default;
+}
+
+.robot-strip.is-carousel .robot-card .label { grid-area: label; padding: 0; }
+.robot-strip.is-carousel .robot-card .robot-lists { grid-area: lists; padding: 0; }
+
+.robot-strip.is-carousel .robot-row {
+  padding: var(--space-4) var(--space-8);
+  border-radius: var(--radius-2);
+}
+
+.robot-strip.is-carousel .robot-thumb {
+  grid-area: thumb;
+  align-self: start;
+  height: 80px;
+  margin: 0 var(--space-16);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.robot-strip.is-carousel .robot-dog { height: 72px; }
+.robot-strip.is-carousel .robot-dog.is-idle { margin-top: 0; }
+
+.rc-side {
+  position: absolute;
+  top: var(--space-8);
+  right: var(--space-8);
+  bottom: var(--space-8);
+  width: calc(100% - var(--space-8) * 3 - 162px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  pointer-events: none;
+}
+
+.rc-nav {
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.rc-arrow {
+  pointer-events: auto;
+  display: inline-flex;
+  width: 16px;
+  height: 32px;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-2);
+  background: none;
+  color: var(--fg-secondary);
+  cursor: pointer;
+}
+
+.rc-arrow:hover { color: var(--fg-primary); background-color: var(--bg-interactive-hover); }
+
+.rc-arrow:focus-visible {
+  outline: var(--border-width-strong) solid var(--border-focus);
+  outline-offset: 1px;
+}
+
+.rc-actions {
+  display: flex;
+  gap: var(--space-8);
+}
+
+.rc-actions .btn { pointer-events: auto; flex: 1 1 0; min-width: 0; }
+
+/* ---------- 시안 2 · 미확인 알림 (Site Context Panel ver.2) ---------- */
+/* Content — bg/container · border/subtle 1 · 패딩 24 · 사이 20. */
+.ua {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+  padding: var(--space-24);
+  border: var(--border-width-thin) solid var(--border-subtle);
+  background-color: var(--bg-container);
+}
+
+.ua-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Figma 는 24/SemiBold 맨 값이다(스타일 미연결) — Heading/2 가 같은 크기라 그것을 쓴다. */
+.ua-title { color: var(--fg-primary); }
+
+/*
+ * Badge Emphasis=Solid(이 파일 기준) — bg/surface/subtle 면, 점과 글이 단계색.
+ * .is-line 은 Emphasis=Subtle — 단계색 면 + 선.
+ */
+.sev-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4);
+  height: 26px;
+  padding: var(--space-4) var(--space-12) var(--space-4) var(--space-8);
+  border-radius: var(--radius-pill);
+  background-color: var(--bg-surface-subtle);
+  color: var(--status-warning-fg);
+  font-size: var(--font-size-13);
+  line-height: var(--font-line-height-18);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.sev-badge .badge-dot { background-color: var(--status-warning-icon); }
+
+.sev-badge.is-critical { color: var(--status-critical-fg); }
+.sev-badge.is-critical .badge-dot { background-color: var(--status-critical-icon); }
+
+.sev-badge.is-neutral { color: var(--fg-secondary); }
+.sev-badge.is-neutral .badge-dot { background-color: var(--fg-secondary); }
+.sev-badge.is-neutral.is-line,
+.ua-done-head .sev-badge { box-shadow: inset 0 0 0 1px var(--border-default); }
+
+.sev-badge.is-line:not(.is-neutral) {
+  background-color: var(--status-warning-bg);
+  box-shadow: inset 0 0 0 1px var(--status-warning-border);
+}
+
+.sev-badge.is-line.is-critical {
+  background-color: var(--status-critical-bg);
+  box-shadow: inset 0 0 0 1px var(--status-critical-border);
+}
+
+/* 필터 — Button Size=Small. 고른 것 Accent, 나머지 Secondary. 정렬 안내는 오른쪽 끝. */
+.ua-filters {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+}
+
+.ua-filters .btn {
+  background-color: var(--button-secondary-bg-default);
+  border-color: var(--button-secondary-border-default);
+  color: var(--button-secondary-fg-default);
+}
+
+.ua-filters .btn[aria-pressed="true"] {
+  background-color: var(--button-accent-bg-default);
+  border-color: transparent;
+  color: var(--button-accent-fg-default);
+}
+
+.ua-sort {
+  margin-left: auto;
+  font-size: var(--font-size-12);
+  line-height: var(--font-line-height-18);
+  color: var(--fg-tertiary);
+  white-space: nowrap;
+}
+
+.ua-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+
+.ua-list:empty { display: none; }
+
+/*
+ * 미확인 카드 — bg/surface/raised · border/subtle · radius 8 · 패딩 20 · 사이 20.
+ * 왼쪽 4 띠(alert/*-bg) · 글 묶음(사이 6) · 오른쪽 [확인하기](Accent · Medium).
+ */
+.ua-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-20);
+  padding: var(--space-20);
+  border: var(--border-width-thin) solid var(--border-subtle);
+  border-radius: var(--radius-container);
+  background-color: var(--bg-surface-raised);
+}
+
+.ua-edge {
+  flex: none;
+  align-self: stretch;
+  width: 4px;
+  border-radius: var(--radius-2);
+  background-color: var(--alert-warning-bg);
+}
+
+.ua-card.is-critical .ua-edge { background-color: var(--alert-danger-bg); }
+
+.ua-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ua-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.ua-row .sev-badge { flex: none; }
+
+/*
+ * 18/Bold · 13/Regular · 12/Regular — Figma 맨 값(스타일 미연결).
+ * 제목은 줄을 넘긴다. Figma 는 한 줄로 두고 카드 밖으로 넘친 것이 잘려 있다 —
+ * 글 칸이 205 뿐이라 "누출감지 · WP-04" 정도만 들어간다. 설명 · 시각은 한 줄 말줄임.
+ */
+.ua-row { align-items: flex-start; }
+.ua-row .sev-badge { margin-top: 0; }
+.ua-card-title { white-space: normal; word-break: keep-all; }
+.ua-nb { white-space: nowrap; }
+
+.ua-card-title,
+.ua-desc,
+.ua-meta {
+  margin: 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ua-desc,
+.ua-meta { white-space: nowrap; }
+
+.ua-card-title { font-size: var(--font-size-18); line-height: var(--font-line-height-26); font-weight: 700; color: var(--fg-primary); }
+.ua-desc { font-size: var(--font-size-13); line-height: var(--font-line-height-20); color: var(--fg-secondary); }
+.ua-meta { font-size: var(--font-size-12); line-height: var(--font-line-height-18); color: var(--fg-tertiary); }
+
+.ua-card .btn { flex: none; }
+
+.ua-done {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: var(--space-8);
+}
+
+.ua-done-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ua-done-label {
+  font-size: var(--font-size-13);
+  line-height: var(--font-line-height-18);
+  font-weight: 500;
+  color: var(--fg-secondary);
+}
+
+.ua-done-list { display: flex; flex-direction: column; gap: 10px; }
+
+/* 확인 완료 한 줄 — bg/surface/subtle · radius 6 · 패딩 8/12. 시각 · 제목(15/Bold) · ✓ 조치 · 확인자. */
+.ua-done-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  padding: var(--space-8) var(--space-12);
+  border-radius: var(--radius-6);
+  background-color: var(--bg-surface-subtle);
+}
+
+.ua-done-item .t { display: flex; flex-direction: column; gap: var(--space-4); }
+.ua-done-item .time { font-size: var(--font-size-12); line-height: var(--font-line-height-18); color: var(--fg-tertiary); }
+.ua-done-item .title { font-size: 15px; line-height: var(--font-line-height-20); font-weight: 700; color: var(--fg-secondary); }
+
+.ua-done-item .how {
+  display: flex;
+  gap: var(--space-16);
+  font-size: var(--font-size-12);
+  line-height: var(--font-line-height-18);
+  color: var(--fg-tertiary);
+}
+
+.ua-done-item .how .ok { color: var(--chart-neutral); margin-right: calc(var(--space-16) * -1 + var(--space-4)); }
+
+.ua-done-item.is-new { animation: ua-new 1.6s ease; }
+
+@keyframes ua-new {
+  0% { box-shadow: inset 0 0 0 1px var(--color-main-400); }
+  100% { box-shadow: inset 0 0 0 1px transparent; }
+}
+
+/* ---------- 시안 2 · 알림 상세보기 모달 ---------- */
+/*
+ * 1240 폭 · 패딩 20 · 두 칸 사이 32 · bg/surface/default · radius 8.
+ * 왼쪽 664 = ① 감지 근거 / 오른쪽 504 = ② 지점 확인 + ③ 조치 및 확인 처리 (사이 20).
+ */
+.ad-scrim { z-index: 110; }
+
+.ad {
+  width: 1240px;
+  max-width: 100%;
+  max-height: 100%;
+  overflow: auto;
+  display: flex;
+  align-items: flex-start;
+  gap: 32px;
+  padding: var(--space-20);
+  border-radius: var(--radius-container);
+  background-color: var(--bg-surface-default);
+}
+
+.ad-col { min-width: 0; display: flex; flex-direction: column; gap: var(--space-20); }
+.ad-col.is-left { flex: 0 1 664px; }
+.ad-col.is-right { flex: 0 1 504px; }
+
+/* 카드 — bg/surface/raised · border/subtle · radius 8 · 패딩 16 · 사이 12. 접힌 단계는 bg/surface/subtle. */
+.ad-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  padding: var(--space-16);
+  border: var(--border-width-thin) solid var(--border-subtle);
+  border-radius: var(--radius-container);
+  background-color: var(--bg-surface-raised);
+}
+
+.ad-step:not(.is-open) { background-color: var(--bg-surface-subtle); }
+
+.ad-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+}
+
+.ad-toggle { cursor: pointer; }
+
+.ad-toggle:focus-visible {
+  outline: var(--border-width-strong) solid var(--border-focus);
+  outline-offset: 4px;
+  border-radius: var(--radius-4);
+}
+
+.ad-l { display: inline-flex; align-items: center; gap: 10px; min-width: 0; }
+
+/* 단계 번호 — 26 원. 끝난 것 chart/neutral + ✓, 펼친 것 bg/accent, 접힌 것 chart/neutral. */
+.ad-no {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radius-pill);
+  background-color: var(--chart-neutral);
+  color: var(--fg-inverse);
+  font-size: var(--font-size-13);
+  line-height: var(--font-line-height-18);
+  font-weight: 700;
+}
+
+.ad-step.is-open .ad-no { background-color: var(--bg-accent); }
+
+.ad-h1 { margin: 0; font-size: var(--font-size-24); line-height: var(--font-line-height-32); font-weight: 600; color: var(--fg-primary); }
+.ad-h2 { margin: 0; font-size: var(--font-size-20); line-height: var(--font-line-height-28); font-weight: 800; color: var(--fg-primary); }
+.ad-h3 { margin: 0; font-size: var(--font-size-18); line-height: var(--font-line-height-26); font-weight: 700; color: var(--fg-primary); }
+
+/*
+ * 감지 프레임 — 632x442 · bg/canvas · border/subtle · radius 8.
+ * 사진은 넣지 않았다. 박스와 라벨은 Figma 좌표 그대로(프레임 기준 %)다.
+ */
+.ad-frame {
+  position: relative;
+  height: 442px;
+  border: var(--border-width-thin) solid var(--border-subtle);
+  border-radius: var(--radius-container);
+  overflow: hidden;
+  background:
+    repeating-linear-gradient(0deg, rgb(255 255 255 / 2.5%) 0 1px, transparent 1px 24px),
+    repeating-linear-gradient(90deg, rgb(255 255 255 / 2.5%) 0 1px, transparent 1px 24px),
+    radial-gradient(ellipse 70% 60% at 50% 55%, var(--color-gray-800), var(--bg-canvas));
+}
+
+.ad-cam {
+  position: absolute;
+  top: var(--space-12);
+  left: var(--space-12);
+  font-size: var(--font-size-12);
+  line-height: var(--font-line-height-18);
+  color: var(--fg-tertiary);
+}
+
+.ad-box {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--w);
+  height: var(--h);
+  border: 6px solid var(--chart-neutral);
+  border-radius: var(--radius-4);
+}
+
+.ad-box.is-hit { border-color: var(--status-critical-fg); }
+
+.ad-box-label {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  padding: 0 13px;
+  height: 19px;
+  display: inline-flex;
+  align-items: center;
+  background-color: var(--chart-neutral);
+  color: var(--fg-inverse);
+  font-size: 12px;
+  line-height: 19px;
+  white-space: nowrap;
+}
+
+.ad-box-label.is-hit { background-color: var(--status-critical-fg); font-weight: 700; }
+
+.ad-judge { display: flex; flex-direction: column; gap: var(--space-8); }
+.ad-judge-row { display: flex; align-items: center; gap: 10px; }
+.ad-desc { margin: 0; font-size: var(--font-size-13); line-height: var(--font-line-height-20); color: var(--fg-secondary); }
+
+.ad-link {
+  align-self: flex-start;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--bg-accent);
+  font-family: inherit;
+  font-size: var(--font-size-12);
+  line-height: var(--font-line-height-18);
+  cursor: pointer;
+}
+
+.ad-link:hover { text-decoration: underline; }
+
+.ad-body { display: flex; flex-direction: column; gap: var(--space-12); }
+.ad-step[data-ad-step="3"] .ad-body { gap: 10px; }
+
+.ad-place { display: flex; flex-direction: column; gap: var(--space-2); }
+.ad-sub { margin: 0; font-size: var(--font-size-12); line-height: var(--font-line-height-18); color: var(--fg-tertiary); }
+
+/* 지점 맵 — 322 높이 · border/subtle · radius 6. 뒤 3D 지도를 로봇 둘레로 잘라 옮겨 그린다. */
+.ad-map {
+  position: relative;
+  height: 322px;
+  border: var(--border-width-thin) solid var(--border-subtle);
+  border-radius: var(--radius-6);
+  overflow: hidden;
+  background-color: var(--bg-canvas);
+}
+
+.ad-map canvas { display: block; width: 100%; height: 100%; }
+
+.ad-pin {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, calc(-100% - 22px));
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px 3px 8px;
+  border-radius: 999px;
+  background-color: var(--alert-warning-edge);
+  color: var(--fg-inverse);
+  font-size: var(--font-size-12);
+  line-height: var(--font-line-height-18);
+  white-space: nowrap;
+}
+
+.ad-pin.is-critical { background-color: var(--alert-danger-edge); }
+.ad-pin-dot { width: 6px; height: 6px; border-radius: 50%; background-color: currentColor; }
+
+.ad-bot {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  transform: translate(-50%, -12px);
+}
+
+.ad-bot-dot {
+  width: 22px;
+  height: 22px;
+  border: 3px solid #cfe0ff;
+  border-radius: 50%;
+  background-color: var(--color-main-500);
+  box-shadow: 0 0 0 4px rgb(106 167 231 / 30%);
+}
+
+.ad-bot-name {
+  font-size: var(--font-size-12);
+  line-height: var(--font-line-height-18);
+  font-weight: 700;
+  color: var(--fg-primary);
+  text-shadow: 0 1px 2px rgb(0 0 0 / 60%);
+}
+
+.ad-kv { margin: 0; display: flex; flex-direction: column; gap: var(--space-4); }
+.ad-kv > div { display: flex; gap: 10px; align-items: baseline; }
+.ad-kv dt { flex: 0 0 96px; font-size: var(--font-size-12); line-height: var(--font-line-height-18); color: var(--fg-tertiary); }
+.ad-kv dd { margin: 0; font-size: var(--font-size-13); line-height: var(--font-line-height-20); color: var(--fg-secondary); }
+.ad-step[data-ad-step="3"] .ad-kv dt { flex-basis: 64px; }
+
+.ad-field { gap: 6px; }
+.ad-label { font-size: var(--font-size-12); line-height: var(--font-line-height-18); color: var(--fg-secondary); }
+
+.ad-divider { margin: 0; height: 1px; border: 0; background-color: var(--border-subtle); }
+
+/* Button Accent · Large — 40 높이, Label/1. */
+.btn.ad-confirm {
+  height: var(--size-control-lg);
+  padding: 0 var(--space-20);
+  font-size: var(--font-size-14);
+  line-height: var(--font-line-height-20);
+  font-weight: 800;
+}
+
+.ad-note { margin: 0; font-size: var(--font-size-12); line-height: var(--font-line-height-18); color: var(--fg-tertiary); }
+
+/* ---------- 검토용 단계 바 (시안에는 없다) ---------- */
+.sian-review {
+  position: fixed;
+  top: 14px;
+  left: 50%;
+  z-index: 120;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  border: var(--border-width-thin) solid var(--border-default);
+  border-radius: var(--radius-pill);
+  background-color: rgb(20 24 32 / 88%);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  font-size: var(--font-size-12);
+  line-height: var(--font-line-height-18);
+}
+
+.sian-review .sr-name { padding: 0 var(--space-8) 0 var(--space-12); color: var(--fg-tertiary); white-space: nowrap; }
+.sian-review .sr-sep { width: 1px; height: 14px; margin: 0 var(--space-4); background-color: var(--border-default); }
+
+.sian-review button {
+  height: 26px;
+  padding: 0 var(--space-12);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: none;
+  color: var(--fg-secondary);
+  font: inherit;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.sian-review button:hover { color: var(--fg-primary); background-color: var(--bg-interactive-hover); }
+.sian-review button[aria-pressed="true"] { color: var(--fg-primary); background-color: var(--color-gray-650); }
+.sian-review button:disabled { opacity: 0.4; cursor: default; background: none; }
