@@ -457,6 +457,23 @@
     });
   })();
 
+  // ==================================================================
+  // Delta 묻기 칸 — 펼친 판의 행동 버튼 줄 맨 오른쪽 [+] 로 열고 닫는다. 열면 바로 적을 수 있게 초점을 준다.
+  // ==================================================================
+  (function () {
+    var open = $("[data-ai-ask-open]");
+    var box = $("#ai-ask");
+    if (!open || !box) { return; }
+    var input = $("[data-ai-ask]", box);
+    open.addEventListener("click", function () {
+      var on = box.hidden;
+      box.hidden = !on;
+      open.setAttribute("aria-expanded", on ? "true" : "false");
+      open.setAttribute("aria-label", on ? "Delta 에게 묻기 닫기" : "Delta 에게 묻기 열기");
+      if (on && input) { input.focus(); }
+    });
+  })();
+
   // screen.js 의 AI 패널 IIFE 가 먼저 돈 뒤에 첫 단계를 알린다(같은 틱에 스크립트 순서로 돈다).
   fromHash();
 })();

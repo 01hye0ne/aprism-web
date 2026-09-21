@@ -110,8 +110,34 @@
   gap: var(--space-8);
 }
 
+/*
+ * 행동 버튼 줄 — 버튼들 오른쪽 끝에 [+](Button Secondary · Medium, 36 정사각).
+ * 누르면 묻기 칸(.ai-input)이 줄 아래에 열리고, + 가 45° 돌아 × 가 된다.
+ * 종합 기준에 못 미쳐 행동 버튼이 없을 때도 [+] 는 남는다 — 물어보는 길은 늘 있어야 한다.
+ */
+.ai-act-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-8);
+}
+
+.ai-act-row .ai-actions { flex: 1 1 auto; min-width: 0; }
+
+.ai-ask-open {
+  flex: none;
+  width: var(--size-control-md);
+  margin-left: auto;
+  padding: 0;
+}
+
+.ai-ask-open .i { transition: transform 160ms ease; }
+.ai-ask-open[aria-expanded="true"] .i { transform: rotate(45deg); }
+
 /* 위험 태그 아이콘은 error(⊗)다. 1차는 주의 · 위험 모두 warning 이었다. */
 .v2 .ai-panel.is-critical .ai-tag .i { --i: var(--ic-error); }
+
+/* 펼친 두 줄은 단어 단위로 접는다 — "권합니/다" 처럼 끝 글자만 떨어지지 않게. */
+.v2 .ai-opened .ai-lines { word-break: keep-all; }
 
 /* 닫힌 요약의 둘째 줄은 한 줄이다 — 넘치면 말줄임. */
 .v2 .ai-fold-closed .ai-line-2 { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
