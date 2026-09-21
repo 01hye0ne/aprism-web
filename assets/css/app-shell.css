@@ -2332,15 +2332,15 @@ button {
   /* 경계가 흐려지는 거리. 0 이면 딱 끊긴 테가 된다. */
   --pulse-blur: 12px;
   /*
-   * 선 색 — Delta 오브 팔레트의 가장 밝은 자리(#F2B020 = hsl(41 89% 54%))에서 가져와
-   * 빛으로 읽히도록 명도만 80% 로 올렸다. 원본 glowColor 는 hsl(40 80% 80%) 이었다 —
-   * 거의 같은 자리인데, 이제 출처가 오브다.
+   * 선 색 — Delta 오브 팔레트의 가장 밝은 자리(#F2B020 = hsl(41 89% 54%)) 그대로다.
+   * 예전에는 빛으로 읽히라고 명도를 80% 까지 올렸는데, plus-lighter 로 지도 위에 더해지면서
+   * 흰빛에 가깝게 떴다(디자이너: "흰끼를 빼 달라"). 명도를 팔레트 원래 값으로 내려 색을 살렸다.
    * 쓰는 건 60 · 20 둘뿐이지만 급을 하나 더 끼울 자리를 남겨 뒀다.
    */
-  --glow-color: hsl(41deg 89% 80% / 100%);
-  --glow-color-60: hsl(41deg 89% 80% / 60%);
-  --glow-color-40: hsl(41deg 89% 80% / 40%);
-  --glow-color-20: hsl(41deg 89% 80% / 20%);
+  --glow-color: hsl(41deg 89% 54% / 100%);
+  --glow-color-60: hsl(41deg 89% 54% / 60%);
+  --glow-color-40: hsl(41deg 89% 54% / 40%);
+  --glow-color-20: hsl(41deg 89% 54% / 20%);
 
   /*
    * 테두리에 깔리는 색 얼룩(원본 buildGradientVars). 전에는 warning 램프
@@ -2382,11 +2382,11 @@ button {
   /* 경계가 흐려지는 거리. 0 이면 딱 끊긴 테가 된다. */
   --pulse-blur: 12px;
 
-  /* 팔레트의 기준 자리(#F05937 = hsl(11 86% 58%))에서 명도만 80% 로 올린 값. */
-  --glow-color: hsl(11deg 86% 80% / 100%);
-  --glow-color-60: hsl(11deg 86% 80% / 60%);
-  --glow-color-40: hsl(11deg 86% 80% / 40%);
-  --glow-color-20: hsl(11deg 86% 80% / 20%);
+  /* 팔레트의 기준 자리(#F05937 = hsl(11 86% 58%)) 그대로다 — 주의와 같은 이유로 명도를 올리지 않는다. */
+  --glow-color: hsl(11deg 86% 58% / 100%);
+  --glow-color-60: hsl(11deg 86% 58% / 60%);
+  --glow-color-40: hsl(11deg 86% 58% / 40%);
+  --glow-color-20: hsl(11deg 86% 58% / 20%);
 
   --gradient-one: radial-gradient(at 80% 55%, #d96f5e 0px, transparent 50%);
   --gradient-two: radial-gradient(at 69% 34%, #a3687b 0px, transparent 50%);
