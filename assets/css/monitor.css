@@ -112,9 +112,9 @@
 }
 
 /*
- * 행동 버튼 줄 — 버튼들 오른쪽 끝에 [+](Button Secondary · Medium, 36 정사각).
- * 누르면 묻기 칸(.ai-input)이 줄 아래에 열리고, + 가 45° 돌아 × 가 된다.
- * 종합 기준에 못 미쳐 행동 버튼이 없을 때도 [+] 는 남는다 — 물어보는 길은 늘 있어야 한다.
+ * 행동 버튼 줄 — 버튼들 오른쪽 끝에 [돋보기](Button Secondary · Medium, 36 정사각).
+ * 누르면 묻기 칸(.ai-input)이 줄 아래에 열리고, 아이콘이 × 로 바뀐다(다시 누르면 닫힌다).
+ * 종합 기준에 못 미쳐 행동 버튼이 없을 때도 이 버튼은 남는다 — 물어보는 길은 늘 있어야 한다.
  */
 .ai-act-row {
   display: flex;
@@ -131,8 +131,8 @@
   padding: 0;
 }
 
-.ai-ask-open .i { transition: transform 160ms ease; }
-.ai-ask-open[aria-expanded="true"] .i { transform: rotate(45deg); }
+.ai-ask-open .i { --i: var(--ic-search); }
+.ai-ask-open[aria-expanded="true"] .i { --i: var(--ic-close); }
 
 /*
  * 펼친 Delta 상자(디자이너 요청, Figma 와 다른 점)
