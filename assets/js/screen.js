@@ -494,7 +494,8 @@
   var ROBOTS = [
     {
       // State=Running · 78% · Strong
-      current: "현재 수행명",
+      // 진행 막대 제목 — 임시 문구다(Figma 는 자리표시자 "현재 수행명"). 지금 도는 칸(WP-04)의 일이다.
+      current: "N₂ 배관 압력 점검",
       steps: [
         {
           title: "FFU-01 토출구", state: "done", time: "09:12 – 09:31", duration: "19분",
@@ -562,7 +563,7 @@
     },
     {
       // 5 · 수행중 · 64% · Good — 첫 구간을 지나는 중이다
-      current: "현재 수행명",
+      current: "발전기 베어링 진동 측정",
       steps: [
         { title: "waypoint name", state: "done", time: "10:02 – 10:17", duration: "15분" },
         {
@@ -632,7 +633,7 @@
     },
     {
       // 11 · 수행중 · 71% · Strong — 막바지에 가까워졌다
-      current: "현재 수행명",
+      current: "배전반실 열화상 점검",
       steps: [
         { title: "waypoint name", state: "done", time: "09:40 – 09:58", duration: "18분" },
         { title: "waypoint name", state: "done", time: "09:58 – 10:12", duration: "14분" },
