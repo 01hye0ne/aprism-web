@@ -500,7 +500,7 @@
  *
  * Proceeding — 338 폭 · 패딩 12 · radius 8 · 면은 위 bg/surface/selected → 아래 overlay-light 세로
  *   그라데이션을 40% 로 깐다.
- *   Infos(사이 8): 배지 · 발생시간 / 제목(Title/2) / 라이브 뷰(236) / 원인 요약(Body/3 두 줄 · fg/secondary) /
+ *   Infos(사이 8): 배지 · 발생시간 / 제목(Title/2) / 라이브 뷰(16:9) / 원인 요약(Body/3 두 줄 · fg/secondary) /
  *                 구분선(Menu Divider — 위아래 4, 1px) / 상황 조치(라디오 목록)
  *   확인 처리 — Button Accent · Small, 폭 전체
  * 아래 꼬리(세모 14 × 8)가 웨이포인트를 가리킨다. 쪽지와 점 사이는 8 을 띄운다.
@@ -594,8 +594,9 @@
   white-space: nowrap;
 }
 
+/* 라이브 뷰 — 16:9 (쪽지 안쪽 폭 314 에서 177). Figma 는 236 높이였다(디자이너 요청으로 바꿨다). */
 .ma-live {
-  height: 236px;
+  aspect-ratio: 16 / 9;
   border-radius: var(--radius-4);
   background-color: #262626;
 }

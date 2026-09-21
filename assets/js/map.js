@@ -398,8 +398,9 @@
   }
 
   hit.addEventListener("pointerdown", function (event) {
-    // 도구 레일과 설비 카드 위에서 시작한 것은 그쪽 몫이다. 지도를 끌면 안 된다.
-    if (event.target.closest(".map-tools, .map-card, .map-bot, .map-wp")) { return; }
+    // 도구 레일과 설비 카드 · 알림 쪽지 위에서 시작한 것은 그쪽 몫이다. 지도를 끌면 안 된다.
+    // (여기서 붙잡으면 setPointerCapture 때문에 클릭이 지도로 넘어가 쪽지 안 버튼이 눌리지 않는다.)
+    if (event.target.closest(".map-tools, .map-card, .map-bot, .map-wp, .map-alert")) { return; }
     // 왼쪽 · 가운데 · 오른쪽까지만. 옆구리 버튼(뒤로·앞으로)은 브라우저 몫으로 둔다.
     if (event.button > 2) { return; }
     if (seat(event.pointerId) >= 0) { return; }
@@ -501,7 +502,7 @@
   // 설비 위에서는 손 모양이 바뀐다 — 누를 수 있다는 것을 알려 주는 유일한 표시다.
   hit.addEventListener("pointermove", function (event) {
     if (down.length || !renderer) { return; }
-    if (event.target.closest(".map-tools, .map-card, .map-bot, .map-wp")) {
+    if (event.target.closest(".map-tools, .map-card, .map-bot, .map-wp, .map-alert")) {
       hit.classList.remove("is-picking");
       return;
     }
