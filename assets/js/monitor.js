@@ -47,15 +47,35 @@
   // 위험도는 알림 정책을 따른다 — 누출 · 부분방전 · 통신 불안정 · 경로 이탈 · 배터리 부족은 주의,
   // NG 판정 · 비상정지는 위험.
   // ==================================================================
+  // robot 은 우측 로봇 카드 번호(data-robot), wp 는 그 로봇 미션의 웨이포인트다 — 고르면 지도의
+  // 그 자리 위에 쪽지가 선다. sum 은 쪽지의 원인 요약(두 줄), acts 는 "상황 조치" 선택지다.
   var WARNINGS = [
-    { sev: "warning", where: "APRO 4F · WP-04 냉각수 배관 이음부", time: "10:11:19", title: "누출감지 · 냉각수 배관 이음부" },
-    { sev: "warning", where: "APRO 4F · WP-06 수배전반", time: "10:09:42", title: "부분방전 · 이상 점수 9.41" },
-    { sev: "warning", where: "Robot 02 · 터빈 2 / Unit 03", time: "10:06:05", title: "통신 불안정 · 재접속 3회 실패" },
-    { sev: "warning", where: "Robot 03 · APRO 4F 복도 B", time: "10:03:27", title: "경로 이탈 · 계획 경로에서 2.4 m" },
-    { sev: "warning", where: "Robot 06 · 충전 도크 2", time: "10:01:12", title: "배터리 부족 · 잔량 18%" }
+    { sev: "warning", robot: 0, wp: "WP-03", where: "APRO 4F · WP-03 냉각수 배관 밸브", time: "10:11:19",
+      title: "누출감지 · 냉각수 배관 밸브",
+      sum: "밸브 이음부에서 누출 패턴이 신뢰도 0.87 로 검출됐습니다. 임계 0.70 을 넘었고 연속 2프레임에서 나왔습니다.",
+      acts: ["현장 점검 요청", "다음 순회 재측정", "추이 관찰"] },
+    { sev: "warning", robot: 1, wp: "WP-06", where: "Robot 02 · WP-06 수배전반", time: "10:09:42",
+      title: "부분방전 · 이상 점수 9.41",
+      sum: "이상 점수 9.41 로 임계 9.23 을 넘었습니다. PRPD 패턴이 코로나 방전 유형과 일치합니다.",
+      acts: ["재진단 예약", "현장 점검 요청", "추이 관찰"] },
+    { sev: "warning", robot: 1, wp: "WP-12", where: "Robot 02 · WP-12 부근", time: "10:06:05",
+      title: "통신 불안정 · 재접속 3회 실패",
+      sum: "재접속을 3회 실패했고 신호가 −78 dBm 까지 떨어졌습니다. 음영 구간일 가능성이 있습니다.",
+      acts: ["자동복귀", "신호 추이 확인", "추이 관찰"] },
+    { sev: "warning", robot: 4, wp: "WP-02", where: "Robot 05 · WP-02 부근", time: "10:03:27",
+      title: "경로 이탈 · 계획 경로에서 2.4 m",
+      sum: "계획 경로에서 2.4 m 벗어났습니다. 장애물을 피한 뒤 경로로 돌아오지 못한 것으로 보입니다.",
+      acts: ["경로 재설정", "수동 조작으로 복귀", "추이 관찰"] },
+    { sev: "warning", robot: 1, wp: "WP-20", where: "Robot 02 · WP-20 부근", time: "10:01:12",
+      title: "배터리 부족 · 잔량 18%",
+      sum: "잔량 18% 로 복귀 기준 20% 아래입니다. 충전 도크까지 남은 거리는 충분합니다.",
+      acts: ["충전 도크 복귀 확인", "자동복귀", "추이 관찰"] }
   ];
 
-  var CRITICAL = { sev: "critical", where: "APRO 4F · 터빈 2 / Unit 03", time: "10:12:40", title: "지하발전소 B3 터빈 2 NG 1건 발견" };
+  var CRITICAL = { sev: "critical", robot: 0, wp: "WP-04", where: "터빈 2 / Unit 03 · WP-04 N₂ 배관 압력계", time: "10:12:40",
+    title: "지하발전소 B3 터빈 2 NG 1건 발견",
+    sum: "Spiral Casing Pr. 측정값 90 이 기준값 87 을 넘었습니다. 최근 3회 측정이 잇달아 올라 NG 로 판정했습니다.",
+    acts: ["현장 무전 연락 · 작업 중지 요청", "로봇 정지 · 현장 점검 요청", "재측정 후 판단"] };
 
   // 검토용 단계 — 주소 끝 #… 로 고른다. few 는 알림은 있지만 Delta 종합 기준에 못 미친 판이다.
   var SETS = {
@@ -118,13 +138,14 @@
     return [];
   }
 
-  var DONE = [
+  var DONE_BASE = [
     { time: "10:29:10", title: "온도감지 · WP-03 펌프 하우징", how: "추이 관찰 · 다음 순회 재측정", who: "김현대" },
     { time: "10:18:52", title: "통신 불안정 · Robot 02", how: "재접속 확인 · 조치 불필요", who: "김현대" },
     { time: "10:02:31", title: "진동감지 · WP-02 터빈1 베어링", how: "추이 관찰 · 다음 순회 재측정", who: "홍길동" },
     { time: "09:47:15", title: "온도감지 · WP-03 펌프 하우징", how: "현장 점검 요청 · 이상 없음", who: "홍길동" },
     { time: "09:30:08", title: "배터리 부족 · Robot 06", how: "충전 도크 복귀 확인", who: "김현대" }
   ];
+  var DONE = DONE_BASE.slice();
 
   var RANK = { critical: 0, warning: 1 };
 
@@ -142,10 +163,11 @@
   var level = "critical";
   var extra = [];          // E-STOP 처럼 화면에서 생긴 알림
   var filter = "all";
-  var picked = null;       // 고른 알림(객체)
+  var picked = null;       // 고른 알림(객체) — 지도에 쪽지가 열려 있는 알림
+  var resolved = [];       // 확인 처리한 알림 — 목록에서 빠지고 오늘 확인 완료로 간다
 
   function items() {
-    var base = (SETS[level] || SETS.critical)();
+    var base = (SETS[level] || SETS.critical)().filter(function (a) { return resolved.indexOf(a) < 0; });
     // "오래된 순 · 위험 우선 정렬" — 위험이 먼저, 같은 단계 안에서는 오래된 것이 위다.
     return extra.concat(base).sort(function (a, b) {
       return (RANK[a.sev] - RANK[b.sev]) || (a.time < b.time ? -1 : a.time > b.time ? 1 : 0);
@@ -174,10 +196,10 @@
 
     node.appendChild(where);
     node.appendChild(title);
-    // 고르면 표시만 남는다. Delta 문구는 목록 전체를 종합한 것이라 바뀌지 않는다.
+    // 고르면 그 알림이 난 웨이포인트 위에 쪽지가 선다. 같은 것을 다시 누르면 닫는다.
+    // Delta 문구는 목록 전체를 종합한 것이라 바뀌지 않는다.
     node.addEventListener("click", function () {
-      picked = a;
-      render();
+      if (picked === a) { note.close(); } else { note.open(a); }
     });
     return node;
   }
@@ -227,7 +249,6 @@
   function render() {
     var all = items();
     if (picked && all.indexOf(picked) < 0) { picked = null; }
-    if (!picked && all.length) { picked = all[0]; }
 
     var crit = all.filter(function (a) { return a.sev === "critical"; }).length;
     var warn = all.length - crit;
@@ -263,18 +284,161 @@
     var chosen = $(".robot-strip .robot-card[aria-pressed='true'] .robot-id");
     var name = chosen ? chosen.textContent : "로봇";
     var a = { sev: "critical", where: name + " · 현재 위치", time: clock(),
-      title: "비상정지 발동 · 로봇 구동 차단" };
+      title: "비상정지 발동 · 로봇 구동 차단",
+      robot: activeRobot(), wp: currentWp(),
+      sum: "모터 전원이 차단되었습니다. 현장 안전을 확인한 뒤 해제 절차를 진행하세요.",
+      acts: ["현장 무전 연락 · 안전 확인", "해제 절차 진행", "로봇 회수 요청"] };
     extra.unshift(a);
-    picked = a;
     render();
   });
+
+  // ==================================================================
+  // 알림 쪽지 — Figma Messages(948:31737)
+  //
+  // 고르면: 그 알림의 로봇으로 카드를 넘기고(지도 · 타임라인이 그 로봇 미션으로 바뀐다),
+  //        타임라인에서 그 웨이포인트를 골라 지도가 그리로 가게 한 뒤 쪽지를 세운다.
+  // 닫기:  같은 알림을 다시 누르거나 Esc. 지도나 타임라인에서 다른 곳을 골라도 닫힌다(map.js).
+  // 확인 처리: 고른 조치와 함께 오늘 확인 완료로 옮긴다 — 위험은 조치를 적어야 풀린다(알림 정책).
+  // ==================================================================
+  function activeRobot() {
+    var on = $(".robot-strip .robot-card[aria-pressed='true'][data-robot]");
+    return on ? Number(on.getAttribute("data-robot")) : 0;
+  }
+
+  function currentWp() {
+    var t = $("[data-timeline]");
+    return (t && t.getAttribute("data-current-waypoint")) || "WP-01";
+  }
+
+  var note = (function () {
+    var box = $("[data-map-alert]");
+    var timeline = $("[data-timeline]");
+    if (!box) { return { open: function () {}, close: function () {} }; }
+
+    var sev = $("[data-ma-sev]", box);
+    var time = $("[data-ma-time]", box);
+    var title = $("[data-ma-title]", box);
+    var sum = $("[data-ma-sum]", box);
+    var trigger = $("[data-ma-trigger]", box);
+    var value = $("[data-ma-value]", box);
+    var menu = $("[data-ma-menu]", box);
+    var confirm = $("[data-ma-confirm]", box);
+    var opening = false;
+
+    function fold(open) {
+      menu.hidden = !open;
+      trigger.setAttribute("aria-expanded", open ? "true" : "false");
+    }
+
+    function choose(label) {
+      value.textContent = label;
+      $$("li", menu).forEach(function (li) { li.setAttribute("aria-selected", li.textContent === label ? "true" : "false"); });
+      fold(false);
+    }
+
+    function fill(a) {
+      box.classList.toggle("is-critical", a.sev === "critical");
+      sev.textContent = a.sev === "critical" ? "위험" : "주의";
+      time.textContent = a.time;
+      title.textContent = a.title;
+      title.title = a.title;
+      sum.textContent = a.sum;
+      sum.title = a.sum;
+      menu.textContent = "";
+      a.acts.forEach(function (label) {
+        var li = el("li", null, label);
+        li.setAttribute("role", "option");
+        li.addEventListener("click", function () { choose(label); trigger.focus(); });
+        menu.appendChild(li);
+      });
+      choose(a.acts[0]);
+    }
+
+    // 타임라인에서 그 칸을 고른다 — 타임라인이 지도에 알리고, 지도가 카메라를 데려간다.
+    // 이미 골라져 있으면 누르지 않는다(누르면 놓아 버린다). 그때는 지도에 직접 다시 알린다.
+    function pointAt(wp) {
+      var item = timeline && timeline.querySelector("[data-waypoint='" + wp + "']");
+      if (item && timeline.getAttribute("data-selected-waypoint") !== wp) {
+        item.click();
+      } else {
+        document.dispatchEvent(new CustomEvent("aprism:waypoint", { detail: { id: wp, from: "panel" } }));
+      }
+      if (item && item.scrollIntoView) { item.scrollIntoView({ block: "nearest", behavior: "smooth" }); }
+    }
+
+    function open(a) {
+      opening = true;
+      if (a.robot !== activeRobot()) {
+        var card = $(".robot-strip .robot-card[data-robot='" + a.robot + "']");
+        if (card) { card.click(); }
+      }
+      picked = a;
+      fill(a);
+      fold(false);
+      box.setAttribute("data-wp", a.wp);
+      box.hidden = false;
+      pointAt(a.wp);
+      opening = false;
+      render();
+    }
+
+    function close() {
+      if (box.hidden) { picked = null; return; }
+      var wp = box.getAttribute("data-wp");
+      box.hidden = true;
+      picked = null;
+      fold(false);
+      // 타임라인 · 지도의 고른 칸도 놓는다.
+      if (timeline && timeline.getAttribute("data-selected-waypoint") === wp) {
+        var item = timeline.querySelector("[data-waypoint='" + wp + "']");
+        if (item) { item.click(); }
+      }
+      render();
+    }
+
+    trigger.addEventListener("click", function (event) {
+      event.stopPropagation();
+      fold(menu.hidden);
+    });
+
+    document.addEventListener("click", function (event) {
+      if (!menu.hidden && !event.target.closest("[data-ma-select]")) { fold(false); }
+    });
+
+    confirm.addEventListener("click", function () {
+      var a = picked;
+      if (!a) { return; }
+      DONE.forEach(function (d) { d.fresh = false; });
+      DONE.unshift({ time: clock(), title: a.title, how: value.textContent, who: "홍길동", fresh: true });
+      if (extra.indexOf(a) >= 0) { extra.splice(extra.indexOf(a), 1); } else { resolved.push(a); }
+      close();
+    });
+
+    // 지도가 다른 웨이포인트로 옮겨 가며 쪽지를 닫았다 — 목록의 고른 표시도 놓는다.
+    document.addEventListener("aprism:map-alert", function (event) {
+      if (opening || (event.detail && event.detail.open)) { return; }
+      picked = null;
+      fold(false);
+      render();
+    });
+
+    document.addEventListener("keydown", function (event) {
+      if (event.key !== "Escape" || box.hidden) { return; }
+      if (!menu.hidden) { fold(false); trigger.focus(); return; }
+      close();
+    });
+
+    return { open: open, close: close };
+  })();
 
   // 검토용 — 주소의 #normal · #few · #warning · #critical 로 단계를 고른다.
   function fromHash() {
     var h = (location.hash || "").replace("#", "");
     level = SETS[h] ? h : "critical";
     extra = [];
-    picked = null;
+    resolved = [];
+    DONE = DONE_BASE.slice();
+    note.close();
     render();
   }
 

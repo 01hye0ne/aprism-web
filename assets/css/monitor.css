@@ -476,3 +476,182 @@
 }
 
 .rc-actions .btn { pointer-events: auto; flex: 1 1 0; min-width: 0; }
+
+/* ---------- 알림 쪽지 (Figma Messages 948:31737) ---------- */
+/*
+ * 왼쪽 목록에서 알림을 고르면 그 알림이 난 웨이포인트 위에 선다. 자리(--x · --y · --tail)는
+ * map.js 가 웨이포인트를 화면 좌표로 옮겨 잡는다 — 카메라를 돌려도 따라간다.
+ *
+ * Proceeding — 338 폭 · 패딩 8 · 사이 20 · radius 8 · overlay-light 40%.
+ *   Infos(사이 8): 배지 · 발생시간 / 제목(Title/2) / 라이브 뷰(241) / 원인 요약(Body/3 두 줄) / 상황 조치 선택
+ *   확인 처리 — Button Accent · Small, 폭 전체
+ * 아래 꼬리(세모 14 × 8)가 웨이포인트를 가리킨다. 쪽지와 점 사이는 8 을 띄운다.
+ * 위에 설 자리가 없으면 아래로 뒤집는다(.is-below) — Figma 에 없는 판이다.
+ * Figma 는 배경 흐림이 없는데, 40% 면만으로는 지도 선이 글자 뒤로 비쳐 읽기 어렵다.
+ * 오른쪽 미션 카드와 같은 흐림 20 을 더했다(Figma 와 다른 점).
+ */
+.map-alert {
+  --tail: 0px;
+  position: absolute;
+  left: var(--x, 50%);
+  top: var(--y, 50%);
+  z-index: 5;
+  width: 338px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+  padding: var(--space-8);
+  border-radius: var(--radius-container);
+  background-color: color-mix(in srgb, var(--bg-surface-overlay-light) 40%, transparent);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  transform: translate(-50%, calc(-100% - 16px));
+  cursor: default;
+}
+
+.map-alert.is-below { transform: translate(-50%, 16px); }
+
+.map-alert::after {
+  content: "";
+  position: absolute;
+  left: calc(50% + var(--tail));
+  top: 100%;
+  width: 14px;
+  height: 8px;
+  transform: translateX(-50%);
+  background-color: color-mix(in srgb, var(--bg-surface-overlay-light) 40%, transparent);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+}
+
+.map-alert.is-below::after {
+  top: auto;
+  bottom: 100%;
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+
+.ma-infos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  min-width: 0;
+}
+
+.ma-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-8);
+}
+
+/* Badge Status=Warning · Critical, Emphasis=Solid — bg/surface/subtle 면, 점과 글이 단계색. */
+.ma-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4);
+  height: 26px;
+  padding: var(--space-4) var(--space-12) var(--space-4) var(--space-8);
+  border-radius: var(--radius-pill);
+  background-color: var(--bg-surface-subtle);
+  color: var(--status-warning-fg);
+  white-space: nowrap;
+}
+
+.ma-badge .badge-dot { background-color: var(--status-warning-icon); }
+.map-alert.is-critical .ma-badge { color: var(--status-critical-fg); }
+.map-alert.is-critical .ma-badge .badge-dot { background-color: var(--status-critical-icon); }
+
+.ma-time { color: var(--fg-secondary); white-space: nowrap; }
+
+.ma-title {
+  margin: 0;
+  color: var(--fg-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ma-live {
+  height: 241px;
+  border-radius: var(--radius-4);
+  background-color: #262626;
+}
+
+/* 원인 요약 — 두 줄까지, 넘치면 말줄임. */
+.ma-sum {
+  margin: 0;
+  color: var(--fg-primary);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Select Size=Medium — 라벨(Label/1) 아래 8 에 36 높이 칸. overlay-dark 50% · border/default · radius 4. */
+.ma-act {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  color: var(--fg-primary);
+}
+
+.ma-select { position: relative; }
+
+.ma-field {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  width: 100%;
+  height: var(--size-control-md);
+  padding: 0 var(--space-12);
+  border: var(--border-width-thin) solid var(--border-default);
+  border-radius: var(--radius-4);
+  background-color: color-mix(in srgb, var(--bg-surface-overlay-dark) 50%, transparent);
+  color: var(--fg-primary);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.ma-field > span:first-child { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ma-field .i { flex: none; color: var(--fg-secondary); transition: transform 140ms ease; }
+.ma-field[aria-expanded="true"] .i { transform: rotate(180deg); }
+.ma-field:hover { border-color: var(--border-control-hover); }
+
+.ma-field:focus-visible,
+.ma-confirm:focus-visible {
+  outline: var(--border-width-strong) solid var(--border-focus);
+  outline-offset: 1px;
+}
+
+/* 펼친 목록 — Figma 에 없는 판이다. 다른 드롭다운(계정 메뉴)과 같은 면으로 칸 바로 아래에 뜬다. */
+.ma-menu {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(100% + var(--space-4));
+  z-index: 2;
+  margin: 0;
+  padding: var(--space-4);
+  list-style: none;
+  border: var(--border-width-thin) solid var(--border-default);
+  border-radius: var(--radius-4);
+  background-color: var(--bg-surface-raised);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 40%);
+}
+
+.ma-menu li {
+  padding: var(--space-8);
+  border-radius: var(--radius-2);
+  color: var(--fg-primary);
+  font-size: var(--font-size-14);
+  line-height: var(--font-line-height-22);
+  cursor: pointer;
+}
+
+.ma-menu li:hover,
+.ma-menu li[aria-selected="true"] { background-color: var(--bg-interactive-hover); }
+
+.ma-confirm { width: 100%; }

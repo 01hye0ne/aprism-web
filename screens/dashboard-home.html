@@ -20,7 +20,7 @@
   </script>
   <link rel="stylesheet" href="../assets/css/tokens.css?v=4e931ef2" />
   <link rel="stylesheet" href="../assets/css/app-shell.css?v=063e3b38" />
-  <link rel="stylesheet" href="../assets/css/monitor.css?v=69b2b741" />
+  <link rel="stylesheet" href="../assets/css/monitor.css?v=084fbda5" />
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
@@ -285,6 +285,32 @@
                 <p class="map-wp-read" data-map-wp-read></p>
                 <button type="button" class="btn btn-ghost map-wp-more" data-map-wp-more>상세보기</button>
               </div>
+              <!-- 알림 쪽지 — Figma Messages(948:31737). 왼쪽 알림 목록에서 하나를 고르면 그 알림이 난
+                   웨이포인트 위에 선다. 내용은 monitor.js 가 채우고, 자리는 map.js 가 웨이포인트를 따라 잡는다. -->
+              <section class="map-alert" data-map-alert hidden aria-labelledby="ma-title">
+                <div class="ma-infos">
+                  <div class="ma-head">
+                    <span class="ma-badge t-label-2" data-ma-badge><span class="badge-dot"></span><span data-ma-sev>주의</span></span>
+                    <span class="ma-time t-caption num" data-ma-time></span>
+                  </div>
+                  <h3 class="ma-title t-title-2" id="ma-title" data-ma-title></h3>
+                  <!-- 라이브 뷰 자리 — Figma 도 아직 빈 면(#262626)이다. -->
+                  <div class="ma-live" role="img" aria-label="라이브 뷰"></div>
+                  <p class="ma-sum t-body-3" data-ma-sum></p>
+                  <div class="ma-act">
+                    <span class="t-label-1" id="ma-act-label">상황 조치</span>
+                    <div class="ma-select" data-ma-select>
+                      <button type="button" class="ma-field" data-ma-trigger
+                              aria-haspopup="listbox" aria-expanded="false" aria-labelledby="ma-act-label ma-value">
+                        <span class="t-body-3" id="ma-value" data-ma-value></span>
+                        <span class="i i-20" style="--i:var(--ic-chevron-down)" aria-hidden="true"></span>
+                      </button>
+                      <ul class="ma-menu" role="listbox" aria-labelledby="ma-act-label" data-ma-menu hidden></ul>
+                    </div>
+                  </div>
+                </div>
+                <button type="button" class="btn btn-accent ma-confirm" data-ma-confirm>확인 처리</button>
+              </section>
               <div class="map-bot" data-map-bot hidden>
                 <div class="map-bot-tip" data-map-bot-tip hidden>
                   <div class="map-card-head">
@@ -1485,8 +1511,8 @@
 <script src="../assets/js/prism-orb.js?v=03386460"></script>
 <script src="../assets/js/screen.js?v=df2c1129"></script>
 <script src="../assets/js/map-model.js?v=fb8d7fde"></script>
-<script src="../assets/js/map.js?v=f80d3538"></script>
-<script src="../assets/js/monitor.js?v=f107862c"></script>
+<script src="../assets/js/map.js?v=db1a8560"></script>
+<script src="../assets/js/monitor.js?v=09d28e8b"></script>
 <script src="../assets/js/grid-overlay.js?v=164e4f2a"></script>
 </body>
 </html>

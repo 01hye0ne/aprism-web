@@ -1699,15 +1699,32 @@
   var wpName = wpBox && wpBox.querySelector("[data-map-wp-name]");
   var wpRead = wpBox && wpBox.querySelector("[data-map-wp-read]");
 
+  /*
+   * 알림 쪽지(04.1 ver.2 · Figma Messages) — 왼쪽 알림 목록에서 알림을 고르면 monitor.js 가
+   * 내용을 채워 열고 data-wp 에 웨이포인트 이름을 적는다. 여기서는 자리만 잡는다.
+   * 그 웨이포인트가 골라져 있는 동안에는 작은 쪽지 대신 이것이 선다.
+   * 다른 웨이포인트로 옮겨 가거나 고른 것을 놓으면 닫고 aprism:map-alert 로 알린다.
+   */
+  var alertBox = document.querySelector("[data-map-alert]");
+
+  function alertOn() {
+    return !!(alertBox && !alertBox.hidden && chosenWp && alertBox.getAttribute("data-wp") === chosenWp);
+  }
+
   var WP_WORD = {
     safe: "정상", caution: "주의", danger: "위험",
     current: "측정 중", upcoming: "예정"
   };
 
   function tellWaypoint() {
+    if (alertBox && !alertBox.hidden && alertBox.getAttribute("data-wp") !== chosenWp) {
+      alertBox.hidden = true;
+      document.dispatchEvent(new CustomEvent("aprism:map-alert", { detail: { open: false } }));
+    }
     if (!wpBox) { return; }
     var found = wpSpots.filter(function (w) { return w.id === chosenWp; })[0];
     if (!found) { wpBox.hidden = true; return; }
+    if (alertOn()) { wpBox.hidden = true; placeWp(); return; }
     var info = found.info;
     wpBox.setAttribute("data-result", info.tone);
     if (wpChip) { wpChip.textContent = WP_WORD[info.tone] || "예정"; }
@@ -1722,7 +1739,9 @@
 
   // 쪽지 자리 — 고른 웨이포인트를 화면 좌표로 옮긴다. 설비 카드와 같은 셈이다.
   function placeWp() {
-    if (!wpBox || wpBox.hidden || !camera) { return; }
+    if (!camera) { return; }
+    var showAlert = alertOn();
+    if (!showAlert && (!wpBox || wpBox.hidden)) { return; }
     var found = wpSpots.filter(function (w) { return w.id === chosenWp; })[0];
     if (!found) { return; }
 
@@ -1732,12 +1751,44 @@
     var x = (p.x * 0.5 + 0.5) * v.width + v.left - c.left;
     var y = (-p.y * 0.5 + 0.5) * v.height + v.top - c.top;
 
+    if (showAlert) { placeAlert(x, y, c.width, c.height); return; }
+
     var half = wpBox.offsetWidth / 2 || 88;
     var tall = wpBox.offsetHeight + 12 || 96;
     x = Math.min(c.width - half - 8, Math.max(half + 8, x));
     y = Math.min(c.height - 8, Math.max(tall + 8, y));
     wpBox.style.setProperty("--x", x.toFixed(1) + "px");
     wpBox.style.setProperty("--y", y.toFixed(1) + "px");
+  }
+
+  /*
+   * 알림 쪽지 자리. 꼬리 끝이 웨이포인트 8 위에 오도록 쪽지를 그 위에 세운다.
+   * 칸 밖으로 나가면 가로는 쪽지만 밀고 꼬리는 점을 계속 가리키게 둔다(--tail).
+   * 위에 설 자리가 없으면 아래로 뒤집는다.
+   */
+  function placeAlert(x, y, W, H) {
+    var half = alertBox.offsetWidth / 2;
+    var tall = alertBox.offsetHeight + 16;
+    var below = y - tall < 8 && y + tall <= H - 8;
+    alertBox.classList.toggle("is-below", below);
+    var cx = Math.min(W - half - 8, Math.max(half + 8, x));
+    var tail = Math.max(-(half - 16), Math.min(half - 16, x - cx));
+    var cy = below ? Math.min(y, H - tall - 8) : Math.max(tall + 8, y);
+    alertBox.style.setProperty("--x", cx.toFixed(1) + "px");
+    alertBox.style.setProperty("--y", cy.toFixed(1) + "px");
+    alertBox.style.setProperty("--tail", tail.toFixed(1) + "px");
+  }
+
+  /*
+   * 카메라가 갈 곳. 알림 쪽지가 열려 있으면 웨이포인트를 칸 한가운데가 아니라 쪽지 높이의
+   * 절반만큼 아래에 세운다 — 한가운데에 두면 쪽지(516)가 위로 설 자리가 없다.
+   * frame() 의 셈과 같다: 화면 1px 은 (baseSize / zoom) / 높이 만큼의 월드 길이다.
+   */
+  function aimAt(spot, z) {
+    if (!alertOn() || !upOnGround) { return spot; }
+    var lift = (alertBox.offsetHeight + 16) / 2;
+    var s = (baseSize / z) / (view.clientHeight || 1);
+    return spot.clone().addScaledVector(upOnGround, lift * s);
   }
 
   /*
@@ -1752,7 +1803,10 @@
 
     if (chosenWp && from === "panel") {
       var found = wpSpots.filter(function (w) { return w.id === chosenWp; })[0];
-      if (found && renderer) { glide(yaw, pitch, Math.max(zoom, 2.4), found.spot); }
+      if (found && renderer) {
+        var z = Math.max(zoom, 2.4);
+        glide(yaw, pitch, z, aimAt(found.spot, z));
+      }
     }
     if (from !== "panel") {
       document.dispatchEvent(new CustomEvent("aprism:waypoint", {
