@@ -86,6 +86,9 @@
    *
    *   face  덩이 면
    *   line  외곽선이 기본으로 갖는 진하기
+   *   alpha 덩이 면의 기본 불투명도. 벽 · 설비 · 계단을 비쳐 보이게 깔아 웨이포인트 · 경로가
+   *         건물 뒤에 있어도 보이게 한다(피드백: "회색 톤이 다 비슷해 강약이 없다"). 바닥만 1 이다 —
+   *         판이 비치면 지도 전체가 떠 보인다. 모서리 선(line)은 그대로 둬서 건물 모양은 선이 잡는다.
    *   peak  보고 있는 자리에 들어왔을 때 선이 올라가는 끝. 바닥은 안 올린다 —
    *         바닥은 판이라 모서리가 건물을 가로지르는 긴 선이고, 그것이 밝아지면
    *         화면을 가로지르는 줄이 하나 생긴다
@@ -100,11 +103,11 @@
    * 모르는 이름은 other 로 떨어진다. 레이어를 더 늘리면 여기에 한 줄 보태면 된다.
    */
   var PALETTE = {
-    floor:     { face: 0x18202e, line: 0.25, peak: 0.25 },
-    wall:      { face: 0x2e3a4e, line: 0.7, peak: 0.9 },
-    equipment: { face: 0x41506a, line: 0.7, peak: 1 },
-    stairs:    { face: 0x36435a, line: 0.32, peak: 0.5 },
-    other:     { face: 0x36435a, line: 0.7, peak: 0.95 }
+    floor:     { face: 0x18202e, line: 0.25, peak: 0.25, alpha: 1 },
+    wall:      { face: 0x2e3a4e, line: 0.7, peak: 0.9, alpha: 0.45 },
+    equipment: { face: 0x41506a, line: 0.7, peak: 1, alpha: 0.6 },
+    stairs:    { face: 0x36435a, line: 0.32, peak: 0.5, alpha: 0.4 },
+    other:     { face: 0x36435a, line: 0.7, peak: 0.95, alpha: 0.55 }
   };
   var EDGE = 0x7b8fb4;    // 외곽선 — 어디서나 같은 색이다
   var GHOST = 0x6a7890;   // 투명해질 때 다가가는 색
@@ -681,7 +684,8 @@
       roughness: 0.85,
       metalness: 0.05,
       transparent: true,
-      opacity: 1
+      opacity: skin.alpha,
+      depthWrite: skin.alpha >= 1
     });
     var mesh = new THREE.Mesh(geo, mat);
     // 덩이는 바닥에 그림자를 드리우고, 서로의 그림자도 받는다.
@@ -708,7 +712,8 @@
       center: geo.boundingBox.getCenter(new THREE.Vector3()),
       line: skin.line,
       peak: skin.peak,
-      now: 1, want: 1,
+      alpha: skin.alpha,
+      now: skin.alpha, want: skin.alpha,
       edgeNow: skin.line, edgeWant: skin.line,
       // 눌리면 파랗게 물든다. 0 이 제 색, 1 이 다 물든 색.
       glowNow: 0, glowWant: 0
@@ -1993,13 +1998,14 @@
     meshes.forEach(function (item) {
       var blocked = !!hits[item.mesh.uuid];
       var close = item.center.distanceTo(target) < near;
-      var want = 1, edge = item.line;
+      // 기본은 레이어의 불투명도(alpha)다. 가린 덩이는 거기서 더 내려간다.
+      var want = item.alpha, edge = item.line;
 
       if (stage === 2) {
-        want = blocked ? 0.35 : 1;
+        want = blocked ? Math.min(item.alpha, 0.35) : item.alpha;
         edge = blocked ? item.line * 0.6 : (close ? item.peak : item.line * 0.8);
       } else if (stage === 3) {
-        want = blocked ? 0.15 : 1;
+        want = blocked ? Math.min(item.alpha, 0.15) : item.alpha;
         edge = blocked ? item.line * 0.4 : (close ? item.peak : item.line * 0.6);
       }
 
@@ -2033,12 +2039,15 @@
         item.mat.opacity = item.now;
         // 눌린 설비는 파랗게 물들고, 옅어질수록 납작한 유령색으로 간다.
         // 유령색을 나중에 섞는다 — 사라지는 중인 것이 파랗게 빛나면 안 된다.
+        // 옅어진 정도는 레이어의 기본 불투명도(alpha)에서 잰다 — 원래 비쳐 보이게 깔린 벽이
+        // 처음부터 회색으로 바래면 덩이끼리 색이 다시 비슷해진다.
+        var fade = Math.max(0, 1 - item.now / item.alpha);
         tone.copy(item.base).lerp(PICKED, item.glowNow);
-        item.mat.color.copy(tone).lerp(GHOSTC, 1 - item.now);
+        item.mat.color.copy(tone).lerp(GHOSTC, fade);
         item.mat.depthWrite = item.now > 0.95;
         item.edgeMat.opacity = item.edgeNow;
         // 비쳐 보이게 낮춘 덩이가 그림자만 멀쩡히 남으면 유령이 선 것처럼 보인다.
-        item.mesh.castShadow = item.now > 0.5;
+        item.mesh.castShadow = item.now > item.alpha * 0.5;
       });
       frame();
       if (moving) { window.requestAnimationFrame(step); }
