@@ -82,6 +82,18 @@
 .v2 .ai-panel:not(.is-open) .ai-tag { padding: var(--space-2) var(--space-8) var(--space-2) var(--space-4); }
 .v2 .ai-panel:not(.is-open) .ai-toggle { height: 20px; }
 
+/*
+ * Delta 행동 버튼 — 펼친 판에서 알림 여러 건을 한꺼번에 다룬다(1차의 캡슐 자리).
+ * 알림 한 건을 겨냥한 캡슐(.ai-chip)과 성격이 달라 Button Size=Medium 으로 둔다 —
+ * 첫째 Primary, 나머지 Secondary. 문구는 아직 초안이다(monitor.js deltaActions).
+ * 종합 기준에 못 미치면(5건 미만) 버튼이 없다.
+ */
+.ai-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-8);
+}
+
 /* 위험 태그 아이콘은 error(⊗)다. 1차는 주의 · 위험 모두 warning 이었다. */
 .v2 .ai-panel.is-critical .ai-tag .i { --i: var(--ic-error); }
 

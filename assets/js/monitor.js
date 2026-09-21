@@ -4,12 +4,14 @@
 // 셸의 동작(로봇 선택 · 타임라인 · 모달 · Drawer · AI 패널 · 지도)은 screen.js 와 map.js 가 그대로 한다.
 // 여기서는 ver.2 에서 새로 생긴 것만 한다.
 //
-//   왼쪽 알림 히스토리 — 처리 필요 목록 · 거르기 · 고르기(→ AI 패널 문구) · 오늘 확인 완료
+//   왼쪽 알림 히스토리 — 처리 필요 목록 · 거르기 · 고르기 · 오늘 확인 완료
+//   Delta(AI 패널) — 목록 전체를 종합한 판단 · 문구 · 행동 버튼
 //   오른쪽 로봇 카드 — 한 대씩 넘겨 보기
 //   알림 단계 body[data-level] — normal · warning · critical (알림 정책 UI_99 1016:1055 의 주의 · 위험)
 //
 // 값은 검토용으로 이 파일 안에 있다. 서버가 없는 퍼블리싱이다.
-// 주소 끝에 #normal · #warning · #critical 을 붙이면 그 단계로 열린다. 없으면 Figma 와 같은 위험이다.
+// 주소 끝에 #normal · #few · #warning · #critical 을 붙이면 그 단계로 열린다. 없으면 Figma 와 같은 위험이다.
+//   few — 알림이 있지만 Delta 종합 기준(5건)에 못 미친 판
 
 (function () {
   "use strict";
@@ -42,28 +44,79 @@
 
   // ==================================================================
   // 알림 데이터 — 최근 24시간.
-  // 위험도는 알림 정책을 따른다 — 통신 불안정 · 누출 · 부분방전은 주의, NG 판정 · 비상정지는 위험.
-  // ai 는 고르면 AI 패널(Delta)에 뜨는 두 줄이다.
+  // 위험도는 알림 정책을 따른다 — 누출 · 부분방전 · 통신 불안정 · 경로 이탈 · 배터리 부족은 주의,
+  // NG 판정 · 비상정지는 위험.
   // ==================================================================
   var WARNINGS = [
-    { sev: "warning", where: "APRO 4F · WP-04 냉각수 배관 이음부", time: "10:11:19",
-      title: "누출감지 · 냉각수 배관 이음부",
-      ai: { line1: "WP-04 냉각수 배관 이음부에서 누출 패턴이 감지되었습니다.",
-        line2: "신뢰도 0.87 로 임계 0.70 을 넘었고 연속 2프레임에서 검출됐습니다. 현장 점검으로 누수 여부를 확인해 주세요." } },
-    { sev: "warning", where: "APRO 4F · WP-06 수배전반", time: "10:09:42",
-      title: "부분방전 · 이상 점수 9.41",
-      ai: { line1: "WP-06 수배전반에서 부분방전 이상 점수가 올랐습니다.",
-        line2: "이상 점수 9.41 로 임계 9.23 을 넘었습니다. PRPD 패턴이 코로나 방전 유형과 일치해 다음 순회에서 추이를 보겠습니다." } },
-    { sev: "warning", where: "Robot 02 · 터빈 2 / Unit 03", time: "10:06:05",
-      title: "통신 불안정 · 재접속 3회 실패",
-      ai: { line1: "Robot 02 의 통신이 불안정합니다.",
-        line2: "재접속을 3회 실패했고 신호가 −78 dBm 까지 떨어졌습니다. 로봇 위치를 확인하고 필요하면 자동복귀시켜 주세요." } }
+    { sev: "warning", where: "APRO 4F · WP-04 냉각수 배관 이음부", time: "10:11:19", title: "누출감지 · 냉각수 배관 이음부" },
+    { sev: "warning", where: "APRO 4F · WP-06 수배전반", time: "10:09:42", title: "부분방전 · 이상 점수 9.41" },
+    { sev: "warning", where: "Robot 02 · 터빈 2 / Unit 03", time: "10:06:05", title: "통신 불안정 · 재접속 3회 실패" },
+    { sev: "warning", where: "Robot 03 · APRO 4F 복도 B", time: "10:03:27", title: "경로 이탈 · 계획 경로에서 2.4 m" },
+    { sev: "warning", where: "Robot 06 · 충전 도크 2", time: "10:01:12", title: "배터리 부족 · 잔량 18%" }
   ];
 
-  var CRITICAL = { sev: "critical", where: "APRO 4F · 터빈 2 / Unit 03", time: "10:12:40",
-    title: "지하발전소 B3 터빈 2 NG 1건 발견",
-    ai: { line1: "지하발전소 B3 터빈 2 에서 NG 1건이 발견되었습니다.",
-      line2: "Spiral Casing Pr. 측정값 90 이 기준값 87 을 넘었습니다. 로봇을 멈추고 현장에 연락한 뒤 조치 내용을 입력해 주세요." } };
+  var CRITICAL = { sev: "critical", where: "APRO 4F · 터빈 2 / Unit 03", time: "10:12:40", title: "지하발전소 B3 터빈 2 NG 1건 발견" };
+
+  // 검토용 단계 — 주소 끝 #… 로 고른다. few 는 알림은 있지만 Delta 종합 기준에 못 미친 판이다.
+  var SETS = {
+    normal: function () { return []; },
+    few: function () { return [CRITICAL, WARNINGS[0], WARNINGS[1]]; },
+    warning: function () { return WARNINGS.slice(); },
+    critical: function () { return [CRITICAL].concat(WARNINGS); }
+  };
+
+  // ==================================================================
+  // Delta — 알림 하나가 아니라 목록 전체를 종합해서 판단한다(2026-09-21 디자이너 정의).
+  //
+  //   주의 + 위험이 DELTA_MIN 건 이상 쌓이면 그 전체를 보고 주의 또는 위험으로 표시한다.
+  //   그 아래에서는 종합 판단을 하지 않는다 — Delta 는 정상(파랑) 색으로 건수만 알린다.
+  //
+  // ※ 기준은 아직 정해지지 않았다. 아래 judge() 는 임시 규칙이다 —
+  //    DELTA_MIN 건 이상일 때 위험이 한 건이라도 있으면 위험, 아니면 주의.
+  //    기준이 정해지면 judge() 만 바꾸면 된다.
+  //
+  // 화면 테두리(엣지 글로우)는 Delta 와 따로 간다 — 알림 정책상 주의 · 위험 알림이 하나라도
+  // 있으면 켜진다(목록에서 가장 높은 단계).
+  // ==================================================================
+  var DELTA_MIN = 5;
+
+  function judge(all) {
+    var crit = all.filter(function (a) { return a.sev === "critical"; }).length;
+    var warn = all.length - crit;
+    var level = all.length < DELTA_MIN ? "normal" : (crit ? "critical" : "warning");
+    return { level: level, total: all.length, crit: crit, warn: warn };
+  }
+
+  // Delta 가 하는 말 — 닫힘은 둘째 줄이 한 줄 말줄임이라 앞쪽에 요지를 둔다.
+  function deltaCopy(j) {
+    if (!j.total) {
+      return { tag: "정기 순회 진행 중", line1: "안녕하세요. 홍길동 님",
+        line2: "Robot 01 이 정기 순회를 진행하고 있어요. 지금은 특이사항이 없습니다." };
+    }
+    var mix = "위험 " + j.crit + " · 주의 " + j.warn;
+    if (j.level === "normal") {
+      return { tag: "알림 " + j.total + "건 관찰 중", line1: "안녕하세요. 홍길동 님",
+        line2: "확인할 알림이 " + j.total + "건 있어요(" + mix + "). 왼쪽 목록에서 하나씩 살펴봐 주세요." };
+    }
+    if (j.level === "warning") {
+      return { tag: "알림 " + j.total + "건 종합 · 주의", line1: "주의 알림이 " + j.total + "건 쌓였습니다.",
+        line2: "여러 지점과 로봇에서 이상징후가 겹칩니다. 개별 대응보다 전체 추세를 함께 보고 점검 순서를 정하는 것을 권합니다." };
+    }
+    return { tag: "알림 " + j.total + "건 종합 · 위험", line1: "위험 " + j.crit + "건을 포함해 알림이 " + j.total + "건 쌓였습니다.",
+      line2: "위험 알림부터 조치하고, 겹치는 주의 알림은 한꺼번에 점검 계획을 세우는 것을 권합니다." };
+  }
+
+  // Delta 를 펼쳤을 때의 행동 버튼 — 알림 여러 건을 한꺼번에 다룬다.
+  // ※ 문구는 아직 정해지지 않은 초안이다. 누르면 아무 일도 하지 않는다.
+  function deltaActions(j) {
+    if (j.level === "critical") {
+      return ["위험 " + j.crit + "건부터 조치", "주의 " + j.warn + "건 묶어서 확인", "현장 점검 한꺼번에 요청"];
+    }
+    if (j.level === "warning") {
+      return ["주의 " + j.warn + "건 묶어서 확인", "추세 한 번에 보기", "현장 점검 한꺼번에 요청"];
+    }
+    return [];
+  }
 
   var DONE = [
     { time: "10:29:10", title: "온도감지 · WP-03 펌프 하우징", how: "추이 관찰 · 다음 순회 재측정", who: "김현대" },
@@ -72,11 +125,6 @@
     { time: "09:47:15", title: "온도감지 · WP-03 펌프 하우징", how: "현장 점검 요청 · 이상 없음", who: "홍길동" },
     { time: "09:30:08", title: "배터리 부족 · Robot 06", how: "충전 도크 복귀 확인", who: "김현대" }
   ];
-
-  // 알림이 없을 때 AI 패널 문구. 태그는 Figma 와 같은 "원인 분석 완료 · 후보 1건 확인" 을 주의 · 위험에 쓴다.
-  var CALM = { line1: "안녕하세요. 홍길동 님",
-    line2: "Robot 01 이 정기 순회를 진행하고 있어요. 지금은 특이사항이 없습니다.", tag: "정기 순회 진행 중" };
-  var TAG = "원인 분석 완료 · 후보 1건 확인";
 
   var RANK = { critical: 0, warning: 1 };
 
@@ -89,14 +137,15 @@
   var filters = $$("[data-ah-filter]");
   if (!list) { return; }
 
+  var aiActions = $("[data-ai-actions]");
+
   var level = "critical";
   var extra = [];          // E-STOP 처럼 화면에서 생긴 알림
   var filter = "all";
   var picked = null;       // 고른 알림(객체)
 
   function items() {
-    var base = level === "normal" ? [] :
-      level === "warning" ? WARNINGS.slice() : [CRITICAL].concat(WARNINGS);
+    var base = (SETS[level] || SETS.critical)();
     // "오래된 순 · 위험 우선 정렬" — 위험이 먼저, 같은 단계 안에서는 오래된 것이 위다.
     return extra.concat(base).sort(function (a, b) {
       return (RANK[a.sev] - RANK[b.sev]) || (a.time < b.time ? -1 : a.time > b.time ? 1 : 0);
@@ -125,6 +174,7 @@
 
     node.appendChild(where);
     node.appendChild(title);
+    // 고르면 표시만 남는다. Delta 문구는 목록 전체를 종합한 것이라 바뀌지 않는다.
     node.addEventListener("click", function () {
       picked = a;
       render();
@@ -151,17 +201,27 @@
     return node;
   }
 
-  function tellAi(tone, glow) {
-    var copy = picked ? picked.ai : CALM;
+  function tellAi(j, glow) {
+    var copy = deltaCopy(j);
     document.dispatchEvent(new CustomEvent("aprism:severity", {
       detail: {
-        level: tone === "normal" ? null : tone,
+        level: j.level === "normal" ? null : j.level,
         glow: glow === "normal" ? null : glow,
         line1: copy.line1,
         line2: copy.line2,
-        tag: picked ? TAG : CALM.tag
+        tag: copy.tag
       }
     }));
+
+    if (!aiActions) { return; }
+    var labels = deltaActions(j);
+    aiActions.textContent = "";
+    aiActions.hidden = !labels.length;
+    labels.forEach(function (label, i) {
+      var b = el("button", "btn is-md " + (i === 0 ? "btn-primary" : "btn-secondary"), label);
+      b.type = "button";
+      aiActions.appendChild(b);
+    });
   }
 
   function render() {
@@ -183,11 +243,11 @@
     DONE.forEach(function (d) { doneList.appendChild(doneItem(d)); });
     doneCount.textContent = DONE.length + "건";
 
-    // AI 패널은 고른 알림의 단계를 입는다 — 위험이 남아 있어도 주의 알림을 고르면 주의(노랑)다.
-    // 화면 테두리(엣지 글로우)는 목록 전체에서 가장 높은 단계를 따른다.
+    // Delta 는 목록 전체를 종합한다 — 목록에서 무엇을 골랐는지와는 상관없다.
+    // 화면 테두리(엣지 글로우)는 목록에서 가장 높은 단계를 따른다.
     var top = highest(all);
     body.setAttribute("data-level", top);
-    tellAi(picked ? picked.sev : "normal", top);
+    tellAi(judge(all), top);
   }
 
   filters.forEach(function (btn) {
@@ -203,18 +263,16 @@
     var chosen = $(".robot-strip .robot-card[aria-pressed='true'] .robot-id");
     var name = chosen ? chosen.textContent : "로봇";
     var a = { sev: "critical", where: name + " · 현재 위치", time: clock(),
-      title: "비상정지 발동 · 로봇 구동 차단",
-      ai: { line1: name + " 에 비상정지가 발동되었습니다.",
-        line2: "모터 전원이 차단되었습니다. 현장 안전을 확인한 뒤 조치 내용을 입력하고 해제 절차를 진행하세요." } };
+      title: "비상정지 발동 · 로봇 구동 차단" };
     extra.unshift(a);
     picked = a;
     render();
   });
 
-  // 검토용 — 주소의 #normal · #warning · #critical 로 단계를 고른다.
+  // 검토용 — 주소의 #normal · #few · #warning · #critical 로 단계를 고른다.
   function fromHash() {
     var h = (location.hash || "").replace("#", "");
-    level = (h === "normal" || h === "warning" || h === "critical") ? h : "critical";
+    level = SETS[h] ? h : "critical";
     extra = [];
     picked = null;
     render();

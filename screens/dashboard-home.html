@@ -20,7 +20,7 @@
   </script>
   <link rel="stylesheet" href="../assets/css/tokens.css?v=4e931ef2" />
   <link rel="stylesheet" href="../assets/css/app-shell.css?v=063e3b38" />
-  <link rel="stylesheet" href="../assets/css/monitor.css?v=0e90da80" />
+  <link rel="stylesheet" href="../assets/css/monitor.css?v=69b2b741" />
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
@@ -360,11 +360,9 @@
                         <p class="ai-headline ai-line-1">안녕하세요. 홍길동 님</p>
                         <p class="ai-headline ai-line-2">지하발전소 B3 터빈2 에서 NG 1건이 발견되었습니다.</p>
                       </div>
-                      <div class="ai-suggestions">
-                        <button type="button" class="ai-chip">Spiral Casing 압력 추이 보여줘</button>
-                        <button type="button" class="ai-chip">이 설비 최근 결함 3건</button>
-                        <button type="button" class="ai-chip">재진단 예약해줘</button>
-                      </div>
+                      <!-- Delta 는 알림 하나가 아니라 전체 알림을 종합한다. 펼치면 알림 한 건에 대한 캡슐 대신
+                           여러 알림을 한꺼번에 다루는 행동 버튼이 뜬다(문구는 아직 초안 — monitor.js 의 DELTA_ACTIONS). -->
+                      <div class="ai-actions" data-ai-actions hidden></div>
                     </div>
 
                     <div class="ai-input">
@@ -1488,7 +1486,7 @@
 <script src="../assets/js/screen.js?v=df2c1129"></script>
 <script src="../assets/js/map-model.js?v=fb8d7fde"></script>
 <script src="../assets/js/map.js?v=f80d3538"></script>
-<script src="../assets/js/monitor.js?v=e2a90239"></script>
+<script src="../assets/js/monitor.js?v=f107862c"></script>
 <script src="../assets/js/grid-overlay.js?v=164e4f2a"></script>
 </body>
 </html>
