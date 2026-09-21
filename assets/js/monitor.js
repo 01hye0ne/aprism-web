@@ -50,30 +50,32 @@
   // ==================================================================
   // robot 은 우측 로봇 카드 번호(data-robot), wp 는 그 로봇 미션의 웨이포인트다 — 고르면 지도의
   // 그 자리 위에 쪽지가 선다. sum 은 쪽지의 원인 요약(두 줄), acts 는 "상황 조치" 선택지다.
+  // live 는 쪽지 라이브 뷰에 까는 임시 그림(assets/img/alert-live-*.webp) — 디자이너가 준 검출 캡처 두 장을
+  // 배관 · 펌프 계열(discharge)과 나머지(ppe)로 나눠 붙였다. 알림 내용과 딱 맞는 그림은 아니다.
   var WARNINGS = [
-    { sev: "warning", robot: 0, wp: "WP-03", where: "APRO 4F · WP-03 냉각수 배관 밸브", time: "10:11:19",
+    { sev: "warning", robot: 0, wp: "WP-03", live: "discharge", where: "APRO 4F · WP-03 냉각수 배관 밸브", time: "10:11:19",
       title: "누출감지 · 냉각수 배관 밸브",
       sum: "밸브 이음부에서 누출 패턴이 신뢰도 0.87 로 검출됐습니다. 임계 0.70 을 넘었고 연속 2프레임에서 나왔습니다.",
       acts: ["현장 점검 요청", "다음 순회 재측정", "추이 관찰"] },
-    { sev: "warning", robot: 1, wp: "WP-06", where: "Robot 02 · WP-06 수배전반", time: "10:09:42",
+    { sev: "warning", robot: 1, wp: "WP-06", live: "discharge", where: "Robot 02 · WP-06 수배전반", time: "10:09:42",
       title: "부분방전 · 이상 점수 9.41",
       sum: "이상 점수 9.41 로 임계 9.23 을 넘었습니다. PRPD 패턴이 코로나 방전 유형과 일치합니다.",
       acts: ["재진단 예약", "현장 점검 요청", "추이 관찰"] },
-    { sev: "warning", robot: 1, wp: "WP-12", where: "Robot 02 · WP-12 냉각 펌프 P-2", time: "10:06:05",
+    { sev: "warning", robot: 1, wp: "WP-12", live: "discharge", where: "Robot 02 · WP-12 냉각 펌프 P-2", time: "10:06:05",
       title: "진동 상승 · 냉각 펌프 P-2",
       sum: "진동 RMS 4.8 mm/s 로 주의 기준 4.5 를 넘었습니다. 최근 3회 측정에서 계속 오르고 있습니다.",
       acts: ["베어링 점검 요청", "다음 순회 재측정", "추이 관찰"] },
-    { sev: "warning", robot: 4, wp: "WP-02", where: "Robot 05 · WP-02 발전기 베어링", time: "10:03:27",
+    { sev: "warning", robot: 4, wp: "WP-02", live: "ppe", where: "Robot 05 · WP-02 발전기 베어링", time: "10:03:27",
       title: "과열 · 발전기 베어링 68.4℃",
       sum: "베어링 표면 온도 68.4℃ 로 주의 기준 65℃ 를 넘었습니다. 주변 온도보다 31℃ 높습니다.",
       acts: ["윤활 상태 점검 요청", "열화상 재촬영", "추이 관찰"] },
-    { sev: "warning", robot: 1, wp: "WP-20", where: "Robot 02 · WP-20 공기 압축기 C-1", time: "10:01:12",
+    { sev: "warning", robot: 1, wp: "WP-20", live: "discharge", where: "Robot 02 · WP-20 공기 압축기 C-1", time: "10:01:12",
       title: "압력 편차 · 공기 압축기 C-1",
       sum: "토출 압력 7.9 bar 로 정상 범위(8.2~8.8) 아래입니다. 흡입 필터가 막혔을 가능성이 있습니다.",
       acts: ["필터 점검 요청", "재측정 예약", "추이 관찰"] }
   ];
 
-  var CRITICAL = { sev: "critical", robot: 0, wp: "WP-04", where: "터빈 2 / Unit 03 · WP-04 N₂ 배관 압력계", time: "10:12:40",
+  var CRITICAL = { sev: "critical", robot: 0, wp: "WP-04", live: "ppe", where: "터빈 2 / Unit 03 · WP-04 N₂ 배관 압력계", time: "10:12:40",
     title: "지하발전소 B3 터빈 2 NG 1건 발견",
     sum: "Spiral Casing Pr. 측정값 90 이 기준값 87 을 넘었습니다. 최근 3회 측정이 잇달아 올라 NG 로 판정했습니다.",
     acts: ["현장 무전 연락 · 작업 중지 요청", "로봇 정지 · 현장 점검 요청", "재측정 후 판단"] };
@@ -334,6 +336,7 @@
     var time = $("[data-ma-time]", box);
     var title = $("[data-ma-title]", box);
     var sum = $("[data-ma-sum]", box);
+    var live = $(".ma-live", box);
     var options = $("[data-ma-options]", box);
     var confirm = $("[data-ma-confirm]", box);
     var opening = false;
@@ -352,6 +355,8 @@
       title.title = a.title;
       sum.textContent = a.sum;
       sum.title = a.sum;
+      // 라이브 뷰 — 그림이 없는 알림(E-STOP 등)은 빈 면(#262626)으로 남는다.
+      live.style.backgroundImage = a.live ? "url(../assets/img/alert-live-" + a.live + ".webp)" : "";
       options.textContent = "";
       a.acts.forEach(function (label) {
         var row = el("label", "ma-option");

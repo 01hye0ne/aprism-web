@@ -679,6 +679,10 @@
 /* 라이브 뷰 — 16:9 (쪽지 안쪽 폭 314 에서 177). Figma 는 236 높이였다(디자이너 요청으로 바꿨다). */
 .ma-live {
   aspect-ratio: 16 / 9;
+  /* 임시 그림(monitor.js live)이 깔린다. 비율이 달라 가운데를 기준으로 꽉 채우고 가장자리를 자른다. */
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
   border-radius: var(--radius-4);
   background-color: #262626;
 }
