@@ -432,6 +432,15 @@
       close();
     });
 
+    /*
+     * 쪽지가 떠 있는 동안 Delta(AI 패널)는 잠시 비킨다 — 쪽지와 겹친다.
+     * 쪽지는 목록 · Esc · 확인 처리 · 지도(다른 웨이포인트를 고름) 여러 곳에서 여닫히므로
+     * 여닫는 자리마다 챙기지 않고 쪽지의 hidden 을 지켜본다.
+     */
+    function syncDelta() { body.classList.toggle("has-map-alert", !box.hidden); }
+    new MutationObserver(syncDelta).observe(box, { attributes: true, attributeFilter: ["hidden"] });
+    syncDelta();
+
     return { open: open, close: close };
   })();
 

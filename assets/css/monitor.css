@@ -162,6 +162,19 @@
 /* 펼친 두 줄은 단어 단위로 접는다 — "권합니/다" 처럼 끝 글자만 떨어지지 않게. */
 .v2 .ai-opened .ai-lines { word-break: keep-all; }
 
+/*
+ * 알림 쪽지가 떠 있는 동안 Delta 는 잠시 비킨다(쪽지와 겹친다). 자리는 그대로 두고 흐려지며 사라진다 —
+ * 지도 칸의 배치가 흔들리지 않게. 쪽지를 닫으면 다시 나타난다(body.has-map-alert — monitor.js).
+ */
+.v2 .ai-panel { transition: opacity 160ms ease, visibility 0s linear 0s; }
+
+.v2.has-map-alert .ai-panel {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 160ms ease, visibility 0s linear 160ms;
+}
+
 /* 닫힌 요약의 둘째 줄은 한 줄이다 — 넘치면 말줄임. */
 .v2 .ai-fold-closed .ai-line-2 { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
