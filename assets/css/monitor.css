@@ -876,3 +876,17 @@
 }
 
 .ma-confirm { width: 100%; }
+
+/*
+ * 타임라인 — 수행 중인 칸도 다른 칸과 같은 회색 면(bg/surface/subtle)이다(2026-09-21 디자이너 결정).
+ * 알림 단계를 표식(△ · ⓧ)과 그 색으로 보여 주므로, 면은 상태와 상관없이 하나로 둔다.
+ * 수행 중이라는 표시는 레일의 재생 표식과 점선이 맡는다. 파란 면과 그 위 흰 글자 · 번호 스크림을 걷는다.
+ * Figma Step Card / Property 1=ing 는 아직 파란 면이다.
+ */
+.v2 .is-running .step-card { background-color: var(--bg-surface-subtle); }
+
+.v2 .is-running .step-no { background-color: var(--bg-surface-default); color: var(--fg-tertiary); }
+.v2 .is-running .step-time { color: var(--fg-tertiary); }
+.v2 .is-running .step-duration { color: var(--fg-secondary); }
+.v2 .is-running .step-title,
+.v2 .is-running .step-desc { color: var(--fg-primary); }
