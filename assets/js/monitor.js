@@ -263,6 +263,8 @@
     doneList.textContent = "";
     DONE.forEach(function (d) { doneList.appendChild(doneItem(d)); });
     doneCount.textContent = DONE.length + "건";
+    // 다시 그리면 내용 길이가 바뀌어 스크롤 자리도 바뀔 수 있다 — 그림자를 다시 맞춘다.
+    $$(".ah-box").forEach(shade);
 
     // Delta 는 목록 전체를 종합한다 — 목록에서 무엇을 골랐는지와는 상관없다.
     // 화면 테두리(엣지 글로우)는 목록에서 가장 높은 단계를 따른다.
@@ -270,6 +272,17 @@
     body.setAttribute("data-level", top);
     tellAi(judge(all), top);
   }
+
+  // 목록을 내렸을 때만 상자 위쪽 안쪽 그림자를 켠다 — 맨 위에서는 가려진 것이 없다.
+  function shade(box) {
+    var inner = box && box.querySelector(".ah-list");
+    if (inner) { box.classList.toggle("is-scrolled", inner.scrollTop > 0); }
+  }
+
+  $$(".ah-box").forEach(function (box) {
+    var inner = box.querySelector(".ah-list");
+    if (inner) { inner.addEventListener("scroll", function () { shade(box); }, { passive: true }); }
+  });
 
   filters.forEach(function (btn) {
     btn.addEventListener("click", function () {

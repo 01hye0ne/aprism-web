@@ -275,7 +275,9 @@
 }
 
 /*
- * Lists — overlay-dark 를 50% 로 한 번 더 얹은 면 · radius 8 · 안쪽 그림자(0 10 8 / 25%). 선은 없다.
+ * Lists — overlay-dark 를 50% 로 한 번 더 얹은 면 · radius 8. 선은 없다.
+ * 위쪽 안쪽 그림자(0 10 8 / 25%)는 목록을 내렸을 때만 보인다(.is-scrolled — monitor.js).
+ * 맨 위에 있을 때는 가려진 것이 없으니 그림자도 없다(디자이너 요청, Figma 는 늘 켜져 있다).
  * 처리 필요 목록만 바닥에 27 높이 그라데이션이 깔려 목록이 더 있다는 것을 알린다.
  */
 .ah-box {
@@ -285,9 +287,12 @@
   display: flex;
   border-radius: var(--radius-container);
   background-color: color-mix(in srgb, var(--bg-surface-overlay-dark) 50%, transparent);
-  box-shadow: inset 0 10px 8px rgb(0 0 0 / 25%);
+  box-shadow: inset 0 10px 8px rgb(0 0 0 / 0%);
   overflow: hidden;
+  transition: box-shadow 160ms ease;
 }
+
+.ah-box.is-scrolled { box-shadow: inset 0 10px 8px rgb(0 0 0 / 25%); }
 
 .ah-box.has-fade::after {
   content: "";
