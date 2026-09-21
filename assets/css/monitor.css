@@ -245,7 +245,7 @@
  * Alert History Item-ver2 — 70 높이. 패딩 8/12/8/16(왼쪽 4 띠 포함) · 안쪽 글 묶음 위아래 4 · 사이 8.
  *   위치(아이콘 target 16 + Caption) · 시각
  *   제목(아이콘 16 + Label/1)
- * 아랫줄 선은 Figma 가 안쪽 선이라 높이를 먹지 않는다 — inset 그림자로 긋는다.
+ * 아랫줄 선(border/disabled)은 Figma 가 안쪽 선이라 높이를 먹지 않는다 — inset 그림자로 긋는다.
  * 고른 것은 bg/surface/selected 면에 위치 · 시각 글자가 fg/primary 로 밝아진다.
  */
 .ah-item,
@@ -257,7 +257,7 @@
   padding: var(--space-12) var(--space-12) var(--space-12) var(--space-16);
   border: 0;
   background: transparent;
-  box-shadow: inset 0 -1px 0 var(--border-default);
+  box-shadow: inset 0 -1px 0 var(--border-disabled);
   color: inherit;
   font: inherit;
   text-align: left;
@@ -316,10 +316,10 @@
 
 /*
  * 확인 완료 한 줄 — 띠는 없다(왼쪽 16 은 그대로 비운다).
- *   제목(Label/1) · 시각(Caption tertiary)
+ *   제목(Label/1 · fg/secondary — 처리 필요 목록보다 한 단 물러난다) · 시각(Caption tertiary)
  *   ✓ 조치(Caption tertiary) · 확인한 사람(Caption tertiary) — 사이 16
  */
-.done-title { gap: var(--space-8); color: var(--fg-primary); }
+.done-title { gap: var(--space-8); color: var(--fg-secondary); }
 .done-title .num { flex: none; color: var(--fg-tertiary); }
 
 .done-how { gap: var(--space-16); color: var(--fg-tertiary); }
