@@ -19,8 +19,8 @@
   }
   </script>
   <link rel="stylesheet" href="../assets/css/tokens.css?v=4aceab62" />
-  <link rel="stylesheet" href="../assets/css/app-shell.css?v=0c27f185" />
-  <link rel="stylesheet" href="../assets/css/monitor.css?v=e6057f62" />
+  <link rel="stylesheet" href="../assets/css/app-shell.css?v=042e7074" />
+  <link rel="stylesheet" href="../assets/css/monitor.css?v=287811e4" />
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
@@ -294,8 +294,12 @@
                     <span class="ma-time t-caption num" data-ma-time></span>
                   </div>
                   <h3 class="ma-title t-title-2" id="ma-title" data-ma-title></h3>
-                  <!-- 라이브 뷰 자리 — Figma 도 아직 빈 면(#262626)이다. -->
-                  <div class="ma-live" role="img" aria-label="라이브 뷰"></div>
+                  <!-- 라이브 뷰 — 임시 그림이 깔린다(monitor.js). 오른쪽 위 [크게보기] 로 크게 띄운다. -->
+                  <div class="ma-live">
+                    <button type="button" class="ma-zoom-open t-caption" data-ma-zoom aria-label="라이브 뷰 크게보기">
+                      <span class="i i-16" style="--i:var(--ic-expand)" aria-hidden="true"></span>크게보기
+                    </button>
+                  </div>
                   <p class="ma-sum t-body-3" data-ma-sum></p>
                   <div class="ma-divider" aria-hidden="true"></div>
                   <!-- 상황 조치 — 선택지가 셋뿐이라 드롭다운 대신 늘 펼쳐 둔 라디오 목록이다(펼친 목록이
@@ -1510,12 +1514,30 @@
   </div>
 </div>
 
+<!-- ============================================================
+     라이브 뷰 크게보기 — 알림 쪽지의 [크게보기] 로 연다. × · Esc · 바깥을 누르면 닫힌다.
+     내용은 monitor.js 가 고른 알림에서 채운다. Figma 에 없는 판이다.
+     ============================================================ -->
+<div class="ma-zoom" data-ma-zoom-box hidden role="dialog" aria-modal="true" aria-labelledby="ma-zoom-title">
+  <div class="ma-zoom-card">
+    <div class="ma-zoom-head">
+      <span class="ma-badge t-label-2" data-ma-zoom-badge><span class="badge-dot"></span><span data-ma-zoom-sev>주의</span></span>
+      <h3 class="t-title-2 ma-zoom-title" id="ma-zoom-title" data-ma-zoom-title></h3>
+      <span class="t-caption num ma-zoom-time" data-ma-zoom-time></span>
+      <button type="button" class="icon-button ma-zoom-close" data-ma-zoom-close aria-label="닫기">
+        <span class="i i-20" style="--i:var(--ic-close)" aria-hidden="true"></span>
+      </button>
+    </div>
+    <img class="ma-zoom-img" data-ma-zoom-img alt="" />
+  </div>
+</div>
+
 <script src="../assets/js/theme.js?v=dcf8f460"></script>
 <script src="../assets/js/prism-orb.js?v=03386460"></script>
 <script src="../assets/js/screen.js?v=274b4904"></script>
 <script src="../assets/js/map-model.js?v=fb8d7fde"></script>
 <script src="../assets/js/map.js?v=187e3f6b"></script>
-<script src="../assets/js/monitor.js?v=18782455"></script>
+<script src="../assets/js/monitor.js?v=b3d88810"></script>
 <script src="../assets/js/grid-overlay.js?v=164e4f2a"></script>
 </body>
 </html>

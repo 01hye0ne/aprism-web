@@ -355,8 +355,9 @@
       title.title = a.title;
       sum.textContent = a.sum;
       sum.title = a.sum;
-      // 라이브 뷰 — 그림이 없는 알림(E-STOP 등)은 빈 면(#262626)으로 남는다.
-      live.style.backgroundImage = a.live ? "url(../assets/img/alert-live-" + a.live + ".webp)" : "";
+      // 라이브 뷰 — 그림이 없는 알림(E-STOP 등)은 빈 면(#262626)으로 남고 [크게보기] 도 숨는다.
+      live.style.backgroundImage = a.live ? "url(" + liveSrc(a) + ")" : "";
+      live.classList.toggle("has-photo", !!a.live);
       options.textContent = "";
       a.acts.forEach(function (label) {
         var row = el("label", "ma-option");
@@ -375,6 +376,41 @@
     }
 
     options.addEventListener("change", function () { confirm.disabled = !chosen(); });
+
+    function liveSrc(a) { return "../assets/img/alert-live-" + a.live + ".webp"; }
+
+    // ---------- 크게보기 ----------
+    var zoomBox = $("[data-ma-zoom-box]");
+    var zoomBtn = $("[data-ma-zoom]", box);
+    var zoomImg = zoomBox && $("[data-ma-zoom-img]", zoomBox);
+    var zoomClose = zoomBox && $("[data-ma-zoom-close]", zoomBox);
+
+    function openZoom() {
+      var a = picked;
+      if (!zoomBox || !a || !a.live) { return; }
+      zoomBox.classList.toggle("is-critical", a.sev === "critical");
+      $("[data-ma-zoom-sev]", zoomBox).textContent = a.sev === "critical" ? "위험" : "주의";
+      $("[data-ma-zoom-title]", zoomBox).textContent = a.title;
+      $("[data-ma-zoom-time]", zoomBox).textContent = a.time;
+      zoomImg.src = liveSrc(a);
+      zoomImg.alt = a.title + " — 라이브 뷰";
+      zoomBox.hidden = false;
+      zoomClose.focus();
+    }
+
+    function closeZoom() {
+      if (!zoomBox || zoomBox.hidden) { return false; }
+      zoomBox.hidden = true;
+      if (!box.hidden && zoomBtn) { zoomBtn.focus(); }
+      return true;
+    }
+
+    if (zoomBox) {
+      zoomBtn.addEventListener("click", openZoom);
+      zoomClose.addEventListener("click", closeZoom);
+      // 카드 바깥(어두운 면)을 누르면 닫힌다.
+      zoomBox.addEventListener("click", function (event) { if (event.target === zoomBox) { closeZoom(); } });
+    }
 
     // 타임라인에서 그 칸을 고른다 — 타임라인이 지도에 알리고, 지도가 카메라를 데려간다.
     // 이미 골라져 있으면 누르지 않는다(누르면 놓아 버린다). 그때는 지도에 직접 다시 알린다.
@@ -404,6 +440,7 @@
     }
 
     function close() {
+      closeZoom();
       if (box.hidden) { picked = null; return; }
       var wp = box.getAttribute("data-wp");
       box.hidden = true;
@@ -434,7 +471,10 @@
     });
 
     document.addEventListener("keydown", function (event) {
-      if (event.key !== "Escape" || box.hidden) { return; }
+      if (event.key !== "Escape") { return; }
+      // 크게보기가 떠 있으면 그것만 닫는다 — 쪽지는 남긴다.
+      if (closeZoom()) { return; }
+      if (box.hidden) { return; }
       close();
     });
 

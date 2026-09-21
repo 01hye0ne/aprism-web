@@ -687,6 +687,93 @@
   background-color: #262626;
 }
 
+/*
+ * [크게보기] — 라이브 뷰 오른쪽 위 8 안쪽에 겹쳐 뜨는 작은 알약. 누르는 대상(그림) 바로 위라
+ * 무엇을 키우는지 분명하고, 쪽지 높이도 늘지 않는다. 그림 위에서도 읽히게 어두운 반투명 면이다.
+ * 그림이 없는 알림(E-STOP)에서는 숨긴다.
+ */
+.ma-live { position: relative; }
+
+.ma-zoom-open {
+  position: absolute;
+  top: var(--space-8);
+  right: var(--space-8);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4);
+  height: 24px;
+  padding: 0 var(--space-8) 0 var(--space-4);
+  border: 0;
+  border-radius: var(--radius-4);
+  background-color: rgb(7 10 16 / 60%);
+  color: var(--color-gray-0);
+  font-family: inherit;
+  cursor: pointer;
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+
+.ma-zoom-open:hover { background-color: rgb(7 10 16 / 80%); }
+
+.ma-zoom-open:focus-visible {
+  outline: var(--border-width-strong) solid var(--border-focus);
+  outline-offset: 1px;
+}
+
+.ma-live:not(.has-photo) .ma-zoom-open { display: none; }
+
+/*
+ * 크게보기 창 — 화면을 어둡게 덮고(color/alpha/Dark/600) 가운데에 카드 하나.
+ * 카드 bg/surface/raised · border/subtle · radius 8 · 패딩 16 · 사이 12. 머리에 단계 배지 · 제목 · 시각 · 닫기.
+ * 그림은 원래 비율 그대로, 높이 700(화면 75% 넘지 않게) · 폭은 화면 90% 안에서.
+ */
+.ma-zoom {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-20);
+  background-color: var(--color-alpha-dark-600);
+}
+
+.ma-zoom-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  max-width: 90vw;
+  padding: var(--space-16);
+  border: var(--border-width-thin) solid var(--border-subtle);
+  border-radius: var(--radius-container);
+  background-color: var(--bg-surface-raised);
+  box-shadow: 0 16px 48px rgb(0 0 0 / 45%);
+}
+
+.ma-zoom-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  min-width: 0;
+}
+
+.ma-zoom-title { flex: 1 1 auto; min-width: 0; margin: 0; color: var(--fg-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ma-zoom-time { flex: none; color: var(--fg-secondary); }
+.ma-zoom-close { flex: none; }
+.ma-zoom.is-critical .ma-badge { color: var(--status-critical-fg); }
+.ma-zoom.is-critical .ma-badge .badge-dot { background-color: var(--status-critical-icon); }
+
+/* 높이를 정하고 폭은 그림 비율대로 따라가게 둔다 — 폭을 못 박으면 좌우에 빈 띠가 생긴다. */
+.ma-zoom-img {
+  display: block;
+  width: auto;
+  height: min(75vh, 700px);
+  max-width: calc(90vw - 32px);
+  object-fit: contain;
+  border-radius: var(--radius-4);
+  background-color: #262626;
+}
+
 /* 원인 요약 — 두 줄까지, 넘치면 말줄임. */
 .ma-sum {
   margin: 0;
