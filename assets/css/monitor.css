@@ -15,6 +15,22 @@
 
 .v2 [hidden] { display: none !important; }
 
+/*
+ * 패널 폭 — Figma 는 왼쪽 420 · 오른쪽 360 인데, 지도가 좁아 보여 줄였다(디자이너 요청, Figma 와 다른 점).
+ *   왼쪽 340  거르기 줄(버튼 셋 190 + 정렬 84)과 알림 제목 한 줄이 잘리지 않는 폭에 여유를 조금 둔 값.
+ *   오른쪽 320 로봇 카드 두 칸(각 144)에 자동복귀 · E-STOP 과 상태 라벨이 잘리지 않고 들어가는 가장 좁은 폭.
+ * 1920 에서 지도 칸이 996 -> 1116 으로 넓어진다. 로봇 카드 칸 폭(--rc-col)은 패널 폭에서 따라 나온다 —
+ * 카드 패딩 4 · 줄 패딩 8 · 두 칸 사이 8 을 뺀 나머지를 반씩(360 이면 Figma 와 같은 164).
+ */
+.v2 {
+  --lp-w: 340px;
+  --rp-w: 320px;
+  --rc-col: calc((var(--rp-w) - 32px) / 2);
+}
+
+/* 관제 · 지도 · 미션이 놓이는 면 — ver.2 Container 는 bg/surface/subtle 이다(1차는 bg/surface/default). */
+.v2 .content-surface { background-color: var(--bg-surface-subtle); }
+
 /* ---------- 상태바 — 로고 옆 층 이름 (Status Bar ver.2) ---------- */
 .status-bar-left {
   display: flex;
@@ -101,13 +117,13 @@
 .v2 .ai-fold-closed .ai-line-2 { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 .v2 .two-col > .floating {
-  flex: 0 0 360px;
+  flex: 0 0 var(--rp-w);
   min-width: 0;
   padding: 0;
 }
 
-/* ---------- 관제 패널 (왼쪽 420) ---------- */
-.v2 .context-panel { flex-basis: 420px; overflow: hidden; }
+/* ---------- 관제 패널 (왼쪽 · --lp-w) ---------- */
+.v2 .context-panel { flex-basis: var(--lp-w); overflow: hidden; }
 
 /* Figma Header — 45 높이, 아래 border/default 1. */
 .v2 .panel-head {
@@ -121,7 +137,7 @@
 .ah-body {
   flex: 1 1 auto;
   min-height: 0;
-  width: 420px;
+  width: var(--lp-w);
   display: flex;
   flex-direction: column;
   padding-top: var(--space-16);
@@ -333,7 +349,7 @@
   100% { background-color: transparent; }
 }
 
-/* ---------- 오른쪽 패널 (360) ---------- */
+/* ---------- 오른쪽 패널 (--rp-w) ---------- */
 /*
  * 카드 면 — ver.2 는 overlay-light 를 40% 로 깔고 배경 흐림 20 이다.
  * (1차는 overlay-light 100% · 흐림 5 였다.)
@@ -373,7 +389,7 @@
 .robot-strip.is-carousel .robot-card[aria-pressed="true"] {
   display: grid;
   width: 100%;
-  grid-template-columns: 164px minmax(0, 1fr);
+  grid-template-columns: var(--rc-col) minmax(0, 1fr);
   grid-template-rows: 20px 24px auto;
   grid-template-areas:
     "thumb label"
@@ -436,7 +452,7 @@
   position: absolute;
   top: 0;
   left: 0;
-  width: 164px;
+  width: var(--rc-col);
   height: 142px;
   display: flex;
   align-items: center;
@@ -469,7 +485,7 @@
 .rc-actions {
   position: absolute;
   top: 28px;
-  left: calc(164px + var(--space-8));
+  left: calc(var(--rc-col) + var(--space-8));
   right: 0;
   display: flex;
   gap: var(--space-8);
