@@ -290,6 +290,7 @@
    * 확인 처리해서 목록에서 빠지면 표식도 정상으로 돌아간다.
    */
   var WP_ALERT = { warning: "caution", critical: "danger" };
+  var WP_ICON = { warning: "var(--ic-warning)", critical: "var(--ic-error)" };
 
   function markWaypoints() {
     var rail = $("[data-timeline]");
@@ -303,8 +304,12 @@
     $$("[data-waypoint]", rail).forEach(function (node) {
       var sev = hits[node.getAttribute("data-waypoint")];
       if (sev) { node.setAttribute("data-wp-alert", WP_ALERT[sev]); } else { node.removeAttribute("data-wp-alert"); }
-      if (node.getAttribute("data-wp-state") === "completed") {
-        node.setAttribute("data-wp-result", sev ? WP_ALERT[sev] : "safe");
+      var done = node.getAttribute("data-wp-state") === "completed";
+      if (done) { node.setAttribute("data-wp-result", sev ? WP_ALERT[sev] : "safe"); }
+      // 표식 모양도 알림 목록과 같은 아이콘으로 바꾼다 — 주의 △ · 위험 ⓧ. 풀리면 체크 · 재생으로 돌아간다.
+      var icon = $(".rail-mark .i", node);
+      if (icon) {
+        icon.style.setProperty("--i", sev ? WP_ICON[sev] : (done ? "var(--ic-check-circle)" : "var(--ic-play-circle)"));
       }
     });
     document.dispatchEvent(new CustomEvent("aprism:wp-marks"));
