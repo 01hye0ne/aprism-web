@@ -134,6 +134,28 @@
 .ai-ask-open .i { transition: transform 160ms ease; }
 .ai-ask-open[aria-expanded="true"] .i { transform: rotate(45deg); }
 
+/*
+ * 펼친 Delta 상자(디자이너 요청, Figma 와 다른 점)
+ *   · 맨 겉 1px 흐르는 빛 테두리(.ai-box::before)를 뺀다 — 닫힌 판은 그대로 둔다.
+ *   · Secondary 버튼(행동 버튼 둘째부터 · [+])은 흰색 반투명 면. 빨강 · 노랑 · 파랑 그라데이션 어디에
+ *     얹혀도 같은 결로 읽히도록 회색 면(button/secondary) 대신 흰색 알파를 쓴다. 토큰에 15% 흰색이 없어 raw 값이다.
+ *   · 묻기 칸은 위 문구 · 버튼 줄과 같은 좌우 선(내용 패딩 12)에 맞추고 아래도 같은 12 를 둔다 —
+ *     상자 안쪽 여백 4 를 더하면 위 · 좌 · 우 · 아래 모두 16 이 된다.
+ */
+.v2 .ai-panel.is-open .ai-box::before { display: none; }
+
+.v2 .ai-actions .btn-secondary,
+.v2 .ai-ask-open.btn-secondary {
+  border-color: transparent;
+  background-color: rgb(255 255 255 / 15%);
+  color: var(--color-gray-0);
+}
+
+.v2 .ai-actions .btn-secondary:hover,
+.v2 .ai-ask-open.btn-secondary:hover { background-color: rgb(255 255 255 / 25%); }
+
+.v2 .ai-panel.is-open .ai-input { margin: 0 var(--space-12) var(--space-12); }
+
 /* 위험 태그 아이콘은 error(⊗)다. 1차는 주의 · 위험 모두 warning 이었다. */
 .v2 .ai-panel.is-critical .ai-tag .i { --i: var(--ic-error); }
 
