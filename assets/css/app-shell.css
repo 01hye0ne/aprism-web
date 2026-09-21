@@ -1510,17 +1510,16 @@ button {
   /* Figma "Map Tool Rail" 330:5822 — 44x132, padding 4(space/4), gap 8(space/8), radius 8. */
   gap: var(--space-8);
   padding: var(--space-4);
-  border: var(--border-width-thin) solid var(--color-gray-700);
+  /* 테두리는 없다(디자이너 요청 · Figma 레일도 선이 없다). 면만으로 지도와 갈린다. */
   border-radius: var(--radius-container);
   background-color: var(--color-gray-800);
 }
 
 /*
- * 확대·로봇 추적은 Ghost(투명), 리플레이만 Secondary —
- * gray/650(#3F485C) 면 + gray/600(#4E576A) 1px 로 한 단계 도드라진다.
+ * 확대·로봇 추적은 Ghost(투명), 리플레이만 Secondary — gray/650(#3F485C) 면으로 한 단계 도드라진다.
+ * Figma 의 gray/600 1px 선은 뺐다(디자이너 요청).
  */
 .map-tools .icon-button.is-secondary {
-  border: var(--border-width-thin) solid var(--color-gray-600);
   background-color: var(--color-gray-650);
   color: var(--fg-primary);
 }
