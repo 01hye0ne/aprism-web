@@ -1592,7 +1592,7 @@
    */
   var lanes = {};   // data-robot 번호 -> 그 로봇의 길을 이루는 것들
 
-  function showLane(index) {
+  function showLane(index, keep) {
     var key = String(index);
     onLane = null;
     Object.keys(lanes).forEach(function (id) {
@@ -1603,7 +1603,8 @@
 
     // 길이 바뀌면 웨이포인트도 그 길 위로 옮겨 놓는다. 고른 것은 놓는다 —
     // 다른 미션의 같은 순번은 같은 자리가 아니다.
-    chosenWp = null;
+    // 처음 깔 때(keep)는 놓지 않는다 — 지도가 뜨기 전에 알림 목록 · 타임라인에서 이미 골랐을 수 있다.
+    if (!keep) { chosenWp = null; }
     layWaypoints();
     tellWaypoint();
 
@@ -2104,8 +2105,10 @@
       // 길은 도킹 스테이션에서 시작한다.
       drawRoute(layRoute(box, [bot.dock].concat(bot.stops)), bot, id);
     });
-    showLane(activeRobot());
+    showLane(activeRobot(), true);
     layWaypoints();
+    // 뜨기 전에 고른 웨이포인트가 있으면 이제 그리로 간다(쪽지도 이때 자리를 잡는다).
+    if (chosenWp) { chooseWaypoint(chosenWp, "panel"); }
 
     /*
      * 키 라이트를 모델 크기에 맞춰 세운다. 그림자 카메라가 여기서 나온다.

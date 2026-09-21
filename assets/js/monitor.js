@@ -298,7 +298,8 @@
   // 고르면: 그 알림의 로봇으로 카드를 넘기고(지도 · 타임라인이 그 로봇 미션으로 바뀐다),
   //        타임라인에서 그 웨이포인트를 골라 지도가 그리로 가게 한 뒤 쪽지를 세운다.
   // 닫기:  같은 알림을 다시 누르거나 Esc. 지도나 타임라인에서 다른 곳을 골라도 닫힌다(map.js).
-  // 확인 처리: 고른 조치와 함께 오늘 확인 완료로 옮긴다 — 위험은 조치를 적어야 풀린다(알림 정책).
+  // 확인 처리: 상황 조치를 골라야 켜진다. 고른 조치와 함께 오늘 확인 완료로 옮긴다
+  //           — 위험은 조치를 적어야 풀린다(알림 정책). 고르기와 확정이 두 번에 나뉜다.
   // ==================================================================
   function activeRobot() {
     var on = $(".robot-strip .robot-card[aria-pressed='true'][data-robot]");
@@ -319,21 +320,14 @@
     var time = $("[data-ma-time]", box);
     var title = $("[data-ma-title]", box);
     var sum = $("[data-ma-sum]", box);
-    var trigger = $("[data-ma-trigger]", box);
-    var value = $("[data-ma-value]", box);
-    var menu = $("[data-ma-menu]", box);
+    var options = $("[data-ma-options]", box);
     var confirm = $("[data-ma-confirm]", box);
     var opening = false;
 
-    function fold(open) {
-      menu.hidden = !open;
-      trigger.setAttribute("aria-expanded", open ? "true" : "false");
-    }
-
-    function choose(label) {
-      value.textContent = label;
-      $$("li", menu).forEach(function (li) { li.setAttribute("aria-selected", li.textContent === label ? "true" : "false"); });
-      fold(false);
+    // 고른 조치. 알림을 새로 열 때마다 비운다 — 조치를 골라야 [확인 처리] 가 켜진다.
+    function chosen() {
+      var on = $("input:checked", options);
+      return on ? on.value : "";
     }
 
     function fill(a) {
@@ -344,15 +338,24 @@
       title.title = a.title;
       sum.textContent = a.sum;
       sum.title = a.sum;
-      menu.textContent = "";
+      options.textContent = "";
       a.acts.forEach(function (label) {
-        var li = el("li", null, label);
-        li.setAttribute("role", "option");
-        li.addEventListener("click", function () { choose(label); trigger.focus(); });
-        menu.appendChild(li);
+        var row = el("label", "ma-option");
+        var input = el("input");
+        input.type = "radio";
+        input.name = "ma-act";
+        input.value = label;
+        var dot = el("span", "ma-radio");
+        dot.setAttribute("aria-hidden", "true");
+        row.appendChild(input);
+        row.appendChild(dot);
+        row.appendChild(el("span", "t-body-3", label));
+        options.appendChild(row);
       });
-      choose(a.acts[0]);
+      confirm.disabled = true;
     }
+
+    options.addEventListener("change", function () { confirm.disabled = !chosen(); });
 
     // 타임라인에서 그 칸을 고른다 — 타임라인이 지도에 알리고, 지도가 카메라를 데려간다.
     // 이미 골라져 있으면 누르지 않는다(누르면 놓아 버린다). 그때는 지도에 직접 다시 알린다.
@@ -374,7 +377,6 @@
       }
       picked = a;
       fill(a);
-      fold(false);
       box.setAttribute("data-wp", a.wp);
       box.hidden = false;
       pointAt(a.wp);
@@ -387,7 +389,6 @@
       var wp = box.getAttribute("data-wp");
       box.hidden = true;
       picked = null;
-      fold(false);
       // 타임라인 · 지도의 고른 칸도 놓는다.
       if (timeline && timeline.getAttribute("data-selected-waypoint") === wp) {
         var item = timeline.querySelector("[data-waypoint='" + wp + "']");
@@ -396,20 +397,12 @@
       render();
     }
 
-    trigger.addEventListener("click", function (event) {
-      event.stopPropagation();
-      fold(menu.hidden);
-    });
-
-    document.addEventListener("click", function (event) {
-      if (!menu.hidden && !event.target.closest("[data-ma-select]")) { fold(false); }
-    });
-
     confirm.addEventListener("click", function () {
       var a = picked;
-      if (!a) { return; }
+      var how = chosen();
+      if (!a || !how) { return; }
       DONE.forEach(function (d) { d.fresh = false; });
-      DONE.unshift({ time: clock(), title: a.title, how: value.textContent, who: "홍길동", fresh: true });
+      DONE.unshift({ time: clock(), title: a.title, how: how, who: "홍길동", fresh: true });
       if (extra.indexOf(a) >= 0) { extra.splice(extra.indexOf(a), 1); } else { resolved.push(a); }
       close();
     });
@@ -418,13 +411,11 @@
     document.addEventListener("aprism:map-alert", function (event) {
       if (opening || (event.detail && event.detail.open)) { return; }
       picked = null;
-      fold(false);
       render();
     });
 
     document.addEventListener("keydown", function (event) {
       if (event.key !== "Escape" || box.hidden) { return; }
-      if (!menu.hidden) { fold(false); trigger.focus(); return; }
       close();
     });
 

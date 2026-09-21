@@ -18,9 +18,9 @@
     }
   }
   </script>
-  <link rel="stylesheet" href="../assets/css/tokens.css?v=4e931ef2" />
+  <link rel="stylesheet" href="../assets/css/tokens.css?v=4aceab62" />
   <link rel="stylesheet" href="../assets/css/app-shell.css?v=063e3b38" />
-  <link rel="stylesheet" href="../assets/css/monitor.css?v=3d8e603a" />
+  <link rel="stylesheet" href="../assets/css/monitor.css?v=4a4be9a4" />
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
@@ -297,16 +297,11 @@
                   <!-- 라이브 뷰 자리 — Figma 도 아직 빈 면(#262626)이다. -->
                   <div class="ma-live" role="img" aria-label="라이브 뷰"></div>
                   <p class="ma-sum t-body-3" data-ma-sum></p>
-                  <div class="ma-act">
+                  <!-- 상황 조치 — 선택지가 셋뿐이라 드롭다운 대신 늘 펼쳐 둔 라디오 목록이다(펼친 목록이
+                       [확인 처리] 와 지도 점을 덮던 문제). 고르기 전에는 [확인 처리] 가 꺼져 있다. -->
+                  <div class="ma-act" role="radiogroup" aria-labelledby="ma-act-label">
                     <span class="t-label-1" id="ma-act-label">상황 조치</span>
-                    <div class="ma-select" data-ma-select>
-                      <button type="button" class="ma-field" data-ma-trigger
-                              aria-haspopup="listbox" aria-expanded="false" aria-labelledby="ma-act-label ma-value">
-                        <span class="t-body-3" id="ma-value" data-ma-value></span>
-                        <span class="i i-20" style="--i:var(--ic-chevron-down)" aria-hidden="true"></span>
-                      </button>
-                      <ul class="ma-menu" role="listbox" aria-labelledby="ma-act-label" data-ma-menu hidden></ul>
-                    </div>
+                    <div class="ma-options" data-ma-options></div>
                   </div>
                 </div>
                 <button type="button" class="btn btn-accent ma-confirm" data-ma-confirm>확인 처리</button>
@@ -1511,8 +1506,8 @@
 <script src="../assets/js/prism-orb.js?v=03386460"></script>
 <script src="../assets/js/screen.js?v=df2c1129"></script>
 <script src="../assets/js/map-model.js?v=fb8d7fde"></script>
-<script src="../assets/js/map.js?v=db1a8560"></script>
-<script src="../assets/js/monitor.js?v=09d28e8b"></script>
+<script src="../assets/js/map.js?v=2d6a59aa"></script>
+<script src="../assets/js/monitor.js?v=f8b9b991"></script>
 <script src="../assets/js/grid-overlay.js?v=164e4f2a"></script>
 </body>
 </html>

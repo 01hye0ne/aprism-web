@@ -243,6 +243,8 @@
   --border-control-hover: var(--color-gray-600);
   --border-default: var(--color-gray-300);
   --border-disabled: var(--color-gray-200);
+  /* input/border/default — 모드가 하나(Value)라 Light · Dark 같다. Radio 상자 테두리가 쓴다. */
+  --input-border-default: var(--color-gray-500);
   --border-focus: var(--color-main-500);
   --border-strong: var(--color-gray-0);
   --border-subtle: var(--color-gray-200);
