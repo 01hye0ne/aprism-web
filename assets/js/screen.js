@@ -106,11 +106,17 @@
       setTag("비상정지 발동 · 해제 절차 필요");
     });
 
-    // 다른 화면 스크립트(시안 페이지)가 심각도를 바꿀 때 쓴다.
-    // detail = { level: null | "warning" | "critical", line1, line2, tag } — 빈 값은 건너뛴다.
+    // 다른 화면 스크립트(monitor.js · 시안 페이지)가 심각도를 바꿀 때 쓴다.
+    // detail = { level: null | "warning" | "critical", glow, line1, line2, tag } — 빈 값은 건너뛴다.
+    // glow 를 주면 화면 테두리(엣지 글로우)만 그 단계로 둔다 — 목록에서 주의 알림을 골라
+    // 패널이 노랑이 되어도, 위험이 남아 있으면 테두리는 빨강이어야 한다.
     document.addEventListener("aprism:severity", function (event) {
       var d = event.detail || {};
       setSeverity(d.level || null);
+      if (d.glow !== undefined && twoCol) {
+        ["is-warning", "is-critical", "is-safe"].forEach(function (cls) { twoCol.classList.remove(cls); });
+        if (d.glow) { twoCol.classList.add("is-" + d.glow); }
+      }
       if (d.line1 || d.line2) { setLines(d.line1 || "", d.line2 || ""); }
       if (d.tag) { setTag(d.tag); }
     });

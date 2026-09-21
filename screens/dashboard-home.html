@@ -18,8 +18,9 @@
     }
   }
   </script>
-  <link rel="stylesheet" href="../assets/css/tokens.css?v=5789c215" />
+  <link rel="stylesheet" href="../assets/css/tokens.css?v=4e931ef2" />
   <link rel="stylesheet" href="../assets/css/app-shell.css?v=063e3b38" />
+  <link rel="stylesheet" href="../assets/css/monitor.css?v=0e90da80" />
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
@@ -34,7 +35,7 @@
     h1, h2, h3, p { margin: 0; }
   </style>
 </head>
-<body>
+<body class="v2" data-level="critical">
 
 <!-- Robot Dog Walk 리그(assets/robot-dog/ 핸드오프)의 공용 defs — 카드 썸네일이 url(#rd-*) 로 참조한다. -->
 <svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute" xmlns="http://www.w3.org/2000/svg">
@@ -93,15 +94,23 @@
 </svg>
 
 <!-- ============================================================
-     Template / 04.1 Dashboard Home · 1922   (node 399:6225)
+     Template / 04.1 Dashboard Home · ver.2   (node 826:8887)
+     시안 1 · 2 를 합친 모니터링 화면이다. 1차(478:17275)에서 바뀐 것
+       · 왼쪽 패널 — 사이트 · 퀵 액션 대신 알림 히스토리(처리 필요) + 오늘 확인 완료
+       · 오른쪽 패널 — 360 폭, 로봇은 한 대씩 넘겨 본다. 자동복귀 · E-STOP 이 로봇 카드로 왔다
+       · 상태바 — 로고 옆에 층 이름
      ============================================================ -->
 <div class="app">
 
   <!-- ---------- Status Bar · 전체 폭 ---------- -->
   <header class="status-bar">
-    <span class="status-bar-logo">
-      <span class="i" style="--i:var(--ic-brand-mark)" role="img" aria-label="APRISM"></span>
-    </span>
+    <div class="status-bar-left">
+      <span class="status-bar-logo">
+        <span class="i" style="--i:var(--ic-brand-mark)" role="img" aria-label="APRISM"></span>
+      </span>
+      <!-- Figma Status Bar ver.2 — 로고 옆에 층 이름(Title/1)이 붙는다. -->
+      <span class="status-bar-place t-title-1">지하 4층</span>
+    </div>
 
     <div class="status-bar-right">
       <!-- Account · 누르면 계정 메뉴가 내려온다 (Figma Account 컴포넌트 Opened) -->
@@ -180,47 +189,48 @@
     <!-- ---------- Container · bg/surface/default 면 ---------- -->
     <div class="content-surface">
 
-      <!-- ---------- Site Context Panel ---------- -->
-      <aside class="context-panel" id="site-panel" aria-label="사이트 컨텍스트">
+      <!-- ---------- Site Context Panel · Figma Alert History Panel-ver.2 ----------
+           위: 알림 히스토리(처리 필요) · 아래: 오늘 확인 완료. 두 칸이 높이를 반씩 나눈다.
+           목록은 assets/js/monitor.js 가 알림 단계(정상 · 주의 · 위험)에 맞춰 채운다. -->
+      <aside class="context-panel" id="site-panel" aria-label="관제">
 
         <div class="panel-head">
-          <p class="t-overline section-label">SITE</p>
+          <p class="t-overline section-label">관제</p>
           <button type="button" data-panel-toggle
-                  aria-expanded="true" aria-controls="site-panel" aria-label="사이트 패널 접기">
+                  aria-expanded="true" aria-controls="site-panel" aria-label="관제 패널 접기">
             <span class="i i-20" style="--i:var(--ic-panel-left)"></span>
           </button>
         </div>
 
-        <!-- 사이트 이름과 터빈 선택. bg/accent 면 위에 놓인다. -->
-        <div class="site-block">
-          <h1 class="t-heading-3">지하발전소 B3</h1>
-          <div class="field-select" data-select>
-            <button type="button" class="select-field t-body-4" data-select-trigger
-                    aria-haspopup="listbox" aria-expanded="false" aria-label="터빈 선택">
-              <span data-select-value>터빈 2 / Unit 03</span>
-              <span class="i i-16" style="--i:var(--ic-chevron-down)" aria-hidden="true"></span>
-            </button>
-            <ul class="field-menu" role="listbox" aria-label="터빈 선택" hidden>
-              <li class="field-option" role="option">터빈 1 / Unit 01</li>
-              <li class="field-option" role="option" aria-selected="true">터빈 2 / Unit 03</li>
-              <li class="field-option" role="option">터빈 3 / Unit 05</li>
-            </ul>
+        <div class="ah-body">
+          <div class="ah-head">
+            <h2 class="t-heading-3" id="ah-title">알림 히스토리</h2>
+            <span class="ah-order t-caption">오래된 순 · 위험 우선 정렬</span>
           </div>
-        </div>
 
-        <div class="panel-body">
-          <section class="panel-section">
-            <p class="t-overline section-label">운영 모드</p>
-            <span class="badge badge-mode badge-info t-label-2"><span class="badge-dot"></span>미션 진행</span>
+          <!-- 처리 필요 — 거르기(Button Small · 고른 것 Accent) · 정렬 · 목록 -->
+          <section class="ah-sec" aria-labelledby="ah-title">
+            <div class="ah-filter">
+              <div class="ah-caps" role="group" aria-label="위험도로 거르기">
+                <button type="button" class="btn" data-ah-filter="all" aria-pressed="true">전체 <span class="num" data-ah-count="all">0</span></button>
+                <button type="button" class="btn" data-ah-filter="critical" aria-pressed="false">위험 <span class="num" data-ah-count="critical">0</span></button>
+                <button type="button" class="btn" data-ah-filter="warning" aria-pressed="false">주의 <span class="num" data-ah-count="warning">0</span></button>
+              </div>
+              <button type="button" class="ah-sort t-label-2">최근 24시간<span class="i i-16" style="--i:var(--ic-chevron-down)" aria-hidden="true"></span></button>
+            </div>
+            <div class="ah-box has-fade">
+              <div class="ah-list" data-ah-list role="list"></div>
+            </div>
           </section>
 
-          <section class="panel-section">
-            <p class="t-overline section-label">퀵 액션</p>
-            <div class="quick-actions">
-              <button type="button" data-goto="mission-setup.html">미션 생성</button>
-              <button type="button">수동 조작</button>
-              <button type="button">안전진단</button>
-              <button type="button">보고서</button>
+          <!-- 오늘 확인 완료 — 머리(Title/2 + 건수 배지) · 목록 -->
+          <section class="ah-sec" aria-labelledby="done-title">
+            <div class="done-head">
+              <h3 class="t-title-2" id="done-title">오늘 확인 완료</h3>
+              <span class="badge done-count t-caption"><span class="badge-dot"></span><span class="num" data-done-count>0건</span></span>
+            </div>
+            <div class="ah-box">
+              <div class="ah-list" data-done-list role="list"></div>
             </div>
           </section>
         </div>
@@ -229,8 +239,9 @@
 
       <!-- ---------- Main ---------- -->
       <main class="main">
-        <!-- 주의(Warning) 알림 상태 예시 — Figma 478:17275. 일반 상태로 되돌리려면 is-warning 두 곳을 뺀다. -->
-        <div class="two-col is-warning">
+        <!-- 알림 단계(엣지 글로우 · AI 패널 색)는 monitor.js 가 body[data-level] 에 맞춰 바꾼다.
+             Figma ver.2 는 위험(critical) 상태로 그려져 있어 그것을 기본으로 둔다. -->
+        <div class="two-col">
           <span class="map-view" data-map aria-hidden="true">
             <!-- 전주기 맵 3D 모델. 움직임은 assets/js/map.js.
                  모델은 map-model.js 가 base64 로 들고 있고(file:// 에서도 열려야 한다),
@@ -310,7 +321,7 @@
             </div>
 
             <!-- AI Assist Panel · Figma UI_00 Design System 121:665 (state=closed 기본, 우측 토글로 opened) -->
-            <section class="ai-panel is-warning" data-ai-panel aria-label="Delta AI 요약">
+            <section class="ai-panel" data-ai-panel aria-label="Delta AI 요약">
 
               <!-- Delta — 그래픽 자리 + 이름. 닫힘은 왼쪽 기둥, 펼침은 헤더 줄.
                    prism-orb.js 가 .ai-delta-mark 안에 캔버스를 붙인다. <i> 원은 오브가 못 뜰 때 남는 자리표시자다. -->
@@ -339,7 +350,6 @@
                       <p class="ai-line-1">안녕하세요. 홍길동 님</p>
                       <p class="ai-line-2">지하발전소 B3 터빈2 에서 NG 1건이 발견되었습니다.</p>
                     </div>
-                    <button type="button" class="ai-ack" data-ai-ack>확인</button>
                   </div></div>
                 </div>
 
@@ -376,10 +386,10 @@
 
               <!-- 카드 1 · 로봇 -->
               <div class="panel-card">
-                <!-- Figma 558:13671 — 헤더에 제목만 남았다. 비상정지는 아래 웨이포인트 패널로 갔다. -->
+                <!-- Figma Mission-in progress-2 Header — 패딩 8, Title/1. -->
                 <div class="panel-header">
                   <div class="texts">
-                    <h2 class="t-heading-3">전체 미션명</h2>
+                    <h2 class="t-title-1">전체 미션명</h2>
                   </div>
                 </div>
 
@@ -397,7 +407,10 @@
                     <button type="button" class="btn btn-ghost" data-modal-open="robots" data-robot-more>로봇 더보기</button>
                   </div>
 
-                  <div class="robot-strip" role="group" aria-label="로봇 선택">
+                  <!-- 한 대씩 넘겨 본다 — 왼쪽 < 그래픽 > , 오른쪽 이름 · 자동복귀 · E-STOP · 상태 세 줄.
+                       카드는 메인 화면 것 그대로이고 선택된 한 장만 보인다(is-carousel). -->
+                  <div class="robot-carousel" data-robot-carousel>
+                  <div class="robot-strip is-carousel" role="group" aria-label="로봇 선택">
                     <button type="button" class="robot-card" data-robot="0" aria-pressed="true">
                       <span class="label">
                         <span class="t-label-1 robot-id">Robot 01</span>
@@ -831,6 +844,22 @@
                       </span>
                     </button>
                   </div>
+                  <div class="rc-side">
+                    <div class="rc-nav">
+                      <button type="button" class="rc-arrow" data-rc-step="-1" aria-label="이전 로봇">
+                        <span class="i i-16" style="--i:var(--ic-chevron-left)" aria-hidden="true"></span>
+                      </button>
+                      <button type="button" class="rc-arrow" data-rc-step="1" aria-label="다음 로봇">
+                        <span class="i i-16" style="--i:var(--ic-chevron-right)" aria-hidden="true"></span>
+                      </button>
+                    </div>
+                    <!-- Button Size=xSmall — 자동복귀(Secondary) · E-STOP(Danger). 미션 머리에서 내려왔다. -->
+                    <div class="rc-actions">
+                      <button type="button" class="btn is-xs btn-secondary" data-modal-open="recall" data-recall-button>자동복귀</button>
+                      <button type="button" class="btn is-xs btn-danger" data-modal-open="estop">E-STOP</button>
+                    </div>
+                  </div>
+                  </div>
 
                 </div>
               </div>
@@ -838,12 +867,9 @@
               <!-- 카드 2 · 미션 -->
               <div class="panel-card is-fill">
                 <div class="mission-header">
-                  <!-- Figma "[변경] 수행로봇 제어"(558:13671) — 이름이 늘어나고
-                       제어 버튼이 오른쪽 끝에 붙는다. Button Size=xSmall(24). -->
+                  <!-- ver.2 — 제어 버튼은 위 로봇 카드로 옮겨 갔다. 라벨(Overline)만 남는다. -->
                   <div class="mission-controls">
                     <p class="t-overline section-label">전체 미션명</p>
-                    <button type="button" class="btn is-xs btn-secondary" data-modal-open="recall" data-recall-button>수행로봇 자동복귀</button>
-                    <button type="button" class="btn is-xs btn-danger" data-modal-open="estop">수행로봇 E-STOP</button>
                   </div>
 
                   <div class="progress-bar">
@@ -1459,9 +1485,10 @@
 
 <script src="../assets/js/theme.js?v=dcf8f460"></script>
 <script src="../assets/js/prism-orb.js?v=03386460"></script>
-<script src="../assets/js/screen.js?v=6aa14360"></script>
+<script src="../assets/js/screen.js?v=df2c1129"></script>
 <script src="../assets/js/map-model.js?v=fb8d7fde"></script>
 <script src="../assets/js/map.js?v=f80d3538"></script>
+<script src="../assets/js/monitor.js?v=e2a90239"></script>
 <script src="../assets/js/grid-overlay.js?v=164e4f2a"></script>
 </body>
 </html>

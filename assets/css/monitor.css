@@ -1,0 +1,466 @@
+/*
+ * 04.1 통합 관제 메인 · 모니터링 — Template ver.2 (Figma UI_00 826:8887)
+ * screens/dashboard-home.html 에서만 쓴다. body.v2 가 붙은 화면이다.
+ *
+ * 시안 1(좌측 패널 전환형) · 시안 2(모달형)를 합친 판이다. app-shell.css 위에 얹는다.
+ * 셸(상태바 · GNB · 3D 지도 · AI 패널 · 타임라인 · 모달 · Drawer)은 1차 그대로이고,
+ * 여기서는 ver.2 에서 달라진 배치와 새 패널만 정한다.
+ *
+ *   왼쪽 420   알림 히스토리(처리 필요) + 오늘 확인 완료 — 높이를 반씩 나눈다
+ *   가운데     3D 지도 + AI 패널(Delta)
+ *   오른쪽 360 로봇 한 대씩 넘겨 보기 + 미션 진행
+ *
+ * 알림 단계는 body[data-level] (normal · warning · critical) 이고 assets/js/monitor.js 가 바꾼다.
+ */
+
+.v2 [hidden] { display: none !important; }
+
+/* ---------- 상태바 — 로고 옆 층 이름 (Status Bar ver.2) ---------- */
+.status-bar-left {
+  display: flex;
+  align-items: center;
+}
+
+.status-bar-place { color: var(--fg-primary); white-space: nowrap; }
+
+/* ---------- 셸 배치 ---------- */
+/* Figma Margin — 위 · 오른쪽 · 아래 8, 왼쪽 0. */
+.v2 .main { padding: var(--space-8) var(--space-8) var(--space-8) 0; }
+
+/*
+ * Two Column — 1차는 12컬럼 그리드였다. ver.2 는 오른쪽 패널이 360 고정이라
+ * 지도 + 패널 두 칸 flex 로 편다. 안쪽 여백 · 사이 20. 면 · 엣지 글로우는 1차 그대로다.
+ */
+.v2 .two-col {
+  display: flex;
+  gap: var(--space-20);
+  padding: var(--space-20);
+}
+
+/*
+ * 지도 칸. 1차에서는 부모 그리드를 subgrid 로 물려받았는데 부모가 flex 가 되면
+ * subgrid 가 풀린다 — 9칸을 직접 깐다(AI 패널이 그중 6칸을 쓴다).
+ * 패딩은 없다. Figma Map Panel 이 Two Column 의 20 안쪽에 바로 붙는다.
+ */
+.v2 .two-col > .map-panel {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 0;
+  grid-template-columns: repeat(9, minmax(0, 1fr));
+  column-gap: var(--grid-gutter);
+}
+
+/* 도구 레일은 지도 칸 오른쪽 위에 붙는다(Figma x 952 · y 0). */
+.v2 .map-tools { top: 0; right: 0; }
+
+/*
+ * AI 패널 — 지도 칸 왼쪽 아래 모서리에 붙는다(Figma x 0 · 아래 0, 폭 658 ≒ 9칸 중 6칸).
+ * Delta 기둥이 60 으로 좁아졌고 메시지와의 사이가 12 다(1차는 좌우 16 을 둔 92 기둥).
+ */
+.v2 .ai-panel {
+  grid-column: 1 / span 6;
+  margin: 0;
+}
+
+.v2 .ai-panel:not(.is-open) {
+  grid-template-columns: 60px minmax(0, 1fr);
+  column-gap: var(--space-12);
+}
+
+/* Delta 기둥 — 오브 60 아래 사이 2 로 이름(Label/2 Medium). 1차는 Title/2 · 사이 8 이었다. */
+.v2 .ai-panel:not(.is-open) .ai-delta { gap: var(--space-2); padding: 0; }
+.v2 .ai-panel:not(.is-open) .ai-delta-label {
+  font-size: var(--font-size-13);
+  line-height: var(--font-line-height-18);
+  font-weight: 500;
+}
+
+/*
+ * Toggle 줄 — 패딩 4 · 높이 30. 태그(Severity Tag)는 위아래 패딩이 2 로 줄어 22,
+ * 오른쪽 펼치기 버튼은 36 × 20(좌우 8) 이다. 1차는 태그 26 · 버튼 36 × 36 이라 줄이 44 였다.
+ */
+.v2 .ai-panel:not(.is-open) .ai-tag { padding: var(--space-2) var(--space-8) var(--space-2) var(--space-4); }
+.v2 .ai-panel:not(.is-open) .ai-toggle { height: 20px; }
+
+/* 위험 태그 아이콘은 error(⊗)다. 1차는 주의 · 위험 모두 warning 이었다. */
+.v2 .ai-panel.is-critical .ai-tag .i { --i: var(--ic-error); }
+
+/* 닫힌 요약의 둘째 줄은 한 줄이다 — 넘치면 말줄임. */
+.v2 .ai-fold-closed .ai-line-2 { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.v2 .two-col > .floating {
+  flex: 0 0 360px;
+  min-width: 0;
+  padding: 0;
+}
+
+/* ---------- 관제 패널 (왼쪽 420) ---------- */
+.v2 .context-panel { flex-basis: 420px; overflow: hidden; }
+
+/* Figma Header — 45 높이, 아래 border/default 1. */
+.v2 .panel-head {
+  height: 45px;
+  border-bottom: var(--border-width-thin) solid var(--border-default);
+}
+
+.v2 .context-panel.is-collapsed .panel-head { border-bottom-color: transparent; }
+
+/* 패널이 접혀도 안쪽은 420 그대로 두고 흐리게 감춘다 — 접히는 동안 글이 다시 흐르지 않게. */
+.ah-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 420px;
+  display: flex;
+  flex-direction: column;
+  padding-top: var(--space-16);
+  transition: opacity 140ms ease;
+}
+
+.context-panel.is-collapsed .ah-body { opacity: 0; pointer-events: none; }
+
+/* Header — 좌우 8. 제목(Heading/3) 과 정렬 안내(Caption · fg/tertiary). */
+.ah-head {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  min-height: 28px;
+  padding: 0 var(--space-8);
+}
+
+.ah-head h2 { flex: 1 1 auto; min-width: 0; color: var(--fg-primary); }
+.ah-order { flex: none; color: var(--fg-tertiary); white-space: nowrap; }
+
+/*
+ * 처리 필요 · 확인 완료 — 두 칸이 남는 높이를 반씩 나눈다.
+ * 패딩 12/8/8/8 · 사이 12. 위 칸만 아래에 border/default 1 이 있다.
+ */
+.ah-sec {
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  padding: var(--space-12) var(--space-8) var(--space-8);
+}
+
+.ah-sec + .ah-sec { border-top: var(--border-width-thin) solid var(--border-default); }
+
+/* 거르기 — Button Size=Small(32). 고른 것 Accent, 나머지 Secondary. 정렬은 오른쪽 끝. */
+.ah-filter {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+}
+
+.ah-caps {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  gap: var(--space-8);
+}
+
+.ah-caps .btn {
+  background-color: var(--button-secondary-bg-default);
+  border-color: var(--button-secondary-border-default);
+  color: var(--button-secondary-fg-default);
+}
+
+.ah-caps .btn:hover { background-color: var(--button-secondary-bg-hover); }
+
+.ah-caps .btn[aria-pressed="true"] {
+  background-color: var(--button-accent-bg-default);
+  border-color: transparent;
+  color: var(--button-accent-fg-default);
+}
+
+.ah-caps .btn[aria-pressed="true"]:hover { background-color: var(--button-accent-bg-hover); }
+
+.ah-sort {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--fg-primary);
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.ah-caps .btn:focus-visible,
+.ah-sort:focus-visible,
+.ah-item:focus-visible {
+  outline: var(--border-width-strong) solid var(--border-focus);
+  outline-offset: -2px;
+}
+
+/*
+ * Lists — overlay-dark 를 50% 로 한 번 더 얹은 면 · radius 8 · 안쪽 그림자(0 10 8 / 25%). 선은 없다.
+ * 처리 필요 목록만 바닥에 27 높이 그라데이션이 깔려 목록이 더 있다는 것을 알린다.
+ */
+.ah-box {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  border-radius: var(--radius-container);
+  background-color: color-mix(in srgb, var(--bg-surface-overlay-dark) 50%, transparent);
+  box-shadow: inset 0 10px 8px rgb(0 0 0 / 25%);
+  overflow: hidden;
+}
+
+.ah-box.has-fade::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 27px;
+  pointer-events: none;
+  background: linear-gradient(rgb(10 14 21 / 0%), rgb(10 14 21 / 50%));
+}
+
+.ah-list {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/*
+ * Alert History Item-ver2 — 70 높이. 패딩 8/12/8/16(왼쪽 4 띠 포함) · 안쪽 글 묶음 위아래 4 · 사이 8.
+ *   위치(아이콘 target 16 + Caption) · 시각
+ *   제목(아이콘 16 + Label/1)
+ * 아랫줄 선은 Figma 가 안쪽 선이라 높이를 먹지 않는다 — inset 그림자로 긋는다.
+ * 고른 것은 bg/surface/selected 면에 위치 · 시각 글자가 fg/primary 로 밝아진다.
+ */
+.ah-item,
+.done-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  width: 100%;
+  padding: var(--space-12) var(--space-12) var(--space-12) var(--space-16);
+  border: 0;
+  background: transparent;
+  box-shadow: inset 0 -1px 0 var(--border-default);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+}
+
+.ah-item {
+  padding-left: var(--space-12);
+  border-left: 4px solid var(--alert-warning-edge);
+  cursor: pointer;
+}
+
+.ah-item.is-critical { border-left-color: var(--alert-danger-edge); }
+.ah-item:hover { background-color: var(--bg-interactive-hover); }
+.ah-item[aria-pressed="true"] { background-color: var(--bg-surface-selected); }
+
+.ah-where,
+.ah-title,
+.done-title,
+.done-how {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.ah-where { color: var(--fg-tertiary); }
+.ah-item[aria-pressed="true"] .ah-where { color: var(--fg-primary); }
+
+.ah-where > span:nth-child(2),
+.ah-title > span:last-child,
+.done-title > span:first-child,
+.done-how > span:nth-child(2) {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ah-title { color: var(--fg-primary); }
+.ah-title .i { flex: none; color: var(--status-warning-icon); }
+.ah-item.is-critical .ah-title .i { color: var(--status-critical-icon); }
+
+/* 오늘 확인 완료 — 머리(Title/2 + 건수 배지). 배지는 선 · 면 없이 점과 글이 fg/secondary. */
+.done-head {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 26px;
+}
+
+.done-head h3 { color: var(--fg-primary); }
+.done-count { color: var(--fg-secondary); }
+
+/*
+ * 확인 완료 한 줄 — 띠는 없다(왼쪽 16 은 그대로 비운다).
+ *   제목(Label/1) · 시각(Caption tertiary)
+ *   ✓ 조치(Caption tertiary) · 확인한 사람(Caption tertiary) — 사이 16
+ */
+.done-title { gap: var(--space-8); color: var(--fg-primary); }
+.done-title .num { flex: none; color: var(--fg-tertiary); }
+
+.done-how { gap: var(--space-16); color: var(--fg-tertiary); }
+.done-how .i { flex: none; margin-right: calc(var(--space-16) * -1 + var(--space-4)); }
+.done-how > span:last-child { flex: none; }
+
+.done-item.is-new { animation: done-new 1.6s ease; }
+
+@keyframes done-new {
+  0% { background-color: var(--bg-surface-selected); }
+  100% { background-color: transparent; }
+}
+
+/* ---------- 오른쪽 패널 (360) ---------- */
+/*
+ * 카드 면 — ver.2 는 overlay-light 를 40% 로 깔고 배경 흐림 20 이다.
+ * (1차는 overlay-light 100% · 흐림 5 였다.)
+ */
+.v2 .panel-card {
+  background-color: color-mix(in srgb, var(--bg-surface-overlay-light) 40%, transparent);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+}
+
+/* 로봇 카드 머리 — 패딩 8, Title/1. */
+.v2 .panel-header { padding: var(--space-8); }
+
+.v2 .robot-list { border-radius: var(--radius-4); }
+
+/* 수행 대수 · 수행중 배지 글자는 status/info/fg-secondary 다. */
+.v2 .robot-list .badge-info { color: var(--status-info-fg-secondary); }
+
+/*
+ * 로봇 한 대씩 넘겨 보기 — List: overlay-dark 50% 면 · 패딩 8.
+ *   왼쪽 164  ‹ 그래픽(132 × 142) ›
+ *   오른쪽 164 로봇명(Label/1) · 자동복귀 · E-STOP(24) · 상태 세 줄(26 · 사이 2) — 사이 8
+ * 카드는 선택된 한 장만 보인다. 화살표는 옆 카드를 누른 것과 같이 동작한다.
+ * 버튼은 카드 밖(.rc-side)에 있어서 카드의 빈 줄(24) 위에 겹쳐 놓는다.
+ */
+.robot-carousel { position: relative; }
+
+.robot-strip.is-carousel {
+  display: block;
+  padding: var(--space-8);
+  background-color: color-mix(in srgb, var(--bg-surface-overlay-dark) 50%, transparent);
+  overflow: hidden;
+}
+
+.robot-strip.is-carousel .robot-card { display: none; }
+
+.robot-strip.is-carousel .robot-card[aria-pressed="true"] {
+  display: grid;
+  width: 100%;
+  grid-template-columns: 164px minmax(0, 1fr);
+  grid-template-rows: 20px 24px auto;
+  grid-template-areas:
+    "thumb label"
+    "thumb act"
+    "thumb lists";
+  column-gap: var(--space-8);
+  row-gap: var(--space-8);
+  padding: 0;
+  border: 0;
+  box-shadow: none;
+  background: none;
+  cursor: default;
+}
+
+.robot-strip.is-carousel .robot-card .label { grid-area: label; padding: 0; }
+.robot-strip.is-carousel .robot-card .robot-lists { grid-area: lists; padding: 0; gap: var(--space-2); }
+
+/* 그래픽 칸 132 × 142 — 로봇은 바닥에 발을 붙이고 가운데 선다(Figma dog 는 x 13 · y 42). */
+.robot-strip.is-carousel .robot-thumb {
+  grid-area: thumb;
+  height: 142px;
+  margin: 0 var(--space-16);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+/*
+ * Figma 로봇 몸통이 94 폭이다. 걷기 리그의 몸통은 75 유닛이라 85 유닛 높이를 106 으로 그리면
+ * 몸통이 94 가 된다. 앉은 리그도 같은 배율로 그리고, 바닥에 붙이므로 위 여백은 없앤다.
+ */
+.robot-strip.is-carousel .robot-dog { height: 106px; }
+
+.robot-strip.is-carousel .robot-dog.is-idle {
+  height: calc(106px / 85 * 58);
+  margin-top: 0;
+}
+
+/* 상태 줄 — overlay-light 40% · radius 2 · 좌우 8 · 라벨 Label/2(fg/secondary). */
+.robot-strip.is-carousel .robot-row {
+  gap: var(--space-8);
+  padding: 0 var(--space-8);
+  border-radius: var(--radius-2);
+  background-color: color-mix(in srgb, var(--bg-surface-overlay-light) 40%, transparent);
+}
+
+.robot-strip.is-carousel .robot-row > span:first-child {
+  font-size: var(--font-size-13);
+  line-height: var(--font-line-height-18);
+  font-weight: 500;
+}
+
+.rc-side {
+  position: absolute;
+  inset: var(--space-8);
+  pointer-events: none;
+}
+
+.rc-nav {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 164px;
+  height: 142px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.rc-arrow {
+  pointer-events: auto;
+  display: inline-flex;
+  width: 16px;
+  height: 32px;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-2);
+  background: none;
+  color: var(--fg-secondary);
+  cursor: pointer;
+}
+
+.rc-arrow:hover { color: var(--fg-primary); background-color: var(--bg-interactive-hover); }
+
+.rc-arrow:focus-visible {
+  outline: var(--border-width-strong) solid var(--border-focus);
+  outline-offset: 1px;
+}
+
+/* 로봇명(20) + 사이 8 아래, 오른쪽 칸 폭 그대로. 두 버튼이 반씩 나눈다. */
+.rc-actions {
+  position: absolute;
+  top: 28px;
+  left: calc(164px + var(--space-8));
+  right: 0;
+  display: flex;
+  gap: var(--space-8);
+}
+
+.rc-actions .btn { pointer-events: auto; flex: 1 1 0; min-width: 0; }
