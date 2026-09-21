@@ -1440,8 +1440,9 @@ button {
 .map-card-tag {
   padding: 2px var(--space-8);
   border-radius: var(--radius-pill, 999px);
-  background-color: var(--bg-accent);
-  color: var(--color-gray-0);
+  /* 설비 카드는 회색 — 파랑은 웨이포인트 · 로봇 쪽에만 쓴다(웨이포인트 쪽지는 아래에서 결과색으로 덮는다). */
+  background-color: var(--color-gray-400);
+  color: var(--color-gray-950);
   font-size: var(--font-size-caption, 11px);
   line-height: 1.4;
 }
