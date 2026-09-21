@@ -98,8 +98,11 @@
   //    DELTA_MIN 건 이상일 때 위험이 한 건이라도 있으면 위험, 아니면 주의.
   //    기준이 정해지면 judge() 만 바꾸면 된다.
   //
-  // 화면 테두리(엣지 글로우)는 Delta 와 따로 간다 — 알림 정책상 주의 · 위험 알림이 하나라도
-  // 있으면 켜진다(목록에서 가장 높은 단계).
+  // 화면의 경고 색은 하나다(2026-09-21 정책 보완 — 델타는 파랑인데 테두리는 노랑이던 어색함).
+  //   색(엣지 글로우 · Delta) = max(목록에서 가장 높은 단계, Delta 종합 판단 단계)
+  //   파랑은 주의 · 위험이 하나도 없을 때만이다.
+  // Delta 의 종합 판단은 색이 아니라 내용으로 드러난다 — 5건 이상이면 태그에 "종합" 이 붙고 행동 버튼이 뜬다.
+  // 기준이 정해져 종합 판단이 단계를 올리면(예: 주의 5건 → 위험) 테두리와 Delta 가 함께 올라간다.
   // ==================================================================
   var DELTA_MIN = 5;
 
@@ -226,12 +229,16 @@
     return node;
   }
 
-  function tellAi(j, glow) {
+  var TONE = { normal: 0, warning: 1, critical: 2 };
+
+  function tellAi(j, top) {
     var copy = deltaCopy(j);
+    // 테두리와 Delta 가 같은 색을 입는다 — 목록 최고 단계와 종합 판단 중 높은 쪽.
+    var tone = TONE[j.level] > TONE[top] ? j.level : top;
     document.dispatchEvent(new CustomEvent("aprism:severity", {
       detail: {
-        level: j.level === "normal" ? null : j.level,
-        glow: glow === "normal" ? null : glow,
+        level: tone === "normal" ? null : tone,
+        glow: tone === "normal" ? null : tone,
         line1: copy.line1,
         line2: copy.line2,
         tag: copy.tag
