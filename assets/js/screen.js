@@ -928,7 +928,10 @@
     metaRow.appendChild(times);
 
     var titleRow = el("div", "step-title-row");
-    titleRow.appendChild(el("span", "t-title-2 step-title", step.title));
+    // 지점 이름은 Label/1(14/20 · 800) — Figma 는 Title/2(16/24) 인데 한 단계 내렸다(디자이너 확인).
+    // 좁아진 카드에서 목록이 진행 제목(Title/1 · 18)과 거의 같은 무게로 읽혔고,
+    // 알림 제목 · 로봇명 같은 다른 목록 제목이 모두 Label/1 이다.
+    titleRow.appendChild(el("span", "t-label-1 step-title", step.title));
 
     var head = el("div", "step-head");
     head.appendChild(metaRow);

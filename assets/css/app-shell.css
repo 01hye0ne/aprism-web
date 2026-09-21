@@ -3842,7 +3842,8 @@ input.field-box { outline: 0; }
   display: flex;
   align-items: center;
   gap: var(--space-8);
-  min-height: 24px;
+  /* Label/1 한 줄 높이. Figma(Title/2) 는 24 였다 — 카드가 72 -> 68 이 된다. */
+  min-height: 20px;
   padding-right: var(--space-2);
 }
 
@@ -3860,6 +3861,7 @@ input.field-box { outline: 0; }
 
 .step-desc {
   margin: 0;
+  word-break: keep-all;
   display: -webkit-box;
   -webkit-line-clamp: 3;
   line-clamp: 3;
