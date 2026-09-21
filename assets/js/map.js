@@ -1479,7 +1479,9 @@
         id: item.getAttribute("data-waypoint"),
         kind: kind,
         // 표식 색은 다녀온 곳이면 검사 결과, 아니면 진행 상태를 따른다.
-        tone: kind === "completed" ? (item.getAttribute("data-wp-result") || "safe") : kind,
+        // 알림이 걸린 칸(monitor.js 가 data-wp-alert 로 적는다)은 진행 상태와 상관없이 그 단계 색이다.
+        tone: item.getAttribute("data-wp-alert") ||
+          (kind === "completed" ? (item.getAttribute("data-wp-result") || "safe") : kind),
         name: title ? title.textContent : "",
         // 측정 요약은 목록에 그리지 않는다. 값만 속성에 있고, 보여 주는 곳은 지도 쪽지다.
         read: item.getAttribute("data-wp-read") || ""
@@ -1828,6 +1830,14 @@
   }
 
   // 우측 목록이 다시 그려졌다 — 표식을 새 상태로 다시 깐다.
+  // 알림이 바뀌어 웨이포인트 색이 달라졌다 — 고른 것은 그대로 두고 점만 다시 깐다.
+  document.addEventListener("aprism:wp-marks", function () {
+    if (!scene) { return; }
+    layWaypoints();
+    if (wpBox && !wpBox.hidden) { tellWaypoint(); }
+    frame();
+  });
+
   document.addEventListener("aprism:mission", function (event) {
     liveWp = (event.detail && event.detail.current) || null;
     chosenWp = null;

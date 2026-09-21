@@ -281,7 +281,37 @@
     var top = highest(all);
     body.setAttribute("data-level", top);
     tellAi(judge(all), top);
+    markWaypoints();
   }
+
+  /*
+   * 알림이 걸린 웨이포인트에 그 단계를 적는다 — 우측 타임라인 표식과 지도의 점이 이 값을 읽는다.
+   * 알림 목록이 원본이다. 미션 더미(screen.js)의 검사 결과는 여기서 덮는다 — 알림이 없는 칸은 정상이다.
+   * 확인 처리해서 목록에서 빠지면 표식도 정상으로 돌아간다.
+   */
+  var WP_ALERT = { warning: "caution", critical: "danger" };
+
+  function markWaypoints() {
+    var rail = $("[data-timeline]");
+    if (!rail) { return; }
+    var robot = activeRobot();
+    var hits = {};
+    items().forEach(function (a) {
+      if (a.robot !== robot || !a.wp) { return; }
+      if (!hits[a.wp] || TONE[a.sev] > TONE[hits[a.wp]]) { hits[a.wp] = a.sev; }
+    });
+    $$("[data-waypoint]", rail).forEach(function (node) {
+      var sev = hits[node.getAttribute("data-waypoint")];
+      if (sev) { node.setAttribute("data-wp-alert", WP_ALERT[sev]); } else { node.removeAttribute("data-wp-alert"); }
+      if (node.getAttribute("data-wp-state") === "completed") {
+        node.setAttribute("data-wp-result", sev ? WP_ALERT[sev] : "safe");
+      }
+    });
+    document.dispatchEvent(new CustomEvent("aprism:wp-marks"));
+  }
+
+  // 로봇을 바꾸면 타임라인이 새로 그려진다 — 그 로봇의 알림을 다시 적는다.
+  document.addEventListener("aprism:mission", markWaypoints);
 
   // 목록을 내렸을 때만 상자 위쪽 안쪽 그림자를 켠다 — 맨 위에서는 가려진 것이 없다.
   function shade(box) {

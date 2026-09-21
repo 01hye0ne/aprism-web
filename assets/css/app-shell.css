@@ -3718,6 +3718,10 @@ input.field-box { outline: 0; }
 
 .is-running .rail-mark { color: var(--bg-accent); }
 
+/* 알림이 걸린 칸은 표식이 그 단계 색을 입는다 — 지도의 점과 같은 색이다(monitor.js 가 data-wp-alert 를 적는다). */
+.timeline-item[data-wp-alert="caution"] .rail-mark { color: var(--status-warning-icon); }
+.timeline-item[data-wp-alert="danger"] .rail-mark { color: var(--status-critical-icon); }
+
 .rail-line {
   flex: 1 1 auto;
   width: 4px;
