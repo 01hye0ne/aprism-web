@@ -995,8 +995,11 @@
 
       // 칸과 단계는 1:1 이다. 칸 색이 그 단계의 상태를 그대로 따른다.
       track.textContent = "";
-      robot.steps.forEach(function (step) {
-        track.appendChild(el("span", STATE[step.state].klass));
+      // 칸마다 웨이포인트 번호를 적어 둔다 — 알림이 걸리면 monitor.js 가 이 번호로 찾아 색을 입힌다.
+      robot.steps.forEach(function (step, i) {
+        var seg = el("span", STATE[step.state].klass);
+        seg.setAttribute("data-seg", wpId(i));
+        track.appendChild(seg);
       });
       track.setAttribute("aria-label", total + "단계 중 " + done + "단계 완료");
 

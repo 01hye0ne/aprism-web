@@ -312,6 +312,11 @@
         icon.style.setProperty("--i", sev ? WP_ICON[sev] : (done ? "var(--ic-check-circle)" : "var(--ic-play-circle)"));
       }
     });
+    // 전체 진행 막대의 칸도 같은 값을 입는다 — 타임라인 표식·지도 점과 한 색이다.
+    $$("[data-progress-track] [data-seg]").forEach(function (seg) {
+      var sev = hits[seg.getAttribute("data-seg")];
+      if (sev) { seg.setAttribute("data-wp-alert", WP_ALERT[sev]); } else { seg.removeAttribute("data-wp-alert"); }
+    });
     document.dispatchEvent(new CustomEvent("aprism:wp-marks"));
   }
 

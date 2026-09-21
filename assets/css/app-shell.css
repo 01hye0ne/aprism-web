@@ -3661,6 +3661,17 @@ input.field-box { outline: 0; }
   background-color: var(--status-critical-icon);
 }
 
+/* 알림이 걸린 칸은 그 단계 색이다 — 타임라인 표식·지도 점과 같은 값을 monitor.js 가 data-wp-alert 로 적는다. */
+.progress-track span[data-wp-alert="caution"] {
+  background-image: none;
+  background-color: var(--status-warning-icon);
+}
+
+.progress-track span[data-wp-alert="danger"] {
+  background-image: none;
+  background-color: var(--status-critical-icon);
+}
+
 /* ---------- Mission Timeline ---------- */
 .timeline {
   flex: 1 1 auto;
