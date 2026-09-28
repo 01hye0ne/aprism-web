@@ -1,0 +1,401 @@
+/*
+ * 시안 3 · Delta — Figma UI_00 826:8887 ver.2 의 Delta 두 판을 그대로 옮긴 것이다.
+ *   접힘  997:20173  지도 왼쪽 위 모서리. 빛이 모서리에서 번지고 그 안에 220 카드가 있다.
+ *   펼침  997:21163  395×295 창. 지도 가운데에 뜨고 머리를 잡아 옮긴다.
+ *
+ * screens/sian-3.html 에서만 쓴다(body.v2.v3). app-shell.css · monitor.css 위에 얹는다.
+ *
+ * 왜 .ai-panel 을 안 쓰나:
+ *   1차 · ver.2 의 Delta 는 지도 왼쪽 아래에 붙는 가로 패널이라 규칙이 통째로 다르다.
+ *   여기서는 클래스를 새로 쓰고(.delta3), screen.js · monitor.js 가 잡는 자리만 남겼다 —
+ *   [data-ai-panel] · [data-ai-toggle] · .ai-line-1 · .ai-line-2 · [data-ai-actions] ·
+ *   [data-ai-ask-open] · #ai-ask. 그래서 알림 단계 · 문구 · 행동 버튼은 ver.2 와 같이 돈다.
+ *
+ * 빛은 Figma 에서 받은 SVG 세 장 그대로다(assets/img/delta-light-*.svg).
+ * 다시 그리지 않았다 — 흐림 · 하드라이트 · 색 정지점이 전부 그 안에 들어 있다.
+ */
+
+/* ------------------------------------------------------------------ *
+ * 공통 — 두 판이 같은 요소다. .is-open 하나로 갈아입는다.
+ * ------------------------------------------------------------------ */
+
+.v3 .delta3 {
+  position: absolute;
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  overflow: hidden;
+}
+
+/*
+ * 접힘 — Two Column 왼쪽 위 모서리에 딱 붙는다(Figma Delta x0 y0, 260×268).
+ * 안쪽 여백은 위 12 · 오른쪽 8 · 아래 8, 왼쪽은 0 이다. 카드가 왼쪽 32 에서 시작한다.
+ */
+.v3 .delta3:not(.is-open) {
+  left: 0;
+  top: 0;
+  width: 260px;
+  height: 268px;
+  gap: var(--space-8);
+  padding: var(--space-12) var(--space-8) var(--space-8) 0;
+  border-radius: var(--radius-container) 0 0 0;
+
+  /*
+   * 모서리에서 번지는 빛. Figma 는 반지름 10 짜리 radial 을 matrix(14.676 17.721 -14.676 17.721)
+   * 로 늘린 것인데, 두 축 길이가 같아서 결국 원점 기준 반지름 230 원이다.
+   */
+  background-image: radial-gradient(
+    circle 230px at 0 0,
+    var(--color-gray-600) 0%,
+    rgb(44 51 64 / 50%) 50%,
+    rgb(10 14 21 / 0%) 100%
+  );
+}
+
+/*
+ * 펼침 — 395×295 창. 자리는 delta-v3.js 가 잡는다(처음엔 지도 한가운데).
+ * 면은 위에서 아래로 slate -> 하늘 -> 흰빛이다. Figma 실측 정지점 그대로다
+ * (bg/surface/selected 50% · #98BDED 83.654% · bg/inverse 100%).
+ */
+.v3 .delta3.is-open {
+  width: 395px;
+  /*
+   * Figma 는 295 고정인데, 조치 버튼 문구가 실제 알림에서 길어지면 두 줄이 된다
+   * (Figma 는 "조치 버튼 1" 같은 자리표시자라 한 줄에 들어간다).
+   * 높이를 295 아래로는 안 내려가게 두고, 넘치면 창이 자란다 — 버튼이 창 밖으로 새는 것보다 낫다.
+   */
+  min-height: 295px;
+  gap: 0;
+  padding: var(--space-4);
+  border-radius: 12px;
+  background-image: linear-gradient(
+    180deg,
+    var(--bg-surface-selected) 50%,
+    #98BDED 83.654%,
+    var(--bg-inverse) 100%
+  );
+  /* 아래 변에서 올라오는 빛 한 겹. Figma inner shadow 0 -6 20 -8 alert/default/glow-primary. */
+  box-shadow: inset 0 -6px 20px -8px var(--delta3-glow-primary, var(--alert-default-glow-primary));
+}
+
+/* ------------------------------------------------------------------ *
+ * 빛 — Figma Group 34(Light-Circle + Ellipse 16 · 17). 접힘에만 있다.
+ * 자리는 Delta 프레임 기준이고, 프레임이 잘라 내는 만큼만 보인다.
+ * ------------------------------------------------------------------ */
+
+.v3 .delta3-light {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.v3 .delta3.is-open .delta3-light { display: none; }
+
+.v3 .delta3-light img {
+  position: absolute;
+  display: block;
+  max-width: none;
+}
+
+/* Light-Circle 480 — 프레임 바깥 (-222, -222) 에서 시작한다. */
+.v3 .delta3-light .lc { left: -222px; top: -222px; }
+
+/*
+ * 두 덩이는 하드라이트로 겹친다. Figma 는 감싼 상자 안에서 회전시키는데,
+ * 여기서는 그 상자의 중심에 SVG 를 놓고 같은 각도로 돌린다 — 결과가 같다.
+ *   Ellipse 16  상자 (-27, -61) 202.536×221.955 · 30°
+ *   Ellipse 17  상자 (-70, -5)  209.052×171.536 · 75°
+ */
+.v3 .delta3-light .blob {
+  mix-blend-mode: hard-light;
+  transform-origin: center;
+}
+
+.v3 .delta3-light .b1 {
+  left: -27px;
+  top: -61px;
+  margin: 10.0265px 26.8445px;   /* (221.955-201.902)/2 · (202.536-148.847)/2 */
+  transform: rotate(30deg);
+}
+
+.v3 .delta3-light .b2 {
+  left: -70px;
+  top: -5px;
+  margin: -15.183px 30.1025px;   /* (171.536-201.902)/2 · (209.052-148.847)/2 */
+  transform: rotate(75deg);
+}
+
+/* ------------------------------------------------------------------ *
+ * 이름 줄 — 접힘은 카드 위에, 펼침은 창 머리에 있다. 같은 줄이 자리만 옮긴다.
+ * ------------------------------------------------------------------ */
+
+.v3 .delta3-name {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  width: 100%;
+  flex: none;
+}
+
+.v3 .delta3-name .i { flex: none; --i: var(--ic-delta); background-color: var(--fg-primary); }
+
+.v3 .delta3-name b {
+  flex: 1 1 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: "JetBrains Mono", var(--font-family-mono, monospace);
+}
+
+/* 접힘 — 왼쪽 12 들여쓰기, 아이콘 20, Mono/Data/1 Bold 16/20. */
+.v3 .delta3:not(.is-open) .delta3-name { padding-left: var(--space-12); }
+.v3 .delta3:not(.is-open) .delta3-name b {
+  font-size: var(--font-size-16);
+  line-height: var(--font-line-height-20);
+  font-weight: 700;
+}
+
+/* 펼침 — 창 머리. 아이콘 16, Mono/Data/2 13/18, 오른쪽 끝에 닫기. */
+.v3 .delta3.is-open .delta3-name .i { width: var(--size-icon-16); height: var(--size-icon-16); }
+.v3 .delta3.is-open .delta3-name {
+  padding: var(--space-4) var(--space-4) 0 var(--space-8);
+  gap: var(--space-8);
+  cursor: grab;
+  user-select: none;
+}
+.v3 .delta3.is-open .delta3-name:active { cursor: grabbing; }
+.v3 .delta3.is-open .delta3-name b {
+  font-size: var(--font-size-13);
+  line-height: var(--font-line-height-18);
+  font-weight: 400;
+}
+
+/* 이름 줄 안쪽 묶음 — 아이콘과 이름은 붙어 다니고 닫기만 끝으로 간다. */
+.v3 .delta3-name .delta3-name-in {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+/* 닫기 — Icon Button 24 · Ghost. 접힘에는 없다. */
+.v3 .delta3-close {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  cursor: pointer;
+}
+.v3 .delta3-close:hover { background-color: rgb(255 255 255 / 10%); }
+.v3 .delta3-close .i { --i: var(--ic-close); background-color: var(--fg-primary); }
+.v3 .delta3:not(.is-open) .delta3-close { display: none; }
+
+/* ------------------------------------------------------------------ *
+ * 카드 — 접힘에서는 220 정사각 카드고, 펼침에서는 창 자체가 카드라 껍데기가 없다.
+ * ------------------------------------------------------------------ */
+
+.v3 .delta3-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  min-height: 0;
+}
+
+.v3 .delta3:not(.is-open) .delta3-card {
+  width: 220px;
+  height: 220px;
+  margin-left: var(--space-32);
+  padding: var(--space-4);
+  overflow: hidden;
+  border-radius: 12px;
+  background-color: var(--bg-surface-selected);
+  /*
+   * 왼쪽 위로 새는 빛 한 겹(바깥)과 카드 안쪽 빛 세 겹. Figma 실측 그대로다.
+   * 바깥  -8 -8 20 -10  alert/default/glow-secondary
+   * 안쪽   0  4 10 -6   glow-secondary · 0 -4 4 -1 glow-primary · 0 -6 20 -8 glow-primary
+   */
+  box-shadow:
+    -8px -8px 20px -10px var(--delta3-glow-secondary, var(--alert-default-glow-secondary)),
+    inset 0 4px 10px -6px var(--delta3-glow-secondary, var(--alert-default-glow-secondary)),
+    inset 0 -4px 4px -1px var(--delta3-glow-primary, var(--alert-default-glow-primary)),
+    inset 0 -6px 20px -8px var(--delta3-glow-primary, var(--alert-default-glow-primary));
+}
+
+.v3 .delta3.is-open .delta3-card {
+  flex: 1 1 auto;
+  width: 100%;
+}
+
+/* 본문 높이는 Figma 창(181) 을 기준으로 잡는다. 창이 자라면 본문이 같이 자란다. */
+.v3 .delta3.is-open .delta3-body { min-height: 173px; }
+
+/* 제목 줄 */
+.v3 .delta3-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  flex: none;
+}
+
+.v3 .delta3-head p {
+  flex: 1 1 0;
+  opacity: 1;                     /* app-shell 의 .ai-line-1 은 0.8 로 흐린다 — 제목은 또렷해야 한다. */
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--fg-primary);
+  font-weight: 700;
+}
+
+/* 접힘 — Title/2 16/24, 오른쪽에 [+]. */
+.v3 .delta3:not(.is-open) .delta3-head {
+  padding: var(--space-4) var(--space-4) var(--space-8) var(--space-8);
+}
+.v3 .delta3:not(.is-open) .delta3-head p {
+  font-size: var(--font-size-16);
+  line-height: var(--font-line-height-24);
+}
+
+/* 펼침 — Title/1 18/26, [+] 는 사라진다(닫기가 머리로 갔다). */
+.v3 .delta3.is-open .delta3-head {
+  padding: var(--space-4) var(--space-8) var(--space-8);
+}
+.v3 .delta3.is-open .delta3-head p {
+  font-size: var(--font-size-18);
+  line-height: var(--font-line-height-26);
+}
+.v3 .delta3.is-open .delta3-plus { display: none; }
+
+/* [+] — Icon Button 24 · Ghost. */
+.v3 .delta3-plus {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  cursor: pointer;
+}
+.v3 .delta3-plus:hover { background-color: rgb(255 255 255 / 10%); }
+.v3 .delta3-plus .i { --i: var(--ic-plus); background-color: var(--fg-primary); }
+
+/*
+ * 본문 — 두 판이 같다. 위 변에 선 하나, 면은 bg/surface/disabled, 위쪽에서 떨어지는 그림자.
+ * Figma 의 면은 반투명이라 아래로 갈수록 창의 빛이 비쳐 올라온다(펼침에서 뚜렷하다).
+ */
+.v3 .delta3-body {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  padding: var(--space-8);
+  border-top: var(--border-width-thin) solid var(--border-control);
+  border-radius: var(--radius-container);
+  background-color: color-mix(in srgb, var(--bg-surface-disabled) 72%, transparent);
+  box-shadow: inset 0 10px 8px 0 rgb(0 0 0 / 25%);
+}
+
+.v3 .delta3-body p {
+  margin: 0;
+  color: var(--fg-primary);
+  font-weight: var(--font-weight-regular);   /* app-shell 의 .ai-line-2 는 Bold 다 — Figma 본문은 Regular. */
+  font-size: var(--font-size-14);
+  line-height: var(--font-line-height-22);
+  word-break: break-word;
+}
+
+/* 접힘은 카드가 작아 넘치는 만큼 잘린다 — Figma 도 잘려 있다. */
+.v3 .delta3:not(.is-open) .delta3-body p { overflow: hidden; }
+
+/* ------------------------------------------------------------------ *
+ * 조치 줄 — 펼침에만 있다. monitor.js 가 버튼을 채우고, 맨 끝은 묻기 [돋보기] 다.
+ * ------------------------------------------------------------------ */
+
+.v3 .delta3-suggest {
+  flex: none;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-8);
+  padding: var(--space-8);
+}
+
+.v3 .delta3:not(.is-open) .delta3-suggest { display: none; }
+
+.v3 .delta3-suggest .ai-actions { flex: 1 1 auto; min-width: 0; }
+
+/* Btn / Secondary · 높이 24 · 좌우 8 · Label/2 Medium 13/18 (Figma Suggestions). */
+.v3 .delta3-suggest .btn {
+  height: 24px;
+  min-height: 24px;
+  padding: 0 var(--space-8);
+  border-radius: var(--radius-control);
+  border: var(--border-width-thin) solid var(--button-secondary-border-default);
+  background-color: var(--button-secondary-bg-default);
+  color: var(--button-secondary-fg-default);
+  font-size: var(--font-size-13);
+  line-height: var(--font-line-height-18);
+  font-weight: 500;
+}
+
+.v3 .delta3-ask {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  margin-left: auto;
+  padding: 0;
+  border-radius: var(--radius-control);
+  border: var(--border-width-thin) solid var(--button-secondary-border-default);
+  background-color: var(--button-secondary-bg-default);
+  cursor: pointer;
+}
+.v3 .delta3-ask .i { --i: var(--ic-search); background-color: var(--button-secondary-fg-default); }
+.v3 .delta3-ask[aria-expanded="true"] .i { --i: var(--ic-close); }
+
+/*
+ * 묻기 칸 — Figma 에는 없다. ver.2 의 [돋보기] 동작을 그대로 살려 둔 것이라
+ * 누르기 전에는 자리를 차지하지 않는다.
+ */
+.v3 .delta3 .ai-input { margin: 0 var(--space-8) var(--space-8); }
+.v3 .delta3:not(.is-open) .ai-input { display: none; }
+
+/* ------------------------------------------------------------------ *
+ * 알림 단계 — 빛 색이 단계를 따라간다(엣지 글로우와 같은 규칙).
+ * screen.js 가 .is-warning · .is-critical · .is-safe 를 붙인다.
+ * ------------------------------------------------------------------ */
+
+.v3 .delta3.is-safe {
+  --delta3-glow-primary: var(--alert-safe-glow-primary);
+  --delta3-glow-secondary: var(--alert-safe-glow-secondary);
+}
+.v3 .delta3.is-warning {
+  --delta3-glow-primary: var(--alert-warning-glow-primary);
+  --delta3-glow-secondary: var(--alert-warning-glow-secondary);
+}
+.v3 .delta3.is-critical {
+  --delta3-glow-primary: var(--alert-danger-glow-primary);
+  --delta3-glow-secondary: var(--alert-danger-glow-secondary);
+}
+
+/*
+ * 빛 세 장(SVG)은 단계를 따라가지 않는다 — Figma 에 그려 둔 그대로 둔다.
+ * 색을 돌려 보니 파랑이 주황으로 뭉개져 Figma 의 빛이 아니게 됐다.
+ * 단계는 카드 · 창의 글로우(위 네 겹)가 말한다.
+ */
