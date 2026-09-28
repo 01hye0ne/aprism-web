@@ -3616,61 +3616,31 @@ input.field-box { outline: 0; }
 }
 
 /*
- * 단계 수만큼 나뉜 막대다. 칸마다 상태가 셋이다(Figma Progress Bar / Fill 422:3988) —
- * 완료 status/normal/icon · 수행중 status/info/icon · 실패 status/critical/icon,
- * 대기는 1px 선을 2px 간격으로 깐 빗금이다.
- * Figma 의 빗금은 굵기 40 짜리 가로 선 하나에 dashPattern [1, 2] 를 준 것이다 —
- * 반복 배경 하나로 같은 그림이 된다.
- * 빗금 색만 Figma 와 다르다. Figma 는 border/strong 인데 그 값이 Light 에서 gray/0(흰색)이라
- * 밝은 화면에서 빗금이 사라진다. 그래서 fg/disabled 로 둔다 — Dark 값(gray/600)은 둘이 같다.
+ * 미션 진행 막대 — 한 줄짜리 게이지다.
+ *
+ * 전에는 단계 수만큼 칸을 나누고 칸마다 상태 색을 입혔다(Figma Progress Bar / Fill 422:3988).
+ * 20단계가 되니 칸이 잘게 부서져 진행률이 한눈에 안 들어왔다 — 디자이너 요청으로
+ * 칸을 없애고 채운 길이 하나로 바꿨다(Figma 와 다른 점).
+ * 단계별 상태(완료 · 수행중 · 알림)는 아래 타임라인과 지도가 이미 말하고 있다.
+ *
+ * 채움은 흰색 한 가지다(fg/primary — Light 에서는 검정이라 밝은 면에서도 읽힌다).
+ * 채운 길이는 screen.js 가 --progress 로 넣는다.
  */
 .progress-track {
-  display: flex;
-  gap: var(--space-4);
-  height: 12px;
-}
-
-.progress-track span {
-  flex: 1 1 0;
-  min-width: 0;
-  overflow: hidden;
+  height: 8px;
   border-radius: var(--radius-chart);
-  background-image: repeating-linear-gradient(
-    90deg,
-    var(--fg-disabled) 0 1px,
-    transparent 1px 3px
-  );
+  overflow: hidden;
+  background-color: color-mix(in srgb, var(--fg-primary) 14%, transparent);
 }
 
-/*
- * 채워진 칸은 단색이다. Figma 에도 아래 변에서 번지는 INNER_SHADOW 가 들어 있지만
- * 세 Variant 모두 visible=false 로 꺼 둔 것이라 여기서도 걷어냈다.
- */
-.progress-track span.is-done {
-  background-image: none;
-  background-color: var(--status-normal-icon);
-}
-
-.progress-track span.is-running {
-  background-image: none;
-  background-color: var(--status-info-icon);
-}
-
-/* Figma 에 실패 Variant 도 있다. 화면에는 아직 쓰이지 않는다. */
-.progress-track span.is-failed {
-  background-image: none;
-  background-color: var(--status-critical-icon);
-}
-
-/* 알림이 걸린 칸은 그 단계 색이다 — 타임라인 표식·지도 점과 같은 값을 monitor.js 가 data-wp-alert 로 적는다. */
-.progress-track span[data-wp-alert="caution"] {
-  background-image: none;
-  background-color: var(--status-warning-icon);
-}
-
-.progress-track span[data-wp-alert="danger"] {
-  background-image: none;
-  background-color: var(--status-critical-icon);
+.progress-track::before {
+  content: "";
+  display: block;
+  height: 100%;
+  width: var(--progress, 0%);
+  border-radius: inherit;
+  background-color: var(--fg-primary);
+  transition: width 400ms ease;
 }
 
 /* ---------- Mission Timeline ---------- */
