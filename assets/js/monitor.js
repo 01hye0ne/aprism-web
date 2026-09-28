@@ -141,22 +141,17 @@
         line2: "위험 알림부터 조치하고, 겹치는 주의 알림은 한꺼번에 점검 계획을 세우는 것을 권합니다." };
     },
 
-    // 조사와 서술어를 걷어낸다. 제목은 무슨 일인지, 둘째 줄은 무엇부터 할지 — 각 한 호흡이다.
+    /*
+     * 제목만 키워드다 — 무슨 일인지 명사구 한 호흡으로 줄인다.
+     * 본문은 문장체 그대로 둔다(디자이너 요청). 제목에서 상황을 집고 본문에서 왜 · 무엇부터 인지를 읽는다.
+     */
     keyword: function (j) {
-      if (!j.total) {
-        return { tag: "정기 순회 진행 중", line1: "정기 순회 진행 중",
-          line2: "특이사항 없음 · Robot 01 순회 중" };
-      }
-      if (j.level === "normal") {
-        return { tag: "알림 " + j.total + "건 관찰 중", line1: "알림 " + j.total + "건 관찰 중",
-          line2: "위험 " + j.crit + " · 주의 " + j.warn + " · 개별 확인 필요" };
-      }
-      if (j.level === "warning") {
-        return { tag: "알림 " + j.total + "건 종합 · 주의", line1: "주의 알림 " + j.total + "건 누적",
-          line2: "이상징후 중복 · 점검 순서 조정 권장 · 개별 대응 비권장" };
-      }
-      return { tag: "알림 " + j.total + "건 종합 · 위험", line1: "위험 " + j.crit + "건 포함 " + j.total + "건 누적",
-        line2: "위험 우선 조치 · 주의 " + j.warn + "건 묶음 점검 · 추세 확인 필요" };
+      var copy = COPY.sentence(j);
+      if (!j.total) { copy.line1 = "정기 순회 진행 중"; }
+      else if (j.level === "normal") { copy.line1 = "알림 " + j.total + "건 관찰 중"; }
+      else if (j.level === "warning") { copy.line1 = "주의 알림 " + j.total + "건 누적"; }
+      else { copy.line1 = "위험 " + j.crit + "건 포함 " + j.total + "건 누적"; }
+      return copy;
     }
   };
 
