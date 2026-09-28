@@ -140,7 +140,12 @@
   flex: none;
 }
 
-.v3 .delta3-name .i { flex: none; --i: var(--ic-delta); background-color: var(--fg-primary); }
+/*
+ * Delta 표식 — Figma Icon / Delta (997:20173 · 997:21163 의 name 줄) 그대로다.
+ * 네 도막으로 끊긴 고리다. ver.2 태그가 쓰는 --ic-delta(체크 원)와는 다른 그림이라
+ * 새 아이콘으로 넣었다(assets/icons/icon-delta-mark.svg).
+ */
+.v3 .delta3-name .i { flex: none; --i: var(--ic-delta-mark); background-color: var(--fg-primary); }
 
 .v3 .delta3-name b {
   flex: 1 1 0;
