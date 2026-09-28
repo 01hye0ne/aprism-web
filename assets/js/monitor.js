@@ -113,23 +113,56 @@
     return { level: level, total: all.length, crit: crit, warn: warn };
   }
 
-  // Delta 가 하는 말 — 닫힘은 둘째 줄이 한 줄 말줄임이라 앞쪽에 요지를 둔다.
+  /*
+   * Delta 가 하는 말. 두 벌이다 — 화면이 body[data-delta-copy] 로 고른다.
+   *
+   *   sentence  (기본) 말을 거는 문장체. ver.2 · 시안 1 · 2 가 쓴다.
+   *   keyword   제목은 명사구, 아래 한 줄은 요지만 남긴 키워드체(디자이너 요청 — 토스증권 이슈 리스트 투).
+   *             시안 3 처럼 창이 좁고 한눈에 읽어야 하는 판에 쓴다.
+   *
+   * 두 벌 다 line1 이 제목, line2 가 요지다. 닫힘은 둘째 줄이 한 줄 말줄임이라 앞쪽에 요지를 둔다.
+   */
+  var COPY = {
+    sentence: function (j) {
+      if (!j.total) {
+        return { tag: "정기 순회 진행 중", line1: "안녕하세요. 홍길동 님",
+          line2: "Robot 01 이 정기 순회를 진행하고 있어요. 지금은 특이사항이 없습니다." };
+      }
+      var mix = "위험 " + j.crit + " · 주의 " + j.warn;
+      if (j.level === "normal") {
+        return { tag: "알림 " + j.total + "건 관찰 중", line1: "안녕하세요. 홍길동 님",
+          line2: "확인할 알림이 " + j.total + "건 있어요(" + mix + "). 왼쪽 목록에서 하나씩 살펴봐 주세요." };
+      }
+      if (j.level === "warning") {
+        return { tag: "알림 " + j.total + "건 종합 · 주의", line1: "주의 알림이 " + j.total + "건 쌓였습니다.",
+          line2: "여러 설비에서 이상징후가 겹칩니다. 개별 대응보다 전체 추세를 함께 보고 점검 순서를 정하는 것을 권합니다." };
+      }
+      return { tag: "알림 " + j.total + "건 종합 · 위험", line1: "위험 " + j.crit + "건을 포함해 알림이 " + j.total + "건 쌓였습니다.",
+        line2: "위험 알림부터 조치하고, 겹치는 주의 알림은 한꺼번에 점검 계획을 세우는 것을 권합니다." };
+    },
+
+    // 조사와 서술어를 걷어낸다. 제목은 무슨 일인지, 둘째 줄은 무엇부터 할지 — 각 한 호흡이다.
+    keyword: function (j) {
+      if (!j.total) {
+        return { tag: "정기 순회 진행 중", line1: "정기 순회 진행 중",
+          line2: "특이사항 없음 · Robot 01 순회 중" };
+      }
+      if (j.level === "normal") {
+        return { tag: "알림 " + j.total + "건 관찰 중", line1: "알림 " + j.total + "건 관찰 중",
+          line2: "위험 " + j.crit + " · 주의 " + j.warn + " · 개별 확인 필요" };
+      }
+      if (j.level === "warning") {
+        return { tag: "알림 " + j.total + "건 종합 · 주의", line1: "주의 알림 " + j.total + "건 누적",
+          line2: "이상징후 중복 · 점검 순서 조정 권장 · 개별 대응 비권장" };
+      }
+      return { tag: "알림 " + j.total + "건 종합 · 위험", line1: "위험 " + j.crit + "건 포함 " + j.total + "건 누적",
+        line2: "위험 우선 조치 · 주의 " + j.warn + "건 묶음 점검 · 추세 확인 필요" };
+    }
+  };
+
   function deltaCopy(j) {
-    if (!j.total) {
-      return { tag: "정기 순회 진행 중", line1: "안녕하세요. 홍길동 님",
-        line2: "Robot 01 이 정기 순회를 진행하고 있어요. 지금은 특이사항이 없습니다." };
-    }
-    var mix = "위험 " + j.crit + " · 주의 " + j.warn;
-    if (j.level === "normal") {
-      return { tag: "알림 " + j.total + "건 관찰 중", line1: "안녕하세요. 홍길동 님",
-        line2: "확인할 알림이 " + j.total + "건 있어요(" + mix + "). 왼쪽 목록에서 하나씩 살펴봐 주세요." };
-    }
-    if (j.level === "warning") {
-      return { tag: "알림 " + j.total + "건 종합 · 주의", line1: "주의 알림이 " + j.total + "건 쌓였습니다.",
-        line2: "여러 설비에서 이상징후가 겹칩니다. 개별 대응보다 전체 추세를 함께 보고 점검 순서를 정하는 것을 권합니다." };
-    }
-    return { tag: "알림 " + j.total + "건 종합 · 위험", line1: "위험 " + j.crit + "건을 포함해 알림이 " + j.total + "건 쌓였습니다.",
-      line2: "위험 알림부터 조치하고, 겹치는 주의 알림은 한꺼번에 점검 계획을 세우는 것을 권합니다." };
+    var mode = body.getAttribute("data-delta-copy");
+    return (COPY[mode] || COPY.sentence)(j);
   }
 
   // Delta 를 펼쳤을 때의 행동 버튼 — 알림 여러 건을 한꺼번에 다룬다.

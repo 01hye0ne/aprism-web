@@ -21,7 +21,7 @@
   <link rel="stylesheet" href="../assets/css/tokens.css?v=4aceab62" />
   <link rel="stylesheet" href="../assets/css/app-shell.css?v=61aa26d0" />
   <link rel="stylesheet" href="../assets/css/monitor.css?v=01695f1a" />
-  <link rel="stylesheet" href="../assets/css/delta-v3.css?v=a31fc4f5" />
+  <link rel="stylesheet" href="../assets/css/delta-v3.css?v=cf529354" />
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
@@ -37,7 +37,7 @@
   </style>
 </head>
 <!-- 기본은 Figma 기본 상태다 — 알림이 없는 판(파란 빛). 주소 끝 #few · #warning · #critical 로 바꿔 본다. -->
-<body class="v2 v3" data-level="normal" data-monitor-default="normal">
+<body class="v2 v3" data-level="normal" data-monitor-default="normal" data-delta-copy="keyword">
 
 <!-- Robot Dog Walk 리그(assets/robot-dog/ 핸드오프)의 공용 defs — 카드 썸네일이 url(#rd-*) 로 참조한다. -->
 <svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute" xmlns="http://www.w3.org/2000/svg">
@@ -273,7 +273,7 @@
 
             <div class="delta3-card">
               <div class="delta3-head">
-                <p class="ai-line-1">종합 알림 요약 타이틀</p>
+                <p class="ai-line-1">정기 순회 진행 중</p>
                 <button type="button" class="delta3-plus" data-ai-toggle
                         aria-expanded="false" aria-label="Delta 창 열기">
                   <span class="i i-16" aria-hidden="true"></span>
@@ -281,7 +281,7 @@
               </div>
 
               <div class="delta3-body">
-                <p class="ai-line-2">지하발전소 B3 터빈2 에서 NG 1건이 발견되었습니다.</p>
+                <p class="ai-line-2">특이사항 없음 · Robot 01 순회 중</p>
               </div>
 
               <!-- 조치 줄 — 버튼은 monitor.js 가 채운다. 맨 끝 [돋보기] 로 묻기 칸을 연다. -->
@@ -1534,7 +1534,7 @@
 <script src="../assets/js/screen.js?v=31cfc18d"></script>
 <script src="../assets/js/map-model.js?v=fb8d7fde"></script>
 <script src="../assets/js/map.js?v=953e3640"></script>
-<script src="../assets/js/monitor.js?v=c3dac611"></script>
+<script src="../assets/js/monitor.js?v=450aed4a"></script>
 <script src="../assets/js/delta-v3.js?v=1eb58086"></script>
 <script src="../assets/js/grid-overlay.js?v=164e4f2a"></script>
 </body>

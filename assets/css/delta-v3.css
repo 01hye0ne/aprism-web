@@ -317,7 +317,9 @@
   font-weight: var(--font-weight-regular);   /* app-shell 의 .ai-line-2 는 Bold 다 — Figma 본문은 Regular. */
   font-size: var(--font-size-14);
   line-height: var(--font-line-height-22);
-  word-break: break-word;
+  /* 한국어는 낱말 안에서 끊으면 읽기 나빠진다 — "묶음 점 / 검" 처럼 갈라졌다. 낱말째 내린다. */
+  word-break: keep-all;
+  overflow-wrap: anywhere;
 }
 
 /* 접힘은 카드가 작아 넘치는 만큼 잘린다 — Figma 도 잘려 있다. */
