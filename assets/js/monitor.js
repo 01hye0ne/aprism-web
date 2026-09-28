@@ -537,10 +537,15 @@
     return { open: open, close: close };
   })();
 
-  // 검토용 — 주소의 #normal · #few · #warning · #critical 로 단계를 고른다.
+  /*
+   * 검토용 — 주소의 #normal · #few · #warning · #critical 로 단계를 고른다.
+   * 주소에 아무것도 없으면 화면이 정한 기본값을 쓴다(body[data-monitor-default]).
+   * ver.2 는 위험 판을 기본으로 보여 주고, 시안 3 은 Figma 기본 상태(알림 없음)로 연다.
+   */
   function fromHash() {
     var h = (location.hash || "").replace("#", "");
-    level = SETS[h] ? h : "critical";
+    var base = body.getAttribute("data-monitor-default");
+    level = SETS[h] ? h : (SETS[base] ? base : "critical");
     extra = [];
     resolved = [];
     DONE = DONE_BASE.slice();
