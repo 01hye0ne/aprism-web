@@ -3643,6 +3643,43 @@ input.field-box { outline: 0; }
   transition: width 400ms ease;
 }
 
+/* ---------- 지도 층 고르기 ----------
+ * 도구 레일 맨 위에 붙는 두 칸이다(지하 3층 · 지하 4층).
+ * 아이콘 버튼과 같은 폭으로 세워, 레일이 한 줄로 읽히게 한다.
+ */
+.map-floors {
+  display: flex;
+  flex-direction: column;
+  gap: var(--border-width-thin);
+  padding: var(--border-width-thin);
+  border-radius: var(--radius-control);
+  background-color: var(--bg-surface-overlay-dark);
+  border: var(--border-width-thin) solid var(--border-subtle);
+}
+
+.map-floor {
+  width: 34px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--fg-secondary);
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-13);
+  line-height: var(--font-line-height-18);
+  cursor: pointer;
+}
+
+.map-floor:hover { background-color: rgb(255 255 255 / 10%); color: var(--fg-primary); }
+
+/* 지금 보는 층. 색이 아니라 면으로 알린다 — 지도 위 색은 알림 단계가 쓰고 있다. */
+.map-floor.is-on {
+  background-color: var(--bg-surface-selected);
+  color: var(--fg-primary);
+  font-weight: 600;
+}
+
 /* ---------- Mission Timeline ---------- */
 .timeline {
   flex: 1 1 auto;

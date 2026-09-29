@@ -19,7 +19,7 @@
   }
   </script>
   <link rel="stylesheet" href="../assets/css/tokens.css?v=4aceab62" />
-  <link rel="stylesheet" href="../assets/css/app-shell.css?v=feb41a1a" />
+  <link rel="stylesheet" href="../assets/css/app-shell.css?v=937035da" />
   <link rel="stylesheet" href="../assets/css/sian.css?v=58117d7d" />
   <style>
     *, *::before, *::after { box-sizing: border-box; }
@@ -101,7 +101,7 @@
         <span class="i" style="--i:var(--ic-brand-mark)" role="img" aria-label="APRISM"></span>
       </span>
       <!-- Figma Status Bar ver.2 — 로고 옆에 층 이름(Title/1)이 붙는다. -->
-      <span class="status-bar-place t-title-1">지하 4층</span>
+      <span class="status-bar-place t-title-1" data-floor-label>지하 4층</span>
       </div>
 
       <div class="status-bar-right">
@@ -403,6 +403,12 @@
           <section class="map-panel" aria-label="설비 배치도">
             <div class="map-canvas">
                           <div class="map-tools">
+              <!-- 층 — 지하 4층 · 지하 3층. 누르면 그 층으로 갈아탄다(assets/js/map.js).
+                   계단을 눌러도 옮겨 간다. -->
+              <div class="map-floors" role="group" aria-label="층">
+                <button type="button" class="map-floor" data-map-floor="B3" aria-pressed="false">B3</button>
+                <button type="button" class="map-floor" data-map-floor="B4" aria-pressed="true">B4</button>
+              </div>
                             <button type="button" class="icon-button" data-map-zoom-in aria-label="확대">
                               <span class="i i-20" style="--i:var(--ic-zoom-in)"></span>
                             </button>
@@ -1580,8 +1586,8 @@
 <script src="../assets/js/theme.js?v=dcf8f460"></script>
 <script src="../assets/js/prism-orb.js?v=03386460"></script>
 <script src="../assets/js/screen.js?v=10e1f3ad"></script>
-<script src="../assets/js/map-model.js?v=fb8d7fde"></script>
-<script src="../assets/js/map.js?v=953e3640"></script>
+<script src="../assets/js/map-model.js?v=46211634"></script>
+<script src="../assets/js/map.js?v=8ba497f4"></script>
 <script src="../assets/js/sian.js?v=3b776a2c"></script>
 <script src="../assets/js/grid-overlay.js?v=164e4f2a"></script>
 </body>

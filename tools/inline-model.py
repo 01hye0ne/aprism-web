@@ -1,4 +1,4 @@
-# assets/model/apro-4f.glb 를 assets/js/map-model.js 안에 base64 로 박아 넣는다.
+# assets/model/apro-b3-b4.glb 를 assets/js/map-model.js 안에 base64 로 박아 넣는다.
 #
 # 왜 필요한가: 지도는 3D 모델(.glb)이다. 브라우저는 file:// 로 연 페이지에서
 # fetch / XHR 로 로컬 파일을 읽는 것을 교차 출처로 막는다. 그냥 열면 지도가 안 뜬다.
@@ -20,10 +20,10 @@ except Exception:
     pass
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-GLB = os.path.join(ROOT, "assets", "model", "apro-4f.glb")
+GLB = os.path.join(ROOT, "assets", "model", "apro-b3-b4.glb")
 OUT = os.path.join(ROOT, "assets", "js", "map-model.js")
 
-HEAD = """// 지도 3D 모델 — assets/model/apro-4f.glb 를 base64 로 담고 있다.
+HEAD = """// 지도 3D 모델 — assets/model/apro-b3-b4.glb 를 base64 로 담고 있다.
 //
 // 손으로 고치지 말 것. 모델을 다시 내보낸 뒤 python tools/inline-model.py 로 다시 만든다.
 // 왜 이렇게 싣는지는 그 파일 머리에 적어 두었다(file:// 에서 fetch 가 막힌다).
