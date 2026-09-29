@@ -1,0 +1,5 @@
+/*
+ * 가운뎃점(·) 대신 — 한 줄 안의 조각(span.t-part)을 간격으로 가른다.
+ * 조각은 screen.js 의 APRISM_TEXT.fill() 이 만든다. 인라인이라 말줄임(text-overflow)도 그대로 먹는다.
+ */
+.t-part + .t-part { margin-left: 0.6em; }

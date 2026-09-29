@@ -1,3 +1,37 @@
+/*
+ * 가운뎃점(·)으로 잇던 문구는 화면에 점을 찍지 않는다. 조각마다 따로 된 텍스트(span.t-part)로 싣고
+ * 사이는 간격이 가른다(assets/css/text-parts.css). 데이터는 "A · B" 그대로 둬도 된다 —
+ * 그리는 자리에서 APRISM_TEXT.fill() 이 나눈다. 배열을 넘기면 배열 그대로 조각이 된다.
+ *
+ *   fill(node, text)   text 를 조각으로 나눠 node 에 싣는다. 조각이 하나면 textContent 와 같다.
+ *   parts(text)        "A · B" -> ["A", "B"]
+ *   plain(text, glue)  속성(title · alt)처럼 요소를 못 넣는 곳 — 조각을 glue(기본 줄바꿈)로 잇는다.
+ */
+window.APRISM_TEXT = (function () {
+  "use strict";
+  var DOT = /\s+\u00b7\s+/;
+  function parts(text) {
+    if (Array.isArray(text)) { return text.filter(function (p) { return p !== "" && p != null; }).map(String); }
+    return String(text == null ? "" : text).split(DOT).filter(function (p) { return p !== ""; });
+  }
+  function fill(node, text) {
+    if (!node) { return node; }
+    var list = parts(text);
+    node.classList.toggle("t-split", list.length > 1);
+    if (list.length < 2) { node.textContent = list[0] || ""; return node; }
+    node.textContent = "";
+    list.forEach(function (p) {
+      var span = document.createElement("span");
+      span.className = "t-part";
+      span.textContent = p;
+      node.appendChild(span);
+    });
+    return node;
+  }
+  function plain(text, glue) { return parts(text).join(glue == null ? "\n" : glue); }
+  return { fill: fill, parts: parts, plain: plain };
+})();
+
 // 화면 안의 동작. 셋이다 — AI 요약 여닫기, 사이트 패널 접기, 로봇 선택.
 //
 // 데이터는 이 파일 안에 있다. 서버가 없는 퍼블리싱이라 검토용 값만 들고 있으면 된다.

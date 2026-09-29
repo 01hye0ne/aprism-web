@@ -1,0 +1,200 @@
+/*
+ * 지도 위 표식 — 층 이동 · 계단 입구 칩 · 도커.
+ * 자리와 내용은 assets/js/map.js 가 채운다. 모두 .map-canvas 안에 absolute 로 선다.
+ */
+
+/* 축소 아이콘 — 확대(--ic-zoom-in) 돋보기에서 + 를 - 로 바꾼 것 */
+:root { --ic-zoom-out: url("data:image/svg+xml,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2020%2020%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20fill-rule%3D%22evenodd%22%20clip-rule%3D%22evenodd%22%20d%3D%22M8.75%202.08333C6.98189%202.08333%205.2862%202.78571%204.03595%204.03595C2.78571%205.2862%202.08333%206.98189%202.08333%208.75C2.08333%2010.5181%202.78571%2012.2138%204.03595%2013.464C5.2862%2014.7143%206.98189%2015.4167%208.75%2015.4167C10.5181%2015.4167%2012.2138%2014.7143%2013.464%2013.464C14.7143%2012.2138%2015.4167%2010.5181%2015.4167%208.75C15.4167%206.98189%2014.7143%205.2862%2013.464%204.03595C12.2138%202.78571%2010.5181%202.08333%208.75%202.08333ZM8.75%204.58333C9.85507%204.58333%2010.9149%205.02232%2011.6963%205.80372C12.4777%206.58512%2012.9167%207.64493%2012.9167%208.75C12.9167%209.85507%2012.4777%2010.9149%2011.6963%2011.6963C10.9149%2012.4777%209.85507%2012.9167%208.75%2012.9167C7.64493%2012.9167%206.58512%2012.4777%205.80372%2011.6963C5.02232%2010.9149%204.58333%209.85507%204.58333%208.75C4.58333%207.64493%205.02232%206.58512%205.80372%205.80372C6.58512%205.02232%207.64493%204.58333%208.75%204.58333ZM6.5%208.75C6.5%208.33579%206.83579%208%207.25%208H10.25C10.6642%208%2011%208.33579%2011%208.75C11%209.16421%2010.6642%209.5%2010.25%209.5H7.25C6.83579%209.5%206.5%209.16421%206.5%208.75ZM12.8333%2013C13.2015%2012.6318%2013.7985%2012.6318%2014.1667%2013L17.25%2016.0833C17.6182%2016.4515%2017.6182%2017.0485%2017.25%2017.4167C16.8818%2017.7849%2016.2849%2017.7849%2015.9167%2017.4167L12.8333%2014.3333C12.4651%2013.9651%2012.4651%2013.3682%2012.8333%2013Z%22%20fill%3D%22%235D6063%22%2F%3E%3C%2Fsvg%3E"); }
+
+/* ---------- 층을 옮기는 시연 로봇의 마커(골라지지 않았을 때) ----------
+ * 지도에 보이는 로봇은 골라진 한 대(.map-bot)다. 층 이동 시연 로봇이 골라져 있지 않을 때만
+ * 이름표 크기의 이 마커로 보인다.
+ * 층을 오가는 로봇이 계단에 들어설 때 계단 지점으로 줄며(.is-shrink) 사라지고,
+ * 다른 층에서 나타날 때 떠오른다(.is-appear).
+ */
+.tr-pill {
+  position: absolute;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 8px 2px 3px;
+  border-radius: var(--radius-pill, 999px);
+  background: var(--bg-surface-default, #1b2230);
+  color: var(--fg-primary, #e0e3e9);
+  font: 500 11px/1.5 "SUIT", sans-serif;
+  white-space: nowrap;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+  transition: transform 260ms cubic-bezier(0.4, 0, 0.2, 1), opacity 260ms ease;
+}
+
+.tr-pill i {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--tint);
+  box-shadow: 0 0 0 2px var(--bg-canvas, #070a10), 0 0 0 3px var(--tint);
+}
+
+.tr-pill.is-shrink { transform: translate(-50%, -50%) scale(0.3); opacity: 0; }
+.tr-pill.is-appear { animation: tr-in 420ms cubic-bezier(0.2, 0.8, 0.2, 1); }
+
+@keyframes tr-in {
+  from { transform: translate(-50%, -50%) scale(0.3); opacity: 0; }
+  to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
+/* 층을 옮긴 뒤 도착한 층을 줌아웃해 둘러볼 때 — 로봇 표식을 한 번씩 반짝여 어디 있는지 찾게 한다. */
+.tr-pill.is-ping { animation: tr-ping 0.6s ease 3; }
+
+@keyframes tr-ping {
+  50% { box-shadow: 0 0 0 5px color-mix(in srgb, var(--tint) 45%, transparent), 0 2px 8px rgba(0, 0, 0, 0.45); }
+}
+
+.map-bot.is-ping .map-bot-halo { animation: tr-halo 0.6s ease 3; }
+
+@keyframes tr-halo { 50% { opacity: 0.45; } }
+
+/* ---------- 층 이동 배지(비트래킹) ----------
+ * 로봇이 계단에 들어서면 마커 대신 계단 자리에 "↓ B4 이동" 이 잠시 남는다.
+ */
+.tr-badge {
+  position: absolute;
+  z-index: 3;
+  transform: translate(-50%, -50%);
+  padding: 3px 9px;
+  border: 1px solid var(--tint, #34c759);
+  border-radius: var(--radius-pill, 999px);
+  background: rgba(7, 10, 16, 0.88);
+  color: var(--tint, #34c759);
+  font: 700 11px/1.4 "SUIT", sans-serif;
+  white-space: nowrap;
+  pointer-events: none;
+  animation: tr-in 220ms ease;
+  transition: opacity 400ms ease;
+}
+
+.tr-badge.is-leaving { opacity: 0; }
+
+/* ---------- 층 이동 칩(트래킹) — 로봇 위 "B3 → B4 이동 중" ---------- */
+.tr-chip {
+  position: absolute;
+  z-index: 4;
+  transform: translate(-50%, -100%);
+  padding: 3px 10px;
+  border: 1px solid var(--border-default, #2a3446);
+  border-radius: var(--radius-pill, 999px);
+  background: var(--bg-surface-default, #1b2230);
+  color: var(--fg-primary, #e0e3e9);
+  font: 600 11px/1.4 "SUIT", sans-serif;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.tr-chip::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-right: 6px;
+  border-radius: 50%;
+  background: #34c759;
+  vertical-align: 1px;
+  animation: tr-blink 1s ease-in-out infinite;
+}
+
+@keyframes tr-blink { 50% { opacity: 0.25; } }
+
+/* ---------- 층 선택기 — 로봇이 도착하는 층 · 트래킹 중 옮겨 가는 층 ----------
+ * 층별 로봇 수는 달지 않는다(우측 로봇 목록과 수가 맞지 않아 틀린 정보로 읽혔다).
+ */
+.map-floor { position: relative; }
+
+.map-floor.is-arriving { animation: tr-pulse 0.9s ease 3; }
+
+.map-floor.is-arriving::before {
+  content: attr(data-arrow);
+  position: absolute;
+  top: 50%;
+  left: -14px;
+  transform: translateY(-50%);
+  color: #34c759;
+  font: 700 12px/1 "SUIT", sans-serif;
+}
+
+@keyframes tr-pulse { 50% { box-shadow: 0 0 0 4px rgba(52, 199, 89, 0.35); } }
+
+.map-floor.is-moving { outline: 1.5px dashed #34c759; outline-offset: -2px; }
+
+/* ---------- 계단 입구 칩 — 두 층을 잇는 계단에만 "↓ B4" · "↑ B3" ---------- */
+.stair-tag {
+  position: absolute;
+  z-index: 2;
+  transform: translate(-50%, -50%);
+  padding: 2px 7px;
+  border: 1px solid var(--color-main-600, #4990e0);
+  border-radius: var(--radius-pill, 999px);
+  background: rgba(7, 10, 16, 0.82);
+  color: #c7ddf8;
+  font: 700 10px/1.4 "SUIT", sans-serif;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* ---------- 도커 — 출발점이자 복귀점. 아이콘 하나에 두 상태 ----------
+ * 둘레 고리가 한 바퀴 진행(--p, 0~1)만큼 차고, 위쪽 눈금이 출발 · 복귀 자리다.
+ */
+.map-dock {
+  position: absolute;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transform: translate(-14px, -50%);
+  pointer-events: none;
+}
+
+.map-dock-ic {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  color: var(--tint, #89b9ed);
+  background: conic-gradient(var(--tint, #89b9ed) calc(var(--p, 0) * 360deg), #2a3446 0);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+}
+
+.map-dock-ic::before {
+  content: "";
+  position: absolute;
+  inset: 2.5px;
+  border-radius: 6px;
+  background: var(--bg-surface-default, #1b2230);
+}
+
+.map-dock-ic svg { position: relative; }
+
+.map-dock-ic::after {
+  content: "";
+  position: absolute;
+  top: -3px;
+  left: 50%;
+  width: 2px;
+  height: 6px;
+  margin-left: -1px;
+  border-radius: 1px;
+  background: #e0e3e9;
+}
+
+.map-dock-txt {
+  padding: 1px 7px;
+  border-radius: var(--radius-pill, 999px);
+  background: rgba(7, 10, 16, 0.85);
+  color: #d1d5de;
+  font: 600 10px/1.5 "SUIT", sans-serif;
+  white-space: nowrap;
+}

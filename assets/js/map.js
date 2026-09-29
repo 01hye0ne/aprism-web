@@ -84,11 +84,14 @@
    * 00_floor / 01_wall / 02_equipment / 03_stairs.
    * 그래서 벽은 물러나고 설비가 앞으로 나오게 제대로 가를 수 있다.
    *
+   * 면은 모두 채운다(불투명). 예전에는 벽 45% · 설비 60% 로 비쳐 보이게 깔았는데 구조물끼리
+   * 구분이 안 되고 X-ray 처럼 읽혔고, 벽 뒤 설비는 탑뷰에서만 보였다. 앞을 가린 것만 골라
+   * 비치게 하는 일은 아래 OPT(Focus Point 가림 판정)가 맡는다.
+   *
    *   face  덩이 면
    *   line  외곽선이 기본으로 갖는 진하기
-   *   alpha 덩이 면의 기본 불투명도. 벽 · 설비 · 계단을 비쳐 보이게 깔아 웨이포인트 · 경로가
-   *         건물 뒤에 있어도 보이게 한다(피드백: "회색 톤이 다 비슷해 강약이 없다"). 바닥만 1 이다 —
-   *         판이 비치면 지도 전체가 떠 보인다. 모서리 선(line)은 그대로 둬서 건물 모양은 선이 잡는다.
+   *   lift  면을 제 색으로 스스로 밝히는 정도(emissive). 반구광이 옆면을 바닥만큼 눌러서
+   *         (옆면 밝기 32 · 바닥 29) 채운 벽이 외곽선만 남은 유리판처럼 읽혔다. 바닥 < 벽 < 설비 사다리를 세운다.
    *   peak  보고 있는 자리에 들어왔을 때 선이 올라가는 끝. 바닥은 안 올린다 —
    *         바닥은 판이라 모서리가 건물을 가로지르는 긴 선이고, 그것이 밝아지면
    *         화면을 가로지르는 줄이 하나 생긴다
@@ -103,12 +106,46 @@
    * 모르는 이름은 other 로 떨어진다. 레이어를 더 늘리면 여기에 한 줄 보태면 된다.
    */
   var PALETTE = {
-    floor:     { face: 0x18202e, line: 0.25, peak: 0.25, alpha: 1 },
-    wall:      { face: 0x2e3a4e, line: 0.7, peak: 0.9, alpha: 0.45 },
-    equipment: { face: 0x41506a, line: 0.7, peak: 1, alpha: 0.6 },
-    stairs:    { face: 0x36435a, line: 0.32, peak: 0.5, alpha: 0.4 },
-    other:     { face: 0x36435a, line: 0.7, peak: 0.95, alpha: 0.55 }
+    floor:     { face: 0x18202e, line: 0.25, peak: 0.25, lift: 0 },
+    wall:      { face: 0x3a475f, line: 0.7, peak: 0.9, lift: 0.55 },
+    equipment: { face: 0x41506a, line: 0.7, peak: 1, lift: 0.4 },   // 면 색은 AS-IS 그대로
+    stairs:    { face: 0x34405a, line: 0.32, peak: 0.5, lift: 0.45 },
+    other:     { face: 0x36435a, line: 0.7, peak: 0.95, lift: 0.4 }
   };
+
+  /*
+   * 지도 설정.
+   *
+   *   Focus Point 가림 판정 — 대상(Focus Point · 로봇)과 카메라 사이에 낀 구조물만 비친다.
+   *   radius     판정 영역 반지름(px). 24~40.
+   *   enter      구조물이 판정 영역을 이 비율 이상 가리면 투명해진다(20%).
+   *   leave      투명해진 것은 이 밑으로 내려가야 돌아온다 — 문턱에서 깜빡이지 않게 한다.
+   *   fadeTo     대상을 직접 가린 구조물(카메라 -> 대상 중심선에 걸린 것)의 면 불투명도.
+   *   fadeSoft   판정 영역만 일부 가린 구조물의 면 불투명도. 설비는 가려도 이 밑으로 안 내린다.
+   *              둘 다 모서리 선은 거의 그대로 둬서 "벽이 사라졌다"가 아니라 "벽 너머가 비친다"로 읽히게 한다
+   *              (14% 로 두었더니 벽이 통째로 없어진 것처럼 보였다).
+   *   samples    판정 영역에 뿌리는 광선 수. 비율의 해상도다.
+   *   topPitch   이 각도보다 위에서 내려다보면 영역 판정을 쉰다 — 탑뷰에선 벽이 아무것도 가리지 않는다.
+   *   robotTarget 로봇도 늘 대상이다 — 누르지 않아도 로봇을 가린 구조물은 투명해진다.
+   *
+   *   routeGhost 벽 뒤로 들어간 경로를 옅게 비쳐 보인다(벽을 채우면 경로가 끊겨 보인다).
+   *   stairTags  두 층을 잇는 계단 입구에 "↓ B4" · "↑ B3" 칩을 단다.
+   *   arriveOverview 직접 층을 옮기면(층 버튼 · 계단) 도착한 층을 줌아웃해 한눈에 담는다. 트래킹 이동은 제외.
+   */
+  var OPT = {
+    radius: 32,
+    enter: 0.2,
+    leave: 0.12,
+    fadeTo: 0.35,
+    fadeSoft: 0.55,
+    samples: 48,
+    topPitch: 75,
+    robotTarget: true,
+    routeGhost: true,
+    stairTags: true,
+    arriveOverview: true
+  };
+
   var EDGE = 0x7b8fb4;    // 외곽선 — 어디서나 같은 색이다
   var GHOST = 0x6a7890;   // 투명해질 때 다가가는 색
   var GRID = 0x1f2a3c;    // 바닥에 깔리는 격자
@@ -169,25 +206,7 @@
   // 모델을 이 크기(가장 긴 변)로 키워서 다룬다. 이유는 build() 에 적어 두었다.
   var SPAN_UNITS = 120;
 
-  /*
-   * 확대할수록 앞을 가린 것이 비쳐 보인다.
-   *
-   * 카메라와 보는 지점 사이에 실제로 걸리는 덩이만 낮춘다.
-   *
-   *   1단계 보통   전부 100
-   *   2단계 집중   가린 것 35 · 나머지 100
-   *   3단계 X-ray  가린 것 15 · 나머지 100
-   *
-   * 가리지 않은 것은 손대지 않는다. 예전에는 먼 것도 55~96 으로 같이 낮춰서
-   * 보는 자리를 도드라지게 했는데, 그러면 그 면들이 depthWrite 를 놓는다(문턱 95).
-   * 깊이를 안 쓰면 뒤에 있는 모서리 선이 앞면을 뚫고 올라온다 — 벽 한가운데를
-   * 가로지르는 줄이 그렇게 생겼다. 바닥 모서리가 벽을 뚫고 비친 것이었다.
-   *
-   * 위계는 이제 면이 아니라 모서리 선이 나른다. 보는 자리는 선이 peak 까지 오르고
-   * 배경은 기본값 밑으로 내려간다. 면은 언제나 단단하다.
-   */
-  var FOCUS_ZOOM = 1.3;   // 여기부터 2단계
-  var XRAY_ZOOM = 1.9;    // 여기부터 3단계 — 아직 건물이 보이는 배율이라야 뜻이 있다
+  // 앞을 가린 것만 비쳐 보이는 규칙은 plan() 에 있다(Focus Point · 로봇 가림 판정).
   var EASE = 0.08;        // 한 프레임에 목표치로 다가가는 정도
   var SETTLED = 0.002;
 
@@ -207,6 +226,7 @@
   var THREE = null;
   var merge = null;       // BufferGeometryUtils.mergeGeometries
   var Fat = null;         // 굵은 선 셋 — Line2 · LineMaterial · LineGeometry
+  var Bvh = null;         // three-mesh-bvh — 없으면 null
 
   var tally = 0;          // 설비 번호 매기기
   var picked = null;      // 지금 눌린 설비(meshes 의 한 항목)
@@ -276,9 +296,34 @@
     if (!renderer) { return; }
     var w = view.clientWidth, h = view.clientHeight;
     if (!w || !h) { return; }
+    renderer.setSize(w, h, false);
+    aim();
+    // 굵은 선은 제 굵기를 재려면 화면 크기를 알아야 한다.
+    fatMats.forEach(function (mat) { mat.resolution.set(w, h); });
+
+    // 실루엣은 보는 쪽이 달라지면 같이 달라진다. 카메라를 옮길 때마다 다시 센다.
+    if (picked) { drawOutline(pickPens, picked); }
+    if (hovered && hovered !== picked) { drawOutline(hoverPens, hovered); }
+
+    syncStairTags();   // 계단 입구 표
+    syncDock();        // 도커 — 시작 · 복귀 한 아이콘
+    travelSync();   // 층 이동 — 층마다 선을 켜고 끄고 표식을 놓는다
+    renderer.render(scene, camera);
+    placeCard();
+    placeBot();
+    placeWp();
+  }
+
+  /*
+   * 카메라만 지금 각도 · 배율 · 자리로 맞춘다(그리지는 않는다).
+   * frame() 에서 떼어 냈다 — plan() 은 frame() 보다 먼저 불리는 일이 많아서
+   * 광선 판정이 한 프레임 전 카메라로 돌았다. 판정 전에 이것부터 부른다.
+   */
+  function aim() {
+    var w = view.clientWidth, h = view.clientHeight;
+    if (!camera || !w || !h) { return; }
     orient();
     fitBase();
-    renderer.setSize(w, h, false);
 
     /*
      * 투시는 아주 조금만 준다.
@@ -314,17 +359,8 @@
     camera.position.copy(look).addScaledVector(dirV, eye);
     camera.up.copy(upOnGround);
     camera.lookAt(look);
-    // 굵은 선은 제 굵기를 재려면 화면 크기를 알아야 한다.
-    fatMats.forEach(function (mat) { mat.resolution.set(w, h); });
-
-    // 실루엣은 보는 쪽이 달라지면 같이 달라진다. 카메라를 옮길 때마다 다시 센다.
-    if (picked) { drawOutline(pickPens, picked); }
-    if (hovered && hovered !== picked) { drawOutline(hoverPens, hovered); }
-
-    renderer.render(scene, camera);
-    placeCard();
-    placeBot();
-    placeWp();
+    camera.updateMatrixWorld();
+    camera.matrixWorldInverse.copy(camera.matrixWorld).invert();
   }
 
   // 창 한 픽셀이 월드에서 갖는 길이. 이동과 확대 셈이 전부 이 값으로 돈다.
@@ -382,6 +418,11 @@
     var p = local(event);
     // deltaMode 가 줄(1)·쪽(2)이면 픽셀로 환산한다 — 파이어폭스가 줄 단위로 준다.
     var d = event.deltaY * (event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? 100 : 1);
+    // 한동안 쉬었다 다시 굴리면 새 확대다 — 그 자리를 Focus Point 로 찍는다.
+    // 한 번 굴리는 동안에는 다시 찍지 않는다. 커서가 조금 흔들려도 기준이 따라 흔들리지 않는다.
+    var now = Date.now();
+    if (now - wheelAt > WHEEL_GAP && d < 0) { setFocusAt(p.x, p.y); }
+    wheelAt = now;
     zoomAt(zoom * Math.pow(WHEEL_STEP, -d), p.x, p.y);
   }, { passive: false });
 
@@ -443,6 +484,7 @@
       mode = "pinch";
       gap = spread();
       mid = middle();
+      setFocusAt(mid.x, mid.y);   // 핀치 확대를 시작한 자리
     } else {
       mode = "";   // 셋 이상은 아무것도 안 한다 — 손이 미끄러진 것이다.
     }
@@ -514,12 +556,15 @@
      */
     if (!down.length && from && !stirred && from.button === 0 && event.type === "pointerup") {
       var p = local(event);
+      setFocusAt(p.x, p.y);       // 누른 자리가 Focus Point 다
       // 웨이포인트가 먼저다. 설비 위에 겹쳐 있어도 작은 표식을 노린 손이 이긴다.
       var mark = wpAt(p.x, p.y);
       var item = mark ? null : pickAt(p.x, p.y);
+      var hop = null;
       if (mark) { chooseWaypoint(mark.id === chosenWp ? null : mark.id, "map"); }
       // 설비가 먼저다. 설비가 아닌 자리에서 계단을 눌렀으면 그 계단으로 층을 옮긴다.
-      else if (!item && stairAt(p.x, p.y)) { goFloor(otherFloor(), "stairs"); }
+      // 계단이 잇는 층으로 간다. 모델 밖으로 오르는 계단(B2 행)은 눌러도 가지 않는다.
+      else if (!item && (hop = stairTo(p.x, p.y))) { goFloor(hop.floor, "stairs", hop.at); }
       else { choose(item); }
     }
     if (!down.length) { from = null; stirred = false; }
@@ -540,7 +585,7 @@
     var mark = wpAt(p.x, p.y);
     var on = mark ? null : pickAt(p.x, p.y);
     // 계단도 누를 수 있다 — 손 모양으로만 알린다(계단은 고르는 것이 아니라 지나가는 곳이다).
-    hit.classList.toggle("is-picking", !!(mark || on || (!on && stairAt(p.x, p.y))));
+    hit.classList.toggle("is-picking", !!(mark || on || (!on && stairTo(p.x, p.y))));
 
     // 이미 고른 것에는 hover 선을 덧그리지 않는다. 두 선이 겹치면 지저분해진다.
     if (on === hovered) { return; }
@@ -564,6 +609,7 @@
   // Esc 로도 놓는다. 카드가 가린 자리를 보려는데 닫을 데를 찾아야 하면 번거롭다.
   document.addEventListener("keydown", function (event) {
     if (event.key === "Escape" && picked) { choose(null); }
+    if (event.key === "Escape" && focus) { clearFocus(); plan(); }
   });
 
   hit.addEventListener("pointerup", lift);
@@ -575,10 +621,22 @@
     event.preventDefault();
   });
 
+  // 축소 — 확대 버튼과 같은 걸음(BUTTON_STEP)으로 칸 한가운데를 기준으로 물러난다.
+  // 멀어지는 것이라 Focus Point 는 새로 찍지 않는다.
+  var zoomOut = document.querySelector("[data-map-zoom-out]");
+  if (zoomOut) {
+    zoomOut.addEventListener("click", function () {
+      var f = focusPoint();
+      zoomAt(zoom / BUTTON_STEP, f.x, f.y);
+    });
+  }
+
   var zoomIn = document.querySelector("[data-map-zoom-in]");
   if (zoomIn) {
     zoomIn.addEventListener("click", function () {
       var f = focusPoint();
+      // 이미 찍힌 기준이 있으면 그대로 둔다. 없을 때만 칸 한가운데를 한 번 찍는다.
+      if (!focus) { setFocusAt(f.x, f.y); }
       zoomAt(zoom * BUTTON_STEP, f.x, f.y);
     });
   }
@@ -589,8 +647,9 @@
    */
   var trip = null;
   // dest 를 주면 보는 지점을 그 자리로 몰고 간다. 안 주면 지금 자리에 둔다.
-  function glide(nextYaw, nextPitch, nextZoom, dest) {
+  function glide(nextYaw, nextPitch, nextZoom, dest, duration) {
     if (!renderer) { return; }
+    var glideMs = duration || 320;
     var from = { yaw: yaw, pitch: pitch, zoom: zoom, t: target.clone() };
     /*
      * 프레임 수가 아니라 시간으로 센다.
@@ -614,7 +673,7 @@
     (function step() {
       if (trip !== mine) { return; }
       var now = (window.performance && performance.now) ? performance.now() : Date.now();
-      var at = Math.min(1, (now - began) / 320);
+      var at = Math.min(1, (now - began) / glideMs);
       put(at);
       if (at < 1) { window.requestAnimationFrame(step); }
       else { trip = null; }
@@ -630,7 +689,7 @@
       if (trip !== mine) { return; }
       put(1);
       trip = null;
-    }, 360);
+    }, glideMs + 40);
   }
 
   // 한 바퀴 넘게 돌려 놨으면 가까운 쪽으로 되감는다 — 몇 바퀴를 거꾸로 풀면 어지럽다.
@@ -646,6 +705,7 @@
   if (reset) {
     reset.addEventListener("click", function () {
       unwind(HOME_YAW);
+      clearFocus();               // 전체 보기는 기준을 푼다
       glide(HOME_YAW, HOME_PITCH, 1, home);
     });
   }
@@ -727,13 +787,16 @@
   // 지오메트리 하나에 면 재질과 모서리 선을 입혀 돌려준다. fid 는 이 덩이가 선 층이다.
   function outfit(geo, key, fid) {
     var skin = PALETTE[key];
+    var alpha = 1;
     var mat = new THREE.MeshStandardMaterial({
       color: skin.face,
       roughness: 0.85,
       metalness: 0.05,
       transparent: true,
-      opacity: skin.alpha,
-      depthWrite: skin.alpha >= 1
+      opacity: alpha,
+      depthWrite: alpha >= 1,
+      // 면을 채우면 모서리 선이 면과 같은 깊이에서 다툰다. 면을 살짝 뒤로 민다.
+      polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1
     });
     var mesh = new THREE.Mesh(geo, mat);
     // 덩이는 바닥에 그림자를 드리우고, 서로의 그림자도 받는다.
@@ -746,6 +809,12 @@
       opacity: skin.line
     });
     mesh.add(new THREE.LineSegments(new THREE.EdgesGeometry(geo, 25), edgeMat));
+    // 위층 바닥의 계단실 구멍만 셰이더로 뚫는다. 층 전환 효과에는 사용하지 않는다.
+    if (fid) {
+      mat.onBeforeCompile = stairHoleFor(fid, key === "floor");
+      edgeMat.onBeforeCompile = stairHoleFor(fid, key === "floor");
+      mat.customProgramCacheKey = edgeMat.customProgramCacheKey = function () { return key === "floor" ? "stair-hole-slab" : "stair-hole"; };
+    }
 
     geo.computeBoundingBox();
     meshes.push({
@@ -761,8 +830,10 @@
       center: geo.boundingBox.getCenter(new THREE.Vector3()),
       line: skin.line,
       peak: skin.peak,
-      alpha: skin.alpha,
-      now: skin.alpha, want: skin.alpha,
+      alpha: alpha,
+      now: alpha, want: alpha,
+      faded: false,     // Focus Point 판정으로 투명해져 있나(히스테리시스)
+      cover: 0,         // 판정 영역을 가린 비율 0~1
       edgeNow: skin.line, edgeWant: skin.line,
       // 눌리면 파랗게 물든다. 0 이 제 색, 1 이 다 물든 색.
       glowNow: 0, glowWant: 0
@@ -1488,7 +1559,8 @@
       new THREE.BufferGeometry().setFromPoints([spot]),
       new THREE.PointsMaterial({
         color: color, map: dockTexture(), size: 20, sizeAttenuation: false,
-        transparent: true, opacity: 0.95, depthWrite: false
+        transparent: true, opacity: 0.95, depthWrite: false,
+        depthTest: false   // 벽을 채워도 표식은 가려지지 않는다
       })
     );
     mark.renderOrder = 3;
@@ -1500,7 +1572,8 @@
       new THREE.BufferGeometry().setFromPoints(spots),
       new THREE.PointsMaterial({
         color: color, map: stopTexture(kind), size: size || 15, sizeAttenuation: false,
-        transparent: true, opacity: 0.95, depthWrite: false
+        transparent: true, opacity: 0.95, depthWrite: false,
+        depthTest: false   // 벽을 채워도 표식은 가려지지 않는다
       })
     );
     // 길보다 나중에 그린다. 굵어진 길이 점을 덮어 버리기 때문이다.
@@ -1580,7 +1653,9 @@
     // 길을 목록 수만큼 잘라 그 경계에 놓는다. 목록이 일곱이면 일곱, 아홉이면 아홉이다.
     var bucket = {};
     list.forEach(function (info, i) {
-      var spot = alongRoute(onLane.turns, onLane.mile, onLane.total * (i / list.length));
+      // 웨이포인트 좌표가 있으면 그 중심에 놓는다(길이 그 중심을 지난다). 없으면 예전처럼 길을 등분.
+      var spot = onLane.wps && onLane.wps[i] ? onLane.wps[i].clone()
+        : alongRoute(onLane.turns, onLane.mile, onLane.total * (i / list.length));
       wpSpots.push({ id: info.id, spot: spot, info: info });
       (bucket[info.tone] = bucket[info.tone] || []).push(spot);
     });
@@ -1632,6 +1707,7 @@
    * resolution 을 다시 넣어 줘야 한다(frame() 에서 한다).
    */
   var fatMats = [];
+  var ghosts = [];   // 벽 뒤 경로의 옅은 선
 
   function strand(points, color, dashed) {
     var flat = [];
@@ -1656,6 +1732,23 @@
     var line = new Fat.Line2(geo, mat);
     line.computeLineDistances();
     line.renderOrder = 2;
+
+    /*
+     * 벽 뒤로 들어간 토막 — 같은 선을 깊이 검사 없이 옅게 한 벌 더 깐다.
+     * 채운 벽 앞에서는 본 선이, 벽 뒤에서는 이 옅은 선만 보인다. 길이 끊겨 읽히지 않게 한다.
+     * 선의 자식이라 길을 켜고 끌 때 같이 따라간다.
+     */
+    var ghostMat = mat.clone();
+    ghostMat.depthTest = false;
+    ghostMat.opacity = mat.opacity * 0.3;
+    ghostMat.resolution.copy(mat.resolution);
+    fatMats.push(ghostMat);
+    var ghost = new Fat.Line2(geo, ghostMat);
+    ghost.computeLineDistances();
+    ghost.renderOrder = 1;
+    ghost.visible = OPT.routeGhost;
+    ghosts.push(ghost);
+    line.add(ghost);
     return line;
   }
 
@@ -1759,7 +1852,7 @@
         var dt = document.createElement("dt");
         var dd = document.createElement("dd");
         dt.textContent = fact[0];
-        dd.textContent = fact[1];
+        window.APRISM_TEXT.fill(dd, fact[1]);
         line.appendChild(dt);
         line.appendChild(dd);
         botRows.appendChild(line);
@@ -1805,10 +1898,10 @@
     var info = found.info;
     wpBox.setAttribute("data-result", info.tone);
     if (wpChip) { wpChip.textContent = WP_WORD[info.tone] || "예정"; }
-    if (wpName) { wpName.textContent = info.id + " · " + (info.name || "waypoint"); }
+    if (wpName) { window.APRISM_TEXT.fill(wpName, [info.id, info.name || "waypoint"]); }
     if (wpRead) {
-      wpRead.textContent = info.read ||
-        (info.kind === "upcoming" ? "아직 가지 않은 자리입니다." : "측정 항목 확인 중");
+      window.APRISM_TEXT.fill(wpRead, info.read ||
+        (info.kind === "upcoming" ? "아직 가지 않은 자리입니다." : "측정 항목 확인 중"));
     }
     wpBox.hidden = false;
     placeWp();
@@ -1882,6 +1975,7 @@
       var found = wpSpots.filter(function (w) { return w.id === chosenWp; })[0];
       if (found && renderer) {
         var z = Math.max(zoom, 2.4);
+        setFocusWorld(found.spot);     // 고른 웨이포인트가 기준이다
         glide(yaw, pitch, z, aimAt(found.spot, z));
       }
     }
@@ -1939,7 +2033,7 @@
     var picked = event.target.closest && event.target.closest(".robot-strip .robot-card[data-robot]");
     if (!picked || picked.hasAttribute("data-robot-offline")) { return; }
     showLane(picked.getAttribute("data-robot"));
-    if (onLane && renderer) { glide(yaw, pitch, Math.max(zoom, 2.2), onLane.here); }
+    if (onLane && renderer) { setFocusWorld(onLane.here); glide(yaw, pitch, Math.max(zoom, 2.2), onLane.here); }
   });
 
   if (botBox) {
@@ -1953,10 +2047,11 @@
     }
   }
 
-  function drawRoute(corners, bot, id) {
+  function drawRoute(corners, bot, id, plan) {
     if (!corners || corners.length < 2) { return; }
     var parts = [];
-    var soft = roundOff(corners);
+    // 계획한 길은 45° · 90° 로 꺾인 그대로 그린다 — 둥글리면 웨이포인트 중심을 비켜 간다.
+    var soft = plan ? { line: corners.map(function (q) { return q.clone(); }) } : roundOff(corners);
     var turns = soft.line;
 
     // 길이를 재서 로봇이 선 자리를 찾는다.
@@ -1971,8 +2066,9 @@
      * 그래서 0.5 를 넘으면 길을 거꾸로 되짚는다. 길 자체는 한 벌만 그린다 —
      * 갈 때와 올 때가 같은 길이라 두 번 그리면 겹쳐서 더 밝아지기만 한다.
      */
-    var back = bot.at > 0.5;
-    var trip = back ? (1 - bot.at) * 2 : bot.at * 2;
+    // 폐회로는 왕복이 아니다 — at 이 한 바퀴(도커 0 -> 도커 1)다.
+    var back = !plan && bot.at > 0.5;
+    var trip = plan ? bot.at : (back ? (1 - bot.at) * 2 : bot.at * 2);
     var mark = total * Math.max(0, Math.min(1, trip));
     var at = 1;
     while (at < mile.length - 1 && mile[at] < mark) { at += 1; }
@@ -1995,7 +2091,8 @@
     // 길을 켤 때 다시 그린다(layWaypoints).
 
     // 도킹 스테이션 — 길의 첫 점이 곧 그 자리다.
-    parts.push(dockMark(turns[0], bot.done));
+    // 폐회로의 도커는 화면 아이콘 하나(syncDock)가 시작 · 복귀를 함께 보인다.
+    if (!plan) { parts.push(dockMark(turns[0], bot.done)); }
 
     parts.forEach(function (part) {
       part.visible = false;
@@ -2024,72 +2121,209 @@
       id: String(id), bot: bot, parts: parts,
       // 웨이포인트를 나중에 다시 놓으려면 길과 그 길이를 들고 있어야 한다.
       turns: turns, mile: mile, total: total,
-      here: here.clone(), ahead: ahead.clone()
+      here: here.clone(), ahead: ahead.clone(),
+      plan: plan || null, wps: plan ? plan.wpWorld : null, dock: turns[0].clone()
     };
   }
 
-  /*
-   * 카메라에서 보는 지점으로 광선을 쏴 그 사이에 걸리는 덩이를 찾는다.
-   * 한가운데 한 줄만 쏘면 정작 눈앞의 벽이 안 걸릴 때가 있어서
-   * 십자로 다섯 줄을 쏜다 — 물건 단위로 합쳐 155개만 훑으면 되니 값이 싸다.
+  /* ---------- Focus Point ----------
+   *
+   * 투명 판정의 기준을 화면 한가운데가 아니라 "사용자가 보려고 한 자리"로 옮긴다.
+   *
+   *   찍히는 때   지도를 누른 자리 · 휠(핀치) 확대를 시작한 자리 · 우측에서 고른 웨이포인트 · 로봇
+   *   붙는 곳     월드 좌표. 벽은 건너뛰고 그 뒤의 바닥 · 설비에 붙는다 — 벽을 누른 손은
+   *               벽이 아니라 벽 너머를 보려는 것이다.
+   *   풀리는 때   [전체 보기] · 층 이동 · Esc
+   *
+   * 화면 가운데를 계속 기준으로 삼으면 판을 밀 때마다 기준이 벽 경계를 넘나들어 구조물이
+   * 깜빡인다. 월드에 붙여 두면 판을 밀거나 돌려도 기준은 같은 물건 위에 남는다.
    */
-  function blocking() {
-    var hitSet = {};
+  var focus = null;        // { world: Vector3, item: meshes 항목 | null }
+  var wheelAt = 0;         // 마지막 휠 시각 — 이만큼 쉬었다 다시 굴리면 새 확대로 친다
+  var WHEEL_GAP = 450;
+  var diskCache = null;
+
+  function currentDeck() {
+    var f = floorOf(floorNow);
+    return f ? f.deck : floorY;
+  }
+
+  // 창 좌표 (px, py) 밑의 바닥 · 설비 한 점. 벽 · 계단은 뚫고 지나간다.
+  function groundAt(px, py) {
+    if (!renderer || !camera) { return null; }
     if (!raycaster) { raycaster = new THREE.Raycaster(); }
-    var reach = span * 0.35;
-    var spots = [
-      target,
-      target.clone().addScaledVector(right, reach),
-      target.clone().addScaledVector(right, -reach),
-      target.clone().addScaledVector(upOnGround, reach),
-      target.clone().addScaledVector(upOnGround, -reach)
-    ];
-    var list = meshes.map(function (item) { return item.mesh; });
-
-    spots.forEach(function (spot) {
-      var from = spot.clone().addScaledVector(dirV, span * 4);
-      var dir = new THREE.Vector3().subVectors(spot, from).normalize();
-      raycaster.set(from, dir);
-      var far = from.distanceTo(spot);
-      // 모서리 선은 자식이라 false 로 두면 안 걸린다 — 면만 센다.
-      raycaster.intersectObjects(list, false).forEach(function (found) {
-        // 보는 지점보다 앞에 있는 것만 가린 것이다.
-        if (found.distance < far - span * 0.02) { hitSet[found.object.uuid] = true; }
-      });
+    var w = view.clientWidth || 1, h = view.clientHeight || 1;
+    raycaster.setFromCamera(new THREE.Vector2((px / w) * 2 - 1, -(py / h) * 2 + 1), camera);
+    var list = [];
+    meshes.forEach(function (item) {
+      if (item.floor && item.floor !== floorNow) { return; }
+      if (item.key === "floor" || item.key === "equipment") { list.push(item.mesh); }
     });
-    return hitSet;
+    var found = raycaster.intersectObjects(list, false)[0];
+    if (found) {
+      var owner = null;
+      for (var i = 0; i < meshes.length; i += 1) {
+        if (meshes[i].mesh === found.object) { owner = meshes[i]; break; }
+      }
+      return { world: found.point.clone(), item: owner && owner.key === "equipment" ? owner : null };
+    }
+    // 바닥 판 밖이면 그 층 바닥 높이의 평면에 떨군다.
+    var plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -currentDeck());
+    var p = new THREE.Vector3();
+    return raycaster.ray.intersectPlane(plane, p) ? { world: p, item: null } : null;
   }
 
-  // 배율에서 단계를 읽는다. 두 문턱 사이는 이어서 섞는다 — 툭 끊기면 어색하다.
-  function level() {
-    if (zoom <= FOCUS_ZOOM) { return 1; }
-    if (zoom >= XRAY_ZOOM) { return 3; }
-    return 2;
+  function setFocusAt(px, py) { focus = groundAt(px, py); }
+  function setFocusWorld(spot) { focus = spot ? { world: spot.clone(), item: null } : null; }
+  function clearFocus() { focus = null; }
+
+  // 판정 영역 안에 고르게 뿌린 점(해바라기 배열). 반지름 1 인 원 기준이다.
+  function disk(n) {
+    if (diskCache && diskCache.length === n) { return diskCache; }
+    var out = [], golden = Math.PI * (3 - Math.sqrt(5));
+    for (var i = 0; i < n; i += 1) {
+      var r = Math.sqrt((i + 0.5) / n), a = i * golden;
+      out.push({ x: r * Math.cos(a), y: r * Math.sin(a) });
+    }
+    diskCache = out;
+    return out;
   }
 
+  /*
+   * 대상(Focus Point · 로봇) 하나와 카메라 사이에 무엇이 끼어 있는지 센다.
+   *
+   * 판정은 두 겹이다.
+   *
+   *   중심선  카메라 -> 대상 한 줄. 여기에 걸린 덩이는 대상을 직접 가린 것이라
+   *           비율과 상관없이 투명해진다. 계단처럼 한 단 한 단이 따로 된 구조물은
+   *           하나하나가 영역의 몇 %만 가려 20% 문턱을 못 넘는데, 모이면 대상을 통째로 덮는다.
+   *   영역    대상 둘레 radius px 에 광선 samples 줄. 한 줄에서 대상보다 카메라 쪽에서 맞은
+   *           덩이가 그 줄을 "가린" 것이다. 앞뒤는 카메라 깊이로 잰다 — 광선마다 대상을 지나는
+   *           화면 평행면까지의 거리를 구해 그보다 앞에서 맞았는지 본다.
+   *
+   * 바닥은 가리는 것이 아니라 받치는 것이라 세지 않는다. 고른 설비 · Focus Point 가 붙은
+   * 설비(skip)도 세지 않는다 — 보려는 그것이 사라지면 안 된다.
+   */
+  function toScreen(world) {
+    var v = world.clone().project(camera);
+    if (v.z > 1 || v.z < -1) { return null; }
+    var w = view.clientWidth || 1, h = view.clientHeight || 1;
+    return { x: (v.x + 1) / 2 * w, y: (1 - v.y) / 2 * h };
+  }
+
+  function coverage(world, skip, area) {
+    var out = { ratio: {}, center: {} };
+    var at = toScreen(world);
+    if (!at) { return out; }
+    if (!raycaster) { raycaster = new THREE.Raycaster(); }
+    var w = view.clientWidth || 1, h = view.clientHeight || 1;
+    var camDir = new THREE.Vector3();
+    camera.getWorldDirection(camDir);
+    var depthF = new THREE.Vector3().subVectors(world, camera.position).dot(camDir);
+    // 제 표면에 맞은 광선만 거를 만큼. 대상에 바짝 붙은 벽도 사이에 끼인 것이다(1.5% 로 두었더니 놓쳤다).
+    var margin = span * 0.002;
+
+    /*
+     * 광선을 쏘기 전에 추린다. 카메라 -> 대상 선분을 판정 반경만큼 두른 원기둥에
+     * 경계구가 닿지도 않는 덩이는 어느 광선에도 걸릴 수 없다. 모두 훑으면 대상 둘에 16ms 가 넘었다.
+     */
+    var toT = new THREE.Vector3().subVectors(world, camera.position);
+    var len = toT.length();
+    var reachW = OPT.radius * perPixel() * 1.5;
+    var closest = new THREE.Vector3();
+    var seg = new THREE.Line3(camera.position, world);
+    var list = [];
+    meshes.forEach(function (item) {
+      if (item.key === "floor") { return; }
+      if (item.floor && item.floor !== floorNow) { return; }
+      if (item === picked || item === skip) { return; }
+      var g = item.mesh.geometry;
+      if (!g.boundingSphere) { g.computeBoundingSphere(); }
+      seg.closestPointToPoint(g.boundingSphere.center, true, closest);
+      if (closest.distanceTo(g.boundingSphere.center) > g.boundingSphere.radius + reachW) { return; }
+      list.push(item.mesh);
+    });
+
+    // 중심선 — 카메라에서 대상까지 곧게 한 줄.
+    raycaster.set(camera.position, toT.normalize());
+    raycaster.intersectObjects(list, false).forEach(function (found) {
+      if (found.distance < len - margin) { out.center[found.object.uuid] = true; }
+    });
+
+    if (area) {
+      var pts = disk(OPT.samples);
+      pts.forEach(function (d) {
+        var sx = at.x + d.x * OPT.radius, sy = at.y + d.y * OPT.radius;
+        raycaster.setFromCamera(new THREE.Vector2((sx / w) * 2 - 1, -(sy / h) * 2 + 1), camera);
+        var cos = raycaster.ray.direction.dot(camDir) || 1;
+        var far = depthF / cos - margin;
+        var seen = {};
+        raycaster.intersectObjects(list, false).forEach(function (found) {
+          if (found.distance >= far || seen[found.object.uuid]) { return; }
+          seen[found.object.uuid] = true;
+          out.ratio[found.object.uuid] = (out.ratio[found.object.uuid] || 0) + 1;
+        });
+      });
+      Object.keys(out.ratio).forEach(function (k) { out.ratio[k] /= pts.length; });
+    }
+    return out;
+  }
+
+  /*
+   * 지금 판정할 대상들. Focus Point 는 사용자가 찍었을 때만 있고,
+   * 로봇은 길이 깔린 층을 보는 동안 늘 대상이다 — 누르지 않아도 벽 뒤에 숨으면 안 된다.
+   * 로봇 표식은 바닥 점에 서므로 몸 높이만큼 살짝 띄워 잰다.
+   */
+  function targets() {
+    var list = [];
+    if (focus) { list.push({ world: focus.world, skip: focus.item }); }
+    if (OPT.robotTarget && onLane && floorNow === (onLane.floor || ROBOT_ON) && !floorBusy) {
+      list.push({ world: onLane.here.clone().add(new THREE.Vector3(0, span * 0.006, 0)), skip: null });
+    }
+    return list;
+  }
+
+  /*
+   * 앞을 가린 것만 비쳐 보인다. 대상(Focus Point · 로봇)과 카메라 사이에 낀 정도로 가른다.
+   *
+   *   중심선에 걸림                투명(벽 · 계단 fadeTo, 설비 fadeSoft)
+   *   가림 >= enter(20%)          투명(fadeSoft). 모서리 선은 거의 그대로 남는다.
+   *   이미 투명 · 가림 >= leave     투명 유지 — 문턱 근처에서 켜졌다 꺼졌다 하지 않는다.
+   *   그 밖                        제 불투명도(채움)
+   *
+   * 선 강조(close → peak)는 Focus Point 둘레에 준다.
+   */
   function plan() {
     if (!meshes.length) { return; }
-    var stage = level();
-    var hits = stage === 1 ? {} : blocking();
-    var near = span * 0.55;
+    // 탑뷰에서는 영역 판정을 쉰다(벽 둘레가 늘 영역에 걸린다). 중심선 판정은 그대로 둔다 —
+    // 위에서 봐도 대상 바로 위를 덮은 것은 대상을 가린 것이다.
+    var topView = pitch * 180 / Math.PI >= OPT.topPitch;
+    aim();
+    var ratio = {}, blockC = {};
+    targets().forEach(function (t) {
+      var r = coverage(t.world, t.skip, !topView);
+      Object.keys(r.center).forEach(function (k) { blockC[k] = true; });
+      if (topView) { return; }
+      Object.keys(r.ratio).forEach(function (k) { ratio[k] = Math.max(ratio[k] || 0, r.ratio[k]); });
+    });
+    var center = focus ? focus.world : target;
+    var near = span * 0.3;
 
     meshes.forEach(function (item) {
-      var blocked = !!hits[item.mesh.uuid];
-      var close = item.center.distanceTo(target) < near;
-      // 기본은 레이어의 불투명도(alpha)다. 가린 덩이는 거기서 더 내려간다.
-      var want = item.alpha, edge = item.line;
+      var c = ratio[item.mesh.uuid] || 0;
+      item.cover = c;
+      item.onLine = !!blockC[item.mesh.uuid];
+      item.faded = item.onLine || (item.faded ? c >= OPT.leave : c >= OPT.enter);
+      var close = focus && item.center.distanceTo(center) < near;
 
-      if (stage === 2) {
-        want = blocked ? Math.min(item.alpha, 0.35) : item.alpha;
-        edge = blocked ? item.line * 0.6 : (close ? item.peak : item.line * 0.8);
-      } else if (stage === 3) {
-        want = blocked ? Math.min(item.alpha, 0.15) : item.alpha;
-        edge = blocked ? item.line * 0.4 : (close ? item.peak : item.line * 0.6);
-      }
+      // 설비는 관제 대상이다. 가려도 주변 가림 수준(fadeSoft) 밑으로는 내리지 않는다 — 통째로 비면
+      // "설비 하나가 사라졌다"로 읽힌다. 깊이 비치는 것은 벽 · 계단 몫이다.
+      var deep = item.onLine && item.key !== "equipment";
+      var want = !item.faded ? item.alpha
+        : Math.min(item.alpha, deep ? OPT.fadeTo : OPT.fadeSoft);
+      var edge = item.faded ? item.line * 0.85 : (close ? item.peak : item.line);
 
-      // 고른 설비는 단계와 상관없이 단단하고 또렷하다.
       if (item === picked) { want = 1; edge = 1; }
-
       item.want = want;
       item.edgeWant = edge;
       item.glowWant = item === picked ? 1 : 0;
@@ -2104,6 +2338,8 @@
    */
   function paintOne(item) {
     var vis = item.floor ? (floorFade[item.floor] || 0) : 1;
+    // 두 층을 잇는 계단은 두 층 어디서 봐도 보인다.
+    if (item.floors) { vis = Math.max(floorFade[item.floors[0]] || 0, floorFade[item.floors[1]] || 0); }
     item.mesh.visible = vis > 0.004;
     item.mat.opacity = item.now * vis;
     // 눌린 설비는 파랗게 물들고, 옅어질수록 납작한 유령색으로 간다.
@@ -2111,9 +2347,19 @@
     // 옅어진 정도는 레이어의 기본 불투명도(alpha)에서 잰다 — 원래 비쳐 보이게 깔린 벽이
     // 처음부터 회색으로 바래면 덩이끼리 색이 다시 비슷해진다.
     var fade = Math.max(0, 1 - item.now / item.alpha);
+    // 채운 판에서는 제 색을 지킨다 — 유령색까지 끝까지 가면 밝은 회색 막이 되어 벽이 읽히지 않는다.
+    fade *= 0.3;
     tone.copy(item.base).lerp(PICKED, item.glowNow);
     item.mat.color.copy(tone).lerp(GHOSTC, fade);
+    item.mat.emissive.copy(tone).multiplyScalar(PALETTE[item.key].lift);
     item.mat.depthWrite = item.now > 0.95 && vis > 0.95;
+    /*
+     * 그리는 차례를 못 박는다. 재질이 전부 transparent 라 three.js 는 덩이 한가운데까지의
+     * 거리로 뒤에서부터 그리는데, 큰 바닥 판의 한가운데가 설비보다 가까우면 옅어진 설비를 먼저 그리고
+     * 바닥이 그 위를 덮어 버렸다(옅어진 것은 깊이를 안 쓰므로 막을 것이 없다) — 35% 여야 할 설비가
+     * 아예 안 보였다. 바닥 -> 단단한 덩이 -> 옅어진 덩이 순서로 그린다.
+     */
+    item.mesh.renderOrder = item.key === "floor" ? -2 : (item.mat.depthWrite ? 0 : 1);
     item.edgeMat.opacity = item.edgeNow * vis;
     // 비쳐 보이게 낮춘 덩이가 그림자만 멀쩡히 남으면 유령이 선 것처럼 보인다.
     item.mesh.castShadow = vis > 0.9 && item.now > item.alpha * 0.5;
@@ -2201,6 +2447,13 @@
     fitBase();
   }
 
+  // 층마다 도면 크기가 달라도 화면상 배율이 순간적으로 튀지 않게 기준 크기 변화만 zoom에 보상한다.
+  function fitFloorKeepingView() {
+    var before = baseSize;
+    fitFloor();
+    if (before > 0 && baseSize > 0) { zoom *= baseSize / before; }
+  }
+
   /* 층 버튼 · 상태바에 지금 층을 알린다. 버튼은 화면마다 있을 수도 없을 수도 있다. */
   function tellFloor() {
     Array.prototype.forEach.call(document.querySelectorAll("[data-map-floor]"), function (btn) {
@@ -2217,6 +2470,9 @@
   // 로봇 · 길 · 웨이포인트는 로봇이 선 층에만 깔린다.
   function layRobots() {
     if (!floors.length) { return; }
+    // 층을 오가는 로봇의 길은 층마다 알아서 켜고 끈다(travelSync). 골라져 있으면 늘 깐다.
+    var ln = lanes[activeRobot()];
+    if (ln && ln.travel) { showLane(activeRobot(), true); return; }
     if (floorNow === ROBOT_ON) { showLane(activeRobot(), true); }
     else { showLane(-1, true); }
   }
@@ -2235,7 +2491,7 @@
    * 어느 쪽이든 순서는 같다 — 떠나는 층이 20% 까지 옅어지고 갈 층이 40% 까지 떠오른 다음,
    * 카메라가 높이를 옮기고, 그제야 갈 층이 100% 로 차오르며 떠나는 층이 사라진다.
    */
-  function goFloor(next, via) {
+  function goFloor(next, via, at) {
     if (!floors.length || next === floorNow) { return; }
     // 옮기는 중에 또 누르면 흘려보내지 않고 적어 두었다가 이어서 간다.
     if (floorBusy) { floorNext = next; return; }
@@ -2243,13 +2499,14 @@
     if (!from || !to) { return; }
 
     floorBusy = true;
+    clearFocus();                      // 다른 층의 기준을 들고 가지 않는다
     choose(null);                      // 옮기는 층의 설비를 고른 채로 남겨 두지 않는다
     var prev = floorNow;
     floorNow = next;
     tellFloor();
     showLane(-1, true);                // 옮기는 동안에는 길을 걷어 둔다
 
-    var stair = via === "stairs" ? from.stairAt : null;
+    var stair = via === "stairs" ? (at || from.stairAt) : null;   // 누른 계단의 입구로 다가간다
     var span0 = target.clone();
     var rise = to.deck - from.deck;
     var dur = stair ? 1400 : 900;
@@ -2287,11 +2544,12 @@
         floorFade[next] = 1;
         home = to.center.clone();
         home.y = span0.y + rise;          // 돌아오는 자리도 새 층 높이다
-        fitFloor();
+        fitFloorKeepingView();
         floorBusy = false;
         layRobots();
         plan();
         repaint();
+        if (!floorNext) { arrivalOverview(via === "stairs" ? 520 : 320); }   // 계단 전환은 한 호흡으로 길게 잇는다
         if (floorNext) {
           var queued = floorNext;
           floorNext = "";
@@ -2299,27 +2557,6 @@
         }
       }
     })();
-  }
-
-  // 층이 둘뿐이라 계단을 누르면 갈 곳은 하나다. 셋 이상이 되면 여기서 고르게 해야 한다.
-  function otherFloor() {
-    for (var i = 0; i < floors.length; i += 1) {
-      if (floors[i].id !== floorNow) { return floors[i].id; }
-    }
-    return "";
-  }
-
-  // 지금 층의 계단을 겨눴는지 본다. 계단은 층을 옮기는 문이다.
-  function stairAt(px, py) {
-    if (!renderer || !camera || floorBusy || floors.length < 2) { return false; }
-    if (!raycaster) { raycaster = new THREE.Raycaster(); }
-    var w = view.clientWidth || 1, h = view.clientHeight || 1;
-    raycaster.setFromCamera(new THREE.Vector2((px / w) * 2 - 1, -(py / h) * 2 + 1), camera);
-    var list = [];
-    meshes.forEach(function (item) {
-      if (item.key === "stairs" && item.floor === floorNow) { list.push(item.mesh); }
-    });
-    return list.length ? raycaster.intersectObjects(list, false).length > 0 : false;
   }
 
   function setupFloors() {
@@ -2334,6 +2571,1036 @@
       btn.addEventListener("click", function () { goFloor(btn.getAttribute("data-map-floor"), "button"); });
     });
   }
+
+  /* ---------- 층 이동 — 로봇이 계단으로 층을 옮긴다 ----------
+   *
+   * 로봇 한 대(ROBOT 02)가 B3 에서 걸어와 계단으로 내려가 B4 출구로 나와 제 길을 잇는다.
+   * 그 로봇이 우측에서 골라져 있으면(= 트래킹) 지도가 따라가고, 아니면 지도는 제자리에 있다.
+   * 모드는 따로 고르지 않는다 — 골라져 있는지(onLane 이 이 로봇의 길인지)로 매 프레임 가른다.
+   *
+   *   트래킹      계단 진입 -> "B3 → B4 이동 중" 칩 · 층 선택기 B4 이동 표시
+   *               -> 카메라가 로봇을 따라 내려가며(수직 이동) 계단 둘레부터 B4 가 드러난다(부분 마스킹)
+   *               -> B4 계단 출구에서 길이 끊기지 않고 이어진다
+   *   비트래킹    계단 진입 -> 마커가 계단 지점으로 줄며(SHRINK) 배지로 바뀐다 -> 배지만 잠시(BADGE)
+   *               -> 층 선택기 B4 에 로봇 수 +1 · 도착 표시 -> B4 로 가 보면 계단 출구에서 나타난다
+   *
+   * 로봇은 출구에서 DWELL 초 자세를 고른다. 실제 로봇도 계단을 내려오면 멈춰 정렬하고,
+   * 그 사이에 층을 옮긴 사람이 "계단 출구에서 나타나는" 것을 볼 수 있다.
+   */
+  var TRAVEL = {
+    SPEED: 7,          // 평지(월드 길이/초)
+    STAIR_SPEED: 3.2,  // 계단
+    DWELL: 2.2,        // 출구에서 멈추는 시간(초)
+    SHRINK: 260,       // 마커가 계단 지점으로 줄어드는 시간(ms) — 200~300
+    BADGE: 2600,       // 배지가 남는 시간(ms)
+    OVERVIEW: 1600     // 수동 층 선택 뒤 전체 보기 유지 시간(ms)
+  };
+  var trav = null;
+  var gridByFloor = {};
+  var stairHole = {};
+  var modelBox = null;
+
+  /*
+   * 위층 바닥 판의 계단실 구멍만 유지한다.
+   * 층 이동 마스크나 청사진 효과는 적용하지 않는다.
+   */
+  function stairHoleFor(fid, slab) {
+    if (!stairHole[fid]) {
+      stairHole[fid] = {
+        uHoleOn: { value: 0 }, uHole: { value: new THREE.Vector4() }
+      };
+    }
+    var u = stairHole[fid];
+    var hole = slab ? "if (uHoleOn > 0.5 && vMaskXZ.x > uHole.x && vMaskXZ.x < uHole.z && vMaskXZ.y > uHole.y && vMaskXZ.y < uHole.w) { discard; }\n" : "";
+    return function (shader) {
+      Object.keys(u).forEach(function (k) { shader.uniforms[k] = u[k]; });
+      shader.vertexShader = "varying vec2 vMaskXZ;\n" + shader.vertexShader.replace(
+        "#include <project_vertex>",
+        "#include <project_vertex>\n  vMaskXZ = (modelMatrix * vec4(transformed, 1.0)).xz;");
+      shader.fragmentShader =
+        "uniform float uHoleOn;\nuniform vec4 uHole;\nvarying vec2 vMaskXZ;\n" +
+        shader.fragmentShader.replace("#include <premultiplied_alpha_fragment>", hole + "#include <premultiplied_alpha_fragment>");
+    };
+  }
+
+  /*
+   * 계단 인식 — 계단이 어느 층과 어느 층을 잇는지, 층마다 어디로 드나드는지 모델에서 읽는다.
+   *
+   * 예전에는 계단을 "그 층 레이어에 들어 있는 덩이"로만 알았다. 그런데 이 모델의 계단실은
+   * 한 자리에 세 줄기가 겹쳐 있다 — B4 -> B3 로 오르는 줄기, B3 -> B2 로 오르는 줄기(B2 는 모델에 없다),
+   * B4 -> B5 로 내려가는 줄기(B5 도 없다). 덩이째 묶어 "가장 낮은 단"을 출구로 잡았더니
+   * B5 로 가는 줄기 바닥(B4 바닥보다 3 넘게 아래)이 출구가 됐다. 게다가 B3 바닥 판이 계단실을
+   * 덮고 있어 B3 에서 보면 내려가는 계단이 아예 안 보이고, 위층으로 오르는 계단만 보였다.
+   *
+   * 그래서 단을 하나씩 따라 내려간다.
+   *   1. 계단 덩이를 이웃끼리 묶어 계단실(core)로 본다.
+   *   2. 위층 바닥 높이 가까이 있는 단(층계참)에서 시작해, 한 단 높이(0.2~0.6)만큼 낮고
+   *      바로 붙은 단으로 한 칸씩 내려간다. 아래층 바닥 높이에 닿으면 그 줄이 두 층을 잇는 계단이다.
+   *      다른 줄기는 높이가 이어지지 않아 따라가지지 않는다.
+   *   3. 줄의 양 끝이 층마다의 입구다. 입구에서 가장 가까운, 계단실 밖의 빈 칸이 그 층의 출입 지점이다.
+   *   4. 모델 맨 위층보다 높이 올라가는 단 · 맨 아래층보다 낮게 내려가는 단은 "모델 밖 층" 계단으로 적어 둔다.
+   */
+  var stairLinks = [];   // { lower, upper, items, path, upMouth, lowMouth, entry, exit, mid, rect }
+  var stairEnds = [];    // 모델 밖으로 이어지는 계단 — { floor, dir, at }
+  var stairTagBox = [];
+
+  function topY(m) { return m.mesh.geometry.boundingBox.max.y; }
+  function gapXZ(a, b) {
+    var A = a.mesh.geometry.boundingBox, B = b.mesh.geometry.boundingBox;
+    var gx = Math.max(0, A.min.x - B.max.x, B.min.x - A.max.x);
+    var gz = Math.max(0, A.min.z - B.max.z, B.min.z - A.max.z);
+    return Math.max(gx, gz);
+  }
+  function centerOf(m) { return m.mesh.geometry.boundingBox.getCenter(new THREE.Vector3()); }
+
+  function descend(items, start, lowDeck) {
+    var chain = [start], cur = start;
+    for (var guard = 0; topY(cur) > lowDeck + 0.6 && guard < 80; guard += 1) {
+      var c0 = centerOf(cur);
+      var next = null, best = Infinity;
+      for (var i = 0; i < items.length; i += 1) {
+        var m = items[i], dy = topY(cur) - topY(m);
+        if (dy < 0.2 || dy > 0.6 || chain.indexOf(m) >= 0 || gapXZ(m, cur) > 0.6) { continue; }
+        var d = centerOf(m).distanceTo(c0);
+        if (d < best) { best = d; next = m; }
+      }
+      if (!next) { return null; }
+      chain.push(next);
+      cur = next;
+    }
+    return topY(cur) <= lowDeck + 0.6 ? chain : null;
+  }
+
+  // 층의 격자에서, 계단실 사각형 밖에 있는 가장 가까운 빈 칸(월드 좌표).
+  function gridOf(fid) {
+    if (gridByFloor[fid] === undefined) {
+      var keep = ROBOT_ON; ROBOT_ON = fid;
+      gridByFloor[fid] = mapFloor(modelBox);
+      ROBOT_ON = keep;
+    }
+    return gridByFloor[fid];
+  }
+  function openNear(fid, p, rect) {
+    var g = gridOf(fid);
+    var f = floorOf(fid);
+    if (!g) { return new THREE.Vector3(p.x, f.deck, p.z); }
+    var best = null, near = Infinity;
+    [g.room, g.open].some(function (grid) {
+      for (var k = 0; k < grid.length; k += 1) {
+        if (!grid[k]) { continue; }
+        var c = k % g.cols, r = (k - c) / g.cols;
+        var x = g.minX + (c + 0.5) * ROUTE_STEP, z = g.minZ + (r + 0.5) * ROUTE_STEP;
+        if (x > rect[0] - 0.3 && x < rect[2] + 0.3 && z > rect[1] - 0.3 && z < rect[3] + 0.3) { continue; }
+        var d = (x - p.x) * (x - p.x) + (z - p.z) * (z - p.z);
+        if (d < near) { near = d; best = new THREE.Vector3(x, 0, z); }
+      }
+      return !!best;
+    });
+    best = best || new THREE.Vector3(p.x, 0, p.z);
+    best.y = f.deck + NAV.lift / NAV.unit;   // 경로선과 같은 높이
+    return best;
+  }
+
+  function readStairs() {
+    stairLinks = []; stairEnds = [];
+    if (floors.length < 1) { return; }
+    var list = meshes.filter(function (m) { return m.key === "stairs"; });
+    var group = list.map(function (_, i) { return i; });
+    function root(i) { while (group[i] !== i) { i = group[i] = group[group[i]]; } return i; }
+    for (var i = 0; i < list.length; i += 1) {
+      var bi = list[i].mesh.geometry.boundingBox.clone().expandByScalar(1.2);
+      for (var j = i + 1; j < list.length; j += 1) {
+        if (bi.intersectsBox(list[j].mesh.geometry.boundingBox)) { group[root(i)] = root(j); }
+      }
+    }
+    var cores = {};
+    list.forEach(function (m, k) { (cores[root(k)] = cores[root(k)] || []).push(m); });
+
+    var lift = span * 0.005;
+    var topDeck = floors[floors.length - 1].deck, botDeck = floors[0].deck;
+    Object.keys(cores).forEach(function (key) {
+      var items = cores[key];
+      var used = [];
+      for (var f = 0; f < floors.length - 1; f += 1) {
+        var L = floors[f], U = floors[f + 1];
+        var chain = null;
+        items.forEach(function (s) {
+          var y = topY(s);
+          if (y < U.deck - 1.1 || y > U.deck + 0.1) { return; }
+          var c = descend(items, s, L.deck);
+          if (c && (!chain || c.length > chain.length)) { chain = c; }
+        });
+        if (!chain) { continue; }
+        used = used.concat(chain);
+        var rect = [Infinity, Infinity, -Infinity, -Infinity];
+        chain.forEach(function (m) {
+          var b = m.mesh.geometry.boundingBox;
+          rect[0] = Math.min(rect[0], b.min.x); rect[1] = Math.min(rect[1], b.min.z);
+          rect[2] = Math.max(rect[2], b.max.x); rect[3] = Math.max(rect[3], b.max.z);
+        });
+        // 줄을 따라 한 단에 한 점. 같은 높이의 조각(디딤판 · 챌판)은 한 점으로 모은다.
+        var path = [], lastY = Infinity;
+        chain.forEach(function (m) {
+          var y = topY(m), c = centerOf(m);
+          if (Math.abs(y - lastY) < 0.1 && path.length) {
+            path[path.length - 1].lerp(new THREE.Vector3(c.x, y + lift, c.z), 0.5);
+          } else { path.push(new THREE.Vector3(c.x, y + lift, c.z)); lastY = y; }
+        });
+        var upMouth = path[0].clone(), lowMouth = path[path.length - 1].clone();
+        var link = {
+          lower: L.id, upper: U.id, items: chain, path: path, rect: rect,
+          upMouth: upMouth, lowMouth: lowMouth,
+          entry: openNear(U.id, upMouth, rect),    // 위층에서 계단으로 드는 자리
+          exit: openNear(L.id, lowMouth, rect),    // 아래층에서 계단을 나서는 자리
+          mid: new THREE.Vector3((rect[0] + rect[2]) / 2, (upMouth.y + lowMouth.y) / 2, (rect[1] + rect[3]) / 2)
+        };
+        stairLinks.push(link);
+        // 두 층을 잇는 단은 두 층 어디서 봐도 보여야 한다 — 레이어는 한 층에만 들어 있다.
+        chain.forEach(function (m) { m.link = link; m.floors = [L.id, U.id]; });
+      }
+      // 모델 밖으로 이어지는 줄기 — 잇는 줄에 안 쓰인 단 가운데 맨 위층보다 높거나 맨 아래층보다 낮은 것.
+      var rest = items.filter(function (m) { return used.indexOf(m) < 0; });
+      var above = rest.filter(function (m) { return topY(m) > topDeck + 1.5; });
+      var below = rest.filter(function (m) { return topY(m) < botDeck - 1.0; });
+      function mean(arr) { var c = new THREE.Vector3(); arr.forEach(function (m) { c.add(centerOf(m)); }); return c.multiplyScalar(1 / arr.length); }
+      if (above.length) {
+        var a = mean(above); a.y = topDeck;
+        stairEnds.push({ floor: floors[floors.length - 1].id, dir: "up", at: a, items: above });
+        above.forEach(function (m) { m.beyond = "up"; });
+      }
+      if (below.length) {
+        var b2 = mean(below); b2.y = botDeck;
+        stairEnds.push({ floor: floors[0].id, dir: "down", at: b2, items: below });
+        below.forEach(function (m) { m.beyond = "down"; });
+      }
+    });
+
+    // 위층 바닥 판에 계단실 구멍을 낸다 — 판이 덮고 있으면 위층에서 내려가는 계단이 안 보인다.
+    stairLinks.forEach(function (link) {
+      var u = stairHole[link.upper];
+      if (u) { u.uHoleOn.value = 1; u.uHole.value.set(link.rect[0], link.rect[1], link.rect[2], link.rect[3]); }
+    });
+  }
+
+  // 지금 층에서 이 계단을 누르면 어디로 가나. 잇는 줄의 단이면 반대편 층, 모델 밖 줄기면 갈 곳이 없다.
+  function stairTo(px, py) {
+    if (!renderer || !camera || floorBusy || floors.length < 2) { return null; }
+    if (!raycaster) { raycaster = new THREE.Raycaster(); }
+    var w = view.clientWidth || 1, h = view.clientHeight || 1;
+    raycaster.setFromCamera(new THREE.Vector2((px / w) * 2 - 1, -(py / h) * 2 + 1), camera);
+    var list = [];
+    meshes.forEach(function (item) {
+      if (item.key !== "stairs") { return; }
+      var on = item.floors ? item.floors.indexOf(floorNow) >= 0 : item.floor === floorNow;
+      if (on) { list.push(item.mesh); }
+    });
+    var found = list.length ? raycaster.intersectObjects(list, false)[0] : null;
+    if (!found) { return null; }
+    var owner = null;
+    for (var i = 0; i < meshes.length; i += 1) { if (meshes[i].mesh === found.object) { owner = meshes[i]; break; } }
+    if (!owner || !owner.link) { return null; }
+    var link = owner.link;
+    return {
+      floor: link.upper === floorNow ? link.lower : link.upper,
+      at: link.upper === floorNow ? link.upMouth : link.lowMouth
+    };
+  }
+
+  /*
+   * 계단 입구 표 — 두 층을 잇는 계단의 층마다 입구에 "↓ B4" · "↑ B3" 를 단다.
+   * 모델 밖 층으로 이어지는 계단에는 달지 않는다.
+   */
+  function syncStairTags() {
+    if (!OPT.stairTags || !stairLinks.length) {
+      stairTagBox.forEach(function (n) { n.hidden = true; });
+      return;
+    }
+    var want = [];
+    stairLinks.forEach(function (link) {
+      var dn = floorOf(link.lower).deck < floorOf(link.upper).deck;
+      if (floorNow === link.upper) { want.push({ at: link.upMouth, text: (dn ? "↓ " : "↑ ") + link.lower, kind: "go" }); }
+      if (floorNow === link.lower) { want.push({ at: link.lowMouth, text: (dn ? "↑ " : "↓ ") + link.upper, kind: "go" }); }
+    });
+    // 모델에 없는 층으로 이어지는 계단에는 칩을 달지 않는다(피드백). 눌러도 안 가는 것은 stairTo 가 맡는다.
+    while (stairTagBox.length < want.length) {
+      var n = document.createElement("div");
+      n.className = "stair-tag"; n.hidden = true;
+      hit.appendChild(n);
+      stairTagBox.push(n);
+    }
+    stairTagBox.forEach(function (n, i) {
+      var w = want[i];
+      // 줌아웃한 판(둘러보기)에서는 뺀다 — 로봇 표식과 겹쳐 몇 대인지 세는 것을 가린다.
+      n.hidden = !w || floorBusy || zoom < 1.4;
+      if (!w) { return; }
+      n.textContent = w.text;
+      n.classList.toggle("is-off", w.kind === "off");
+      put(n, w.at);
+    });
+  }
+
+  // 점을 고르게 다시 찍는다 — 지나온 길을 토막 수로 끊어 그리려면 토막이 고르게 짧아야 한다.
+  function resample(points, step) {
+    var out = [points[0].clone()];
+    for (var i = 1; i < points.length; i += 1) {
+      var a = points[i - 1], b = points[i], d = a.distanceTo(b);
+      var n = Math.max(1, Math.ceil(d / step));
+      for (var k = 1; k <= n; k += 1) { out.push(a.clone().lerp(b, k / n)); }
+    }
+    return out;
+  }
+
+  function miles(points) {
+    var m = [0];
+    for (var i = 1; i < points.length; i += 1) { m.push(m[i - 1] + points[i].distanceTo(points[i - 1])); }
+    return m;
+  }
+
+  function pointAt(pts, mi, s) {
+    if (s <= 0) { return pts[0].clone(); }
+    var n = pts.length - 1;
+    if (s >= mi[n]) { return pts[n].clone(); }
+    var lo = 0, hi = n;
+    while (hi - lo > 1) { var md = (lo + hi) >> 1; if (mi[md] <= s) { lo = md; } else { hi = md; } }
+    return pts[lo].clone().lerp(pts[hi], (s - mi[lo]) / Math.max(1e-6, mi[hi] - mi[lo]));
+  }
+
+  /*
+   * 한 토막(층 하나 · 계단 하나)을 선 두 벌로 깐다. 지나온 길은 앞에서부터, 남은 길은
+   * 거꾸로 깔아 뒤에서부터 그린다 — 그리는 토막 수(instanceCount)만 바꾸면
+   * 로봇이 움직여도 선을 다시 만들지 않는다.
+   */
+  function lanePart(points, s0, bot, floor) {
+    var pts = resample(points, 0.35);
+    var mi = miles(pts);
+    var done = strand(pts, bot.done, false);
+    var left = strand(pts.slice().reverse(), bot.left, true);
+    return { pts: pts, mi: mi, s0: s0, len: mi[mi.length - 1], done: done, left: left, floor: floor };
+  }
+
+  function showPart(part, s) {
+    var n = part.pts.length - 1;
+    var k = Math.max(0, Math.min(n, Math.round(n * (s - part.s0) / Math.max(1e-6, part.len))));
+    part.done.geometry.instanceCount = k;
+    part.left.geometry.instanceCount = n - k;
+  }
+
+  function travelBuild(up, low) {
+    var box = modelBox, size = box.getSize(new THREE.Vector3());
+    function world(fx, fz) { return new THREE.Vector3(box.min.x + fx * size.x, 0, box.min.z + fz * size.z); }
+    var bot = ROBOTS[1];
+    var flights = stairLinks.filter(function (l) { return l.upper === up && l.lower === low; });
+    if (!flights.length) { return null; }
+    var dest = bot.stops.slice(1).map(function (s) { return world(s[0], s[1]); });
+    var flight = flights.reduce(function (a, b) {
+      return b.exit.distanceTo(dest[0]) < a.exit.distanceTo(dest[0]) ? b : a;
+    });
+    var start = flight.entry.clone().add(new THREE.Vector3(14, 0, -10));
+
+    var aPts = routeOnNav(up, [start, flight.entry]);
+    // 위층 출입 지점 -> 층계참 -> 단을 하나씩 -> 아래층 입구 -> 아래층 출입 지점
+    var sPts = [flight.entry].concat(flight.path.map(function (q) { return q.clone(); })).concat([flight.exit]);
+    var bPts = routeOnNav(low, [flight.exit].concat(dest));
+    if (!aPts || !bPts) { return null; }
+    // 토막끼리 끝과 처음을 맞춘다 — 계단 출구에서 길이 끊겨 보이지 않게.
+    aPts[aPts.length - 1] = flight.entry.clone();
+    bPts[0] = flight.exit.clone();
+
+    var A = lanePart(aPts, 0, bot, up);
+    var S = lanePart(sPts, A.len, bot, "stair");
+    var B = lanePart(bPts, A.len + S.len, bot, low);
+    var here = aPts[0].clone();
+    var fan = viewFan(bot, here, 1, 0);
+    var parts = [A.done, A.left, S.done, S.left, B.done, B.left, fan];
+    parts.forEach(function (p) { p.visible = false; scene.add(p); });
+
+    var lane = {
+      id: "1", bot: bot, parts: parts, travel: true, floor: up,
+      here: here, ahead: here.clone(),
+      // 웨이포인트는 B4 미션이라 B4 토막 위에 놓는다.
+      turns: B.pts, mile: B.mi, total: B.len
+    };
+    return {
+      up: up, low: low, flight: flight, lane: lane, segs: [A, S, B], fan: fan,
+      s: 0, s1: A.len, s2: A.len + S.len, s3: A.len + S.len + B.len,
+      phase: "walk", dwell: 0, floor: up, t: 0,
+      down: floorOf(low).deck < floorOf(up).deck,
+      backup: lanes["1"], seen: false, onStairs: false,
+      shrinkAt: 0, badgeAt: 0, arriveAt: 0, gridY0: 0, followFrom: 0
+    };
+  }
+
+  /* ----- 화면 위 표시(DOM) ----- */
+  var travDom = null;
+  function travelDom() {
+    if (travDom) { return travDom; }
+    function el(cls, html) {
+      var n = document.createElement("div");
+      n.className = cls; n.hidden = true; n.innerHTML = html || "";
+      hit.appendChild(n);
+      return n;
+    }
+    travDom = {
+      pill: el("tr-pill", "<i></i><span>ROBOT 02</span>"),
+      badge: el("tr-badge"),
+      chip: el("tr-chip")
+    };
+    return travDom;
+  }
+
+  function onCanvas(world) {
+    var v = view.getBoundingClientRect(), c = hit.getBoundingClientRect();
+    var a = world.clone().project(camera);
+    return { x: (a.x * 0.5 + 0.5) * v.width + v.left - c.left, y: (-a.y * 0.5 + 0.5) * v.height + v.top - c.top };
+  }
+
+  function put(node, world, dy) {
+    var p = onCanvas(world);
+    node.style.left = p.x.toFixed(1) + "px";
+    node.style.top = (p.y + (dy || 0)).toFixed(1) + "px";
+  }
+
+  function arrow() { return trav.down ? "↓" : "↑"; }
+
+  // 층 선택기 — 층마다 로봇 수, 도착하는 층에는 잠시 표시, 트래킹 중 옮겨 가는 층에는 이동 표시.
+  // 층 선택기 — 로봇 수는 세지 않는다(층별 숫자는 우측 12대 목록과 맞지 않아 틀린 정보로 읽혔다).
+  // 도착하는 층에 잠시 이동 표시, 트래킹 중 옮겨 가는 층에 이동 표시만 단다.
+  // 몇 대가 있는지는 도착한 층을 줌아웃해 지도로 보인다(arrivalOverview).
+  function tellFloorRobots(now) {
+    if (!trav) { return; }
+    Array.prototype.forEach.call(document.querySelectorAll("[data-map-floor]"), function (btn) {
+      var id = btn.getAttribute("data-map-floor");
+      var arriving = id === trav.low && trav.arriveAt && now - trav.arriveAt < TRAVEL.BADGE + TRAVEL.SHRINK;
+      btn.classList.toggle("is-arriving", !!arriving);
+      btn.setAttribute("data-arrow", arriving ? arrow() : "");
+      btn.classList.toggle("is-moving", id === trav.low && trav.onStairs);
+    });
+  }
+
+  function clearFloorRobots() {
+    Array.prototype.forEach.call(document.querySelectorAll("[data-map-floor]"), function (btn) {
+      btn.removeAttribute("data-arrow");
+      btn.classList.remove("is-arriving", "is-moving");
+    });
+  }
+
+  /*
+   * 지도에 보이는 로봇은 골라진 한 대(botBox)다 — 층을 옮기는 시연 로봇만 제 마커(travDom.pill)를 따로 든다.
+   * 도착한 층을 줌아웃한 판에서 그 표식을 한 번씩 반짝여 어디 있는지 찾게 한다.
+   */
+  function ping() {
+    var list = [];
+    if (travDom && !travDom.pill.hidden) { list.push(travDom.pill); }
+    if (botBox) { list.push(botBox); }
+    list.forEach(function (n) { n.classList.remove("is-ping"); void n.offsetWidth; n.classList.add("is-ping"); });
+    window.setTimeout(function () { list.forEach(function (n) { n.classList.remove("is-ping"); }); }, 1800);
+  }
+
+  /*
+   * 층이 바뀌면 도착 맥락을 잠깐 보여 준다.
+   * 트래킹 중에는 로봇을 화면 중심에서 놓지 않고 주변만 살짝 넓혀 본 뒤 원래 배율로 돌아간다.
+   * 직접 층을 바꾼 경우에만 종전처럼 층 전체를 담는다.
+   */
+  function arrivalOverview(duration) {
+    if (!OPT.arriveOverview || !renderer || !home) { return; }
+    var overviewMs = duration || 320;
+    var backZoom = zoom;
+    clearFocus();
+    unwind(yaw);
+    glide(yaw, pitch, 1, home.clone(), overviewMs);
+    window.setTimeout(ping, overviewMs + 20);
+    if (trav && onLane === trav.lane) {
+      var hold = overviewMs + TRAVEL.OVERVIEW;
+      trav.followFrom = Date.now() + hold + 420;
+      window.setTimeout(function () {
+        if (trav && onLane === trav.lane) { glide(yaw, pitch, Math.max(backZoom, 2.2), trav.lane.here.clone()); }
+      }, hold);
+    }
+  }
+
+  /*
+   * 매 프레임 — 선 · 부채꼴 · 웨이포인트를 층에 맞춰 켜고 끄고, 표식을 제자리에 놓는다.
+   * frame() 이 그리기 직전에 부른다.
+   */
+  function travelSync() {
+    if (!trav) { return; }
+    var now = Date.now();
+    var d = travelDom();
+    var tracked = onLane === trav.lane;
+    var both = trav.onStairs;
+
+    trav.segs.forEach(function (part) {
+      // 계단 토막은 내려가기 전 · 내려가는 중 · 출구에서 멈춘 동안만 — B4 를 걷기 시작하면 B3 높이까지 솟은
+      // 선이 공중에 떠 설비를 가로지른다.
+      var stairOn = trav.phase === "walk" || trav.phase === "stair" || trav.phase === "dwell";
+      var on = tracked && (part.floor === "stair" ? stairOn : part.floor === floorNow);
+      part.done.visible = on; part.left.visible = on;
+    });
+    trav.fan.visible = tracked && (trav.floor === floorNow || trav.floor === "stair" || both);
+    if (tracked) { wpMarks.forEach(function (m) { m.visible = floorNow === trav.low; }); }
+
+    // 트래킹 — 칩(층 이동 중)
+    var chipOn = tracked && trav.phase === "stair";
+    d.chip.hidden = !chipOn;
+    if (chipOn) {
+      d.chip.textContent = trav.up + " → " + trav.low + " 이동 중";
+      put(d.chip, trav.lane.here, -38 * Math.min(2.8, Math.max(1, Math.pow(zoom, 0.7))));
+    }
+
+    // 비트래킹 — 작은 마커 · 배지
+    var shrinking = trav.shrinkAt && now - trav.shrinkAt < TRAVEL.SHRINK;
+    var visible = !tracked && trav.floor === floorNow && trav.phase !== "stair";
+    var showPill = !tracked && (visible || (shrinking && floorNow === trav.up));
+    if (showPill && !visible) {
+      d.pill.classList.add("is-shrink");
+    } else {
+      d.pill.classList.remove("is-shrink");
+      // 안 보이다가 보이게 되면(층을 옮겨 와서든, 로봇이 출구로 나와서든) 계단 출구에서 떠오른다.
+      if (visible && d.pill.hidden) {
+        d.pill.classList.remove("is-appear"); void d.pill.offsetWidth; d.pill.classList.add("is-appear");
+      }
+    }
+    d.pill.hidden = !showPill;
+    if (showPill) {
+      d.pill.style.setProperty("--tint", "#" + ("00000" + trav.lane.bot.done.toString(16)).slice(-6));
+      put(d.pill, shrinking && !visible ? trav.flight.upMouth : trav.lane.here);
+    }
+
+    var badgeOn = !tracked && trav.badgeAt && now >= trav.badgeAt && now - trav.badgeAt < TRAVEL.BADGE &&
+      floorNow === trav.up;
+    d.badge.hidden = !badgeOn;
+    if (badgeOn) {
+      d.badge.textContent = arrow() + " " + trav.low + " 이동";
+      d.badge.style.setProperty("--tint", "#" + ("00000" + trav.lane.bot.done.toString(16)).slice(-6));
+      d.badge.classList.toggle("is-leaving", now - trav.badgeAt > TRAVEL.BADGE - 400);
+      put(d.badge, trav.flight.upMouth);
+    }
+    tellFloorRobots(now);
+  }
+
+  /* ----- 움직임 ----- */
+  function ease(t) { return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; }
+
+  function where(s) {
+    var seg = s < trav.s1 ? trav.segs[0] : (s < trav.s2 ? trav.segs[1] : trav.segs[2]);
+    return pointAt(seg.pts, seg.mi, s - seg.s0);
+  }
+
+  // 트래킹 중 계단에 들어섰다 — 별도 전환 효과 없이 높이 이동만 시작한다.
+  function beginStairMove() {
+    trav.onStairs = true;
+    floorBusy = true;                 // 그 사이 층 버튼은 줄을 세워 둔다(goFloor 의 floorNext)
+    clearFocus();
+    floorFade[trav.up] = 1; floorFade[trav.low] = 0;
+    trav.gridY0 = gridMesh ? gridMesh.position.y : 0;
+    trav.homeY0 = home.y;
+  }
+
+  function stepStairMove(u) {
+    u = Math.max(0, Math.min(1, u));
+    var rise = floorOf(trav.low).deck - floorOf(trav.up).deck;
+    if (gridMesh) { gridMesh.position.y = trav.gridY0 + rise * ease(u); }
+    // 로봇이 계단 한가운데를 지날 때 모델과 경로를 한 번만 교체한다. 마스크·페이드 효과는 없다.
+    if (u >= 0.5 && floorNow !== trav.low) {
+      floorFade[trav.up] = 0; floorFade[trav.low] = 1;
+      floorNow = trav.low;
+      tellFloor();
+      meshes.forEach(paintOne);
+    }
+  }
+
+  function endStairMove() {
+    if (!trav || !trav.onStairs) { return; }
+    var rise = floorOf(trav.low).deck - floorOf(trav.up).deck;
+    trav.onStairs = false;
+    floorFade[trav.up] = 0; floorFade[trav.low] = 1;
+    if (gridMesh) { gridMesh.position.y = trav.gridY0 + rise; }
+    if (floorNow !== trav.low) { floorNow = trav.low; tellFloor(); }
+    var to = floorOf(trav.low);
+    home = to.center.clone();
+    home.y = trav.homeY0 + rise;          // 돌아오는 자리도 새 층 높이다(goFloor 와 같은 셈)
+    fitFloorKeepingView();
+    floorBusy = false;
+    meshes.forEach(paintOne);
+    if (floorNext) { var q = floorNext; floorNext = ""; goFloor(q, "button"); }
+    // 트래킹 이동은 도착 후 줌아웃하지 않는다. 로봇을 같은 화면 위치에서 계속 따라간다.
+  }
+
+  var travLast = 0;
+  function travelTick() {
+    if (!trav) { return; }
+    var nowT = (window.performance ? performance.now() : Date.now());
+    var dt = Math.min(0.1, (nowT - travLast) / 1000);
+    travLast = nowT;
+    var now = Date.now();
+    var tracked = onLane === trav.lane;
+    var before = trav.s;
+
+    if (trav.phase === "dwell") {
+      trav.dwell -= dt;
+      if (trav.dwell <= 0) { trav.phase = "walk2"; }
+    } else if (trav.phase !== "done") {
+      trav.s += dt * (trav.phase === "stair" ? TRAVEL.STAIR_SPEED : TRAVEL.SPEED);
+    }
+
+    // 계단 진입
+    if (before < trav.s1 && trav.s >= trav.s1) {
+      trav.s = trav.s1;
+      trav.phase = "stair";
+      trav.arriveAt = now;
+      if (tracked) { beginStairMove(); }
+      else if (floorNow === trav.up) { trav.shrinkAt = now; trav.badgeAt = now + TRAVEL.SHRINK; }
+    }
+    // 계단 출구
+    if (trav.phase === "stair" && trav.s >= trav.s2) {
+      trav.s = trav.s2;
+      trav.phase = "dwell";
+      trav.dwell = TRAVEL.DWELL;
+      endStairMove();
+    }
+    if (trav.phase === "walk2" && trav.s >= trav.s3) { trav.s = trav.s3; trav.phase = "done"; }
+
+    trav.floor = trav.phase === "walk" ? trav.up : (trav.phase === "stair" ? "stair" : trav.low);
+    trav.lane.floor = trav.floor;
+
+    var here = where(trav.s);
+    var ahead = where(Math.min(trav.s3, trav.s + 1.5));
+    if (ahead.distanceTo(here) < 1e-3) { ahead = here.clone().add(trav.lane.ahead.clone().sub(trav.lane.here)); }
+    trav.lane.here.copy(here);
+    trav.lane.ahead.copy(ahead);
+    trav.segs.forEach(function (part) { showPart(part, trav.s); });
+    trav.fan.position.copy(here);
+    trav.fan.position.y += span * 0.002;
+    trav.fan.rotation.y = Math.atan2(ahead.x - here.x, ahead.z - here.z);
+
+    if (trav.onStairs) { stepStairMove((trav.s - trav.s1) / Math.max(1e-6, trav.s2 - trav.s1)); }
+
+    if (tracked) {
+      // 트래킹 — 로봇이 선 층을 보고 있지 않으면 그 층으로 간다(계단 위가 아닐 때만).
+      if (trav.floor !== "stair" && trav.floor !== floorNow && !floorBusy) { goFloor(trav.floor, "button"); }
+      // 로봇 마커와 카메라 중심을 붙여 둔다. 높이까지 따라가므로 계단을 내려가면 카메라도 내려간다.
+      else if (now > trav.followFrom && !down.length) {
+        target.lerp(here, 1 - Math.pow(0.002, dt));
+      }
+    }
+    plan();
+    frame();
+    if (trav.phase !== "done" || (trav.badgeAt && now - trav.badgeAt < TRAVEL.BADGE + 500)) {
+      window.requestAnimationFrame(travelTick);
+    } else { trav.running = false; }
+  }
+
+  function travelReset() {
+    if (!trav) { return; }
+    if (trav.onStairs) { endStairMove(); }
+    trav.lane.parts.forEach(function (p) { scene.remove(p); });
+    lanes["1"] = trav.backup;
+    if (travDom) { travDom.pill.hidden = travDom.badge.hidden = travDom.chip.hidden = true; }
+    clearFloorRobots();
+    var was = onLane === trav.lane;
+    trav = null;
+    if (was) { onLane = null; }
+    layRobots();
+    plan();
+  }
+
+  /*
+   * 시연을 건다. tracked 면 ROBOT 02 를 골라 두고(트래킹), 아니면 ROBOT 01 을 골라 둔다.
+   * 둘 다 B3 에서 시작한다 — 비트래킹은 "지도가 B3 에 그대로 있는" 경우를 보려는 것이다.
+   */
+  function travelStart(tracked) {
+    if (!renderer || floors.length < 2) { return; }
+    travelReset();
+    var up = "B3", low = "B4";
+    var built = travelBuild(up, low);
+    if (!built) { return; }
+    trav = built;
+    lanes["1"] = trav.lane;
+    if (trav.backup) { trav.backup.parts.forEach(function (p) { p.visible = false; }); }
+
+    function go() {
+      if (floorBusy) { window.setTimeout(go, 60); return; }
+      var card = document.querySelector(".robot-strip .robot-card[data-robot='" + (tracked ? "1" : "0") + "']");
+      if (tracked) {
+        if (card) { card.click(); }
+        glide(yaw, pitch, Math.max(zoom, 2.2), trav.lane.here.clone());
+      } else {
+        // 다른 로봇을 골라 둔다. 카드를 누르면 카메라가 그 로봇(B4)으로 끌려가므로 끌려간 것을 되돌린다.
+        if (card && activeRobot() === "1") {
+          var keep = target.clone();
+          card.click();
+          trip = null;
+          target.copy(keep);
+        }
+        layRobots();
+        glide(yaw, pitch, Math.max(zoom, 2), trav.lane.here.clone().lerp(trav.flight.entry, 0.5));
+      }
+      trav.followFrom = Date.now() + 400;
+      travLast = window.performance ? performance.now() : Date.now();
+      if (!trav.running) { trav.running = true; window.requestAnimationFrame(travelTick); }
+    }
+    if (floorNow !== up) { goFloor(up, "button"); }
+    go();
+  }
+
+  window.APRISM_TRAVEL = { start: travelStart, reset: travelReset, config: TRAVEL,
+    state: function () { return trav && { phase: trav.phase, floor: trav.floor, s: trav.s, s1: trav.s1, s2: trav.s2, s3: trav.s3, tracked: onLane === trav.lane, floorNow: floorNow, onStairs: trav.onStairs }; } };
+
+  /* ---------- 경로 재구성 — 미터 좌표 · 장애물 여유 · 폐회로 ----------
+   *
+   * 좌표
+   *   1 UNIT = 1 m. 모델 원본에 단위가 없어서 층고로 맞췄다 — B3 · B4 바닥 사이가 4.49 UNIT 이고
+   *   지하층 층고 4.5 m 로 읽으면 건물이 73.6 m × 120 m 가 된다. 실제 치수가 다르면 NAV.unit 만 고친다.
+   *   도면 좌표(plan)는 탑뷰 화면의 좌측 하단이 (0, 0, 0) 이다. X 오른쪽(월드 +x) · Y 위쪽(월드 -z) · Z 위.
+   *   바닥 경로의 Z 는 언제나 0 이다. 그릴 때만 경로선을 바닥에서 NAV.lift(0.02 m) 띄운다.
+   *
+   * 장애물
+   *   벽 · 설비(그리고 계단 — 로봇이 디딤판을 가로지르면 안 된다)의 삼각형 가운데 바닥에서
+   *   로봇 키(NAV.height) 사이에 걸치는 것을 0.25 m 격자에 찍는다. 머리 위 덕트는 막지 않는다.
+   *   찍은 칸에서 떨어진 거리(거리장)를 재 두고, 로봇 반경 + 안전거리 안쪽은 못 가는 곳으로 친다.
+   *
+   * 길
+   *   0.5 m 마디에서 A*. 여덟 방향으로만 가고, 꺾을 때마다 값을 더 치른다(45° < 90° < 135°, 되돌기 금지).
+   *   그래서 결과가 45° · 90° 로 꺾인 몇 토막으로 나온다. 웨이포인트 사이에 장애물이 있으면 이동 가능한
+   *   곳으로 돌아간다. 좁아서 안전거리를 못 지키는 구간은 반경만 지켜 다시 찾고 표시해 둔다(reduced).
+   */
+  var NAV = {
+    unit: 1,          // 월드 1 UNIT 이 몇 m 인가
+    raster: 0.25,     // 장애물 격자(m)
+    cell: 0.5,        // 길찾기 마디 간격(m) — 웨이포인트 좌표도 이 간격에 맞춘다
+    radius: 0.4,      // 로봇 반경(m)
+    safety: 0.2,      // 안전거리(m)
+    height: 1.5,      // 이 높이 안에 걸치는 것만 장애물(m)
+    lift: 0.02,       // 경로선을 바닥에서 띄우는 높이(m) — 그릴 때만
+    turn45: 0.6, turn90: 1.4, turn135: 4   // 꺾는 값(m 로 친다)
+  };
+  var navByFloor = {};
+  var routeLog = [];    // 좌표 보정 · 여유 부족 구간 기록 — APRISM_ROUTE.report()
+
+  function deckOf(fid) { var f = floorOf(fid); return f ? f.deck : floorY; }
+  function toWorld(X, Y, fid, lift) {
+    return new THREE.Vector3(modelBox.min.x + X / NAV.unit, deckOf(fid) + (lift || 0) / NAV.unit,
+      modelBox.max.z - Y / NAV.unit);
+  }
+  function toPlan(v) { return { X: (v.x - modelBox.min.x) * NAV.unit, Y: (modelBox.max.z - v.z) * NAV.unit }; }
+
+  function buildNav(fid) {
+    var r = NAV.raster;
+    var Wm = (modelBox.max.x - modelBox.min.x) * NAV.unit, Hm = (modelBox.max.z - modelBox.min.z) * NAV.unit;
+    var cw = Math.ceil(Wm / r), ch = Math.ceil(Hm / r);
+    var solid = new Uint8Array(cw * ch);
+    var deck = deckOf(fid), low = deck + 0.05 / NAV.unit, high = deck + NAV.height / NAV.unit;
+
+    meshes.forEach(function (item) {
+      if (item.key === "floor") { return; }
+      var on = item.floors ? item.floors.indexOf(fid) >= 0 : (!item.floor || item.floor === fid);
+      if (!on) { return; }
+      var bb = item.mesh.geometry.boundingBox;
+      if (bb.max.y < low || bb.min.y > high) { return; }
+      var pos = item.mesh.geometry.attributes.position, idx = item.mesh.geometry.index;
+      var count = idx ? idx.count : pos.count;
+      for (var t = 0; t + 2 < count; t += 3) {
+        var lox = Infinity, hix = -Infinity, loz = Infinity, hiz = -Infinity, loy = Infinity, hiy = -Infinity;
+        for (var k = 0; k < 3; k += 1) {
+          var v = idx ? idx.getX(t + k) : t + k;
+          var x = pos.getX(v), y = pos.getY(v), z = pos.getZ(v);
+          if (x < lox) { lox = x; } if (x > hix) { hix = x; }
+          if (z < loz) { loz = z; } if (z > hiz) { hiz = z; }
+          if (y < loy) { loy = y; } if (y > hiy) { hiy = y; }
+        }
+        if (hiy < low || loy > high) { continue; }
+        var c0 = Math.max(0, Math.floor((lox - modelBox.min.x) * NAV.unit / r));
+        var c1 = Math.min(cw - 1, Math.floor((hix - modelBox.min.x) * NAV.unit / r));
+        var r0 = Math.max(0, Math.floor((modelBox.max.z - hiz) * NAV.unit / r));
+        var r1 = Math.min(ch - 1, Math.floor((modelBox.max.z - loz) * NAV.unit / r));
+        for (var rr = r0; rr <= r1; rr += 1) {
+          for (var cc = c0; cc <= c1; cc += 1) { solid[rr * cw + cc] = 1; }
+        }
+      }
+    });
+    for (var c = 0; c < cw; c += 1) { solid[c] = 1; solid[(ch - 1) * cw + c] = 1; }
+    for (var q = 0; q < ch; q += 1) { solid[q * cw] = 1; solid[q * cw + cw - 1] = 1; }
+
+    // 거리장 — 두 번 훑는 모따기 거리(1 · √2). 값은 가장 가까운 장애물 칸 중심까지의 m.
+    var d = new Float32Array(cw * ch), D1 = r, D2 = r * Math.SQRT2, i, j, p;
+    for (i = 0; i < d.length; i += 1) { d[i] = solid[i] ? 0 : 1e9; }
+    for (j = 0; j < ch; j += 1) {
+      for (i = 0; i < cw; i += 1) {
+        p = j * cw + i;
+        if (!d[p]) { continue; }
+        if (i > 0) { d[p] = Math.min(d[p], d[p - 1] + D1); }
+        if (j > 0) {
+          d[p] = Math.min(d[p], d[p - cw] + D1);
+          if (i > 0) { d[p] = Math.min(d[p], d[p - cw - 1] + D2); }
+          if (i < cw - 1) { d[p] = Math.min(d[p], d[p - cw + 1] + D2); }
+        }
+      }
+    }
+    for (j = ch - 1; j >= 0; j -= 1) {
+      for (i = cw - 1; i >= 0; i -= 1) {
+        p = j * cw + i;
+        if (!d[p]) { continue; }
+        if (i < cw - 1) { d[p] = Math.min(d[p], d[p + 1] + D1); }
+        if (j < ch - 1) {
+          d[p] = Math.min(d[p], d[p + cw] + D1);
+          if (i < cw - 1) { d[p] = Math.min(d[p], d[p + cw + 1] + D2); }
+          if (i > 0) { d[p] = Math.min(d[p], d[p + cw - 1] + D2); }
+        }
+      }
+    }
+    return {
+      fid: fid, cw: cw, ch: ch, dist: d,
+      ni: Math.floor(Wm / NAV.cell) + 1, nj: Math.floor(Hm / NAV.cell) + 1
+    };
+  }
+
+  function navOf(fid) { return navByFloor[fid] || (navByFloor[fid] = buildNav(fid)); }
+
+  // 마디 (i, j) 의 여유 — 가장 가까운 장애물 가장자리까지(m).
+  function clearAt(nav, i, j) {
+    var c = Math.min(nav.cw - 1, Math.floor(i * NAV.cell / NAV.raster));
+    var r = Math.min(nav.ch - 1, Math.floor(j * NAV.cell / NAV.raster));
+    return nav.dist[r * nav.cw + c] - NAV.raster / 2;
+  }
+
+  // 못 가는 곳에 찍힌 점은 가장 가까운 갈 수 있는 마디로 옮긴다.
+  function snapNode(nav, P, need) {
+    var i0 = Math.round(P.X / NAV.cell), j0 = Math.round(P.Y / NAV.cell);
+    for (var ring = 0; ring < 40; ring += 1) {
+      var best = null, bd = Infinity;
+      for (var dj = -ring; dj <= ring; dj += 1) {
+        for (var di = -ring; di <= ring; di += 1) {
+          if (Math.max(Math.abs(di), Math.abs(dj)) !== ring) { continue; }
+          var i = i0 + di, j = j0 + dj;
+          if (i < 0 || j < 0 || i >= nav.ni || j >= nav.nj) { continue; }
+          if (clearAt(nav, i, j) < need) { continue; }
+          var dd = di * di + dj * dj;
+          if (dd < bd) { bd = dd; best = [i, j]; }
+        }
+      }
+      if (best) { return best; }
+    }
+    return [i0, j0];
+  }
+
+  var DIRS = [[1, 0], [1, 1], [0, 1], [-1, 1], [-1, 0], [-1, -1], [0, -1], [1, -1]];
+
+  function astar(nav, s, g, need) {
+    var ni = nav.ni, nj = nav.nj, N = ni * nj;
+    var cost = new Float32Array(N * 9).fill(Infinity);
+    var from = new Int32Array(N * 9).fill(-1);
+    var heapF = [], heapS = [];
+    function push(f, st) {
+      heapF.push(f); heapS.push(st);
+      var k = heapF.length - 1;
+      while (k > 0) {
+        var up = (k - 1) >> 1;
+        if (heapF[up] <= heapF[k]) { break; }
+        var tf = heapF[up]; heapF[up] = heapF[k]; heapF[k] = tf;
+        var ts = heapS[up]; heapS[up] = heapS[k]; heapS[k] = ts;
+        k = up;
+      }
+    }
+    function pop() {
+      var top = heapS[0], lf = heapF.pop(), ls = heapS.pop();
+      if (heapF.length) {
+        heapF[0] = lf; heapS[0] = ls;
+        var k = 0;
+        for (;;) {
+          var a = 2 * k + 1, b = a + 1, m = k;
+          if (a < heapF.length && heapF[a] < heapF[m]) { m = a; }
+          if (b < heapF.length && heapF[b] < heapF[m]) { m = b; }
+          if (m === k) { break; }
+          var tf = heapF[m]; heapF[m] = heapF[k]; heapF[k] = tf;
+          var ts = heapS[m]; heapS[m] = heapS[k]; heapS[k] = ts;
+          k = m;
+        }
+      }
+      return top;
+    }
+    function h(i, j) {
+      var dx = Math.abs(i - g[0]), dy = Math.abs(j - g[1]);
+      return NAV.cell * (Math.max(dx, dy) + (Math.SQRT2 - 1) * Math.min(dx, dy));
+    }
+    var free = function (i, j) { return i >= 0 && j >= 0 && i < ni && j < nj && clearAt(nav, i, j) >= need; };
+    var TURN = [0, NAV.turn45, NAV.turn90, NAV.turn135, Infinity];
+    var st0 = (s[1] * ni + s[0]) * 9 + 8;
+    cost[st0] = 0;
+    push(h(s[0], s[1]), st0);
+    var goal = -1, guard = 0;
+    while (heapF.length && guard < 4e6) {
+      guard += 1;
+      var st = pop(), node = (st / 9) | 0, dir = st % 9;
+      var i = node % ni, j = (node - i) / ni;
+      if (i === g[0] && j === g[1]) { goal = st; break; }
+      var base = cost[st];
+      for (var k = 0; k < 8; k += 1) {
+        var turn = 0;
+        if (dir !== 8) { var dd = Math.abs(dir - k); turn = TURN[Math.min(dd, 8 - dd)]; }
+        if (turn === Infinity) { continue; }
+        var ii = i + DIRS[k][0], jj = j + DIRS[k][1];
+        if (!free(ii, jj)) { continue; }
+        if ((k & 1) && (!free(i + DIRS[k][0], j) || !free(i, j + DIRS[k][1]))) { continue; }
+        var nst = (jj * ni + ii) * 9 + k;
+        var nc = base + NAV.cell * ((k & 1) ? Math.SQRT2 : 1) + turn;
+        if (nc < cost[nst]) { cost[nst] = nc; from[nst] = st; push(nc + h(ii, jj), nst); }
+      }
+    }
+    if (goal < 0) { return null; }
+    var out = [];
+    for (var w = goal; w >= 0; w = from[w]) {
+      var nd = (w / 9) | 0, x = nd % ni;
+      out.push([x, (nd - x) / ni]);
+    }
+    return out.reverse();
+  }
+
+  // 같은 방향으로 이어지는 마디는 한 토막으로 — 꺾이는 자리만 남긴다.
+  function straighten(nodes) {
+    if (nodes.length < 3) { return nodes.slice(); }
+    var out = [nodes[0]];
+    for (var i = 1; i < nodes.length - 1; i += 1) {
+      var a = out[out.length - 1], b = nodes[i], c = nodes[i + 1];
+      var d1x = Math.sign(b[0] - a[0]), d1y = Math.sign(b[1] - a[1]);
+      var d2x = Math.sign(c[0] - b[0]), d2y = Math.sign(c[1] - b[1]);
+      if (d1x !== d2x || d1y !== d2y) { out.push(b); }
+    }
+    out.push(nodes[nodes.length - 1]);
+    return out;
+  }
+
+  /*
+   * 점들을 차례로 잇는 길(도면 좌표). closed 면 마지막 점에서 처음 점으로 돌아온다.
+   * 돌려주는 것: { path:[{X,Y,Z}], stops:[{X,Y,Z}](보정된 웨이포인트), reduced:[구간 번호] }
+   */
+  function planChain(fid, pts, closed, names) {
+    var nav = navOf(fid);
+    var need = NAV.radius + NAV.safety;
+    var stops = pts.map(function (P, k) {
+      var n = snapNode(nav, P, need);
+      var S = { X: n[0] * NAV.cell, Y: n[1] * NAV.cell, Z: 0 };
+      var moved = Math.hypot(S.X - P.X, S.Y - P.Y);
+      if (moved > 0.01) {
+        routeLog.push((names ? names[k] : "점 " + k) + " 좌표 보정 " + moved.toFixed(2) + " m (장애물 여유 안쪽)");
+      }
+      return S;
+    });
+    var order = closed ? stops.concat([stops[0]]) : stops;
+    var nodes = [], reduced = [];
+    for (var k = 0; k < order.length - 1; k += 1) {
+      var a = [Math.round(order[k].X / NAV.cell), Math.round(order[k].Y / NAV.cell)];
+      var b = [Math.round(order[k + 1].X / NAV.cell), Math.round(order[k + 1].Y / NAV.cell)];
+      var leg = astar(nav, a, b, need);
+      if (!leg) {
+        leg = astar(nav, a, b, NAV.radius) || astar(nav, a, b, 0);
+        reduced.push(k);
+        routeLog.push((names ? names[k] + " → " + (names[k + 1] || names[0]) : "구간 " + k) +
+          (leg ? " : 안전거리 미확보(반경만 지킴)" : " : 길 없음 — 직선으로 둠"));
+      }
+      leg = leg || [a, b];
+      nodes = nodes.concat(nodes.length ? leg.slice(1) : leg);
+    }
+    var path = straighten(nodes).map(function (n) { return { X: n[0] * NAV.cell, Y: n[1] * NAV.cell, Z: 0 }; });
+    return { path: path, stops: stops, reduced: reduced };
+  }
+
+  /*
+   * 로봇 경로 데이터 — 도면 좌표(m). 도커 -> WP-01 -> … -> WP-20 -> 같은 도커(폐회로).
+   * ROBOT_WPS 가 비어 있는 로봇은 예전 경유지(stops, 건물 비율)로 한 바퀴를 먼저 찾고
+   * 그 위에 20 개를 고르게 뿌려 씨앗으로 쓴다. 뿌린 좌표는 APRISM_ROUTE.report() 로 꺼내
+   * ROBOT_WPS 에 붙여 넣으면 그때부터 고정 데이터가 된다.
+   */
+  var ROBOT_WPS = {};
+
+  function planRobot(bot, id) {
+    if (!modelBox) { return null; }
+    var size = modelBox.getSize(new THREE.Vector3());
+    function frac(f) { return { X: f[0] * size.x * NAV.unit, Y: (1 - f[1]) * size.z * NAV.unit }; }
+    var fid = ROBOT_ON;
+    var dock = frac(bot.dock);
+    var count = readWaypoints().length || WAYPOINTS;
+    var names = ["DOCK"];
+    for (var n = 1; n <= count; n += 1) { names.push("WP-" + ("0" + n).slice(-2)); }
+    var wps = ROBOT_WPS[id];
+    if (!wps) {
+      var seed = planChain(fid, [dock].concat(bot.stops.map(frac)), true, null);
+      var mi = [0];
+      for (var s = 1; s < seed.path.length; s += 1) {
+        mi.push(mi[s - 1] + Math.hypot(seed.path[s].X - seed.path[s - 1].X, seed.path[s].Y - seed.path[s - 1].Y));
+      }
+      var total = mi[mi.length - 1];
+      wps = [];
+      for (var k = 1; k <= count; k += 1) {
+        var far = total * k / (count + 1), a = 1;
+        while (a < mi.length - 1 && mi[a] < far) { a += 1; }
+        var t = (far - mi[a - 1]) / Math.max(1e-6, mi[a] - mi[a - 1]);
+        var P = seed.path[a - 1], Q = seed.path[a];
+        wps.push([Math.round((P.X + (Q.X - P.X) * t) / NAV.cell) * NAV.cell,
+                  Math.round((P.Y + (Q.Y - P.Y) * t) / NAV.cell) * NAV.cell]);
+      }
+      routeLog.push(bot.name + " 웨이포인트 " + count + "개는 씨앗 좌표(ROBOT_WPS 비어 있음)");
+    }
+    var pts = [dock].concat(wps.map(function (w) { return { X: w[0], Y: w[1] }; }));
+    var res = planChain(fid, pts, true, names);
+    var lift = NAV.lift;
+    return {
+      fid: fid, names: names, dockPlan: res.stops[0], wpPlan: res.stops.slice(1), pathPlan: res.path,
+      reduced: res.reduced,
+      world: res.path.map(function (q) { return toWorld(q.X, q.Y, fid, lift); }),
+      wpWorld: res.stops.slice(1).map(function (q) { return toWorld(q.X, q.Y, fid, lift); }),
+      dockWorld: toWorld(res.stops[0].X, res.stops[0].Y, fid, lift)
+    };
+  }
+
+  // 층을 오가는 로봇(시연)의 평지 구간도 같은 길찾기를 쓴다 — 열린 길(폐회로 아님).
+  function routeOnNav(fid, worldPts) {
+    var res = planChain(fid, worldPts.map(toPlan), false, null);
+    return res.path.map(function (q) { return toWorld(q.X, q.Y, fid, NAV.lift); });
+  }
+
+  /*
+   * 도커 — 출발점이자 복귀점이라 아이콘 하나에 두 상태를 같이 싣는다.
+   * 둘레의 고리가 한 바퀴 중 어디까지 왔는지(출발 → 복귀)를 채우고, 옆 글자가 지금 상태를 말한다.
+   *   출발 대기 · 출발 완료 → 복귀 대기(n%) · 복귀 완료
+   */
+  var dockBox = null;
+  function syncDock() {
+    var ln = onLane && onLane.plan ? onLane : null;
+    if (!dockBox) {
+      dockBox = document.createElement("div");
+      dockBox.className = "map-dock"; dockBox.hidden = true;
+      dockBox.innerHTML = '<span class="map-dock-ic" aria-hidden="true"><svg viewBox="0 0 16 16" width="12" height="12">' +
+        '<path d="M9 1 3 9h4l-1 6 6-8H8l1-6z" fill="currentColor"/></svg></span><span class="map-dock-txt"></span>';
+      hit.appendChild(dockBox);
+    }
+    var show = !!ln && (ln.floor || ROBOT_ON) === floorNow && !floorBusy;
+    dockBox.hidden = !show;
+    if (!show) { return; }
+    var at = ln.bot.at;
+    // 도커는 아이콘이 말하므로 "DOCK" 글자는 싣지 않는다. 출발 · 복귀는 조각 둘로.
+    var txt = at <= 0.001 ? ["출발 대기"] : (at >= 0.999 ? ["복귀 완료"] : ["출발 완료", "복귀 대기 " + Math.round(at * 100) + "%"]);
+    window.APRISM_TEXT.fill(dockBox.querySelector(".map-dock-txt"), txt);
+    dockBox.style.setProperty("--p", String(Math.max(0, Math.min(1, at))));
+    dockBox.style.setProperty("--tint", "#" + ("00000" + ln.bot.done.toString(16)).slice(-6));
+    put(dockBox, ln.dock);
+  }
+
+  window.APRISM_ROUTE = {
+    config: NAV,
+    // 로봇별 도면 좌표(m)를 꺼낸다. 경로선 좌표의 Z 는 0 이다(그릴 때만 +lift).
+    report: function () {
+      var out = { unit: "1 UNIT = " + NAV.unit + " m", origin: "도면 좌측 하단 (0,0,0)", log: routeLog.slice(), robots: {} };
+      Object.keys(lanes).forEach(function (id) {
+        var ln = lanes[id];
+        if (!ln || !ln.plan) { return; }
+        out.robots[ln.bot.name] = {
+          dock: ln.plan.dockPlan, wps: ln.plan.wpPlan.map(function (w, k) { return { id: ln.plan.names[k + 1], X: w.X, Y: w.Y, Z: 0 }; }),
+          path: ln.plan.pathPlan, reducedLegs: ln.plan.reduced
+        };
+      });
+      return out;
+    }
+  };
 
   function start(three, utils, gltf) {
     THREE = three;
@@ -2360,12 +3627,23 @@
     var model = build(gltf.scene);
     scene.add(model);
 
+    // 덩이마다 광선 가속 나무를 한 번 심는다. 좌표가 월드로 굳어 있어 다시 만들 일이 없다.
+    if (Bvh) {
+      meshes.forEach(function (item) {
+        item.mesh.geometry.computeBoundsTree = Bvh.computeBoundsTree;
+        item.mesh.geometry.computeBoundsTree();
+        item.mesh.raycast = Bvh.acceleratedRaycast;
+      });
+    }
+
     var box = new THREE.Box3().setFromObject(model);
+    modelBox = box;   // 층 이동이 층마다 길을 찾을 때 쓴다
     var size = box.getSize(new THREE.Vector3());
     span = size.length() / 2;
 
     // 층을 읽는다. 층이 있으면 처음 자리는 그 층 한가운데다(두 층을 합친 한가운데가 아니다).
     setupFloors();
+    readStairs();   // 계단이 잇는 층 · 층마다 입구
     var here = floors.length ? floorOf(floorNow) : null;
 
     home = (here ? here.center : box.getCenter(new THREE.Vector3())).clone();
@@ -2405,7 +3683,9 @@
     // 깔아만 두고 보이지는 않는다 — 지금 고른 로봇의 것 하나만 켠다.
     ROBOTS.forEach(function (bot, id) {
       // 길은 도킹 스테이션에서 시작한다.
-      drawRoute(layRoute(box, [bot.dock].concat(bot.stops)), bot, id);
+      // 도커 -> WP-01 … -> 같은 도커 폐회로(미터 좌표 · 장애물 여유). 못 만들면 예전 길로 둔다.
+      var planned = planRobot(bot, id);
+      drawRoute(planned ? planned.world : layRoute(box, [bot.dock].concat(bot.stops)), bot, id, planned);
     });
     layRobots();
     layWaypoints();
@@ -2473,6 +3753,17 @@
     plan();
     frame();
 
+    /*
+     * 층 이동 시연 — 로봇 위치 실데이터가 붙기 전까지 URL 로 켠다.
+     *   ?demo=travel       ROBOT 02 를 골라 둔 채(트래킹) B3 -> B4
+     *   ?demo=travel-free  다른 로봇을 골라 둔 채(비트래킹) B3 -> B4
+     * 콘솔에서는 APRISM_TRAVEL.start(true | false) · APRISM_TRAVEL.reset().
+     */
+    var demo = (window.location.search.match(/[?&]demo=([\w-]+)/) || [])[1];
+    if (demo === "travel" || demo === "travel-free") {
+      window.setTimeout(function () { travelStart(demo === "travel"); }, 600);
+    }
+
     if (window.ResizeObserver) {
       new ResizeObserver(frame).observe(view);
     } else {
@@ -2493,8 +3784,11 @@
     import("three/addons/lines/LineMaterial.js"),
     import("three/addons/lines/LineGeometry.js"),
     import("three/addons/lines/LineSegments2.js"),
-    import("three/addons/lines/LineSegmentsGeometry.js")
+    import("three/addons/lines/LineSegmentsGeometry.js"),
+    // 광선 가속 — 판정이 광선 백여 줄을 쏜다. 못 가져오면 그냥 느린 광선으로 돈다.
+    import("https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.7.8/build/index.module.js").catch(function () { return null; })
   ]).then(function (mods) {
+    Bvh = mods[8];
     Fat = {
       Line2: mods[3].Line2,
       LineMaterial: mods[4].LineMaterial,
