@@ -229,7 +229,13 @@
         if (!next) {
           if (tag) { tag.textContent = "완료"; }
           if (startBtn) { startBtn.disabled = false; }
+          /*
+           * 다 통과하면 모니터링으로 넘어간다. 단, 그 단계를 보여 주려고 연 화면
+           * (사전 점검 화면 — body[data-stage-hold])에서는 멈춰 선다 —
+           * 링크를 열어 둔 사람이 잠깐 뒤에 다른 화면을 보고 있으면 안 된다.
+           */
           timers.push(window.setTimeout(function () {
+            if (body.getAttribute("data-stage-hold") === "precheck") { return; }
             if (stage === "precheck") { setLevel("normal"); setStage("monitor"); }
           }, 1600));
           return;
@@ -791,7 +797,10 @@
     setStage("monitor");
     setLevel("normal");
   } else {
-    setStage(hash === "precheck" ? "precheck" : "setup");
+    // 주소에 단계가 없으면 화면이 정한 단계다(body[data-stage-start]).
+    // 시안 1 은 미션 설정부터 열고, 사전 점검 화면은 그 단계로 바로 연다.
+    var start = body.getAttribute("data-stage-start") || "setup";
+    setStage(hash === "precheck" ? "precheck" : (hash === "setup" ? "setup" : start));
     level = "normal";
   }
 })();
