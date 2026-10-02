@@ -223,7 +223,8 @@
       var card = document.querySelector(".robot-strip.is-carousel .robot-card[aria-pressed='true']");
       var badge = card && card.querySelector(".robot-row .badge");
       var text = badge ? badge.textContent.replace(/\s+/g, "") : "";
-      var m = MOTION[text] || "idle";
+      /* 카드가 data-motion 을 들고 있으면 배지 상태보다 그 값이 먼저다. */
+      var m = (card && card.getAttribute("data-motion")) || MOTION[text] || "idle";
       /* 수행 중이면서 칸 하나를 붙들고 있으면 그 자리에서 재는 중이다 — 걷기가 아니라 검사다. */
       if (m === "walk" && atWaypoint()) { return "inspect"; }
       return m;
