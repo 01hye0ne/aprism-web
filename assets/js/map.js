@@ -1783,7 +1783,7 @@
       if (botTip) { botTip.hidden = true; }
       botBox.classList.remove("is-picked");
       if (onLane) {
-        botBox.style.setProperty("--bot-tint", "#" + ("00000" + onLane.bot.done.toString(16)).slice(-6));
+        botBox.style.setProperty("--bot-tint", "#" + ("00000" + (onLane.bot.mark || onLane.bot.done).toString(16)).slice(-6));
         if (botName) { botName.textContent = onLane.bot.name; }
         if (botTitle) { botTitle.textContent = onLane.bot.name; }
       }
@@ -2035,13 +2035,19 @@
    */
   var BOT_TINT = {
     /*
-     * 수행 중인 로봇은 흰빛이다(디자이너 요청).
-     * 파랑은 이 화면에서 링크 · 정보 · 주요 동작 버튼이 이미 쓰고 있어서,
-     * "지금 도는 길" 까지 파랑이면 뜻이 넷이 된다. 흰빛은 바탕이 밝아진 지금 지도에서
-     * 가장 또렷하고, 진행 막대(흰 게이지) · 프리즘의 입사광과도 같은 말을 한다.
-     * 남은 길은 흰색을 그대로 쓰지 않는다 — 지나온 길과 밝기로도 갈려야 한다.
+     * 수행 중인 로봇 — 길의 앞뒤를 색으로 가른다(디자이너 요청).
+     *
+     *   done  지나온 길   회색. 이미 한 일이라 뒤로 물러난다.
+     *   left  앞으로 갈 길 파랑. 관제에서 쓰는 쪽은 이쪽이다 — 어디로 가는지가 판단에 든다.
+     *   dot   시야 빛      흰빛
+     *   mark  로봇 · 도커 표식  흰빛 — "지금 여기" 는 화면에서 가장 밝다.
+     *
+     * 흰빛을 길에서 표식으로 옮긴 것이다. 세 층위가 갈린다 —
+     * 로봇(흰빛) · 앞으로 갈 길(파랑) · 지나온 길(회색).
+     * 대기 로봇도 회색이라 지나온 길과 톤이 겹치는데, 수행 중인 로봇은 흰 표식과
+     * 파란 앞길이 함께 서 있어 멀리서도 갈린다.
      */
-    "수행중": { done: 0xf7f8fa, left: 0x9ea8bb, dot: 0xffffff },
+    "수행중": { done: 0x6b7585, left: 0x89b9ed, dot: 0xffffff, mark: 0xf7f8fa },
     "완료":   { done: 0x34c759, left: 0x1da67f, dot: 0x72f494 },
     "대기":   { done: 0x8894aa, left: 0x5d6675, dot: 0xaeb8c8 },
     "끊김":   { done: 0x667085, left: 0x4e576a, dot: 0x8894aa }
@@ -2059,6 +2065,8 @@
     bot.done = tint.done;
     bot.left = tint.left;
     bot.dot = tint.dot;
+    // 표식 색을 따로 들지 않는 상태는 지나온 길 색을 그대로 쓴다.
+    bot.mark = tint.mark || tint.done;
     return bot;
   }
 
@@ -2131,7 +2139,7 @@
 
     // 도킹 스테이션 — 길의 첫 점이 곧 그 자리다.
     // 폐회로의 도커는 화면 아이콘 하나(syncDock)가 시작 · 복귀를 함께 보인다.
-    if (!plan) { parts.push(dockMark(turns[0], bot.done)); }
+    if (!plan) { parts.push(dockMark(turns[0], bot.mark || bot.done)); }
 
     parts.forEach(function (part) {
       part.visible = false;
@@ -3101,7 +3109,7 @@
     }
     d.pill.hidden = !showPill;
     if (showPill) {
-      d.pill.style.setProperty("--tint", "#" + ("00000" + trav.lane.bot.done.toString(16)).slice(-6));
+      d.pill.style.setProperty("--tint", "#" + ("00000" + (trav.lane.bot.mark || trav.lane.bot.done).toString(16)).slice(-6));
       put(d.pill, shrinking && !visible ? trav.flight.upMouth : trav.lane.here);
     }
 
@@ -3110,7 +3118,7 @@
     d.badge.hidden = !badgeOn;
     if (badgeOn) {
       d.badge.textContent = arrow() + " " + trav.low + " 이동";
-      d.badge.style.setProperty("--tint", "#" + ("00000" + trav.lane.bot.done.toString(16)).slice(-6));
+      d.badge.style.setProperty("--tint", "#" + ("00000" + (trav.lane.bot.mark || trav.lane.bot.done).toString(16)).slice(-6));
       d.badge.classList.toggle("is-leaving", now - trav.badgeAt > TRAVEL.BADGE - 400);
       put(d.badge, trav.flight.upMouth);
     }
@@ -3620,7 +3628,7 @@
     var txt = at <= 0.001 ? ["출발 대기"] : (at >= 0.999 ? ["복귀 완료"] : ["출발 완료", "복귀 대기 " + Math.round(at * 100) + "%"]);
     window.APRISM_TEXT.fill(dockBox.querySelector(".map-dock-txt"), txt);
     dockBox.style.setProperty("--p", String(Math.max(0, Math.min(1, at))));
-    dockBox.style.setProperty("--tint", "#" + ("00000" + ln.bot.done.toString(16)).slice(-6));
+    dockBox.style.setProperty("--tint", "#" + ("00000" + (ln.bot.mark || ln.bot.done).toString(16)).slice(-6));
     put(dockBox, ln.dock);
   }
 
