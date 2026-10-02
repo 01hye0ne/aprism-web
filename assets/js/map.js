@@ -1456,8 +1456,9 @@
     geo.setAttribute("uv", new THREE.Float32BufferAttribute(uv, 2));
     geo.setIndex(idx);
 
+    // 로봇이 쏘는 빛은 그 로봇의 가장 밝은 색이다 — 길이 흰빛이면 빛도 흰빛이다.
     var fan = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({
-      color: bot.left, map: fanTexture(), transparent: true,
+      color: bot.dot, map: fanTexture(), transparent: true,
       depthWrite: false, side: THREE.DoubleSide
     }));
     fan.position.copy(here);
@@ -2033,7 +2034,14 @@
    *   대기 · 끊김  gray  아직 · 더는 아무 일도 하지 않는다
    */
   var BOT_TINT = {
-    "수행중": { done: 0x89b9ed, left: 0x4990e0, dot: 0xc7ddf8 },
+    /*
+     * 수행 중인 로봇은 흰빛이다(디자이너 요청).
+     * 파랑은 이 화면에서 링크 · 정보 · 주요 동작 버튼이 이미 쓰고 있어서,
+     * "지금 도는 길" 까지 파랑이면 뜻이 넷이 된다. 흰빛은 바탕이 밝아진 지금 지도에서
+     * 가장 또렷하고, 진행 막대(흰 게이지) · 프리즘의 입사광과도 같은 말을 한다.
+     * 남은 길은 흰색을 그대로 쓰지 않는다 — 지나온 길과 밝기로도 갈려야 한다.
+     */
+    "수행중": { done: 0xf7f8fa, left: 0x9ea8bb, dot: 0xffffff },
     "완료":   { done: 0x34c759, left: 0x1da67f, dot: 0x72f494 },
     "대기":   { done: 0x8894aa, left: 0x5d6675, dot: 0xaeb8c8 },
     "끊김":   { done: 0x667085, left: 0x4e576a, dot: 0x8894aa }

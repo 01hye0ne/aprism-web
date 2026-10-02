@@ -17,3 +17,8 @@ dist/
 # Local env
 .env
 .env.local
+
+# 소스 드롭 폴더 — 디자이너가 넣어 두는 원본이다. 쓸 때 제자리로 옮기므로 저장소에는 두지 않는다.
+# (README 만 남긴다. assets/source/README.md 에 쓰는 법이 적혀 있다.)
+assets/source/*
+!assets/source/README.md
