@@ -75,6 +75,8 @@
     var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     if ("outputColorSpace" in renderer) { renderer.outputColorSpace = THREE.SRGBColorSpace; }
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
     var scene = new THREE.Scene();
     var camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.01, 40);
@@ -99,6 +101,43 @@
     var rim = new THREE.DirectionalLight(0xbcd8ff, 2.4);
     rim.position.set(-4, 5, -7);
     scene.add(rim);
+
+    /*
+     * 그림자 전용 빛. 거의 바로 위에서 내려 그림자가 로봇 밑에 고이게 한다.
+     * 주광(key)에 그림자를 맡기면 그림자가 카메라 반대쪽으로 뻗어 로봇 뒤에 숨는다 —
+     * 카메라와 같은 쪽(앞 오른쪽 위)에서 비추는 빛이라 그렇다. 그렇다고 주광을 뒤로 옮기면
+     * 이번엔 로봇의 앞면이 어두워진다. 그래서 빛을 하나 더 두고 그 몫만 맡겼다.
+     * 세기는 낮다. 바닥의 ShadowMaterial 은 빛의 세기가 아니라 가림 여부로 그늘을 그려서,
+     * 세기를 낮춰도 그림자는 또렷하다.
+     *
+     * 판이 140 쯤이라 512 로도 넉넉하다. 틀은 로봇 둘레로 바짝 좁혀야 해상도가 다 쓰인다.
+     */
+    var sun = new THREE.DirectionalLight(0xcfe0ff, 0.3);
+    sun.position.set(1.2, 9, 1.6);
+    sun.castShadow = true;
+    sun.shadow.mapSize.set(512, 512);
+    sun.shadow.bias = -0.0015;
+    sun.shadow.camera.left = -1.3;
+    sun.shadow.camera.right = 1.3;
+    sun.shadow.camera.top = 1.3;
+    sun.shadow.camera.bottom = -1.3;
+    sun.shadow.camera.near = 1;
+    sun.shadow.camera.far = 20;
+    scene.add(sun);
+
+    /*
+     * 그림자 받는 바닥. 판이 투명이라 ShadowMaterial 이 그림자가 진 자리만 어둡게 깐다 —
+     * 로봇 카드 면(#0A0E15 50%) 위에 그늘이 생긴다. 다이얼보다 조금 아래에 두어
+     * 눈금과 면이 서로 깜빡이지 않게 한다.
+     */
+    var shade = new THREE.Mesh(
+      new THREE.PlaneGeometry(6, 6),
+      new THREE.ShadowMaterial({ color: 0x050a14, opacity: 0.55 })
+    );
+    shade.rotation.x = -Math.PI / 2;
+    shade.position.y = -0.002;
+    shade.receiveShadow = true;
+    scene.add(shade);
 
     var dial = buildDial(THREE);
     scene.add(dial.group);
@@ -378,6 +417,7 @@
     function mesh(name, geo, mat, parent, pos, rot) {
       var m = new THREE.Mesh(geo, mat);
       m.name = name;
+      m.castShadow = true;
       if (pos) { m.position.set(pos[0], pos[1], pos[2]); }
       if (rot) { m.rotation.set(rot[0], rot[1], rot[2]); }
       parent.add(m);
