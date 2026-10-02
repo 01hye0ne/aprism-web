@@ -22,7 +22,7 @@
   <link rel="stylesheet" href="../assets/css/app-shell.css?v=0c5747d1" />
   <link rel="stylesheet" href="../assets/css/map-overlays.css?v=bf2847b4" />
   <link rel="stylesheet" href="../assets/css/text-parts.css?v=e38e19ea" />
-  <link rel="stylesheet" href="../assets/css/monitor.css?v=c92da5d5" />
+  <link rel="stylesheet" href="../assets/css/monitor.css?v=858d859a" />
   <link rel="stylesheet" href="../assets/css/delta-v3.css?v=755e6185" />
   <style>
     *, *::before, *::after { box-sizing: border-box; }
@@ -897,6 +897,12 @@
                       </span>
                     </button>
                   </div>
+                  <!-- 로봇 3D — 캐러셀에 보이는 한 대만 그린다. 그래픽 칸에 겹쳐 놓고
+                       아래의 SVG 로봇은 가린다(assets/js/robot-stage.js).
+                       three.js 를 못 가져오면 이 칸은 비고 SVG 가 그대로 보인다. -->
+                  <span class="robot-stage" data-robot-stage aria-hidden="true">
+                    <canvas class="robot-scene"></canvas>
+                  </span>
                   <div class="rc-side">
                     <div class="rc-nav">
                       <button type="button" class="rc-arrow" data-rc-step="-1" aria-label="이전 로봇">
@@ -1612,7 +1618,8 @@
 <script src="../assets/js/prism-orb.js?v=03386460"></script>
 <script src="../assets/js/screen.js?v=46828ac1"></script>
 <script src="../assets/js/map-model.js?v=0f88c871"></script>
-<script src="../assets/js/map.js?v=f2c1f68e"></script>
+<script src="../assets/js/map.js?v=53abcbb1"></script>
+<script src="../assets/js/robot-stage.js?v=80ba0885"></script>
 <script src="../assets/js/monitor.js?v=e236eb9b"></script>
 <script src="../assets/js/delta-v3.js?v=ba0f09af"></script>
 <script src="../assets/js/grid-overlay.js?v=164e4f2a"></script>

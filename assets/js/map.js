@@ -1778,6 +1778,8 @@
     layWaypoints();
     tellWaypoint();
 
+    tellHeading();
+
     if (botBox) {
       botBox.hidden = !onLane;
       if (botTip) { botTip.hidden = true; }
@@ -1789,6 +1791,23 @@
       }
     }
     frame();
+  }
+
+  /*
+   * 로봇이 보는 쪽을 우측 패널에 알린다 — 거기 3D 로봇이 같은 쪽을 본다
+   * (assets/js/robot-stage.js). 월드 각이다. 패널의 카메라는 지도의 처음 방위와
+   * 같은 45도로 붙박여 있어서, 지도를 돌리지 않은 상태에서 둘이 같은 쪽을 가리킨다.
+   */
+  var toldHeading = null;
+
+  function tellHeading() {
+    var h = null;
+    if (onLane) { h = Math.atan2(onLane.ahead.x - onLane.here.x, onLane.ahead.z - onLane.here.z); }
+    if (h === toldHeading) { return; }
+    toldHeading = h;
+    document.dispatchEvent(new CustomEvent("aprism:robot-heading", {
+      detail: { id: onLane ? onLane.id : null, heading: h }
+    }));
   }
 
   /*
@@ -3219,6 +3238,7 @@
     trav.fan.position.copy(here);
     trav.fan.position.y += span * 0.002;
     trav.fan.rotation.y = Math.atan2(ahead.x - here.x, ahead.z - here.z);
+    tellHeading();
 
     if (trav.onStairs) { stepStairMove((trav.s - trav.s1) / Math.max(1e-6, trav.s2 - trav.s1)); }
 
