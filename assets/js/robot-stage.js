@@ -23,6 +23,13 @@
 (function () {
   "use strict";
 
+  /*
+   * 로봇개를 만드는 일은 밖에서도 쓴다 — 셰이더 시험 페이지(screens/hatch-lab.html)가
+   * 같은 로봇을 세워 놓고 효과를 입혀 본다. 판이 없는 화면에서는 아래에서 바로 빠지므로
+   * 여는 일만 먼저 해 둔다.
+   */
+  window.APRISM_ROBOT_DOG = buildDog;
+
   var mount = document.querySelector("[data-robot-stage]");
   var canvas = mount && mount.querySelector("canvas");
   if (!mount || !canvas) { return; }

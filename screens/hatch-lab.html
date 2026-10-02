@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hatching 시험판 — APRISM</title>
+  <meta name="description" content="Figma 1차 셰이더 Hatching 을 WebGL 로 옮긴 시험판. 조절값을 바꿔 가며 APRISM 화면에 쓸지 정하는 자리다." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/static/woff2/SUIT.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" />
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+  <link rel="stylesheet" href="../assets/css/tokens.css?v=4aceab62" />
+  <style>
+    /*
+     * 시험용 한 장짜리 화면이라 꾸밈은 여기에 둔다 — 지우기 쉽게.
+     * 쓰는 값은 모두 토큰이다.
+     */
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; }
+
+    body {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 300px;
+      height: 100%;
+      background-color: var(--bg-canvas);
+      color: var(--fg-primary);
+      font-family: "SUIT Variable", "SUIT", system-ui, sans-serif;
+    }
+
+    .stage {
+      position: relative;
+      min-width: 0;
+      display: grid;
+      place-items: stretch;
+      padding: var(--space-24);
+    }
+
+    .stage-box {
+      position: relative;
+      border-radius: var(--radius-container);
+      background-color: var(--bg-surface-overlay-dark);
+      overflow: hidden;
+    }
+
+    .stage-box canvas { display: block; width: 100%; height: 100%; }
+
+    .panel {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-16);
+      padding: var(--space-20) var(--space-16);
+      border-left: var(--border-width-thin) solid var(--border-default);
+      background-color: var(--bg-surface-subtle);
+      overflow-y: auto;
+    }
+
+    .panel h1 { margin: 0; font-size: var(--font-size-16); line-height: var(--font-line-height-24); }
+    .panel p { margin: 0; color: var(--fg-tertiary); font-size: var(--font-size-12); line-height: var(--font-line-height-18); }
+
+    .row { display: flex; flex-direction: column; gap: var(--space-4); }
+
+    .row > label {
+      display: flex;
+      justify-content: space-between;
+      gap: var(--space-8);
+      color: var(--fg-secondary);
+      font-size: var(--font-size-12);
+      line-height: var(--font-line-height-18);
+    }
+
+    .row output {
+      color: var(--fg-primary);
+      font-family: "JetBrains Mono", monospace;
+      font-size: var(--font-size-12);
+    }
+
+    input[type="range"] { width: 100%; accent-color: var(--bg-brand); }
+    input[type="color"] { width: 100%; height: 28px; padding: 0; border: 0; background: none; }
+
+    select, button {
+      width: 100%;
+      padding: var(--space-8);
+      border: var(--border-width-thin) solid var(--border-default);
+      border-radius: var(--radius-control);
+      background-color: var(--bg-surface-default);
+      color: var(--fg-primary);
+      font: inherit;
+      font-size: var(--font-size-13);
+      cursor: pointer;
+    }
+
+    .presets { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-4); }
+    .presets button { padding: var(--space-8) var(--space-4); font-size: var(--font-size-12); }
+
+    .rule { height: 1px; background-color: var(--border-default); }
+
+    .check { flex-direction: row; align-items: center; gap: var(--space-8); }
+    .check input { accent-color: var(--bg-brand); }
+  </style>
+</head>
+<body>
+
+  <!-- 왼쪽 — 원본을 렌더 타깃에 담고 그 위에 해칭 패스를 한 장 얹는다. -->
+  <main class="stage">
+    <div class="stage-box" data-hatch-stage></div>
+  </main>
+
+  <!-- 오른쪽 — 조절값. 이름과 기본값은 Figma 속성판 그대로다. -->
+  <aside class="panel">
+    <div class="row">
+      <h1>Hatching 시험판</h1>
+      <p>Figma 1차 셰이더 <b>Hatching</b> 을 WebGL 로 옮긴 것이다. 셈은 원본(WGSL)과 한 줄씩 같다.
+        줄 간격은 Figma 와 똑같이 <b>판 폭의 %</b> 라, 작은 프레임에서 고른 값을 큰 판에 그대로 넣으면 줄이 훨씬 굵게 나온다.</p>
+    </div>
+
+    <div class="presets">
+      <button type="button" data-preset="figma">Figma 기본</button>
+      <button type="button" data-preset="aprism">APRISM</button>
+      <button type="button" data-preset="print">도면</button>
+    </div>
+
+    <div class="rule"></div>
+
+    <div class="row">
+      <label for="src">원본</label>
+      <select id="src" data-p="source">
+        <option value="dog">로봇개 (3D)</option>
+        <option value="ramp">휘도 띠</option>
+      </select>
+    </div>
+
+    <div class="row check">
+      <input type="checkbox" id="on" data-p="hatch" checked />
+      <label for="on">해칭 켜기 — 끄면 원본 그대로</label>
+    </div>
+
+    <div class="rule"></div>
+
+    <div class="row">
+      <label for="mode">Pattern</label>
+      <select id="mode" data-p="mode">
+        <option value="0">Circles</option>
+        <option value="1" selected>Waves</option>
+        <option value="2">Zigzag</option>
+      </select>
+    </div>
+
+    <div class="row">
+      <label for="density">Density <output data-out="density"></output></label>
+      <input type="range" id="density" data-p="density" min="0" max="2" step="0.01" />
+    </div>
+
+    <div class="row">
+      <label for="softness">Softness (%) <output data-out="softness"></output></label>
+      <input type="range" id="softness" data-p="softness" min="0" max="100" step="1" />
+    </div>
+
+    <div class="row">
+      <label for="freq">Frequency <output data-out="waveFrequency"></output></label>
+      <input type="range" id="freq" data-p="waveFrequency" min="0" max="20" step="0.1" />
+    </div>
+
+    <div class="row">
+      <label for="amp">Amplitude (%) <output data-out="waveAmplitude"></output></label>
+      <input type="range" id="amp" data-p="waveAmplitude" min="0" max="100" step="0.1" />
+    </div>
+
+    <div class="row">
+      <label for="ox">Offset X (%) <output data-out="offsetX"></output></label>
+      <input type="range" id="ox" data-p="offsetX" min="0" max="100" step="1" />
+    </div>
+
+    <div class="row">
+      <label for="oy">Offset Y (%) <output data-out="offsetY"></output></label>
+      <input type="range" id="oy" data-p="offsetY" min="0" max="100" step="1" />
+    </div>
+
+    <div class="rule"></div>
+
+    <div class="row">
+      <label for="angle">Transform · 각도 (°) <output data-out="angle"></output></label>
+      <input type="range" id="angle" data-p="angle" min="0" max="180" step="1" />
+    </div>
+
+    <div class="row">
+      <label for="radius">Transform · 줄 간격 (판 폭의 %) <output data-out="radius"></output></label>
+      <input type="range" id="radius" data-p="radius" min="0.2" max="100" step="0.1" />
+    </div>
+
+    <div class="row">
+      <label for="cx">Transform · 중심 X (%) <output data-out="centerX"></output></label>
+      <input type="range" id="cx" data-p="centerX" min="0" max="100" step="1" />
+    </div>
+
+    <div class="row">
+      <label for="cy">Transform · 중심 Y (%) <output data-out="centerY"></output></label>
+      <input type="range" id="cy" data-p="centerY" min="0" max="100" step="1" />
+    </div>
+
+    <div class="rule"></div>
+
+    <div class="row">
+      <label for="ca">Background</label>
+      <input type="color" id="ca" data-p="colorA" />
+    </div>
+
+    <div class="row">
+      <label for="cb">Foreground</label>
+      <input type="color" id="cb" data-p="colorB" />
+    </div>
+  </aside>
+
+  <script src="../assets/js/robot-stage.js?v=d3bb1e24"></script>
+  <script src="../assets/js/hatch-lab.js?v=b4faf30a"></script>
+</body>
+</html>
