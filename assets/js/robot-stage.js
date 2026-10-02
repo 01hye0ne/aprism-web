@@ -48,6 +48,24 @@
 
   var still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+  /*
+   * 방향은 지도가 알려 준다(map.js 의 showLane · 이동 갱신).
+   * 듣는 자리를 three.js 를 받기 전에 먼저 걸어 둔다 — 지도가 먼저 말하고
+   * 이쪽이 나중에 깨면 그 한 번을 놓쳐서 로봇이 처음 방향에 붙박인다.
+   */
+  /*
+   * 지도가 알려 주기 전까지 볼 쪽. 카메라가 45도에 서 있으므로 이 각이면
+   * 로봇이 화면 오른쪽 아래를 향한 3/4 로 선다 — 옆모습으로 납작해지지 않는 자리다.
+   */
+  var want = Math.PI / 2;
+  var onTurn = null;
+
+  document.addEventListener("aprism:robot-heading", function (event) {
+    var h = event.detail && event.detail.heading;
+    if (typeof h === "number") { want = h; }
+    if (onTurn) { onTurn(); }
+  });
+
   /* 지도와 같은 길이다 — <head> 의 importmap 이 "three" 를 CDN 으로 이어 준다. */
   import("three").then(start).catch(function () { /* 없으면 SVG 로봇이 그대로 남는다 */ });
 
@@ -63,13 +81,22 @@
      * 빛 — 핸드오프의 스튜디오 조명을 어두운 패널에 맞춰 옮겼다.
      * 반구광의 아랫색을 패널 바탕으로 낮춰야 흰 몸체의 밑면이 떠 보이지 않는다.
      */
-    scene.add(new THREE.HemisphereLight(0xdfe7f5, 0x0a0e15, 1.1));
-    var key = new THREE.DirectionalLight(0xffffff, 2.0);
+    scene.add(new THREE.HemisphereLight(0xdfe7f5, 0x1b2434, 1.0));
+    var key = new THREE.DirectionalLight(0xffffff, 1.9);
     key.position.set(4, 7, 5);
     scene.add(key);
     var fill = new THREE.DirectionalLight(0x9fc4ff, 0.55);
     fill.position.set(-5, 3, -4);
     scene.add(fill);
+
+    /*
+     * 뒤에서 치는 빛 — 몸통 위 장비(LiDAR · PTZ)가 거의 검은 재질이라
+     * 어두운 패널 바탕에 묻혀 윤곽이 사라졌다. 뒤위에서 한 겹 비춰 테두리를 띄운다.
+     * 면을 밝히는 게 아니라 가장자리만 걸치게 하는 빛이라 세기를 높여도 흰 몸체가 뜨지 않는다.
+     */
+    var rim = new THREE.DirectionalLight(0xbcd8ff, 2.4);
+    rim.position.set(-4, 5, -7);
+    scene.add(rim);
 
     var floor = new THREE.Group();
     scene.add(floor);
@@ -123,7 +150,6 @@
     else { window.addEventListener("resize", fit); }
 
     /* ---------- 고른 로봇을 따라간다 ---------- */
-    var want = Math.PI * 0.75;   /* 가야 할 방향. 지도가 알려 주기 전까지는 보기 좋은 쪽을 본다 */
     var now = want;              /* 지금 보고 있는 방향 — 천천히 따라간다 */
 
     function motion() {
@@ -135,12 +161,7 @@
 
     function follow() { play(motion()); }
 
-    /* 지도가 고른 로봇의 길 방향을 알려 준다(map.js 의 showLane · 이동 갱신). */
-    document.addEventListener("aprism:robot-heading", function (event) {
-      var h = event.detail && event.detail.heading;
-      if (typeof h === "number") { want = h; }
-      follow();
-    });
+    onTurn = follow;
 
     /* 카드를 바꾸면 상태도 바뀐다. 눌린 뒤의 상태를 읽어야 하므로 한 틱 뒤에 본다. */
     document.addEventListener("click", function (event) {
@@ -192,16 +213,43 @@
     return new THREE.Vector3(Math.sin(angle) * radius, 0, Math.cos(angle) * radius);
   }
 
+  /*
+   * 바닥 위의 띠 한 토막. 선(THREE.Line)은 WebGL 에서 굵기를 못 준다 —
+   * linewidth 는 거의 모든 브라우저가 무시한다. 그래서 바닥에 눕힌 면으로 그린다.
+   * 폭은 월드 단위다. 칸 폭이 2R/OVER 이므로 1px ≈ 0.0153R 로 보면 된다.
+   */
+  function ribbon(THREE, a0, a1, width, color, opacity, lift) {
+    var N = 72;
+    var pos = new Float32Array((N + 1) * 2 * 3);
+    var idx = [];
+    for (var i = 0; i <= N; i++) {
+      var a = a0 + (a1 - a0) * i / N;
+      var sn = Math.sin(a), cs = Math.cos(a);
+      var k = i * 6;
+      pos[k] = sn * (R - width / 2); pos[k + 1] = 0; pos[k + 2] = cs * (R - width / 2);
+      pos[k + 3] = sn * (R + width / 2); pos[k + 4] = 0; pos[k + 5] = cs * (R + width / 2);
+      if (i < N) { idx.push(2 * i, 2 * i + 1, 2 * i + 2, 2 * i + 1, 2 * i + 3, 2 * i + 2); }
+    }
+    var geo = new THREE.BufferGeometry();
+    geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+    geo.setIndex(idx);
+    var mat = new THREE.MeshBasicMaterial({
+      color: color, side: THREE.DoubleSide,
+      transparent: opacity < 1, opacity: opacity, depthWrite: opacity >= 1
+    });
+    var mesh = new THREE.Mesh(geo, mat);
+    mesh.position.y = lift || 0;
+    return { mesh: mesh, geo: geo, mat: mat, count: N };
+  }
+
   function buildRing(THREE, parent) {
     var GAP = 2.6 * Math.PI / 180;          /* Figma 에서 잰 끊긴 폭(≈3px / 지름 134) */
-    var mat = new THREE.LineBasicMaterial({ color: RING });
+    var W = R * 0.024;                      /* ≈1.5px — Figma 의 선 굵기 */
 
     for (var k = 0; k < 4; k++) {
       var a0 = Math.PI / 4 + k * Math.PI / 2 + GAP / 2;
       var a1 = Math.PI / 4 + (k + 1) * Math.PI / 2 - GAP / 2;
-      var pts = [];
-      for (var i = 0; i <= 48; i++) { pts.push(onRing(THREE, a0 + (a1 - a0) * i / 48, R)); }
-      parent.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), mat));
+      parent.add(ribbon(THREE, a0, a1, W, RING, 1, 0).mesh);
     }
 
     /*
@@ -225,35 +273,47 @@
   }
 
   /*
-   * 방향 호 — 90도. 꼬리에서 머리로 밝아지고 머리가 진행 방향이다.
-   * Figma 도 한쪽이 밝은 그라데이션이라 그 결을 그대로 가져왔다.
+   * 방향 호 — 90도. 머리가 로봇이 가는 쪽이다.
+   *
+   * 세 겹이다. 넓고 옅은 번짐 · 본선 · 머리의 점.
+   * 바닥선 하나로는 어두운 판에서 눈에 안 들어온다 — 이 화면에서 제일 먼저 읽혀야 할 것이
+   * "어디로 가는가" 라, 기본 링보다 두 배 넘게 굵고 번짐을 깔아 띄웠다.
+   *
+   * 꼬리에서 머리로 밝아지는 결은 Figma 와 같은데, 면 하나에 그라데이션을 넣는 대신
+   * 토막을 나눠 색을 올린다 — 호 전체를 heading 만큼 돌리면 되므로 매 프레임 다시 그릴 일이 없다.
    */
   function buildArc(THREE) {
-    var N = 64, SPAN = Math.PI / 2;
-    var pos = new Float32Array((N + 1) * 3);
-    var col = new Float32Array((N + 1) * 3);
+    var SPAN = Math.PI / 2, SEG = 12;
+    var group = new THREE.Group();
     var tail = new THREE.Color(ARC_TAIL), head = new THREE.Color(ARC_HEAD), mix = new THREE.Color();
-    for (var i = 0; i <= N; i++) {
-      mix.copy(tail).lerp(head, i / N);
-      col[i * 3] = mix.r; col[i * 3 + 1] = mix.g; col[i * 3 + 2] = mix.b;
+
+    /* 번짐 — 본선보다 네 배 넓게 깔아 바닥에 빛이 번진 것처럼 둔다. */
+    var glow = ribbon(THREE, -SPAN, 0, R * 0.22, ARC_HEAD, 0.14, 0.0015);
+    glow.mat.blending = THREE.AdditiveBlending;
+    group.add(glow.mesh);
+
+    /* 본선 — 토막마다 꼬리색에서 머리색으로. */
+    for (var i = 0; i < SEG; i++) {
+      var t0 = i / SEG, t1 = (i + 1) / SEG;
+      mix.copy(tail).lerp(head, (t0 + t1) / 2);
+      /* 토막끼리 실밥이 보이지 않게 살짝 겹친다. */
+      var over = i < SEG - 1 ? SPAN / SEG * 0.5 : 0;
+      group.add(ribbon(THREE, -SPAN + SPAN * t0, -SPAN + SPAN * t1 + over,
+        R * 0.055, mix.getHex(), 1, 0.003).mesh);
     }
-    var geo = new THREE.BufferGeometry();
-    geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
-    geo.setAttribute("color", new THREE.BufferAttribute(col, 3));
-    var line = new THREE.Line(geo, new THREE.LineBasicMaterial({ vertexColors: true }));
-    line.position.y = 0.002;
+
+    /* 머리의 점 — 진행 방향을 콕 집는다. */
+    var dot = new THREE.Mesh(
+      new THREE.CircleGeometry(R * 0.045, 24),
+      new THREE.MeshBasicMaterial({ color: 0xdceaff })
+    );
+    dot.rotation.x = -Math.PI / 2;
+    dot.position.set(0, 0.004, R);
+    group.add(dot);
 
     return {
-      line: line,
-      aim: function (heading) {
-        for (var i = 0; i <= N; i++) {
-          var a = heading - SPAN + SPAN * i / N;
-          pos[i * 3] = Math.sin(a) * R;
-          pos[i * 3 + 1] = 0;
-          pos[i * 3 + 2] = Math.cos(a) * R;
-        }
-        geo.attributes.position.needsUpdate = true;
-      }
+      line: group,
+      aim: function (heading) { group.rotation.y = heading; }
     };
   }
 
@@ -290,10 +350,11 @@
 
     var M = {
       shell: new THREE.MeshStandardMaterial({ color: 0xf6f6f4, roughness: 0.42, metalness: 0 }),
-      gloss: new THREE.MeshStandardMaterial({ color: 0x101114, roughness: 0.12, metalness: 0.1 }),
+      gloss: new THREE.MeshStandardMaterial({ color: 0x1b1d23, roughness: 0.12, metalness: 0.1 }),
       joint: new THREE.MeshStandardMaterial({ color: 0x5a5e66, roughness: 0.5, metalness: 0.15 }),
       rubber: new THREE.MeshStandardMaterial({ color: 0x26272a, roughness: 0.85, metalness: 0 }),
-      dark: new THREE.MeshStandardMaterial({ color: 0x1d1e22, roughness: 0.55, metalness: 0.1 }),
+      /* 원본은 0x1d1e22 인데 어두운 패널에서 바탕과 붙어 버린다 — 한 단계 올렸다. */
+      dark: new THREE.MeshStandardMaterial({ color: 0x33373f, roughness: 0.5, metalness: 0.1 }),
       glass: new THREE.MeshStandardMaterial({ color: 0x2f4a8a, roughness: 0.12, metalness: 0.2 }),
       red: new THREE.MeshStandardMaterial({ color: 0xff8a80, emissive: 0xff2a1f, emissiveIntensity: 2.2, roughness: 0.3 }),
       light: new THREE.MeshStandardMaterial({ color: 0x9cc0ff, emissive: 0x3f7cff, emissiveIntensity: 1.6, roughness: 0.3 })
