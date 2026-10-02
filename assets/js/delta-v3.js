@@ -170,6 +170,21 @@
     if (event.key === "Escape" && isOpen() && toggle) { toggle.click(); }
   });
 
+  /*
+   * Delta 표식(세 상태 도트) — 단계가 바뀌면 점 셋이 1 - 2 - 3 순으로 다시 팝인한다.
+   * 점 자체의 애니메이션은 단계마다 이름이 달라 브라우저가 알아서 다시 돌리는데,
+   * 팝인은 이름이 그대로라 안 돈다. 클래스를 뗐다 붙이고 그 사이에 리플로를 한 번 일으킨다.
+   */
+  var dots = document.querySelector("[data-delta-dots]");
+
+  if (dots) {
+    new MutationObserver(function () {
+      dots.classList.remove("is-enter");
+      void dots.offsetWidth;
+      dots.classList.add("is-enter");
+    }).observe(document.body, { attributes: true, attributeFilter: ["data-level"] });
+  }
+
   /* 창이 잘려 보이지 않게 — 무대가 줄면 안쪽으로 당긴다. */
   window.addEventListener("resize", function () {
     if (!isOpen()) { return; }

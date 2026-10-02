@@ -19,11 +19,11 @@
   }
   </script>
   <link rel="stylesheet" href="../assets/css/tokens.css?v=4aceab62" />
-  <link rel="stylesheet" href="../assets/css/app-shell.css?v=0c5747d1" />
+  <link rel="stylesheet" href="../assets/css/app-shell.css?v=81f4c7fb" />
   <link rel="stylesheet" href="../assets/css/map-overlays.css?v=bf2847b4" />
   <link rel="stylesheet" href="../assets/css/text-parts.css?v=e38e19ea" />
   <link rel="stylesheet" href="../assets/css/monitor.css?v=858d859a" />
-  <link rel="stylesheet" href="../assets/css/delta-v3.css?v=755e6185" />
+  <link rel="stylesheet" href="../assets/css/delta-v3.css?v=2ccddd22" />
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
@@ -307,7 +307,16 @@
                  펼침에서는 이 줄이 창 머리가 되고, 여기를 잡아 창을 옮긴다. -->
             <div class="delta3-name" data-delta3-drag>
               <span class="delta3-name-in">
-                <span class="i i-20" aria-hidden="true"></span>
+                <!-- Delta 표식 — 세 상태 도트(디자이너 핸드오프 "세 상태 도트 모션 그래픽").
+                     정상이면 흰 점 셋이 가만히 있고, 주의면 1-2-3 으로 번갈아 켜지고,
+                     위험이면 셋이 한꺼번에 깜빡인다. 단계는 body[data-level] 이 정한다. -->
+                <span class="delta-dots" data-delta-dots aria-hidden="true">
+                  <svg viewBox="0 0 20 20" fill="none">
+                    <g><rect class="dd-1" x="0" y="12" width="8" height="8" rx="2" /></g>
+                    <g><rect class="dd-2" x="0" y="0" width="8" height="8" rx="2" /></g>
+                    <g><rect class="dd-3" x="12" y="0" width="8" height="8" rx="2" /></g>
+                  </svg>
+                </span>
                 <b>DELTA</b>
               </span>
               <button type="button" class="delta3-close" data-delta3-close aria-label="Delta 창 닫기">
@@ -1621,7 +1630,7 @@
 <script src="../assets/js/map.js?v=53abcbb1"></script>
 <script src="../assets/js/robot-stage.js?v=97b2b6f9"></script>
 <script src="../assets/js/monitor.js?v=e236eb9b"></script>
-<script src="../assets/js/delta-v3.js?v=ba0f09af"></script>
+<script src="../assets/js/delta-v3.js?v=624aef2f"></script>
 <script src="../assets/js/grid-overlay.js?v=164e4f2a"></script>
 </body>
 </html>
