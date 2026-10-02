@@ -999,6 +999,52 @@ window.APRISM_TEXT = (function () {
     return "WP-" + (index + 1 < 10 ? "0" : "") + (index + 1);
   }
 
+  /*
+   * 남은 시간 — 진행 막대 아래 왼쪽.
+   *
+   * 관제사가 그 자리에서 묻는 것은 "얼마나 했나" 가 아니라 "언제 끝나나" 다.
+   * 얼마나 했나는 백분율 · 지나온 수 · 타임라인이 이미 세 번 말한다.
+   *
+   * 아직 안 지난 칸들의 예상 소요를 더한다. 소요가 안 적힌 칸은 적힌 칸들의 평균으로 친다 —
+   * 지어낸 값이 아니라 같은 미션의 평균이다. 추정이라 "약" 을 붙인다.
+   */
+  function minutesOf(text) {
+    var m = String(text || "").match(/([0-9]+)\s*분/);
+    return m ? Number(m[1]) : 0;
+  }
+
+  // 상태바 시계가 지금이다(퍼블리싱이라 멈춰 있는 시각이다).
+  function nowMinutes() {
+    var clock = document.querySelector(".utc-clock .num");
+    var m = clock && clock.textContent.match(/T([0-9]{2}):([0-9]{2})/);
+    return m ? Number(m[1]) * 60 + Number(m[2]) : null;
+  }
+
+  function timeLeft(robot) {
+    var known = robot.steps.map(function (s) { return minutesOf(s.duration); })
+      .filter(function (n) { return n > 0; });
+    if (!known.length) { return "—"; }
+    var avg = Math.round(known.reduce(function (a, b) { return a + b; }, 0) / known.length);
+
+    var left = 0;
+    robot.steps.forEach(function (s) {
+      if (s.state === "done") { return; }
+      left += minutesOf(s.duration) || avg;
+    });
+    if (!left) { return "모든 지점 완료"; }
+
+    var span = left >= 60
+      ? "약 " + Math.floor(left / 60) + "시간 " + (left % 60 ? (left % 60) + "분 " : "") + "남음"
+      : "약 " + left + "분 남음";
+
+    var now = nowMinutes();
+    if (now === null) { return span; }
+    var end = (now + left) % (24 * 60);
+    var hh = ("0" + Math.floor(end / 60)).slice(-2);
+    var mm = ("0" + (end % 60)).slice(-2);
+    return span + " · " + hh + ":" + mm + " 종료 예상";
+  }
+
   function stepNode(step, index) {
     var meta = STATE[step.state];
 
@@ -1099,6 +1145,8 @@ window.APRISM_TEXT = (function () {
       if (title) { title.textContent = (live && live.title) || robot.current; }
       percent.textContent = Math.round((done / total) * 100) + "%";
 
+      if (leftSlot) { leftSlot.textContent = timeLeft(robot); }
+
       // 선은 길이만 말한다. 수는 아래 줄이 맡는다(지나온 수 / 전체 수).
       track.style.setProperty("--progress", (total ? done / total * 100 : 0) + "%");
       if (countSlot) { countSlot.textContent = done + "/" + total; }
@@ -1128,16 +1176,6 @@ window.APRISM_TEXT = (function () {
         detail: { current: live }
       }));
     }
-
-    /*
-     * 남은 거리 — 지도가 길을 깔면서 재 온다(map.js 의 aprism:route).
-     * 지도를 못 띄우는 자리(WebGL 없음)에서는 자리만 남긴다. 숫자를 지어내지 않는다.
-     */
-    document.addEventListener("aprism:route", function (event) {
-      if (!leftSlot || !event.detail) { return; }
-      var left = event.detail.left;
-      leftSlot.textContent = (left || left === 0) ? Math.round(left) + " m 남음" : "—";
-    });
 
     // 고른 칸에만 표시를 남긴다. 진행 상태(completed·current·upcoming)는 건드리지 않는다.
     function paintPicked(id) {
