@@ -3658,6 +3658,13 @@ input.field-box { outline: 0; }
   padding: 0 var(--space-4);
 }
 
+/*
+ * 다 돌았으면 채움이 트랙을 끝까지 메운다.
+ * 트랙 끝의 전체 수는 뺀다 — 채움 안의 수가 이미 같은 수이고, 그대로 두면
+ * 그 자리만큼 채움이 못 들어가 100% 인데도 막대가 덜 찬 것처럼 보인다.
+ */
+.progress-track.is-full .progress-rest { display: none; }
+
 /* Typography/Mono/Label — 12/18 · 자간 1.08. 두 숫자가 같은 글자다. */
 .progress-fill b,
 .progress-rest b {

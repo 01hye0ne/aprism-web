@@ -1036,6 +1036,7 @@ window.APRISM_TEXT = (function () {
 
       // 막대 길이와 두 숫자가 같은 말을 한다 — 채운 끝에 지나온 수, 트랙 끝에 전체 수.
       track.style.setProperty("--progress", (total ? done / total * 100 : 0) + "%");
+      track.classList.toggle("is-full", total > 0 && done >= total);
       if (doneNum) { doneNum.textContent = done; }
       if (totalNum) { totalNum.textContent = total; }
       track.setAttribute("aria-label", total + "단계 중 " + done + "단계 완료");
