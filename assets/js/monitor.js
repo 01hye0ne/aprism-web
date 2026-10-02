@@ -246,7 +246,8 @@
     if (d.fresh) { node.classList.add("is-new"); }
 
     var head = el("span", "done-title");
-    head.appendChild(el("span", "t-label-1", d.title));
+    // 확인 완료 제목도 알림 제목과 같은 Label/2 다 — 처리 끝난 것이 처리할 것보다 크면 위계가 뒤집힌다.
+    head.appendChild(el("span", "t-label-2", d.title));
     head.appendChild(el("span", "t-caption num", d.time));
 
     var how = el("span", "done-how t-caption");
