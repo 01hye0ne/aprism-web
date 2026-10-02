@@ -39,6 +39,7 @@
   var NOSE = -Math.PI / 2;
   var LOOK_Y = 0.30;                     /* 카메라가 보는 높이. 로봇이 칸 가운데에 서게 한다 */
   var OVER = 1.06;                       /* 링이 좌우로 넘치는 정도 — 클수록 그림이 커진다 */
+  var SCALE = 0.9;                       /* 그림 크기 손잡이. 1 이 기준이고 작을수록 줄어든다 */
 
   var RING = 0x323846;                   /* Figma 바닥 링 */
   var ARC_TAIL = 0x3b79d5;               /* 방향 호 꼬리 */
@@ -129,10 +130,17 @@
       var w = mount.clientWidth || 1;
       var h = mount.clientHeight || 1;
       renderer.setSize(w, h, false);
-      var halfW = R / OVER;
-      var halfH = halfW * h / w;
-      camera.left = -halfW; camera.right = halfW;
-      camera.top = halfH; camera.bottom = -halfH;
+
+      /*
+       * 그림 크기는 상자가 아니라 "그래픽 칸"으로 정한다. 상자는 사방 --stage-pad 만큼
+       * 더 넓은데, 그 폭으로 틀을 잡으면 상자를 넓힐수록 그림이 커져 버린다.
+       * 넓힌 자리는 칸 밖으로 나간 부분을 보여 주는 데 쓴다 — 거기서 잘리지 않게 하려는 것이다.
+       */
+      var pad = parseFloat(window.getComputedStyle(mount).getPropertyValue("--stage-pad")) || 0;
+      var ref = Math.max(1, w - pad * 2);
+      var perPx = (R / OVER / SCALE) / (ref / 2);
+      camera.left = -w / 2 * perPx; camera.right = w / 2 * perPx;
+      camera.top = h / 2 * perPx; camera.bottom = -h / 2 * perPx;
       camera.updateProjectionMatrix();
       camera.position.set(
         Math.cos(PITCH) * Math.sin(YAW) * 12,

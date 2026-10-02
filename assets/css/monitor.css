@@ -583,12 +583,27 @@
  * 화살표가 이 위에 있으므로 손은 통과시킨다.
  */
 .robot-stage {
+  /*
+   * 상자를 사방 --stage-pad 만큼 넓게 잡는다. 그림 크기는 그 안쪽(원래 그래픽 칸)으로
+   * 정하고, 넓힌 테두리는 밖으로 나간 부분을 보여 주는 자리다 — 잘려 나가지 않는다.
+   * robot-stage.js 가 이 값을 읽어 카메라 틀을 잡는다.
+   */
+  --stage-pad: 24px;
   position: absolute;
-  left: var(--space-8);
-  top: var(--space-8);
-  width: var(--rc-col);
-  height: 142px;
+  left: calc(var(--space-8) - var(--stage-pad));
+  top: calc(var(--space-8) - var(--stage-pad));
+  width: calc(var(--rc-col) + var(--stage-pad) * 2);
+  height: calc(142px + var(--stage-pad) * 2);
+  /* 오른쪽 정보 줄 아래로 깐다 — 그래픽이 넘어와도 글이 가려지지 않는다. */
+  z-index: 0;
   pointer-events: none;
+}
+
+/* 로봇명과 상태 줄은 그래픽 위에 뜬다. 상태 줄 면이 반투명이라 뒤로 그래픽이 비친다. */
+.robot-carousel.has-stage .robot-strip.is-carousel .robot-card > .label,
+.robot-carousel.has-stage .robot-strip.is-carousel .robot-card > .robot-lists {
+  position: relative;
+  z-index: 1;
 }
 
 .robot-stage canvas { display: block; width: 100%; height: 100%; }
