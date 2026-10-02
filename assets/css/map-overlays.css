@@ -195,6 +195,6 @@
   border-radius: var(--radius-pill, 999px);
   background: rgba(7, 10, 16, 0.85);
   color: #d1d5de;
-  font: 600 10px/1.5 "SUIT", sans-serif;
+  font: 600 12px/1.5 "SUIT", sans-serif;   /* 화면 최소 글자는 12 */
   white-space: nowrap;
 }

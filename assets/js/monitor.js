@@ -343,7 +343,11 @@
   // 목록을 내렸을 때만 상자 위쪽 안쪽 그림자를 켠다 — 맨 위에서는 가려진 것이 없다.
   function shade(box) {
     var inner = box && box.querySelector(".ah-list");
-    if (inner) { box.classList.toggle("is-scrolled", inner.scrollTop > 0); }
+    if (!inner) { return; }
+    box.classList.toggle("is-scrolled", inner.scrollTop > 0);
+    // 아래로 더 남았을 때만 바닥에 페이드를 깐다 — 없으면 목록이 그냥 잘린 것처럼 보인다.
+    // 규칙은 monitor.css 에 있었는데 켜 주는 곳이 없었다.
+    box.classList.toggle("has-fade", inner.scrollHeight - inner.scrollTop - inner.clientHeight > 1);
   }
 
   $$(".ah-box").forEach(function (box) {

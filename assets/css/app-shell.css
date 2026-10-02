@@ -1371,7 +1371,8 @@ button {
   border-radius: var(--radius-pill, 999px);
   background-color: var(--bg-surface-default);
   color: var(--fg-primary);
-  font-size: calc(var(--font-size-caption, 11px) * min(var(--bot-zoom, 1), 1.5));
+  /* 최소 글자는 Caption(12)다 — 지도 위 작은 글씨는 축소하면 가장 먼저 못 읽는다. */
+  font-size: calc(var(--font-size-12) * min(var(--bot-zoom, 1), 1.5));
   line-height: 1.5;
   white-space: nowrap;
 }
@@ -3714,10 +3715,10 @@ input.field-box { outline: 0; }
 .map-floor:hover { background-color: rgb(255 255 255 / 10%); color: var(--fg-primary); }
 
 /* 지금 보는 층. 색이 아니라 면으로 알린다 — 지도 위 색은 알림 단계가 쓰고 있다. */
+/* 고른 층은 면과 글자색으로 말한다 — 굵기까지 바꾸면 같은 크기 글자가 두 벌이 된다. */
 .map-floor.is-on {
   background-color: var(--bg-surface-selected);
   color: var(--fg-primary);
-  font-weight: 600;
 }
 
 /* ---------- Mission Timeline ---------- */
