@@ -470,15 +470,21 @@
  * Robot list (Figma 828:14611) — 덩이 전체가 bg/surface/selected 면 · radius 4 · 패딩 0/4/4/4.
  * 위 줄(veiw modal)은 면 없이 32 높이 · 왼쪽 8. 아래 로봇 칸(List)은 bg/canvas 면 · radius 4.
  */
+/*
+ * 로봇 묶음 — Figma 828:15004 부터 제 면을 갖지 않는다.
+ * 전에는 바와 카드를 한 덩이로 묶느라 회색 면(bg/surface/selected)을 깔았는데,
+ * 바가 머리로 올라가면서 그 면이 로봇 판 둘레의 테두리처럼 남았다.
+ * 이제 면은 안쪽 판(bg/canvas) 하나뿐이고, 좌우 4 만 띄워 카드 안에 앉는다.
+ */
 .v2 .robot-list {
   padding: 0 var(--space-4) var(--space-4);
-  border-radius: var(--radius-4);
-  background-color: var(--bg-surface-selected);
+  background: none;
 }
 
+/* 로봇 줄 — 머리의 제목과 왼쪽 끝을 맞춘다(머리 패딩 8 = 묶음 4 + 여기 4). */
 .v2 .robot-bar {
   height: 32px;
-  padding: 0 0 0 var(--space-8);
+  padding: 0 var(--space-4);
   background: none;
 }
 
