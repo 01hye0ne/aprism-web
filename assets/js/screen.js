@@ -164,6 +164,67 @@ window.APRISM_TEXT = (function () {
     });
   })();
 
+  /* ------------------------------------------------------------------
+   * 관제사 교대 (UI_99 작업화면 1319:89664)
+   *
+   * 수행 중인 로봇이 있으면 로그아웃을 잠그고 [관제사 교대] 를 연다 —
+   * 관제 자리를 비우는 것과 사람이 바뀌는 것은 다른 일이다. 로봇은 계속 돈다.
+   * 교대자가 모달에서 로그인하면 화면은 그대로 두고 이름만 바뀐다.
+   * ------------------------------------------------------------------ */
+  function runningRobots() {
+    return document.querySelectorAll(".robot-strip .robot-card .badge-info").length;
+  }
+
+  function handOver(scrim) {
+    var id = scrim.querySelector("[data-shift-id]");
+    var name = (id && id.value.trim()) || "김현대";
+
+    // 상태바 — 누가 앉아 있는지가 여기서 바뀐다.
+    var chip = document.querySelector(".account-chip");
+    if (chip) {
+      var slots = chip.querySelectorAll(".t-label-2");
+      if (slots[0]) { slots[0].textContent = name; }
+    }
+    // 로그아웃 모달 문구의 이름도 같이 간다.
+    var who = document.querySelector("[data-modal-user]");
+    if (who) { window.APRISM_TEXT.fill(who, name + " · 관제운영"); }
+
+    if (id) { id.value = ""; }
+    var pw = scrim.querySelector("[data-shift-pw]");
+    if (pw) { pw.value = ""; }
+
+    // Delta 가 새 관제사에게 인계 상황을 말한다(monitor.js 가 듣는다).
+    document.dispatchEvent(new CustomEvent("aprism:shift", { detail: { name: name } }));
+  }
+
+  (function () {
+    var logout = document.querySelector("[data-logout-item]");
+    var shift = document.querySelector("[data-shift-item]");
+    if (!logout || !shift) { return; }
+
+    // 수행 중인 로봇 수를 모달 문구에도 적는다.
+    var count = runningRobots();
+    var slot = document.querySelector("[data-shift-count]");
+    if (slot) { slot.textContent = count; }
+
+    var busy = count > 0;
+    logout.disabled = busy;
+    logout.title = busy ? "수행 중인 로봇이 있어 로그아웃할 수 없습니다 — 관제사 교대를 쓰세요" : "";
+    shift.hidden = !busy;
+
+    // 비밀번호 보기 — 모달 안에서만 쓴다.
+    var eye = document.querySelector("[data-shift-eye]");
+    var pw = document.querySelector("[data-shift-pw]");
+    if (eye && pw) {
+      eye.addEventListener("click", function () {
+        var shown = pw.type === "text";
+        pw.type = shown ? "password" : "text";
+        eye.querySelector(".i").style.setProperty("--i", shown ? "var(--ic-eye-off)" : "var(--ic-eye)");
+        eye.setAttribute("aria-label", shown ? "비밀번호 보기" : "비밀번호 숨기기");
+      });
+    }
+  })();
+
   // ------------------------------------------------------------------
   // 사이트 컨텍스트 패널 접기
   // 접힌 모습은 Figma 에 없다. 버튼만 남는 44 폭으로 줄인다(app-shell.css).
@@ -391,6 +452,10 @@ window.APRISM_TEXT = (function () {
       if (then === "estop") {
         document.dispatchEvent(new CustomEvent("aprism:estop"));
       }
+
+      // 관제사 교대 — 화면을 떠나지 않는다. 로봇 임무가 돌고 있기 때문이다.
+      // 상태바의 이름만 교대자로 바꾸고, Delta 가 인계 인사를 하게 알린다.
+      if (then === "shift") { handOver(scrim); }
 
       // 갈 곳이 적혀 있으면 간다. E-STOP 처럼 비어 있으면 닫기만 한다 —
       // 서버가 없는 퍼블리싱이라 "정지됨" 화면이 아직 없다.

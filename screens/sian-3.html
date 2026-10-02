@@ -19,7 +19,7 @@
   }
   </script>
   <link rel="stylesheet" href="../assets/css/tokens.css?v=4aceab62" />
-  <link rel="stylesheet" href="../assets/css/app-shell.css?v=8ae0a021" />
+  <link rel="stylesheet" href="../assets/css/app-shell.css?v=a4569bad" />
   <link rel="stylesheet" href="../assets/css/map-overlays.css?v=bf2847b4" />
   <link rel="stylesheet" href="../assets/css/text-parts.css?v=e38e19ea" />
   <link rel="stylesheet" href="../assets/css/monitor.css?v=2060f87b" />
@@ -135,9 +135,15 @@
             <span class="i i-16" style="--i:var(--ic-lock)" aria-hidden="true"></span>
             <span class="t-label-2">비밀번호 변경</span>
           </a>
-          <button type="button" class="menu-item" role="menuitem" data-modal-open="logout">
+          <!-- 수행 중인 로봇이 있으면 로그아웃은 잠기고 [관제사 교대] 가 열린다(screen.js).
+               UI_99 1319:89664 — 로봇 임무는 교대 중에도 이어진다. -->
+          <button type="button" class="menu-item" role="menuitem" data-modal-open="logout" data-logout-item>
             <span class="i i-16" style="--i:var(--ic-power)" aria-hidden="true"></span>
             <span class="t-label-2">로그아웃</span>
+          </button>
+          <button type="button" class="menu-item" role="menuitem" data-modal-open="shift" data-shift-item hidden>
+            <span class="i i-16" style="--i:var(--ic-users)" aria-hidden="true"></span>
+            <span class="t-label-2">관제사 교대</span>
           </button>
         </div>
       </div>
@@ -1002,6 +1008,60 @@
 
 
 <!-- ============================================================
+     Modal · 관제사 교대 — UI_99 작업화면 1319:88826 (Panel 1319:88848)
+     수행 중인 로봇이 있어 로그아웃을 못 할 때, 교대자가 여기서 바로 로그인한다.
+     로봇 임무는 끊기지 않는다 — 화면은 그대로 두고 관제사 이름만 바뀐다.
+     ============================================================ -->
+<div class="modal-scrim" data-modal="shift" hidden>
+  <div class="modal is-shift" role="dialog" aria-modal="true"
+       aria-labelledby="m-shift-title" aria-describedby="m-shift-desc">
+
+    <div class="shift-head">
+      <h2 class="t-heading-3" id="m-shift-title">관제사 교대</h2>
+      <p class="t-body-2" id="m-shift-desc">
+        현재 수행 중인 로봇 <span data-shift-count>3</span>대가 있어 로그아웃할 수 없습니다.<br />
+        교대 중에 로봇 임무는 중단되지 않습니다.
+      </p>
+      <button type="button" class="icon-button modal-close" data-modal-dismiss aria-label="닫기">
+        <span class="i i-16" style="--i:var(--ic-close)" aria-hidden="true"></span>
+      </button>
+    </div>
+
+    <div class="shift-fields">
+      <label class="field">
+        <span class="field-label">아이디</span>
+        <span class="field-box">
+          <span class="i i-20" style="--i:var(--ic-user)" aria-hidden="true"></span>
+          <input type="text" class="field-input" placeholder="사번 또는 아이디를 입력하세요"
+                 aria-label="아이디" autocomplete="off" data-shift-id />
+        </span>
+      </label>
+
+      <label class="field">
+        <span class="field-label">비밀번호</span>
+        <span class="field-box">
+          <span class="i i-20" style="--i:var(--ic-lock)" aria-hidden="true"></span>
+          <input type="password" class="field-input" placeholder="비밀번호를 입력하세요"
+                 aria-label="비밀번호" autocomplete="off" data-shift-pw />
+          <button type="button" class="field-eye" data-shift-eye aria-label="비밀번호 보기">
+            <span class="i i-20" style="--i:var(--ic-eye-off)" aria-hidden="true"></span>
+          </button>
+        </span>
+      </label>
+    </div>
+
+    <button type="button" class="btn is-lg btn-secondary shift-go"
+            data-modal-confirm="" data-modal-then="shift">로그인</button>
+
+    <div class="shift-help">
+      <span class="shift-divider" aria-hidden="true"></span>
+      <p class="t-caption">계정 발급 · 잠금 해제 문의 : 설비운영팀 내선 2400</p>
+      <p class="t-caption">ⓒ 2026 APRISM · 모든 접속 기록은 감사 로그에 저장됩니다.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
      Modal · Figma UI_00 Design System 71:492
      로그아웃 확인. Show Timer=true — 남은 시간이 0 이 되면 그대로 나간다.
      ============================================================ -->
@@ -1539,10 +1599,10 @@
 
 <script src="../assets/js/theme.js?v=dcf8f460"></script>
 <script src="../assets/js/prism-orb.js?v=03386460"></script>
-<script src="../assets/js/screen.js?v=f31d54de"></script>
+<script src="../assets/js/screen.js?v=7789d6ff"></script>
 <script src="../assets/js/map-model.js?v=0f88c871"></script>
 <script src="../assets/js/map.js?v=f2c1f68e"></script>
-<script src="../assets/js/monitor.js?v=6a9ec7f7"></script>
+<script src="../assets/js/monitor.js?v=e236eb9b"></script>
 <script src="../assets/js/delta-v3.js?v=ba0f09af"></script>
 <script src="../assets/js/grid-overlay.js?v=164e4f2a"></script>
 </body>

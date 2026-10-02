@@ -262,8 +262,24 @@
 
   var TONE = { normal: 0, warning: 1, critical: 2 };
 
+  /*
+   * 관제사 교대 — 사람이 바뀌어도 로봇은 돈다(UI_99 1319:89664).
+   * 교대 직후 Delta 는 종합 판단 대신 새 관제사에게 인계 상황부터 말한다.
+   * 새 관제사가 목록을 한 번이라도 건드리면 평소 문구로 돌아간다 — 인사는 한 번이면 된다.
+   */
+  var handover = null;
+
+  document.addEventListener("aprism:shift", function (event) {
+    handover = (event.detail && event.detail.name) || "";
+    render();
+  });
+
   function tellAi(j, top) {
-    var copy = deltaCopy(j);
+    var copy = handover === null ? deltaCopy(j) : {
+      tag: "관제사 교대 · 인계",
+      line1: "안녕하세요. " + handover + " 님",
+      line2: "인계된 알림 " + j.total + "건과 진행 예정인 미션 1건이 있어요. 먼저 살펴볼까요?"
+    };
     // 테두리와 Delta 가 같은 색을 입는다 — 목록 최고 단계와 종합 판단 중 높은 쪽.
     var tone = TONE[j.level] > TONE[top] ? j.level : top;
     document.dispatchEvent(new CustomEvent("aprism:severity", {
@@ -360,6 +376,7 @@
 
   filters.forEach(function (btn) {
     btn.addEventListener("click", function () {
+      handover = null;
       filter = btn.getAttribute("data-ah-filter");
       filters.forEach(function (b) { b.setAttribute("aria-pressed", b === btn ? "true" : "false"); });
       render();

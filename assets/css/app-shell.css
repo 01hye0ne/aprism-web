@@ -627,6 +627,18 @@ button {
 .menu-item:hover .i,
 .menu-item:focus-visible .i { color: var(--fg-primary); }
 
+/*
+ * 잠긴 항목 — 수행 중인 로봇이 있을 때의 [로그아웃] 이 그렇다(UI_99 1319:89664).
+ * 글자와 아이콘이 함께 내려앉고 면도 안 밝아진다. 왜 잠겼는지는 title 이 말한다.
+ */
+.menu-item:disabled {
+  color: var(--fg-disabled);
+  cursor: not-allowed;
+}
+
+.menu-item:disabled .i { color: var(--fg-disabled); }
+.menu-item:disabled:hover { background: transparent; }
+
 .menu-item .i {
   flex: none;
   color: var(--fg-secondary);
@@ -3719,6 +3731,80 @@ input.field-box { outline: 0; }
 .map-floor.is-on {
   background-color: var(--bg-surface-selected);
   color: var(--fg-primary);
+}
+
+/* ---------- 관제사 교대 모달 (UI_99 1319:88848) ----------
+ * 로그인 판을 모달 안에 그대로 들여놓은 것이다 — 교대자가 제 계정으로 들어온다.
+ * Figma 468 × 483 · 패딩 위 40 / 좌우 20 / 아래 20 · 묶음 사이 32.
+ * 로봇 임무는 교대 중에도 돈다. 그래서 이 모달은 화면을 떠나지 않는다 —
+ * 확인을 누르면 관제사 이름만 바뀌고 지도 · 미션은 그대로다(screen.js 의 shift).
+ */
+.modal.is-shift {
+  position: relative;
+  width: 468px;
+  gap: var(--space-32);
+  padding: var(--space-40) var(--space-20) var(--space-20);
+}
+
+.modal.is-shift .modal-close { position: absolute; top: var(--space-12); right: var(--space-12); }
+
+.shift-head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.shift-head h2 { color: var(--fg-primary); letter-spacing: -0.2px; }
+.shift-head p { color: var(--fg-secondary); }
+
+.shift-fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+}
+
+/* 칸 안에서 늘어나는 입력 — 테두리 · 면은 .field-box 가 갖는다. */
+.shift-fields .field-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  text-align: left;   /* 모달이 가운데 정렬을 물려준다 — 입력은 왼쪽이다 */
+  border: 0;
+  background: none;
+  color: var(--fg-primary);
+  font-family: inherit;
+  font-size: var(--font-size-14);
+  line-height: var(--font-line-height-22);
+}
+
+.shift-fields .field-input:focus { outline: 0; }
+.shift-fields .field-input::placeholder { color: var(--fg-tertiary); }
+
+.field-eye {
+  flex: none;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--fg-secondary);
+  cursor: pointer;
+}
+
+.field-eye:hover { color: var(--fg-primary); }
+
+.shift-go { width: 100%; }
+
+.shift-help {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  text-align: center;
+  color: var(--fg-tertiary);
+}
+
+.shift-divider {
+  height: 1px;
+  background-color: var(--border-subtle);
 }
 
 /* ---------- Mission Timeline ---------- */
