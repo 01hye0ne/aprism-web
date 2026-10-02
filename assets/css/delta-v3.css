@@ -93,8 +93,8 @@
   background-image: linear-gradient(
     180deg,
     color-mix(in srgb, var(--bg-surface-selected) 90%, transparent) 50%,
-    color-mix(in srgb, #98BDED 90%, transparent) 83.654%,
-    color-mix(in srgb, var(--bg-inverse) 88%, transparent) 100%
+    color-mix(in srgb, var(--d3-face-mid, #98BDED) 90%, transparent) 83.654%,
+    color-mix(in srgb, var(--d3-face-end, var(--bg-inverse)) 88%, transparent) 100%
   );
   backdrop-filter: blur(12px) saturate(1.12);
   -webkit-backdrop-filter: blur(12px) saturate(1.12);
@@ -572,17 +572,28 @@
  * screen.js 가 .is-warning · .is-critical · .is-safe 를 붙인다.
  * ------------------------------------------------------------------ */
 
+/*
+ * 펼친 창의 면 — 아래로 갈수록 단계 색으로 물든다(--d3-face-mid · -end).
+ * 기본은 Figma 의 하늘 -> 흰빛이고, 단계가 오르면 AI 패널 Gradient/Warning · Danger 의
+ * 끝 색으로 바꾼다. 위험은 흰 끝을 두지 않는다 — 빨강이 분홍으로 바래 보인다.
+ */
 .v3 .delta3.is-safe {
+  --d3-face-mid: #7FCFA3;
+  --d3-face-end: #2AD982;
   --delta3-glow-primary: var(--alert-safe-glow-primary);
   --delta3-glow-secondary: var(--alert-safe-glow-secondary);
   --d3-ramp: #2AD982 0%, #0EBB57 12.5%, #10893B 25%, #2F603E 37.5%, #5A595F 50%, #77778A 62.5%, #75A9A6 75%, #55D2A2 87.5%, #2AD982 100%;
 }
 .v3 .delta3.is-warning {
+  --d3-face-mid: #C9A23A;
+  --d3-face-end: #F7CD36;
   --delta3-glow-primary: var(--alert-warning-glow-primary);
   --delta3-glow-secondary: var(--alert-warning-glow-secondary);
   --d3-ramp: #F2B020 0%, #D38210 12.5%, #A5521A 25%, #813D39 37.5%, #7D4F5A 50%, #9C7D6B 62.5%, #CBAD61 75%, #EEC242 87.5%, #F2B020 100%;
 }
 .v3 .delta3.is-critical {
+  --d3-face-mid: #B8443B;
+  --d3-face-end: #F4463F;
   --delta3-glow-primary: var(--alert-danger-glow-primary);
   --delta3-glow-secondary: var(--alert-danger-glow-secondary);
   --d3-ramp: #F05937 0%, #D9321D 12.5%, #A3121E 25%, #6D0B3B 37.5%, #572262 50%, #6D487C 62.5%, #A3687B 75%, #D96F5E 87.5%, #F05937 100%;
