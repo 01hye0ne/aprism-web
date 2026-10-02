@@ -1,0 +1,12 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="480" height="480" viewBox="0 0 480 480" fill="none" xmlns="http://www.w3.org/2000/svg">
+<circle id="Light-Circle" opacity="0.5" cx="240" cy="240" r="240" fill="url(#paint0_radial_0_37)"/>
+<defs>
+<radialGradient id="paint0_radial_0_37" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(240 241.901) scale(240)">
+<stop stop-color="#FF8F7A" stop-opacity="0.8"/>
+<stop offset="0.230769" stop-color="#FF8F7A" stop-opacity="0.3"/>
+<stop offset="0.418269" stop-color="#F4463F" stop-opacity="0.1"/>
+<stop offset="0.826923" stop-color="#FF8F7A" stop-opacity="0.2"/>
+<stop offset="1" stop-color="#F4463F" stop-opacity="0"/>
+</radialGradient>
+</defs>
+</svg>

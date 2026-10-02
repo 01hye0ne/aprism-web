@@ -185,6 +185,26 @@
     }).observe(document.body, { attributes: true, attributeFilter: ["data-level"] });
   }
 
+  /*
+   * 빛 세 장의 색 — 단계를 따라 SVG 를 갈아 낀다(위험 빨강 · 주의 금빛 · 그 밖 파랑).
+   * 단계 클래스는 screen.js 가 이 요소에 붙인다. 위의 여닫힘 감시와 같은 class 변화를 본다.
+   */
+  var lights = win.querySelectorAll(".delta3-light img");
+  var tint = null;
+
+  function tintLights() {
+    var next = win.classList.contains("is-critical") ? "-critical"
+      : win.classList.contains("is-warning") ? "-warning" : "";
+    if (next === tint) { return; }
+    tint = next;
+    Array.prototype.forEach.call(lights, function (img) {
+      img.src = img.src.replace(/(delta-light-[a-z0-9-]+?)(-critical|-warning)?\.svg/, "$1" + next + ".svg");
+    });
+  }
+
+  new MutationObserver(tintLights).observe(win, { attributes: true, attributeFilter: ["class"] });
+  tintLights();
+
   /* 창이 잘려 보이지 않게 — 무대가 줄면 안쪽으로 당긴다. */
   window.addEventListener("resize", function () {
     if (!isOpen()) { return; }

@@ -54,7 +54,8 @@
   height: 260px;
   gap: 0;
   padding: var(--space-20);
-  border-radius: var(--radius-container) 0 0 0;
+  /* 모서리는 엣지 글로우의 깎인 선이 맡는다 — 둥글리면 삼각판 끝에 어두운 호가 비친다. */
+  border-radius: 0;
 
   /*
    * 모서리에서 번지는 빛. Figma 는 반지름 10 짜리 radial 을 matrix(14.676 17.721 -14.676 17.721)
@@ -313,8 +314,12 @@
   position: absolute;
   left: 0;
   top: 0;
-  width: 56px;
-  height: 56px;
+  /*
+   * 빗변은 Figma 56 그대로고, 두 끝은 엣지 글로우 모서리(아래 .edge-corner)의
+   * 라운드 이음매(반지름 16)에 맞춰 변에 접하며 가늘어진다. 그래서 칸이 64 다.
+   */
+  width: 64px;
+  height: 64px;
   padding: var(--space-4);
   /*
    * 표식은 직각 모서리에 붙는다 — 삼각판은 왼쪽 위로 갈수록 넓으니
@@ -324,7 +329,7 @@
   align-items: flex-start;
   background-image: url("../img/delta-corner.svg");
   background-repeat: no-repeat;
-  background-size: 56px 56px;
+  background-size: 64px 64px;
 }
 
 .v3 .delta3:not(.is-open) .delta3-name b { display: none; }
@@ -569,10 +574,88 @@
 }
 
 /*
- * 빛 세 장(SVG)은 단계를 따라가지 않는다 — Figma 에 그려 둔 그대로 둔다.
- * 색을 돌려 보니 파랑이 주황으로 뭉개져 Figma 의 빛이 아니게 됐다.
- * 단계는 카드 · 창의 글로우(위 네 겹)가 말한다.
+ * 빛 세 장(SVG)도 단계를 따라간다 — 위험은 빨강, 주의는 금빛, 그 밖은 Figma 의 파랑.
+ * 색을 돌리면(hue-rotate) 파랑이 주황으로 뭉개지므로, 정지점 색만 바꾼 SVG 를
+ * 따로 두고(delta-light-*-critical · -warning.svg) delta-v3.js 가 src 를 갈아 낀다.
+ * 흰 중심 · 흐림 · 투명도 정지점은 Figma 그대로다.
  */
+
+/* ------------------------------------------------------------------ *
+ * 엣지 글로우 모서리 — 테두리의 왼쪽 위 모서리는 Delta 삼각판의 빗변을 따라
+ * 45도로 깎여(chamfer) 있다. 깎인 선이 위 · 왼쪽 변과 만나는 두 이음매는
+ * 반지름 16 으로 둥글린다. 기하는 SVG 세 장이 같이 쓴다.
+ *   빗변  x + y = 56 (Figma 삼각판)
+ *   이음매 원 중심 (62.627, 16) · (16, 62.627) — 변에 닿는 자리가 62.627 이다.
+ *
+ *   delta-corner.svg       삼각판(깎인 바깥). Delta 표식이 앉는다.
+ *   delta-corner-line.svg  깎인 선. .edge-corner 가 단계 색으로 칠한다.
+ *   delta-corner-fill.svg  깎인 안쪽. 테두리 맥박을 모서리에서 잘라 낸다.
+ * ------------------------------------------------------------------ */
+
+.v3 .edge-corner { display: none; }
+
+/* 모서리는 깎인 선이 대신하므로 상자의 8 라운드는 뺀다 — 남겨 두면 삼각판 끝이 둥글게 패여 어두운 호가 비친다. */
+.v3 .two-col { border-top-left-radius: 0; }
+
+.v3 .two-col.is-warning > .edge-corner,
+.v3 .two-col.is-critical > .edge-corner {
+  display: block;
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 7;                    /* Delta(6) 의 삼각판 위에 선다. */
+  width: 64px;
+  height: 64px;
+  pointer-events: none;
+  /* 바깥으로 아주 조금 새는 빛 — 다른 변의 0 0 8px -3px 와 같은 결이다. */
+  filter: drop-shadow(0 0 3px var(--glow-color-60));
+}
+
+.v3 .two-col > .edge-corner::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-color: var(--glow-color);
+  -webkit-mask: url("../img/delta-corner-line.svg") 0 0 / 64px 64px no-repeat;
+  mask: url("../img/delta-corner-line.svg") 0 0 / 64px 64px no-repeat;
+}
+
+/*
+ * 네모난 모서리는 걷는다. 테두리(::after)는 모서리 62 칸을 비우고 깎인 선이 그 자리를 잇는다.
+ * 바깥 1px 테(box-shadow)는 상자 밖이라 clip-path 로만 잘린다 — 모서리 바깥 두 변만 덜어 낸다.
+ */
+.v3 .two-col.is-warning,
+.v3 .two-col.is-critical {
+  clip-path: polygon(
+    62px -20px, calc(100% + 20px) -20px, calc(100% + 20px) calc(100% + 20px),
+    -20px calc(100% + 20px), -20px 62px, 0 62px, 0 0, 62px 0
+  );
+}
+
+.v3 .two-col.is-warning::after,
+.v3 .two-col.is-critical::after {
+  -webkit-mask:
+    conic-gradient(at 62px 62px, #000 0 75%, transparent 0),
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: source-in, xor;
+  mask:
+    conic-gradient(at 62px 62px, #000 0 75%, transparent 0),
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: intersect, exclude;
+}
+
+/* 안으로 뛰는 맥박도 깎인 선 바깥(삼각판 자리)으로는 번지지 않는다 — 창을 펼쳐 모서리가 비었을 때 보인다. */
+.v3 .two-col.is-warning > .edge-light,
+.v3 .two-col.is-critical > .edge-light {
+  -webkit-mask:
+    url("../img/delta-corner-fill.svg") 0 0 / 64px 64px no-repeat,
+    conic-gradient(at 64px 64px, #000 0 75%, transparent 0);
+  mask:
+    url("../img/delta-corner-fill.svg") 0 0 / 64px 64px no-repeat,
+    conic-gradient(at 64px 64px, #000 0 75%, transparent 0);
+}
 
 /* ------------------------------------------------------------------ *
  * 왼쪽 패널 접기 버튼 — 시안 3 에서만 줄 왼쪽으로 옮긴다.
