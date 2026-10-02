@@ -174,11 +174,28 @@
     paintReview();
   }
 
+  /*
+   * 모니터링으로 가는 길.
+   *
+   * 시안 1 · 2 는 제 안에 모니터링 판을 들고 있다. 그런데 미션 설정 · 사전 점검 화면은
+   * 단계만 시안 1 에서 가져온 것이고 모니터링은 기존 화면(dashboard-home)이 맡는다 —
+   * 그 화면들은 body[data-monitor-href] 로 갈 곳을 적어 두고, 여기서 그리로 넘긴다.
+   */
+  function goMonitor() {
+    var href = body.getAttribute("data-monitor-href");
+    if (!href) { return false; }
+    window.location.href = href;
+    return true;
+  }
+
   document.addEventListener("click", function (event) {
     var go = event.target.closest && event.target.closest("[data-sian-go]");
     if (!go || go.disabled) { return; }
     var to = go.getAttribute("data-sian-go");
-    if (to === "monitor") { setLevel("normal"); }
+    if (to === "monitor") {
+      if (goMonitor()) { return; }
+      setLevel("normal");
+    }
     setStage(to);
   });
 
@@ -236,7 +253,10 @@
            */
           timers.push(window.setTimeout(function () {
             if (body.getAttribute("data-stage-hold") === "precheck") { return; }
-            if (stage === "precheck") { setLevel("normal"); setStage("monitor"); }
+            if (stage !== "precheck") { return; }
+            if (goMonitor()) { return; }
+            setLevel("normal");
+            setStage("monitor");
           }, 1600));
           return;
         }
@@ -772,7 +792,10 @@
       if (!b) { return; }
       if (b.hasAttribute("data-review-stage")) {
         var s = b.getAttribute("data-review-stage");
-        if (s === "monitor" && stage !== "monitor") { setLevel("normal"); }
+        if (s === "monitor") {
+          if (goMonitor()) { return; }
+          if (stage !== "monitor") { setLevel("normal"); }
+        }
         setStage(s);
       }
       if (b.hasAttribute("data-review-level")) { setLevel(b.getAttribute("data-review-level")); }
