@@ -3613,13 +3613,17 @@ input.field-box { outline: 0; }
   line-height: var(--font-line-height-24);
 }
 
-/* Typography/Mono/Metric — JetBrains Mono Medium 20/28. */
+/*
+ * Typography/Mono/Data/1 — JetBrains Mono Medium 14/20.
+ * 처음에는 Mono/Metric(20/28)로 넣었다. Figma 실측 변수는 Data/1 이다 —
+ * 제목(Body/2 16)보다 작아서 수치가 제목을 밀어내지 않는다.
+ */
 .progress-percent {
   flex: none;
   color: var(--fg-secondary);
   font-family: var(--font-family-mono);
-  font-size: var(--font-size-20);
-  line-height: var(--font-line-height-28);
+  font-size: var(--font-size-14);
+  line-height: var(--font-line-height-20);
   font-weight: 500;
 }
 
