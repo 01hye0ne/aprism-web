@@ -48,9 +48,22 @@
 
   // ---------- 로그인 ----------
   //
-  // 붙일 인증이 없는 퍼블리싱 화면이라 값을 확인하지 않고 다음 화면으로 넘긴다.
-  // 들어오면 바로 미션을 짜는 흐름이라 미션 설정으로 간다.
-  // 서버가 붙으면 이 자리가 요청으로 바뀐다.
+  /*
+   * 들어간 뒤 어느 화면으로 가는가.
+   *
+   * 기본은 미션 설정이다 — 들어오면 바로 미션을 짜는 흐름이다.
+   * 다만 나가기 전에 로봇이 돌고 있었으면 모니터링으로 간다(screen.js 가 적어 둔다).
+   * 교대나 잠깐 자리를 비운 사이에도 임무는 돌고 있어서, 다시 들어온 사람이
+   * 먼저 볼 것은 설정 화면이 아니라 돌고 있는 로봇이다(디자이너 피드백).
+   *
+   * 붙일 인증이 없는 퍼블리싱 화면이라 값을 확인하지 않고 넘긴다.
+   * 서버가 붙으면 이 자리가 요청으로 바뀐다.
+   */
+  function landing() {
+    var running = "0";
+    try { running = window.sessionStorage.getItem("aprism.running") || "0"; } catch (e) { running = "0"; }
+    return running === "1" ? "./dashboard-home.html" : "./mission-setup.html";
+  }
   var form = document.querySelector("[data-login-form]");
   if (form) {
     form.addEventListener("submit", function (event) {
@@ -63,7 +76,7 @@
       } catch (e) {
         // 사파리 프라이빗 모드처럼 막힌 곳에서는 그냥 넘어간다 — 규칙 3 이 통과로 잡힌다.
       }
-      location.href = "./mission-setup.html";
+      location.href = landing();
     });
   }
 
@@ -162,7 +175,7 @@
     pwForm.addEventListener("submit", function (event) {
       event.preventDefault();
       if (submit.disabled) { return; }
-      location.href = "./mission-setup.html";
+      location.href = landing();
     });
   }
 })();

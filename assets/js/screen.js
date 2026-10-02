@@ -453,6 +453,16 @@ window.APRISM_TEXT = (function () {
         document.dispatchEvent(new CustomEvent("aprism:estop"));
       }
 
+      /*
+       * 로그아웃 — 나가기 전에 로봇이 돌고 있었는지 적어 둔다.
+       * 다시 들어왔을 때 미션 설정부터 보여 주면 "내가 띄워 둔 미션은 어디 갔나" 가 된다.
+       * 로봇이 돌고 있었으면 로그인 뒤 바로 모니터링으로 돌아간다(auth.js 가 읽는다).
+       */
+      if (then === "logout" || /login\.html$/.test(to || "")) {
+        try { window.sessionStorage.setItem("aprism.running", runningRobots() > 0 ? "1" : "0"); }
+        catch (e) { /* 사파리 프라이빗 모드처럼 막힌 곳 — 기본 흐름으로 간다 */ }
+      }
+
       // 관제사 교대 — 화면을 떠나지 않는다. 로봇 임무가 돌고 있기 때문이다.
       // 상태바의 이름만 교대자로 바꾸고, Delta 가 인계 인사를 하게 알린다.
       if (then === "shift") { handOver(scrim); }
