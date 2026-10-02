@@ -75,6 +75,22 @@
     if (onTurn) { onTurn(); }
   });
 
+  /*
+   * 지금 어느 웨이포인트를 수행 중인가. 수행 중인 칸이 있다는 것은 로봇이 그 설비 앞에
+   * 서서 재고 있다는 뜻이다 — 걷는 게 아니라 검사다. 칸 사이를 옮겨 가는 중이면 비어 있다.
+   *
+   * 값은 screen.js 가 타임라인에 적어 둔다. 알림(aprism:mission)이 아니라 그 자국을 읽는다 —
+   * 처음 한 번은 screen.js 가 이 파일보다 먼저 돌아서 알림을 놓치기 때문이다.
+   */
+  function atWaypoint() {
+    var line = document.querySelector("[data-timeline]");
+    return !!(line && line.getAttribute("data-current-waypoint"));
+  }
+
+  document.addEventListener("aprism:mission", function () {
+    if (onTurn) { onTurn(); }
+  });
+
   /* 지도와 같은 길이다 — <head> 의 importmap 이 "three" 를 CDN 으로 이어 준다. */
   import("three").then(start).catch(function () { /* 없으면 SVG 로봇이 그대로 남는다 */ });
 
@@ -207,7 +223,10 @@
       var card = document.querySelector(".robot-strip.is-carousel .robot-card[aria-pressed='true']");
       var badge = card && card.querySelector(".robot-row .badge");
       var text = badge ? badge.textContent.replace(/\s+/g, "") : "";
-      return MOTION[text] || "idle";
+      var m = MOTION[text] || "idle";
+      /* 수행 중이면서 칸 하나를 붙들고 있으면 그 자리에서 재는 중이다 — 걷기가 아니라 검사다. */
+      if (m === "walk" && atWaypoint()) { return "inspect"; }
+      return m;
     }
 
     function follow() { play(motion()); }
