@@ -456,10 +456,16 @@
 }
 
 /* 머리 — Figma Texts(1061:16388) 는 패널 위에서 12, 좌우 12 다. 패널 패딩 4 를 뺀 값이 여기다. */
+/*
+ * 전체 미션명 줄. Figma 의 Texts 는 51 높이인데 글(26)과 위아래 여백(12)을 빼면 1 이 남는다 —
+ * 아래쪽 1px 선이다(border/default · #3F485C 를 실측으로 확인). 미션 이름과 그 아래
+ * 로봇 · 진행 막대 · 타임라인을 가르는 줄이라 카드 폭을 끝에서 끝까지 지난다.
+ */
 .v2 .panel-header {
   flex-direction: column;
   gap: var(--space-8);
   padding: var(--space-8) var(--space-8) var(--space-12);
+  border-bottom: var(--border-width-thin) solid var(--border-default);
 }
 
 /* 진행 막대 — Figma Progress Bar(1054:20548) 패딩 12/8/8. */
