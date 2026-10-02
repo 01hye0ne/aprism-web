@@ -1080,8 +1080,8 @@ window.APRISM_TEXT = (function () {
     var title = document.querySelector("[data-progress-title]");
     var percent = document.querySelector("[data-progress-percent]");
     var track = document.querySelector("[data-progress-track]");
-    var doneNum = document.querySelector("[data-progress-done]");
-    var totalNum = document.querySelector("[data-progress-total]");
+    var countSlot = document.querySelector("[data-progress-count]");
+    var leftSlot = document.querySelector("[data-progress-left]");
 
     function render(index) {
       var robot = ROBOTS[index];
@@ -1099,11 +1099,9 @@ window.APRISM_TEXT = (function () {
       if (title) { title.textContent = (live && live.title) || robot.current; }
       percent.textContent = Math.round((done / total) * 100) + "%";
 
-      // 막대 길이와 두 숫자가 같은 말을 한다 — 채운 끝에 지나온 수, 트랙 끝에 전체 수.
+      // 선은 길이만 말한다. 수는 아래 줄이 맡는다(지나온 수 / 전체 수).
       track.style.setProperty("--progress", (total ? done / total * 100 : 0) + "%");
-      track.classList.toggle("is-full", total > 0 && done >= total);
-      if (doneNum) { doneNum.textContent = done; }
-      if (totalNum) { totalNum.textContent = total; }
+      if (countSlot) { countSlot.textContent = done + "/" + total; }
       track.setAttribute("aria-label", total + "단계 중 " + done + "단계 완료");
 
       timeline.textContent = "";
@@ -1130,6 +1128,16 @@ window.APRISM_TEXT = (function () {
         detail: { current: live }
       }));
     }
+
+    /*
+     * 남은 거리 — 지도가 길을 깔면서 재 온다(map.js 의 aprism:route).
+     * 지도를 못 띄우는 자리(WebGL 없음)에서는 자리만 남긴다. 숫자를 지어내지 않는다.
+     */
+    document.addEventListener("aprism:route", function (event) {
+      if (!leftSlot || !event.detail) { return; }
+      var left = event.detail.left;
+      leftSlot.textContent = (left || left === 0) ? Math.round(left) + " m 남음" : "—";
+    });
 
     // 고른 칸에만 표시를 남긴다. 진행 상태(completed·current·upcoming)는 건드리지 않는다.
     function paintPicked(id) {

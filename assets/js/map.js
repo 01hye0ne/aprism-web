@@ -1778,6 +1778,21 @@
     layWaypoints();
     tellWaypoint();
 
+    /*
+     * 남은 거리 — 우측 진행 막대의 아래 줄이 쓴다(Figma Progress Bar 의 "nn m").
+     * 길 전체 길이에서 로봇이 지나온 만큼을 뺀 값이고, 단위는 NAV 의 m 다.
+     */
+    if (onLane) {
+      var gone = onLane.total * Math.max(0, Math.min(1, onLane.bot.at || 0));
+      document.dispatchEvent(new CustomEvent("aprism:route", {
+        detail: {
+          robot: onLane.id,
+          total: onLane.total * NAV.unit,
+          left: (onLane.total - gone) * NAV.unit
+        }
+      }));
+    }
+
     if (botBox) {
       botBox.hidden = !onLane;
       if (botTip) { botTip.hidden = true; }

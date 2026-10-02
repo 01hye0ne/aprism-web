@@ -19,7 +19,7 @@
   }
   </script>
   <link rel="stylesheet" href="../assets/css/tokens.css?v=4aceab62" />
-  <link rel="stylesheet" href="../assets/css/app-shell.css?v=b3b8406c" />
+  <link rel="stylesheet" href="../assets/css/app-shell.css?v=073202a6" />
   <link rel="stylesheet" href="../assets/css/map-overlays.css?v=bf2847b4" />
   <link rel="stylesheet" href="../assets/css/text-parts.css?v=e38e19ea" />
   <link rel="stylesheet" href="../assets/css/monitor.css?v=2060f87b" />
@@ -919,13 +919,18 @@
                 <div class="mission-header">
                   <div class="progress-bar">
                     <div class="progress-meta">
+                      <span class="progress-kind" aria-hidden="true"><span class="i i-16" style="--i:var(--ic-thermometer)"></span></span>
                       <span class="progress-title" data-progress-title>현재 수행명</span>
                       <span class="progress-percent num" data-progress-percent>00%</span>
                     </div>
-                    <!-- Figma Progress Bar(1054:20548) — 채운 막대 끝에 지나온 수, 트랙 끝에 전체 수. -->
+                    <!-- Figma Progress Bar(1054:20548) — 4px 선 위를 표식이 지나간다. 아래 줄은 남은 거리와 지나온 수. -->
                     <div class="progress-track" role="img" data-progress-track>
-                      <span class="progress-fill"><b class="num" data-progress-done>0</b></span>
-                      <span class="progress-rest"><b class="num" data-progress-total>0</b></span>
+                      <span class="progress-fill"></span>
+                      <span class="progress-knob"><span class="i i-16" style="--i:var(--ic-way)"></span></span>
+                    </div>
+                    <div class="progress-foot">
+                      <span class="progress-left" data-progress-left>—</span>
+                      <span class="progress-count num" data-progress-count>0/00</span>
                     </div>
                   </div>
                 </div>
@@ -1602,9 +1607,9 @@
 
 <script src="../assets/js/theme.js?v=dcf8f460"></script>
 <script src="../assets/js/prism-orb.js?v=03386460"></script>
-<script src="../assets/js/screen.js?v=7789d6ff"></script>
+<script src="../assets/js/screen.js?v=0e65f908"></script>
 <script src="../assets/js/map-model.js?v=0f88c871"></script>
-<script src="../assets/js/map.js?v=f2c1f68e"></script>
+<script src="../assets/js/map.js?v=ea5f2e59"></script>
 <script src="../assets/js/monitor.js?v=e236eb9b"></script>
 <script src="../assets/js/grid-overlay.js?v=164e4f2a"></script>
 </body>
