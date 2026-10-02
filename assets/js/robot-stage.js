@@ -5,10 +5,10 @@
  *   1. 로봇개     디자이너 핸드오프(assets/source/심플한 로봇개 3D 모델링-handoff)의
  *                 three.js 모델을 그대로 옮겼다. 네 가지 동작(걷기 · 대기 · 앉기 · 검사)을
  *                 뼈대 없이 구워 둔 클립으로 돌린다.
- *   2. 바닥 링    Figma UI_00 826:12682 의 Robot-grahpics 를 3D 로 다시 세운 것이다.
- *                 화면 기준 상·하·좌·우에서 선이 끊기고 대각 네 곳에 작은 삼각 표식이 붙는다.
- *   3. 방향 호    로봇이 가는 쪽을 가리킨다. 90도 길이로 꼬리에서 머리로 밝아지고,
- *                 머리가 곧 진행 방향이다.
+ *   2. 바닥 다이얼 Figma UI_00 826:12682 의 Robot-grahpics 에서 온 바닥 링이다.
+ *                 24 칸(한 칸 15도)으로 쪼갰고, 대각 네 곳에 작은 삼각 표식이 붙는다.
+ *   3. 방향 불    로봇이 보는 쪽 칸에 불이 들어온다. 가장 밝은 칸이 코가 가리키는 쪽이고
+ *                 양옆으로 55도까지 차차 꺼진다.
  *
  * 구도는 고정이다 — 돌려 볼 수 없다. 방위는 지도의 처음 자리와 같은 45도라
  * 패널과 지도가 같은 쪽을 가리킨다. 지도를 돌려도 여기는 그대로다 —
@@ -42,7 +42,8 @@
 
   var RING = 0x323846;                   /* Figma 바닥 링 */
   var ARC_TAIL = 0x3b79d5;               /* 방향 호 꼬리 */
-  var ARC_HEAD = 0x4990e0;               /* 방향 호 머리 — 여기가 진행 방향이다 */
+  var ARC_HEAD = 0x4990e0;               /* 방향 호 머리 */
+  var ARC_PEAK = 0x9fcdff;               /* 가장 밝은 칸 — 여기가 로봇이 보는 쪽이다 */
 
   var MOTION = { "수행중": "walk", "대기": "idle", "완료": "sit", "끊김": "idle" };
 
@@ -98,12 +99,8 @@
     rim.position.set(-4, 5, -7);
     scene.add(rim);
 
-    var floor = new THREE.Group();
-    scene.add(floor);
-    buildRing(THREE, floor);
-
-    var arc = buildArc(THREE);
-    floor.add(arc.line);
+    var dial = buildDial(THREE);
+    scene.add(dial.group);
 
     var dog = buildDog(THREE);
     var turn = new THREE.Group();          /* 방향만 맡는 바깥 틀 — 동작 클립은 안쪽을 돌린다 */
@@ -172,7 +169,7 @@
 
     follow();
     turn.rotation.y = now + NOSE;
-    arc.aim(now);
+    dial.aim(now);
 
     /* ---------- 보일 때만 그린다 ---------- */
     var clock = new THREE.Clock();
@@ -190,7 +187,7 @@
       var d = ((want - now + Math.PI) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI) - Math.PI;
       now += d * (1 - Math.pow(0.01, dt));
       turn.rotation.y = now + NOSE;
-      arc.aim(now);
+      dial.aim(now);
 
       renderer.render(scene, camera);
     });
@@ -242,20 +239,47 @@
     return { mesh: mesh, geo: geo, mat: mat, count: N };
   }
 
-  function buildRing(THREE, parent) {
-    var GAP = 2.6 * Math.PI / 180;          /* Figma 에서 잰 끊긴 폭(≈3px / 지름 134) */
-    var W = R * 0.024;                      /* ≈1.5px — Figma 의 선 굵기 */
+  /* ------------------------------------------------------------------ *
+   * 바닥 다이얼 — 링을 24 칸으로 쪼개고, 로봇이 보는 쪽 칸에 불이 들어온다.
+   *
+   * 한 칸이 15도다. 가장 밝은 칸이 곧 로봇의 코가 가리키는 쪽이고, 양옆으로
+   * 55도까지 차차 꺼진다. 칸을 잘게 나눈 덕에 몇 도쯤 돌았는지가 눈에 잡힌다.
+   *
+   * 두 겹이다. 늘 깔려 있는 가는 눈금과, 불이 들어올 때만 보이는 굵은 띠.
+   * 색만 바꾸면 밝아지기만 할 뿐 굵어지지 않아서, 켜진 칸이 눈에 덜 들어온다.
+   *
+   * 대각 네 곳의 삼각 표식은 그대로 둔다 — 화면 대각선은 월드의 축이라
+   * 저 표식이 설비 격자의 방향을 알려 준다. 칸 경계와도 맞아떨어진다(15도의 배수).
+   * ------------------------------------------------------------------ */
 
-    for (var k = 0; k < 4; k++) {
-      var a0 = Math.PI / 4 + k * Math.PI / 2 + GAP / 2;
-      var a1 = Math.PI / 4 + (k + 1) * Math.PI / 2 - GAP / 2;
-      parent.add(ribbon(THREE, a0, a1, W, RING, 1, 0).mesh);
+  function buildDial(THREE) {
+    var SEG = 24;                          /* 칸 수 — 한 칸 15도 */
+    var GAP = 3.4 * Math.PI / 180;         /* 칸과 칸 사이 */
+    var LIT = 55 * Math.PI / 180;          /* 불이 번지는 폭(한쪽) */
+    var step = Math.PI * 2 / SEG;
+
+    var group = new THREE.Group();
+    var cells = [];
+
+    var base = new THREE.Color(RING);
+    var tail = new THREE.Color(ARC_TAIL);
+    var head = new THREE.Color(ARC_HEAD);
+    var peak = new THREE.Color(ARC_PEAK);
+
+    for (var i = 0; i < SEG; i++) {
+      var a0 = i * step + GAP / 2;
+      var a1 = (i + 1) * step - GAP / 2;
+
+      /* 눈금 — Figma 바닥 링과 같은 굵기(≈1.5px). */
+      group.add(ribbon(THREE, a0, a1, R * 0.024, RING, 1, 0).mesh);
+
+      /* 불 — 꺼져 있을 때는 투명이라 눈금만 보인다. */
+      var lamp = ribbon(THREE, a0, a1, R * 0.075, ARC_HEAD, 0, 0.003);
+      group.add(lamp.mesh);
+      cells.push({ at: (i + 0.5) * step, mat: lamp.mat });
     }
 
-    /*
-     * 대각 표식 — 링 바깥으로 뾰족한 작은 삼각이다.
-     * Figma 는 화면 축에 다리를 맞춘 직각삼각형인데, 이 크기(6px 남짓)에서는 같게 읽힌다.
-     */
+    /* 대각 표식 — 링 바깥으로 뾰족한 작은 삼각(Figma 826:12682). */
     var TIP = R * 0.075, HALF = 3.2 * Math.PI / 180;
     var face = new THREE.MeshBasicMaterial({ color: RING, side: THREE.DoubleSide });
     for (var m = 0; m < 4; m++) {
@@ -268,52 +292,35 @@
       geo.setIndex([0, 1, 2]);
       var mesh = new THREE.Mesh(geo, face);
       mesh.position.y = 0.001;
-      parent.add(mesh);
+      group.add(mesh);
     }
-  }
 
-  /*
-   * 방향 호 — 90도. 머리가 로봇이 가는 쪽이다.
-   *
-   * 세 겹이다. 넓고 옅은 번짐 · 본선 · 머리의 점.
-   * 바닥선 하나로는 어두운 판에서 눈에 안 들어온다 — 이 화면에서 제일 먼저 읽혀야 할 것이
-   * "어디로 가는가" 라, 기본 링보다 두 배 넘게 굵고 번짐을 깔아 띄웠다.
-   *
-   * 꼬리에서 머리로 밝아지는 결은 Figma 와 같은데, 면 하나에 그라데이션을 넣는 대신
-   * 토막을 나눠 색을 올린다 — 호 전체를 heading 만큼 돌리면 되므로 매 프레임 다시 그릴 일이 없다.
-   */
-  function buildArc(THREE) {
-    var SPAN = Math.PI / 2, SEG = 12;
-    var group = new THREE.Group();
-    var tail = new THREE.Color(ARC_TAIL), head = new THREE.Color(ARC_HEAD), mix = new THREE.Color();
-
-    /* 번짐 — 본선보다 네 배 넓게 깔아 바닥에 빛이 번진 것처럼 둔다. */
-    var glow = ribbon(THREE, -SPAN, 0, R * 0.22, ARC_HEAD, 0.14, 0.0015);
+    /* 번짐 — 켜진 칸들 아래에 깔아 바닥에 빛이 번진 것처럼 둔다. 머리와 같이 돈다. */
+    var glow = ribbon(THREE, -LIT, LIT, R * 0.24, ARC_HEAD, 0.16, 0.0015);
     glow.mat.blending = THREE.AdditiveBlending;
-    group.add(glow.mesh);
+    var glowPivot = new THREE.Group();
+    glowPivot.add(glow.mesh);
+    group.add(glowPivot);
 
-    /* 본선 — 토막마다 꼬리색에서 머리색으로. */
-    for (var i = 0; i < SEG; i++) {
-      var t0 = i / SEG, t1 = (i + 1) / SEG;
-      mix.copy(tail).lerp(head, (t0 + t1) / 2);
-      /* 토막끼리 실밥이 보이지 않게 살짝 겹친다. */
-      var over = i < SEG - 1 ? SPAN / SEG * 0.5 : 0;
-      group.add(ribbon(THREE, -SPAN + SPAN * t0, -SPAN + SPAN * t1 + over,
-        R * 0.055, mix.getHex(), 1, 0.003).mesh);
-    }
-
-    /* 머리의 점 — 진행 방향을 콕 집는다. */
-    var dot = new THREE.Mesh(
-      new THREE.CircleGeometry(R * 0.045, 24),
-      new THREE.MeshBasicMaterial({ color: 0xdceaff })
-    );
-    dot.rotation.x = -Math.PI / 2;
-    dot.position.set(0, 0.004, R);
-    group.add(dot);
+    var mix = new THREE.Color();
 
     return {
-      line: group,
-      aim: function (heading) { group.rotation.y = heading; }
+      group: group,
+      aim: function (heading) {
+        glowPivot.rotation.y = heading;
+        for (var i = 0; i < cells.length; i++) {
+          var d = Math.abs(((cells[i].at - heading + Math.PI) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI) - Math.PI);
+          var t = d >= LIT ? 0 : Math.pow(1 - d / LIT, 1.6);
+          cells[i].mat.opacity = t;
+          /* 멀수록 짙은 파랑, 가까울수록 밝은 파랑 — 머리가 어디인지 색으로도 읽힌다. */
+          if (t > 0) {
+            if (t <= 0.35) { mix.copy(base).lerp(tail, t / 0.35); }
+            else if (t <= 0.75) { mix.copy(tail).lerp(head, (t - 0.35) / 0.4); }
+            else { mix.copy(head).lerp(peak, (t - 0.75) / 0.25); }
+            cells[i].mat.color.copy(mix);
+          }
+        }
+      }
     };
   }
 

@@ -604,6 +604,8 @@ window.APRISM_TEXT = (function () {
     {
       // State=Running · 78% · Strong
       // 진행 막대 제목 — 임시 문구다(Figma 는 자리표시자 "현재 수행명"). 지금 도는 칸(WP-04)의 일이다.
+      // 전체 미션명(패널 머리)과 지금 하는 일(current) 은 다른 말이다.
+      mission: "지하 4층 정기 순회 점검",
       current: "N₂ 배관 압력 점검",
       steps: [
         {
@@ -620,6 +622,8 @@ window.APRISM_TEXT = (function () {
         },
         {
           title: "N₂ 배관 압력계",
+          // act — 진행 막대에 뜨는 "지금 하는 일". 칸 이름(설비명)과는 다른 말이다.
+          act: "N₂ 배관 압력계 판독",
           state: "running",
           time: "10:08 – 10:24",
           duration: "16분",
@@ -634,6 +638,7 @@ window.APRISM_TEXT = (function () {
     },
     {
       // State=Returning · 18% · Weak — 미션을 마치고 복귀 중이다
+      mission: "지하 4층 정기 순회 점검",
       current: "복귀 중",
       steps: [
         { title: "waypoint name", state: "done", time: "08:40 – 08:58", duration: "18분",
@@ -650,6 +655,7 @@ window.APRISM_TEXT = (function () {
     },
     {
       // State=Idle · 35% · Good — 아직 시작하지 않았다
+      mission: "배정된 미션 없음",
       current: "대기 중",
       steps: [
         { title: "waypoint name", state: "pending" },
@@ -660,6 +666,7 @@ window.APRISM_TEXT = (function () {
     },
     {
       // 4 · 완료 · 92% · Strong — 끝까지 돌고 돌아왔다
+      mission: "지하 4층 야간 순회 점검",
       current: "순회 완료",
       steps: [
         { title: "waypoint name", state: "done", time: "07:20 – 07:38", duration: "18분" },
@@ -672,11 +679,13 @@ window.APRISM_TEXT = (function () {
     },
     {
       // 5 · 수행중 · 64% · Good — 첫 구간을 지나는 중이다
+      mission: "지하 3층 발전기실 설비 점검",
       current: "발전기 베어링 진동 측정",
       steps: [
         { title: "waypoint name", state: "done", time: "10:02 – 10:17", duration: "15분" },
         {
           title: "Generator Bearing Vibration",
+          act: "발전기 베어링 진동 측정",
           state: "running",
           time: "10:17 – 10:31",
           duration: "14분",
@@ -689,6 +698,7 @@ window.APRISM_TEXT = (function () {
     },
     {
       // 6 · 대기 · 8% 충전 · Weak — 배터리가 바닥이라 못 나간다
+      mission: "배정된 미션 없음",
       current: "충전 중",
       steps: [
         { title: "waypoint name", state: "pending" },
@@ -698,6 +708,7 @@ window.APRISM_TEXT = (function () {
     },
     {
       // 7 · 완료 · 96% 충전 · Strong — 도킹에서 다음 미션을 기다린다
+      mission: "지하 3층 공조 설비 순회",
       current: "순회 완료",
       steps: [
         { title: "waypoint name", state: "done", time: "06:05 – 06:24", duration: "19분" },
@@ -708,6 +719,7 @@ window.APRISM_TEXT = (function () {
     },
     {
       // 8 · 대기 · 47% · Good — 불러온 미션이 있고 시작 전이다
+      mission: "배정된 미션 없음",
       current: "대기 중",
       steps: [
         { title: "waypoint name", state: "pending" },
@@ -719,6 +731,7 @@ window.APRISM_TEXT = (function () {
     },
     {
       // 9 · 완료 · 88% · Strong
+      mission: "지하 4층 유틸리티 순회",
       current: "순회 완료",
       steps: [
         { title: "waypoint name", state: "done", time: "05:10 – 05:29", duration: "19분" },
@@ -730,6 +743,7 @@ window.APRISM_TEXT = (function () {
     },
     {
       // 10 · 대기 · 29% · Weak — 신호가 약해 보내지 못한다
+      mission: "배정된 미션 없음",
       current: "대기 중",
       steps: [
         { title: "waypoint name", state: "pending" },
@@ -742,6 +756,7 @@ window.APRISM_TEXT = (function () {
     },
     {
       // 11 · 수행중 · 71% · Strong — 막바지에 가까워졌다
+      mission: "지하 3층 전기실 열화상 점검",
       current: "배전반실 열화상 점검",
       steps: [
         { title: "waypoint name", state: "done", time: "09:40 – 09:58", duration: "18분" },
@@ -749,6 +764,7 @@ window.APRISM_TEXT = (function () {
         { title: "waypoint name", state: "done", time: "10:12 – 10:29", duration: "17분" },
         {
           title: "Switchgear Room Thermal Scan",
+          act: "배전반 발열 스캔",
           state: "running",
           time: "10:29 – 10:44",
           duration: "15분",
@@ -759,6 +775,7 @@ window.APRISM_TEXT = (function () {
     },
     {
       // 12 · 대기 · 55% 충전 · Good
+      mission: "배정된 미션 없음",
       current: "충전 중",
       steps: [
         { title: "waypoint name", state: "pending" },
@@ -1151,8 +1168,14 @@ window.APRISM_TEXT = (function () {
       // 지금 하는 칸. 다 돌았으면 마지막으로 한 칸을 쓴다.
       var live = robot.steps.filter(function (s) { return s.state === "running"; })[0];
 
-      if (missionName) { missionName.textContent = robot.current; }
-      if (title) { title.textContent = (live && live.title) || robot.current; }
+      /*
+       * 패널 머리는 전체 미션명, 진행 막대 제목은 지금 하는 행동이다 — 다른 말이어야 한다.
+       * 칸 이름(title)은 설비 이름이라 그대로 쓰면 "무엇을 하는 중인지"가 빠진다.
+       * 그래서 지금 도는 칸의 act 를 먼저 보고, 없으면 칸 이름으로 물러선다.
+       * 수행 중인 칸이 아예 없으면(대기 · 복귀 · 충전) 로봇의 지금 상태가 곧 하는 일이다.
+       */
+      if (missionName) { missionName.textContent = robot.mission || robot.current; }
+      if (title) { title.textContent = (live && (live.act || live.title)) || robot.current; }
       percent.textContent = Math.round((done / total) * 100) + "%";
 
       if (leftSlot) { leftSlot.textContent = timeLeft(robot); }
