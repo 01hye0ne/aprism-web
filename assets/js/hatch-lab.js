@@ -130,7 +130,10 @@
     var canvas = document.createElement("canvas");
     host.appendChild(canvas);
 
-    var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+    /* preserveDrawingBuffer — 화면을 갈무리하는 도구가 빈 판 대신 그린 것을 가져가게 한다. */
+    var renderer = new THREE.WebGLRenderer({
+      canvas: canvas, antialias: true, alpha: true, preserveDrawingBuffer: true
+    });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
 
@@ -160,7 +163,44 @@
       mixer.clipAction(dog.clips.filter(function (c) { return c.name === "walk"; })[0]).play();
     }
 
-    /* ---------- 원본 2 · 휘도 띠 ---------- */
+    /* ---------- 원본 2 · 공장 사진 ----------
+     * 해칭은 원래 사진 같은 결이 있는 그림에서 제 모습이 나온다 — 휘도가 고르게 퍼져 있어야
+     * 굵은 줄과 가는 줄이 다 나온다. 3D 로봇은 흰 몸체와 검은 바탕으로 쏠려 있어 중간이 비었다.
+     */
+    var photoScene = new THREE.Scene();
+    /* 카메라를 한 칸 물려 둔다 — 판과 눈이 같은 자리에 있으면 near 에 걸려 아무것도 안 나온다. */
+    var photoCam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 10);
+    photoCam.position.z = 1;
+    var photoTex = null;
+    var photoMat = new THREE.MeshBasicMaterial({ color: 0x000000 });
+    photoScene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), photoMat));
+
+    /* 사진은 hatch-sample.js 가 데이터 URI 로 들고 있다 — file:// 에서 그림 파일을
+       텍스처로 올리면 교차 출처로 막힌다(지도 모델과 같은 사정이다). */
+    new THREE.TextureLoader().load(window.APRISM_HATCH_SAMPLE || "", function (tex) {
+      tex.colorSpace = THREE.SRGBColorSpace;
+      photoTex = tex;
+      photoMat.map = tex;
+      photoMat.color.setHex(0xffffff);
+      photoMat.needsUpdate = true;
+      coverFit();
+    });
+
+    /* 판을 꽉 채우고 남는 쪽을 잘라 낸다(background-size: cover 와 같다). */
+    function coverFit() {
+      if (!photoTex || !photoTex.image) { return; }
+      var box = (host.clientWidth || 1) / (host.clientHeight || 1);
+      var img = photoTex.image.width / photoTex.image.height;
+      if (img > box) {
+        photoTex.repeat.set(box / img, 1);
+        photoTex.offset.set((1 - box / img) / 2, 0);
+      } else {
+        photoTex.repeat.set(1, img / box);
+        photoTex.offset.set(0, (1 - img / box) / 2);
+      }
+    }
+
+    /* ---------- 원본 3 · 휘도 띠 ---------- */
     var rampScene = new THREE.Scene();
     var rampCam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
     rampScene.add(new THREE.Mesh(
@@ -203,7 +243,7 @@
 
     /* ---------- 조절값 ---------- */
     var P = {
-      source: "dog",
+      source: "photo",
       hatch: true,
       mode: 1,
       density: 1,
@@ -255,6 +295,8 @@
       target.setSize(Math.round(w * dpr), Math.round(h * dpr));
       uniforms.uDims.value.set(target.width, target.height);
 
+      coverFit();
+
       var halfH = 1.1;
       var halfW = halfH * w / h;
       dogCam.left = -halfW; dogCam.right = halfW;
@@ -279,8 +321,8 @@
 
     renderer.setAnimationLoop(function () {
       if (mixer) { mixer.update(clock.getDelta()); }
-      var scene = P.source === "dog" ? dogScene : rampScene;
-      var cam = P.source === "dog" ? dogCam : rampCam;
+      var scene = P.source === "dog" ? dogScene : (P.source === "photo" ? photoScene : rampScene);
+      var cam = P.source === "dog" ? dogCam : (P.source === "photo" ? photoCam : rampCam);
 
       if (!P.hatch) {
         renderer.setRenderTarget(null);
