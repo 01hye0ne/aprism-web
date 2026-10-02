@@ -2762,7 +2762,11 @@ button {
 }
 
 .field-box.is-select { cursor: pointer; }
-.field-box > span:first-child { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/*
+ * 칸 안에서 늘어나는 것은 값이다. 앞머리가 아이콘인 칸(교대 모달의 아이디 · 비밀번호)에서는
+ * 이 규칙이 아이콘을 잡아 늘려 20 짜리 아이콘이 127 이 됐다 — 아이콘은 빼고 본다.
+ */
+.field-box > span:first-child:not(.i) { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .field-box .i { flex: none; color: var(--fg-secondary); }
 
 input.field-box { outline: 0; }
