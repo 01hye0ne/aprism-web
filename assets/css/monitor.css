@@ -571,15 +571,16 @@
 
 /*
  * 로봇 3D 판 — 캐러셀의 그래픽 칸에 그대로 겹친다.
- * 자리는 .robot-thumb 와 같은 셈으로 잡는다(띠 안쪽 여백 8 + 좌우 여백 16).
+ * 그래픽 칸을 끝에서 끝까지 쓴다. 좌우 화살표에 자리를 비켜 주면 그만큼 로봇이
+ * 작아지고 바닥 링이 잘린다 — 화살표는 그 위에 겹쳐 놓는다(.rc-side 가 DOM 뒤라 위에 깔린다).
  * 살아 있을 때만 아래의 SVG 로봇을 가린다 — three.js 를 못 가져오면 SVG 가 남아야 한다.
  * 화살표가 이 위에 있으므로 손은 통과시킨다.
  */
 .robot-stage {
   position: absolute;
-  left: calc(var(--space-8) + var(--space-16));
+  left: var(--space-8);
   top: var(--space-8);
-  width: calc(var(--rc-col) - var(--space-16) * 2);
+  width: var(--rc-col);
   height: 142px;
   pointer-events: none;
 }
@@ -608,6 +609,8 @@
 
 .rc-arrow {
   pointer-events: auto;
+  /* 이제 로봇 그래픽 위에 겹친다 — 흰 몸체 위에서도 모양이 남게 그림자를 깐다. */
+  filter: drop-shadow(0 1px 3px rgb(0 0 0 / 65%));
   display: inline-flex;
   width: 16px;
   height: 32px;

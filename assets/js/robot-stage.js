@@ -38,7 +38,7 @@
    */
   var NOSE = -Math.PI / 2;
   var LOOK_Y = 0.30;                     /* 카메라가 보는 높이. 로봇이 칸 가운데에 서게 한다 */
-  var OVER = 1.02;                       /* 링이 좌우로 살짝 넘친다(Figma 134 / 128) */
+  var OVER = 1.06;                       /* 링이 좌우로 넘치는 정도 — 클수록 그림이 커진다 */
 
   var RING = 0x323846;                   /* Figma 바닥 링 */
   var ARC_TAIL = 0x3b79d5;               /* 방향 호 꼬리 */
