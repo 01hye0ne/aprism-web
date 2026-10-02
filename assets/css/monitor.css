@@ -513,7 +513,8 @@
   display: block;
   padding: var(--space-8);
   border-radius: var(--radius-4);
-  background-color: var(--bg-canvas);
+  /* 오른쪽 타임라인의 웨이포인트 칸과 같은 면이다 — 패널 안에서 두 덩이가 같은 높이로 앉는다. */
+  background-color: var(--bg-surface-subtle);
   overflow: hidden;
 }
 

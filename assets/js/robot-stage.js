@@ -41,7 +41,11 @@
   var OVER = 1.06;                       /* 링이 좌우로 넘치는 정도 — 클수록 그림이 커진다 */
   var SCALE = 0.9;                       /* 그림 크기 손잡이. 1 이 기준이고 작을수록 줄어든다 */
 
-  var RING = 0x323846;                   /* Figma 바닥 링 */
+  /*
+   * 바닥 다이얼의 눈금. Figma 값은 #323846 인데 로봇 카드 면이 bg/surface/subtle(#2C3443)로
+   * 밝아지면서 바탕과 거의 같은 색이 됐다. 한 단계 올려 gray/600 을 쓴다.
+   */
+  var RING = 0x4e576a;
   var ARC_TAIL = 0x3b79d5;               /* 방향 호 꼬리 */
   var ARC_HEAD = 0x4990e0;               /* 방향 호 머리 */
   var ARC_PEAK = 0x9fcdff;               /* 가장 밝은 칸 — 여기가 로봇이 보는 쪽이다 */
