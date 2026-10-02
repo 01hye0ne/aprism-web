@@ -571,6 +571,40 @@
  * 누르기 전에는 자리를 차지하지 않는다.
  */
 .v3 .delta3 .ai-input { margin: 0 var(--space-8) var(--space-8); }
+
+/*
+ * 초점 — 면은 쉴 때와 같고(bg/surface/overlay-dark), 바깥에 선만 두른다(디자이너 요청).
+ * app-shell 은 면을 단계 색(--ai-input-focus-bg)으로 바꾸고 선을 안쪽에 그린다 — 여기서 둘 다 되돌린다.
+ * 선은 같은 ::before 를 상자 밖으로 2px 키워 그린다. 색은 그대로 --ai-input-edge(단계 색)다.
+ */
+.v3 .delta3 .ai-input:focus-within { background-color: var(--bg-surface-overlay-dark); }
+
+/*
+ * 선 색 — app-shell 은 --ai-input-edge 를 .ai-box 에만 둔다. Delta 창은 .ai-box 가 아니라
+ * 변수가 비어 선이 안 그려졌다(초점 면도 비어 뒤의 단계 색이 비쳤다). 여기서 단계마다 준다.
+ * 값은 AI 패널의 일반 · 주의 · 위험 입력창 선과 같다.
+ */
+.v3 .delta3 {
+  --ai-input-edge: linear-gradient(90deg,
+    var(--color-main-700) 0%, var(--color-main-300) 25%, var(--color-main-400) 46%,
+    var(--color-main-700) 72%, var(--color-main-300) 100%);
+}
+.v3 .delta3.is-warning {
+  --ai-input-edge: linear-gradient(90deg,
+    var(--status-warning-border) 0%, #f7cd36 25%, var(--color-warning-500) 46%,
+    var(--status-warning-border) 72%, #f7cd36 100%);
+}
+.v3 .delta3.is-critical {
+  --ai-input-edge: linear-gradient(90deg,
+    var(--status-critical-border) 0%, #f4463f 25%, var(--color-danger-500) 46%,
+    var(--status-critical-border) 72%, #f4463f 100%);
+}
+.v3 .delta3 .ai-input:focus-within::before {
+  inset: calc(var(--border-width-strong) * -1);
+  border-radius: calc(var(--radius-control) + var(--border-width-strong));
+}
+.v3 .delta3 .ai-input:focus-within .ai-input-ph { color: var(--fg-primary); }
+.v3 .delta3 .ai-input:focus-within .ai-input-ph::placeholder { color: var(--fg-secondary); }
 .v3 .delta3:not(.is-open) .ai-input { display: none; }
 
 /* ------------------------------------------------------------------ *
