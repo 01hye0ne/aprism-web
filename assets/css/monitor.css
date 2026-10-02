@@ -191,6 +191,14 @@
 .v2 .panel-head {
   height: 45px;
   border-bottom: var(--border-width-thin) solid var(--border-default);
+  /* 접기 버튼과 라벨은 한 덩이로 읽혀야 한다 — 20 은 둘을 떼어 놓는다. */
+  gap: var(--space-8);
+}
+
+/* 패널 이름은 한 단계 키운다(Overline 13/18 -> 14/20). 자간 · 굵기는 그대로 둔다. */
+.v2 .panel-head .section-label {
+  font-size: var(--font-size-14);
+  line-height: var(--font-line-height-20);
 }
 
 .v2 .context-panel.is-collapsed .panel-head { border-bottom-color: transparent; }
