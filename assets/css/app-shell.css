@@ -3609,11 +3609,14 @@ input.field-box { outline: 0; }
  * 1차는 20 높이 트랙 안에 숫자를 넣었는데, 숫자가 선을 밀어내 100% 가 덜 찬 것처럼 보였다.
  * 2차는 선을 얇게 두고 숫자를 아래로 내렸다 — 선은 길이만 말한다.
  */
-/* 제목줄과 선 사이는 8, 선과 아랫줄 사이는 4 다(Figma). 묶음 간격은 4 로 두고 제목줄만 더 띄운다. */
+/*
+ * 선 위아래로 숨을 틔운다 — 제목줄과 선 사이 12, 선과 아랫줄 사이 8(디자이너 요청, Figma 와 다른 점).
+ * Figma 는 8 · 4 인데 선이 4px 로 얇아지면서 세 줄이 서로 붙어 보였다.
+ */
 .progress-bar {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: var(--space-8);
 }
 
 .progress-meta {
