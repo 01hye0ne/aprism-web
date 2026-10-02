@@ -327,10 +327,25 @@
    * (.delta3-name 은 펼침의 창 머리를 위해 세로 가운데 정렬이라 여기서 되돌린다.)
    */
   align-items: flex-start;
-  background-image: url("../img/delta-corner.svg");
-  background-repeat: no-repeat;
-  background-size: 64px 64px;
 }
+
+/*
+ * 삼각판 면 — 깎인 선 바깥이라 화면 바탕(bg/canvas)과 같은 색이다.
+ * 예전 #2C3443 회색은 바탕 위에 회색 삼각형이 튀어나와 보였다.
+ * 모양만 SVG 에서 빌리고(마스크) 색은 토큰으로 칠한다.
+ */
+.v3 .delta3:not(.is-open) .delta3-name::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-color: var(--bg-canvas);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg preserveAspectRatio='none' overflow='visible' style='display: block;' width='64' height='64' viewBox='0 0 64 64' fill='none' xmlns='http://www.w3.org/2000/svg'%3E %3Cpath id='Rectangle 180' d='M0 0H62.627A16 16 0 0 0 51.314 4.686L4.686 51.314A16 16 0 0 0 0 62.627V0Z' fill='%232C3443'/%3E %3C/svg%3E") 0 0 / 64px 64px no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg preserveAspectRatio='none' overflow='visible' style='display: block;' width='64' height='64' viewBox='0 0 64 64' fill='none' xmlns='http://www.w3.org/2000/svg'%3E %3Cpath id='Rectangle 180' d='M0 0H62.627A16 16 0 0 0 51.314 4.686L4.686 51.314A16 16 0 0 0 0 62.627V0Z' fill='%232C3443'/%3E %3C/svg%3E") 0 0 / 64px 64px no-repeat;
+  pointer-events: none;
+}
+
+/* 표식이 판 위에 앉도록 — 판(::before)이 positioned 라 표식도 positioned 여야 뒤에 그려진다. */
+.v3 .delta3-name .delta3-name-in { position: relative; }
 
 .v3 .delta3:not(.is-open) .delta3-name b { display: none; }
 
@@ -581,6 +596,9 @@
  */
 
 /* ------------------------------------------------------------------ *
+ * (마스크 SVG 는 CSS 에 data URI 로 박았다 — mask-image 는 CORS 로 받아서 file:// 에서는
+ *  파일 경로가 막힌다. 원본은 assets/img 의 세 장이고, 고치면 여기도 다시 넣는다.)
+ *
  * 엣지 글로우 모서리 — 테두리의 왼쪽 위 모서리는 Delta 삼각판의 빗변을 따라
  * 45도로 깎여(chamfer) 있다. 깎인 선이 위 · 왼쪽 변과 만나는 두 이음매는
  * 반지름 16 으로 둥글린다. 기하는 SVG 세 장이 같이 쓴다.
@@ -616,8 +634,8 @@
   position: absolute;
   inset: 0;
   background-color: var(--glow-color);
-  -webkit-mask: url("../img/delta-corner-line.svg") 0 0 / 64px 64px no-repeat;
-  mask: url("../img/delta-corner-line.svg") 0 0 / 64px 64px no-repeat;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg width='64' height='64' viewBox='0 0 64 64' fill='none' xmlns='http://www.w3.org/2000/svg'%3E %3Cpath d='M64 0H62.627A16 16 0 0 0 51.314 4.686L4.686 51.314A16 16 0 0 0 0 62.627V64' stroke='%23000' stroke-width='2'/%3E %3C/svg%3E") 0 0 / 64px 64px no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg width='64' height='64' viewBox='0 0 64 64' fill='none' xmlns='http://www.w3.org/2000/svg'%3E %3Cpath d='M64 0H62.627A16 16 0 0 0 51.314 4.686L4.686 51.314A16 16 0 0 0 0 62.627V64' stroke='%23000' stroke-width='2'/%3E %3C/svg%3E") 0 0 / 64px 64px no-repeat;
 }
 
 /*
@@ -650,10 +668,10 @@
 .v3 .two-col.is-warning > .edge-light,
 .v3 .two-col.is-critical > .edge-light {
   -webkit-mask:
-    url("../img/delta-corner-fill.svg") 0 0 / 64px 64px no-repeat,
+    url("data:image/svg+xml,%3Csvg width='64' height='64' viewBox='0 0 64 64' fill='none' xmlns='http://www.w3.org/2000/svg'%3E %3Cpath d='M62.627 0H64V64H0V62.627A16 16 0 0 1 4.686 51.314L51.314 4.686A16 16 0 0 1 62.627 0Z' fill='%23000'/%3E %3C/svg%3E") 0 0 / 64px 64px no-repeat,
     conic-gradient(at 64px 64px, #000 0 75%, transparent 0);
   mask:
-    url("../img/delta-corner-fill.svg") 0 0 / 64px 64px no-repeat,
+    url("data:image/svg+xml,%3Csvg width='64' height='64' viewBox='0 0 64 64' fill='none' xmlns='http://www.w3.org/2000/svg'%3E %3Cpath d='M62.627 0H64V64H0V62.627A16 16 0 0 1 4.686 51.314L51.314 4.686A16 16 0 0 1 62.627 0Z' fill='%23000'/%3E %3C/svg%3E") 0 0 / 64px 64px no-repeat,
     conic-gradient(at 64px 64px, #000 0 75%, transparent 0);
 }
 
