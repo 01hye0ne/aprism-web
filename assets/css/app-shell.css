@@ -3647,11 +3647,16 @@ input.field-box { outline: 0; }
  * 도구 레일 맨 위에 붙는 두 칸이다(지하 3층 · 지하 4층).
  * 아이콘 버튼과 같은 폭으로 세워, 레일이 한 줄로 읽히게 한다.
  */
+/*
+ * 고른 층은 상자를 가득 채운다 — 테두리와 면 사이에 틈을 두지 않는다(디자이너 요청).
+ * 안쪽 여백 · 칸 사이 틈을 없애고 상자가 모서리를 잘라낸다. 버튼은 모서리를 갖지 않는다.
+ */
 .map-floors {
   display: flex;
   flex-direction: column;
-  gap: var(--border-width-thin);
-  padding: var(--border-width-thin);
+  gap: 0;
+  padding: 0;
+  overflow: hidden;
   border-radius: var(--radius-control);
   background-color: var(--bg-surface-overlay-dark);
   border: var(--border-width-thin) solid var(--border-subtle);
@@ -3662,7 +3667,7 @@ input.field-box { outline: 0; }
   height: 28px;
   padding: 0;
   border: 0;
-  border-radius: var(--radius-control);
+  border-radius: 0;
   background: transparent;
   color: var(--fg-secondary);
   font-family: var(--font-family-mono);
