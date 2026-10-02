@@ -2024,6 +2024,37 @@
   }
 
   /*
+   * 길 색은 로봇의 상태에서 나온다 — 상태는 우측 로봇 카드가 들고 있는 것이 원본이다.
+   *
+   * 대기 중인 로봇은 회색이다. 전에는 노랑이었는데 이 화면에서 노랑은 주의 알림 색이라
+   * 가만히 선 로봇이 경고처럼 읽혔다(디자이너 요청).
+   *   수행중  main      움직이는 중이다
+   *   완료    safe      한 바퀴 다 돌았다
+   *   대기 · 끊김  gray  아직 · 더는 아무 일도 하지 않는다
+   */
+  var BOT_TINT = {
+    "수행중": { done: 0x89b9ed, left: 0x4990e0, dot: 0xc7ddf8 },
+    "완료":   { done: 0x34c759, left: 0x1da67f, dot: 0x72f494 },
+    "대기":   { done: 0x8894aa, left: 0x5d6675, dot: 0xaeb8c8 },
+    "끊김":   { done: 0x667085, left: 0x4e576a, dot: 0x8894aa }
+  };
+
+  function botState(id) {
+    var badge = document.querySelector(".robot-strip .robot-card[data-robot='" + id + "'] .badge");
+    return badge ? badge.textContent.trim() : "";
+  }
+
+  // 길을 깔기 전에 그 로봇의 상태색을 입힌다. 상태를 못 읽으면 들고 있던 색 그대로다.
+  function tintRobot(bot, id) {
+    var tint = BOT_TINT[botState(id)];
+    if (!tint) { return bot; }
+    bot.done = tint.done;
+    bot.left = tint.left;
+    bot.dot = tint.dot;
+    return bot;
+  }
+
+  /*
    * 우측에서 로봇을 누르면 지도가 그 로봇에게 간다.
    *
    * 길만 바꾸면 로봇이 화면 밖에 있을 때 아무 일도 안 일어난 것처럼 보인다.
@@ -3682,6 +3713,7 @@
     // 로봇마다 제 고리를 깐다. 바닥 격자는 첫 로봇이 만들고 나머지가 나눠 쓴다.
     // 깔아만 두고 보이지는 않는다 — 지금 고른 로봇의 것 하나만 켠다.
     ROBOTS.forEach(function (bot, id) {
+      tintRobot(bot, id);
       // 길은 도킹 스테이션에서 시작한다.
       // 도커 -> WP-01 … -> 같은 도커 폐회로(미터 좌표 · 장애물 여유). 못 만들면 예전 길로 둔다.
       var planned = planRobot(bot, id);
