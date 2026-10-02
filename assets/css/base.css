@@ -87,9 +87,10 @@ body {
 .site-main {
   flex: 1;
   width: 100%;
-  max-width: 960px;
+  /* 카드가 한 줄에 더 들어오게 좌우를 넓혔다 — 960 에서는 양옆이 화면의 절반이었다. */
+  max-width: 1440px;
   margin: 0 auto;
-  padding: var(--space-48) var(--space-20);
+  padding: var(--space-48) var(--space-32);
 }
 
 .eyebrow {
@@ -140,6 +141,19 @@ body {
   font-weight: 600;
   letter-spacing: 0.02em;
   color: var(--fg-secondary);
+}
+
+/* 소목차 — 같은 묶음 안에서 무엇을 고르는 시안인지 가른다(레이아웃 · Delta GUI). */
+.screen-sub + .screen-sub { margin-top: var(--space-20); }
+
+.screen-sub h4 {
+  margin: 0 0 var(--space-8);
+  font-size: var(--font-size-12);
+  line-height: var(--font-line-height-18);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--fg-tertiary);
 }
 
 .screen-list {

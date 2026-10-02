@@ -6,7 +6,7 @@
   <title>APRISM — 화면 퍼블리싱</title>
   <meta name="description" content="APRISM 공장 환경점검 로봇 관제 대시보드 화면 퍼블리싱" />
   <link rel="stylesheet" href="./assets/css/tokens.css?v=4aceab62" />
-  <link rel="stylesheet" href="./assets/css/base.css?v=0f3be04f" />
+  <link rel="stylesheet" href="./assets/css/base.css?v=965f92a1" />
 </head>
 <body>
   <header class="site-header">
@@ -81,10 +81,14 @@
         </ul>
       </div>
 
-      <!-- 시안 확인용 — 고르려고 만든 판이다. 결정되면 위로 올린다. -->
+      <!-- 시안 확인용 — 고르려고 만든 판이다. 결정되면 위로 올린다.
+           무엇을 고르는 시안인지로 소목차를 나눈다(레이아웃 · Delta GUI). -->
       <div class="screen-group">
         <h3>시안 확인용</h3>
-        <ul class="screen-list">
+
+        <div class="screen-sub">
+          <h4>레이아웃</h4>
+          <ul class="screen-list">
           <li class="screen-card">
             <span class="screen-status">[레이아웃] 시안 1</span>
             <a class="screen-name" href="./screens/sian-1.html">통합 관제 메인 · 좌측 패널 전환형</a>
@@ -97,6 +101,12 @@
             <span class="screen-desc">미션 설정 · 사전 점검이 지도 위 모달로 뜹니다. 모니터링은 미확인 알림 패널, [확인하기] 로
               감지 근거 · 지점 확인 · 조치 및 확인 처리 3단계 상세 모달이 열립니다.</span>
           </li>
+          </ul>
+        </div>
+
+        <div class="screen-sub">
+          <h4>Delta GUI</h4>
+          <ul class="screen-list">
           <li class="screen-card">
             <span class="screen-status">[Delta GUI] 시안 1</span>
             <a class="screen-name" href="./screens/sian-3.html">통합 관제 메인 · Delta 창형</a>
@@ -104,7 +114,8 @@
               <code>[+]</code> 를 누르면 지도 한가운데에 창으로 펼쳐지고 머리를 잡아 옮길 수 있습니다.
               빛은 Figma(UI_00 826:8887) 의 SVG 그대로입니다.</span>
           </li>
-        </ul>
+          </ul>
+        </div>
       </div>
 
       <div class="screen-group">
