@@ -455,15 +455,15 @@
   backdrop-filter: none;
 }
 
-/* 머리 — 제목 아래 로봇 줄이 바로 붙는다(Figma Header 패딩 12/8/8). */
+/* 머리 — Figma Texts(1061:16388) 는 패널 위에서 12, 좌우 12 다. 패널 패딩 4 를 뺀 값이 여기다. */
 .v2 .panel-header {
   flex-direction: column;
   gap: var(--space-8);
-  padding: var(--space-12) var(--space-8) var(--space-8);
+  padding: var(--space-8) var(--space-8) var(--space-12);
 }
 
-/* 진행 막대 — Figma Progress Bar 패딩 12/8. */
-.v2 .mission-header { padding: var(--space-12) var(--space-8); }
+/* 진행 막대 — Figma Progress Bar(1054:20548) 패딩 12/8/8. */
+.v2 .mission-header { padding: var(--space-12) var(--space-8) var(--space-8); }
 
 
 /*
@@ -477,14 +477,17 @@
  * 이제 면은 안쪽 판(bg/canvas) 하나뿐이고, 좌우 4 만 띄워 카드 안에 앉는다.
  */
 .v2 .robot-list {
-  padding: 0 var(--space-4) var(--space-4);
+  padding: 0 0 var(--space-4);
   background: none;
 }
 
-/* 로봇 줄 — 머리의 제목과 왼쪽 끝을 맞춘다(머리 패딩 8 = 묶음 4 + 여기 4). */
+/*
+ * 로봇 줄 — Figma Header(1068:16439) 는 42 높이에 위아래 8 이고, 글은 패널 위에서 12 에 선다.
+ * 왼쪽도 제목과 같은 12 다(패널 패딩 4 + 여기 8).
+ */
 .v2 .robot-bar {
-  height: 32px;
-  padding: 0 var(--space-4);
+  height: 42px;
+  padding: var(--space-8);
   background: none;
 }
 

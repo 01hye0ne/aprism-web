@@ -3609,10 +3609,11 @@ input.field-box { outline: 0; }
  * 1차는 20 높이 트랙 안에 숫자를 넣었는데, 숫자가 선을 밀어내 100% 가 덜 찬 것처럼 보였다.
  * 2차는 선을 얇게 두고 숫자를 아래로 내렸다 — 선은 길이만 말한다.
  */
+/* 제목줄과 선 사이는 8, 선과 아랫줄 사이는 4 다(Figma). 묶음 간격은 4 로 두고 제목줄만 더 띄운다. */
 .progress-bar {
   display: flex;
   flex-direction: column;
-  gap: var(--space-8);
+  gap: var(--space-4);
 }
 
 .progress-meta {
@@ -3620,6 +3621,7 @@ input.field-box { outline: 0; }
   align-items: center;
   gap: var(--space-8);
   height: 28px;
+  margin-bottom: var(--space-4);
 }
 
 /* 지금 하는 점검의 종류 — 20 배지 안에 16 아이콘. */
