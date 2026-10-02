@@ -485,7 +485,18 @@
     function lerp(x, y, t) { return x + (y - x) * t; }
 
     var STAND = { pitch: 0, py: 0, feet: legs.map(function (L) { return [L.x, FOOT_R]; }) };
-    var SIT = { pitch: 0.38, py: -0.14, feet: legs.map(function (L) { return [L.x > 0 ? 0.3 : -0.22, FOOT_R]; }) };
+    /*
+     * 앉기 — 핸드오프는 뒷다리만 접고 앞다리는 선 채로 두었다(개가 앉는 모습).
+     * 네 다리를 다 접게 고쳤다. 몸을 0.30 내리면 엉덩이가 0.54 에서 0.24 로 와서
+     * 다리 길이(0.58) 가 한참 남아 네 다리 모두 Z 자로 접힌다.
+     * 발은 엉덩이보다 조금씩 바깥에 둔다 — 바로 밑에 두면 무릎이 몸통을 파고든다.
+     * 가슴만 조금 든 채로(pitch 0.12) 둔다. 완전히 평평하면 엎드린 것처럼 보인다.
+     */
+    var SIT = {
+      pitch: 0.12,
+      py: -0.30,
+      feet: legs.map(function (L) { return [L.x > 0 ? L.x + 0.05 : L.x - 0.05, FOOT_R]; })
+    };
 
     var poses = {
       walk: function (t) {
