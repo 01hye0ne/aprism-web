@@ -330,15 +330,15 @@
 }
 
 /*
- * 삼각판 면 — 깎인 선 바깥이라 화면 바탕(bg/canvas)과 같은 색이다.
- * 예전 #2C3443 회색은 바탕 위에 회색 삼각형이 튀어나와 보였다.
+ * 삼각판 면 — 옆 관제 프레임(.content-surface)과 같은 bg/surface/subtle 이다.
+ * 깎인 선 바깥이 관제 프레임에 이어져 보이게 한다(디자이너 요청 — 검정 바탕색은 아니다).
  * 모양만 SVG 에서 빌리고(마스크) 색은 토큰으로 칠한다.
  */
 .v3 .delta3:not(.is-open) .delta3-name::before {
   content: "";
   position: absolute;
   inset: 0;
-  background-color: var(--bg-canvas);
+  background-color: var(--bg-surface-subtle);
   -webkit-mask: url("data:image/svg+xml,%3Csvg preserveAspectRatio='none' overflow='visible' style='display: block;' width='64' height='64' viewBox='0 0 64 64' fill='none' xmlns='http://www.w3.org/2000/svg'%3E %3Cpath id='Rectangle 180' d='M0 0H62.627A16 16 0 0 0 51.314 4.686L4.686 51.314A16 16 0 0 0 0 62.627V0Z' fill='%232C3443'/%3E %3C/svg%3E") 0 0 / 64px 64px no-repeat;
   mask: url("data:image/svg+xml,%3Csvg preserveAspectRatio='none' overflow='visible' style='display: block;' width='64' height='64' viewBox='0 0 64 64' fill='none' xmlns='http://www.w3.org/2000/svg'%3E %3Cpath id='Rectangle 180' d='M0 0H62.627A16 16 0 0 0 51.314 4.686L4.686 51.314A16 16 0 0 0 0 62.627V0Z' fill='%232C3443'/%3E %3C/svg%3E") 0 0 / 64px 64px no-repeat;
   pointer-events: none;
