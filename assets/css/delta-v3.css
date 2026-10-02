@@ -582,27 +582,28 @@
  * 펼친 창의 면 — 아래로 갈수록 단계 색으로 물든다(--d3-face-mid · -end).
  * 기본은 Figma 의 하늘 -> 흰빛이고, 단계가 오르면 AI 패널 Gradient/Warning · Danger 의
  * 끝 색으로 바꾼다. 위험은 흰 끝을 두지 않는다 — 빨강이 분홍으로 바래 보인다.
- * 단계 색은 어두운 gray-900 에 섞어 명도를 누른다(가운데 45% · 끝 55%) —
+ * 단계 색은 어두운 gray-900 에 섞어 명도를 누른다(가운데 55% · 끝 70%) —
  * 창이 회색 화면에 묻히고, 위험은 어두운 빨강으로 남는다(디자이너 요청).
- * 밝은 gray-600 에 섞었을 때는 색이 바래 뿌옇게 떴다.
+ * 밝은 gray-600 에 섞으면 색이 바래 뿌옇고, 단계 색을 덜 넣으면 칙칙하다.
+ * 어두운 바탕에 색을 넉넉히 넣어 명도는 낮게, 채도는 살린다.
  */
 .v3 .delta3.is-safe {
-  --d3-face-mid: color-mix(in srgb, #7FCFA3 45%, var(--color-gray-900));
-  --d3-face-end: color-mix(in srgb, #2AD982 55%, var(--color-gray-900));
+  --d3-face-mid: color-mix(in srgb, #7FCFA3 55%, var(--color-gray-900));
+  --d3-face-end: color-mix(in srgb, #2AD982 70%, var(--color-gray-900));
   --delta3-glow-primary: var(--alert-safe-glow-primary);
   --delta3-glow-secondary: var(--alert-safe-glow-secondary);
   --d3-ramp: #2AD982 0%, #0EBB57 12.5%, #10893B 25%, #2F603E 37.5%, #5A595F 50%, #77778A 62.5%, #75A9A6 75%, #55D2A2 87.5%, #2AD982 100%;
 }
 .v3 .delta3.is-warning {
-  --d3-face-mid: color-mix(in srgb, #C9A23A 45%, var(--color-gray-900));
-  --d3-face-end: color-mix(in srgb, #F7CD36 55%, var(--color-gray-900));
+  --d3-face-mid: color-mix(in srgb, #C9A23A 55%, var(--color-gray-900));
+  --d3-face-end: color-mix(in srgb, #F7CD36 70%, var(--color-gray-900));
   --delta3-glow-primary: var(--alert-warning-glow-primary);
   --delta3-glow-secondary: var(--alert-warning-glow-secondary);
   --d3-ramp: #F2B020 0%, #D38210 12.5%, #A5521A 25%, #813D39 37.5%, #7D4F5A 50%, #9C7D6B 62.5%, #CBAD61 75%, #EEC242 87.5%, #F2B020 100%;
 }
 .v3 .delta3.is-critical {
-  --d3-face-mid: color-mix(in srgb, #B8443B 45%, var(--color-gray-900));
-  --d3-face-end: color-mix(in srgb, #F4463F 55%, var(--color-gray-900));
+  --d3-face-mid: color-mix(in srgb, #B8443B 55%, var(--color-gray-900));
+  --d3-face-end: color-mix(in srgb, #F4463F 70%, var(--color-gray-900));
   --delta3-glow-primary: var(--alert-danger-glow-primary);
   --delta3-glow-secondary: var(--alert-danger-glow-secondary);
   --d3-ramp: #F05937 0%, #D9321D 12.5%, #A3121E 25%, #6D0B3B 37.5%, #572262 50%, #6D487C 62.5%, #A3687B 75%, #D96F5E 87.5%, #F05937 100%;
