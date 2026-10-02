@@ -2047,7 +2047,7 @@
      * 대기 로봇도 회색이라 지나온 길과 톤이 겹치는데, 수행 중인 로봇은 흰 표식과
      * 파란 앞길이 함께 서 있어 멀리서도 갈린다.
      */
-    "수행중": { done: 0x6b7585, left: 0x89b9ed, dot: 0xffffff, mark: 0xf7f8fa },
+    "수행중": { done: 0x9ea8bb, left: 0x89b9ed, dot: 0xffffff, mark: 0xf7f8fa },
     "완료":   { done: 0x34c759, left: 0x1da67f, dot: 0x72f494 },
     "대기":   { done: 0x8894aa, left: 0x5d6675, dot: 0xaeb8c8 },
     "끊김":   { done: 0x667085, left: 0x4e576a, dot: 0x8894aa }
