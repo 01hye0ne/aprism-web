@@ -19,7 +19,7 @@
   }
   </script>
   <link rel="stylesheet" href="../assets/css/tokens.css?v=4aceab62" />
-  <link rel="stylesheet" href="../assets/css/app-shell.css?v=7584945e" />
+  <link rel="stylesheet" href="../assets/css/app-shell.css?v=e39c2aaa" />
   <link rel="stylesheet" href="../assets/css/map-overlays.css?v=29710549" />
   <link rel="stylesheet" href="../assets/css/text-parts.css?v=e38e19ea" />
   <link rel="stylesheet" href="../assets/css/sian.css?v=940fcc3e" />
@@ -969,14 +969,13 @@
 
                                 <div class="progress-bar">
                                   <div class="progress-meta">
-                                    <span class="progress-title t-title-1">
-                                      <span class="badge-dot"></span><span data-progress-title>현재 수행명</span>
-                                    </span>
-                                    <span class="progress-values t-caption">
-                                      <span class="num" data-progress-count></span><span class="num" data-progress-percent></span>
-                                    </span>
+                                    <span class="progress-title" data-progress-title>현재 수행명</span>
+                                    <span class="progress-percent num" data-progress-percent>00%</span>
                                   </div>
-                                  <div class="progress-track" role="img" data-progress-track></div>
+                                  <div class="progress-track" role="img" data-progress-track>
+                                    <span class="progress-fill"><b class="num" data-progress-done>0</b></span>
+                                    <span class="progress-rest"><b class="num" data-progress-total>0</b></span>
+                                  </div>
                                 </div>
                               </div>
 
@@ -1590,7 +1589,7 @@
 
 <script src="../assets/js/theme.js?v=dcf8f460"></script>
 <script src="../assets/js/prism-orb.js?v=03386460"></script>
-<script src="../assets/js/screen.js?v=4dff999f"></script>
+<script src="../assets/js/screen.js?v=52c5f78c"></script>
 <script src="../assets/js/map-model.js?v=0f88c871"></script>
 <script src="../assets/js/map.js?v=f2c1f68e"></script>
 <script src="../assets/js/sian.js?v=9553c96a"></script>

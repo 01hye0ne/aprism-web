@@ -433,7 +433,38 @@
 }
 
 /* 로봇 카드 머리 — 패딩 8, Title/1. */
-.v2 .panel-header { padding: var(--space-8); }
+/*
+ * 우측 패널 — Figma Mission-in progress-2(828:15313) 부터 로봇과 미션이 한 장이다.
+ * 카드 면(반투명 유리)은 패널이 한 번만 두르고, 안쪽 두 덩이는 면을 벗는다.
+ * 쌓이는 차례는 Figma 와 같다 — 머리(전체 미션명 + 로봇 줄) · 로봇 · 진행 막대 · 타임라인.
+ */
+.v2 .right-panel {
+  gap: 0;
+  padding: var(--space-4);
+  border-radius: var(--radius-container);
+  background-color: var(--bg-surface-overlay-light);
+  -webkit-backdrop-filter: blur(5px);
+  backdrop-filter: blur(5px);
+}
+
+.v2 .right-panel > .panel-card {
+  padding: 0;
+  border-radius: 0;
+  background: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+/* 머리 — 제목 아래 로봇 줄이 바로 붙는다(Figma Header 패딩 12/8/8). */
+.v2 .panel-header {
+  flex-direction: column;
+  gap: var(--space-8);
+  padding: var(--space-12) var(--space-8) var(--space-8);
+}
+
+/* 진행 막대 — Figma Progress Bar 패딩 12/8. */
+.v2 .mission-header { padding: var(--space-12) var(--space-8); }
+
 
 /*
  * Robot list (Figma 828:14611) — 덩이 전체가 bg/surface/selected 면 · radius 4 · 패딩 0/4/4/4.

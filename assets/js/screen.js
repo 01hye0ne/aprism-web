@@ -1010,10 +1010,13 @@ window.APRISM_TEXT = (function () {
       return;
     }
 
+    // 머리의 제목이 전체 미션명이고, 진행 막대의 제목은 지금 하는 칸 이름이다(Figma 828:15313).
+    var missionName = document.querySelector("[data-mission-name]");
     var title = document.querySelector("[data-progress-title]");
-    var count = document.querySelector("[data-progress-count]");
     var percent = document.querySelector("[data-progress-percent]");
     var track = document.querySelector("[data-progress-track]");
+    var doneNum = document.querySelector("[data-progress-done]");
+    var totalNum = document.querySelector("[data-progress-total]");
 
     function render(index) {
       var robot = ROBOTS[index];
@@ -1024,14 +1027,17 @@ window.APRISM_TEXT = (function () {
       var total = robot.steps.length;
       var done = robot.steps.filter(function (s) { return s.state === "done"; }).length;
 
-      title.textContent = robot.current;
-      count.textContent = done + " / " + total;
+      // 지금 하는 칸. 다 돌았으면 마지막으로 한 칸을 쓴다.
+      var live = robot.steps.filter(function (s) { return s.state === "running"; })[0];
+
+      if (missionName) { missionName.textContent = robot.current; }
+      if (title) { title.textContent = (live && live.title) || robot.current; }
       percent.textContent = Math.round((done / total) * 100) + "%";
 
-      // 칸과 단계는 1:1 이다. 칸 색이 그 단계의 상태를 그대로 따른다.
-      track.textContent = "";
-      // 한 줄짜리 게이지다 — 채운 길이만 넣는다(칸은 없앴다. app-shell.css 주석 참고).
+      // 막대 길이와 두 숫자가 같은 말을 한다 — 채운 끝에 지나온 수, 트랙 끝에 전체 수.
       track.style.setProperty("--progress", (total ? done / total * 100 : 0) + "%");
+      if (doneNum) { doneNum.textContent = done; }
+      if (totalNum) { totalNum.textContent = total; }
       track.setAttribute("aria-label", total + "단계 중 " + done + "단계 완료");
 
       timeline.textContent = "";

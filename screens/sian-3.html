@@ -19,10 +19,10 @@
   }
   </script>
   <link rel="stylesheet" href="../assets/css/tokens.css?v=4aceab62" />
-  <link rel="stylesheet" href="../assets/css/app-shell.css?v=7584945e" />
+  <link rel="stylesheet" href="../assets/css/app-shell.css?v=e39c2aaa" />
   <link rel="stylesheet" href="../assets/css/map-overlays.css?v=29710549" />
   <link rel="stylesheet" href="../assets/css/text-parts.css?v=e38e19ea" />
-  <link rel="stylesheet" href="../assets/css/monitor.css?v=a84b762a" />
+  <link rel="stylesheet" href="../assets/css/monitor.css?v=79b15014" />
   <link rel="stylesheet" href="../assets/css/delta-v3.css?v=e7856271" />
   <style>
     *, *::before, *::after { box-sizing: border-box; }
@@ -423,12 +423,14 @@
           <div class="floating col-3">
             <section class="right-panel" aria-label="로봇 · 미션">
 
-              <!-- 카드 1 · 로봇 -->
+              <!-- Figma Mission-in progress-2(828:15313) — 로봇과 미션이 한 장이다.
+                   머리(전체 미션명 + 로봇 줄) · 로봇 · 진행 막대 · 타임라인 순이고,
+                   카드 면(유리)은 .right-panel 이 한 번만 두른다(monitor.css). -->
               <div class="panel-card">
                 <!-- Figma Mission-in progress-2 Header — 패딩 8, Title/1. -->
                 <div class="panel-header">
                   <div class="texts">
-                    <h2 class="t-title-1">전체 미션명</h2>
+                    <h2 class="t-title-1" data-mission-name>전체 미션명</h2>
                   </div>
                 </div>
 
@@ -443,7 +445,7 @@
                       <span>11대 연결</span>
                       <span class="badge badge-info t-caption"><span class="badge-dot"></span>3대 수행중</span>
                     </p>
-                    <button type="button" class="btn btn-ghost" data-modal-open="robots" data-robot-more>로봇 더보기</button>
+                    <button type="button" class="btn btn-ghost" data-modal-open="robots" data-robot-more>로봇 현황</button>
                   </div>
 
                   <!-- 한 대씩 넘겨 본다 — 왼쪽 < 그래픽 > , 오른쪽 이름 · 자동복귀 · E-STOP · 상태 세 줄.
@@ -903,24 +905,19 @@
                 </div>
               </div>
 
-              <!-- 카드 2 · 미션 -->
+              <!-- 아래쪽 — 진행 막대와 타임라인 -->
               <div class="panel-card is-fill">
                 <div class="mission-header">
-                  <!-- ver.2 — 제어 버튼은 위 로봇 카드로 옮겨 갔다. 라벨(Overline)만 남는다. -->
-                  <div class="mission-controls">
-                    <p class="t-overline section-label">전체 미션명</p>
-                  </div>
-
                   <div class="progress-bar">
                     <div class="progress-meta">
-                      <span class="progress-title t-title-1">
-                        <span class="badge-dot"></span><span data-progress-title>N₂ 배관 압력 점검</span>
-                      </span>
-                      <span class="progress-values t-caption">
-                        <span class="num" data-progress-count></span><span class="num" data-progress-percent></span>
-                      </span>
+                      <span class="progress-title" data-progress-title>현재 수행명</span>
+                      <span class="progress-percent num" data-progress-percent>00%</span>
                     </div>
-                    <div class="progress-track" role="img" data-progress-track></div>
+                    <!-- Figma Progress Bar(1054:20548) — 채운 막대 끝에 지나온 수, 트랙 끝에 전체 수. -->
+                    <div class="progress-track" role="img" data-progress-track>
+                      <span class="progress-fill"><b class="num" data-progress-done>0</b></span>
+                      <span class="progress-rest"><b class="num" data-progress-total>0</b></span>
+                    </div>
                   </div>
                 </div>
 
@@ -1542,7 +1539,7 @@
 
 <script src="../assets/js/theme.js?v=dcf8f460"></script>
 <script src="../assets/js/prism-orb.js?v=03386460"></script>
-<script src="../assets/js/screen.js?v=4dff999f"></script>
+<script src="../assets/js/screen.js?v=52c5f78c"></script>
 <script src="../assets/js/map-model.js?v=0f88c871"></script>
 <script src="../assets/js/map.js?v=f2c1f68e"></script>
 <script src="../assets/js/monitor.js?v=32cd50df"></script>
