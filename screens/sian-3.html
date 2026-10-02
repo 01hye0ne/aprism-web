@@ -553,7 +553,8 @@
                       </span>
                     </button>
 
-                    <button type="button" class="robot-card" data-robot="1" aria-pressed="false">
+                    <!-- Robot 02 — 미션은 완료지만 모션은 걷기로 둔다(data-motion 이 배지 상태보다 먼저다). -->
+                    <button type="button" class="robot-card" data-robot="1" data-motion="walk" aria-pressed="false">
                       <span class="label">
                         <span class="t-label-1 robot-id">Robot 02</span>
                       </span>
@@ -563,7 +564,7 @@
                       <span class="robot-lists">
                         <span class="robot-row">
                           <span class="t-caption">Mission</span>
-                          <span class="badge badge-idle t-caption"><span class="badge-dot"></span>대기</span>
+                          <span class="badge badge-normal t-caption"><span class="badge-dot"></span>완료</span>
                         </span>
                         <span class="robot-row">
                           <span class="t-caption">Battery</span>
