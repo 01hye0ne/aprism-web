@@ -3725,6 +3725,16 @@ input.field-box { outline: 0; }
  * 표식은 면이 없다 — 24px 원형 아이콘 하나가 전부다(Figma Marker=Check · Marker=Play).
  * 동그라미는 아이콘 그림 자체에 들어 있어서 색만 갈아 끼우면 된다.
  */
+/*
+ * 웨이포인트 표식 — 지도의 점과 같은 그림이다(map.js stopTexture 의 "full").
+ *
+ * 바탕색으로 속을 막고, 상태색 고리를 두르고, 가운데에 같은 색 점을 하나 찍는다.
+ * 지도는 64px 판에 고리 9 · 가운데 점 반지름 0.32 로 그린다 — 여기 16px 점에 같은 비율로 옮겼다.
+ * 색도 지도의 WP_TINT 와 같은 값이다(safe/300 · warning/500 · danger/500 · main/400).
+ *
+ * 예전에는 체크 · 재생 · 경고 아이콘이었다. 같은 웨이포인트를 지도와 목록이 다른 그림으로
+ * 가리키면 둘을 오갈 때마다 다시 읽어야 해서 지도 쪽으로 맞췄다(디자이너 요청).
+ */
 .rail-mark {
   flex: none;
   display: flex;
@@ -3735,7 +3745,27 @@ input.field-box { outline: 0; }
   color: var(--status-normal-icon);
 }
 
-.is-running .rail-mark { color: var(--bg-accent); }
+.rail-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2.5px solid currentColor;
+  background-color: var(--bg-canvas);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rail-dot::after {
+  content: "";
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background-color: currentColor;
+}
+
+/* 지금 하는 칸은 지도의 current 와 같은 main/400 이다(--bg-accent 는 한 단계 어둡다). */
+.is-running .rail-mark { color: var(--color-main-400); }
 
 /* 알림이 걸린 칸은 표식이 그 단계 색을 입는다 — 지도의 점과 같은 색이다(monitor.js 가 data-wp-alert 를 적는다). */
 .timeline-item[data-wp-alert="caution"] .rail-mark { color: var(--status-warning-icon); }

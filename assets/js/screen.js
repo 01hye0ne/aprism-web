@@ -944,9 +944,10 @@ window.APRISM_TEXT = (function () {
     if (meta.icon) {
       capsule.appendChild(el("span", "rail-stub"));
       var mark = el("span", "rail-mark");
-      var icon = el("span", "i i-24");
-      icon.style.setProperty("--i", meta.icon);
-      mark.appendChild(icon);
+      // 표식은 지도의 웨이포인트 점과 같은 그림이다 — 상태색 고리에 가운데 점(app-shell.css).
+      // 체크 · 재생 · 경고 아이콘을 쓰던 자리인데, 같은 것을 가리키는 표식이 두 모양이면
+      // 지도와 목록을 오갈 때마다 다시 읽어야 한다.
+      mark.appendChild(el("span", "rail-dot"));
       capsule.appendChild(mark);
     }
     capsule.appendChild(el("span", "rail-line"));
