@@ -224,7 +224,9 @@
     where.appendChild(el("span", null, a.where));
     where.appendChild(el("span", "num", a.time));
 
-    var title = el("span", "ah-title t-label-1");
+    // 알림 제목은 Label/2(13/500) 다 — 한 단계 내렸다(디자이너 요청).
+    // 화면의 Label/1(14/800)이 목록마다 깔려 "다 중요해 보이는" 것을 푸는 쪽이다.
+    var title = el("span", "ah-title t-label-2");
     title.appendChild(icon(a.sev === "critical" ? "error" : "warning"));
     title.appendChild(el("span", null, a.title));
 
