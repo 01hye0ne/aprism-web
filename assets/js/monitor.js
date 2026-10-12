@@ -540,7 +540,15 @@
 
     options.addEventListener("change", function () { confirm.disabled = !chosen(); });
 
-    function liveSrc(a) { return "../assets/img/alert-live-" + a.live + ".webp"; }
+    /*
+     * v2.2 — 사람이 찍힌 그림은 비식별화된 판(-deid)을 쓴다. 실제로는 서버가 이미 가린 영상을 보낸다는 뜻이라
+     * 화면에서 덮지 않고 미리 구운 그림을 받는다(tools/deid-image.py · 비교판 screens/deid-lab.html 과 같은 셈).
+     */
+    var DEID = { ppe: true };
+    var useDeid = body.classList.contains("v2-2");
+    function liveSrc(a) {
+      return "../assets/img/alert-live-" + a.live + (useDeid && DEID[a.live] ? "-deid" : "") + ".webp";
+    }
 
     // ---------- 크게보기 ----------
     var zoomBox = $("[data-ma-zoom-box]");
