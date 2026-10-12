@@ -1,0 +1,212 @@
+/*
+ * 비식별화 패턴 비교 — 해칭 시험판에서 갈라져 나왔다(2026-10-12).
+ *
+ * 해칭을 그대로 덮으면 점 하나하나의 밝기가 줄 굵기로 옮겨 가 얼굴 형태가 남는다.
+ * 그래서 순서를 바꿨다 — 먼저 정보를 지우고(칸 평균), 그 위에 패턴을 입힌다.
+ *
+ *   mosaic      칸마다 평균색 하나
+ *   hatch       A 사선 · 줄 굵기 = 칸 평균 밝기(점 단위 정보는 이미 없다)
+ *   silhouette  A 사선 · 줄 굵기 고정 — 칸 사이 차이도 없다
+ *
+ * 사선 각도 57° 는 로고 A 의 다리 기울기다(brand-mark.svg 실측 — 꼭짓점 (14.3, 0.2) → 밑 (3.2, 17.1)).
+ * 칸 격자와 사선은 영역 왼쪽 위에 붙는다. 영상이 움직이면 영역과 함께 움직여 줄이 지글거리지 않는다.
+ *
+ * 그리기는 2D 캔버스 · 점 단위다. 시안 비교용이라 단순하게 두었다 — 제품에서는 셰이더 한 장이면 된다.
+ */
+(function () {
+  "use strict";
+
+  var W = 960, H = 640;
+  var IMG_W = 1280, IMG_H = 854;
+
+  // 사진(assets/img/hatch-sample-factory.jpg · 1280×854) 속 두 작업자 — 눈으로 잡은 자리다.
+  var PEOPLE = {
+    body: [[45, 95, 505, 770], [495, 165, 940, 835]],
+    head: [[280, 95, 475, 370], [570, 160, 795, 445]]
+  };
+
+  var P = {
+    scope: "body",
+    move: false,
+    cell: 24,
+    margin: 12,
+    angle: 57,
+    gap: 7,
+    thick: 45,
+    range: 70,
+    tint: false,
+    ink: "#89B9ED",
+    paper: "#0A0E15"
+  };
+
+  var views = {};
+  Array.prototype.forEach.call(document.querySelectorAll("[data-view]"), function (c) {
+    views[c.getAttribute("data-view")] = c.getContext("2d");
+  });
+
+  var work = document.createElement("canvas");
+  work.width = W; work.height = H;
+  var wctx = work.getContext("2d", { willReadFrequently: true });
+
+  var img = new Image();
+  var ready = false;
+  img.onload = function () { ready = true; draw(0); };
+  img.src = window.APRISM_HATCH_SAMPLE || "";
+
+  function hex(h) {
+    var n = parseInt(h.slice(1), 16);
+    return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+  }
+
+  // 화면 흔들림 흉내 — 사진을 조금 키워 두고 천천히 민다. 영역도 같은 변환을 탄다.
+  function camera(t) {
+    var s = (W / IMG_W) * 1.08;
+    var ox = (W - IMG_W * s) / 2, oy = (H - IMG_H * s) / 2;
+    if (P.move) {
+      ox += Math.sin(t * 0.0011) * 22;
+      oy += Math.cos(t * 0.0008) * 12;
+    }
+    return { s: s, ox: ox, oy: oy };
+  }
+
+  function regions(cam) {
+    return PEOPLE[P.scope].map(function (r) {
+      return [
+        r[0] * cam.s + cam.ox - P.margin,
+        r[1] * cam.s + cam.oy - P.margin,
+        r[2] * cam.s + cam.ox + P.margin,
+        r[3] * cam.s + cam.oy + P.margin
+      ];
+    });
+  }
+
+  /*
+   * 칸 평균 — 칸 격자는 영역 왼쪽 위(rx, ry)에서 시작한다.
+   * 영역을 넘는 칸은 영역 안쪽 점만 센다.
+   */
+  function cellsOf(src, r) {
+    var x0 = Math.max(0, Math.floor(r[0])), y0 = Math.max(0, Math.floor(r[1]));
+    var x1 = Math.min(W, Math.ceil(r[2])), y1 = Math.min(H, Math.ceil(r[3]));
+    var c = P.cell;
+    var cols = Math.ceil((r[2] - r[0]) / c), rows = Math.ceil((r[3] - r[1]) / c);
+    var sum = new Float32Array(cols * rows * 4);
+    for (var y = y0; y < y1; y++) {
+      var row = Math.floor((y - r[1]) / c);
+      for (var x = x0; x < x1; x++) {
+        var k = (row * cols + Math.floor((x - r[0]) / c)) * 4;
+        var i = (y * W + x) * 4;
+        sum[k] += src[i]; sum[k + 1] += src[i + 1]; sum[k + 2] += src[i + 2]; sum[k + 3] += 1;
+      }
+    }
+    for (var j = 0; j < cols * rows; j++) {
+      var n = sum[j * 4 + 3] || 1;
+      sum[j * 4] /= n; sum[j * 4 + 1] /= n; sum[j * 4 + 2] /= n;
+    }
+    return { x0: x0, y0: y0, x1: x1, y1: y1, cols: cols, sum: sum };
+  }
+
+  function smooth(e0, e1, x) {
+    var t = Math.min(1, Math.max(0, (x - e0) / (e1 - e0)));
+    return t * t * (3 - 2 * t);
+  }
+
+  function paint(kind, src, regs, cellSets) {
+    var ctx = views[kind];
+    if (!ctx) { return; }
+    var out = ctx.createImageData(W, H);
+    var d = out.data;
+    d.set(src);
+
+    if (kind === "source") {
+      ctx.putImageData(out, 0, 0);
+      ctx.save();
+      ctx.setLineDash([8, 6]);
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = P.ink;
+      regs.forEach(function (r) { ctx.strokeRect(r[0], r[1], r[2] - r[0], r[3] - r[1]); });
+      ctx.restore();
+      return;
+    }
+
+    var ink = hex(P.ink), paper = hex(P.paper);
+    // 사선 방향 — 오른쪽 위로 오르는 A 의 왼다리. 줄은 법선 n 방향으로 gap 마다 선다.
+    var a = P.angle * Math.PI / 180;
+    var nx = Math.sin(a), ny = Math.cos(a);
+    var aa = 1.2 / P.gap;   // 줄 가장자리 1px 남짓을 부드럽게
+
+    regs.forEach(function (r, ri) {
+      var cs = cellSets[ri];
+      for (var y = cs.y0; y < cs.y1; y++) {
+        var row = Math.floor((y - r[1]) / P.cell);
+        for (var x = cs.x0; x < cs.x1; x++) {
+          var k = (row * cs.cols + Math.floor((x - r[0]) / P.cell)) * 4;
+          var cr = cs.sum[k], cg = cs.sum[k + 1], cb = cs.sum[k + 2];
+          var i = (y * W + x) * 4;
+
+          if (kind === "mosaic") {
+            d[i] = cr; d[i + 1] = cg; d[i + 2] = cb;
+            continue;
+          }
+
+          var t;
+          if (kind === "hatch") {
+            var lum = (0.2126 * cr + 0.7152 * cg + 0.0722 * cb) / 255;
+            var mid = P.thick / 100, span = P.range / 100;
+            t = Math.min(0.95, Math.max(0.05, mid + (lum - 0.5) * span));
+          } else {
+            t = P.thick / 100;
+          }
+
+          var u = ((x - r[0]) * nx + (y - r[1]) * ny) / P.gap;
+          var h = Math.abs(u - Math.floor(u) - 0.5) * 2;      // 줄 가운데 0 · 줄 사이 1
+          var cov = 1 - smooth(t - aa, t + aa, h);
+
+          var br = paper[0], bg = paper[1], bb = paper[2];
+          if (P.tint) { br = cr * 0.45; bg = cg * 0.45; bb = cb * 0.45; }
+          d[i] = br + (ink[0] - br) * cov;
+          d[i + 1] = bg + (ink[1] - bg) * cov;
+          d[i + 2] = bb + (ink[2] - bb) * cov;
+        }
+      }
+    });
+    ctx.putImageData(out, 0, 0);
+  }
+
+  function draw(t) {
+    if (!ready) { return; }
+    var cam = camera(t || 0);
+    wctx.fillStyle = "#000";
+    wctx.fillRect(0, 0, W, H);
+    wctx.drawImage(img, cam.ox, cam.oy, IMG_W * cam.s, IMG_H * cam.s);
+    var src = wctx.getImageData(0, 0, W, H).data;
+    var regs = regions(cam);
+    var cellSets = regs.map(function (r) { return cellsOf(src, r); });
+    ["source", "mosaic", "hatch", "silhouette"].forEach(function (k) { paint(k, src, regs, cellSets); });
+  }
+
+  var running = false;
+  function loop(t) {
+    if (!P.move) { running = false; return; }
+    draw(t);
+    requestAnimationFrame(loop);
+  }
+
+  function changed() {
+    if (P.move && !running) { running = true; requestAnimationFrame(loop); }
+    else if (!P.move) { draw(performance.now()); }
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll("[data-p]"), function (el) {
+    var name = el.getAttribute("data-p");
+    var out = document.querySelector("[data-out='" + name + "']");
+    if (el.type === "checkbox") { el.checked = P[name]; } else { el.value = P[name]; }
+    if (out) { out.textContent = el.value; }
+    function read() {
+      P[name] = el.type === "checkbox" ? el.checked : (el.type === "range" ? Number(el.value) : el.value);
+      if (out) { out.textContent = el.value; }
+      changed();
+    }
+    el.addEventListener("input", read);
+    el.addEventListener("change", read);
+  });
+})();

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>비식별화 패턴 비교 — APRISM</title>
+  <meta name="description" content="사람 영역을 가리는 방식 비교 — 일반 모자이크 · A 사선 모자이크 · A 사선 실루엣. 해칭 시험판에서 갈라져 나온 시험판이다." />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/static/woff2/SUIT.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" />
+  <link rel="stylesheet" href="../assets/css/tokens.css?v=4aceab62" />
+  <style>
+    /*
+     * 시험용 한 장짜리 화면이라 꾸밈은 여기에 둔다 — 해칭 시험판(hatch-lab.html)과 같은 짜임이다.
+     * 쓰는 값은 모두 토큰이다.
+     */
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; }
+    body {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 300px;
+      height: 100%;
+      background-color: var(--bg-canvas);
+      color: var(--fg-primary);
+      font-family: "SUIT Variable", "SUIT", system-ui, sans-serif;
+    }
+    .stage {
+      min-width: 0;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      align-content: start;
+      gap: var(--space-16);
+      padding: var(--space-24);
+      overflow-y: auto;
+    }
+    .view { display: flex; flex-direction: column; gap: var(--space-8); margin: 0; }
+    .view canvas {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: var(--radius-container);
+      background-color: var(--bg-surface-overlay-dark);
+    }
+    .view figcaption { display: flex; flex-direction: column; gap: var(--space-2); }
+    .view b { font-size: var(--font-size-14); line-height: var(--font-line-height-20); }
+    .view span { color: var(--fg-tertiary); font-size: var(--font-size-12); line-height: var(--font-line-height-18); }
+    .panel {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-16);
+      padding: var(--space-20) var(--space-16);
+      border-left: var(--border-width-thin) solid var(--border-default);
+      background-color: var(--bg-surface-subtle);
+      overflow-y: auto;
+    }
+    .panel h1 { margin: 0; font-size: var(--font-size-16); line-height: var(--font-line-height-24); }
+    .panel p { margin: 0; color: var(--fg-tertiary); font-size: var(--font-size-12); line-height: var(--font-line-height-18); }
+    .row { display: flex; flex-direction: column; gap: var(--space-4); }
+    .row > label {
+      display: flex;
+      justify-content: space-between;
+      gap: var(--space-8);
+      color: var(--fg-secondary);
+      font-size: var(--font-size-12);
+      line-height: var(--font-line-height-18);
+    }
+    .row output {
+      color: var(--fg-primary);
+      font-family: "JetBrains Mono", monospace;
+      font-size: var(--font-size-12);
+    }
+    input[type="range"] { width: 100%; accent-color: var(--bg-brand); }
+    input[type="color"] { width: 100%; height: 28px; padding: 0; border: 0; background: none; }
+    select {
+      width: 100%;
+      padding: var(--space-8);
+      border: var(--border-width-thin) solid var(--border-default);
+      border-radius: var(--radius-control);
+      background-color: var(--bg-surface-default);
+      color: var(--fg-primary);
+      font: inherit;
+      font-size: var(--font-size-13);
+    }
+    .rule { height: 1px; background-color: var(--border-default); }
+    .check { flex-direction: row; align-items: center; gap: var(--space-8); }
+    .check input { accent-color: var(--bg-brand); }
+    .warn {
+      padding: var(--space-12);
+      border-radius: var(--radius-card);
+      border: var(--border-width-thin) solid var(--status-warning-border);
+    }
+    .warn p { color: var(--fg-secondary); }
+    @media (max-width: 900px) {
+      body { grid-template-columns: 1fr; height: auto; }
+      .stage { grid-template-columns: 1fr; padding: var(--space-16); }
+      .panel { border-left: 0; border-top: var(--border-width-thin) solid var(--border-default); }
+    }
+  </style>
+</head>
+<body>
+  <!-- 왼쪽 — 같은 장면을 네 가지로. 원본 · 일반 모자이크 · A 사선 모자이크 · A 사선 실루엣. -->
+  <main class="stage">
+    <figure class="view">
+      <canvas data-view="source" width="960" height="640"></canvas>
+      <figcaption><b>원본</b><span>점선이 가리는 영역 — 실제로는 사람 감지 결과가 이 자리를 준다.</span></figcaption>
+    </figure>
+    <figure class="view">
+      <canvas data-view="mosaic" width="960" height="640"></canvas>
+      <figcaption><b>일반 모자이크</b><span>칸마다 평균색 하나. 널리 쓰는 방식이다.</span></figcaption>
+    </figure>
+    <figure class="view">
+      <canvas data-view="hatch" width="960" height="640"></canvas>
+      <figcaption><b>A 사선 모자이크 · 밝기 반영</b><span>칸 평균 밝기만 줄 굵기로 남긴다. 점 단위 정보는 이미 지워진 뒤다.</span></figcaption>
+    </figure>
+    <figure class="view">
+      <canvas data-view="silhouette" width="960" height="640"></canvas>
+      <figcaption><b>A 사선 실루엣 · 밝기 버림</b><span>모든 칸이 같은 결. 남는 것은 영역의 윤곽뿐이다.</span></figcaption>
+    </figure>
+  </main>
+
+  <aside class="panel">
+    <div class="row">
+      <h1>비식별화 패턴 비교</h1>
+      <p>정보를 먼저 지우고(칸 평균) 그 위에 APRISM 로고 A 의 사선(57°)을 입힌다.
+        사선과 칸 격자는 화면이 아니라 <b>영역에 붙어 있어</b> 영상이 움직여도 줄이 지글거리지 않는다 — [움직이기] 로 본다.</p>
+    </div>
+
+    <div class="row">
+      <label for="scope">가리는 범위</label>
+      <select id="scope" data-p="scope">
+        <option value="body">전신</option>
+        <option value="head">머리</option>
+      </select>
+    </div>
+    <div class="row check">
+      <input type="checkbox" id="move" data-p="move" />
+      <label for="move">움직이기 (카메라 흔들림 흉내)</label>
+    </div>
+
+    <div class="rule"></div>
+
+    <div class="row">
+      <label for="cell">칸 크기 (px) <output data-out="cell"></output></label>
+      <input type="range" id="cell" data-p="cell" min="8" max="64" step="1" />
+    </div>
+    <div class="row">
+      <label for="margin">영역 여백 (px) <output data-out="margin"></output></label>
+      <input type="range" id="margin" data-p="margin" min="0" max="48" step="1" />
+    </div>
+
+    <div class="rule"></div>
+
+    <div class="row">
+      <label for="angle">사선 각도 (°) <output data-out="angle"></output></label>
+      <input type="range" id="angle" data-p="angle" min="0" max="180" step="1" />
+    </div>
+    <div class="row">
+      <label for="gap">줄 간격 (px) <output data-out="gap"></output></label>
+      <input type="range" id="gap" data-p="gap" min="3" max="24" step="0.5" />
+    </div>
+    <div class="row">
+      <label for="thick">실루엣 줄 굵기 (%) <output data-out="thick"></output></label>
+      <input type="range" id="thick" data-p="thick" min="5" max="95" step="1" />
+    </div>
+    <div class="row">
+      <label for="range">밝기 반영 폭 (%) <output data-out="range"></output></label>
+      <input type="range" id="range" data-p="range" min="0" max="100" step="1" />
+    </div>
+    <div class="row check">
+      <input type="checkbox" id="tint" data-p="tint" />
+      <label for="tint">칸 색 남기기 (바탕을 칸 평균색으로)</label>
+    </div>
+
+    <div class="rule"></div>
+
+    <div class="row">
+      <label for="ink">줄 색</label>
+      <input type="color" id="ink" data-p="ink" />
+    </div>
+    <div class="row">
+      <label for="paper">바탕 색</label>
+      <input type="color" id="paper" data-p="paper" />
+    </div>
+
+    <div class="warn">
+      <p><b>시안용입니다.</b> 브라우저에서 덮으면 화면에서만 가려지고 원본 영상은 그대로 전송 · 녹화됩니다.
+        실제 비식별화는 영상이 나가기 전(로봇 · 서버)에서 해야 하고, 감지가 한두 프레임 끊겨도 가림을 유지해야 합니다.</p>
+    </div>
+  </aside>
+
+  <script src="../assets/js/hatch-sample.js?v=8219cd21"></script>
+  <script src="../assets/js/deid-lab.js?v=eb8d09fe"></script>
+</body>
+</html>
