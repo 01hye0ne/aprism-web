@@ -40,9 +40,10 @@
   var palette = /[?&]palette=(neutral)/.exec(location.search);
   if (palette) { root.setAttribute("data-palette", palette[1]); }
 
-  // ?delta=glass — 톤 실험실의 위험 Delta 제안(빛으로 강조)을 씌워 본다. 저장하지 않는다.
-  var delta = /[?&]delta=(glass)/.exec(location.search);
-  if (delta) { root.setAttribute("data-delta", delta[1]); }
+  // ?delta=glass · off — 위험 Delta 를 빛으로 강조한 판(v2.2 기본, 10/12 채택)을 켜고 끈다. 저장하지 않는다.
+  var delta = /[?&]delta=(glass|off)/.exec(location.search);
+  if (delta && delta[1] === "off") { root.removeAttribute("data-delta"); }
+  else if (delta) { root.setAttribute("data-delta", delta[1]); }
 
   if (button) {
     button.addEventListener("click", function () {
