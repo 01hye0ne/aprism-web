@@ -45,6 +45,10 @@
   if (delta && delta[1] === "off") { root.removeAttribute("data-delta"); }
   else if (delta) { root.setAttribute("data-delta", delta[1]); }
 
+  // ?glow=top — 위험 Delta 의 빛을 아래 변이 아니라 왼쪽 위 모서리(Delta 아이콘 자리)에서 내는 시안. 저장하지 않는다.
+  var glow = /[?&]glow=(top)/.exec(location.search);
+  if (glow) { root.setAttribute("data-glow", glow[1]); }
+
   if (button) {
     button.addEventListener("click", function () {
       var next = root.getAttribute("data-theme") === "light" ? "dark" : "light";
