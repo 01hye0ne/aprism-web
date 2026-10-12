@@ -254,11 +254,13 @@
     var row = el("div", "ah-row");
     row.setAttribute("role", "listitem");
     node.removeAttribute("role");
+    // 평소엔 아이콘만, 그 줄에 올라가면 글자가 붙는다 — 알림마다 반복돼 글자까지 늘 서 있으면 목록이 시끄럽다.
     var report = el("button", "btn btn-ghost is-xs ah-report");
     report.type = "button";
     report.title = "보고서 화면 준비 중";
+    report.setAttribute("aria-label", "보고서");
     report.appendChild(icon("document"));
-    report.appendChild(el("span", null, "보고서"));
+    report.appendChild(el("span", "ah-report-label", "보고서"));
     row.appendChild(node);
     row.appendChild(report);
     return row;

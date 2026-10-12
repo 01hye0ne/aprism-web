@@ -22,7 +22,7 @@
   <link rel="stylesheet" href="../assets/css/app-shell.css?v=81f4c7fb" />
   <link rel="stylesheet" href="../assets/css/map-overlays.css?v=bf2847b4" />
   <link rel="stylesheet" href="../assets/css/text-parts.css?v=e38e19ea" />
-  <link rel="stylesheet" href="../assets/css/monitor.css?v=9a0a8664" />
+  <link rel="stylesheet" href="../assets/css/monitor.css?v=90075db2" />
   <link rel="stylesheet" href="../assets/css/delta-v3.css?v=ad42641a" />
   <style>
     *, *::before, *::after { box-sizing: border-box; }
@@ -41,7 +41,7 @@
 <!-- 상황은 04.1 통합 관제 메인과 같다 — 위험 알림이 쌓인 판이다(디자이너 요청).
      Delta 만 다른 시안이라 나머지 조건이 같아야 둘을 나란히 놓고 고를 수 있다.
      주소 끝 #normal · #few · #warning 으로 다른 단계도 볼 수 있다. -->
-<body class="v2 v3" data-level="critical" data-delta-copy="keyword" data-mission-scope>
+<body class="v2 v3 v2-2" data-level="critical" data-delta-copy="keyword" data-mission-scope>
 
 <!-- Robot Dog Walk 리그(assets/robot-dog/ 핸드오프)의 공용 defs — 카드 썸네일이 url(#rd-*) 로 참조한다. -->
 <svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute" xmlns="http://www.w3.org/2000/svg">
@@ -233,8 +233,9 @@
 
         <div class="ah-body">
           <div class="ah-head">
-            <h2 class="t-heading-3" id="ah-title">최신 알림</h2>
-            <span class="ah-order t-caption">오래된 순 · 위험 우선 정렬</span>
+            <!-- 제목은 아래 "오늘 확인 완료" 와 같은 Title/2 다 — 같은 패널의 형제 칸이다(v2.2 위계 정리).
+                 제목 줄은 이름 + 이동만. 정렬 안내는 목록을 다루는 거르기 줄로 내려갔다. -->
+            <h2 class="t-title-2" id="ah-title">최신 알림</h2>
             <button type="button" class="btn btn-ghost is-xs ah-all" data-ah-all>전체보기<span class="i i-16" style="--i:var(--ic-arrow-right)" aria-hidden="true"></span></button>
           </div>
 
@@ -246,6 +247,7 @@
                 <button type="button" class="btn" data-ah-filter="critical" aria-pressed="false">위험 <span class="num" data-ah-count="critical">0</span></button>
                 <button type="button" class="btn" data-ah-filter="warning" aria-pressed="false">주의 <span class="num" data-ah-count="warning">0</span></button>
               </div>
+              <span class="ah-order t-caption">오래된 순 · 위험 우선</span>
             </div>
             <div class="ah-box has-fade">
               <div class="ah-list" data-ah-list data-ah-report role="list"></div>
@@ -471,12 +473,8 @@
                    머리(전체 미션명 + 로봇 줄) · 로봇 · 진행 막대 · 타임라인 순이고,
                    카드 면(유리)은 .right-panel 이 한 번만 두른다(monitor.css). -->
               <div class="panel-card">
-                <!-- Figma Mission-in progress-2 Header — 패딩 8, Title/1. -->
-                <div class="panel-header">
-                  <div class="texts">
-                    <h2 class="t-title-1" data-mission-name>전체 미션명</h2>
-                  </div>
-                </div>
+                <!-- v2.2 — 미션명 머리(Figma Mission-in progress-2 Header)는 뺐다. 미션명은 상태바 한 곳만 말한다.
+                     패널은 대수 줄(로봇 줄)부터 시작한다. -->
 
                 <!-- Figma "Robot list"(558:13332) — 바 + 카드 줄이 한 덩이다.
                      대수가 헤더 부제에서 이 바로 내려왔고, 오른쪽에 [로봇 더보기]가 붙는다. -->
@@ -1654,7 +1652,7 @@
 <script src="../assets/js/map-model.js?v=0f88c871"></script>
 <script src="../assets/js/map.js?v=53abcbb1"></script>
 <script src="../assets/js/robot-stage.js?v=0e7afdc2"></script>
-<script src="../assets/js/monitor.js?v=79ecc152"></script>
+<script src="../assets/js/monitor.js?v=e085df47"></script>
 <script src="../assets/js/mission-scope.js?v=b5f75429"></script>
 <script src="../assets/js/delta-v3.js?v=6842c15b"></script>
 <script src="../assets/js/grid-overlay.js?v=164e4f2a"></script>
