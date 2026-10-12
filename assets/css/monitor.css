@@ -293,6 +293,54 @@
   cursor: pointer;
 }
 
+/*
+ * v2.2 — 정렬 칸이 미션 고르기가 된다. 모양은 .ah-sort 그대로(글자 + chevron)이고 안은 기본 select 다.
+ * 미션 이름이 길어 거르기 버튼과 한 줄에 서지 못한다 — 그 위에 한 줄로 선다.
+ */
+.ah-mission {
+  align-self: flex-start;
+  max-width: 100%;
+  padding: 0 var(--space-4);
+}
+
+.ah-mission select {
+  min-width: 0;
+  max-width: 100%;
+  padding: 0 20px 0 0;
+  margin-right: -20px;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  appearance: none;
+}
+
+.ah-mission select option { color: var(--fg-primary); background-color: var(--bg-surface-raised); }
+.ah-mission .i { pointer-events: none; }
+.ah-mission:focus-within {
+  outline: var(--border-width-strong) solid var(--border-focus);
+  outline-offset: 2px;
+  border-radius: var(--radius-2);
+}
+
+/* 머리 오른쪽 [전체보기] — Ghost xSmall. 정렬 안내 옆에 선다. */
+.ah-all { flex: none; margin-right: calc(var(--space-8) * -1); }
+
+/*
+ * 알림마다 [보고서] — 알림 버튼 안에 버튼을 둘 수 없어 한 줄(.ah-row)을 감싸고 오른쪽 아래(제목 줄)에 얹는다.
+ * 제목은 그만큼 오른쪽을 비우고 말줄임한다.
+ */
+.ah-row { position: relative; }
+.ah-row .ah-title { padding-right: 76px; }
+
+.ah-report {
+  position: absolute;
+  right: var(--space-12);
+  bottom: 10px;
+}
+
 .ah-caps .btn:focus-visible,
 .ah-sort:focus-visible,
 .ah-item:focus-visible {

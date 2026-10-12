@@ -106,6 +106,22 @@
   // ==================================================================
   var DELTA_MIN = 5;
 
+  // ==================================================================
+  // 미션 — v2.2(2026-10-06 회의)부터 최신 알림은 미션 단위로 본다.
+  // 알림은 로봇에서 나므로 로봇이 지금 맡은 미션으로 묶는다. 순서 · 이름은 screen.js 로봇 카드 데이터와 같다.
+  // 패널에 [data-ah-mission] 이 없는 판(v2 · v2.1)은 예전처럼 미션과 상관없이 다 보인다.
+  // ==================================================================
+  var ROBOT_MISSION = [
+    "지하 4층 정기 순회 점검",      // Robot 01
+    "지하 4층 정기 순회 점검",      // Robot 02
+    null,                           // Robot 03 — 배정된 미션 없음
+    "지하 4층 야간 순회 점검",      // Robot 04
+    "지하 3층 발전기실 설비 점검"   // Robot 05
+  ];
+  var NO_MISSION = "배정된 미션 없음";
+
+  function missionOf(a) { return ROBOT_MISSION[a.robot] || NO_MISSION; }
+
   function judge(all) {
     var crit = all.filter(function (a) { return a.sev === "critical"; }).length;
     var warn = all.length - crit;
@@ -193,6 +209,9 @@
   if (!list) { return; }
 
   var aiActions = $("[data-ai-actions]");
+  var missionPick = $("[data-ah-mission]");   // v2.2 — 미션 고르기
+  var withReport = list.hasAttribute("data-ah-report");   // v2.2 — 알림마다 [보고서]
+  var mission = ROBOT_MISSION[0];
 
   var level = "critical";
   var extra = [];          // E-STOP 처럼 화면에서 생긴 알림
@@ -237,7 +256,38 @@
     node.addEventListener("click", function () {
       if (picked === a) { note.close(); } else { note.open(a); }
     });
-    return node;
+    if (!withReport) { return node; }
+
+    // [보고서] 는 알림 버튼 안에 넣을 수 없다(버튼 안 버튼) — 한 줄을 감싸고 오른쪽 아래에 얹는다.
+    // 보고서 화면은 아직 없다 — 자리만 잡았다.
+    var row = el("div", "ah-row");
+    row.setAttribute("role", "listitem");
+    node.removeAttribute("role");
+    var report = el("button", "btn btn-ghost is-xs ah-report");
+    report.type = "button";
+    report.title = "보고서 화면 준비 중";
+    report.appendChild(icon("document"));
+    report.appendChild(el("span", null, "보고서"));
+    row.appendChild(node);
+    row.appendChild(report);
+    return row;
+  }
+
+  // 미션 고르기 — 알림이 있는 미션만 로봇 순서대로 둔다. 고른 미션의 알림이 다 처리돼 사라져도
+  // 그 미션은 남긴다(빈 목록이 "다 처리했다" 는 뜻이 된다).
+  function fillMissions(all) {
+    var names = [];
+    ROBOT_MISSION.concat([NO_MISSION]).forEach(function (m) {
+      if (!m || names.indexOf(m) >= 0) { return; }
+      if (m === mission || all.some(function (a) { return missionOf(a) === m; })) { names.push(m); }
+    });
+    missionPick.textContent = "";
+    names.forEach(function (m) {
+      var opt = el("option", null, m);
+      opt.value = m;
+      opt.selected = m === mission;
+      missionPick.appendChild(opt);
+    });
   }
 
   function doneItem(d) {
@@ -307,13 +357,21 @@
     var all = items();
     if (picked && all.indexOf(picked) < 0) { picked = null; }
 
-    var crit = all.filter(function (a) { return a.sev === "critical"; }).length;
-    var warn = all.length - crit;
-    var shown = all.filter(function (a) { return filter === "all" || a.sev === filter; });
+    // 목록 · 건수는 고른 미션만 센다. Delta · 테두리 색은 아래에서 여전히 전체(all)를 본다 —
+    // 다른 미션에서 난 위험을 미션을 바꿔야만 알게 되면 안 된다.
+    var mine = all;
+    if (missionPick) {
+      fillMissions(all);
+      mine = all.filter(function (a) { return missionOf(a) === mission; });
+    }
+
+    var crit = mine.filter(function (a) { return a.sev === "critical"; }).length;
+    var warn = mine.length - crit;
+    var shown = mine.filter(function (a) { return filter === "all" || a.sev === filter; });
 
     list.textContent = "";
     shown.forEach(function (a) { list.appendChild(item(a)); });
-    $("[data-ah-count='all']").textContent = all.length;
+    $("[data-ah-count='all']").textContent = mine.length;
     $("[data-ah-count='critical']").textContent = crit;
     $("[data-ah-count='warning']").textContent = warn;
 
@@ -383,6 +441,38 @@
     });
   });
 
+  if (missionPick) {
+    missionPick.addEventListener("change", function () {
+      mission = missionPick.value;
+      if (picked && missionOf(picked) !== mission) { note.close(); }
+      render();
+    });
+  }
+
+  /*
+   * [전체보기] — 알림 전체보기(알림 센터) 화면을 연다(v2.2).
+   * 듀얼 모니터면 지금 모니터가 아닌 쪽에 꽉 차게 띄운다(2026-10-06 회의 — 한 화면은 늘 알림 센터).
+   * 다른 모니터 자리를 알려면 브라우저의 창 관리(Window Management) 권한이 필요하다 — 처음 한 번 묻는다.
+   * 권한이 없거나 모니터가 하나면 새 탭으로 연다. 같은 이름의 창이 있으면 그 창을 다시 쓴다.
+   */
+  var allBtn = $("[data-ah-all]");
+  if (allBtn) {
+    allBtn.addEventListener("click", function () {
+      var url = "./alert-center.html";
+      var name = "aprism-alert-center";
+      if (!window.screen.isExtended || !window.getScreenDetails) {
+        window.open(url, name);
+        return;
+      }
+      window.getScreenDetails().then(function (details) {
+        var other = details.screens.filter(function (s) { return s !== details.currentScreen; })[0];
+        if (!other) { window.open(url, name); return; }
+        window.open(url, name, "popup,left=" + other.availLeft + ",top=" + other.availTop +
+          ",width=" + other.availWidth + ",height=" + other.availHeight);
+      }).catch(function () { window.open(url, name); });
+    });
+  }
+
   // 비상정지는 위험 알림이다(알림 정책) — 목록에 쌓고 그것을 고른다.
   document.addEventListener("aprism:estop", function () {
     var chosen = $(".robot-strip .robot-card[aria-pressed='true'] .robot-id");
@@ -393,6 +483,8 @@
       sum: "모터 전원이 차단되었습니다. 현장 안전을 확인한 뒤 해제 절차를 진행하세요.",
       acts: ["현장 무전 연락 · 안전 확인", "해제 절차 진행", "로봇 회수 요청"] };
     extra.unshift(a);
+    // v2.2 — 다른 미션 로봇이 멈췄으면 그 미션으로 넘어가 보여 준다.
+    if (missionPick) { mission = missionOf(a); }
     render();
   });
 
