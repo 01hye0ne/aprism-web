@@ -1346,7 +1346,10 @@
 
 /* Delta 아래 빛 — 박에 맞춰 세기만 오른다. 판 모양 · 색은 그대로다. */
 :root[data-delta="glass"] .v2-2 .delta3.is-critical:not(.is-open) .delta3-card,
-:root[data-delta="glass"] .v2-2 .delta3.is-critical.is-open { animation: dg-breath 2.4s ease-in-out infinite; }
+:root[data-delta="glass"] .v2-2 .delta3.is-critical.is-open {
+  /* 판은 뛰지 않는다 — 박자는 점 · 엣지 글로우만(10/12 디자이너). dg-beat · dg-breath 는 남겨만 둔다. */
+  animation: none;
+}
 :root[data-delta="glass"] .v2-2.is-surge .delta3.is-critical:not(.is-open) .delta3-card,
 :root[data-delta="glass"] .v2-2.is-surge .delta3.is-critical.is-open {
   /* 처음 10초의 두근두근은 점 · 엣지 글로우만 — 판까지 뛰면 과하다(10/12 디자이너). 판은 그동안 멈춰 있다. */
