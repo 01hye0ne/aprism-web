@@ -25,18 +25,19 @@
     head: [[280, 95, 475, 370], [570, 160, 795, 445]]
   };
 
+  // 기본값 — 2026-10-12 디자이너가 손잡이로 고른 값이다.
   var P = {
     scope: "body",
     move: false,
     cell: 24,
     margin: 12,
     angle: 57,
-    gap: 7,
-    thick: 45,
-    range: 70,
-    tint: false,
-    ink: "#89B9ED",
-    paper: "#0A0E15"
+    gap: 8.5,
+    thick: 20,
+    range: 60,
+    tint: true,
+    ink: "#FFFFFF",
+    paper: "#000000"
   };
 
   var views = {};
