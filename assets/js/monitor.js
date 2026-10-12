@@ -541,13 +541,13 @@
     options.addEventListener("change", function () { confirm.disabled = !chosen(); });
 
     /*
-     * v2.2 — 사람이 찍힌 그림은 비식별화된 판(-deid)을 쓴다. 실제로는 서버가 이미 가린 영상을 보낸다는 뜻이라
-     * 화면에서 덮지 않고 미리 구운 그림을 받는다(tools/deid-image.py · 비교판 screens/deid-lab.html 과 같은 셈).
+     * v2.2 — 사람이 찍힌 검출 캡처(ppe) 자리에 비식별화가 적용된 현장 그림을 쓴다(디자이너가 준 그림,
+     * 비교판 screens/deid-lab.html 의 줄무늬 결과). 실제로는 서버가 이미 가린 영상을 보낸다는 뜻이다.
      */
-    var DEID = { ppe: true };
     var useDeid = body.classList.contains("v2-2");
     function liveSrc(a) {
-      return "../assets/img/alert-live-" + a.live + (useDeid && DEID[a.live] ? "-deid" : "") + ".webp";
+      if (useDeid && a.live === "ppe") { return "../assets/img/alert-live-deid.webp"; }
+      return "../assets/img/alert-live-" + a.live + ".webp";
     }
 
     // ---------- 크게보기 ----------
