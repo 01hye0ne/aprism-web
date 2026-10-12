@@ -385,6 +385,10 @@
 .ah-row:hover .ah-report-label,
 .ah-report:focus-visible .ah-report-label { display: inline; }
 
+/* 좌우 여백을 관제 머리줄(.panel-head 12)과 맞춘다 — 8 이라 제목 · 목록이 4 만큼 왼쪽으로 나와 있었다. */
+.v2-2 .ah-head { padding: 0 var(--space-12); }
+.v2-2 .ah-sec { padding-left: var(--space-12); padding-right: var(--space-12); }
+
 /* 정렬 안내 — 거르기 줄 오른쪽 끝(예전 "최근 24시간" 자리). */
 .ah-filter .ah-order { margin-left: auto; padding-left: var(--space-4); }
 
