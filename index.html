@@ -6,7 +6,7 @@
   <title>APRISM — 화면 퍼블리싱</title>
   <meta name="description" content="APRISM 공장 환경점검 로봇 관제 대시보드 화면 퍼블리싱" />
   <link rel="stylesheet" href="./assets/css/tokens.css?v=4aceab62" />
-  <link rel="stylesheet" href="./assets/css/base.css?v=0391a4bf" />
+  <link rel="stylesheet" href="./assets/css/base.css?v=da609ee5" />
 </head>
 <body>
   <header class="site-header">
@@ -24,6 +24,34 @@
       <p class="eyebrow">Wireframe Publishing</p>
       <h1>화면 퍼블리싱 인덱스</h1>
       <p class="lead">화면별로 버전을 모았습니다. <span class="ver-badge">최신</span> 이 붙은 판이 지금 기준입니다.</p>
+    </section>
+
+    <!-- 확인이 필요한 것 — 디자이너 혼자 정하기 애매해 클라이언트와 같이 정할 것.
+         항목 하나 = 질문 한 줄 + 화면 · 버전 태그. 긴 설명은 퍼블리싱 노트로 보낸다.
+         답이 나오면 그 li 를 아래 "결정된 것" 으로 옮기고 답과 날짜(ask-answer)를 붙인다.
+         해당 버전 카드의 "확인 N" 배지 수도 같이 맞춘다. -->
+    <section class="ask" id="ask" aria-labelledby="ask-title">
+      <h2 class="ask-title" id="ask-title">확인이 필요한 것 <span class="ask-count">3</span></h2>
+      <ul class="ask-list">
+        <li class="ask-item">
+          <a class="ask-tag" href="./screens/main-v2-2.html">04.1 · v2.2</a>
+          <span class="ask-q">미션을 골라도 Delta 문구와 화면 테두리 색은 전체 알림 기준으로 둡니다. 다른 미션에서 난 위험을 놓치지 않게 하려는 것인데, 이대로 갈까요?</span>
+        </li>
+        <li class="ask-item">
+          <a class="ask-tag" href="./screens/main-v2-2.html">04.1 · v2.2</a>
+          <span class="ask-q">듀얼 모니터에서 알림 전체보기를 켜자마자 자동으로 띄우는 것은 웹 브라우저가 막습니다. 지금은 [전체보기]를 누르면 다른 모니터에 뜹니다. 자동 띄우기는 실제 운영 환경(앱 · 키오스크 설정)에서 풀까요?</span>
+        </li>
+        <li class="ask-item">
+          <a class="ask-tag" href="./screens/main-v2-2.html">04.1 · v2.2</a>
+          <span class="ask-q">알림 전체보기(알림 센터)와 알림별 보고서 화면은 아직 설계 전이라 버튼 자리만 있습니다. 두 화면에 꼭 들어가야 할 내용이 있을까요?</span>
+        </li>
+      </ul>
+      <details class="ask-done">
+        <summary>결정된 것 <span class="ask-count">0</span></summary>
+        <ul class="ask-list">
+          <!-- 예) <li class="ask-item"><a class="ask-tag" href="…">04.1 · v2.2</a><span class="ask-q">질문</span><span class="ask-answer">2026.10.20 · 답</span></li> -->
+        </ul>
+      </details>
     </section>
 
     <!-- 화면 한 줄 = 화면 하나. 버전은 왼쪽에서 오른쪽으로 시간순이고, 마지막 판에 is-latest 를 붙인다.
@@ -103,6 +131,7 @@
             <a class="ver-link" href="./screens/main-v2-2.html"><span class="ver-name">v2.2</span><span class="ver-tag">미션별 최신 알림</span></a>
             <span class="ver-date">2026.10.12</span>
             <span class="ver-badge">최신</span>
+            <a class="ver-ask" href="#ask">확인 3</a>
           </li>
         </ol>
       </article>

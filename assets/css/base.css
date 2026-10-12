@@ -135,6 +135,98 @@ body {
   white-space: nowrap;
 }
 
+/*
+ * 확인이 필요한 것 — 인덱스 맨 위. 클라이언트와 같이 정할 질문 목록.
+ * 아직 안 정한 것은 주의(노랑) 띠를 두르고, 정한 것은 접어 둔다.
+ */
+.ask {
+  margin-top: var(--space-40);
+  padding: var(--space-16) var(--space-20);
+  background-color: var(--bg-surface-default);
+  border: var(--border-width-thin) solid var(--status-warning-border);
+  border-left-width: 4px;
+  border-radius: var(--radius-card);
+  scroll-margin-top: var(--space-16);
+}
+
+.ask-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  margin: 0 0 var(--space-12);
+  font-size: var(--font-size-16);
+  line-height: var(--font-line-height-24);
+  font-weight: 600;
+}
+
+.ask-count {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-12);
+  font-weight: 600;
+  color: var(--status-warning-fg);
+}
+
+.ask-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ask-item {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-12);
+  font-size: var(--font-size-14);
+  line-height: var(--font-line-height-22);
+}
+
+.ask-tag {
+  flex: none;
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-12);
+  color: var(--fg-tertiary);
+  white-space: nowrap;
+}
+
+.ask-tag:hover { color: var(--fg-link); }
+
+.ask-q { color: var(--fg-primary); word-break: keep-all; }
+
+.ask-answer {
+  display: block;
+  margin-top: var(--space-4);
+  color: var(--fg-secondary);
+}
+
+.ask-q:has(+ .ask-answer) { color: var(--fg-secondary); }
+
+.ask-done {
+  margin-top: var(--space-16);
+  color: var(--fg-secondary);
+}
+
+.ask-done summary {
+  cursor: pointer;
+  font-size: var(--font-size-13);
+  font-weight: 600;
+}
+
+.ask-done .ask-count { color: var(--fg-tertiary); }
+.ask-done .ask-list { margin-top: var(--space-12); }
+
+/* 버전 카드의 "확인 N" — 누르면 위 목록으로 간다. 카드 링크(::after) 위로 올린다. */
+.ver-ask {
+  position: relative;
+  z-index: 1;
+  font-size: var(--font-size-12);
+  line-height: var(--font-line-height-18);
+  font-weight: 600;
+  color: var(--status-warning-fg);
+}
+
 /* 화면 한 줄 — 왼쪽 화면 이름, 오른쪽 버전 카드(시간순). */
 .screen-row {
   display: grid;
@@ -328,6 +420,11 @@ a.screen-name:hover {
 
   .screen-row {
     grid-template-columns: 1fr;
+  }
+
+  .ask-item {
+    flex-direction: column;
+    gap: 0;
   }
 
   .intro h1 {
