@@ -121,61 +121,40 @@ body {
 
 .screens {
   margin-top: var(--space-48);
-}
-
-.screens h2 {
-  margin: 0 0 var(--space-16);
-  font-size: var(--font-size-16);
-  line-height: var(--font-line-height-24);
-  font-weight: 600;
-}
-
-.screen-group + .screen-group {
-  margin-top: var(--space-32);
-}
-
-.screen-group h3 {
-  margin: 0 0 var(--space-12);
-  font-size: var(--font-size-13);
-  line-height: var(--font-line-height-18);
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  color: var(--fg-secondary);
-}
-
-/* 소목차 — 같은 묶음 안에서 무엇을 고르는 시안인지 가른다(레이아웃 · Delta GUI). */
-.screen-sub + .screen-sub { margin-top: var(--space-20); }
-
-.screen-sub h4 {
-  margin: 0 0 var(--space-8);
-  font-size: var(--font-size-12);
-  line-height: var(--font-line-height-18);
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--fg-tertiary);
-}
-
-.screen-list {
-  display: grid;
-  gap: var(--space-12);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-}
-
-.screen-card {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: var(--space-12);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* 화면 한 줄 — 왼쪽 화면 이름, 오른쪽 버전 카드(시간순). */
+.screen-row {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: var(--space-16);
+  align-items: start;
   padding: var(--space-16);
-  background-color: var(--bg-surface-default);
+  background-color: var(--bg-surface-subtle);
   border: var(--border-width-thin) solid var(--border-subtle);
   border-radius: var(--radius-card);
 }
 
-.screen-status {
+.screen-head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding-top: var(--space-4);
+}
+
+.screen-code {
   font-family: var(--font-family-mono);
   font-size: var(--font-size-12);
   font-weight: 500;
@@ -184,21 +163,121 @@ body {
   color: var(--fg-tertiary);
 }
 
-.screen-name {
+.screen-title {
+  font-size: var(--font-size-16);
+  line-height: var(--font-line-height-24);
+  font-weight: 600;
+  color: var(--fg-primary);
+  text-decoration: none;
+}
+
+.screen-title:hover {
+  color: var(--fg-link);
+  text-decoration: underline;
+}
+
+.ver-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: var(--space-8);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* 카드 전체가 링크다 — .ver-link 의 ::after 가 카드를 덮고, 안쪽 보조 링크(.ver-extra)만 그 위로 올린다. */
+.ver-card {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  align-content: flex-start;
+  gap: var(--space-4) var(--space-8);
+  padding: var(--space-12) var(--space-16);
+  background-color: var(--bg-surface-default);
+  border: var(--border-width-thin) solid var(--border-subtle);
+  border-radius: var(--radius-card);
+}
+
+.ver-card:hover {
+  border-color: var(--border-default);
+  background-color: var(--bg-surface-raised);
+}
+
+.ver-card.is-latest {
+  border-color: var(--border-brand);
+}
+
+.ver-link {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-8);
+  flex-basis: 100%;
+  color: var(--fg-primary);
+  text-decoration: none;
+}
+
+.ver-link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+.ver-name {
+  font-family: var(--font-family-mono);
   font-size: var(--font-size-16);
   line-height: var(--font-line-height-24);
   font-weight: 600;
 }
 
-.screen-desc {
+.ver-tag {
   font-size: var(--font-size-13);
-  line-height: var(--font-line-height-18);
   color: var(--fg-secondary);
 }
 
-.screen-card.is-empty {
-  border-style: dashed;
-  background-color: var(--bg-surface-subtle);
+.ver-date {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-12);
+  color: var(--fg-tertiary);
+}
+
+.ver-badge {
+  display: inline-block;
+  padding: 0 var(--space-8);
+  font-size: var(--font-size-12);
+  line-height: var(--font-line-height-18);
+  font-weight: 600;
+  color: var(--fg-on-brand);
+  background-color: var(--bg-brand);
+  border-radius: var(--radius-pill);
+}
+
+.ver-extra {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4) var(--space-12);
+  flex-basis: 100%;
+  font-size: var(--font-size-12);
+}
+
+.ver-extra a,
+.internal-list a {
+  color: var(--fg-secondary);
+}
+
+.ver-extra a:hover,
+.internal-list a:hover {
+  color: var(--fg-link);
+}
+
+/* 퍼블리싱 노트 아래쪽 이동 링크(auth-notes · dashboard-home-notes)가 쓴다. */
+.screen-name {
+  font-size: var(--font-size-16);
+  line-height: var(--font-line-height-24);
+  font-weight: 600;
 }
 
 a.screen-name {
@@ -211,9 +290,26 @@ a.screen-name:hover {
   text-decoration: underline;
 }
 
-.screen-card:has(a.screen-name):hover {
-  border-color: var(--border-default);
-  background-color: var(--bg-surface-raised);
+/* 내부 문서 — 디자인 시스템 검토 · 효과 시험. 접어 둔다. */
+.internal {
+  margin-top: var(--space-48);
+  color: var(--fg-secondary);
+}
+
+.internal summary {
+  cursor: pointer;
+  font-size: var(--font-size-13);
+  font-weight: 600;
+}
+
+.internal-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-8) var(--space-20);
+  margin: var(--space-12) 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--font-size-13);
 }
 
 /* Footer */
@@ -228,6 +324,10 @@ a.screen-name:hover {
 @media (max-width: 600px) {
   .site-main {
     padding: var(--space-20) var(--space-16);
+  }
+
+  .screen-row {
+    grid-template-columns: 1fr;
   }
 
   .intro h1 {
