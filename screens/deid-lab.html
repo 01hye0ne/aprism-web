@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>비식별화 패턴 비교 — APRISM</title>
-  <meta name="description" content="사람 영역을 가리는 방식 비교 — 일반 모자이크 · A 사선 모자이크 · A 사선 실루엣. 해칭 시험판에서 갈라져 나온 시험판이다." />
+  <meta name="description" content="사람 영역을 가리는 방식 비교 — 일반 모자이크 · 줄무늬 모자이크 · 줄무늬 실루엣. 해칭 시험판에서 갈라져 나온 시험판이다." />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/static/woff2/SUIT.css" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" />
   <link rel="stylesheet" href="../assets/css/tokens.css?v=4aceab62" />
@@ -97,7 +97,7 @@
   </style>
 </head>
 <body>
-  <!-- 왼쪽 — 같은 장면을 네 가지로. 원본 · 일반 모자이크 · A 사선 모자이크 · A 사선 실루엣. -->
+  <!-- 왼쪽 — 같은 장면을 네 가지로. 원본 · 일반 모자이크 · 줄무늬 모자이크 · 줄무늬 실루엣. -->
   <main class="stage">
     <figure class="view">
       <canvas data-view="source" width="960" height="640"></canvas>
@@ -109,19 +109,19 @@
     </figure>
     <figure class="view">
       <canvas data-view="hatch" width="960" height="640"></canvas>
-      <figcaption><b>A 사선 모자이크 · 밝기 반영</b><span>칸 평균 밝기만 줄 굵기로 남긴다. 점 단위 정보는 이미 지워진 뒤다.</span></figcaption>
+      <figcaption><b>줄무늬 모자이크 · 밝기 반영</b><span>칸 평균 밝기만 줄 굵기로 남긴다. 점 단위 정보는 이미 지워진 뒤다.</span></figcaption>
     </figure>
     <figure class="view">
       <canvas data-view="silhouette" width="960" height="640"></canvas>
-      <figcaption><b>A 사선 실루엣 · 밝기 버림</b><span>모든 칸이 같은 결. 남는 것은 영역의 윤곽뿐이다.</span></figcaption>
+      <figcaption><b>줄무늬 실루엣 · 밝기 버림</b><span>모든 칸이 같은 결. 남는 것은 영역의 윤곽뿐이다.</span></figcaption>
     </figure>
   </main>
 
   <aside class="panel">
     <div class="row">
       <h1>비식별화 패턴 비교</h1>
-      <p>정보를 먼저 지우고(칸 평균) 그 위에 APRISM 로고 A 의 사선(57°)을 입힌다.
-        사선과 칸 격자는 화면이 아니라 <b>영역에 붙어 있어</b> 영상이 움직여도 줄이 지글거리지 않는다 — [움직이기] 로 본다.</p>
+      <p>정보를 먼저 지우고(칸 평균) 그 위에 줄무늬를 입힌다. 기본은 가로 일자 줄(0°)이고,
+        57° 로 두면 APRISM 로고 A 의 사선이 된다. 줄과 칸 격자는 화면이 아니라 <b>영역에 붙어 있어</b> 영상이 움직여도 줄이 지글거리지 않는다 — [움직이기] 로 본다.</p>
     </div>
 
     <div class="row">
@@ -150,7 +150,7 @@
     <div class="rule"></div>
 
     <div class="row">
-      <label for="angle">사선 각도 (°) <output data-out="angle"></output></label>
+      <label for="angle">줄 각도 (°) <output data-out="angle"></output></label>
       <input type="range" id="angle" data-p="angle" min="0" max="180" step="1" />
     </div>
     <div class="row">
@@ -188,6 +188,6 @@
   </aside>
 
   <script src="../assets/js/hatch-sample.js?v=8219cd21"></script>
-  <script src="../assets/js/deid-lab.js?v=75efd2ed"></script>
+  <script src="../assets/js/deid-lab.js?v=cf6f795b"></script>
 </body>
 </html>
