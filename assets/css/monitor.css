@@ -1348,7 +1348,10 @@
 :root[data-delta="glass"] .v2-2 .delta3.is-critical:not(.is-open) .delta3-card,
 :root[data-delta="glass"] .v2-2 .delta3.is-critical.is-open { animation: dg-breath 2.4s ease-in-out infinite; }
 :root[data-delta="glass"] .v2-2.is-surge .delta3.is-critical:not(.is-open) .delta3-card,
-:root[data-delta="glass"] .v2-2.is-surge .delta3.is-critical.is-open { animation: dg-beat 1.2s ease-out infinite; }
+:root[data-delta="glass"] .v2-2.is-surge .delta3.is-critical.is-open {
+  /* 처음 10초의 두근두근은 점 · 엣지 글로우만 — 판까지 뛰면 과하다(10/12 디자이너). 판은 그동안 멈춰 있다. */
+  animation: none;
+}
 
 @keyframes dg-beat {
   0%, 25% {
