@@ -96,13 +96,15 @@
 
     footer.doc { margin-top: 60px; padding-top: 18px; border-top: 1px solid var(--ui-border); color: var(--ui-faint); font-size: 12px; }
 
-    /* 위험 Delta 비교 — 실제 화면의 Delta 자리(x 410 · y 55 · 290×275)를 잘라 1.5 배로 */
-    .dc-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+    /*
+     * 위험 Delta 비교 — 실제 화면의 Delta 자리(x 410 · y 55 · 290×275)를 1:1 로 잘라 보인다.
+     * 판 폭에 맞춰 늘리면(비정수 배율) 깎인 모서리 선이 계단지고 위 테두리가 한 줄 끼어 보였다 — 배율을 두지 않는다.
+     */
+    .dc-grid { display: grid; grid-template-columns: repeat(auto-fill, 290px); gap: 12px; }
     .dc-cell { margin: 0; }
     .dc-cell figcaption { font-size: 12px; font-weight: 600; color: var(--ui-dim); margin-bottom: 6px; }
-    .dc-view { position: relative; width: 100%; aspect-ratio: 290 / 275; overflow: hidden; border: 1px solid var(--ui-border); border-radius: 8px; background: #000; }
+    .dc-view { position: relative; width: 290px; height: 275px; overflow: hidden; border: 1px solid var(--ui-border); border-radius: 8px; background: #000; }
     .dc-view iframe { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; border: 0; transform-origin: 0 0; pointer-events: none; }
-    @media (max-width: 900px) { .dc-grid { grid-template-columns: 1fr 1fr; } }
     /* 제안 비교 — 실제 v2.2 두 장 */
     .np h3 { font-size: 13px; margin: 0 0 8px; color: var(--ui-dim); }
     .np-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 12px; }
@@ -148,7 +150,7 @@
     <p class="note">
       붉은 면으로 채운 판은 너무 셌습니다. 레퍼런스처럼 쿨그레이 유리판은 그대로 두고, <b>아래 변에서 붉은 빛이 올라와 사라지게</b> 했습니다.
       빛은 밝은 주황빛 빨강 → 크림슨 → 채도 빠진 회색 → 투명 순서이고, 회색 정지점을 직접 넣어 oklab 에서 섞었습니다(보라로 탁해지지 않게).
-      윗변 흰 반사선 · 아래 변 붉은 선 · 아주 옅은 가로 결 · 판 밖 번짐을 함께 넣었습니다.
+      윗변 흰 반사선 · 아래 변 붉은 선 · 판 밖 번짐을 함께 넣었고, 설명글 칸은 바깥 판보다 한 단 어둡게 눌렀습니다.
     </p>
     <div class="dc-grid">
       <figure class="dc-cell"><figcaption>다크 · 지금</figcaption><div class="dc-view"><iframe data-dc="?theme=dark#critical" title="다크 지금"></iframe></div></figure>
@@ -458,14 +460,9 @@
   if (!frames.length) { return; }
   var X = 410, Y = 55, W = 290;
   Array.prototype.forEach.call(frames, function (f) { f.src = "./screens/main-v2-2.html" + f.getAttribute("data-dc"); });
-  function fit() {
-    Array.prototype.forEach.call(frames, function (f) {
-      var k = (f.parentNode.clientWidth || W) / W;
-      f.style.transform = "scale(" + k + ") translate(" + (-X) + "px, " + (-Y) + "px)";
-    });
-  }
-  fit();
-  window.addEventListener("resize", fit);
+  Array.prototype.forEach.call(frames, function (f) {
+    f.style.transform = "translate(" + (-X) + "px, " + (-Y) + "px)";
+  });
 })();
 
 /* 제안 비교 — 두 화면을 같은 상태로 띄우고, 판 폭에 맞춰 1920×1080 을 줄인다. */
