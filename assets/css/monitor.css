@@ -187,6 +187,12 @@
 /* ---------- 관제 패널 (왼쪽 · --lp-w) ---------- */
 .v2 .context-panel { flex-basis: var(--lp-w); overflow: hidden; }
 
+/*
+ * 접힌 폭 — app-shell.css 의 .context-panel.is-collapsed 와 같은 값이다. 위 줄이 같은 무게로 뒤에 와서
+ * 그 규칙을 덮는 바람에 접어도 폭이 420 그대로였다(안만 흐려지고 지도는 안 넓어졌다 — 10/06 회의 지적).
+ */
+.v2 .context-panel.is-collapsed { flex-basis: calc(var(--size-icon-20) + var(--space-12) * 2); }
+
 /* Figma Header — 45 높이, 아래 border/default 1. */
 .v2 .panel-head {
   height: 45px;
