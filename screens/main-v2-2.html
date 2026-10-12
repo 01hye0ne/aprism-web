@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>v2.2 · 통합 관제 메인 — APRISM</title>
-  <meta name="description" content="v2.2 — 최신 알림을 미션 단위로 보고, 알림 전체보기 · 알림별 보고서로 이어지는 판" />
+  <meta name="description" content="v2.2 — 화면 전체가 미션 하나를 본다. 최신 알림 · 로봇 패널 · 지도 층이 상단 미션 고르기를 따른다" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/static/woff2/SUIT.css" />
@@ -22,7 +22,7 @@
   <link rel="stylesheet" href="../assets/css/app-shell.css?v=81f4c7fb" />
   <link rel="stylesheet" href="../assets/css/map-overlays.css?v=bf2847b4" />
   <link rel="stylesheet" href="../assets/css/text-parts.css?v=e38e19ea" />
-  <link rel="stylesheet" href="../assets/css/monitor.css?v=79ec2d53" />
+  <link rel="stylesheet" href="../assets/css/monitor.css?v=9a0a8664" />
   <link rel="stylesheet" href="../assets/css/delta-v3.css?v=ad42641a" />
   <style>
     *, *::before, *::after { box-sizing: border-box; }
@@ -41,7 +41,7 @@
 <!-- 상황은 04.1 통합 관제 메인과 같다 — 위험 알림이 쌓인 판이다(디자이너 요청).
      Delta 만 다른 시안이라 나머지 조건이 같아야 둘을 나란히 놓고 고를 수 있다.
      주소 끝 #normal · #few · #warning 으로 다른 단계도 볼 수 있다. -->
-<body class="v2 v3" data-level="critical" data-delta-copy="keyword">
+<body class="v2 v3" data-level="critical" data-delta-copy="keyword" data-mission-scope>
 
 <!-- Robot Dog Walk 리그(assets/robot-dog/ 핸드오프)의 공용 defs — 카드 썸네일이 url(#rd-*) 로 참조한다. -->
 <svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute" xmlns="http://www.w3.org/2000/svg">
@@ -116,6 +116,16 @@
       </span>
       <!-- Figma Status Bar ver.2 — 로고 옆에 층 이름(Title/1)이 붙는다. -->
       <span class="status-bar-place t-title-1" data-floor-label>지하 4층</span>
+      <!-- v2.2 — 미션 고르기. 화면 전체(최신 알림 · 로봇 패널 · 지도 층)가 이 미션을 본다(mission-scope.js).
+           메뉴의 점은 그 미션에 있는 가장 높은 알림 단계다(주의 노랑 · 위험 빨강). -->
+      <div class="scope-menu-box" data-scope-menu-box>
+        <button type="button" class="scope-trigger" data-scope-trigger
+                aria-haspopup="true" aria-expanded="false" aria-label="미션 고르기">
+          <span class="t-title-1" data-scope-name>지하 4층 정기 순회 점검</span>
+          <span class="i i-16" style="--i:var(--ic-chevron-down)" aria-hidden="true"></span>
+        </button>
+        <div class="dropdown-menu scope-menu" data-scope-menu role="menu" aria-label="미션" hidden></div>
+      </div>
     </div>
 
     <div class="status-bar-right">
@@ -205,7 +215,7 @@
            위: 최신 알림(처리 필요) · 아래: 오늘 확인 완료. 두 칸이 높이를 반씩 나눈다.
            v2.2(2026-10-06 클라이언트 회의) — 기준이 최근 24시간에서 미션으로 바뀌었다.
              · 패널명 "알림 히스토리" → "최신 알림"
-             · 정렬 칸(최근 24시간)이 미션 고르기가 된다 — 고른 미션의 알림만 보인다.
+             · 기준이 미션이다 — 상태바에서 고른 미션의 알림만 보인다(정렬 칸 · 최근 24시간은 뺐다).
                미션이 끝나면 그 알림은 알림 전체보기(알림 센터)로 넘어간다.
              · [전체보기] — 듀얼 모니터면 다른 모니터에 띄운다(monitor.js).
              · 알림마다 [보고서]
@@ -230,12 +240,6 @@
 
           <!-- 처리 필요 — 거르기(Button Small · 고른 것 Accent) · 정렬 · 목록 -->
           <section class="ah-sec" aria-labelledby="ah-title">
-            <!-- 미션 고르기 — 정렬 칸(최근 24시간) 자리를 대신한다. 미션 이름이 길어 거르기 줄 위에 한 줄로 선다.
-                 알림이 있는 미션만 나온다. 목록은 monitor.js 가 채운다. -->
-            <label class="ah-sort ah-mission t-label-2">
-              <select data-ah-mission aria-label="미션 고르기"></select>
-              <span class="i i-16" style="--i:var(--ic-chevron-down)" aria-hidden="true"></span>
-            </label>
             <div class="ah-filter">
               <div class="ah-caps" role="group" aria-label="위험도로 거르기">
                 <button type="button" class="btn" data-ah-filter="all" aria-pressed="true">전체 <span class="num" data-ah-count="all">0</span></button>
@@ -482,8 +486,9 @@
                     <!-- Figma 710:24540 — 수행 대수가 맨 글자에서 Badge(Info · Emphasis=Text)로 바뀌었다. -->
                     <p class="robot-counts t-caption">
                       <span class="i i-16" style="--i:var(--ic-bot)" aria-hidden="true"></span>
-                      <span>11대 연결</span>
-                      <span class="badge badge-info t-caption"><span class="badge-dot"></span>3대 수행중</span>
+                      <!-- v2.2 — 고른 미션에 배정된 로봇만 센다. 전체 대수는 [로봇 현황] 이 맡는다. -->
+                      <span data-scope-count>2대 배정</span>
+                      <span class="badge badge-info t-caption"><span class="badge-dot"></span><span data-scope-running>1대 수행중</span></span>
                     </p>
                     <button type="button" class="btn btn-ghost" data-modal-open="robots" data-robot-more>로봇 현황</button>
                   </div>
@@ -1645,11 +1650,12 @@
 
 <script src="../assets/js/theme.js?v=dcf8f460"></script>
 <script src="../assets/js/prism-orb.js?v=03386460"></script>
-<script src="../assets/js/screen.js?v=1e820d91"></script>
+<script src="../assets/js/screen.js?v=6bf0828f"></script>
 <script src="../assets/js/map-model.js?v=0f88c871"></script>
 <script src="../assets/js/map.js?v=53abcbb1"></script>
 <script src="../assets/js/robot-stage.js?v=0e7afdc2"></script>
-<script src="../assets/js/monitor.js?v=39b75e56"></script>
+<script src="../assets/js/monitor.js?v=79ecc152"></script>
+<script src="../assets/js/mission-scope.js?v=b5f75429"></script>
 <script src="../assets/js/delta-v3.js?v=6842c15b"></script>
 <script src="../assets/js/grid-overlay.js?v=164e4f2a"></script>
 </body>

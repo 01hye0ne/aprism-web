@@ -786,6 +786,12 @@ window.APRISM_TEXT = (function () {
     }
   ];
 
+  // 로봇마다 맡은 미션 이름(순번 = data-robot). 미션이 없으면 null.
+  // v2.2 의 미션 범위(mission-scope.js) · 알림 묶기(monitor.js)가 읽는다.
+  window.APRISM_ROBOT_MISSIONS = ROBOTS.map(function (r) {
+    return r.mission && r.mission !== "배정된 미션 없음" ? r.mission : null;
+  });
+
   /*
    * 목록을 스무 칸으로 채운다. Figma 의 "3 / 17" 언저리이고, 이만큼 있어야
    * 목록 스크롤과 진행 막대의 칸 나눔이 실제 길이로 보인다.
