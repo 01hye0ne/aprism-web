@@ -1159,3 +1159,53 @@
  * 키보드 초점 링(:focus-visible)은 접근성 표시라 파랑 그대로 둔다.
  */
 .v2 .timeline-item.is-selected .step-card { outline-color: var(--step-now-bg); }
+
+/* ==================================================================
+ * v2.2 라이트 모드 (2026-10-12 디자이너 요청)
+ * 다크 값이 그대로 남아 있던 곳을 라이트에 맞춘다. 원시 회색(gray/800 등)과 raw 어두운 값은
+ * 두 테마에서 같은 색이라, 라이트에서는 검은 판으로 떠 보였다.
+ * ================================================================== */
+
+/* 알림 목록 상자 — 패널(gray/50)보다 한 단 어둡게. 줄 사이 선은 상자 면과 같은 색이 되므로 한 단 올린다. */
+:root[data-theme="light"] .v2-2 .ah-box { background-color: var(--color-gray-200); }
+:root[data-theme="light"] .v2-2 .ah-item,
+:root[data-theme="light"] .v2-2 .done-item { box-shadow: inset 0 -1px 0 var(--border-default); }
+:root[data-theme="light"] .v2-2 .ah-box.is-scrolled { box-shadow: inset 0 10px 8px rgb(0 0 0 / 8%); }
+:root[data-theme="light"] .v2-2 .ah-box.has-fade::after {
+  background: linear-gradient(rgb(0 0 0 / 0%), rgb(0 0 0 / 6%));
+}
+
+/* 지도 도구 레일 — gray/800 판 대신 떠 있는 흰 면 */
+:root[data-theme="light"] .v2-2 .map-tools {
+  background-color: var(--bg-surface-raised);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 12%);
+}
+:root[data-theme="light"] .v2-2 .map-tools .icon-button { color: var(--fg-secondary); }
+:root[data-theme="light"] .v2-2 .map-tools .icon-button:hover { color: var(--fg-primary); }
+:root[data-theme="light"] .v2-2 .map-tools .icon-button.is-secondary {
+  background-color: var(--bg-surface-subtle);
+  color: var(--fg-primary);
+}
+:root[data-theme="light"] .v2-2 .map-tools .icon-button.is-secondary:hover { background-color: var(--bg-interactive-pressed); }
+:root[data-theme="light"] .v2-2 .map-floor:hover { background-color: rgb(0 0 0 / 5%); }
+
+/* 지도 위 알약들 — 어두운 반투명 판(rgba 7,10,16) 대신 흰 면 + 진한 글자 */
+:root[data-theme="light"] .v2-2 .tr-pill,
+:root[data-theme="light"] .v2-2 .tr-chip,
+:root[data-theme="light"] .v2-2 .map-dock-ic::before { background: var(--bg-surface-raised); }
+:root[data-theme="light"] .v2-2 .tr-pill,
+:root[data-theme="light"] .v2-2 .map-dock-ic { box-shadow: 0 2px 8px rgb(0 0 0 / 15%); }
+:root[data-theme="light"] .v2-2 .tr-pill i { box-shadow: 0 0 0 2px var(--bg-surface-raised), 0 0 0 3px var(--tint); }
+:root[data-theme="light"] .v2-2 .map-dock-ic {
+  background: conic-gradient(var(--tint, #89b9ed) calc(var(--p, 0) * 360deg), var(--color-gray-300) 0);
+}
+:root[data-theme="light"] .v2-2 .map-dock-txt {
+  background: var(--bg-surface-raised);
+  color: var(--fg-primary);
+  box-shadow: 0 1px 4px rgb(0 0 0 / 12%);
+}
+:root[data-theme="light"] .v2-2 .stair-tag {
+  background: var(--bg-surface-raised);
+  color: var(--color-main-700);
+}
+:root[data-theme="light"] .v2-2 .tr-badge { background: var(--bg-surface-raised); }

@@ -150,6 +150,21 @@
   var GHOST = 0x6a7890;   // 투명해질 때 다가가는 색
   var GRID = 0x1f2a3c;    // 바닥에 깔리는 격자
 
+  /*
+   * 라이트 모드 — v2.2(body.v2-2)에서만 쓴다(2026-10-12). 다크 남색 덩이가 밝은 화면 위에 검은 판으로 떴다.
+   * 덩이는 회색 단으로 갈리고(바닥이 가장 밝고 설비가 가장 진하다), 선은 한 색으로 진하게.
+   * lift(스스로 밝아지는 정도)는 밝은 면에서 하얗게 날아가므로 줄인다(LIGHT_LIFT 를 곱한다).
+   * 지도는 회의 3번(현장 사진 표현)에서 다시 손볼 자리라, 여기 값은 다크와 같은 위계만 옮긴 것이다.
+   */
+  var LIGHT = {
+    face: { floor: 0xeceef1, wall: 0xb4bcc9, equipment: 0x9aa5b6, stairs: 0xc3cad5, other: 0xb0b8c6 },
+    edge: 0x5d6773, ghost: 0xe3e6eb, grid: 0xaab1bd,
+    pickFace: 0x6b7586, pickLine: 0x2b2f36, hoverLine: 0x4b4f57
+  };
+  var LIGHT_LIFT = 0.15;
+  var THEMED = document.body.classList.contains("v2-2");
+  function isLight() { return THEMED && document.documentElement.getAttribute("data-theme") === "light"; }
+
   // 눌린 설비 — 디자인 시스템의 main 램프에서 가져온다.
   /*
    * 설비 고르기 색은 밝은 회색 계열이다. 파랑(main)은 경로 · 웨이포인트 · 로봇에만 쓴다 —
@@ -1486,13 +1501,24 @@
    * 점 그림. 흰색으로 구워 두고 재질 색으로 로봇 색을 입힌다.
    * 채운 것은 지나온 자리, 테두리만 있는 것은 앞으로 갈 자리다.
    */
+  // 점 속을 막는 바탕색 — 테마를 따른다(라이트는 v2.2 만). 재질 색이 곱해지므로 라이트에선 옅은 상태색 속이 된다.
+  function stopFill() { return isLight() ? "#eef0f3" : "#0a0f18"; }
+
   function stopTexture(kind) {
     if (stopArt[kind]) { return stopArt[kind]; }
-    var size = 64, mid = size / 2;
     var pad = document.createElement("canvas");
-    pad.width = size;
-    pad.height = size;
+    pad.width = 64;
+    pad.height = 64;
+    drawStop(kind, pad);
+    stopArt[kind] = new THREE.CanvasTexture(pad);
+    return stopArt[kind];
+  }
+
+  function drawStop(kind, pad) {
+    if (kind === "dock") { drawDock(pad); return; }
+    var size = pad.width, mid = size / 2;
     var ink = pad.getContext("2d");
+    ink.clearRect(0, 0, size, size);
 
     if (kind === "halo") {
       // 고른 웨이포인트를 두르는 바깥 고리. 속은 비운다 — 안의 상태색을 덮으면 안 된다.
@@ -1501,15 +1527,14 @@
       ink.lineWidth = 5;
       ink.strokeStyle = "#ffffff";
       ink.stroke();
-      stopArt[kind] = new THREE.CanvasTexture(pad);
-      return stopArt[kind];
+      return;
     }
 
     // 속은 바탕색으로 막는다 — 길이 비쳐 보이면 점이 아니라 얼룩이 된다.
     var full = kind === "full";
     ink.beginPath();
     ink.arc(mid, mid, mid - 9, 0, Math.PI * 2);
-    ink.fillStyle = "#0a0f18";
+    ink.fillStyle = stopFill();
     ink.fill();
     ink.lineWidth = full ? 9 : 6;
     ink.strokeStyle = "#ffffff";
@@ -1522,9 +1547,6 @@
       ink.fillStyle = "#ffffff";
       ink.fill();
     }
-
-    stopArt[kind] = new THREE.CanvasTexture(pad);
-    return stopArt[kind];
   }
 
   /*
@@ -1533,11 +1555,18 @@
    */
   function dockTexture() {
     if (stopArt.dock) { return stopArt.dock; }
-    var size = 64, edge = 12, r = 9;
     var pad = document.createElement("canvas");
-    pad.width = size;
-    pad.height = size;
+    pad.width = 64;
+    pad.height = 64;
+    drawStop("dock", pad);
+    stopArt.dock = new THREE.CanvasTexture(pad);
+    return stopArt.dock;
+  }
+
+  function drawDock(pad) {
+    var size = pad.width, edge = 12, r = 9;
     var ink = pad.getContext("2d");
+    ink.clearRect(0, 0, size, size);
     var x = edge, y = edge, w = size - edge * 2, h = size - edge * 2;
     ink.beginPath();
     ink.moveTo(x + r, y);
@@ -1546,13 +1575,11 @@
     ink.arcTo(x, y + h, x, y, r);
     ink.arcTo(x, y, x + w, y, r);
     ink.closePath();
-    ink.fillStyle = "#0a0f18";
+    ink.fillStyle = stopFill();
     ink.fill();
     ink.lineWidth = 8;
     ink.strokeStyle = "#ffffff";
     ink.stroke();
-    stopArt.dock = new THREE.CanvasTexture(pad);
-    return stopArt.dock;
   }
 
   function dockMark(spot, color) {
@@ -2072,6 +2099,17 @@
     "끊김":   { done: 0x667085, left: 0x4e576a, dot: 0x8894aa }
   };
 
+  /*
+   * 라이트 모드의 상태색 — v2.2 만. 다크의 흰 선(지나온 길) · 흰 로봇 표식이 밝은 바닥에 묻혔다.
+   * 지나온 길은 진한 회색, 로봇 표식은 거의 검정(라이트의 inverse)으로 뒤집는다. 갈 길(main)은 한 단 진하게.
+   */
+  var BOT_TINT_LIGHT = {
+    "수행중": { done: 0x4b5563, left: 0x4990e0, dot: 0x2b2f36, mark: 0x2b2f36 },
+    "완료":   { done: 0x1da67f, left: 0x34c759, dot: 0x1da67f },
+    "대기":   { done: 0x5d6675, left: 0x8894aa, dot: 0x5d6675 },
+    "끊김":   { done: 0x4e576a, left: 0x667085, dot: 0x4e576a }
+  };
+
   function botState(id) {
     var badge = document.querySelector(".robot-strip .robot-card[data-robot='" + id + "'] .badge");
     return badge ? badge.textContent.trim() : "";
@@ -2079,7 +2117,7 @@
 
   // 길을 깔기 전에 그 로봇의 상태색을 입힌다. 상태를 못 읽으면 들고 있던 색 그대로다.
   function tintRobot(bot, id) {
-    var tint = BOT_TINT[botState(id)];
+    var tint = (isLight() ? BOT_TINT_LIGHT : BOT_TINT)[botState(id)];
     if (!tint) { return bot; }
     bot.done = tint.done;
     bot.left = tint.left;
@@ -2143,6 +2181,9 @@
 
     parts.push(strand(turns.slice(0, at).concat([here]), bot.done, false));
     parts.push(strand([here].concat(turns.slice(at)), bot.left, true));
+    // 테마가 바뀌면 이 이름표로 찾아 다시 칠한다(applyTheme).
+    parts[0].userData.tone = "done";
+    parts[1].userData.tone = "left";
 
     /*
      * 멈춰 서서 볼 자리 일곱 — 우측 미션 목록의 웨이포인트 일곱과 같은 수다.
@@ -2158,7 +2199,10 @@
 
     // 도킹 스테이션 — 길의 첫 점이 곧 그 자리다.
     // 폐회로의 도커는 화면 아이콘 하나(syncDock)가 시작 · 복귀를 함께 보인다.
-    if (!plan) { parts.push(dockMark(turns[0], bot.mark || bot.done)); }
+    if (!plan) {
+      parts.push(dockMark(turns[0], bot.mark || bot.done));
+      parts[parts.length - 1].userData.tone = "mark";
+    }
 
     parts.forEach(function (part) {
       part.visible = false;
@@ -2417,7 +2461,7 @@
     fade *= 0.3;
     tone.copy(item.base).lerp(PICKED, item.glowNow);
     item.mat.color.copy(tone).lerp(GHOSTC, fade);
-    item.mat.emissive.copy(tone).multiplyScalar(PALETTE[item.key].lift);
+    item.mat.emissive.copy(tone).multiplyScalar(PALETTE[item.key].lift * (isLight() ? LIGHT_LIFT : 1));
     item.mat.depthWrite = item.now > 0.95 && vis > 0.95;
     /*
      * 그리는 차례를 못 박는다. 재질이 전부 transparent 라 three.js 는 덩이 한가운데까지의
@@ -2429,6 +2473,53 @@
     item.edgeMat.opacity = item.edgeNow * vis;
     // 비쳐 보이게 낮춘 덩이가 그림자만 멀쩡히 남으면 유령이 선 것처럼 보인다.
     item.mesh.castShadow = vis > 0.9 && item.now > item.alpha * 0.5;
+  }
+
+  /*
+   * 테마에 맞는 색을 덩이 · 선 · 격자 · 고르기 색에 다시 넣는다.
+   * 덩이 색은 paintOne 이 base 에서 매번 다시 섞으므로 base 만 바꾸면 된다.
+   * 격자(GridHelper)는 색이 꼭짓점에 구워져 있어 꼭짓점 색을 새로 채운다.
+   */
+  function applyTheme() {
+    if (!THEMED || !tone) { return; }
+    var light = isLight();
+    meshes.forEach(function (item) {
+      var face = light ? (LIGHT.face[item.key] || LIGHT.face.other) : PALETTE[item.key].face;
+      item.base.setHex(face);
+      item.edgeMat.color.setHex(light ? LIGHT.edge : EDGE);
+    });
+    PICKED.setHex(light ? LIGHT.pickFace : PICK_FACE);
+    GHOSTC.setHex(light ? LIGHT.ghost : GHOST);
+    pickPens.forEach(function (pen) { pen.material.color.setHex(light ? LIGHT.pickLine : PICK_LINE); });
+    hoverPens.forEach(function (pen) { pen.material.color.setHex(light ? LIGHT.hoverLine : HOVER_LINE); });
+    if (gridMesh) {
+      var c = new THREE.Color(light ? LIGHT.grid : GRID);
+      var col = gridMesh.geometry.getAttribute("color");
+      for (var i = 0; i < col.count; i++) { col.setXYZ(i, c.r, c.g, c.b); }
+      col.needsUpdate = true;
+      gridMesh.material.opacity = light ? 0.5 : 0.3;
+    }
+    // 길 — 상태색을 다시 입히고 이름표(tone)로 선 · 도킹 표식을 찾아 칠한다. 선 밑의 옅은 벌(ghost)도 같이.
+    Object.keys(lanes).forEach(function (id) {
+      var ln = lanes[id];
+      if (!ln || !ln.bot) { return; }
+      tintRobot(ln.bot, id);
+      ln.parts.forEach(function (part) {
+        var t = part.userData && part.userData.tone;
+        if (!t) { return; }
+        var hexc = t === "mark" ? (ln.bot.mark || ln.bot.done) : ln.bot[t];
+        if (part.material && part.material.color) { part.material.color.setHex(hexc); }
+        part.children.forEach(function (ch) { if (ch.material && ch.material.color) { ch.material.color.setHex(hexc); } });
+      });
+    });
+    if (onLane) { showLane(onLane.id, true); }
+
+    // 웨이포인트 · 도킹 그림은 같은 캔버스에 다시 그린다 — 쓰는 재질이 모두 따라온다.
+    Object.keys(stopArt).forEach(function (kind) {
+      drawStop(kind, stopArt[kind].image);
+      stopArt[kind].needsUpdate = true;
+    });
+    repaint();
   }
 
   // 값은 그대로 두고 다시 칠하기만 한다 — 층 전환이 프레임마다 부른다.
@@ -3773,6 +3864,12 @@
     // 바닥 격자는 지금 층 바닥에 깐다. 층을 옮기면 같이 따라 올라간다.
     gridMesh = floorGrid(box, here ? here.deck : box.min.y);
     scene.add(gridMesh);
+
+    // 라이트 · 다크 — 처음 한 번 칠하고, 테마 단추로 바뀌면 다시 칠한다(v2.2 만).
+    applyTheme();
+    if (THEMED && window.MutationObserver) {
+      new MutationObserver(applyTheme).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+    }
 
     WORLD_UP = new THREE.Vector3(0, 1, 0);
     dirV = new THREE.Vector3();
