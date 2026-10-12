@@ -357,6 +357,22 @@
 .v2-2 .ah-report:hover,
 .v2-2 .ah-report:focus-visible { color: var(--fg-primary); }
 
+/*
+ * 글자 링크처럼 — 좌우 여백 · hover 면을 없앤다. 버튼 안쪽 여백만큼 글자가 안으로 들어가
+ * 오른쪽 끝선이 어긋났다(로봇 현황 ↔ E-STOP 13px, 보고서 ↔ 알림 시각 9px).
+ */
+.v2-2 .ah-all,
+.v2-2 [data-robot-more],
+.v2-2 .ah-report {
+  padding-left: 0;
+  padding-right: 0;
+  margin-right: 0;
+}
+
+.v2-2 .ah-all:hover,
+.v2-2 [data-robot-more]:hover,
+.v2-2 .ah-report:hover { background-color: transparent; }
+
 /* [보고서] — 평소엔 아이콘만, 그 줄에 올라가거나 초점이 오면 글자가 붙는다. */
 .ah-report { padding: 0 var(--space-4); }
 .ah-report-label { display: none; }
