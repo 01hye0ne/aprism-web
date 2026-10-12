@@ -159,6 +159,8 @@
       <figure class="dc-cell"><figcaption>라이트 · 제안</figcaption><div class="dc-view"><iframe data-dc="?theme=light&amp;delta=glass#critical" title="라이트 제안"></iframe></div></figure>
     </div>
     <p class="note" style="margin-top:12px">
+      <button type="button" data-dc-replay>새 위험 다시 울리기</button>
+      박자는 새 위험이 들어온 뒤 10초 동안 빠르게(두근두근 — 쉼, 1.2초) 뛰고, 그다음 느린 숨(2.4초)으로 가라앉습니다. 점 · Delta 빛 · 엣지 글로우가 같은 박자입니다.<br />
       펼친 창은 v2.2 에서 직접 봅니다 —
       <a href="./screens/main-v2-2.html?delta=glass#critical" target="_blank" rel="noopener" style="color:var(--ui-accent)">제안 판 열기</a>
       · <a href="./screens/main-v2-2.html#critical" target="_blank" rel="noopener" style="color:var(--ui-accent)">지금 판 열기</a> (Delta 의 [+] 를 누릅니다).
@@ -462,7 +464,12 @@
   Array.prototype.forEach.call(frames, function (f) { f.src = "./screens/main-v2-2.html" + f.getAttribute("data-dc"); });
   Array.prototype.forEach.call(frames, function (f) {
     f.style.transform = "translate(" + (-X) + "px, " + (-Y) + "px)";
-  });
+  });  var replay = document.querySelector("[data-dc-replay]");
+  if (replay) {
+    replay.addEventListener("click", function () {
+      Array.prototype.forEach.call(frames, function (f) { f.src = f.src; });
+    });
+  }
 })();
 
 /* 제안 비교 — 두 화면을 같은 상태로 띄우고, 판 폭에 맞춰 1920×1080 을 줄인다. */

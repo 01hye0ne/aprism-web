@@ -1298,3 +1298,78 @@
     rgb(55 63 78 / 4%) 100%);
   border-top-color: rgb(0 0 0 / 6%);
 }
+
+/* ------------------------------------------------------------------
+ * 제안(?delta=glass) — 위험 깜빡임을 하나의 박자로 (2026-10-12)
+ *
+ *   ① 점 · Delta 아래 빛 · 엣지 글로우가 같은 박자로 같이 뛴다
+ *   ② 박자는 "두근두근 — 쉼". 새 위험이 들어온 뒤 10초(body.is-surge)는 1.2초 한 바퀴,
+ *      그다음은 2.4초 한 바퀴의 느린 숨으로 가라앉는다 — 경보 피로를 줄인다. 새 위험이 오면 다시 뛴다(delta-pulse.js)
+ *   ③ 점은 켜질 때 흰빛 도는 주황(빛의 심지)으로 넘쳤다가 빨강으로 식는다
+ * 이름이 다른 keyframes 로 갈아 끼우므로 is-surge 가 붙고 떨어질 때 셋이 함께 처음부터 다시 뛴다.
+ * 빠른 번쩍임은 작은 점에만 — 1초에 1.67번(WCAG 2.3.1 의 3번 아래). 넓은 면(빛 · 글로우)은 세기만 오르내린다.
+ * ------------------------------------------------------------------ */
+:root[data-delta="glass"] .v2-2[data-level="critical"] .delta-dots rect {
+  animation: dd-breath 2.4s ease-in-out infinite;
+}
+:root[data-delta="glass"] .v2-2.is-surge[data-level="critical"] .delta-dots rect {
+  animation: dd-beat 1.2s linear infinite;
+}
+
+@keyframes dd-beat {
+  0%       { fill: #FFE3D2; transform: scale(1.16); }
+  7%       { fill: var(--status-critical-icon); transform: scale(1); }
+  17%      { fill: var(--dd-dim); }
+  25%      { fill: #FFE3D2; transform: scale(1.16); }
+  32%      { fill: var(--status-critical-icon); transform: scale(1); }
+  44%, 100% { fill: var(--dd-dim); transform: scale(1); }
+}
+@keyframes dd-breath {
+  0%, 100% { fill: var(--dd-dim); }
+  40%      { fill: var(--status-critical-icon); }
+}
+
+/* 엣지 글로우 — 맥박 모양(edge-pulse)은 그대로, 박자만 맞춘다. 두 번째 고리가 두 번째 박에 맞춰 0.3초 뒤에. */
+:root[data-delta="glass"] .v2-2 .two-col.is-critical > .edge-light::before { animation: edge-pulse 2.4s linear infinite; }
+:root[data-delta="glass"] .v2-2 .two-col.is-critical > .edge-light::after { animation: edge-pulse 2.4s linear 0.3s infinite; }
+:root[data-delta="glass"] .v2-2.is-surge .two-col.is-critical > .edge-light::before { animation: edge-beat 1.2s linear infinite; }
+:root[data-delta="glass"] .v2-2.is-surge .two-col.is-critical > .edge-light::after { animation: edge-beat 1.2s linear 0.3s infinite; }
+
+@keyframes edge-beat {
+  0%   { box-shadow: inset 0 0 var(--pulse-blur) var(--pulse-from) var(--glow-color-60); opacity: 1; }
+  32%  { box-shadow: inset 0 0 var(--pulse-blur) var(--pulse-to) var(--glow-color-60); opacity: 0; }
+  100% { box-shadow: inset 0 0 var(--pulse-blur) var(--pulse-to) var(--glow-color-60); opacity: 0; }
+}
+
+/* Delta 아래 빛 — 박에 맞춰 세기만 오른다. 판 모양 · 색은 그대로다. */
+:root[data-delta="glass"] .v2-2 .delta3.is-critical:not(.is-open) .delta3-card,
+:root[data-delta="glass"] .v2-2 .delta3.is-critical.is-open { animation: dg-breath 2.4s ease-in-out infinite; }
+:root[data-delta="glass"] .v2-2.is-surge .delta3.is-critical:not(.is-open) .delta3-card,
+:root[data-delta="glass"] .v2-2.is-surge .delta3.is-critical.is-open { animation: dg-beat 1.2s ease-out infinite; }
+
+@keyframes dg-beat {
+  0%, 25% {
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 14%), inset 0 -1px 0 rgb(255 140 110 / 100%),
+      inset 0 -22px 30px -12px rgb(255 96 72 / 85%), 0 16px 36px -14px rgb(245 50 45 / 85%);
+  }
+  14%, 44%, 100% {
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 14%), inset 0 -1px 0 rgb(255 96 80 / 90%),
+      inset 0 -14px 24px -12px rgb(255 72 60 / 55%), 0 14px 30px -16px rgb(235 40 40 / 60%);
+  }
+}
+@keyframes dg-breath {
+  0%, 100% {
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 14%), inset 0 -1px 0 rgb(255 96 80 / 90%),
+      inset 0 -14px 24px -12px rgb(255 72 60 / 55%), 0 14px 30px -16px rgb(235 40 40 / 60%);
+  }
+  40% {
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 14%), inset 0 -1px 0 rgb(255 120 96 / 100%),
+      inset 0 -18px 28px -12px rgb(255 84 66 / 72%), 0 15px 33px -15px rgb(240 45 42 / 74%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root[data-delta="glass"] .v2-2 .delta-dots rect,
+  :root[data-delta="glass"] .v2-2 .delta3-card,
+  :root[data-delta="glass"] .v2-2 .delta3 { animation: none; }
+}
