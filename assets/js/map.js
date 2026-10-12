@@ -162,6 +162,17 @@
     pickFace: 0x6b7586, pickLine: 0x2b2f36, hoverLine: 0x4b4f57
   };
   var LIGHT_LIFT = 0.15;
+
+  /*
+   * 제안 팔레트(?palette=neutral · 톤 실험실 비교용) — 다크 남색을 같은 명도의 무채색으로.
+   * palette-neutral.css 와 같은 셈(OKLCH 명도 유지 · 채도 0.004)이다.
+   */
+  var NEUTRAL = {
+    face: { floor: 0x1f2022, wall: 0x464749, equipment: 0x4e5052, stairs: 0x3f4043, other: 0x414345 },
+    edge: 0x8d8f91, ghost: 0x76777a, grid: 0x292a2c,
+    pickFace: 0xb5b7b9, pickLine: 0xe1e3e6, hoverLine: 0xd3d5d8
+  };
+  function isNeutral() { return THEMED && document.documentElement.getAttribute("data-palette") === "neutral"; }
   var THEMED = document.body.classList.contains("v2-2");
   function isLight() { return THEMED && document.documentElement.getAttribute("data-theme") === "light"; }
 
@@ -2483,17 +2494,21 @@
   function applyTheme() {
     if (!THEMED || !tone) { return; }
     var light = isLight();
-    meshes.forEach(function (item) {
-      var face = light ? (LIGHT.face[item.key] || LIGHT.face.other) : PALETTE[item.key].face;
-      item.base.setHex(face);
-      item.edgeMat.color.setHex(light ? LIGHT.edge : EDGE);
+    // 라이트 · 제안 팔레트 · 지금 다크 — 셋 중 하나의 판을 고른다.
+    var set = light ? LIGHT : (isNeutral() ? NEUTRAL : {
+      face: null, edge: EDGE, ghost: GHOST, grid: GRID, pickFace: PICK_FACE, pickLine: PICK_LINE, hoverLine: HOVER_LINE
     });
-    PICKED.setHex(light ? LIGHT.pickFace : PICK_FACE);
-    GHOSTC.setHex(light ? LIGHT.ghost : GHOST);
-    pickPens.forEach(function (pen) { pen.material.color.setHex(light ? LIGHT.pickLine : PICK_LINE); });
-    hoverPens.forEach(function (pen) { pen.material.color.setHex(light ? LIGHT.hoverLine : HOVER_LINE); });
+    meshes.forEach(function (item) {
+      var face = set.face ? (set.face[item.key] || set.face.other) : PALETTE[item.key].face;
+      item.base.setHex(face);
+      item.edgeMat.color.setHex(set.edge);
+    });
+    PICKED.setHex(set.pickFace);
+    GHOSTC.setHex(set.ghost);
+    pickPens.forEach(function (pen) { pen.material.color.setHex(set.pickLine); });
+    hoverPens.forEach(function (pen) { pen.material.color.setHex(set.hoverLine); });
     if (gridMesh) {
-      var c = new THREE.Color(light ? LIGHT.grid : GRID);
+      var c = new THREE.Color(set.grid);
       var col = gridMesh.geometry.getAttribute("color");
       for (var i = 0; i < col.count; i++) { col.setXYZ(i, c.r, c.g, c.b); }
       col.needsUpdate = true;

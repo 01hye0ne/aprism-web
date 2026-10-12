@@ -96,6 +96,21 @@
 
     footer.doc { margin-top: 60px; padding-top: 18px; border-top: 1px solid var(--ui-border); color: var(--ui-faint); font-size: 12px; }
 
+    /* 제안 비교 — 실제 v2.2 두 장 */
+    .np h3 { font-size: 13px; margin: 0 0 8px; color: var(--ui-dim); }
+    .np-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 12px; }
+    .np-bar button[aria-pressed="true"] { border-color: var(--ui-accent); color: var(--ui-accent); }
+    .np-hint { font-size: 11.5px; color: var(--ui-faint); }
+    .np-frames { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .np-frame { margin: 0; }
+    .np-frame figcaption { font-size: 12px; font-weight: 600; color: var(--ui-dim); margin-bottom: 6px; }
+    .np-view { position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; border: 1px solid var(--ui-border); border-radius: 8px; background: #000; }
+    .np-view iframe { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; border: 0; transform-origin: 0 0; }
+    .np-ramps { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 20px; }
+    .np-strip { display: flex; align-items: center; gap: 2px; margin-bottom: 4px; }
+    .np-lab { width: 34px; font-size: 11px; color: var(--ui-faint); flex: none; }
+    .np-chip { flex: 1 1 0; height: 22px; border-radius: 2px; }
+    @media (max-width: 900px) { .np-frames, .np-ramps { grid-template-columns: 1fr; } }
     @media (max-width: 900px) { .previews { grid-template-columns: 1fr; } .wrap { padding: 22px 14px 60px; } }
   </style>
 </head>
@@ -118,6 +133,53 @@
     <div class="dec"><dt>브랜드 색</dt><dd>기존 <code>main</code>은 임시값이므로 레퍼런스 기반으로 교체</dd></div>
     <div class="dec"><dt>상태색 채도</dt><dd>틴트 단계만 낮추고 <code>300</code>·<code>500</code> 원색은 경보 강도 유지</dd></div>
   </dl>
+
+  <!-- 2026-10-12 — 레퍼런스 대비 "촌스러움" 진단에서 나온 제안. 실제 v2.2 화면 두 장을 띄워 한쪽에만
+       ?palette=neutral(assets/css/palette-neutral.css)을 씌운다. 화면 안의 상태는 주소 끝 #normal · #warning · #critical. -->
+  <section class="np" style="margin-top:0">
+    <h2>제안 — 무채색 회색 · 색상각을 고정한 빨강</h2>
+    <p class="note">
+      지금 회색은 OKLCH 채도 0.03 안팎의 남색 슬레이트(<code>gray/800 #202838</code>)라, 빨강 · 노랑을 얹으면 보색끼리 부딪칩니다.
+      제안은 <b>명도는 그대로 두고 채도만 0.004 로</b> 내린 회색과, 색상각을 25°에 고정하고 명도만 내린 빨강입니다.
+      같은 v2.2 화면을 나란히 띄웠습니다. 지도(3D)도 같은 셈으로 바뀝니다.
+    </p>
+    <div class="np-bar" role="group" aria-label="화면 상태">
+      <button type="button" data-np-state="normal">정상</button>
+      <button type="button" data-np-state="warning">주의</button>
+      <button type="button" data-np-state="critical" aria-pressed="true">위험</button>
+      <span class="np-hint">위 단추는 두 화면을 같이 바꿉니다. 화면 안을 눌러 쪽지 · Delta 를 열어 볼 수도 있습니다.</span>
+    </div>
+    <div class="np-frames">
+      <figure class="np-frame">
+        <figcaption>지금 — 남색 슬레이트</figcaption>
+        <div class="np-view"><iframe data-np-frame="now" title="지금 팔레트"></iframe></div>
+      </figure>
+      <figure class="np-frame">
+        <figcaption>제안 — 무채색 · 고정 색상각</figcaption>
+        <div class="np-view"><iframe data-np-frame="neutral" title="제안 팔레트"></iframe></div>
+      </figure>
+    </div>
+    <div class="np-ramps">
+      <div>
+        <h3>Gray</h3>
+        <div class="np-strip"><span class="np-lab">지금</span><span class="np-chip" style="background:#F7F8FA" title="50 #F7F8FA"></span><span class="np-chip" style="background:#F0F1F5" title="100 #F0F1F5"></span><span class="np-chip" style="background:#E0E3E9" title="200 #E0E3E9"></span><span class="np-chip" style="background:#D1D5DE" title="300 #D1D5DE"></span><span class="np-chip" style="background:#AFB7C8" title="400 #AFB7C8"></span><span class="np-chip" style="background:#9EA8BB" title="450 #9EA8BB"></span><span class="np-chip" style="background:#667085" title="500 #667085"></span><span class="np-chip" style="background:#4E576A" title="600 #4E576A"></span><span class="np-chip" style="background:#3F485C" title="650 #3F485C"></span><span class="np-chip" style="background:#373F4E" title="700 #373F4E"></span><span class="np-chip" style="background:#2C3443" title="750 #2C3443"></span><span class="np-chip" style="background:#202838" title="800 #202838"></span><span class="np-chip" style="background:#151C26" title="850 #151C26"></span><span class="np-chip" style="background:#0A0E15" title="900 #0A0E15"></span><span class="np-chip" style="background:#070A10" title="950 #070A10"></span></div>
+        <div class="np-strip"><span class="np-lab">제안</span><span class="np-chip" style="background:#F6F8FB" title="50 #F6F8FB"></span><span class="np-chip" style="background:#F0F1F4" title="100 #F0F1F4"></span><span class="np-chip" style="background:#E1E3E6" title="200 #E1E3E6"></span><span class="np-chip" style="background:#D3D5D8" title="300 #D3D5D8"></span><span class="np-chip" style="background:#B5B7B9" title="400 #B5B7B9"></span><span class="np-chip" style="background:#A6A8AA" title="450 #A6A8AA"></span><span class="np-chip" style="background:#6E7072" title="500 #6E7072"></span><span class="np-chip" style="background:#565759" title="600 #565759"></span><span class="np-chip" style="background:#47484A" title="650 #47484A"></span><span class="np-chip" style="background:#3E3F41" title="700 #3E3F41"></span><span class="np-chip" style="background:#333436" title="750 #333436"></span><span class="np-chip" style="background:#27282A" title="800 #27282A"></span><span class="np-chip" style="background:#1A1C1D" title="850 #1A1C1D"></span><span class="np-chip" style="background:#0D0E10" title="900 #0D0E10"></span><span class="np-chip" style="background:#090A0C" title="950 #090A0C"></span></div>
+        <div class="scroll"><table><thead><tr><th>토큰</th><th>지금</th><th>제안</th></tr></thead><tbody><tr><td class="tname">gray/50</td><td><span class="sw-sm" style="background:#F7F8FA"></span><span class="thex">#F7F8FA</span></td><td><span class="sw-sm" style="background:#F6F8FB"></span><span class="thex">#F6F8FB</span></td></tr><tr><td class="tname">gray/100</td><td><span class="sw-sm" style="background:#F0F1F5"></span><span class="thex">#F0F1F5</span></td><td><span class="sw-sm" style="background:#F0F1F4"></span><span class="thex">#F0F1F4</span></td></tr><tr><td class="tname">gray/200</td><td><span class="sw-sm" style="background:#E0E3E9"></span><span class="thex">#E0E3E9</span></td><td><span class="sw-sm" style="background:#E1E3E6"></span><span class="thex">#E1E3E6</span></td></tr><tr><td class="tname">gray/300</td><td><span class="sw-sm" style="background:#D1D5DE"></span><span class="thex">#D1D5DE</span></td><td><span class="sw-sm" style="background:#D3D5D8"></span><span class="thex">#D3D5D8</span></td></tr><tr><td class="tname">gray/400</td><td><span class="sw-sm" style="background:#AFB7C8"></span><span class="thex">#AFB7C8</span></td><td><span class="sw-sm" style="background:#B5B7B9"></span><span class="thex">#B5B7B9</span></td></tr><tr><td class="tname">gray/450</td><td><span class="sw-sm" style="background:#9EA8BB"></span><span class="thex">#9EA8BB</span></td><td><span class="sw-sm" style="background:#A6A8AA"></span><span class="thex">#A6A8AA</span></td></tr><tr><td class="tname">gray/500</td><td><span class="sw-sm" style="background:#667085"></span><span class="thex">#667085</span></td><td><span class="sw-sm" style="background:#6E7072"></span><span class="thex">#6E7072</span></td></tr><tr><td class="tname">gray/600</td><td><span class="sw-sm" style="background:#4E576A"></span><span class="thex">#4E576A</span></td><td><span class="sw-sm" style="background:#565759"></span><span class="thex">#565759</span></td></tr><tr><td class="tname">gray/650</td><td><span class="sw-sm" style="background:#3F485C"></span><span class="thex">#3F485C</span></td><td><span class="sw-sm" style="background:#47484A"></span><span class="thex">#47484A</span></td></tr><tr><td class="tname">gray/700</td><td><span class="sw-sm" style="background:#373F4E"></span><span class="thex">#373F4E</span></td><td><span class="sw-sm" style="background:#3E3F41"></span><span class="thex">#3E3F41</span></td></tr><tr><td class="tname">gray/750</td><td><span class="sw-sm" style="background:#2C3443"></span><span class="thex">#2C3443</span></td><td><span class="sw-sm" style="background:#333436"></span><span class="thex">#333436</span></td></tr><tr><td class="tname">gray/800</td><td><span class="sw-sm" style="background:#202838"></span><span class="thex">#202838</span></td><td><span class="sw-sm" style="background:#27282A"></span><span class="thex">#27282A</span></td></tr><tr><td class="tname">gray/850</td><td><span class="sw-sm" style="background:#151C26"></span><span class="thex">#151C26</span></td><td><span class="sw-sm" style="background:#1A1C1D"></span><span class="thex">#1A1C1D</span></td></tr><tr><td class="tname">gray/900</td><td><span class="sw-sm" style="background:#0A0E15"></span><span class="thex">#0A0E15</span></td><td><span class="sw-sm" style="background:#0D0E10"></span><span class="thex">#0D0E10</span></td></tr><tr><td class="tname">gray/950</td><td><span class="sw-sm" style="background:#070A10"></span><span class="thex">#070A10</span></td><td><span class="sw-sm" style="background:#090A0C"></span><span class="thex">#090A0C</span></td></tr></tbody></table></div>
+      </div>
+      <div>
+        <h3>Danger</h3>
+        <div class="np-strip"><span class="np-lab">지금</span><span class="np-chip" style="background:#FBEBE9" title="100 #FBEBE9"></span><span class="np-chip" style="background:#FFA69A" title="200 #FFA69A"></span><span class="np-chip" style="background:#FF6B72" title="300 #FF6B72"></span><span class="np-chip" style="background:#FF383C" title="500 #FF383C"></span><span class="np-chip" style="background:#B92B18" title="700 #B92B18"></span><span class="np-chip" style="background:#8A2012" title="800 #8A2012"></span><span class="np-chip" style="background:#421A13" title="900 #421A13"></span></div>
+        <div class="np-strip"><span class="np-lab">제안</span><span class="np-chip" style="background:#FFE8E6" title="100 #FFE8E6"></span><span class="np-chip" style="background:#FFB5AE" title="200 #FFB5AE"></span><span class="np-chip" style="background:#FD736D" title="300 #FD736D"></span><span class="np-chip" style="background:#F52F39" title="500 #F52F39"></span><span class="np-chip" style="background:#B71824" title="700 #B71824"></span><span class="np-chip" style="background:#861118" title="800 #861118"></span><span class="np-chip" style="background:#460A0B" title="900 #460A0B"></span></div>
+        <div class="scroll"><table><thead><tr><th>토큰</th><th>지금 (색상각)</th><th>제안</th></tr></thead><tbody><tr><td class="tname">danger/100</td><td><span class="sw-sm" style="background:#FBEBE9"></span><span class="thex">#FBEBE9</span> <span class="role">H 26°</span></td><td><span class="sw-sm" style="background:#FFE8E6"></span><span class="thex">#FFE8E6</span> <span class="role">H 25°</span></td></tr><tr><td class="tname">danger/200</td><td><span class="sw-sm" style="background:#FFA69A"></span><span class="thex">#FFA69A</span> <span class="role">H 28°</span></td><td><span class="sw-sm" style="background:#FFB5AE"></span><span class="thex">#FFB5AE</span> <span class="role">H 25°</span></td></tr><tr><td class="tname">danger/300</td><td><span class="sw-sm" style="background:#FF6B72"></span><span class="thex">#FF6B72</span> <span class="role">H 20°</span></td><td><span class="sw-sm" style="background:#FD736D"></span><span class="thex">#FD736D</span> <span class="role">H 25°</span></td></tr><tr><td class="tname">danger/500</td><td><span class="sw-sm" style="background:#FF383C"></span><span class="thex">#FF383C</span> <span class="role">H 26°</span></td><td><span class="sw-sm" style="background:#F52F39"></span><span class="thex">#F52F39</span> <span class="role">H 25°</span></td></tr><tr><td class="tname">danger/700</td><td><span class="sw-sm" style="background:#B92B18"></span><span class="thex">#B92B18</span> <span class="role">H 31°</span></td><td><span class="sw-sm" style="background:#B71824"></span><span class="thex">#B71824</span> <span class="role">H 25°</span></td></tr><tr><td class="tname">danger/800</td><td><span class="sw-sm" style="background:#8A2012"></span><span class="thex">#8A2012</span> <span class="role">H 31°</span></td><td><span class="sw-sm" style="background:#861118"></span><span class="thex">#861118</span> <span class="role">H 25°</span></td></tr><tr><td class="tname">danger/900</td><td><span class="sw-sm" style="background:#421A13"></span><span class="thex">#421A13</span> <span class="role">H 32°</span></td><td><span class="sw-sm" style="background:#460A0B"></span><span class="thex">#460A0B</span> <span class="role">H 25°</span></td></tr></tbody></table></div>
+        <p class="note" style="margin-top:12px">지금 빨강은 300(20°)에서 900(32°)까지 12° 틀어져, 어두운 쪽으로 갈수록 주황 · 갈색이 됩니다.</p>
+      </div>
+    </div>
+    <p class="note" style="margin-top:14px">
+      <b>챙길 것</b> — ① 아래 "색온도: 약한 쿨 뉴트럴" 결정을 거의 무채색으로 바꾸는 안입니다.
+      ② 화면 곳곳의 raw 남색 값(토큰이 아닌 #1b2230 등)은 이 비교에서 다 바뀌지 않습니다 — 채택하면 그것까지 찾아 바꿉니다.
+      ③ 파랑(main) · 노랑(warning)은 아직 그대로입니다. 회색이 정해지면 같은 방식으로 다듬습니다.
+    </p>
+  </section>
 
   <div class="controls">
     <div class="ctl">
@@ -354,6 +416,35 @@
   </footer>
 </div>
 
+<script>
+/* 제안 비교 — 두 화면을 같은 상태로 띄우고, 판 폭에 맞춰 1920×1080 을 줄인다. */
+(function () {
+  var frames = document.querySelectorAll("[data-np-frame]");
+  var buttons = document.querySelectorAll("[data-np-state]");
+  if (!frames.length) { return; }
+  function load(state) {
+    Array.prototype.forEach.call(frames, function (f) {
+      var neutral = f.getAttribute("data-np-frame") === "neutral";
+      f.src = "./screens/main-v2-2.html?theme=dark" + (neutral ? "&palette=neutral" : "") + "#" + state;
+    });
+    Array.prototype.forEach.call(buttons, function (b) {
+      b.setAttribute("aria-pressed", b.getAttribute("data-np-state") === state ? "true" : "false");
+    });
+  }
+  function fit() {
+    Array.prototype.forEach.call(frames, function (f) {
+      var w = f.parentNode.clientWidth || 1;
+      f.style.transform = "scale(" + (w / 1920) + ")";
+    });
+  }
+  Array.prototype.forEach.call(buttons, function (b) {
+    b.addEventListener("click", function () { load(b.getAttribute("data-np-state")); });
+  });
+  load("critical");
+  fit();
+  window.addEventListener("resize", fit);
+})();
+</script>
 <script>
 // ============ 색 변환 ============
 function hexToRgb(hex) {

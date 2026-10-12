@@ -36,6 +36,10 @@
 
   apply(forced() || (read() === "light" ? "light" : "dark"));
 
+  // ?palette=neutral — 톤 실험실의 제안 팔레트(palette-neutral.css)를 씌워 본다. 저장하지 않는다.
+  var palette = /[?&]palette=(neutral)/.exec(location.search);
+  if (palette) { root.setAttribute("data-palette", palette[1]); }
+
   if (button) {
     button.addEventListener("click", function () {
       var next = root.getAttribute("data-theme") === "light" ? "dark" : "light";

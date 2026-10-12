@@ -1,0 +1,51 @@
+/*
+ * 제안 팔레트 — 무채색 회색 + 색상각을 고정한 빨강 (2026-10-12 · 톤 실험실 비교용)
+ *
+ * 주소에 ?palette=neutral 을 붙이면 theme.js 가 <html data-palette="neutral"> 을 단다.
+ * Primitive 만 바꾼다 — Semantic 은 alias 라 그대로 따라온다(tokens.css 와 같은 구조).
+ *
+ * 왜
+ *   회색 — 지금 램프는 OKLCH 채도가 0.03 안팎인 남색 슬레이트다(gray/800 #202838).
+ *          바탕이 이미 파랑이라 빨강 · 노랑을 얹으면 보색끼리 부딪친다.
+ *          명도(L)는 그대로 두고 채도만 0.004 로 내렸다 — 층위 간격은 지금과 같다.
+ *   빨강 — 지금 램프는 색상각이 300 의 20° 에서 900 의 32° 까지 틀어져 있어
+ *          밝은 데서 어두운 데로 갈수록 주황 · 갈색으로 탁해진다. 색상각 25° 에 고정하고 명도만 내렸다.
+ *
+ * 화면 곳곳에 남은 raw 남색 값(지도 · 일부 알약)은 토큰이 아니라 여기서 다 바뀌지 않는다.
+ * 지도는 map.js 가 같은 값으로 따로 칠한다.
+ */
+:root[data-palette="neutral"] {
+  --color-gray-50: #F6F8FB;
+  --color-gray-100: #F0F1F4;
+  --color-gray-200: #E1E3E6;
+  --color-gray-300: #D3D5D8;
+  --color-gray-400: #B5B7B9;
+  --color-gray-450: #A6A8AA;
+  --color-gray-500: #6E7072;
+  --color-gray-600: #565759;
+  --color-gray-650: #47484A;
+  --color-gray-700: #3E3F41;
+  --color-gray-750: #333436;
+  --color-gray-800: #27282A;
+  --color-gray-850: #1A1C1D;
+  --color-gray-900: #0D0E10;
+  --color-gray-950: #090A0C;
+
+  --color-danger-100: #FFE8E6;
+  --color-danger-200: #FFB5AE;
+  --color-danger-300: #FD736D;
+  --color-danger-500: #F52F39;
+  --color-danger-700: #B71824;
+  --color-danger-800: #861118;
+  --color-danger-900: #460A0B;
+}
+
+/* Delta 모서리 번짐 — raw 남색(rgb 44 51 64)을 무채색으로 */
+:root[data-palette="neutral"] .v3 .delta3:not(.is-open) {
+  background-image: radial-gradient(
+    circle 226px at 0 0,
+    var(--color-gray-600) 0%,
+    rgb(50 51 53 / 50%) 50%,
+    rgb(13 14 16 / 0%) 100%
+  );
+}
