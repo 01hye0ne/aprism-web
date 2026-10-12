@@ -96,6 +96,13 @@
 
     footer.doc { margin-top: 60px; padding-top: 18px; border-top: 1px solid var(--ui-border); color: var(--ui-faint); font-size: 12px; }
 
+    /* 위험 Delta 비교 — 실제 화면의 Delta 자리(x 410 · y 55 · 290×275)를 잘라 1.5 배로 */
+    .dc-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+    .dc-cell { margin: 0; }
+    .dc-cell figcaption { font-size: 12px; font-weight: 600; color: var(--ui-dim); margin-bottom: 6px; }
+    .dc-view { position: relative; width: 100%; aspect-ratio: 290 / 275; overflow: hidden; border: 1px solid var(--ui-border); border-radius: 8px; background: #000; }
+    .dc-view iframe { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; border: 0; transform-origin: 0 0; pointer-events: none; }
+    @media (max-width: 900px) { .dc-grid { grid-template-columns: 1fr 1fr; } }
     /* 제안 비교 — 실제 v2.2 두 장 */
     .np h3 { font-size: 13px; margin: 0 0 8px; color: var(--ui-dim); }
     .np-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 12px; }
@@ -134,10 +141,38 @@
     <div class="dec"><dt>상태색 채도</dt><dd>틴트 단계만 낮추고 <code>300</code>·<code>500</code> 원색은 경보 강도 유지</dd></div>
   </dl>
 
+  <!-- 2026-10-12 — 위험 Delta 를 면이 아니라 빛으로. 실제 v2.2 화면에서 Delta 자리만 잘라 키워 보인다.
+       제안은 ?delta=glass(monitor.css 의 :root[data-delta="glass"]). 회색은 쿨그레이 그대로다. -->
+  <section class="dc" style="margin-top:0">
+    <h2>제안 — 위험 Delta 를 빛으로 강조</h2>
+    <p class="note">
+      붉은 면으로 채운 판은 너무 셌습니다. 레퍼런스처럼 쿨그레이 유리판은 그대로 두고, <b>아래 변에서 붉은 빛이 올라와 사라지게</b> 했습니다.
+      빛은 밝은 주황빛 빨강 → 크림슨 → 채도 빠진 회색 → 투명 순서이고, 회색 정지점을 직접 넣어 oklab 에서 섞었습니다(보라로 탁해지지 않게).
+      윗변 흰 반사선 · 아래 변 붉은 선 · 아주 옅은 가로 결 · 판 밖 번짐을 함께 넣었습니다.
+    </p>
+    <div class="dc-grid">
+      <figure class="dc-cell"><figcaption>다크 · 지금</figcaption><div class="dc-view"><iframe data-dc="?theme=dark#critical" title="다크 지금"></iframe></div></figure>
+      <figure class="dc-cell"><figcaption>다크 · 제안</figcaption><div class="dc-view"><iframe data-dc="?theme=dark&amp;delta=glass#critical" title="다크 제안"></iframe></div></figure>
+      <figure class="dc-cell"><figcaption>라이트 · 지금</figcaption><div class="dc-view"><iframe data-dc="?theme=light#critical" title="라이트 지금"></iframe></div></figure>
+      <figure class="dc-cell"><figcaption>라이트 · 제안</figcaption><div class="dc-view"><iframe data-dc="?theme=light&amp;delta=glass#critical" title="라이트 제안"></iframe></div></figure>
+    </div>
+    <p class="note" style="margin-top:12px">
+      펼친 창은 v2.2 에서 직접 봅니다 —
+      <a href="./screens/main-v2-2.html?delta=glass#critical" target="_blank" rel="noopener" style="color:var(--ui-accent)">제안 판 열기</a>
+      · <a href="./screens/main-v2-2.html#critical" target="_blank" rel="noopener" style="color:var(--ui-accent)">지금 판 열기</a> (Delta 의 [+] 를 누릅니다).
+    </p>
+    <p class="note">
+      <b>챙길 것</b> — ① 빛이 아래 변에 있어 접힌 판에서는 본문 글 아래가 붉어집니다. 글이 길어져 아래까지 차면 빛과 겹치므로 글 줄 수를 지금처럼 3~4줄로 둡니다.
+      ② 주의(노랑)에도 같은 짜임을 쓸지 — 회의 2번 "주의는 덜어내기"와 맞추려면 주의는 지금처럼 띠만 두는 편이 강약이 섭니다.
+      ③ 엣지 글로우 맥박과 이 빛이 같이 뛰면 빨강이 두 번 움직입니다. 채택하면 판의 빛은 멈춰 두는 것을 권합니다.
+    </p>
+  </section>
+
   <!-- 2026-10-12 — 레퍼런스 대비 "촌스러움" 진단에서 나온 제안. 실제 v2.2 화면 두 장을 띄워 한쪽에만
        ?palette=neutral(assets/css/palette-neutral.css)을 씌운다. 화면 안의 상태는 주소 끝 #normal · #warning · #critical. -->
-  <section class="np" style="margin-top:0">
-    <h2>제안 — 무채색 회색 · 색상각을 고정한 빨강</h2>
+  <section class="np">
+    <!-- 보류 — 초기에 무채색을 썼다가 완성도가 떨어져 보여 쿨그레이로 간 이력이 있다(디자이너). 비교용으로 남겨 둔다. -->
+    <h2>제안 — 무채색 회색 · 색상각을 고정한 빨강 <span style="font-size:12px;color:var(--ui-flag);font-weight:600">보류 · 쿨그레이 유지(10/12)</span></h2>
     <p class="note">
       지금 회색은 OKLCH 채도 0.03 안팎의 남색 슬레이트(<code>gray/800 #202838</code>)라, 빨강 · 노랑을 얹으면 보색끼리 부딪칩니다.
       제안은 <b>명도는 그대로 두고 채도만 0.004 로</b> 내린 회색과, 색상각을 25°에 고정하고 명도만 내린 빨강입니다.
@@ -417,6 +452,22 @@
 </div>
 
 <script>
+/* 위험 Delta 비교 — 네 장을 띄우고 Delta 자리만 보이게 옮겨 키운다. */
+(function () {
+  var frames = document.querySelectorAll("[data-dc]");
+  if (!frames.length) { return; }
+  var X = 410, Y = 55, W = 290;
+  Array.prototype.forEach.call(frames, function (f) { f.src = "./screens/main-v2-2.html" + f.getAttribute("data-dc"); });
+  function fit() {
+    Array.prototype.forEach.call(frames, function (f) {
+      var k = (f.parentNode.clientWidth || W) / W;
+      f.style.transform = "scale(" + k + ") translate(" + (-X) + "px, " + (-Y) + "px)";
+    });
+  }
+  fit();
+  window.addEventListener("resize", fit);
+})();
+
 /* 제안 비교 — 두 화면을 같은 상태로 띄우고, 판 폭에 맞춰 1920×1080 을 줄인다. */
 (function () {
   var frames = document.querySelectorAll("[data-np-frame]");

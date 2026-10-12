@@ -1246,3 +1246,44 @@
 /* 주의 — 덜어내기 */
 .v2-2 .delta3.is-warning .delta3-light .blob { display: none; }
 .v2-2 .delta3.is-warning .delta3-light .lc { opacity: 0.15; }
+
+/* ==================================================================
+ * 제안 — 위험 Delta 를 "빛"으로 (2026-10-12 · 톤 실험실 비교용, ?delta=glass)
+ *
+ * 레퍼런스(Movado 기둥 · 1000 Miglia · 붉은 기둥)에서 뽑은 짜임:
+ *   ① 빛은 한 자리(아래 변)에서 나와 위로 사라진다 — 면 전체를 칠하지 않는다
+ *   ② 빛의 온도 — 심지는 밝은 주황빛 빨강, 올라가며 크림슨, 그다음 채도 빠진 회색을 지나 투명
+ *      (투명도로 쿨그레이 위에 얹으면 중간이 보라로 탁해진다 — 회색 정지점을 직접 넣고 oklab 에서 섞는다)
+ *   ③ 부드러운 빛 + 날 선 1px — 윗변 흰 반사선, 아래 변 붉은 선
+ *   ④ 결 — 아주 옅은 가로 줄(4px)로 매끈한 그라데이션의 밴딩을 깬다
+ *   ⑤ 판 바깥으로 살짝 번지는 붉은 빛(블룸)
+ * 판 자체는 지금 쿨그레이 유리판 그대로다.
+ * ================================================================== */
+:root[data-delta="glass"] .v2-2 .delta3.is-critical .delta3-light { display: none; }
+
+:root[data-delta="glass"] .v2-2 .delta3.is-critical:not(.is-open) .delta3-card,
+:root[data-delta="glass"] .v2-2 .delta3.is-critical.is-open {
+  background-color: color-mix(in srgb, var(--bg-surface-disabled) 55%, transparent);
+  background-image:
+    repeating-linear-gradient(0deg, rgb(255 255 255 / 3.5%) 0 1px, transparent 1px 4px),
+    linear-gradient(in oklab to top,
+      rgb(255 104 72 / 78%) 0%,
+      rgb(226 34 48 / 52%) 18%,
+      rgb(150 40 52 / 26%) 34%,
+      rgb(122 116 120 / 10%) 52%,
+      rgb(122 116 120 / 0%) 70%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 32%),
+    inset 0 -1px 0 rgb(255 96 80 / 90%),
+    inset 0 -14px 24px -12px rgb(255 72 60 / 55%),
+    0 14px 30px -16px rgb(235 40 40 / 60%);
+}
+
+/* 본문 상자 — 아래로 갈수록 비워 빛이 겹쳐 비쳐 올라오게 한다(겹겹이 투명한 판). 위쪽 그림자는 그대로. */
+:root[data-delta="glass"] .v2-2 .delta3.is-critical .delta3-body {
+  background-color: transparent;
+  background-image: linear-gradient(to bottom,
+    color-mix(in srgb, var(--bg-surface-disabled) 62%, transparent) 0%,
+    color-mix(in srgb, var(--bg-surface-disabled) 40%, transparent) 55%,
+    color-mix(in srgb, var(--bg-surface-disabled) 14%, transparent) 100%);
+}

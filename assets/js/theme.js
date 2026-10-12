@@ -40,6 +40,10 @@
   var palette = /[?&]palette=(neutral)/.exec(location.search);
   if (palette) { root.setAttribute("data-palette", palette[1]); }
 
+  // ?delta=glass — 톤 실험실의 위험 Delta 제안(빛으로 강조)을 씌워 본다. 저장하지 않는다.
+  var delta = /[?&]delta=(glass)/.exec(location.search);
+  if (delta) { root.setAttribute("data-delta", delta[1]); }
+
   if (button) {
     button.addEventListener("click", function () {
       var next = root.getAttribute("data-theme") === "light" ? "dark" : "light";
