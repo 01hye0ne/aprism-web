@@ -1219,8 +1219,13 @@
 :root[data-theme="light"] .v2-2 .delta3-body,
 :root[data-theme="light"] .v2-2 .delta3:not(.is-open) { box-shadow: inset 0 10px 8px 0 rgb(0 0 0 / 6%); }
 
-/* Delta 모서리에서 번지는 빛 — gray/600 원이 짙은 연기처럼 깔렸다. 옅은 회색으로. */
+/*
+ * Delta 모서리에서 번지는 빛 — gray/600 원이 짙은 연기처럼 깔렸다. 옅은 회색으로.
+ * 판 면(overlay-dark)과 안쪽 그림자는 뺀다 — 밝은 지도 위에서 260×260 네모 경계가 드러났다.
+ */
 :root[data-theme="light"] .v2-2 .delta3:not(.is-open) {
+  background-color: transparent;
+  box-shadow: none;
   background-image: radial-gradient(
     circle 226px at 0 0,
     color-mix(in srgb, var(--color-gray-400) 40%, transparent) 0%,
