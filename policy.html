@@ -100,7 +100,7 @@
         <li>주의 + 위험이 <b>5건 이상</b> 쌓이면 그 전체를 종합해 주의 또는 위험으로 말한다. 그 아래에서는 "알림 N건 관찰 중"으로 건수만 알린다.</li>
         <li>화면의 경고 색은 하나다 — <b>엣지 글로우 · Delta = max(목록에서 가장 높은 단계, Delta 종합 판단)</b>.</li>
         <li>Delta 와 엣지 글로우는 <b>미션과 상관없이 전체 알림</b>을 본다. 다른 미션의 알림은 상단 미션 메뉴에 점(주의 노랑 · 위험 빨강)으로 표시한다.</li>
-        <li>펼치면 알림 하나가 아니라 여러 알림에 대한 행동 버튼이 나온다. 주요 행동 하나만 강조한다.</li>
+        <li>펼치면 알림 하나가 아니라 여러 알림에 대한 행동 버튼이 나온다. 문구가 정해지기 전까지는 모두 같은 Secondary 로 둔다(4. 버튼 위계).</li>
       </ul>
 
       <h3>Delta 판 표현</h3>
@@ -215,8 +215,8 @@
         <tbody>
           <tr><td>① Danger</td><td><span class="swatch sw-danger">E-STOP</span></td><td>로봇 카드 [E-STOP]</td><td>되돌릴 수 없는 안전 행동만. 상태색 빨강을 버튼에 쓰는 유일한 예외다.</td></tr>
           <tr><td>② Accent</td><td><span class="swatch sw-accent">확인 처리</span></td><td>알림 쪽지 [확인 처리]</td><td>한 영역에 하나, 지금 할 주요 행동. 빨강 위에서도 파랑이다 — 빨강 버튼은 상태로 읽힌다.</td></tr>
-          <tr><td>③ Primary</td><td><span class="swatch sw-primary">전체 5</span></td><td>Delta 펼친 창의 첫 조치 · Delta 묻기 [보내기] · 고른 필터 칩</td><td>흰 면. Delta 가 권하는 첫 조치, 입력을 보내는 순간, "지금 고른 것". Delta 는 판단을 권하는 자리라 ②가 아니라 ③이다 — 파랑은 실제로 확정하는 [확인 처리] 몫.</td></tr>
-          <tr><td>④ Secondary</td><td><span class="swatch sw-secondary">자동복귀</span></td><td>[자동복귀] · Delta 나머지 조치 · 대화 칩 · 필터 칩</td><td>일반 행동. 여럿이 나란히 있어도 된다.</td></tr>
+          <tr><td>③ Primary</td><td><span class="swatch sw-primary">전체 5</span></td><td>Delta 묻기 [보내기] · 고른 필터 칩</td><td>흰 면. 입력을 보내는 순간과 "지금 고른 것"에만.</td></tr>
+          <tr><td>④ Secondary</td><td><span class="swatch sw-secondary">자동복귀</span></td><td>[자동복귀] · Delta 조치(첫 조치 포함) · 대화 칩 · 필터 칩</td><td>일반 행동. 여럿이 나란히 있어도 된다.</td></tr>
           <tr><td>⑤ Ghost</td><td><span class="swatch sw-ghost">전체보기</span></td><td>[전체보기] · [로봇 현황] · [상세보기] · 보고서 아이콘 · 대화 속 화면 잇기 칩(밑줄)</td><td>이동 · 보조. <code>fg/secondary</code>, hover 에서 <code>fg/primary</code>. 줄마다 반복되는 것은 아이콘만, hover 에서 글자.</td></tr>
           <tr><td>⑥ Icon</td><td>면 없는 아이콘</td><td>지도 도구 · 닫기 · 패널 접기 · 로봇 넘기기</td><td>도구. 줄 안에서 하나만 Secondary 면을 쓸 수 있다(지도 도구의 영상 리플레이).</td></tr>
         </tbody>
@@ -233,7 +233,7 @@
 
       <h3>이번에 고친 것 (10/13)</h3>
       <ul>
-        <li>Delta 펼친 창의 첫 조치가 주요 행동으로 만들어져 있었지만 나머지와 같은 회색으로 그려져 강조가 없었다 → ③ Primary(흰 면)로.</li>
+        <li>Delta 펼친 창의 첫 조치가 주요 행동으로 만들어져 있었지만 나머지와 같은 회색으로 그려져 있었다. ② · ③을 차례로 대 보고 <b>모두 ④ Secondary 로 맞춰 두기</b>로 했다 — 조치 문구가 정해지기 전이라 어느 하나를 주요 행동으로 세우지 않는다.</li>
       </ul>
 
       <div class="open">
@@ -241,7 +241,7 @@
         <ul>
           <li>"고른 것"의 면 — 필터 칩은 흰 면(③), 지도 층 고르기(B3 · B4)는 회색 면이다. 하나로 맞출지.</li>
           <li>Figma Button 의 Primary(흰) · Accent(파랑) 이름 — 일반적인 뜻(Primary = 브랜드색)과 거꾸로 읽혀 헷갈린다. 이름을 바꿀지.</li>
-          <li>Delta 첫 조치의 Primary(흰 면)를 Figma 에도 반영.</li>
+          <li>Delta 조치 문구가 정해지면 주요 행동 하나를 강조할지, 한다면 ②(파랑) · ③(흰 면) 중 무엇으로 할지.</li>
         </ul>
       </div>
     </section>

@@ -1709,14 +1709,8 @@
   font-weight: 500;
 }
 .v2-2 .delta3 .delta3-body > .ai-actions .btn:hover { background-color: var(--button-secondary-bg-hover); }
-/* 첫 조치는 주요 행동 — Primary 흰 면 하나 (버튼 위계 ③ · 화면 정책 4, 10/13 디자이너). 나머지는 Secondary 그대로.
- * 파랑(Accent)은 알림 쪽지 [확인 처리] 몫으로 남긴다 — Delta 는 판단을 권하는 자리라 한 단계 아래다. */
-.v2-2 .delta3 .delta3-body > .ai-actions .btn-primary {
-  border-color: transparent;
-  background-color: var(--button-primary-bg-default);
-  color: var(--button-primary-fg-default);
-}
-.v2-2 .delta3 .delta3-body > .ai-actions .btn-primary:hover { background-color: var(--button-primary-bg-hover); }
+/* 조치는 첫 것까지 모두 Secondary (10/13 디자이너) — 문구가 정해지기 전이라 어느 하나를 주요 행동으로 세우지 않는다.
+ * monitor.js 가 첫 버튼에 btn-primary 를 붙이지만 위 규칙이 같은 면으로 덮는다. 강조는 문구 확정 후 정한다(화면 정책 4). */
 .v2-2 .delta3.is-chat .delta3-body > .ai-actions,
 .v2-2 .delta3:not(.is-open) .delta3-body > .ai-actions { display: none; }
 /* 설명 문장은 제 높이만 — 남는 자리는 조치 줄 아래가 아니라 입력 칸 위로 간다. */
