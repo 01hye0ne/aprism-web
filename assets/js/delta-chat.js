@@ -146,6 +146,7 @@
     start();
     add(el("div", "dc-msg is-me", text));
     busy = true;
+    sync();
     win.classList.add("is-thinking");
     var wait = el("div", "dc-msg is-ai is-wait");
     wait.appendChild(el("span", "dc-typing"));
@@ -154,18 +155,26 @@
       wait.remove();
       win.classList.remove("is-thinking");
       busy = false;
+      sync();
       var r = reply(text);
       add(aiMsg(r.text, r.chips));
     }, 900);
+  }
+
+  // 보내기 단추는 글이 있고 답을 기다리지 않을 때만 보인다(CSS .has-text).
+  function sync() {
+    box.classList.toggle("has-text", !busy && input.value.trim() !== "");
   }
 
   function submit() {
     var text = input.value;
     input.value = "";
     ask(text);
+    sync();
     input.focus();
   }
 
+  input.addEventListener("input", sync);
   input.addEventListener("keydown", function (event) {
     if (event.key === "Enter" && !event.isComposing) { event.preventDefault(); submit(); }
   });

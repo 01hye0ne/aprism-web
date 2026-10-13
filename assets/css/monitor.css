@@ -1672,6 +1672,24 @@
 
 :root[data-theme="light"] .v2-2.v3 .delta3 .delta3-body .ai-input { border-top-color: rgb(0 0 0 / 8%); }
 
+/* 보내기 단추는 글이 있을 때만 (10/13 디자이너) — 빈 칸 · 답을 기다리는 동안엔 숨긴다.
+ * 자리는 그대로 두고 서서히 나타난다 — 쓰는 글이 옆으로 밀리지 않게. 숨은 동안엔 눌리지도, Tab 이 서지도 않는다. */
+.v2-2.v3 .delta3 .delta3-body .ai-send {
+  opacity: 0;
+  visibility: hidden;
+  transform: scale(.85);
+  transition: opacity .16s ease, transform .16s ease, visibility 0s linear .16s;
+}
+.v2-2.v3 .delta3 .delta3-body .ai-input.has-text .ai-send {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition: opacity .16s ease, transform .16s ease, visibility 0s;
+}
+@media (prefers-reduced-motion: reduce) {
+  .v2-2.v3 .delta3 .delta3-body .ai-send { transition: none; transform: none; }
+}
+
 /*
  * 펼친 첫 화면 — 조치 버튼은 설명 문장 바로 아래(대화 때 답 아래 칩과 같은 자리), 입력 칸은 늘 열려 있다.
  * 상자 아래 줄(조치 · 묻기 여닫기)은 비게 되어 숨긴다. 조치는 대화 칩과 같은 꼴(Secondary · 24).
