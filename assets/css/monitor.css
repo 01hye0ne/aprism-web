@@ -1532,7 +1532,14 @@
 .v2-2 .delta3.is-open.is-chat .delta3-body > .ai-line-2 { display: none; }
 .v2-2 .delta3.is-open.is-chat .delta3-suggest { display: none; }
 .v2-2 .delta3.is-open.is-chat .ai-input[hidden] { display: flex; }
-.v2-2 .delta3.is-open.is-chat .ai-input { margin-top: var(--space-8); }
+/*
+ * 줄 맞춤 — 입력 칸 상자는 대화 칸 상자와 같은 좌우 끝에, 입력 글은 메시지 글과 같은 왼쪽 선(8)에,
+ * 보내기 단추 오른쪽 끝은 내 말풍선 오른쪽 끝(8)에 맞춘다.
+ */
+.v2-2 .delta3.is-open.is-chat .ai-input {
+  margin: var(--space-8) 0 var(--space-4);
+  padding: var(--space-4) var(--space-8);
+}
 
 /* 대화 칸 — 위로 자라 지도 높이의 60% 안팎에서 멈춘다(창 머리 · 입력 칸 몫을 뺀 값). */
 .dc-thread {
@@ -1542,8 +1549,26 @@
   max-height: calc(60vh - 150px);
   min-height: 173px;
   overflow-y: auto;
-  padding: var(--space-8);
-  scrollbar-width: thin;
+  /* 오른쪽은 스크롤 자리(8)가 여백을 맡는다 — 막대가 생겨도 글이 밀리지 않게 늘 비워 둔다. */
+  padding: var(--space-8) 0 var(--space-8) var(--space-8);
+  scrollbar-gutter: stable;
+}
+
+/*
+ * 스크롤바 — 웨이포인트 목록 · 알림 목록과 같은 막대(border/default, 손이 닿으면 border/strong).
+ * 트랙 8 안에 4 짜리 막대. Chrome 은 표준 속성을 주면 ::-webkit-scrollbar 를 무시하므로 Firefox 쪽만 따로 준다.
+ */
+.dc-thread::-webkit-scrollbar { width: 8px; }
+.dc-thread::-webkit-scrollbar-track { background: transparent; }
+.dc-thread::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+  border-radius: var(--radius-pill);
+  background-color: var(--border-default);
+  background-clip: content-box;
+}
+.dc-thread::-webkit-scrollbar-thumb:hover { background-color: var(--border-strong); }
+@supports not selector(::-webkit-scrollbar) {
+  .dc-thread { scrollbar-width: thin; scrollbar-color: var(--border-default) transparent; }
 }
 
 .dc-msg p {
