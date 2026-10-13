@@ -1498,8 +1498,9 @@
 }
 
 /*
- * 펼친 창 머리 — Delta 아이콘을 16 → 12 로 줄여 "DELTA"(Mono 13 · 대문자 높이 약 9.5)와 무게를 맞춘다(10/13 디자이너).
- * 점 하나가 6.4 → 4.8 이 된다. 접힌 판의 모서리 표식은 그대로 둔다.
+ * 펼친 창 머리 — Delta 아이콘을 16 → 10 으로 줄여 "DELTA"(Mono 13 · 대문자 높이 약 9.5)와 무게를 맞춘다(10/13 디자이너).
+ * 10 은 viewBox 20 의 딱 절반이라 점 4 · 틈 2 가 정수 픽셀에 떨어진다 — 12(점 4.8)는 가장자리가 번져 더 무거워 보였다.
+ * 접힌 판의 모서리 표식은 그대로 둔다.
  */
-.v2-2 .delta3.is-open .delta3-name .delta-dots { width: 12px; height: 12px; }
+.v2-2 .delta3.is-open .delta3-name .delta-dots { width: 10px; height: 10px; }
 .v2-2 .delta3.is-open .delta3-name .delta3-name-in { gap: 6px; }
