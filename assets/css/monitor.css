@@ -1843,3 +1843,7 @@
   background-color: var(--map-glass-bg);
   clip-path: polygon(100% 0, 100% 100%, 0 100%);
 }
+
+/* 로봇 상태 줄(Mission · Battery · Signal) — 웨이포인트 칸(.step-card)과 같은 면 (10/13 디자이너).
+ * 유리 패널 안의 칸들이 한 단계로 맞는다. */
+.v2-2 .robot-strip.is-carousel .robot-row { background-color: var(--bg-surface-subtle); }
