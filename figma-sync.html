@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>APRISM — Figma 반영 목록</title>
+  <title>APRISM — 디자인 시스템 기록</title>
   <meta name="description" content="확정된 톤 작업을 Figma UI_00_Design System 에 반영하기 위한 변경 목록과 변경 로그" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -58,11 +58,12 @@
 <body>
 <div class="wrap">
   <header class="doc">
-    <p class="eyebrow">Design System · Change Set</p>
-    <h1>Figma 반영 목록</h1>
+    <p class="eyebrow">Design System · Record</p>
+    <h1>디자인 시스템 기록</h1>
     <p class="sub">
-      톤 실험실에서 확정한 값을 <code>UI_00_Design System</code> 에 옮기기 위한 변경 목록입니다.
-      Primitive 값 교체가 대부분이고 Semantic 바인딩 변경은 두 건입니다.
+      <code>UI_00_Design System</code> 에 옮길 변경(Figma 반영 목록)과 지난 검토 기록을 한 장에 모았습니다.
+      화면 규칙 자체는 <a href="./policy.html" style="color:inherit">화면 정책</a>에 있고, 여기는 Figma 작업용 값과 근거입니다.
+      맨 아래 "지난 검토"에 정리해 지운 페이지(데이터 서체 · Strands · Primitive 톤 감사)의 결론을 남겼습니다.
     </p>
   </header>
 
@@ -352,6 +353,25 @@
       <code>danger/400</code> 추가 건은 보류 중입니다 — Dark Danger 버튼이 hover 에서 어두워지는 문제를 해결하려면
       필요하지만, 그 버튼의 라벨 색이 흰색인지 어두운 색인지 확인이 필요합니다.
     </p>
+  </section>
+
+  <!-- 2026-10-13 — 잘 안 보게 된 검토 페이지 셋을 지우고 결론만 남긴다. 되살리려면 git show e01be8b:<파일> -->
+  <section>
+    <h2>지난 검토 — 정리해 지운 페이지</h2>
+    <p class="note">2026-10-13 에 지웠습니다. 원본은 저장소 이력에 있습니다 — <code>git show e01be8b:type-lab.html</code> 처럼 되살릴 수 있습니다.</p>
+    <div class="log">
+      <dl>
+        <dt>데이터 서체 검토</dt>
+        <dd><code>type-lab.html</code> · 2026-09-01. 수치 · 코드 · 시각 표기에 모노스페이스가 필요한지 비교했습니다.
+          결론 — 수치 · 타임스탬프는 <b>JetBrains Mono</b>(아래 5번 Text Style 신규의 Mono 계열), 본문은 SUIT.</dd>
+        <dt>Strands 검토</dt>
+        <dd><code>strands-lab.html</code> · 2026-09-03. React Bits 의 Strands 애니메이션을 원본 셰이더 그대로 돌려 본 페이지입니다.
+          결론 — 제품 화면에는 쓰지 않았습니다(엣지 글로우는 같은 라이브러리의 BorderGlow 변형). 라이선스 기록은 THIRD-PARTY.md 에 남겼습니다.</dd>
+        <dt>Primitive 톤 감사</dt>
+        <dd><code>tokens.html</code> · 2026-08-28. Figma Primitive 램프의 명도 · 색온도 · 대비를 실측한 문서입니다.
+          결론 — 그 진단이 이 문서 1~4번(Primitive 값 교체 · Semantic 바인딩 · Gradient)과 톤 실험실로 이어졌습니다.</dd>
+      </dl>
+    </div>
   </section>
 
   <footer class="doc">

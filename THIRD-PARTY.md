@@ -10,7 +10,7 @@
 | 항목 | 쓰는 곳 | 라이선스 | 제품에 넣어 팔 때 |
 |---|---|---|---|
 | React Bits — BorderGlow | 주의 상태 엣지 글로우 | MIT + Commons Clause | **가능** · 조건 있음 |
-| React Bits — Strands | `strands-lab.html` | MIT + Commons Clause | **가능** · 조건 있음 |
+| React Bits — Strands | 쓰지 않음 (검토 페이지 2026-10-13 삭제) | MIT + Commons Clause | 해당 없음 |
 | three.js | 지도(3D 모델) 렌더링 | MIT | 가능 |
 | JetBrains Mono | 수치·코드 표기 | SIL OFL 1.1 | 가능 |
 | IBM Plex Sans / Mono | 실험실 페이지 비교용 | SIL OFL 1.1 | 가능 |
@@ -64,14 +64,14 @@
   - 안쪽 면을 물들이는 층은 뺐습니다(지도 위에 색 얼룩이 상시로 뜨게 됩니다).
     테두리 링은 지도 때문에 원본의 배경색 덮기 대신 마스크로 잡았습니다 — 결과는 같습니다.
 
-### Strands — 검토용입니다
+### Strands — 쓰지 않습니다 (검토 페이지 삭제)
 
-- **쓰는 곳** — `strands-lab.html` (검토용 페이지). 실제 화면에는 얹지 않았습니다.
+- **쓰는 곳** — 없습니다. 검토용 `strands-lab.html` 은 2026-10-13 에 지웠습니다(저장소 이력 `e01be8b` 에 남아 있음). 실제 화면에는 얹은 적이 없습니다.
 - **출처** — <https://reactbits.dev/animations/strands> · 레지스트리 `https://reactbits.dev/r/Strands-JS-CSS.json`
 - 원본은 `ogl` 에 의존합니다. 이 저장소에는 빌드 단계가 없어서
   **프래그먼트 셰이더는 원본 그대로 두고 캔버스·uniform 껍데기만 순수 WebGL2 로 옮겼습니다.**
 
-저작권 표시는 `app-shell.css` 의 엣지 글로우 블록 머리와 `strands-lab.html` 의 스크립트 머리에
+저작권 표시는 `app-shell.css` 의 엣지 글로우 블록 머리에
 들어 있습니다 — 라이선스가 요구하는 사항이라 **다른 곳에 또 옮겨 쓸 때도 같이 따라가야 합니다.**
 
 **판매해도 됩니다.** 라이선스가 그 경우를 명시합니다.
@@ -108,7 +108,7 @@ CDN 이 죽으면 서체가 무너지고, 사용자 브라우저가 외부에 �
 
 ### IBM Plex Sans / Mono — SIL OFL 1.1
 
-- `tone-lab.html` · `type-lab.html` 의 서체 비교용입니다. 제품 화면에는 쓰지 않습니다.
+- `tone-lab.html` 의 서체 비교용입니다(`type-lab.html` 은 2026-10-13 삭제). 제품 화면에는 쓰지 않습니다.
 - <https://github.com/IBM/plex> · `LICENSE.txt`
 
 ### SUIT Variable — 확인 필요
