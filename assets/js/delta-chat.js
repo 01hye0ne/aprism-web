@@ -25,6 +25,9 @@
   var thread = null;
   var busy = false;
 
+  // 입력 칸을 설명 칸(대화 칸) 안 아래로 옮긴다 — 상자 하나 안에서 1px 선으로만 나뉜다(10/13 디자이너, 네모 안의 네모를 없앤다).
+  bodyBox.appendChild(box);
+
   function el(tag, cls, text) {
     var n = document.createElement(tag);
     if (cls) { n.className = cls; }
@@ -49,7 +52,7 @@
       thread.setAttribute("role", "log");
       thread.setAttribute("aria-live", "polite");
       thread.appendChild(aiMsg(first.textContent, []));
-      bodyBox.appendChild(thread);
+      bodyBox.insertBefore(thread, box);
       win.classList.add("is-chat");
     });
   }
