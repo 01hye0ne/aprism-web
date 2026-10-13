@@ -214,8 +214,8 @@
         <thead><tr><th>단계</th><th>모양</th><th>v2.2 에서 쓰는 곳</th><th>규칙</th></tr></thead>
         <tbody>
           <tr><td>① Danger</td><td><span class="swatch sw-danger">E-STOP</span></td><td>로봇 카드 [E-STOP]</td><td>되돌릴 수 없는 안전 행동만. 상태색 빨강을 버튼에 쓰는 유일한 예외다.</td></tr>
-          <tr><td>② Accent</td><td><span class="swatch sw-accent">확인 처리</span></td><td>알림 쪽지 [확인 처리] · Delta 펼친 창의 첫 조치</td><td>한 영역에 하나, 지금 할 주요 행동. 위험 Delta 위에서도 파랑이다 — 빨강 버튼은 상태로 읽힌다.</td></tr>
-          <tr><td>③ Primary</td><td><span class="swatch sw-primary">전체 5</span></td><td>Delta 묻기 [보내기] · 고른 필터 칩</td><td>흰 면. 입력을 보내는 순간과 "지금 고른 것"에만.</td></tr>
+          <tr><td>② Accent</td><td><span class="swatch sw-accent">확인 처리</span></td><td>알림 쪽지 [확인 처리]</td><td>한 영역에 하나, 지금 할 주요 행동. 빨강 위에서도 파랑이다 — 빨강 버튼은 상태로 읽힌다.</td></tr>
+          <tr><td>③ Primary</td><td><span class="swatch sw-primary">전체 5</span></td><td>Delta 펼친 창의 첫 조치 · Delta 묻기 [보내기] · 고른 필터 칩</td><td>흰 면. Delta 가 권하는 첫 조치, 입력을 보내는 순간, "지금 고른 것". Delta 는 판단을 권하는 자리라 ②가 아니라 ③이다 — 파랑은 실제로 확정하는 [확인 처리] 몫.</td></tr>
           <tr><td>④ Secondary</td><td><span class="swatch sw-secondary">자동복귀</span></td><td>[자동복귀] · Delta 나머지 조치 · 대화 칩 · 필터 칩</td><td>일반 행동. 여럿이 나란히 있어도 된다.</td></tr>
           <tr><td>⑤ Ghost</td><td><span class="swatch sw-ghost">전체보기</span></td><td>[전체보기] · [로봇 현황] · [상세보기] · 보고서 아이콘 · 대화 속 화면 잇기 칩(밑줄)</td><td>이동 · 보조. <code>fg/secondary</code>, hover 에서 <code>fg/primary</code>. 줄마다 반복되는 것은 아이콘만, hover 에서 글자.</td></tr>
           <tr><td>⑥ Icon</td><td>면 없는 아이콘</td><td>지도 도구 · 닫기 · 패널 접기 · 로봇 넘기기</td><td>도구. 줄 안에서 하나만 Secondary 면을 쓸 수 있다(지도 도구의 영상 리플레이).</td></tr>
@@ -233,7 +233,7 @@
 
       <h3>이번에 고친 것 (10/13)</h3>
       <ul>
-        <li>Delta 펼친 창의 첫 조치가 주요 행동으로 만들어져 있었지만 나머지와 같은 회색으로 그려져 강조가 없었다 → ② Accent 로.</li>
+        <li>Delta 펼친 창의 첫 조치가 주요 행동으로 만들어져 있었지만 나머지와 같은 회색으로 그려져 강조가 없었다 → ③ Primary(흰 면)로.</li>
       </ul>
 
       <div class="open">
@@ -241,7 +241,7 @@
         <ul>
           <li>"고른 것"의 면 — 필터 칩은 흰 면(③), 지도 층 고르기(B3 · B4)는 회색 면이다. 하나로 맞출지.</li>
           <li>Figma Button 의 Primary(흰) · Accent(파랑) 이름 — 일반적인 뜻(Primary = 브랜드색)과 거꾸로 읽혀 헷갈린다. 이름을 바꿀지.</li>
-          <li>Delta 첫 조치의 Accent 를 Figma 에도 반영.</li>
+          <li>Delta 첫 조치의 Primary(흰 면)를 Figma 에도 반영.</li>
         </ul>
       </div>
     </section>
