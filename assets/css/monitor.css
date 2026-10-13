@@ -1794,6 +1794,22 @@
  * 바깥 1px 테(box-shadow)는 걷는다. 위험은 지금처럼 네 변 전부다 — 둘의 강약이 테 길이로도 갈린다.
  * ================================================================== */
 .v2-2 .two-col.is-warning { box-shadow: none; }
-.v2-2 .two-col.is-warning::after {
+/*
+ * 변을 따라 나가는 선은 상자 테(::after, z 2)가 아니라 깎인 선과 같은 층(.edge-corner, z 7)에 그린다.
+ * 테는 접힌 Delta 판(z 6) 밑에 깔려 흐려져서, 미니창일 때 깎인 선과 이어지는 자리에서 끊겨 보였다(10/13).
+ * 같은 층 · 같은 drop-shadow 라 두께 · 밝기가 한 줄로 이어진다.
+ */
+.v2-2 .two-col.is-warning::after { display: none; }
+.v2-2.v3 .two-col.is-warning > .edge-corner { width: 200px; height: 200px; }
+.v2-2 .two-col.is-warning > .edge-corner::after {
+  content: "";
+  position: absolute;
+  inset: 0;
   background: radial-gradient(circle 200px at 0 0, var(--glow-color) 62px, transparent 100%);
+  -webkit-mask:
+    linear-gradient(#000 0 0) 62px 0 / calc(100% - 62px) 1px no-repeat,
+    linear-gradient(#000 0 0) 0 62px / 1px calc(100% - 62px) no-repeat;
+  mask:
+    linear-gradient(#000 0 0) 62px 0 / calc(100% - 62px) 1px no-repeat,
+    linear-gradient(#000 0 0) 0 62px / 1px calc(100% - 62px) no-repeat;
 }
