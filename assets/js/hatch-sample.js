@@ -1,5 +1,5 @@
 /*
- * 해칭 시험판이 쓰는 공장 사진 — assets/img/hatch-sample-factory.jpg 를 데이터 URI 로 담았다.
+ * 비식별화 패턴 비교(screens/deid-lab.html)가 쓰는 공장 사진 — 원래 해칭 시험판(2026-10-13 삭제)용이었다 — assets/img/hatch-sample-factory.jpg 를 데이터 URI 로 담았다.
  *
  * 왜 파일을 바로 안 읽나: file:// 로 연 화면에서 file:// 그림을 WebGL 텍스처로 올리면
  * 브라우저가 교차 출처로 보고 막는다. 이 저장소는 서버 없이 열어 보는 판이라
