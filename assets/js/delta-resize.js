@@ -2,8 +2,8 @@
  * Delta 창 너비 조절 (v2.2 · 2026-10-13 디자이너) — 펼친 창 · 대화 중 모두.
  *
  *   · 창의 왼쪽 · 오른쪽 변을 잡아 끈다. 오른쪽 변은 왼쪽 변을, 왼쪽 변은 오른쪽 변을 그 자리에 둔다.
- *   · 395(Figma 펼친 창) 아래로는 줄지 않고, 720 또는 무대 폭(-16) 위로는 늘지 않는다.
- *   · 정한 너비는 기억한다 — 접었다 다시 펼쳐도 그 너비다. 변을 두 번 누르면 395 로 돌아간다.
+ *   · 처음엔 395(Figma 펼친 창). 320(오른쪽 패널 너비) 아래로는 줄지 않고, 720 또는 무대 폭(-16) 위로는 늘지 않는다.
+ *   · 정한 너비는 기억한다 — 접었다 다시 펼쳐도 그 너비다. 변을 두 번 누르거나 Home 을 누르면 395 로 돌아간다.
  *   · 너비는 --d3-w 변수로만 넣는다. 접힌 판(260)은 건드리지 않는다.
  *   · 손잡이는 role="separator" — Tab 으로 가서 ← → 로 16씩 바꾼다.
  *
@@ -18,10 +18,11 @@
   if (!win) { return; }
   var stage = win.parentElement;
 
-  var MIN = 395;
+  var MIN = 320;      // 오른쪽 패널(col-3) 너비와 같다(10/13 디자이너)
+  var START = 395;    // 처음 펼친 너비 — Figma 펼친 창
   var MAX = 720;
   var STEP = 16;
-  var width = MIN;
+  var width = START;
 
   function isOpen() { return win.classList.contains("is-open"); }
   function most() { return Math.max(MIN, Math.min(MAX, stage.clientWidth - 16)); }
@@ -48,7 +49,7 @@
     g.setAttribute("aria-label", "Delta 창 너비");
     g.setAttribute("aria-valuemin", String(MIN));
     g.setAttribute("aria-valuemax", String(MAX));
-    g.setAttribute("aria-valuenow", String(MIN));
+    g.setAttribute("aria-valuenow", String(START));
     g.title = "끌어서 너비 조절 · 두 번 눌러 처음 너비로";
     win.appendChild(g);
 
@@ -75,10 +76,10 @@
     }
     g.addEventListener("pointerup", drop);
     g.addEventListener("pointercancel", drop);
-    g.addEventListener("dblclick", function () { set(MIN, side); window.dispatchEvent(new Event("resize")); });
+    g.addEventListener("dblclick", function () { set(START, side); window.dispatchEvent(new Event("resize")); });
     g.addEventListener("keydown", function (event) {
       var d = event.key === "ArrowRight" ? STEP : event.key === "ArrowLeft" ? -STEP : 0;
-      if (event.key === "Home") { set(MIN, side); event.preventDefault(); return; }
+      if (event.key === "Home") { set(START, side); event.preventDefault(); return; }
       if (!d) { return; }
       event.preventDefault();
       set(win.offsetWidth + (side === "left" ? -d : d), side);
