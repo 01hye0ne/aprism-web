@@ -1657,7 +1657,8 @@
 .v2-2.v3 .delta3 .delta3-body .ai-input,
 .v2-2.v3 .delta3 .delta3-body .ai-input:focus-within {
   margin: auto calc(var(--space-8) * -1) calc(var(--space-8) * -1);
-  padding: var(--space-4) var(--space-8);
+  /* 사방 8 — 설명 칸 안쪽 여백(8)과 같다. 보내기 단추가 구분선 · 아래 변 · 오른쪽 변에서 똑같이 8 떨어진다. */
+  padding: var(--space-8);
   border-radius: 0;
   background: none;
   border-top: var(--border-width-thin) solid rgb(255 255 255 / 8%);
