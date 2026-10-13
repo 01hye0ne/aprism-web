@@ -1787,3 +1787,13 @@
   font-size: var(--font-size-13);
   line-height: var(--font-line-height-20);
 }
+
+/* ==================================================================
+ * 주의 엣지 글로우 — Delta 모서리에만 (10/13 디자이너, 주의 강도를 더 덜어낸다)
+ * 깎인 선(.edge-corner)은 그대로 두고, 상자 테는 모서리에서 위 · 왼쪽 변을 따라 조금 나가다 사라진다.
+ * 바깥 1px 테(box-shadow)는 걷는다. 위험은 지금처럼 네 변 전부다 — 둘의 강약이 테 길이로도 갈린다.
+ * ================================================================== */
+.v2-2 .two-col.is-warning { box-shadow: none; }
+.v2-2 .two-col.is-warning::after {
+  background: radial-gradient(circle 200px at 0 0, var(--glow-color) 62px, transparent 100%);
+}
