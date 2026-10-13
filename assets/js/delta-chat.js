@@ -59,6 +59,7 @@
       bodyBox.insertBefore(thread, box);
       win.classList.add("is-chat");
     });
+    hint();
   }
 
   function aiMsg(text, chips) {
@@ -161,6 +162,18 @@
     }, 900);
   }
 
+  // 묻기 칸 안내 문구 — 단계에 맞춰 '더 알고 싶은 것'으로 좁힌다(10/13 디자이너). 대화 중엔 "이어서".
+  //   설비 이름은 넣지 않는다(알림이 바뀌면 낡고 칸을 넘친다). 조치 버튼과 겹치지 않게 '묻기'로만 둔다.
+  var HINT = {
+    critical: "원인이나 조치를 물어보세요",
+    warning: "주의 알림에 대해 물어보세요",
+    normal: "현장이나 로봇 상황을 물어보세요"
+  };
+  function hint() {
+    input.placeholder = thread ? "이어서 물어보세요" : (HINT[body.getAttribute("data-level")] || HINT.normal);
+  }
+  hint();
+
   // 보내기 단추는 글이 있고 답을 기다리지 않을 때만 보인다(CSS .has-text).
   function sync() {
     box.classList.toggle("has-text", !busy && input.value.trim() !== "");
@@ -187,6 +200,7 @@
     var now = body.getAttribute("data-level");
     if (now === lastLevel) { return; }
     lastLevel = now;
+    hint();
     if (!thread) { return; }
     var sys = el("div", "dc-sys is-" + now, "상황이 바뀌었어요 — 지금 " + (WORD[now] || now) + " 단계");
     add(sys);
@@ -202,5 +216,6 @@
     thread.remove();
     thread = null;
     win.classList.remove("is-chat");
+    hint();
   });
 })();
