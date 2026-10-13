@@ -1518,3 +1518,112 @@
 :root[data-theme="light"] .v2-2.v3 .delta3,
 :root[data-theme="light"] .v2-2.v3 .delta3.is-warning,
 :root[data-theme="light"] .v2-2.v3 .delta3.is-critical { --ai-input-edge: linear-gradient(var(--color-gray-600), var(--color-gray-600)); }
+
+/* ==================================================================
+ * Delta 대화 (v2.2 · 2026-10-13 시안 — delta-chat.js)
+ * 펼친 창의 설명 칸이 대화창이 된다. 제목 줄은 고정, 고정 조치 줄은 숨고 조치는 마지막 답 아래 칩으로.
+ * 말풍선은 무채색 — 색 위계상 대화는 상태가 아니다. 붉은 빛은 창 머리에만 남는다.
+ * ================================================================== */
+.v2-2 .delta3.is-open.is-chat .delta3-body {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+}
+.v2-2 .delta3.is-open.is-chat .delta3-body > .ai-line-2 { display: none; }
+.v2-2 .delta3.is-open.is-chat .delta3-suggest { display: none; }
+.v2-2 .delta3.is-open.is-chat .ai-input[hidden] { display: flex; }
+.v2-2 .delta3.is-open.is-chat .ai-input { margin-top: var(--space-8); }
+
+/* 대화 칸 — 위로 자라 지도 높이의 60% 안팎에서 멈춘다(창 머리 · 입력 칸 몫을 뺀 값). */
+.dc-thread {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  max-height: calc(60vh - 150px);
+  min-height: 173px;
+  overflow-y: auto;
+  padding: var(--space-8);
+  scrollbar-width: thin;
+}
+
+.dc-msg p {
+  margin: 0;
+  color: var(--fg-primary);
+  font-size: var(--font-size-14);
+  line-height: var(--font-line-height-22);
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+/* Delta — 말풍선 없이 글만. 내 메시지 — 오른쪽 옅은 말풍선. */
+.dc-msg.is-ai { align-self: stretch; }
+.dc-msg.is-me {
+  align-self: flex-end;
+  max-width: 80%;
+  padding: var(--space-4) var(--space-12);
+  border-radius: 12px 12px 4px 12px;
+  background-color: rgb(255 255 255 / 10%);
+  color: var(--fg-primary);
+  font-size: var(--font-size-14);
+  line-height: var(--font-line-height-22);
+  word-break: keep-all;
+}
+:root[data-theme="light"] .dc-msg.is-me { background-color: rgb(0 0 0 / 6%); }
+
+.dc-chips { display: flex; flex-wrap: wrap; gap: var(--space-4); margin-top: var(--space-8); }
+.dc-chip {
+  border: var(--border-width-thin) solid var(--button-secondary-border-default);
+  background-color: var(--button-secondary-bg-default);
+  color: var(--button-secondary-fg-default);
+}
+.dc-chip:hover { background-color: var(--button-secondary-bg-hover); }
+/* 화면과 잇는 칩 — 이동이라 무채색 글자 링크 꼴(색 위계 ③). */
+.dc-chip.is-go {
+  border-color: transparent;
+  background: none;
+  padding-left: 0;
+  color: var(--fg-secondary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.dc-chip.is-go:hover { color: var(--fg-primary); background: none; }
+
+/* 시스템 한 줄 — 대화 중 상황이 바뀌었을 때. 단계 색은 점에만. */
+.dc-sys {
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4);
+  color: var(--fg-tertiary);
+  font-size: var(--font-size-12);
+}
+.dc-sys::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background-color: var(--fg-tertiary); }
+.dc-sys.is-critical::before { background-color: var(--status-critical-icon); }
+.dc-sys.is-warning::before { background-color: var(--status-warning-icon); }
+
+/* 답을 기다리는 동안 — 말줄임 점 셋 */
+.dc-typing { display: inline-flex; gap: 4px; padding: var(--space-4) 0; }
+.dc-typing::before, .dc-typing::after, .dc-typing { position: relative; }
+.dc-typing::before, .dc-typing::after {
+  content: "";
+  width: 6px; height: 6px; border-radius: 50%;
+  background-color: var(--fg-tertiary);
+  animation: dc-type 1s ease-in-out infinite;
+}
+.dc-typing::after { animation-delay: 0.2s; }
+@keyframes dc-type { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+
+/* Delta 아이콘 — 생각하는 동안 흰 점이 1-2-3 으로 차례로 숨 쉰다. 주의 · 위험의 깜빡임(노랑 · 빨강)과 색으로 갈린다. */
+.v2-2 .delta3.is-thinking .delta3-name .delta-dots rect {
+  fill: var(--fg-primary) !important;
+  transform: none !important;
+  animation: dd-think 1.2s ease-in-out infinite !important;
+}
+.v2-2 .delta3.is-thinking .delta3-name .delta-dots .dd-2 { animation-delay: 0.2s !important; }
+.v2-2 .delta3.is-thinking .delta3-name .delta-dots .dd-3 { animation-delay: 0.4s !important; }
+@keyframes dd-think { 0%, 100% { opacity: 0.3; } 40% { opacity: 1; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .dc-typing::before, .dc-typing::after,
+  .v2-2 .delta3.is-thinking .delta3-name .delta-dots rect { animation: none !important; }
+}
