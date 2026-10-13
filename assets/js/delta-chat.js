@@ -27,6 +27,10 @@
 
   // 입력 칸을 설명 칸(대화 칸) 안 아래로 옮긴다 — 상자 하나 안에서 1px 선으로만 나뉜다(10/13 디자이너, 네모 안의 네모를 없앤다).
   bodyBox.appendChild(box);
+  // 조치 버튼도 설명 문장 바로 아래로 — 대화 때 답 아래 칩과 같은 자리(10/13). 입력 칸은 늘 열어 둔다.
+  var acts = win.querySelector("[data-ai-actions]");
+  if (acts) { bodyBox.insertBefore(acts, box); }
+  box.hidden = false;
 
   function el(tag, cls, text) {
     var n = document.createElement(tag);
