@@ -1425,7 +1425,7 @@
 }
 
 /* ==================================================================
- * 시안(?glow=top) — 위험의 빛을 왼쪽 위 모서리에서 (2026-10-12 · 톤 실험실 비교용)
+ * 위험의 빛을 왼쪽 위 모서리에서 — v2.2 기본(html data-glow="top", 2026-10-13 채택). ?glow=off 면 아래 변의 빛
  *   빛이 Delta 아이콘(깜빡이는 점) · 깎인 모서리 엣지 글로우와 같은 자리에서 나와 판으로 번진다.
  *   가장 진한 곳은 모서리 바깥쪽에 두고 제목 글자 밑은 한 단 옅게 — 흰 제목 대비를 지킨다.
  *   빛은 판 높이의 3분의 1 남짓에서 사라진다. 본문 상자는 위를 비우고 아래로 갈수록 누른다.
@@ -1433,7 +1433,7 @@
 :root[data-glow="top"][data-delta="glass"] .v2-2 .delta3.is-critical:not(.is-open) .delta3-card,
 :root[data-glow="top"][data-delta="glass"] .v2-2 .delta3.is-critical.is-open {
   background-image:
-    radial-gradient(in oklab 150% 85% at 0% 0%,
+    radial-gradient(in oklab 155% 88% at -5% -6%,
       rgb(255 104 72 / 82%) 0%,
       rgb(236 44 50 / 58%) 20%,
       rgb(170 40 52 / 30%) 40%,
@@ -1454,7 +1454,7 @@
 :root[data-theme="light"][data-glow="top"][data-delta="glass"] .v2-2 .delta3.is-critical:not(.is-open) .delta3-card,
 :root[data-theme="light"][data-glow="top"][data-delta="glass"] .v2-2 .delta3.is-critical.is-open {
   background-image:
-    radial-gradient(in oklab 150% 85% at 0% 0%,
+    radial-gradient(in oklab 155% 88% at -5% -6%,
       rgb(255 92 60 / 78%) 0%,
       rgb(255 128 92 / 52%) 20%,
       rgb(255 176 146 / 28%) 40%,
