@@ -1718,3 +1718,41 @@
 .v2-2 .delta3:not(.is-open) .delta3-body > .ai-actions { display: none; }
 /* 설명 문장은 제 높이만 — 남는 자리는 조치 줄 아래가 아니라 입력 칸 위로 간다. */
 .v2-2 .delta3.is-open .delta3-body > .ai-line-2 { flex: none; }
+
+/* ==================================================================
+ * Delta 창 너비 조절 (10/13 디자이너) — delta-resize.js 가 --d3-w 를 넣는다. 접힌 판은 그대로 260.
+ * 손잡이는 좌우 변 안쪽 8px 띠. 평소엔 안 보이고, 올리거나 Tab 으로 가면 가운데에 짧은 막대가 뜬다.
+ * ================================================================== */
+.v2-2.v3 .delta3.is-open { width: var(--d3-w, 395px); }
+.v2-2 .delta3 .d3-grip { display: none; }
+.v2-2 .delta3.is-open .d3-grip {
+  display: block;
+  position: absolute;
+  top: 40px;
+  bottom: 12px;
+  width: 8px;
+  z-index: 3;
+  cursor: ew-resize;
+  touch-action: none;
+  outline: none;
+}
+.v2-2 .delta3.is-open .d3-grip.is-left { left: 0; }
+.v2-2 .delta3.is-open .d3-grip.is-right { right: 0; }
+.v2-2 .delta3.is-open .d3-grip::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 3px;
+  width: 2px;
+  height: 32px;
+  margin-top: -16px;
+  border-radius: 1px;
+  background: var(--fg-tertiary);
+  opacity: 0;
+  transition: opacity .12s ease;
+}
+.v2-2 .delta3.is-open .d3-grip:hover::after,
+.v2-2 .delta3.is-resizing .d3-grip::after { opacity: .7; }
+.v2-2 .delta3.is-open .d3-grip:focus-visible::after { opacity: 1; background: var(--fg-primary); }
+.v2-2 .delta3.is-resizing,
+.v2-2 .delta3.is-resizing * { cursor: ew-resize; user-select: none; }
