@@ -1709,6 +1709,13 @@
   font-weight: 500;
 }
 .v2-2 .delta3 .delta3-body > .ai-actions .btn:hover { background-color: var(--button-secondary-bg-hover); }
+/* 첫 조치는 주요 행동 — Accent 파랑 면 하나 (버튼 위계 ② · 화면 정책 4). 나머지는 Secondary 그대로. */
+.v2-2 .delta3 .delta3-body > .ai-actions .btn-primary {
+  border-color: transparent;
+  background-color: var(--button-accent-bg-default);
+  color: var(--button-accent-fg-default);
+}
+.v2-2 .delta3 .delta3-body > .ai-actions .btn-primary:hover { background-color: var(--button-accent-bg-hover); }
 .v2-2 .delta3.is-chat .delta3-body > .ai-actions,
 .v2-2 .delta3:not(.is-open) .delta3-body > .ai-actions { display: none; }
 /* 설명 문장은 제 높이만 — 남는 자리는 조치 줄 아래가 아니라 입력 칸 위로 간다. */
