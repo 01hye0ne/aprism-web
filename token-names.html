@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>APRISM — 토큰 이름 대조표</title>
+  <meta name="description" content="Figma 색 변수 이름을 디자이너가 고르기 쉽게 — 지금 이름 → 새 이름, 고르는 창에 뜨는 자리, 코드 사용 수" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/static/woff2/SUIT.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" />
+  <link rel="stylesheet" href="./assets/css/tokens.css?v=4aceab62" />
+  <link rel="stylesheet" href="./assets/css/base.css?v=da609ee5" />
+  <style>
+    /* 대조표 한 장 — 꾸밈은 여기에 둔다. 값은 토큰만 쓴다. (policy.html 과 같은 짜임) */
+    .site-main { max-width: 1180px; }
+    .toc { display: flex; flex-wrap: wrap; gap: var(--space-8); margin: var(--space-24) 0 0; padding: 0; list-style: none; }
+    .toc a {
+      display: inline-block; padding: var(--space-4) var(--space-12);
+      border: var(--border-width-thin) solid var(--border-default); border-radius: var(--radius-pill);
+      color: var(--fg-secondary); font-size: var(--font-size-13); text-decoration: none;
+    }
+    .toc a:hover { color: var(--fg-primary); border-color: var(--border-strong); }
+    .pol { margin-top: var(--space-48); scroll-margin-top: var(--space-16); }
+    .pol h2 { margin: 0 0 var(--space-4); font-size: var(--font-size-20); line-height: var(--font-line-height-28); }
+    .pol .meta { margin: 0 0 var(--space-16); color: var(--fg-tertiary); font-size: var(--font-size-12); }
+    .pol h3 { margin: var(--space-32) 0 var(--space-8); font-size: var(--font-size-14); color: var(--fg-secondary); }
+    .pol h3 .cnt { margin-left: var(--space-4); color: var(--fg-tertiary); font-weight: 400; }
+    .pol p, .pol li { color: var(--fg-secondary); font-size: var(--font-size-14); line-height: var(--font-line-height-22); word-break: keep-all; }
+    .pol p { margin: 0 0 var(--space-8); }
+    .pol ul, .pol ol { margin: 0 0 var(--space-8); padding-left: var(--space-20); }
+    .pol b { color: var(--fg-primary); }
+    .rule {
+      margin: 0 0 var(--space-16); padding: var(--space-12) var(--space-16);
+      border-left: 3px solid var(--border-brand); background-color: var(--bg-surface-default);
+      border-radius: 0 var(--radius-card) var(--radius-card) 0;
+      color: var(--fg-primary); font-weight: 600;
+    }
+    .tbl { width: 100%; border-collapse: collapse; font-size: var(--font-size-13); margin-bottom: var(--space-8); }
+    .tbl th, .tbl td { padding: var(--space-8) var(--space-12); border-bottom: var(--border-width-thin) solid var(--border-subtle); text-align: left; vertical-align: top; word-break: keep-all; }
+    .tbl th { color: var(--fg-tertiary); font-weight: 600; font-size: var(--font-size-12); white-space: nowrap; }
+    .tbl td { color: var(--fg-secondary); }
+    .tbl td:nth-child(1), .tbl td:nth-child(2) { white-space: nowrap; }
+    .tbl .num { text-align: right; font-variant-numeric: tabular-nums; color: var(--fg-tertiary); }
+    code { font-family: "JetBrains Mono", monospace; font-size: 0.92em; color: var(--fg-primary); }
+    .scroll { overflow-x: auto; }
+    .sc { display: inline-block; margin: 0 2px 2px 0; padding: 0 6px; border-radius: var(--radius-2, 2px); background: var(--bg-surface-subtle); color: var(--fg-secondary); font-size: var(--font-size-12); line-height: 20px; white-space: nowrap; }
+    .act { display: inline-block; padding: 0 6px; border-radius: var(--radius-2, 2px); font-size: var(--font-size-12); line-height: 20px; white-space: nowrap; border: var(--border-width-thin) solid var(--border-default); color: var(--fg-secondary); }
+    .act.a-keep { color: var(--fg-tertiary); border-color: transparent; }
+    .act.a-ren { color: var(--fg-primary); }
+    .act.a-mrg, .act.a-del { color: var(--fg-primary); border-style: dashed; }
+    .act.a-chk { color: var(--status-warning-fg); border-color: var(--status-warning-border); }
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: var(--space-8); margin: var(--space-16) 0; }
+    .stat { padding: var(--space-12) var(--space-16); border: var(--border-width-thin) solid var(--border-subtle); border-radius: var(--radius-card); }
+    .stat .k { color: var(--fg-tertiary); font-size: var(--font-size-12); }
+    .stat .v { color: var(--fg-primary); font-size: var(--font-size-20); font-weight: 700; font-variant-numeric: tabular-nums; }
+    .stat .v small { color: var(--fg-tertiary); font-size: var(--font-size-13); font-weight: 400; }
+    .open {
+      margin-top: var(--space-16); padding: var(--space-12) var(--space-16);
+      border: var(--border-width-thin) solid var(--status-warning-border); border-radius: var(--radius-card);
+    }
+    .open h3 { margin-top: 0; color: var(--status-warning-fg); }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span class="brand-name">APRISM</span>
+    </div>
+    <a href="./index.html" class="theme-toggle" style="text-decoration:none">목록으로</a>
+  </header>
+
+  <main class="site-main">
+    <section class="intro">
+      <p class="eyebrow">Token Naming</p>
+      <h1>토큰 이름 대조표</h1>
+      <p class="lead">Figma 색 변수를 디자이너가 이름만 보고 고를 수 있게 바꾸는 제안입니다. 아직 Figma · 코드에는 반영하지 않았습니다.
+        확정하면 Figma 변수 → 코드 순서로 바꿉니다.</p>
+      <ul class="toc">
+        <li><a href="#why">왜 바꾸나</a></li>
+        <li><a href="#rule">원칙</a></li>
+        <li><a href="#prim">기본 팔레트</a></li>
+        <li><a href="#sem">의미 토큰</a></li>
+        <li><a href="#comp">컴포넌트 토큰</a></li>
+        <li><a href="#new">새로 만들 토큰</a></li>
+        <li><a href="#steps">진행 순서</a></li>
+      </ul>
+    </section>
+
+    <section class="pol" id="why">
+      <h2>왜 바꾸나</h2>
+      <p class="meta">Figma 파일 실측 2026-10-14 · 색 변수 203개(기본 62 · 의미 141)</p>
+      <p class="rule">칠할 때 후보가 너무 많고, 이름만으로는 무엇을 골라야 할지 알 수 없다.</p>
+      <ul>
+        <li><b>후보가 많다</b> — 프레임을 칠할 때 약 86개, 글자는 약 53개, 선은 약 44개가 뜬다. 글자색이 프레임 후보에 섞여 있고, 로봇 그림 · 빛 색 15개는 "어디에나" 뜬다.</li>
+        <li><b>컴포넌트 전용 색이 섞인다</b> — 버튼 · 알림 안에서만 쓰는 색(약 60개)이 일반 패널을 칠할 때도 뜬다. 버튼 바탕이 패널에 쓰이는 일이 여기서 생긴다.</li>
+        <li><b>이름과 쓰임이 다르다</b> — <code>bg/surface/disabled</code> 를 Delta 유리판에, "light" 라는 <code>overlay-light</code> 는 다크에서 어두운 값, 흰 버튼이 <code>button/primary</code>.</li>
+        <li><b>한 뜻에 단어가 여럿</b> — 위험 critical · danger, 안전 normal · safe, 파랑 main · brand · accent.</li>
+      </ul>
+    </section>
+
+    <section class="pol" id="rule">
+      <h2>원칙</h2>
+      <ol>
+        <li><b>이름은 쓰는 자리 + 역할</b> — <code>bg/panel</code> · <code>bg/cell</code> · <code>bg/glass</code> 처럼 화면에서 부르는 말로.</li>
+        <li><b>한 뜻 한 단어</b> — 위험 <code>critical</code> · 주의 <code>warning</code> · 안전 <code>safe</code> · 정보 <code>info</code>. 모든 층이 같다.</li>
+        <li><b>기본 팔레트는 색 이름</b> — <code>main</code> → <code>blue</code>, <code>danger</code> → <code>red</code>, <code>safe</code> → <code>green</code>, <code>warning</code> → <code>yellow</code>.</li>
+        <li><b>모드에 따라 뒤집히는 말은 쓰지 않는다</b> — light · dark 대신 쓰임이나 세기로.</li>
+        <li><b>짝을 이름에 드러낸다</b> — <code>bg/inverse</code> 위에는 <code>text/on-inverse</code>.</li>
+        <li><b>고르는 창에 뜨는 자리를 좁힌다</b> — 글자색은 글자 · 아이콘에만, 바탕은 프레임 · 도형에만, 선은 선에만. 빛은 효과에만.</li>
+        <li><b>컴포넌트 전용 색은 <code>comp/</code> 아래로</b> — 고르는 창에서 한 묶음으로 접혀 일반 후보와 갈린다. 라이브러리 공개에서도 숨긴다.</li>
+        <li><b>설명은 실제 값 기준 한 줄</b> — 고를 때 마우스를 올리면 보이는 "쓰는 곳"(아래 표 마지막 칸).</li>
+      </ol>
+      <div class="stats">
+        <div class="stat"><div class="k">의미 토큰 수</div><div class="v">133 <small>← 141 + 새 3</small></div></div>
+        <div class="stat"><div class="k">프레임 칠할 때 일반 후보</div><div class="v">31 <small>← 약 86</small></div></div>
+        <div class="stat"><div class="k">글자 칠할 때 일반 후보</div><div class="v">14 <small>← 약 53</small></div></div>
+        <div class="stat"><div class="k">선 칠할 때 일반 후보</div><div class="v">22 <small>← 약 44</small></div></div>
+      </div>
+      <p>컴포넌트 묶음(<code>comp/</code>)은 따로 접혀 뜬다 — 프레임 23 · 글자 19 · 선 15. 구분: 이름 바꿈 82 · 합침 8 · 지움 3 · 값 확인 6 · 그대로 42 (모두 141).</p>
+    </section>
+
+    <section class="pol" id="prim">
+      <h2>기본 팔레트 (Primitive)</h2>
+      <p class="meta">고르는 창에는 이미 안 뜬다(쓸 자리가 비어 있음). 디자이너가 직접 칠하지 않고, 의미 토큰이 가리키기만 한다.</p>
+      <div class="scroll"><table class="tbl">
+        <thead><tr><th>지금</th><th>새 이름</th><th>구분</th><th>메모</th></tr></thead>
+        <tbody>
+<tr><td><code>color/gray/*</code></td><td><code>color/gray/*</code></td><td><span class="act a-keep">그대로</span></td><td>16색</td></tr>
+<tr><td><code>color/main/*</code></td><td><code>color/blue/*</code></td><td><span class="act a-ren">이름</span></td><td>11색 · 코드 91곳</td></tr>
+<tr><td><code>color/danger/*</code></td><td><code>color/red/*</code></td><td><span class="act a-ren">이름</span></td><td>7색</td></tr>
+<tr><td><code>color/warning/*</code></td><td><code>color/yellow/*</code></td><td><span class="act a-ren">이름</span></td><td>6색</td></tr>
+<tr><td><code>color/safe/*</code></td><td><code>color/green/*</code></td><td><span class="act a-ren">이름</span></td><td>6색</td></tr>
+<tr><td><code>color/alpha/Light/*</code></td><td><code>color/alpha/white/*</code></td><td><span class="act a-ren">이름</span></td><td>0 · 50 · 60 · 100% — 흰색 투명도</td></tr>
+<tr><td><code>color/alpha/Dark/200</code></td><td><code>color/alpha/gray-300/40</code></td><td><span class="act a-ren">이름</span></td><td>&quot;Dark&quot; 인데 실제는 밝은 회색(#D1D5DE) 40%</td></tr>
+<tr><td><code>color/alpha/Dark/400</code></td><td><code>color/alpha/gray-600/40</code></td><td><span class="act a-ren">이름</span></td><td>#4E576A 40%</td></tr>
+<tr><td><code>color/alpha/Dark/500</code></td><td><code>color/alpha/gray-900/50</code></td><td><span class="act a-ren">이름</span></td><td>#0A0E15 50%</td></tr>
+<tr><td><code>color/alpha/Dark/600</code></td><td><code>color/alpha/gray-950/60</code></td><td><span class="act a-ren">이름</span></td><td>#070A10 60%</td></tr>
+<tr><td><code>color/alpha/glow/Primary/*</code></td><td><code>color/glow/*/core</code></td><td><span class="act a-ren">이름</span></td><td>빛의 심지 — blue · red · yellow · green</td></tr>
+<tr><td><code>color/alpha/glow/Secondary/*</code></td><td><code>color/glow/*/halo</code></td><td><span class="act a-ren">이름</span></td><td>빛의 번짐</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section class="pol" id="sem">
+      <h2>의미 토큰 (Semantic)</h2>
+      <p class="meta">"코드" 칸은 aprism-web 에서 이 토큰을 쓴 횟수(토큰끼리 가리키는 것 포함). 빈칸은 코드에 같은 이름이 없는 것.</p>
+<h3>글자 · 아이콘 <span class="cnt">8</span></h3>
+<div class="scroll"><table class="tbl"><thead><tr><th>지금 (Figma)</th><th>새 이름</th><th>구분</th><th>고르는 창에 뜨는 자리</th><th class="num">코드</th><th>쓰는 곳 · 메모</th></tr></thead><tbody>
+<tr><td><code>fg/primary</code></td><td><code>text/primary</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">글자</span> <span class="sc">도형</span></td><td class="num">137</td><td>본문 · 제목 · 주요 아이콘</td></tr>
+<tr><td><code>fg/secondary</code></td><td><code>text/secondary</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">글자</span> <span class="sc">도형</span></td><td class="num">76</td><td>부제 · 설명 · 이동 버튼 글자(색 위계 ③)</td></tr>
+<tr><td><code>fg/tertiary</code></td><td><code>text/tertiary</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">글자</span> <span class="sc">도형</span></td><td class="num">66</td><td>시간 · 단위 · 안내 문구(placeholder)</td></tr>
+<tr><td><code>fg/disabled</code></td><td><code>text/disabled</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">글자</span> <span class="sc">도형</span></td><td class="num">5</td><td>꺼진 컨트롤의 글자 · 아이콘</td></tr>
+<tr><td><code>fg/inverse</code></td><td><code>text/on-inverse</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">글자</span> <span class="sc">도형</span></td><td class="num">3</td><td>bg/inverse 위 글자 — 짝을 이름에 드러낸다</td></tr>
+<tr><td><code>fg/on-brand</code></td><td><code>text/on-brand</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">글자</span> <span class="sc">도형</span></td><td class="num">2</td><td>bg/brand 위 글자</td></tr>
+<tr><td><code>fg/brand</code></td><td><code>text/brand</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">글자</span> <span class="sc">도형</span></td><td class="num">6</td><td>GNB 현재 위치 글자만(색 위계 ④)</td></tr>
+<tr><td><code>fg/link</code></td><td>—</td><td><span class="act a-del">지움</span></td><td><span class="sc">안 뜸</span></td><td class="num">4</td><td>fg/brand 와 값이 같고, 색 위계상 이동은 무채색이라 쓸 자리가 없다. 코드 4곳은 text/secondary 로</td></tr>
+</tbody></table></div>
+<h3>바탕 <span class="cnt">16</span></h3>
+<div class="scroll"><table class="tbl"><thead><tr><th>지금 (Figma)</th><th>새 이름</th><th>구분</th><th>고르는 창에 뜨는 자리</th><th class="num">코드</th><th>쓰는 곳 · 메모</th></tr></thead><tbody>
+<tr><td><code>bg/canvas</code></td><td><code>bg/page</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">프레임</span></td><td class="num">24</td><td>화면 맨 바탕 — &quot;캔버스&quot;는 Figma 캔버스와 헷갈린다</td></tr>
+<tr><td><code>bg/surface/default</code></td><td><code>bg/panel</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">프레임</span> <span class="sc">도형</span></td><td class="num">19</td><td>패널 · 카드 기본 면</td></tr>
+<tr><td><code>bg/container</code></td><td><code>bg/panel</code></td><td><span class="act a-mrg">합침</span></td><td><span class="sc">프레임</span></td><td class="num">3</td><td>bg/surface/default 와 두 모드 값이 같다</td></tr>
+<tr><td><code>bg/surface/subtle</code></td><td><code>bg/cell</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">프레임</span> <span class="sc">도형</span></td><td class="num">17</td><td>패널 안 칸 — 웨이포인트 칸 · 로봇 상태 줄</td></tr>
+<tr><td><code>bg/surface/raised</code></td><td><code>bg/raised</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">프레임</span> <span class="sc">도형</span></td><td class="num">18</td><td>떠 있는 면 — 쪽지 · 메뉴 · 팝업</td></tr>
+<tr><td><code>bg/surface/selected</code></td><td><code>bg/selected</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">프레임</span> <span class="sc">도형</span></td><td class="num">10</td><td>고른 줄 · 칸</td></tr>
+<tr><td><code>bg/surface/disabled</code></td><td><code>bg/disabled</code></td><td><span class="act a-chk">값확인</span></td><td><span class="sc">프레임</span> <span class="sc">도형</span></td><td class="num">5</td><td>꺼진 컨트롤 면. 지금 Delta 유리판이 빌려 쓴다 → bg/glass 로 옮긴다. 값이 bg/cell 과 같다</td></tr>
+<tr><td><code>bg/surface/overlay-light</code></td><td><code>bg/glass</code></td><td><span class="act a-chk">값확인</span></td><td><span class="sc">프레임</span> <span class="sc">도형</span></td><td class="num">12</td><td>지도 위 패널 유리면. &quot;light&quot; 인데 다크 값이 어두운 알파라 뜻이 뒤집힌다. 값은 v2.2 의 지도 위 유리면(--map-glass)으로 맞춘다</td></tr>
+<tr><td><code>bg/surface/overlay-dark</code></td><td><code>bg/map-chip</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">프레임</span> <span class="sc">도형</span></td><td class="num">24</td><td>지도 위 작은 표지 바탕 — 층 고르기 · 로봇 이름표</td></tr>
+<tr><td><code>bg/overlay</code></td><td><code>bg/dim</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">프레임</span></td><td class="num">1</td><td>모달 뒤를 어둡게 덮는 면</td></tr>
+<tr><td><code>bg/brand</code></td><td><code>bg/brand</code></td><td><span class="act a-keep">그대로</span></td><td><span class="sc">프레임</span> <span class="sc">도형</span></td><td class="num">7</td><td>로고 · GNB 현재 위치</td></tr>
+<tr><td><code>bg/inverse</code></td><td><code>bg/inverse</code></td><td><span class="act a-keep">그대로</span></td><td><span class="sc">프레임</span> <span class="sc">도형</span></td><td class="num">2</td><td>반전 면(라이트 검정 · 다크 흰색)</td></tr>
+<tr><td><code>bg/navigation</code></td><td><code>bg/gnb</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">프레임</span></td><td class="num">1</td><td>왼쪽 GNB 바탕</td></tr>
+<tr><td><code>bg/accent</code></td><td><code>bg/accent</code></td><td><span class="act a-chk">값확인</span></td><td><span class="sc">프레임</span> <span class="sc">도형</span></td><td class="num">4</td><td>파랑 면. 코드 4곳 — 상태 파랑인지 행동 파랑인지 쓰임을 보고 status/info 또는 comp/button/accent 로 나눈다</td></tr>
+<tr><td><code>bg/critical</code></td><td><code>status/critical/fill</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">프레임</span> <span class="sc">도형</span></td><td class="num">0</td><td>위험 진한 면 — 상태 묶음으로</td></tr>
+<tr><td><code>bg/safe</code></td><td><code>status/safe/fill</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">프레임</span> <span class="sc">도형</span></td><td class="num">0</td><td>안전 진한 면 — 상태 묶음으로</td></tr>
+</tbody></table></div>
+<h3>누르기 · 올리기 반응 <span class="cnt">10</span></h3>
+<div class="scroll"><table class="tbl"><thead><tr><th>지금 (Figma)</th><th>새 이름</th><th>구분</th><th>고르는 창에 뜨는 자리</th><th class="num">코드</th><th>쓰는 곳 · 메모</th></tr></thead><tbody>
+<tr><td><code>bg/interactive/hover</code></td><td><code>state/hover</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">프레임</span> <span class="sc">도형</span></td><td class="num">13</td><td>마우스를 올렸을 때 덧칠</td></tr>
+<tr><td><code>bg/interactive/pressed</code></td><td><code>state/pressed</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">프레임</span> <span class="sc">도형</span></td><td class="num">3</td><td>눌렀을 때 덧칠</td></tr>
+<tr><td><code>bg/interactive/brand-hover</code></td><td>—</td><td><span class="act a-del">지움</span></td><td><span class="sc">안 뜸</span></td><td class="num">0</td><td>코드 미사용 · 버튼 토큰이 맡는다</td></tr>
+<tr><td><code>bg/interactive/brand-pressed</code></td><td>—</td><td><span class="act a-del">지움</span></td><td><span class="sc">안 뜸</span></td><td class="num">0</td><td>코드 미사용</td></tr>
+<tr><td><code>bg/interactive/accent-hover</code></td><td><code>comp/button/accent/bg/hover</code></td><td><span class="act a-mrg">합침</span></td><td><span class="sc">안 뜸</span></td><td class="num">0</td><td>버튼 토큰과 겹친다</td></tr>
+<tr><td><code>bg/interactive/accent-pressed</code></td><td><code>comp/button/accent/bg/pressed</code></td><td><span class="act a-mrg">합침</span></td><td><span class="sc">안 뜸</span></td><td class="num">0</td><td>버튼 토큰과 겹친다</td></tr>
+<tr><td><code>bg/interactive/critical-hover</code></td><td><code>comp/button/danger/bg/hover</code></td><td><span class="act a-mrg">합침</span></td><td><span class="sc">안 뜸</span></td><td class="num">0</td><td>버튼 토큰과 겹친다</td></tr>
+<tr><td><code>bg/interactive/critical-pressed</code></td><td><code>comp/button/danger/bg/pressed</code></td><td><span class="act a-mrg">합침</span></td><td><span class="sc">안 뜸</span></td><td class="num">0</td><td>버튼 토큰과 겹친다</td></tr>
+<tr><td><code>bg/interactive/inverse-hover</code></td><td><code>comp/button/inverse/bg/hover</code></td><td><span class="act a-mrg">합침</span></td><td><span class="sc">안 뜸</span></td><td class="num">0</td><td>버튼 토큰과 겹친다</td></tr>
+<tr><td><code>bg/interactive/inverse-pressed</code></td><td><code>comp/button/inverse/bg/pressed</code></td><td><span class="act a-mrg">합침</span></td><td><span class="sc">안 뜸</span></td><td class="num">0</td><td>버튼 토큰과 겹친다</td></tr>
+</tbody></table></div>
+<h3>선 <span class="cnt">8</span></h3>
+<div class="scroll"><table class="tbl"><thead><tr><th>지금 (Figma)</th><th>새 이름</th><th>구분</th><th>고르는 창에 뜨는 자리</th><th class="num">코드</th><th>쓰는 곳 · 메모</th></tr></thead><tbody>
+<tr><td><code>border/subtle</code></td><td><code>border/divider</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">선</span></td><td class="num">33</td><td>구분선</td></tr>
+<tr><td><code>border/disabled</code></td><td><code>border/divider</code></td><td><span class="act a-mrg">합침</span></td><td><span class="sc">선</span></td><td class="num">2</td><td>border/subtle 과 두 모드 값이 같다</td></tr>
+<tr><td><code>border/default</code></td><td><code>border/default</code></td><td><span class="act a-keep">그대로</span></td><td><span class="sc">선</span></td><td class="num">41</td><td>칸 · 카드 테두리</td></tr>
+<tr><td><code>border/strong</code></td><td><code>border/strong</code></td><td><span class="act a-chk">값확인</span></td><td><span class="sc">선</span></td><td class="num">9</td><td>라이트 값이 흰색(gray/0)이라 흰 바탕에서 안 보인다 — 라이트 값을 진하게</td></tr>
+<tr><td><code>border/control</code></td><td><code>border/input</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">선</span></td><td class="num">1</td><td>입력 칸 · 체크박스 테두리</td></tr>
+<tr><td><code>border/control-hover</code></td><td><code>border/input-hover</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">선</span></td><td class="num">0</td><td>입력 칸에 올렸을 때</td></tr>
+<tr><td><code>border/focus</code></td><td><code>border/focus</code></td><td><span class="act a-keep">그대로</span></td><td><span class="sc">선</span></td><td class="num">25</td><td>키보드 초점 링</td></tr>
+<tr><td><code>border/brand</code></td><td><code>border/brand</code></td><td><span class="act a-keep">그대로</span></td><td><span class="sc">선</span></td><td class="num">6</td><td>브랜드 강조 선</td></tr>
+</tbody></table></div>
+<h3>상태 — 위험 · 주의 · 안전 · 정보 <span class="cnt">18</span></h3>
+<div class="scroll"><table class="tbl"><thead><tr><th>지금 (Figma)</th><th>새 이름</th><th>구분</th><th>고르는 창에 뜨는 자리</th><th class="num">코드</th><th>쓰는 곳 · 메모</th></tr></thead><tbody>
+<tr><td><code>status/critical/fg-Primary</code></td><td><code>status/critical/text</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">글자</span> <span class="sc">도형</span></td><td class="num">0</td><td>위험 글자. 코드에는 status-critical-fg 로 따로 있다 — 하나로</td></tr>
+<tr><td><code>status/critical/fg-Secondary</code></td><td><code>status/critical/text-subtle</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">글자</span> <span class="sc">도형</span></td><td class="num">0</td><td>위험 보조 글자</td></tr>
+<tr><td><code>status/critical/bg</code></td><td><code>status/critical/bg</code></td><td><span class="act a-keep">그대로</span></td><td><span class="sc">프레임</span> <span class="sc">도형</span></td><td class="num">3</td><td>위험 옅은 면</td></tr>
+<tr><td><code>status/critical/border</code></td><td><code>status/critical/border</code></td><td><span class="act a-keep">그대로</span></td><td><span class="sc">선</span></td><td class="num">9</td><td></td></tr>
+<tr><td><code>status/critical/icon</code></td><td><code>status/critical/icon</code></td><td><span class="act a-keep">그대로</span></td><td><span class="sc">도형</span></td><td class="num">20</td><td>아이콘 · 점 — 프레임 후보에서 뺀다</td></tr>
+<tr><td><code>status/warning/fg</code></td><td><code>status/warning/text</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">글자</span> <span class="sc">도형</span></td><td class="num">11</td><td></td></tr>
+<tr><td><code>status/warning/bg</code></td><td><code>status/warning/bg</code></td><td><span class="act a-keep">그대로</span></td><td><span class="sc">프레임</span> <span class="sc">도형</span></td><td class="num">4</td><td></td></tr>
+<tr><td><code>status/warning/border</code></td><td><code>status/warning/border</code></td><td><span class="act a-keep">그대로</span></td><td><span class="sc">선</span></td><td class="num">11</td><td></td></tr>
+<tr><td><code>status/warning/icon</code></td><td><code>status/warning/icon</code></td><td><span class="act a-keep">그대로</span></td><td><span class="sc">도형</span></td><td class="num">15</td><td></td></tr>
+<tr><td><code>status/normal/fg</code></td><td><code>status/safe/text</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">글자</span> <span class="sc">도형</span></td><td class="num">7</td><td>&quot;normal&quot; → &quot;safe&quot; — 알림 단계 이름(안전)과 한 단어로</td></tr>
+<tr><td><code>status/normal/bg</code></td><td><code>status/safe/bg</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">프레임</span> <span class="sc">도형</span></td><td class="num">0</td><td></td></tr>
+<tr><td><code>status/normal/border</code></td><td><code>status/safe/border</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">선</span></td><td class="num">0</td><td></td></tr>
+<tr><td><code>status/normal/icon</code></td><td><code>status/safe/icon</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">도형</span></td><td class="num">4</td><td></td></tr>
+<tr><td><code>status/info/fg-primary</code></td><td><code>status/info/text</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">글자</span> <span class="sc">도형</span></td><td class="num">0</td><td>코드에는 status-info-fg 로 따로 있다 — 하나로</td></tr>
+<tr><td><code>status/info/fg-secondary</code></td><td><code>status/info/text-subtle</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">글자</span> <span class="sc">도형</span></td><td class="num">1</td><td></td></tr>
+<tr><td><code>status/info/bg</code></td><td><code>status/info/bg</code></td><td><span class="act a-keep">그대로</span></td><td><span class="sc">프레임</span> <span class="sc">도형</span></td><td class="num">3</td><td></td></tr>
+<tr><td><code>status/info/border</code></td><td><code>status/info/border</code></td><td><span class="act a-keep">그대로</span></td><td><span class="sc">선</span></td><td class="num">3</td><td></td></tr>
+<tr><td><code>status/info/icon</code></td><td><code>status/info/icon</code></td><td><span class="act a-keep">그대로</span></td><td><span class="sc">도형</span></td><td class="num">2</td><td></td></tr>
+</tbody></table></div>
+<h3>차트 <span class="cnt">16</span></h3>
+<div class="scroll"><table class="tbl"><thead><tr><th>지금 (Figma)</th><th>새 이름</th><th>구분</th><th>고르는 창에 뜨는 자리</th><th class="num">코드</th><th>쓰는 곳 · 메모</th></tr></thead><tbody>
+<tr><td><code>chart/categorical/1</code></td><td><code>chart/series/1</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">프레임</span> <span class="sc">도형</span> <span class="sc">선</span></td><td class="num">0</td><td>계열 색 1~4</td></tr>
+<tr><td><code>chart/categorical/2</code></td><td><code>chart/series/2</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">프레임</span> <span class="sc">도형</span> <span class="sc">선</span></td><td class="num">0</td><td></td></tr>
+<tr><td><code>chart/categorical/3</code></td><td><code>chart/series/3</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">프레임</span> <span class="sc">도형</span> <span class="sc">선</span></td><td class="num">0</td><td></td></tr>
+<tr><td><code>chart/categorical/4</code></td><td><code>chart/series/4</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">프레임</span> <span class="sc">도형</span> <span class="sc">선</span></td><td class="num">0</td><td></td></tr>
+<tr><td><code>chart/positive</code></td><td><code>chart/positive</code></td><td><span class="act a-keep">그대로</span></td><td><span class="sc">도형</span> <span class="sc">선</span></td><td class="num">0</td><td>좋아짐</td></tr>
+<tr><td><code>chart/negative</code></td><td><code>chart/negative</code></td><td><span class="act a-keep">그대로</span></td><td><span class="sc">도형</span> <span class="sc">선</span></td><td class="num">0</td><td>나빠짐</td></tr>
+<tr><td><code>chart/warning</code></td><td><code>chart/warning</code></td><td><span class="act a-keep">그대로</span></td><td><span class="sc">도형</span> <span class="sc">선</span></td><td class="num">0</td><td></td></tr>
+<tr><td><code>chart/neutral</code></td><td><code>chart/neutral</code></td><td><span class="act a-keep">그대로</span></td><td><span class="sc">도형</span> <span class="sc">선</span></td><td class="num">4</td><td></td></tr>
+<tr><td><code>chart/grid</code></td><td><code>chart/grid</code></td><td><span class="act a-keep">그대로</span></td><td><span class="sc">선</span></td><td class="num">0</td><td></td></tr>
+<tr><td><code>chart/axis</code></td><td><code>chart/axis</code></td><td><span class="act a-keep">그대로</span></td><td><span class="sc">글자</span> <span class="sc">선</span></td><td class="num">0</td><td></td></tr>
+<tr><td><code>chart/track</code></td><td><code>chart/track</code></td><td><span class="act a-keep">그대로</span></td><td><span class="sc">프레임</span> <span class="sc">도형</span></td><td class="num">4</td><td>막대 · 진행 바탕</td></tr>
+<tr><td><code>chart/heat/1</code></td><td><code>chart/heat/1</code></td><td><span class="act a-keep">그대로</span></td><td><span class="sc">프레임</span> <span class="sc">도형</span></td><td class="num">0</td><td>히트맵 1~5</td></tr>
+<tr><td><code>chart/heat/2</code></td><td><code>chart/heat/2</code></td><td><span class="act a-keep">그대로</span></td><td><span class="sc">프레임</span> <span class="sc">도형</span></td><td class="num">0</td><td></td></tr>
+<tr><td><code>chart/heat/3</code></td><td><code>chart/heat/3</code></td><td><span class="act a-keep">그대로</span></td><td><span class="sc">프레임</span> <span class="sc">도형</span></td><td class="num">0</td><td></td></tr>
+<tr><td><code>chart/heat/4</code></td><td><code>chart/heat/4</code></td><td><span class="act a-keep">그대로</span></td><td><span class="sc">프레임</span> <span class="sc">도형</span></td><td class="num">0</td><td></td></tr>
+<tr><td><code>chart/heat/5</code></td><td><code>chart/heat/5</code></td><td><span class="act a-keep">그대로</span></td><td><span class="sc">프레임</span> <span class="sc">도형</span></td><td class="num">0</td><td></td></tr>
+</tbody></table></div>
+    </section>
+
+    <section class="pol" id="comp">
+      <h2>컴포넌트 토큰</h2>
+      <p class="meta">컴포넌트를 만들 때만 쓴다. 완성된 컴포넌트 안에는 이미 연결돼 있어 화면을 그릴 때 고를 일이 없다.</p>
+<h3>알림 · 엣지 글로우 (comp/alert) <span class="cnt">24</span></h3>
+<div class="scroll"><table class="tbl"><thead><tr><th>지금 (Figma)</th><th>새 이름</th><th>구분</th><th>고르는 창에 뜨는 자리</th><th class="num">코드</th><th>쓰는 곳 · 메모</th></tr></thead><tbody>
+<tr><td><code>alert/default/edge</code></td><td><code>comp/alert/default/edge</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">선</span></td><td class="num">0</td><td></td></tr>
+<tr><td><code>alert/default/fg</code></td><td><code>comp/alert/default/text</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">글자</span> <span class="sc">도형</span></td><td class="num">0</td><td></td></tr>
+<tr><td><code>alert/default/bg</code></td><td><code>comp/alert/default/bg</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">프레임</span></td><td class="num">0</td><td></td></tr>
+<tr><td><code>alert/default/on-edge</code></td><td><code>comp/alert/default/on-edge</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">글자</span> <span class="sc">도형</span></td><td class="num">0</td><td></td></tr>
+<tr><td><code>alert/default/glow-Primary</code></td><td><code>comp/alert/default/glow-core</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">효과</span></td><td class="num">3</td><td>빛의 심지 — 효과에만</td></tr>
+<tr><td><code>alert/default/glow-Secondary</code></td><td><code>comp/alert/default/glow-halo</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">효과</span></td><td class="num">2</td><td>빛의 번짐 — 효과에만</td></tr>
+<tr><td><code>alert/danger/edge</code></td><td><code>comp/alert/critical/edge</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">선</span></td><td class="num">3</td><td>&quot;danger&quot; → &quot;critical&quot; — 상태 이름과 한 단어로</td></tr>
+<tr><td><code>alert/danger/fg</code></td><td><code>comp/alert/critical/text</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">글자</span> <span class="sc">도형</span></td><td class="num">1</td><td></td></tr>
+<tr><td><code>alert/danger/bg</code></td><td><code>comp/alert/critical/bg</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">프레임</span></td><td class="num">2</td><td></td></tr>
+<tr><td><code>alert/danger/on-edge</code></td><td><code>comp/alert/critical/on-edge</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">글자</span> <span class="sc">도형</span></td><td class="num">0</td><td></td></tr>
+<tr><td><code>alert/danger/glow-Primary</code></td><td><code>comp/alert/critical/glow-core</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">효과</span></td><td class="num">1</td><td></td></tr>
+<tr><td><code>alert/danger/glow-Secondary</code></td><td><code>comp/alert/critical/glow-halo</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">효과</span></td><td class="num">1</td><td></td></tr>
+<tr><td><code>alert/warning/edge</code></td><td><code>comp/alert/warning/edge</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">선</span></td><td class="num">4</td><td></td></tr>
+<tr><td><code>alert/warning/fg</code></td><td><code>comp/alert/warning/text</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">글자</span> <span class="sc">도형</span></td><td class="num">0</td><td></td></tr>
+<tr><td><code>alert/warning/bg</code></td><td><code>comp/alert/warning/bg</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">프레임</span></td><td class="num">1</td><td></td></tr>
+<tr><td><code>alert/warning/on-edge</code></td><td><code>comp/alert/warning/on-edge</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">글자</span> <span class="sc">도형</span></td><td class="num">0</td><td></td></tr>
+<tr><td><code>alert/warning/glow-Primary</code></td><td><code>comp/alert/warning/glow-core</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">효과</span></td><td class="num">1</td><td></td></tr>
+<tr><td><code>alert/warning/glow-Secondary</code></td><td><code>comp/alert/warning/glow-halo</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">효과</span></td><td class="num">1</td><td></td></tr>
+<tr><td><code>alert/safe/edge</code></td><td><code>comp/alert/safe/edge</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">선</span></td><td class="num">0</td><td></td></tr>
+<tr><td><code>alert/safe/fg</code></td><td><code>comp/alert/safe/text</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">글자</span> <span class="sc">도형</span></td><td class="num">0</td><td></td></tr>
+<tr><td><code>alert/safe/bg</code></td><td><code>comp/alert/safe/bg</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">프레임</span></td><td class="num">0</td><td></td></tr>
+<tr><td><code>alert/safe/on-edge</code></td><td><code>comp/alert/safe/on-edge</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">글자</span> <span class="sc">도형</span></td><td class="num">0</td><td></td></tr>
+<tr><td><code>alert/safe/glow-Primary</code></td><td><code>comp/alert/safe/glow-core</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">효과</span></td><td class="num">1</td><td></td></tr>
+<tr><td><code>alert/safe/glow-Secondary</code></td><td><code>comp/alert/safe/glow-halo</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">효과</span></td><td class="num">1</td><td></td></tr>
+</tbody></table></div>
+<h3>버튼 (comp/button) — 화면 정책 4. 버튼 위계와 같은 이름 <span class="cnt">33</span></h3>
+<div class="scroll"><table class="tbl"><thead><tr><th>지금 (Figma)</th><th>새 이름</th><th>구분</th><th>고르는 창에 뜨는 자리</th><th class="num">코드</th><th>쓰는 곳 · 메모</th></tr></thead><tbody>
+<tr><td><code>button/primary/bg/default</code></td><td><code>comp/button/inverse/bg/default</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">프레임</span></td><td class="num">4</td><td>흰 면 버튼(③). &quot;primary&quot; 가 브랜드색으로 읽혀 → &quot;inverse&quot;(bg/inverse 와 같은 뜻)</td></tr>
+<tr><td><code>button/primary/bg/hover</code></td><td><code>comp/button/inverse/bg/hover</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">프레임</span></td><td class="num">3</td><td></td></tr>
+<tr><td><code>button/primary/bg/pressed</code></td><td><code>comp/button/inverse/bg/pressed</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">프레임</span></td><td class="num">1</td><td></td></tr>
+<tr><td><code>button/primary/bg/disabled</code></td><td><code>comp/button/inverse/bg/disabled</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">프레임</span></td><td class="num">0</td><td></td></tr>
+<tr><td><code>button/primary/fg/default</code></td><td><code>comp/button/inverse/text/default</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">글자</span> <span class="sc">도형</span></td><td class="num">4</td><td></td></tr>
+<tr><td><code>button/primary/fg/disabled</code></td><td><code>comp/button/inverse/text/disabled</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">글자</span> <span class="sc">도형</span></td><td class="num">0</td><td></td></tr>
+<tr><td><code>button/accent/bg/default</code></td><td><code>comp/button/accent/bg/default</code></td><td><span class="act a-keep">그대로</span></td><td><span class="sc">프레임</span></td><td class="num">2</td><td>파랑 면(②)</td></tr>
+<tr><td><code>button/accent/bg/hover</code></td><td><code>comp/button/accent/bg/hover</code></td><td><span class="act a-keep">그대로</span></td><td><span class="sc">프레임</span></td><td class="num">2</td><td></td></tr>
+<tr><td><code>button/accent/bg/pressed</code></td><td><code>comp/button/accent/bg/pressed</code></td><td><span class="act a-keep">그대로</span></td><td><span class="sc">프레임</span></td><td class="num">1</td><td></td></tr>
+<tr><td><code>button/accent/bg/disabled</code></td><td><code>comp/button/accent/bg/disabled</code></td><td><span class="act a-keep">그대로</span></td><td><span class="sc">프레임</span></td><td class="num">1</td><td></td></tr>
+<tr><td><code>button/accent/fg/default</code></td><td><code>comp/button/accent/text/default</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">글자</span> <span class="sc">도형</span></td><td class="num">2</td><td></td></tr>
+<tr><td><code>button/accent/fg/disabled</code></td><td><code>comp/button/accent/text/disabled</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">글자</span> <span class="sc">도형</span></td><td class="num">1</td><td></td></tr>
+<tr><td><code>button/secondary/bg/default</code></td><td><code>comp/button/secondary/bg/default</code></td><td><span class="act a-keep">그대로</span></td><td><span class="sc">프레임</span></td><td class="num">9</td><td>회색 면(④)</td></tr>
+<tr><td><code>button/secondary/bg/hover</code></td><td><code>comp/button/secondary/bg/hover</code></td><td><span class="act a-keep">그대로</span></td><td><span class="sc">프레임</span></td><td class="num">5</td><td></td></tr>
+<tr><td><code>button/secondary/bg/pressed</code></td><td><code>comp/button/secondary/bg/pressed</code></td><td><span class="act a-keep">그대로</span></td><td><span class="sc">프레임</span></td><td class="num">1</td><td></td></tr>
+<tr><td><code>button/secondary/bg/disabled</code></td><td><code>comp/button/secondary/bg/disabled</code></td><td><span class="act a-keep">그대로</span></td><td><span class="sc">프레임</span></td><td class="num">1</td><td></td></tr>
+<tr><td><code>button/secondary/border/default</code></td><td><code>comp/button/secondary/border/default</code></td><td><span class="act a-keep">그대로</span></td><td><span class="sc">선</span></td><td class="num">9</td><td></td></tr>
+<tr><td><code>button/secondary/border/disabled</code></td><td><code>comp/button/secondary/border/disabled</code></td><td><span class="act a-keep">그대로</span></td><td><span class="sc">선</span></td><td class="num">1</td><td></td></tr>
+<tr><td><code>button/secondary/fg/default</code></td><td><code>comp/button/secondary/text/default</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">글자</span> <span class="sc">도형</span></td><td class="num">9</td><td></td></tr>
+<tr><td><code>button/secondary/fg/disabled</code></td><td><code>comp/button/secondary/text/disabled</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">글자</span> <span class="sc">도형</span></td><td class="num">1</td><td></td></tr>
+<tr><td><code>button/ghost/bg/default</code></td><td><code>comp/button/ghost/bg/default</code></td><td><span class="act a-chk">값확인</span></td><td><span class="sc">프레임</span></td><td class="num"></td><td>Ghost 인데 면 값이 회색 40% — 투명이어야 한다. 쓸 자리도 &quot;어디에나&quot;였다</td></tr>
+<tr><td><code>button/ghost/bg/hover</code></td><td><code>comp/button/ghost/bg/hover</code></td><td><span class="act a-keep">그대로</span></td><td><span class="sc">프레임</span></td><td class="num">1</td><td></td></tr>
+<tr><td><code>button/ghost/bg/pressed</code></td><td><code>comp/button/ghost/bg/pressed</code></td><td><span class="act a-keep">그대로</span></td><td><span class="sc">프레임</span></td><td class="num">0</td><td></td></tr>
+<tr><td><code>button/ghost/fg/default</code></td><td><code>comp/button/ghost/text/default</code></td><td><span class="act a-chk">값확인</span></td><td><span class="sc">글자</span> <span class="sc">도형</span></td><td class="num">1</td><td>값이 파랑(main) — 색 위계상 text/secondary 여야 한다(정책 3 · 정할 것)</td></tr>
+<tr><td><code>button/ghost/fg/pressed</code></td><td><code>comp/button/ghost/text/pressed</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">글자</span> <span class="sc">도형</span></td><td class="num">0</td><td></td></tr>
+<tr><td><code>button/ghost/fg/disabled</code></td><td><code>comp/button/ghost/text/disabled</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">글자</span> <span class="sc">도형</span></td><td class="num">0</td><td></td></tr>
+<tr><td><code>button/danger/bg/default</code></td><td><code>comp/button/danger/bg/default</code></td><td><span class="act a-keep">그대로</span></td><td><span class="sc">프레임</span></td><td class="num">3</td><td>빨강 면(①) E-STOP</td></tr>
+<tr><td><code>button/danger/bg/hover</code></td><td><code>comp/button/danger/bg/hover</code></td><td><span class="act a-keep">그대로</span></td><td><span class="sc">프레임</span></td><td class="num">2</td><td></td></tr>
+<tr><td><code>button/danger/bg/pressed</code></td><td><code>comp/button/danger/bg/pressed</code></td><td><span class="act a-keep">그대로</span></td><td><span class="sc">프레임</span></td><td class="num">3</td><td></td></tr>
+<tr><td><code>button/danger/bg/disabled</code></td><td><code>comp/button/danger/bg/disabled</code></td><td><span class="act a-keep">그대로</span></td><td><span class="sc">프레임</span></td><td class="num">2</td><td></td></tr>
+<tr><td><code>button/danger/fg/default</code></td><td><code>comp/button/danger/text/default</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">글자</span> <span class="sc">도형</span></td><td class="num">3</td><td></td></tr>
+<tr><td><code>button/danger/fg/disabled</code></td><td><code>comp/button/danger/text/disabled</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">글자</span> <span class="sc">도형</span></td><td class="num">2</td><td></td></tr>
+<tr><td><code>button/focus/border</code></td><td><code>comp/button/focus</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">선</span></td><td class="num">0</td><td></td></tr>
+</tbody></table></div>
+<h3>로봇 그림 (illust/robot) <span class="cnt">8</span></h3>
+<div class="scroll"><table class="tbl"><thead><tr><th>지금 (Figma)</th><th>새 이름</th><th>구분</th><th>고르는 창에 뜨는 자리</th><th class="num">코드</th><th>쓰는 곳 · 메모</th></tr></thead><tbody>
+<tr><td><code>Robot/White</code></td><td><code>illust/robot/white</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">도형</span> <span class="sc">선</span></td><td class="num"></td><td>일러스트 도형에만 — 지금은 &quot;어디에나&quot;</td></tr>
+<tr><td><code>Robot/White/0</code></td><td><code>illust/robot/white-0</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">도형</span> <span class="sc">선</span></td><td class="num"></td><td></td></tr>
+<tr><td><code>Robot/White/Middle</code></td><td><code>illust/robot/white-mid</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">도형</span> <span class="sc">선</span></td><td class="num"></td><td></td></tr>
+<tr><td><code>Robot/White/End</code></td><td><code>illust/robot/white-end</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">도형</span> <span class="sc">선</span></td><td class="num"></td><td></td></tr>
+<tr><td><code>Robot/Light Gray</code></td><td><code>illust/robot/gray-light</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">도형</span> <span class="sc">선</span></td><td class="num"></td><td></td></tr>
+<tr><td><code>Robot/Gray</code></td><td><code>illust/robot/gray</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">도형</span> <span class="sc">선</span></td><td class="num"></td><td></td></tr>
+<tr><td><code>Robot/Black</code></td><td><code>illust/robot/black</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">도형</span> <span class="sc">선</span></td><td class="num"></td><td></td></tr>
+<tr><td><code>Robot/Accent</code></td><td><code>illust/robot/accent</code></td><td><span class="act a-ren">이름</span></td><td><span class="sc">도형</span> <span class="sc">선</span></td><td class="num"></td><td></td></tr>
+</tbody></table></div>
+    </section>
+
+    <section class="pol" id="new">
+      <h2>새로 만들 토큰</h2>
+      <p class="meta">v2.2 에서 토큰 없이 직접 적은 값 중 여러 번 쓰는 것 — monitor.css 에 흰색 · 검정 직접 값이 32곳 있다.</p>
+      <div class="scroll"><table class="tbl">
+        <thead><tr><th>새 이름</th><th>고르는 창에 뜨는 자리</th><th>쓰는 곳</th></tr></thead>
+        <tbody>
+<tr><td><code>border/on-glass</code></td><td><span class="sc">선</span></td><td>유리면 위 구분선 — 지금 코드에 rgb(255 255 255 / 8%) 로 직접 적혀 있다</td></tr>
+<tr><td><code>effect/glass-edge</code></td><td><span class="sc">효과</span></td><td>유리면 윗변 1px 반사선 — rgb(255 255 255 / 14%)</td></tr>
+<tr><td><code>effect/glass-shadow</code></td><td><span class="sc">효과</span></td><td>유리면 아래 그림자</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section class="pol" id="steps">
+      <h2>진행 순서</h2>
+      <ol>
+        <li><b>이 표 확정</b> — 이름 · 합침 · 지움 · 값 확인 항목.</li>
+        <li><b>Figma 변수</b> — 이름 바꾸기(연결된 컴포넌트는 끊기지 않는다) · 쓸 자리 좁히기 · 설명 다시 쓰기 · <code>comp/</code> 공개 숨김. 합치는 것은 사용처를 남는 쪽으로 옮긴 뒤 지운다.</li>
+        <li><b>코드</b> — <code>tokens.css</code> 를 새 이름으로. 한동안 예전 이름이 새 이름을 가리키게 남겨 v2.1 등 지난 화면의 겉모습이 바뀌지 않게 한다. 다 옮기면 예전 이름을 지운다.</li>
+        <li><b>확인</b> — 지난 화면(v1 · v2 · v2.1)과 v2.2 를 바꾸기 전후로 찍어 겉모습이 같은지 대조.</li>
+      </ol>
+      <div class="open">
+        <h3>정할 것</h3>
+        <ul>
+          <li><b>값 확인</b> 표시 항목 — 이름만이 아니라 값도 바뀐다(<code>border/strong</code> 라이트 값, Ghost 버튼 면 · 글자, 유리면).</li>
+          <li><code>fg/link</code> 지우기 · <code>bg/accent</code> 나누기 — 색 위계(정책 3)에 맞춘 판단.</li>
+          <li>클라이언트 개발팀이 지금 토큰 이름을 코드에 쓰고 있는지 — 쓰고 있으면 바꾸는 시점을 맞춘다.</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <span>APRISM · 토큰 이름 대조표 · 2026-10-14 기준 (Figma 실측)</span>
+  </footer>
+  <script src="./assets/js/theme.js?v=7145a122"></script>
+</body>
+</html>
