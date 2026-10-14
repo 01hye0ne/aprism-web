@@ -243,6 +243,8 @@
   --comp-gnb-bg: var(--color-gray-0);
   --comp-modal-dim: var(--color-alpha-gray-900-50);
   --bg-cell: var(--color-gray-100);
+  --bg-frame: var(--color-gray-50);          /* 관제 프레임 — 바탕 3단(10/14) */
+  --bg-inset: var(--color-gray-100);         /* 프레임 안 들어간 상자 — 바탕 2단(알림 목록) */
   --bg-map-chip: var(--color-alpha-gray-300-40);
   --bg-glass: var(--color-alpha-white-50);
   --bg-raised: var(--color-gray-0);
@@ -383,6 +385,8 @@
   --comp-gnb-bg: var(--color-gray-900);
   --comp-modal-dim: var(--color-alpha-gray-950-60);
   --bg-cell: var(--color-gray-750);
+  --bg-frame: var(--color-gray-750);
+  --bg-inset: var(--color-alpha-gray-950-18);
   --bg-map-chip: var(--color-alpha-gray-900-50);
   --bg-glass: var(--color-alpha-gray-600-40);
   --bg-raised: var(--color-gray-700);

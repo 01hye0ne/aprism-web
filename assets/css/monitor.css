@@ -1168,17 +1168,17 @@
 
 /*
  * 바탕 세 단 — 다크와 같은 순서로(2026-10-14 디자이너). 1 이 가장 어둡고 3 이 가장 밝다.
- *   1 GNB · 상태 바 · 지도 바탕   bg/page  gray/200
- *   2 알림 목록 상자              bg/cell  gray/100
- *   3 관제 프레임(+ 모서리 삼각판) bg/panel gray/50
- * 2–3 차이를 1–2 차이보다 작게 둔다(다크도 그렇다: 950 → 상자 → 750).
- * 전에는 상자가 gray/200 이라 1 단과 같은 색이었고, 프레임은 bg/cell 이었다.
- * 줄 사이 선은 상자 면과 같은 색이 되므로 한 단 올린다.
+ *   1 GNB · 상태 바 · 지도 바탕     bg/page   라이트 gray/200 · 다크 gray/950
+ *   2 알림 목록 상자                bg/inset  라이트 gray/100 · 다크 alpha/gray-950/18(프레임 위에 겹침)
+ *   3 관제 프레임(+ 모서리 삼각판)  bg/frame  라이트 gray/50  · 다크 gray/750
+ * 2–3 차이를 1–2 차이보다 작게 둔다. Figma 변수 bg/frame · bg/inset 과 같다.
+ * 다크 상자는 전에 bg/map-chip 반을 섞은 값(#242B38)이었다 — Figma 에 둘 수 있는 값으로 바꾸며 1 단위 안쪽으로 달라졌다.
  */
-:root[data-theme="light"] .v2-2 .content-surface,
-:root[data-theme="light"] .v2-2.v3 .corner-tab,
-:root[data-theme="light"] .v2-2.v3 .delta3:not(.is-open) .delta3-name::before { background-color: var(--bg-panel); }
-:root[data-theme="light"] .v2-2 .ah-box { background-color: var(--bg-cell); }
+.v2-2 .content-surface,
+.v2-2.v3 .corner-tab,
+.v2-2.v3 .delta3:not(.is-open) .delta3-name::before { background-color: var(--bg-frame); }
+.v2-2 .ah-box { background-color: var(--bg-inset); }
+/* 줄 사이 선은 상자 면과 같은 색이 되므로 라이트에서 한 단 올린다. */
 :root[data-theme="light"] .v2-2 .ah-item,
 :root[data-theme="light"] .v2-2 .done-item { box-shadow: inset 0 -1px 0 var(--border-default); }
 :root[data-theme="light"] .v2-2 .ah-box.is-scrolled { box-shadow: inset 0 10px 8px rgb(0 0 0 / 8%); }
