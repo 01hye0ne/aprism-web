@@ -326,6 +326,7 @@
     aim();
     // 굵은 선은 제 굵기를 재려면 화면 크기를 알아야 한다.
     fatMats.forEach(function (mat) { mat.resolution.set(w, h); });
+    syncDots();   // v2.2 점선 — 배율이 바뀌어도 화면에서 2 · 6 px 로
 
     // 실루엣은 보는 쪽이 달라지면 같이 달라진다. 카메라를 옮길 때마다 다시 센다.
     if (picked) { drawOutline(pickPens, picked); }
@@ -1748,6 +1749,20 @@
   var fatMats = [];
   var ghosts = [];   // 벽 뒤 경로의 옅은 선
 
+  /*
+   * v2.2 — 남은 길 점선을 우측 패널 타임라인 점선과 같은 무늬로 맞춘다(2026-10-14 디자이너).
+   * 2px 사각 점 · 6px 쉼(주기 8) · 굵기 2. 색과 투명도는 그대로다.
+   * 점선 길이는 월드 단위라, 확대할 때마다 화면 1px 의 월드 길이(perPixel)로 다시 잰다 — frame() 에서.
+   * 화면 안쪽으로 뻗는 길은 기울기만큼 조금 촘촘해 보인다(투시를 거의 안 주므로 그 정도뿐이다).
+   */
+  var DOT = { on: 2, off: 6, width: 2 };
+  var dotMats = [];
+  function syncDots() {
+    if (!dotMats.length) { return; }
+    var pp = perPixel();
+    dotMats.forEach(function (mat) { mat.dashSize = DOT.on * pp; mat.gapSize = DOT.off * pp; });
+  }
+
   function strand(points, color, dashed) {
     var flat = [];
     points.forEach(function (p) { flat.push(p.x, p.y, p.z); });
@@ -1757,7 +1772,7 @@
 
     var mat = new Fat.LineMaterial({
       color: color,
-      linewidth: dashed ? 2.6 : 3.6,
+      linewidth: dashed ? (THEMED ? DOT.width : 2.6) : 3.6,
       transparent: true,
       opacity: dashed ? 0.85 : 0.95,
       dashed: !!dashed,
@@ -1767,6 +1782,7 @@
     });
     mat.resolution.set(view.clientWidth || 1, view.clientHeight || 1);
     fatMats.push(mat);
+    if (THEMED && dashed) { dotMats.push(mat); }
 
     var line = new Fat.Line2(geo, mat);
     line.computeLineDistances();
@@ -1782,6 +1798,7 @@
     ghostMat.opacity = mat.opacity * 0.3;
     ghostMat.resolution.copy(mat.resolution);
     fatMats.push(ghostMat);
+    if (THEMED && dashed) { dotMats.push(ghostMat); }
     var ghost = new Fat.Line2(geo, ghostMat);
     ghost.computeLineDistances();
     ghost.renderOrder = 1;
