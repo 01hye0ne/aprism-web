@@ -1,10 +1,10 @@
 # assets/icons/outline/*.svg 를 assets/css/icons-outline.css 안에 data URI 로 인라인한다.
 #
-# 2026-10-14 아이콘 개편(Figma 01.7 Icon · "아웃라인" 섹션 1142:28126). v2.2 에만 쓴다 —
+# 2026-10-14 아이콘 개편(Figma 01.7 Icon · "아웃라인" 섹션 1142:32478). v2.2 에만 쓴다 —
 # 지난 판(v1 · v2 · v2.1)은 app-shell.css 의 기존 아이콘(assets/icons/*.svg)을 그대로 둔다.
 # .v2-2 아래에서 같은 --ic-* 이름을 덮으므로 화면 마크업은 고치지 않는다.
 #
-# 16px 이하(.i-14 · .i-16)는 획을 굵힌 작은 크기용(assets/icons/outline-16)을 쓴다.
+# 16px 이하(.i-14 · .i-16)는 선을 굵힌 작은 크기용(assets/icons/outline-16)을 쓴다.
 #
 # 아이콘 SVG 를 바꾼 뒤 커밋 전에 실행한다:
 #   python tools/make-icons-small.py && python tools/inline-icons-outline.py
