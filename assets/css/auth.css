@@ -19,8 +19,8 @@
   height: 100vh;
   height: 100dvh;
   overflow: hidden;
-  background-color: var(--bg-canvas);
-  color: var(--fg-primary);
+  background-color: var(--bg-page);
+  color: var(--text-primary);
 }
 
 /*
@@ -37,7 +37,7 @@
   color: #fff;
 }
 
-:root[data-theme="light"] .brand-lockup { color: var(--fg-primary); }
+:root[data-theme="light"] .brand-lockup { color: var(--text-primary); }
 
 /* Figma "Frame 1597881564" — 락업 + 태그라인, gap 18. 18 은 스페이싱 토큰에 없는 값이다. */
 .brand-block {
@@ -59,8 +59,8 @@
 .brand-tagline p { margin: 0; }
 
 /* 위 줄 — 국문. 아래 줄 — 영문. 크기는 화면마다 다르고 색은 같다. */
-.brand-title { color: var(--fg-secondary); }
-.brand-sub { color: var(--fg-disabled); }
+.brand-title { color: var(--text-secondary); }
+.brand-sub { color: var(--text-disabled); }
 
 /* ---------- 스플래시 (630:3480) ---------- */
 
@@ -153,7 +153,7 @@
   gap: var(--space-40);
   padding: var(--space-40) var(--space-20) var(--space-20);
   border-radius: var(--radius-container);
-  background-color: color-mix(in srgb, var(--bg-surface-disabled) 50%, transparent);
+  background-color: color-mix(in srgb, var(--bg-cell) 50%, transparent);
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
 }
@@ -165,8 +165,8 @@
   gap: var(--space-8);
 }
 
-.login-head h1 { margin: 0; color: var(--fg-primary); }
-.login-head p { margin: 0; color: var(--fg-tertiary); }
+.login-head h1 { margin: 0; color: var(--text-primary); }
+.login-head p { margin: 0; color: var(--text-tertiary); }
 
 /* Figma "Fields" — Text Field 둘 + Options, gap 20. Text Field 는 app-shell 의 .field 를 쓴다. */
 .login-fields {
@@ -184,7 +184,7 @@
  */
 .login-fields .field-box > .lead {
   flex: none;
-  color: var(--fg-primary);
+  color: var(--text-primary);
 }
 
 /*
@@ -197,14 +197,14 @@
   border: 0;
   padding: 0;
   background: none;
-  color: var(--fg-primary);
+  color: var(--text-primary);
   font-family: inherit;
   font-size: var(--font-size-14);
   line-height: var(--font-line-height-22);
 }
 
 .login-fields input:focus { outline: 0; }
-.login-fields input::placeholder { color: var(--fg-tertiary); }
+.login-fields input::placeholder { color: var(--text-tertiary); }
 
 /* 입력칸 안을 눌러도 테두리가 반응하게 — 포커스는 칸 전체에 준다. */
 .login-fields .field:not(.is-error) .field-box:focus-within {
@@ -233,11 +233,11 @@
   border: 0;
   border-radius: var(--radius-2);
   background: none;
-  color: var(--fg-primary);
+  color: var(--text-primary);
   cursor: pointer;
 }
 
-.pw-toggle:hover { color: var(--fg-secondary); }
+.pw-toggle:hover { color: var(--text-secondary); }
 .pw-toggle .i { --i: var(--ic-eye-off); }
 .pw-toggle[aria-pressed="true"] .i { --i: var(--ic-eye); }
 
@@ -267,7 +267,7 @@
   align-items: center;
   gap: var(--space-8);
   padding: var(--space-8) 0;
-  color: var(--fg-primary);
+  color: var(--text-primary);
   cursor: pointer;
   user-select: none;
 }
@@ -294,7 +294,7 @@
   height: 18px;
   border: var(--border-width-thin) solid var(--border-default);
   border-radius: var(--radius-control);
-  background-color: var(--bg-surface-default);
+  background-color: var(--bg-panel);
 }
 
 /* Checked=On — 면이 bg/brand 로 차고 테두리가 사라진다. 표식은 14 짜리 check. */
@@ -302,13 +302,13 @@
   --i: var(--ic-check);
   width: 14px;
   height: 14px;
-  color: var(--fg-on-brand);
+  color: var(--comp-gnb-text-on-brand);
   opacity: 0;
 }
 
 .checkbox input:checked + .box {
   border-color: transparent;
-  background-color: var(--bg-brand);
+  background-color: var(--comp-gnb-brand);
 }
 
 .checkbox input:checked + .box .i { opacity: 1; }
@@ -330,15 +330,15 @@
   width: 100%;
   height: var(--size-control-lg);
   padding: 0 var(--space-20);
-  border: var(--border-width-thin) solid var(--button-secondary-border-default);
+  border: var(--border-width-thin) solid var(--comp-button-secondary-border-default);
   border-radius: var(--radius-control);
-  background-color: var(--button-secondary-bg-default);
-  color: var(--button-secondary-fg-default);
+  background-color: var(--comp-button-secondary-bg-default);
+  color: var(--comp-button-secondary-text-default);
   cursor: pointer;
 }
 
-.login-submit:hover { background-color: var(--button-secondary-bg-hover); }
-.login-submit:active { background-color: var(--button-secondary-bg-pressed); }
+.login-submit:hover { background-color: var(--comp-button-secondary-bg-hover); }
+.login-submit:active { background-color: var(--comp-button-secondary-bg-pressed); }
 
 .login-submit:focus-visible {
   outline: var(--border-width-strong) solid var(--border-focus);
@@ -353,17 +353,17 @@
  */
 .login-submit.is-danger {
   border-color: transparent;
-  background-color: var(--button-danger-bg-default);
-  color: var(--button-danger-fg-default);
+  background-color: var(--comp-button-danger-bg-default);
+  color: var(--comp-button-danger-text-default);
 }
 
-.login-submit.is-danger:hover { background-color: var(--button-danger-bg-hover); }
-.login-submit.is-danger:active { background-color: var(--button-danger-bg-pressed); }
+.login-submit.is-danger:hover { background-color: var(--comp-button-danger-bg-hover); }
+.login-submit.is-danger:active { background-color: var(--comp-button-danger-bg-pressed); }
 
 /* 규칙을 다 채우기 전에는 눌러도 반응이 없다 — Figma 실측 그대로 State=Disabled. */
 .login-submit.is-danger:disabled {
-  background-color: var(--button-danger-bg-disabled);
-  color: var(--button-danger-fg-disabled);
+  background-color: var(--comp-button-danger-bg-disabled);
+  color: var(--comp-button-danger-text-disabled);
   cursor: not-allowed;
 }
 
@@ -392,7 +392,7 @@
 
 .auth-switch {
   margin: 0;
-  color: var(--fg-brand);
+  color: var(--comp-gnb-text-brand);
   text-decoration: none;
   cursor: pointer;
 }
@@ -423,15 +423,15 @@
   align-items: center;
   gap: var(--space-8);
   padding: var(--space-4) 0;
-  color: var(--fg-secondary);
+  color: var(--text-secondary);
 }
 
 .pw-rule .i {
-  color: var(--fg-disabled);
+  color: var(--text-disabled);
   transition: color 120ms ease;
 }
 
-.pw-rule.is-met .i { color: var(--status-normal-fg); }
+.pw-rule.is-met .i { color: var(--status-safe-text); }
 
 @media (prefers-reduced-motion: reduce) {
   .pw-rule .i { transition: none; }
@@ -445,7 +445,7 @@
 .inline-notice.is-warning {
   border: var(--border-width-thin) solid var(--status-warning-border);
   background-color: var(--status-warning-bg);
-  color: var(--status-warning-fg);
+  color: var(--status-warning-text);
 }
 
 .inline-notice.is-warning .i { color: var(--status-warning-icon); }
@@ -461,13 +461,13 @@
   height: var(--border-width-thin);
   margin: 0;
   border: 0;
-  background-color: var(--border-subtle);
+  background-color: var(--border-divider);
 }
 
 .login-help p {
   margin: 0;
   text-align: center;
-  color: var(--fg-tertiary);
+  color: var(--text-tertiary);
 }
 
 /* Figma "Copyright" — 카드 안 마지막 줄. Help 와 gap 40. */
@@ -475,7 +475,7 @@
   flex: none;
   margin: 0;
   text-align: center;
-  color: var(--fg-tertiary);
+  color: var(--text-tertiary);
 }
 
 /*

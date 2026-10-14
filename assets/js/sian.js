@@ -654,7 +654,7 @@
       mapCanvas.width = Math.round(box.width * ratio);
       mapCanvas.height = Math.round(box.height * ratio);
       var ctx = mapCanvas.getContext("2d");
-      ctx.fillStyle = getComputedStyle(document.body).getPropertyValue("--bg-canvas") || "#070a10";
+      ctx.fillStyle = getComputedStyle(document.body).getPropertyValue("--bg-page") || "#070a10";
       ctx.fillRect(0, 0, mapCanvas.width, mapCanvas.height);
 
       var srcBox = src.getBoundingClientRect();

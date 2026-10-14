@@ -31,13 +31,13 @@
   --color-gray-900: #0D0E10;
   --color-gray-950: #090A0C;
 
-  --color-danger-100: #FFE8E6;
-  --color-danger-200: #FFB5AE;
-  --color-danger-300: #FD736D;
-  --color-danger-500: #F52F39;
-  --color-danger-700: #B71824;
-  --color-danger-800: #861118;
-  --color-danger-900: #460A0B;
+  --color-red-100: #FFE8E6;
+  --color-red-200: #FFB5AE;
+  --color-red-300: #FD736D;
+  --color-red-500: #F52F39;
+  --color-red-700: #B71824;
+  --color-red-800: #861118;
+  --color-red-900: #460A0B;
 }
 
 /* Delta 모서리 번짐 — raw 남색(rgb 44 51 64)을 무채색으로 */

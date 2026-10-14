@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>스플래시 · 로그인 · 비밀번호 변경 · 퍼블리싱 노트 — APRISM</title>
   <meta name="description" content="진입 화면 Figma 기준 반영 내역과 고친 지점" />
-  <link rel="stylesheet" href="../assets/css/tokens.css?v=4aceab62" />
-  <link rel="stylesheet" href="../assets/css/base.css?v=da609ee5" />
+  <link rel="stylesheet" href="../assets/css/tokens.css?v=24e3f8af" />
+  <link rel="stylesheet" href="../assets/css/base.css?v=6c992126" />
   <style>
     .notes {
       max-width: 880px;
@@ -14,7 +14,7 @@
       padding: var(--space-48) var(--space-20) 96px;
       font-size: var(--font-size-14);
       line-height: var(--font-line-height-22);
-      color: var(--fg-secondary);
+      color: var(--text-secondary);
     }
 
     .notes h2 {
@@ -22,14 +22,14 @@
       font-size: var(--font-size-32);
       line-height: var(--font-line-height-40);
       letter-spacing: -0.02em;
-      color: var(--fg-primary);
+      color: var(--text-primary);
     }
 
     .notes h3 {
       margin: var(--space-48) 0 var(--space-12);
       font-size: var(--font-size-16);
       line-height: var(--font-line-height-24);
-      color: var(--fg-primary);
+      color: var(--text-primary);
     }
 
     .notes p + p { margin-top: var(--space-12); }
@@ -46,23 +46,23 @@
     .notes th,
     .notes td {
       padding: var(--space-8) var(--space-12);
-      border-bottom: var(--border-width-thin) solid var(--border-subtle);
+      border-bottom: var(--border-width-thin) solid var(--border-divider);
       text-align: left;
       vertical-align: top;
     }
 
-    .notes th { color: var(--fg-tertiary); font-weight: 500; white-space: nowrap; }
+    .notes th { color: var(--text-tertiary); font-weight: 500; white-space: nowrap; }
 
     .notes code {
       font-family: var(--font-family-mono);
       font-size: 0.92em;
-      color: var(--fg-primary);
+      color: var(--text-primary);
     }
 
     .notes ul { margin: var(--space-8) 0 0; padding-left: 1.1em; }
     .notes li { margin-bottom: var(--space-4); }
     .notes strong,
-    .notes b { color: var(--fg-primary); font-weight: 600; }
+    .notes b { color: var(--text-primary); font-weight: 600; }
 
     .notes .eyebrow {
       font-family: var(--font-family-mono);
@@ -70,7 +70,7 @@
       font-weight: 500;
       letter-spacing: 0.09em;
       text-transform: uppercase;
-      color: var(--fg-brand);
+      color: var(--comp-gnb-text-brand);
       margin-bottom: var(--space-8);
     }
 

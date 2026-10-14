@@ -7,7 +7,7 @@
   <meta name="description" content="사람 영역을 가리는 방식 비교 — 일반 모자이크 · 줄무늬 모자이크 · 줄무늬 실루엣. 해칭 시험판에서 갈라져 나온 시험판이다." />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/static/woff2/SUIT.css" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" />
-  <link rel="stylesheet" href="../assets/css/tokens.css?v=4aceab62" />
+  <link rel="stylesheet" href="../assets/css/tokens.css?v=24e3f8af" />
   <style>
     /*
      * 시험용 한 장짜리 화면이라 꾸밈은 여기에 둔다 — 해칭 시험판(hatch-lab.html)과 같은 짜임이다.
@@ -19,8 +19,8 @@
       display: grid;
       grid-template-columns: minmax(0, 1fr) 300px;
       height: 100%;
-      background-color: var(--bg-canvas);
-      color: var(--fg-primary);
+      background-color: var(--bg-page);
+      color: var(--text-primary);
       font-family: "SUIT Variable", "SUIT", system-ui, sans-serif;
     }
     .stage {
@@ -38,57 +38,57 @@
       width: 100%;
       height: auto;
       border-radius: var(--radius-container);
-      background-color: var(--bg-surface-overlay-dark);
+      background-color: var(--bg-map-chip);
     }
     .view figcaption { display: flex; flex-direction: column; gap: var(--space-2); }
     .view b { font-size: var(--font-size-14); line-height: var(--font-line-height-20); }
-    .view span { color: var(--fg-tertiary); font-size: var(--font-size-12); line-height: var(--font-line-height-18); }
+    .view span { color: var(--text-tertiary); font-size: var(--font-size-12); line-height: var(--font-line-height-18); }
     .panel {
       display: flex;
       flex-direction: column;
       gap: var(--space-16);
       padding: var(--space-20) var(--space-16);
       border-left: var(--border-width-thin) solid var(--border-default);
-      background-color: var(--bg-surface-subtle);
+      background-color: var(--bg-cell);
       overflow-y: auto;
     }
     .panel h1 { margin: 0; font-size: var(--font-size-16); line-height: var(--font-line-height-24); }
-    .panel p { margin: 0; color: var(--fg-tertiary); font-size: var(--font-size-12); line-height: var(--font-line-height-18); }
+    .panel p { margin: 0; color: var(--text-tertiary); font-size: var(--font-size-12); line-height: var(--font-line-height-18); }
     .row { display: flex; flex-direction: column; gap: var(--space-4); }
     .row > label {
       display: flex;
       justify-content: space-between;
       gap: var(--space-8);
-      color: var(--fg-secondary);
+      color: var(--text-secondary);
       font-size: var(--font-size-12);
       line-height: var(--font-line-height-18);
     }
     .row output {
-      color: var(--fg-primary);
+      color: var(--text-primary);
       font-family: "JetBrains Mono", monospace;
       font-size: var(--font-size-12);
     }
-    input[type="range"] { width: 100%; accent-color: var(--bg-brand); }
+    input[type="range"] { width: 100%; accent-color: var(--comp-gnb-brand); }
     input[type="color"] { width: 100%; height: 28px; padding: 0; border: 0; background: none; }
     select {
       width: 100%;
       padding: var(--space-8);
       border: var(--border-width-thin) solid var(--border-default);
       border-radius: var(--radius-control);
-      background-color: var(--bg-surface-default);
-      color: var(--fg-primary);
+      background-color: var(--bg-panel);
+      color: var(--text-primary);
       font: inherit;
       font-size: var(--font-size-13);
     }
     .rule { height: 1px; background-color: var(--border-default); }
     .check { flex-direction: row; align-items: center; gap: var(--space-8); }
-    .check input { accent-color: var(--bg-brand); }
+    .check input { accent-color: var(--comp-gnb-brand); }
     .warn {
       padding: var(--space-12);
       border-radius: var(--radius-card);
       border: var(--border-width-thin) solid var(--status-warning-border);
     }
-    .warn p { color: var(--fg-secondary); }
+    .warn p { color: var(--text-secondary); }
     @media (max-width: 900px) {
       body { grid-template-columns: 1fr; height: auto; }
       .stage { grid-template-columns: 1fr; padding: var(--space-16); }

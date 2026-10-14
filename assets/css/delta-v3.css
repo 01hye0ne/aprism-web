@@ -31,9 +31,9 @@
 
   /* 광원에서 멀어질수록 빛이 옅다 — 세기는 delta-v3.js 가 --d3-power 로 넣는다. */
   --d3-primary: color-mix(in srgb,
-    var(--delta3-glow-primary, var(--alert-default-glow-primary)) calc(var(--d3-power, 1) * 100%), transparent);
+    var(--delta3-glow-primary, var(--comp-alert-default-glow-core)) calc(var(--d3-power, 1) * 100%), transparent);
   --d3-secondary: color-mix(in srgb,
-    var(--delta3-glow-secondary, var(--alert-default-glow-secondary)) calc(var(--d3-power, 1) * 100%), transparent);
+    var(--delta3-glow-secondary, var(--comp-alert-default-glow-halo)) calc(var(--d3-power, 1) * 100%), transparent);
 
   position: absolute;
   z-index: 6;
@@ -92,7 +92,7 @@
    */
   background-image: linear-gradient(
     180deg,
-    color-mix(in srgb, var(--bg-surface-selected) 90%, transparent) 50%,
+    color-mix(in srgb, var(--bg-selected) 90%, transparent) 50%,
     color-mix(in srgb, var(--d3-face-mid, #98BDED) 90%, transparent) 83.654%,
     color-mix(in srgb, var(--d3-face-end, var(--bg-inverse)) 88%, transparent) 100%
   );
@@ -229,7 +229,7 @@
  * ------------------------------------------------------------------ */
 
 .v3 .delta-dots {
-  --dd-dim: color-mix(in srgb, var(--fg-primary) 35%, transparent);
+  --dd-dim: color-mix(in srgb, var(--text-primary) 35%, transparent);
   flex: none;
   display: block;
   width: var(--size-icon-20);
@@ -242,7 +242,7 @@
 .v3 .delta-dots rect { transform-box: fill-box; transform-origin: center; }
 
 /* 정상 — 흰 점 셋. 움직이지 않는다. */
-.v3 .delta-dots rect { fill: var(--fg-primary); }
+.v3 .delta-dots rect { fill: var(--text-primary); }
 
 /* 움츠러드는 쪽 — 각 점이 가운데(10, 10)를 향한다. */
 .v3 .delta-dots .dd-1 { --tx: 1.4px; --ty: -1.4px; }
@@ -344,7 +344,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  background-color: var(--bg-surface-subtle);
+  background-color: var(--bg-cell);
   -webkit-mask: url("data:image/svg+xml,%3Csvg preserveAspectRatio='none' overflow='visible' style='display: block;' width='64' height='64' viewBox='0 0 64 64' fill='none' xmlns='http://www.w3.org/2000/svg'%3E %3Cpath id='Rectangle 180' d='M0 0H62.627A16 16 0 0 0 51.314 4.686L4.686 51.314A16 16 0 0 0 0 62.627V0Z' fill='%232C3443'/%3E %3C/svg%3E") 0 0 / 64px 64px no-repeat;
   mask: url("data:image/svg+xml,%3Csvg preserveAspectRatio='none' overflow='visible' style='display: block;' width='64' height='64' viewBox='0 0 64 64' fill='none' xmlns='http://www.w3.org/2000/svg'%3E %3Cpath id='Rectangle 180' d='M0 0H62.627A16 16 0 0 0 51.314 4.686L4.686 51.314A16 16 0 0 0 0 62.627V0Z' fill='%232C3443'/%3E %3C/svg%3E") 0 0 / 64px 64px no-repeat;
   pointer-events: none;
@@ -364,7 +364,7 @@
   width: 64px;
   height: 64px;
   pointer-events: none;
-  background-color: var(--bg-surface-subtle);
+  background-color: var(--bg-cell);
   -webkit-mask: url("data:image/svg+xml,%3Csvg preserveAspectRatio='none' overflow='visible' style='display: block;' width='64' height='64' viewBox='0 0 64 64' fill='none' xmlns='http://www.w3.org/2000/svg'%3E %3Cpath id='Rectangle 180' d='M0 0H62.627A16 16 0 0 0 51.314 4.686L4.686 51.314A16 16 0 0 0 0 62.627V0Z' fill='%232C3443'/%3E %3C/svg%3E") 0 0 / 64px 64px no-repeat;
   mask: url("data:image/svg+xml,%3Csvg preserveAspectRatio='none' overflow='visible' style='display: block;' width='64' height='64' viewBox='0 0 64 64' fill='none' xmlns='http://www.w3.org/2000/svg'%3E %3Cpath id='Rectangle 180' d='M0 0H62.627A16 16 0 0 0 51.314 4.686L4.686 51.314A16 16 0 0 0 0 62.627V0Z' fill='%232C3443'/%3E %3C/svg%3E") 0 0 / 64px 64px no-repeat;
 }
@@ -414,7 +414,7 @@
   cursor: pointer;
 }
 .v3 .delta3-close:hover { background-color: rgb(255 255 255 / 10%); }
-.v3 .delta3-close .i { --i: var(--ic-close); background-color: var(--fg-primary); }
+.v3 .delta3-close .i { --i: var(--ic-close); background-color: var(--text-primary); }
 .v3 .delta3:not(.is-open) .delta3-close { display: none; }
 
 /* ------------------------------------------------------------------ *
@@ -440,10 +440,10 @@
   padding: var(--space-4);
   overflow: hidden;
   border-radius: 12px;
-  background-color: color-mix(in srgb, var(--bg-surface-disabled) 55%, transparent);
+  background-color: color-mix(in srgb, var(--bg-cell) 55%, transparent);
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
-  box-shadow: inset 0 -6px 20px -8px var(--delta3-glow-primary, var(--alert-default-glow-primary));
+  box-shadow: inset 0 -6px 20px -8px var(--delta3-glow-primary, var(--comp-alert-default-glow-core));
 }
 
 .v3 .delta3.is-open .delta3-card {
@@ -470,7 +470,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  color: var(--fg-primary);
+  color: var(--text-primary);
   font-weight: 700;
 }
 
@@ -507,7 +507,7 @@
   cursor: pointer;
 }
 .v3 .delta3-plus:hover { background-color: rgb(255 255 255 / 10%); }
-.v3 .delta3-plus .i { --i: var(--ic-plus); background-color: var(--fg-primary); }
+.v3 .delta3-plus .i { --i: var(--ic-plus); background-color: var(--text-primary); }
 
 /*
  * 본문 — 두 판이 같다. 위 변에 선 하나, 면은 bg/surface/disabled, 위쪽에서 떨어지는 그림자.
@@ -519,15 +519,15 @@
   min-height: 0;
   overflow: hidden;
   padding: var(--space-8);
-  border-top: var(--border-width-thin) solid var(--border-control);
+  border-top: var(--border-width-thin) solid var(--comp-input-border);
   border-radius: var(--radius-container);
-  background-color: color-mix(in srgb, var(--bg-surface-disabled) 72%, transparent);
+  background-color: color-mix(in srgb, var(--bg-cell) 72%, transparent);
   box-shadow: inset 0 10px 8px 0 rgb(0 0 0 / 25%);
 }
 
 .v3 .delta3-body p {
   margin: 0;
-  color: var(--fg-primary);
+  color: var(--text-primary);
   font-weight: var(--font-weight-regular);   /* app-shell 의 .ai-line-2 는 Bold 다 — Figma 본문은 Regular. */
   font-size: var(--font-size-14);
   line-height: var(--font-line-height-22);
@@ -561,9 +561,9 @@
   min-height: 24px;
   padding: 0 var(--space-8);
   border-radius: var(--radius-control);
-  border: var(--border-width-thin) solid var(--button-secondary-border-default);
-  background-color: var(--button-secondary-bg-default);
-  color: var(--button-secondary-fg-default);
+  border: var(--border-width-thin) solid var(--comp-button-secondary-border-default);
+  background-color: var(--comp-button-secondary-bg-default);
+  color: var(--comp-button-secondary-text-default);
   font-size: var(--font-size-13);
   line-height: var(--font-line-height-18);
   font-weight: 500;
@@ -578,11 +578,11 @@
   margin-left: auto;
   padding: 0;
   border-radius: var(--radius-control);
-  border: var(--border-width-thin) solid var(--button-secondary-border-default);
-  background-color: var(--button-secondary-bg-default);
+  border: var(--border-width-thin) solid var(--comp-button-secondary-border-default);
+  background-color: var(--comp-button-secondary-bg-default);
   cursor: pointer;
 }
-.v3 .delta3-ask .i { --i: var(--ic-search); background-color: var(--button-secondary-fg-default); }
+.v3 .delta3-ask .i { --i: var(--ic-search); background-color: var(--comp-button-secondary-text-default); }
 .v3 .delta3-ask[aria-expanded="true"] .i { --i: var(--ic-close); }
 
 /*
@@ -596,7 +596,7 @@
  * app-shell 은 면을 단계 색(--ai-input-focus-bg)으로 바꾸고 선을 안쪽에 그린다 — 여기서 둘 다 되돌린다.
  * 선은 같은 ::before 를 상자 밖으로 2px 키워 그린다. 색은 그대로 --ai-input-edge(단계 색)다.
  */
-.v3 .delta3 .ai-input:focus-within { background-color: var(--bg-surface-overlay-dark); }
+.v3 .delta3 .ai-input:focus-within { background-color: var(--bg-map-chip); }
 
 /*
  * 선 색 — app-shell 은 --ai-input-edge 를 .ai-box 에만 둔다. Delta 창은 .ai-box 가 아니라
@@ -605,25 +605,25 @@
  */
 .v3 .delta3 {
   --ai-input-edge: linear-gradient(90deg,
-    var(--color-main-700) 0%, var(--color-main-300) 25%, var(--color-main-400) 46%,
-    var(--color-main-700) 72%, var(--color-main-300) 100%);
+    var(--color-blue-700) 0%, var(--color-blue-300) 25%, var(--color-blue-400) 46%,
+    var(--color-blue-700) 72%, var(--color-blue-300) 100%);
 }
 .v3 .delta3.is-warning {
   --ai-input-edge: linear-gradient(90deg,
-    var(--status-warning-border) 0%, #f7cd36 25%, var(--color-warning-500) 46%,
+    var(--status-warning-border) 0%, #f7cd36 25%, var(--color-yellow-500) 46%,
     var(--status-warning-border) 72%, #f7cd36 100%);
 }
 .v3 .delta3.is-critical {
   --ai-input-edge: linear-gradient(90deg,
-    var(--status-critical-border) 0%, #f4463f 25%, var(--color-danger-500) 46%,
+    var(--status-critical-border) 0%, #f4463f 25%, var(--color-red-500) 46%,
     var(--status-critical-border) 72%, #f4463f 100%);
 }
 .v3 .delta3 .ai-input:focus-within::before {
   inset: calc(var(--border-width-strong) * -1);
   border-radius: calc(var(--radius-control) + var(--border-width-strong));
 }
-.v3 .delta3 .ai-input:focus-within .ai-input-ph { color: var(--fg-primary); }
-.v3 .delta3 .ai-input:focus-within .ai-input-ph::placeholder { color: var(--fg-secondary); }
+.v3 .delta3 .ai-input:focus-within .ai-input-ph { color: var(--text-primary); }
+.v3 .delta3 .ai-input:focus-within .ai-input-ph::placeholder { color: var(--text-secondary); }
 .v3 .delta3:not(.is-open) .ai-input { display: none; }
 
 /* ------------------------------------------------------------------ *
@@ -643,22 +643,22 @@
 .v3 .delta3.is-safe {
   --d3-face-mid: color-mix(in srgb, #7FCFA3 55%, var(--color-gray-900));
   --d3-face-end: color-mix(in srgb, #2AD982 70%, var(--color-gray-900));
-  --delta3-glow-primary: var(--alert-safe-glow-primary);
-  --delta3-glow-secondary: var(--alert-safe-glow-secondary);
+  --delta3-glow-primary: var(--comp-alert-safe-glow-core);
+  --delta3-glow-secondary: var(--comp-alert-safe-glow-halo);
   --d3-ramp: #2AD982 0%, #0EBB57 12.5%, #10893B 25%, #2F603E 37.5%, #5A595F 50%, #77778A 62.5%, #75A9A6 75%, #55D2A2 87.5%, #2AD982 100%;
 }
 .v3 .delta3.is-warning {
   --d3-face-mid: color-mix(in srgb, #C9A23A 55%, var(--color-gray-900));
   --d3-face-end: color-mix(in srgb, #F7CD36 70%, var(--color-gray-900));
-  --delta3-glow-primary: var(--alert-warning-glow-primary);
-  --delta3-glow-secondary: var(--alert-warning-glow-secondary);
+  --delta3-glow-primary: var(--comp-alert-warning-glow-core);
+  --delta3-glow-secondary: var(--comp-alert-warning-glow-halo);
   --d3-ramp: #F2B020 0%, #D38210 12.5%, #A5521A 25%, #813D39 37.5%, #7D4F5A 50%, #9C7D6B 62.5%, #CBAD61 75%, #EEC242 87.5%, #F2B020 100%;
 }
 .v3 .delta3.is-critical {
   --d3-face-mid: color-mix(in srgb, #B8443B 55%, var(--color-gray-900));
   --d3-face-end: color-mix(in srgb, #F4463F 70%, var(--color-gray-900));
-  --delta3-glow-primary: var(--alert-danger-glow-primary);
-  --delta3-glow-secondary: var(--alert-danger-glow-secondary);
+  --delta3-glow-primary: var(--comp-alert-critical-glow-core);
+  --delta3-glow-secondary: var(--comp-alert-critical-glow-halo);
   --d3-ramp: #F05937 0%, #D9321D 12.5%, #A3121E 25%, #6D0B3B 37.5%, #572262 50%, #6D487C 62.5%, #A3687B 75%, #D96F5E 87.5%, #F05937 100%;
 }
 

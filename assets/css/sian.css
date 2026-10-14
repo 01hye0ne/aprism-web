@@ -20,7 +20,7 @@
   align-items: center;
 }
 
-.status-bar-place { color: var(--fg-primary); white-space: nowrap; }
+.status-bar-place { color: var(--text-primary); white-space: nowrap; }
 
 /* ---------- 셸 배치 ---------- */
 /*
@@ -114,7 +114,7 @@
 
 .sian-1 .mp-stage .mp-header { padding: var(--space-16) var(--space-8) var(--space-8); }
 .sian .mp-stage .mp-header p,
-.sian .stage-card .mp-header p { color: var(--fg-tertiary); }
+.sian .stage-card .mp-header p { color: var(--text-tertiary); }
 
 .sian .mp-stage .mp-scroll,
 .sian .stage-card .mp-scroll { gap: var(--space-12); padding-bottom: var(--space-12); }
@@ -130,7 +130,7 @@
 .sian .precheck-list {
   border: var(--border-width-thin) solid var(--border-default);
   border-radius: var(--radius-container);
-  background-color: var(--bg-surface-overlay-dark);
+  background-color: var(--bg-map-chip);
   box-shadow: inset 0 10px 8px rgb(0 0 0 / 25%);
   overflow: hidden;
 }
@@ -162,9 +162,9 @@
   flex-direction: column;
   gap: 0;
   padding: var(--space-20);
-  border: var(--border-width-thin) solid var(--border-subtle);
+  border: var(--border-width-thin) solid var(--border-divider);
   border-radius: var(--radius-container);
-  background-color: var(--bg-surface-raised);
+  background-color: var(--bg-raised);
   -webkit-backdrop-filter: blur(20px);
   backdrop-filter: blur(20px);
 }
@@ -203,14 +203,14 @@
   gap: var(--space-8);
 }
 
-.ah-title-row h2 { flex: 1 1 auto; min-width: 0; color: var(--fg-primary); }
+.ah-title-row h2 { flex: 1 1 auto; min-width: 0; color: var(--text-primary); }
 
 /* 조치 필요 N — Badge Emphasis=Text. 색은 지금 가장 높은 단계를 따른다. */
-.ah-need { color: var(--status-info-fg); }
+.ah-need { color: var(--status-info-text); }
 .ah-need .badge-dot { background-color: var(--status-info-icon); }
-.sian[data-level="warning"] .ah-need { color: var(--status-warning-fg); }
+.sian[data-level="warning"] .ah-need { color: var(--status-warning-text); }
 .sian[data-level="warning"] .ah-need .badge-dot { background-color: var(--status-warning-icon); }
-.sian[data-level="critical"] .ah-need { color: var(--status-critical-fg); }
+.sian[data-level="critical"] .ah-need { color: var(--status-critical-text); }
 .sian[data-level="critical"] .ah-need .badge-dot { background-color: var(--status-critical-icon); }
 
 .ah-filter {
@@ -249,7 +249,7 @@
 .sev-chip.is-critical {
   background-color: var(--status-critical-bg);
   border-color: var(--status-critical-border);
-  color: var(--status-critical-fg);
+  color: var(--status-critical-text);
 }
 
 .sev-chip.is-critical .badge-dot { background-color: var(--status-critical-icon); }
@@ -257,7 +257,7 @@
 .sev-chip.is-warning {
   background-color: var(--status-warning-bg);
   border-color: var(--status-warning-border);
-  color: var(--status-warning-fg);
+  color: var(--status-warning-text);
 }
 
 .sev-chip.is-warning .badge-dot { background-color: var(--status-warning-icon); }
@@ -279,7 +279,7 @@
   padding: 0;
   border: 0;
   background: none;
-  color: var(--fg-primary);
+  color: var(--text-primary);
   font-family: inherit;
   cursor: pointer;
 }
@@ -295,7 +295,7 @@
   display: flex;
   border: var(--border-width-thin) solid var(--border-default);
   border-radius: var(--radius-container);
-  background-color: var(--bg-surface-overlay-dark);
+  background-color: var(--bg-map-chip);
   box-shadow: inset 0 10px 8px rgb(0 0 0 / 25%);
   overflow: hidden;
 }
@@ -331,7 +331,7 @@
   width: 100%;
   padding: var(--space-12) var(--space-12) var(--space-12) var(--space-12);
   border: 0;
-  border-left: 4px solid var(--alert-warning-edge);
+  border-left: 4px solid var(--comp-alert-warning-edge);
   border-bottom: var(--border-width-thin) solid var(--border-default);
   background: transparent;
   color: inherit;
@@ -340,15 +340,15 @@
   cursor: pointer;
 }
 
-.ah-item.is-critical { border-left-color: var(--alert-danger-edge); }
-.ah-item:hover { background-color: var(--bg-interactive-hover); }
-.ah-item[aria-pressed="true"] { background-color: var(--bg-surface-selected); }
+.ah-item.is-critical { border-left-color: var(--comp-alert-critical-edge); }
+.ah-item:hover { background-color: var(--state-hover); }
+.ah-item[aria-pressed="true"] { background-color: var(--bg-selected); }
 
 .ah-where {
   display: flex;
   align-items: center;
   gap: var(--space-4);
-  color: var(--fg-tertiary);
+  color: var(--text-tertiary);
 }
 
 .ah-where > span:nth-child(2) { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -359,13 +359,13 @@
   display: flex;
   align-items: center;
   gap: var(--space-4);
-  color: var(--fg-primary);
+  color: var(--text-primary);
 }
 
 .ah-title .i { flex: none; color: var(--status-warning-icon); }
 .ah-item.is-critical .ah-title .i { color: var(--status-critical-icon); }
 
-.ah-state { color: var(--fg-secondary); }
+.ah-state { color: var(--text-secondary); }
 
 /* ---------- 시안 1 · Delta (Delta-ver.2) ---------- */
 /*
@@ -377,7 +377,7 @@
   --dl-a: #36b2df;
   --dl-b: #7598e8;
   --dl-c: #89b9ed;
-  --ai-input-edge: linear-gradient(90deg, var(--color-main-400), var(--color-main-600));
+  --ai-input-edge: linear-gradient(90deg, var(--color-blue-400), var(--color-blue-600));
 
   flex: 1 1 0;
   min-height: 0;
@@ -392,7 +392,7 @@
       color-mix(in srgb, var(--dl-a) 10%, transparent) 85%,
       color-mix(in srgb, var(--dl-b) 80%, transparent) 95%,
       var(--dl-c) 100%),
-    var(--bg-surface-default);
+    var(--bg-panel);
   box-shadow: inset 0 -7px 8px 6px var(--color-gray-800);
   transition: background 240ms ease;
 }
@@ -417,7 +417,7 @@
   display: flex;
   align-items: center;
   gap: var(--space-4);
-  color: var(--fg-primary);
+  color: var(--text-primary);
 }
 
 /* Delta/Size=Small — 24. 오브가 못 뜨면 19 원이 남는다. */
@@ -436,8 +436,8 @@
 
 /* Body/1 — Figma 스타일 이름은 Regular 인데 값은 20/32 SemiBold 다. */
 .dl-lines p { word-break: keep-all; }
-.dl-line-1 { color: var(--fg-secondary); }
-.dl-line-2 { color: var(--fg-primary); }
+.dl-line-1 { color: var(--text-secondary); }
+.dl-line-2 { color: var(--text-primary); }
 
 .dl-foot {
   margin-top: auto;
@@ -460,8 +460,8 @@
   padding: var(--space-4) var(--space-12);
   border: 0;
   border-radius: var(--radius-pill);
-  background-color: var(--bg-surface-overlay-dark);
-  color: var(--fg-primary);
+  background-color: var(--bg-map-chip);
+  color: var(--text-primary);
   font-family: inherit;
   font-size: var(--font-size-13);
   line-height: var(--font-line-height-18);
@@ -470,7 +470,7 @@
   cursor: pointer;
 }
 
-.dl-chip:hover { background-color: var(--bg-surface-overlay-light); }
+.dl-chip:hover { background-color: var(--bg-glass); }
 
 /* 조치 버튼 — Button Size=Medium. 첫째 Primary, 나머지 Secondary. */
 .dl-actions { display: flex; gap: var(--space-8); flex-wrap: wrap; }
@@ -557,11 +557,11 @@
   border: 0;
   border-radius: var(--radius-2);
   background: none;
-  color: var(--fg-secondary);
+  color: var(--text-secondary);
   cursor: pointer;
 }
 
-.rc-arrow:hover { color: var(--fg-primary); background-color: var(--bg-interactive-hover); }
+.rc-arrow:hover { color: var(--text-primary); background-color: var(--state-hover); }
 
 .rc-arrow:focus-visible {
   outline: var(--border-width-strong) solid var(--border-focus);
@@ -585,8 +585,8 @@
   flex-direction: column;
   gap: var(--space-20);
   padding: var(--space-24);
-  border: var(--border-width-thin) solid var(--border-subtle);
-  background-color: var(--bg-container);
+  border: var(--border-width-thin) solid var(--border-divider);
+  background-color: var(--bg-panel);
 }
 
 .ua-head {
@@ -596,7 +596,7 @@
 }
 
 /* Figma 는 24/SemiBold 맨 값이다(스타일 미연결) — Heading/2 가 같은 크기라 그것을 쓴다. */
-.ua-title { color: var(--fg-primary); }
+.ua-title { color: var(--text-primary); }
 
 /*
  * Badge Emphasis=Solid(이 파일 기준) — bg/surface/subtle 면, 점과 글이 단계색.
@@ -609,8 +609,8 @@
   height: 26px;
   padding: var(--space-4) var(--space-12) var(--space-4) var(--space-8);
   border-radius: var(--radius-pill);
-  background-color: var(--bg-surface-subtle);
-  color: var(--status-warning-fg);
+  background-color: var(--bg-cell);
+  color: var(--status-warning-text);
   font-size: var(--font-size-13);
   line-height: var(--font-line-height-18);
   font-weight: 500;
@@ -619,11 +619,11 @@
 
 .sev-badge .badge-dot { background-color: var(--status-warning-icon); }
 
-.sev-badge.is-critical { color: var(--status-critical-fg); }
+.sev-badge.is-critical { color: var(--status-critical-text); }
 .sev-badge.is-critical .badge-dot { background-color: var(--status-critical-icon); }
 
-.sev-badge.is-neutral { color: var(--fg-secondary); }
-.sev-badge.is-neutral .badge-dot { background-color: var(--fg-secondary); }
+.sev-badge.is-neutral { color: var(--text-secondary); }
+.sev-badge.is-neutral .badge-dot { background-color: var(--text-secondary); }
 .sev-badge.is-neutral.is-line,
 .ua-done-head .sev-badge { box-shadow: inset 0 0 0 1px var(--border-default); }
 
@@ -645,9 +645,9 @@
 }
 
 .ua-filters .btn {
-  background-color: var(--button-secondary-bg-default);
-  border-color: var(--button-secondary-border-default);
-  color: var(--button-secondary-fg-default);
+  background-color: var(--comp-button-secondary-bg-default);
+  border-color: var(--comp-button-secondary-border-default);
+  color: var(--comp-button-secondary-text-default);
 }
 
 .ua-filters .btn[aria-pressed="true"] {
@@ -665,7 +665,7 @@
   margin-left: auto;
   font-size: var(--font-size-12);
   line-height: var(--font-line-height-18);
-  color: var(--fg-tertiary);
+  color: var(--text-tertiary);
   white-space: nowrap;
 }
 
@@ -688,9 +688,9 @@
   align-items: center;
   gap: var(--space-20);
   padding: var(--space-20);
-  border: var(--border-width-thin) solid var(--border-subtle);
+  border: var(--border-width-thin) solid var(--border-divider);
   border-radius: var(--radius-container);
-  background-color: var(--bg-surface-raised);
+  background-color: var(--bg-raised);
 }
 
 .ua-edge {
@@ -698,10 +698,10 @@
   align-self: stretch;
   width: 4px;
   border-radius: var(--radius-2);
-  background-color: var(--alert-warning-bg);
+  background-color: var(--comp-alert-warning-bg);
 }
 
-.ua-card.is-critical .ua-edge { background-color: var(--alert-danger-bg); }
+.ua-card.is-critical .ua-edge { background-color: var(--comp-alert-critical-bg); }
 
 .ua-text {
   flex: 1 1 auto;
@@ -742,9 +742,9 @@
 .ua-desc,
 .ua-meta { white-space: nowrap; }
 
-.ua-card-title { font-size: var(--font-size-18); line-height: var(--font-line-height-26); font-weight: 700; color: var(--fg-primary); }
-.ua-desc { font-size: var(--font-size-13); line-height: var(--font-line-height-20); color: var(--fg-secondary); }
-.ua-meta { font-size: var(--font-size-12); line-height: var(--font-line-height-18); color: var(--fg-tertiary); }
+.ua-card-title { font-size: var(--font-size-18); line-height: var(--font-line-height-26); font-weight: 700; color: var(--text-primary); }
+.ua-desc { font-size: var(--font-size-13); line-height: var(--font-line-height-20); color: var(--text-secondary); }
+.ua-meta { font-size: var(--font-size-12); line-height: var(--font-line-height-18); color: var(--text-tertiary); }
 
 /*
  * [확인하기] — 기본은 숨기고 카드에 올리거나(hover) 초점이 들어오면 나타난다.
@@ -758,7 +758,7 @@
   transform: translateY(-50%);
   opacity: 0;
   pointer-events: none;
-  box-shadow: -32px 0 24px 8px var(--bg-surface-raised);
+  box-shadow: -32px 0 24px 8px var(--bg-raised);
   transition: opacity 120ms ease;
 }
 
@@ -787,7 +787,7 @@
   font-size: var(--font-size-13);
   line-height: var(--font-line-height-18);
   font-weight: 500;
-  color: var(--fg-secondary);
+  color: var(--text-secondary);
 }
 
 .ua-done-list { display: flex; flex-direction: column; gap: 10px; }
@@ -799,27 +799,27 @@
   gap: var(--space-8);
   padding: var(--space-8) var(--space-12);
   border-radius: var(--radius-6);
-  background-color: var(--bg-surface-subtle);
+  background-color: var(--bg-cell);
 }
 
 .ua-done-item .t { display: flex; flex-direction: column; gap: var(--space-4); }
-.ua-done-item .time { font-size: var(--font-size-12); line-height: var(--font-line-height-18); color: var(--fg-tertiary); }
-.ua-done-item .title { font-size: 15px; line-height: var(--font-line-height-20); font-weight: 700; color: var(--fg-secondary); }
+.ua-done-item .time { font-size: var(--font-size-12); line-height: var(--font-line-height-18); color: var(--text-tertiary); }
+.ua-done-item .title { font-size: 15px; line-height: var(--font-line-height-20); font-weight: 700; color: var(--text-secondary); }
 
 .ua-done-item .how {
   display: flex;
   gap: var(--space-16);
   font-size: var(--font-size-12);
   line-height: var(--font-line-height-18);
-  color: var(--fg-tertiary);
+  color: var(--text-tertiary);
 }
 
-.ua-done-item .how .ok { color: var(--chart-neutral); margin-right: calc(var(--space-16) * -1 + var(--space-4)); }
+.ua-done-item .how .ok { color: var(--comp-chart-neutral); margin-right: calc(var(--space-16) * -1 + var(--space-4)); }
 
 .ua-done-item.is-new { animation: ua-new 1.6s ease; }
 
 @keyframes ua-new {
-  0% { box-shadow: inset 0 0 0 1px var(--color-main-400); }
+  0% { box-shadow: inset 0 0 0 1px var(--color-blue-400); }
   100% { box-shadow: inset 0 0 0 1px transparent; }
 }
 
@@ -842,7 +842,7 @@
   /* 위 52 — 닫기 버튼(32) 자리. 카드 머리와 겹치지 않게 한 줄을 비운다. */
   padding: 52px var(--space-20) var(--space-20);
   border-radius: var(--radius-container);
-  background-color: var(--bg-surface-default);
+  background-color: var(--bg-panel);
 }
 
 /* 닫기 — 다른 모달과 같은 Ghost · Small(32) 아이콘 버튼. 오른쪽 위 12 안쪽. */
@@ -850,10 +850,10 @@
   position: absolute;
   top: var(--space-12);
   right: var(--space-12);
-  color: var(--fg-secondary);
+  color: var(--text-secondary);
 }
 
-.icon-button.ad-close:hover { color: var(--fg-primary); }
+.icon-button.ad-close:hover { color: var(--text-primary); }
 
 .ad-col { min-width: 0; display: flex; flex-direction: column; gap: var(--space-20); }
 .ad-col.is-left { flex: 0 1 664px; }
@@ -865,12 +865,12 @@
   flex-direction: column;
   gap: var(--space-12);
   padding: var(--space-16);
-  border: var(--border-width-thin) solid var(--border-subtle);
+  border: var(--border-width-thin) solid var(--border-divider);
   border-radius: var(--radius-container);
-  background-color: var(--bg-surface-raised);
+  background-color: var(--bg-raised);
 }
 
-.ad-step:not(.is-open) { background-color: var(--bg-surface-subtle); }
+.ad-step:not(.is-open) { background-color: var(--bg-cell); }
 
 .ad-head {
   display: flex;
@@ -905,8 +905,8 @@
   width: 26px;
   height: 26px;
   border-radius: var(--radius-pill);
-  background-color: var(--chart-neutral);
-  color: var(--fg-inverse);
+  background-color: var(--comp-chart-neutral);
+  color: var(--text-on-inverse);
   font-size: var(--font-size-13);
   line-height: var(--font-line-height-18);
   font-weight: 700;
@@ -914,9 +914,9 @@
 
 .ad-step.is-open .ad-no { background-color: var(--bg-accent); }
 
-.ad-h1 { margin: 0; font-size: var(--font-size-24); line-height: var(--font-line-height-32); font-weight: 600; color: var(--fg-primary); }
-.ad-h2 { margin: 0; font-size: var(--font-size-20); line-height: var(--font-line-height-28); font-weight: 800; color: var(--fg-primary); }
-.ad-h3 { margin: 0; font-size: var(--font-size-18); line-height: var(--font-line-height-26); font-weight: 700; color: var(--fg-primary); }
+.ad-h1 { margin: 0; font-size: var(--font-size-24); line-height: var(--font-line-height-32); font-weight: 600; color: var(--text-primary); }
+.ad-h2 { margin: 0; font-size: var(--font-size-20); line-height: var(--font-line-height-28); font-weight: 800; color: var(--text-primary); }
+.ad-h3 { margin: 0; font-size: var(--font-size-18); line-height: var(--font-line-height-26); font-weight: 700; color: var(--text-primary); }
 
 /*
  * 감지 프레임 — 632x442 · bg/canvas · border/subtle · radius 8.
@@ -925,13 +925,13 @@
 .ad-frame {
   position: relative;
   height: 442px;
-  border: var(--border-width-thin) solid var(--border-subtle);
+  border: var(--border-width-thin) solid var(--border-divider);
   border-radius: var(--radius-container);
   overflow: hidden;
   background:
     repeating-linear-gradient(0deg, rgb(255 255 255 / 2.5%) 0 1px, transparent 1px 24px),
     repeating-linear-gradient(90deg, rgb(255 255 255 / 2.5%) 0 1px, transparent 1px 24px),
-    radial-gradient(ellipse 70% 60% at 50% 55%, var(--color-gray-800), var(--bg-canvas));
+    radial-gradient(ellipse 70% 60% at 50% 55%, var(--color-gray-800), var(--bg-page));
 }
 
 /*
@@ -951,7 +951,7 @@
   left: var(--space-12);
   font-size: var(--font-size-12);
   line-height: var(--font-line-height-18);
-  color: var(--fg-tertiary);
+  color: var(--text-tertiary);
 }
 
 .ad-box {
@@ -960,11 +960,11 @@
   top: var(--y);
   width: var(--w);
   height: var(--h);
-  border: 6px solid var(--chart-neutral);
+  border: 6px solid var(--comp-chart-neutral);
   border-radius: var(--radius-4);
 }
 
-.ad-box.is-hit { border-color: var(--status-critical-fg); }
+.ad-box.is-hit { border-color: var(--status-critical-text); }
 
 .ad-box-label {
   position: absolute;
@@ -974,18 +974,18 @@
   height: 19px;
   display: inline-flex;
   align-items: center;
-  background-color: var(--chart-neutral);
-  color: var(--fg-inverse);
+  background-color: var(--comp-chart-neutral);
+  color: var(--text-on-inverse);
   font-size: 12px;
   line-height: 19px;
   white-space: nowrap;
 }
 
-.ad-box-label.is-hit { background-color: var(--status-critical-fg); font-weight: 700; }
+.ad-box-label.is-hit { background-color: var(--status-critical-text); font-weight: 700; }
 
 .ad-judge { display: flex; flex-direction: column; gap: var(--space-8); }
 .ad-judge-row { display: flex; align-items: center; gap: 10px; }
-.ad-desc { margin: 0; font-size: var(--font-size-13); line-height: var(--font-line-height-20); color: var(--fg-secondary); }
+.ad-desc { margin: 0; font-size: var(--font-size-13); line-height: var(--font-line-height-20); color: var(--text-secondary); }
 
 .ad-link {
   align-self: flex-start;
@@ -1005,16 +1005,16 @@
 .ad-step[data-ad-step="3"] .ad-body { gap: 10px; }
 
 .ad-place { display: flex; flex-direction: column; gap: var(--space-2); }
-.ad-sub { margin: 0; font-size: var(--font-size-12); line-height: var(--font-line-height-18); color: var(--fg-tertiary); }
+.ad-sub { margin: 0; font-size: var(--font-size-12); line-height: var(--font-line-height-18); color: var(--text-tertiary); }
 
 /* 지점 맵 — 322 높이 · border/subtle · radius 6. 뒤 3D 지도를 로봇 둘레로 잘라 옮겨 그린다. */
 .ad-map {
   position: relative;
   height: 322px;
-  border: var(--border-width-thin) solid var(--border-subtle);
+  border: var(--border-width-thin) solid var(--border-divider);
   border-radius: var(--radius-6);
   overflow: hidden;
-  background-color: var(--bg-canvas);
+  background-color: var(--bg-page);
 }
 
 .ad-map canvas { display: block; width: 100%; height: 100%; }
@@ -1029,14 +1029,14 @@
   gap: 6px;
   padding: 3px 10px 3px 8px;
   border-radius: 999px;
-  background-color: var(--alert-warning-edge);
-  color: var(--fg-inverse);
+  background-color: var(--comp-alert-warning-edge);
+  color: var(--text-on-inverse);
   font-size: var(--font-size-12);
   line-height: var(--font-line-height-18);
   white-space: nowrap;
 }
 
-.ad-pin.is-critical { background-color: var(--alert-danger-edge); }
+.ad-pin.is-critical { background-color: var(--comp-alert-critical-edge); }
 .ad-pin-dot { width: 6px; height: 6px; border-radius: 50%; background-color: currentColor; }
 
 .ad-bot {
@@ -1055,7 +1055,7 @@
   height: 22px;
   border: 3px solid #cfe0ff;
   border-radius: 50%;
-  background-color: var(--color-main-500);
+  background-color: var(--color-blue-500);
   box-shadow: 0 0 0 4px rgb(106 167 231 / 30%);
 }
 
@@ -1063,20 +1063,20 @@
   font-size: var(--font-size-12);
   line-height: var(--font-line-height-18);
   font-weight: 700;
-  color: var(--fg-primary);
+  color: var(--text-primary);
   text-shadow: 0 1px 2px rgb(0 0 0 / 60%);
 }
 
 .ad-kv { margin: 0; display: flex; flex-direction: column; gap: var(--space-4); }
 .ad-kv > div { display: flex; gap: 10px; align-items: baseline; }
-.ad-kv dt { flex: 0 0 96px; font-size: var(--font-size-12); line-height: var(--font-line-height-18); color: var(--fg-tertiary); }
-.ad-kv dd { margin: 0; font-size: var(--font-size-13); line-height: var(--font-line-height-20); color: var(--fg-secondary); }
+.ad-kv dt { flex: 0 0 96px; font-size: var(--font-size-12); line-height: var(--font-line-height-18); color: var(--text-tertiary); }
+.ad-kv dd { margin: 0; font-size: var(--font-size-13); line-height: var(--font-line-height-20); color: var(--text-secondary); }
 .ad-step[data-ad-step="3"] .ad-kv dt { flex-basis: 64px; }
 
 .ad-field { gap: 6px; }
-.ad-label { font-size: var(--font-size-12); line-height: var(--font-line-height-18); color: var(--fg-secondary); }
+.ad-label { font-size: var(--font-size-12); line-height: var(--font-line-height-18); color: var(--text-secondary); }
 
-.ad-divider { margin: 0; height: 1px; border: 0; background-color: var(--border-subtle); }
+.ad-divider { margin: 0; height: 1px; border: 0; background-color: var(--border-divider); }
 
 /* Button Accent · Large — 40 높이, Label/1. */
 .btn.ad-confirm {
@@ -1087,7 +1087,7 @@
   font-weight: 800;
 }
 
-.ad-note { margin: 0; font-size: var(--font-size-12); line-height: var(--font-line-height-18); color: var(--fg-tertiary); }
+.ad-note { margin: 0; font-size: var(--font-size-12); line-height: var(--font-line-height-18); color: var(--text-tertiary); }
 
 /* ---------- 검토용 단계 바 (시안에는 없다) ---------- */
 .sian-review {
@@ -1109,7 +1109,7 @@
   line-height: var(--font-line-height-18);
 }
 
-.sian-review .sr-name { padding: 0 var(--space-8) 0 var(--space-12); color: var(--fg-tertiary); white-space: nowrap; }
+.sian-review .sr-name { padding: 0 var(--space-8) 0 var(--space-12); color: var(--text-tertiary); white-space: nowrap; }
 .sian-review .sr-sep { width: 1px; height: 14px; margin: 0 var(--space-4); background-color: var(--border-default); }
 
 .sian-review button {
@@ -1118,12 +1118,12 @@
   border: 0;
   border-radius: var(--radius-pill);
   background: none;
-  color: var(--fg-secondary);
+  color: var(--text-secondary);
   font: inherit;
   white-space: nowrap;
   cursor: pointer;
 }
 
-.sian-review button:hover { color: var(--fg-primary); background-color: var(--bg-interactive-hover); }
-.sian-review button[aria-pressed="true"] { color: var(--fg-primary); background-color: var(--color-gray-650); }
+.sian-review button:hover { color: var(--text-primary); background-color: var(--state-hover); }
+.sian-review button[aria-pressed="true"] { color: var(--text-primary); background-color: var(--color-gray-650); }
 .sian-review button:disabled { opacity: 0.4; cursor: default; background: none; }

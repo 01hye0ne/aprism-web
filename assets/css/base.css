@@ -28,8 +28,8 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background-color: var(--bg-canvas);
-  color: var(--fg-primary);
+  background-color: var(--bg-page);
+  color: var(--text-primary);
   font-family: var(--font-family-sans);
   font-size: var(--font-size-14);
   line-height: var(--font-line-height-22);
@@ -43,8 +43,8 @@ body {
   justify-content: space-between;
   gap: var(--space-16);
   padding: var(--space-16) var(--space-20);
-  background-color: var(--bg-navigation);
-  border-bottom: var(--border-width-thin) solid var(--border-subtle);
+  background-color: var(--comp-gnb-bg);
+  border-bottom: var(--border-width-thin) solid var(--border-divider);
 }
 
 .brand {
@@ -57,7 +57,7 @@ body {
   width: 14px;
   height: 14px;
   border-radius: var(--radius-card);
-  background: var(--bg-brand);
+  background: var(--comp-gnb-brand);
 }
 
 .brand-name {
@@ -71,16 +71,16 @@ body {
   padding: var(--space-4) var(--space-12);
   font: inherit;
   font-size: var(--font-size-13);
-  color: var(--fg-secondary);
-  background-color: var(--bg-surface-raised);
+  color: var(--text-secondary);
+  background-color: var(--bg-raised);
   border: var(--border-width-thin) solid var(--border-default);
   border-radius: var(--radius-card);
   cursor: pointer;
 }
 
 .theme-toggle:hover {
-  color: var(--fg-primary);
-  background-color: var(--bg-interactive-hover);
+  color: var(--text-primary);
+  background-color: var(--state-hover);
 }
 
 /* Main */
@@ -100,7 +100,7 @@ body {
   font-weight: 500;
   letter-spacing: 0.09em;
   text-transform: uppercase;
-  color: var(--fg-brand);
+  color: var(--comp-gnb-text-brand);
 }
 
 .intro h1 {
@@ -116,7 +116,7 @@ body {
   max-width: 60ch;
   font-size: var(--font-size-16);
   line-height: var(--font-line-height-24);
-  color: var(--fg-secondary);
+  color: var(--text-secondary);
 }
 
 .screens {
@@ -142,7 +142,7 @@ body {
 .ask {
   margin-top: var(--space-40);
   padding: var(--space-16) var(--space-20);
-  background-color: var(--bg-surface-default);
+  background-color: var(--bg-panel);
   border: var(--border-width-thin) solid var(--status-warning-border);
   border-left-width: 4px;
   border-radius: var(--radius-card);
@@ -163,7 +163,7 @@ body {
   font-family: var(--font-family-mono);
   font-size: var(--font-size-12);
   font-weight: 600;
-  color: var(--status-warning-fg);
+  color: var(--status-warning-text);
 }
 
 .ask-list {
@@ -187,25 +187,25 @@ body {
   flex: none;
   font-family: var(--font-family-mono);
   font-size: var(--font-size-12);
-  color: var(--fg-tertiary);
+  color: var(--text-tertiary);
   white-space: nowrap;
 }
 
 .ask-tag:hover { color: var(--fg-link); }
 
-.ask-q { color: var(--fg-primary); word-break: keep-all; }
+.ask-q { color: var(--text-primary); word-break: keep-all; }
 
 .ask-answer {
   display: block;
   margin-top: var(--space-4);
-  color: var(--fg-secondary);
+  color: var(--text-secondary);
 }
 
-.ask-q:has(+ .ask-answer) { color: var(--fg-secondary); }
+.ask-q:has(+ .ask-answer) { color: var(--text-secondary); }
 
 .ask-done {
   margin-top: var(--space-16);
-  color: var(--fg-secondary);
+  color: var(--text-secondary);
 }
 
 .ask-done summary {
@@ -214,7 +214,7 @@ body {
   font-weight: 600;
 }
 
-.ask-done .ask-count { color: var(--fg-tertiary); }
+.ask-done .ask-count { color: var(--text-tertiary); }
 .ask-done .ask-list { margin-top: var(--space-12); }
 
 /* 버전 카드의 "확인 N" — 누르면 위 목록으로 간다. 카드 링크(::after) 위로 올린다. */
@@ -224,7 +224,7 @@ body {
   font-size: var(--font-size-12);
   line-height: var(--font-line-height-18);
   font-weight: 600;
-  color: var(--status-warning-fg);
+  color: var(--status-warning-text);
 }
 
 /* 화면 한 줄 — 왼쪽 화면 이름, 오른쪽 버전 카드(시간순). */
@@ -234,8 +234,8 @@ body {
   gap: var(--space-16);
   align-items: start;
   padding: var(--space-16);
-  background-color: var(--bg-surface-subtle);
-  border: var(--border-width-thin) solid var(--border-subtle);
+  background-color: var(--bg-cell);
+  border: var(--border-width-thin) solid var(--border-divider);
   border-radius: var(--radius-card);
 }
 
@@ -252,14 +252,14 @@ body {
   font-weight: 500;
   letter-spacing: 0.09em;
   text-transform: uppercase;
-  color: var(--fg-tertiary);
+  color: var(--text-tertiary);
 }
 
 .screen-title {
   font-size: var(--font-size-16);
   line-height: var(--font-line-height-24);
   font-weight: 600;
-  color: var(--fg-primary);
+  color: var(--text-primary);
   text-decoration: none;
 }
 
@@ -286,14 +286,14 @@ body {
   align-content: flex-start;
   gap: var(--space-4) var(--space-8);
   padding: var(--space-12) var(--space-16);
-  background-color: var(--bg-surface-default);
-  border: var(--border-width-thin) solid var(--border-subtle);
+  background-color: var(--bg-panel);
+  border: var(--border-width-thin) solid var(--border-divider);
   border-radius: var(--radius-card);
 }
 
 .ver-card:hover {
   border-color: var(--border-default);
-  background-color: var(--bg-surface-raised);
+  background-color: var(--bg-raised);
 }
 
 .ver-card.is-latest {
@@ -305,7 +305,7 @@ body {
   align-items: baseline;
   gap: var(--space-8);
   flex-basis: 100%;
-  color: var(--fg-primary);
+  color: var(--text-primary);
   text-decoration: none;
 }
 
@@ -325,13 +325,13 @@ body {
 
 .ver-tag {
   font-size: var(--font-size-13);
-  color: var(--fg-secondary);
+  color: var(--text-secondary);
 }
 
 .ver-date {
   font-family: var(--font-family-mono);
   font-size: var(--font-size-12);
-  color: var(--fg-tertiary);
+  color: var(--text-tertiary);
 }
 
 .ver-badge {
@@ -340,8 +340,8 @@ body {
   font-size: var(--font-size-12);
   line-height: var(--font-line-height-18);
   font-weight: 600;
-  color: var(--fg-on-brand);
-  background-color: var(--bg-brand);
+  color: var(--comp-gnb-text-on-brand);
+  background-color: var(--comp-gnb-brand);
   border-radius: var(--radius-pill);
 }
 
@@ -357,7 +357,7 @@ body {
 
 .ver-extra a,
 .internal-list a {
-  color: var(--fg-secondary);
+  color: var(--text-secondary);
 }
 
 .ver-extra a:hover,
@@ -373,7 +373,7 @@ body {
 }
 
 a.screen-name {
-  color: var(--fg-primary);
+  color: var(--text-primary);
   text-decoration: none;
 }
 
@@ -385,7 +385,7 @@ a.screen-name:hover {
 /* 내부 문서 — 디자인 시스템 검토 · 효과 시험. 접어 둔다. */
 .internal {
   margin-top: var(--space-48);
-  color: var(--fg-secondary);
+  color: var(--text-secondary);
 }
 
 .internal summary {
@@ -409,8 +409,8 @@ a.screen-name:hover {
   padding: var(--space-16) var(--space-20);
   font-size: var(--font-size-12);
   line-height: var(--font-line-height-18);
-  color: var(--fg-tertiary);
-  border-top: var(--border-width-thin) solid var(--border-subtle);
+  color: var(--text-tertiary);
+  border-top: var(--border-width-thin) solid var(--border-divider);
 }
 
 @media (max-width: 600px) {

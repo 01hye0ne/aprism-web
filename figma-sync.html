@@ -8,50 +8,50 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" />
-  <link rel="stylesheet" href="./assets/css/tokens.css?v=4aceab62" />
+  <link rel="stylesheet" href="./assets/css/tokens.css?v=24e3f8af" />
   <style>
     * { box-sizing: border-box; }
-    body { margin: 0; background: var(--bg-canvas); color: var(--fg-primary);
+    body { margin: 0; background: var(--bg-page); color: var(--text-primary);
       font-family: var(--font-family-sans); font-size: 14px; line-height: 1.65; -webkit-font-smoothing: antialiased; }
     .wrap { max-width: 1060px; margin: 0 auto; padding: 40px 24px 90px; }
-    header.doc { border-bottom: 1px solid var(--border-subtle); padding-bottom: 24px; margin-bottom: 32px; }
+    header.doc { border-bottom: 1px solid var(--border-divider); padding-bottom: 24px; margin-bottom: 32px; }
     .eyebrow { font-family: var(--font-family-mono); font-size: 11px; letter-spacing: .12em;
-      text-transform: uppercase; color: var(--fg-brand); margin: 0 0 10px; font-weight: 500; }
+      text-transform: uppercase; color: var(--comp-gnb-text-brand); margin: 0 0 10px; font-weight: 500; }
     h1 { margin: 0 0 10px; font-size: 26px; }
-    .sub { margin: 0; color: var(--fg-secondary); max-width: 72ch; }
+    .sub { margin: 0; color: var(--text-secondary); max-width: 72ch; }
     section { margin-top: 48px; }
     h2 { font-size: 17px; margin: 0 0 6px; }
-    h3 { font-size: 13px; margin: 28px 0 8px; color: var(--fg-secondary); font-weight: 600; }
-    .note { color: var(--fg-secondary); margin: 0 0 18px; max-width: 78ch; font-size: 13px; }
-    code { font-family: var(--font-family-mono); font-size: 12px; background: var(--bg-surface-raised);
-      padding: 1px 6px; border-radius: 3px; color: var(--fg-primary); }
-    code.hit { color: var(--fg-brand); }
+    h3 { font-size: 13px; margin: 28px 0 8px; color: var(--text-secondary); font-weight: 600; }
+    .note { color: var(--text-secondary); margin: 0 0 18px; max-width: 78ch; font-size: 13px; }
+    code { font-family: var(--font-family-mono); font-size: 12px; background: var(--bg-raised);
+      padding: 1px 6px; border-radius: 3px; color: var(--text-primary); }
+    code.hit { color: var(--comp-gnb-text-brand); }
     .scroll { overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; font-size: 13px; }
     th { text-align: left; font-size: 10.5px; letter-spacing: .07em; text-transform: uppercase;
-      color: var(--fg-tertiary); font-weight: 600; padding: 0 10px 8px;
+      color: var(--text-tertiary); font-weight: 600; padding: 0 10px 8px;
       border-bottom: 1px solid var(--border-default); white-space: nowrap; }
-    td { padding: 6px 10px; border-bottom: 1px solid var(--border-subtle); vertical-align: middle; white-space: nowrap; }
+    td { padding: 6px 10px; border-bottom: 1px solid var(--border-divider); vertical-align: middle; white-space: nowrap; }
     tr.same td { opacity: .45; }
     .tname { font-family: var(--font-family-mono); font-size: 12px; }
-    .arrow { color: var(--fg-tertiary); }
-    .num { font-family: var(--font-family-mono); font-size: 12px; text-align: right; color: var(--fg-secondary); }
-    .nochange { color: var(--fg-tertiary); font-size: 12px; }
+    .arrow { color: var(--text-tertiary); }
+    .num { font-family: var(--font-family-mono); font-size: 12px; text-align: right; color: var(--text-secondary); }
+    .nochange { color: var(--text-tertiary); font-size: 12px; }
     .sw { display: inline-block; width: 34px; height: 18px; border-radius: 3px; vertical-align: -4px;
       margin-right: 8px; border: 1px solid rgb(128 128 128 / 35%); }
-    .gradbar { height: 40px; border-radius: 6px; margin: 8px 0 10px; border: 1px solid var(--border-subtle); }
-    .log { border: 1px solid var(--border-subtle); border-left: 3px solid var(--border-brand);
-      border-radius: 6px; padding: 18px 20px; background: var(--bg-container); }
+    .gradbar { height: 40px; border-radius: 6px; margin: 8px 0 10px; border: 1px solid var(--border-divider); }
+    .log { border: 1px solid var(--border-divider); border-left: 3px solid var(--border-brand);
+      border-radius: 6px; padding: 18px 20px; background: var(--bg-panel); }
     .log dl { margin: 0; display: grid; grid-template-columns: 128px 1fr; gap: 10px 18px; }
     .log dt { font-family: var(--font-family-mono); font-size: 11px; letter-spacing: .06em;
-      text-transform: uppercase; color: var(--fg-tertiary); padding-top: 2px; }
-    .log dd { margin: 0; color: var(--fg-secondary); font-size: 13px; }
+      text-transform: uppercase; color: var(--text-tertiary); padding-top: 2px; }
+    .log dd { margin: 0; color: var(--text-secondary); font-size: 13px; }
     ol.steps { padding-left: 20px; margin: 0; }
-    ol.steps li { margin-bottom: 12px; color: var(--fg-secondary); font-size: 13px; }
-    ol.steps li strong { color: var(--fg-primary); }
-    .warn { border-left-color: var(--alert-warning-edge); }
-    footer.doc { margin-top: 64px; padding-top: 20px; border-top: 1px solid var(--border-subtle);
-      color: var(--fg-tertiary); font-size: 12px; }
+    ol.steps li { margin-bottom: 12px; color: var(--text-secondary); font-size: 13px; }
+    ol.steps li strong { color: var(--text-primary); }
+    .warn { border-left-color: var(--comp-alert-warning-edge); }
+    footer.doc { margin-top: 64px; padding-top: 20px; border-top: 1px solid var(--border-divider);
+      color: var(--text-tertiary); font-size: 12px; }
     @media (max-width: 700px) { .wrap { padding: 24px 16px 60px; } .log dl { grid-template-columns: 1fr; gap: 4px 0; } }
   </style>
 </head>
