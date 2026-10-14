@@ -3926,7 +3926,13 @@
       canvas: canvas, antialias: true, alpha: true,
       preserveDrawingBuffer: canvas.hasAttribute("data-map-keep")
     });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    /*
+     * v2.2 는 배율 1 모니터에서도 2배로 그려 줄여 보인다(2026-10-14 디자이너).
+     * 2px 점선은 점 끝이 셰이더에서 칼같이 잘려(discard) 안티에일리어싱을 못 받는다 —
+     * 배율 1 에서는 점이 픽셀 사이에 걸릴 때마다 굵기가 들쭉날쭉해 지글거렸다.
+     * 2배로 그리면 브라우저가 줄이면서 끝을 부드럽게 섞는다. 외곽선 계단도 같이 준다.
+     */
+    renderer.setPixelRatio(Math.min(Math.max(window.devicePixelRatio || 1, THEMED ? 2 : 1), 2));
     renderer.setClearAlpha(0);
 
     /*
