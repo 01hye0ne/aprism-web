@@ -19,8 +19,14 @@ RATIO = 1.3
 # 선이 아니라 면(선을 면으로 바꾼 것)으로만 온 테두리 아이콘 — 선 굵기를 못 올리므로 도형을 고르게 OFFSET 만큼 민다.
 # (2026-10-14 Figma 컴포넌트에서만 고친 것들. "원본" 프레임에 선으로 다시 그리면 이 목록에서 빼면 된다.)
 # 꽉 찬 도형(사람 · 번개 등)은 넣지 않는다 — 안쪽 가는 틈이 막힌다.
-OFFSET_ICONS = {"icon-calendar.svg", "icon-cpu.svg", "icon-shield.svg"}
+OFFSET_ICONS = {"icon-calendar.svg", "icon-shield.svg"}   # cpu 는 10/14 원본 프레임이 선으로 갱신돼 빠졌다
 OFFSET = 0.3      # 24 격자 단위 · 한쪽 — 16px 에서 2px 테두리 → 약 1.73px
+
+# 굵힌 뒤 안쪽 틈이 막히는 아이콘 — 작은 크기용에서만 안쪽 도형을 줄인다(바꿀 문자열, 새 문자열).
+# cpu: 테두리를 굵히면 안쪽 사각형과의 틈이 0.93px 로 줄어 막혀 보였다 → 사각형을 8 → 6.5 로(틈 약 1.43px).
+SMALL_TWEAK = {
+    "icon-cpu.svg": [('x="8" y="8" width="8" height="8"', 'x="8.75" y="8.75" width="6.5" height="6.5"')],
+}
 
 
 def thicken(svg):
@@ -69,7 +75,11 @@ def main():
         with io.open(os.path.join(SRC, name), encoding="utf-8") as f:
             svg = f.read()
         with io.open(os.path.join(DST, name), "w", encoding="utf-8", newline="\n") as f:
-            f.write(offset(svg) if name in OFFSET_ICONS else thicken(svg))
+            out = offset(svg) if name in OFFSET_ICONS else thicken(svg)
+            for a, b in SMALL_TWEAK.get(name, []):
+                assert a in out, (name, a)
+                out = out.replace(a, b)
+            f.write(out)
         n += 1
     print("wrote", n, "icons -> assets/icons/outline-16")
 
