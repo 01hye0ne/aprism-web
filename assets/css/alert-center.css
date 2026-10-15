@@ -430,7 +430,7 @@
  * ========================================================== */
 
 /* ── 오늘 조치 요약 만들기 · DELTA 인수인계 요약 ───────────── */
-/* 둘 다 DELTA 면이다 — status/info/bg 에 border/brand. */
+/* 버튼만 DELTA 면이다 — status/info/bg 에 border/brand. 카드는 .ac-delta 와 같은 꼴이다. */
 .ac-summary-btn {
   display: inline-flex;
   align-items: center;
@@ -463,14 +463,20 @@
 
 .ac-handover-slot[hidden] { display: none; }
 
+/*
+ * DELTA 조치 제안(.ac-delta)과 같은 카드다 — 둘 다 DELTA 가 쓴 글이라 같은 꼴이어야 한다.
+ * Figma 1202 는 이 카드만 파란 면(status/info/bg + border/brand)으로 그렸는데,
+ * 그러면 한 제품 안에서 DELTA 카드가 두 가지 꼴이 된다. 조치 제안 쪽으로 맞췄다 —
+ * 파랑은 머리의 DELTA 표시(fg/link)가 맡고, 면은 조용히 둔다.
+ */
 .ac-handover {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: var(--space-12) 14px;
-  border: var(--border-width-thin) solid var(--border-brand);
+  gap: var(--space-8);
+  padding: var(--space-16) var(--space-12) var(--space-12);
+  border: var(--border-width-thin) solid var(--border-default);
   border-radius: var(--radius-container);
-  background-color: var(--status-info-bg);
+  background-color: var(--bg-panel);
 }
 
 .ac-handover-head {
@@ -489,8 +495,9 @@
 .ac-handover-when { color: var(--text-tertiary); }
 
 /*
- * Ghost 기본 글자색은 blue/500 인데 이 카드 면이 blue/900 이라 [닫기] 가 묻힌다.
- * Figma 도 여기만 gray/400 이다 — 카드 안에서만 되돌린다.
+ * Ghost 기본 글자색은 blue/500 인데, 이 카드에서 파랑은 머리의 DELTA 표시가 맡는다 —
+ * [닫기] 까지 파랗면 둘이 같은 무게로 읽힌다. 조용히 물러나는 동작이라 text/secondary 다
+ * (Figma 도 여기만 gray/400 이다). 카드 안에서만 되돌린다.
  */
 .ac-handover .btn-ghost { color: var(--text-secondary); }
 .ac-handover .btn-ghost:hover { color: var(--text-primary); }
