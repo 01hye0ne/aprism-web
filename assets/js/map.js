@@ -2018,7 +2018,15 @@
     alertBox.classList.toggle("is-below", below);
     var cx = Math.min(W - half - 8, Math.max(half + 8, x));
     var tail = Math.max(-(half - 16), Math.min(half - 16, x - cx));
-    var cy = below ? Math.min(y, H - tall - 8) : Math.max(tall + 8, y);
+    /*
+     * 세로도 칸 안쪽 8 로 양끝을 묶는다. 웨이포인트가 칸 밖으로 벗어나 있으면(점이 화면 밖이거나
+     * 카메라가 아직 못 따라왔을 때) y 가 음수이거나 H 를 넘는데, 한쪽만 막아 두어
+     * 쪽지 머리(배지 · 제목 · 버튼)가 윗변에 잘리거나 바닥 버튼이 아랫변 밖으로 나갔다.
+     * 기준점이 뒤집기에 따라 다르다 — 아래로 뒤집으면 윗변 = cy + 16, 위에 세우면 아랫변 = cy - 16.
+     * 꼬리는 --tail 과 달리 세로로는 따라가지 않는다. 점에서 멀어져도 쪽지가 온전한 쪽이 낫다.
+     */
+    var cy = below ? Math.max(-8, Math.min(y, H - tall - 8))
+                   : Math.min(H + 8, Math.max(tall + 8, y));
     alertBox.style.setProperty("--x", cx.toFixed(1) + "px");
     alertBox.style.setProperty("--y", cy.toFixed(1) + "px");
     alertBox.style.setProperty("--tail", tail.toFixed(1) + "px");

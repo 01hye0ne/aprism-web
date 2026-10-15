@@ -976,12 +976,16 @@
 /* 사진이 없는 알림 — 머리의 아래 여백 12 로 충분하다. 둘이 겹치면 24 가 비어 보인다. */
 .ma-snap[hidden] + .ma-body { padding-top: 0; }
 
-/* ── 몸 — 메타 · DELTA · 조치. 사진과 달리 12 안쪽으로 들어온다(Figma 1212:16863). ── */
+/*
+ * ── 몸 — 메타 · DELTA · 조치. 사진과 달리 12 안쪽으로 들어온다(Figma 1212:16863). ──
+ * 아래 여백만 0 이다. Figma 는 여기 12 와 Contents 의 12 가 겹쳐 구분선 위가 24, 아래가 12 라
+ * 선을 사이에 두고 위아래가 어긋난다. 여백은 Contents 것 하나만 두어 12 로 맞춘다.
+ */
 .ma-body {
   display: flex;
   flex-direction: column;
   gap: var(--space-8);
-  padding: var(--space-12);
+  padding: var(--space-12) var(--space-12) 0;
 }
 
 .ma-snap img {
@@ -1159,17 +1163,21 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-8);
-  /* 메타와 같은 4 를 들여 쓴다 — DELTA 카드만 테두리가 있어 꽉 차고, 맨글은 나란히 선다. */
-  padding: 0 var(--space-4);
   color: var(--text-primary);
 }
 
-/* 칸 이름과 안내가 한 줄 양끝에 선다(Figma 1212:16834). */
+/*
+ * 칸 이름과 안내가 한 줄 양끝에 선다(Figma 1212:16834).
+ * 4 들여쓰기는 이 줄에만 준다 — 메타의 "위치 · 감지" 와 세로로 맞는다.
+ * Figma 는 칩까지 같이 들여 쓰는데, 그러면 칩이 쓸 폭이 8 줄어 두 줄로 넘어간다.
+ * 칩은 테두리가 있어 제 끝이 보이니 줄을 아끼는 쪽이 낫다.
+ */
 .ma-act-head {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: var(--space-8);
+  padding: 0 var(--space-4);
 }
 
 .ma-act-hint { color: var(--text-tertiary); }
