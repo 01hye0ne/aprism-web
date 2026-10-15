@@ -1635,7 +1635,8 @@
     caution: 0xffcc00,    // warning/500
     danger: 0xff383c,     // danger/500
     current: 0x89b9ed,    // main/400
-    upcoming: 0x8894aa    // gray/450 언저리 — 아직 아무 일도 없었다는 뜻이다
+    upcoming: 0x8894aa,   // gray/450 언저리 — 아직 아무 일도 없었다는 뜻이다
+    skipped: 0x4e576a     // gray/600 — 미션 설정에서 꺼 둔 자리. 있지만 이번엔 안 간다
   };
   var WP_HALO = 0xffffff;   // 고른 것을 두르는 바깥 고리. 상태색 위에 얹기만 한다.
 
@@ -1645,8 +1646,37 @@
   var chosenWp = null; // selectedWaypointId — 사람이 짚은 것
   var liveWp = null;   // currentWaypointId — 미션이 지금 하는 것
 
+  /* ================================================================
+   * 미션 설정 — 왼쪽 계획표가 길의 원본이 된다
+   *
+   * 평소 지도는 우측 타임라인(오늘 도는 한 바퀴)을 읽는다. 그런데 미션을 짜는 동안에는
+   * 그 한 바퀴가 아직 없다 — 어디를 어떤 차례로 들를지가 지금 정해지는 중이다.
+   * 그동안만 계획표를 원본으로 삼고, 들르는 자리가 바뀔 때마다 길을 다시 깐다.
+   * 길찾기는 평소와 같은 것(planChain)을 쓴다 — 설정에서 본 길과 실제로 도는 길이 같아야 한다.
+   * ================================================================ */
+  var missionPlan = null;   // { stops: [차례대로 들르는 id], skip: [끈 id], names: {id: 이름} }
+
   // 우측 목록에서 웨이포인트를 읽어 온다. 목록이 원본이다.
   function readWaypoints() {
+    if (missionPlan) {
+      var pick = missionPlan.stops.map(function (id) {
+        return { id: id, kind: "upcoming", tone: "upcoming", name: missionPlan.names[id] || id, read: "" };
+      });
+      // 끈 자리도 지도에는 남는다 — 사라지면 "안 가기로 했다" 가 아니라 "없다" 로 읽힌다.
+      return pick.concat(missionPlan.skip.map(function (id) {
+        return { id: id, kind: "upcoming", tone: "skipped", name: missionPlan.names[id] || id, read: "" };
+      }));
+    }
+    return railWaypoints();
+  }
+
+  /*
+   * 이 층에 깔린 웨이포인트 — 계획표와 상관없이 늘 타임라인이 원본이다.
+   * 계획표(미션 설정)는 "그중 어디를 어떤 차례로 갈까" 를 고르는 것이지 자리를 만드는 것이 아니다.
+   * planRobot 이 readWaypoints() 로 개수를 세던 때가 있었는데, 계획표가 지도보다 먼저 서다 보니
+   * 좌표집이 고른 네 자리만으로 만들어졌다 — 모니터링으로 넘어가도 네 자리밖에 없었다.
+   */
+  function railWaypoints() {
     var rail = document.querySelector("[data-timeline]");
     if (!rail) { return []; }
     return Array.prototype.map.call(rail.querySelectorAll("[data-waypoint]"), function (item) {
@@ -1690,12 +1720,26 @@
     var list = readWaypoints();
     if (!list.length) { return; }
 
-    // 길을 목록 수만큼 잘라 그 경계에 놓는다. 목록이 일곱이면 일곱, 아홉이면 아홉이다.
+    /*
+     * 자리는 번호로 찾는다. 예전에는 목록의 i 번째를 길의 i 번째 좌표에 놓았는데,
+     * 미션 설정에서 들르는 차례를 바꾸면 WP-05 가 두 번째가 되고 그러면 표식이 통째로
+     * 자리를 옮겨 버렸다 — 차례가 바뀐 것이지 그 설비가 옮겨 간 것이 아니다.
+     * book 은 처음 깐 한 바퀴다. 길을 다시 깔아도 좌표집은 그대로 둔다.
+     */
+    var book = onLane.book || onLane.plan;
+
+    function spotOf(id, i) {
+      if (book && book.names) {
+        var k = book.names.indexOf(id);
+        if (k > 0 && book.wpWorld && book.wpWorld[k - 1]) { return book.wpWorld[k - 1].clone(); }
+      }
+      if (onLane.wps && onLane.wps[i]) { return onLane.wps[i].clone(); }
+      return alongRoute(onLane.turns, onLane.mile, onLane.total * (i / list.length));
+    }
+
     var bucket = {};
     list.forEach(function (info, i) {
-      // 웨이포인트 좌표가 있으면 그 중심에 놓는다(길이 그 중심을 지난다). 없으면 예전처럼 길을 등분.
-      var spot = onLane.wps && onLane.wps[i] ? onLane.wps[i].clone()
-        : alongRoute(onLane.turns, onLane.mile, onLane.total * (i / list.length));
+      var spot = spotOf(info.id, i);
       wpSpots.push({ id: info.id, spot: spot, info: info });
       (bucket[info.tone] = bucket[info.tone] || []).push(spot);
     });
@@ -2189,6 +2233,7 @@
 
   function drawRoute(corners, bot, id, plan) {
     if (!corners || corners.length < 2) { return; }
+    var was = lanes[String(id)];
     var parts = [];
     // 계획한 길은 45° · 90° 로 꺾인 그대로 그린다 — 둥글리면 웨이포인트 중심을 비켜 간다.
     var soft = plan ? { line: corners.map(function (q) { return q.clone(); }) } : roundOff(corners);
@@ -2268,7 +2313,9 @@
       // 웨이포인트를 나중에 다시 놓으려면 길과 그 길이를 들고 있어야 한다.
       turns: turns, mile: mile, total: total,
       here: here.clone(), ahead: ahead.clone(),
-      plan: plan || null, wps: plan ? plan.wpWorld : null, dock: turns[0].clone()
+      plan: plan || null, wps: plan ? plan.wpWorld : null, dock: turns[0].clone(),
+      // 좌표집 — 처음 깐 한 바퀴. 길을 다시 깔아도 설비 자리는 여기서 읽는다.
+      book: (was && was.book) || (plan && plan.names ? plan : null)
     };
   }
 
@@ -3716,7 +3763,7 @@
     function frac(f) { return { X: f[0] * size.x * NAV.unit, Y: (1 - f[1]) * size.z * NAV.unit }; }
     var fid = ROBOT_ON;
     var dock = frac(bot.dock);
-    var count = readWaypoints().length || WAYPOINTS;
+    var count = railWaypoints().length || WAYPOINTS;
     var names = ["DOCK"];
     for (var n = 1; n <= count; n += 1) { names.push("WP-" + ("0" + n).slice(-2)); }
     var wps = ROBOT_WPS[id];
@@ -3749,6 +3796,98 @@
       dockWorld: toWorld(res.stops[0].X, res.stops[0].Y, fid, lift)
     };
   }
+
+  /*
+   * 미션 설정에서 들르는 자리가 바뀌었다 — 길을 다시 깐다.
+   *
+   * 좌표집(book)에서 고른 자리를 차례대로 꺼내, 도커에서 떠나 도커로 돌아오는 폐회로를
+   * 다시 찾는다. 처음 한 바퀴를 깔 때 쓴 planChain 과 같은 길찾기다 —
+   * 설정에서 본 길과 실제로 도는 길이 다르면 이 화면은 거짓말을 하는 셈이다.
+   *
+   * 표식(웨이포인트 점)은 건드리지 않는다. 자리는 좌표집에서 번호로 찾으니(layWaypoints)
+   * 차례를 바꿔도 설비가 옮겨 가지 않는다.
+   */
+  function dropLane(ln) {
+    ln.parts.forEach(function (part) {
+      scene.remove(part);
+      part.traverse(function (node) {
+        if (node.geometry) { node.geometry.dispose(); }
+        if (!node.material) { return; }
+        var mats = Array.isArray(node.material) ? node.material : [node.material];
+        mats.forEach(function (m) { m.dispose(); });
+      });
+    });
+    ln.parts = [];
+  }
+
+  function replanMission() {
+    var id = activeRobot();
+    var ln = lanes[String(id)];
+    var book = ln && ln.book;
+    if (!scene || !book) { return; }
+
+    // 계획표를 놓았다 — 처음 깔아 둔 한 바퀴를 그대로 되돌린다. 다시 찾으면 미세하게 달라진다.
+    if (!missionPlan) {
+      dropLane(ln);
+      drawRoute(book.world, ln.bot, id, book);
+      showLane(id, true);
+      frame();
+      return;
+    }
+
+    var names = ["DOCK"];
+    var pts = [book.dockPlan];
+    missionPlan.stops.forEach(function (wp) {
+      var k = book.names.indexOf(wp);
+      if (k > 0 && book.wpPlan[k - 1]) { names.push(wp); pts.push(book.wpPlan[k - 1]); }
+    });
+
+    // 들를 자리가 하나도 없으면 길도 없다. 없는 것을 있는 척하지 않는다 — 표식만 남긴다.
+    if (pts.length < 2) {
+      dropLane(ln);
+      layWaypoints();
+      frame();
+      return;
+    }
+
+    var res = planChain(book.fid, pts, true, names);
+    function world(q) { return toWorld(q.X, q.Y, book.fid, NAV.lift); }
+    var line = res.path.map(world);
+    dropLane(ln);
+    drawRoute(line, ln.bot, id, {
+      fid: book.fid, names: names, dockPlan: res.stops[0], wpPlan: res.stops.slice(1),
+      pathPlan: res.path, reduced: res.reduced, world: line,
+      wpWorld: res.stops.slice(1).map(world), dockWorld: world(res.stops[0])
+    });
+    showLane(id, true);
+    frame();
+  }
+
+  /*
+   * 설정 단계를 떠나면 계획표를 놓는다(sian.js 가 body[data-stage] 를 바꾼다).
+   * 모니터링에서는 우측 타임라인이 다시 원본이다 — 계획을 붙들고 있으면 오늘 도는 한 바퀴가
+   * 미션 설정에서 고른 네 자리로 줄어 버린다.
+   */
+  if (window.MutationObserver) {
+    new MutationObserver(function () {
+      if (!missionPlan || document.body.getAttribute("data-stage") === "setup") { return; }
+      missionPlan = null;
+      replanMission();
+      layWaypoints();
+      frame();
+    }).observe(document.body, { attributes: true, attributeFilter: ["data-stage"] });
+  }
+
+  // 왼쪽 계획표가 바뀌었다(mission-setup.js).
+  document.addEventListener("aprism:mission-plan", function (event) {
+    var d = event.detail || {};
+    missionPlan = {
+      stops: (d.stops || []).slice(),
+      skip: (d.skip || []).slice(),
+      names: d.names || {}
+    };
+    replanMission();
+  });
 
   // 층을 오가는 로봇(시연)의 평지 구간도 같은 길찾기를 쓴다 — 열린 길(폐회로 아님).
   function routeOnNav(fid, worldPts) {
@@ -3887,6 +4026,8 @@
       drawRoute(planned ? planned.world : layRoute(box, [bot.dock].concat(bot.stops)), bot, id, planned);
     });
     layRobots();
+    // 계획표는 지도(three.js 를 받아 온다)보다 먼저 선다 — 그동안 온 계획을 여기서 받는다.
+    if (missionPlan) { replanMission(); }
     layWaypoints();
     // 뜨기 전에 고른 웨이포인트가 있으면 이제 그리로 간다(쪽지도 이때 자리를 잡는다).
     if (chosenWp) { chooseWaypoint(chosenWp, "panel"); }

@@ -19,9 +19,9 @@
   }
   </script>
   <link rel="stylesheet" href="../assets/css/tokens.css?v=df3f45ff" />
-  <link rel="stylesheet" href="../assets/css/app-shell.css?v=911d61e3" />
+  <link rel="stylesheet" href="../assets/css/app-shell.css?v=175aa339" />
   <link rel="stylesheet" href="../assets/css/map-overlays.css?v=6bbdf88e" />
-  <link rel="stylesheet" href="../assets/css/icons-outline.css?v=79a2ccd3" />
+  <link rel="stylesheet" href="../assets/css/icons-outline.css?v=83872c0c" />
   <link rel="stylesheet" href="../assets/css/text-parts.css?v=e38e19ea" />
   <link rel="stylesheet" href="../assets/css/sian.css?v=4c392770" />
   <style>
@@ -227,41 +227,47 @@
 
                                 <div class="field">
                                   <span class="field-label" id="mp-lbl-robot">실행 로봇</span>
-                                  <div class="field-select" data-select>
+                                  <div class="field-select" data-select data-mp-robot>
                                     <button type="button" class="field-box is-select" data-select-trigger aria-haspopup="listbox" aria-expanded="false" aria-labelledby="mp-lbl-robot">
                                       <span data-select-value>ROBOT 02 · 배터리 82%</span>
                                       <span class="i i-20" style="--i:var(--ic-chevron-down)" aria-hidden="true"></span>
                                     </button>
                                     <ul class="field-menu" role="listbox" aria-label="실행 로봇" hidden>
-                                      <li class="field-option" role="option">ROBOT 01 · 배터리 64%</li>
+                                      <li class="field-option" role="option">ROBOT 01 · 배터리 31%</li>
                                       <li class="field-option" role="option" aria-selected="true">ROBOT 02 · 배터리 82%</li>
                                       <li class="field-option" role="option">ROBOT 03 · 배터리 91%</li>
                                     </ul>
                                   </div>
                                 </div>
 
-                                <div class="check-group">
+                                <!--
+                                  점검항목 — 고르는 것뿐 아니라 방문 순서까지 여기서 정한다.
+                                  줄은 mission-setup.js 가 다시 그린다. 아래 네 줄이 원본 자료다
+                                  (data-wp 는 지도의 웨이포인트 번호, data-dwell 은 그 자리에서 머무는 초).
+                                -->
+                                <div class="check-group" data-mp-plan>
                                   <div class="check-group-head">
                                     <span class="label">점검항목</span>
-                                    <span class="count">4개 선택</span>
+                                    <button type="button" class="btn btn-ghost is-xs check-reset" data-mp-reset hidden>순서 되돌리기</button>
+                                    <span class="count" data-mp-count>4개 선택</span>
                                   </div>
-                                  <div class="check-list">
-                              <div class="check-row" role="checkbox" aria-checked="true" tabindex="0">
-                                <span>WP-02 터빈1 베어링 온도</span>
-                                <span class="check-box"><span class="i" style="--i:var(--ic-check)" aria-hidden="true"></span></span>
-                              </div>
-                              <div class="check-row" role="checkbox" aria-checked="true" tabindex="0">
-                                <span>WP-03 터빈2 스파이럴 케이싱</span>
-                                <span class="check-box"><span class="i" style="--i:var(--ic-check)" aria-hidden="true"></span></span>
-                              </div>
-                              <div class="check-row" role="checkbox" aria-checked="true" tabindex="0">
-                                <span>WP-04 냉각수 배관 누수</span>
-                                <span class="check-box"><span class="i" style="--i:var(--ic-check)" aria-hidden="true"></span></span>
-                              </div>
-                              <div class="check-row" role="checkbox" aria-checked="true" tabindex="0">
-                                <span>WP-05 비상 발전기실 가스</span>
-                                <span class="check-box"><span class="i" style="--i:var(--ic-check)" aria-hidden="true"></span></span>
-                              </div>
+                                  <div class="check-list is-plan" data-mp-list>
+                                    <div class="check-row" role="checkbox" aria-checked="true" tabindex="0" data-wp="WP-02" data-dwell="120">
+                                      <span>WP-02 터빈1 베어링 온도</span>
+                                      <span class="check-box"><span class="i" style="--i:var(--ic-check)" aria-hidden="true"></span></span>
+                                    </div>
+                                    <div class="check-row" role="checkbox" aria-checked="true" tabindex="0" data-wp="WP-03" data-dwell="150">
+                                      <span>WP-03 터빈2 스파이럴 케이싱</span>
+                                      <span class="check-box"><span class="i" style="--i:var(--ic-check)" aria-hidden="true"></span></span>
+                                    </div>
+                                    <div class="check-row" role="checkbox" aria-checked="true" tabindex="0" data-wp="WP-04" data-dwell="110">
+                                      <span>WP-04 냉각수 배관 누수</span>
+                                      <span class="check-box"><span class="i" style="--i:var(--ic-check)" aria-hidden="true"></span></span>
+                                    </div>
+                                    <div class="check-row" role="checkbox" aria-checked="true" tabindex="0" data-wp="WP-05" data-dwell="120">
+                                      <span>WP-05 비상 발전기실 가스</span>
+                                      <span class="check-box"><span class="i" style="--i:var(--ic-check)" aria-hidden="true"></span></span>
+                                    </div>
                                   </div>
                                 </div>
 
@@ -273,21 +279,39 @@
                                 </div>
                               </div>
 
+                              <!-- 값은 모두 mission-setup.js 가 점검항목 · 순서 · 로봇에서 다시 센다. -->
                               <div class="mp-summary">
                                 <div class="sum-row">
                                   <span class="i i-20" style="--i:var(--ic-clock)" aria-hidden="true"></span>
                                   <span class="label">예상 소요시간</span>
-                                  <span class="value num">약 24분</span>
+                                  <span class="value num" data-mp-time>약 24분</span>
+                                </div>
+                                <div class="sum-row has-detail">
+                                  <span class="i i-20" style="--i:var(--ic-bolt)" aria-hidden="true"></span>
+                                  <span class="label">배터리</span>
+                                  <span class="value" data-mp-bat-state></span>
+                                </div>
+                                <!-- 막대 — 남는 양(면) · 이 미션이 쓸 양(빗금) · 복귀 예비선(눈금). -->
+                                <div class="mp-bat" data-mp-bat>
+                                  <div class="mp-bat-bar" data-mp-bat-bar role="img">
+                                    <i class="rest"></i><i class="use"></i><i class="mark"></i>
+                                  </div>
+                                  <div class="mp-bat-scale t-caption">
+                                    <span>0</span>
+                                    <span>복귀 예비 20%</span>
+                                    <span data-mp-bat-now>현재 82%</span>
+                                  </div>
+                                  <p class="mp-bat-note t-caption" data-mp-bat-note></p>
                                 </div>
                                 <div class="sum-row">
                                   <span class="i i-20" style="--i:var(--ic-target)" aria-hidden="true"></span>
                                   <span class="label">Way-point</span>
-                                  <span class="value num">4개</span>
+                                  <span class="value num" data-mp-wp>4개</span>
                                 </div>
                               </div>
                             </div>
 
-            <button type="button" class="mp-cta" data-sian-go="precheck">사전 점검 시작</button>
+            <button type="button" class="mp-cta" data-sian-go="precheck" data-mp-cta>사전 점검 시작</button>
           </section>
 
           <section class="lp-stage mp-stage mission-panel" data-stage-show="precheck" aria-label="사전 점검" hidden>
@@ -1587,8 +1611,10 @@
 <script src="../assets/js/prism-orb.js?v=03386460"></script>
 <script src="../assets/js/screen.js?v=7e3ba55e"></script>
 <script src="../assets/js/map-model.js?v=0f88c871"></script>
-<script src="../assets/js/map.js?v=dcbaf4f1"></script>
+<script src="../assets/js/map.js?v=c4567d2b"></script>
 <script src="../assets/js/sian.js?v=fdbaa548"></script>
+<!-- 미션 설정 — 점검항목 · 순서 · 로봇이 소요시간과 배터리를 움직인다. screen.js 뒤에 온다. -->
+<script src="../assets/js/mission-setup.js?v=71d284f1"></script>
 <script src="../assets/js/grid-overlay.js?v=164e4f2a"></script>
 </body>
 </html>

@@ -293,7 +293,31 @@
     }
   }
 
-  function draw() { drawList(); drawSummary(); }
+  /*
+   * 지도에 계획을 넘긴다 — 지도는 이 차례대로 도커에서 떠나 도커로 돌아오는 길을 다시 찾는다(map.js).
+   * 끈 자리도 같이 보낸다. 지도에서 아예 지워 버리면 "안 가기로 했다" 가 아니라 "없다" 로 읽힌다.
+   */
+  // 설정 단계일 때만 알린다. 사전 점검 · 모니터링에서는 지도가 우측 타임라인을 원본으로 쓴다
+  // (같은 판을 쓰는 사전 점검 화면은 [취소] 로 설정으로 돌아올 수 있다).
+  function inSetup() {
+    var now = document.body.getAttribute("data-stage");
+    return !now || now === "setup";
+  }
+
+  function tellMap() {
+    if (!inSetup()) { return; }
+    var names = {};
+    WPS.forEach(function (w) { names[w.id] = w.text; });
+    document.dispatchEvent(new CustomEvent("aprism:mission-plan", {
+      detail: {
+        stops: chosen(),
+        skip: order.filter(function (id) { return !on[id]; }),
+        names: names
+      }
+    }));
+  }
+
+  function draw() { drawList(); drawSummary(); tellMap(); }
 
   /* ================================================================
    * 손놀림
@@ -402,6 +426,7 @@
     order = next;
     drawOrd();
     drawSummary();
+    tellMap();
   });
 
   function drop() {
@@ -428,6 +453,12 @@
     lastMin = null;
     drawSummary();
   });
+
+  // 단계가 설정으로 돌아오면 계획을 다시 알린다.
+  if (window.MutationObserver) {
+    new MutationObserver(function () { if (inSetup()) { tellMap(); } })
+      .observe(document.body, { attributes: true, attributeFilter: ["data-stage"] });
+  }
 
   draw();
 })();
