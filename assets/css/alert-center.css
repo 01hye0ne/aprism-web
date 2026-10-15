@@ -33,6 +33,14 @@
  * 12. 오탐 가능성 막대에 채움이 없었다(12% 인데 빈 막대). -> 12% 를 실제로 채운다.
  * 13. 빈 Action Slot(64x28)이 줄마다 있고 열 머리에도 빈 칸이 있었다.
  *     v2.2 는 알림마다 [보고서]가 있다 — 그 자리로 채웠다.
+ *
+ * ---- 조치 완료 탭 (Figma 1202:16151) -------------------------
+ * 그 프레임은 조치 완료 탭만이 아니라 화면 껍데기까지 손본 판이었다 —
+ * Body 를 gray/800 에 padding 24 로, 보드를 카드 두 장(gap 16)으로 갈라 놨다.
+ * 껍데기는 따르지 않았다. 두 탭은 같은 화면이라 탭을 오갈 때 보드가 바뀌면 안 되고,
+ * 뼈대는 미확인 탭 판(위 1~13)이 기준이다. 1202 에서는 "내용"만 가져왔다 —
+ * 줄 모양(조치 시각 · 조치 내용 · 원 등급 · 담당), 날짜 묶음, 조치 기록 상세,
+ * DELTA 인수인계 요약, 그리고 등급별 건수 분할이다.
  * ============================================================ */
 
 /* ---------- Body — GNB 오른쪽 전체 면 ---------- */
@@ -45,19 +53,11 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--space-16);
-  padding: var(--space-24);
-  border-radius: var(--radius-container) 0 0 0;
-  background-color: var(--bg-panel);
-  overflow: hidden;
-}
-
-/* Breadcrumb + 제목 줄은 한 덩이다(Figma Page Head, gap 12). */
-.ac-page-head {
-  flex: none;
-  display: flex;
-  flex-direction: column;
   gap: var(--space-12);
+  padding: var(--space-20);
+  border-radius: var(--radius-container) var(--radius-container) 0 0;
+  background-color: var(--bg-frame);
+  overflow: hidden;
 }
 
 /* ---------- Breadcrumb ---------- */
@@ -101,9 +101,8 @@
 }
 
 /*
- * Figma Badge Dot=true — padding 4/12/4/8, gap 4, radius/pill, 면 gray/750.
- * 색은 위험 계열이다(1202:16161) — 1177 판의 파랑에서 바뀌었다.
- * 미확인이 남아 있다는 뜻이라 이쪽이 맞다.
+ * Figma Badge Dot=true — padding 4/12/4/8, gap 4, radius/pill.
+ * 면은 bg/inset 으로 올렸다(Figma 는 gray/750 이라 Body 면과 같았다).
  */
 .ac-count-badge {
   display: inline-flex;
@@ -111,11 +110,11 @@
   gap: var(--space-4);
   padding: var(--space-4) var(--space-12) var(--space-4) var(--space-8);
   border-radius: var(--radius-pill);
-  background-color: var(--bg-frame);
-  color: var(--status-critical-text);
+  background-color: var(--bg-inset);
+  color: var(--status-info-text);
 }
 
-.ac-count-badge .badge-dot { background-color: var(--status-critical-icon); }
+.ac-count-badge .badge-dot { background-color: var(--status-info-icon); }
 
 /* ---------- Filter Bar ---------- */
 .ac-filter {
@@ -123,7 +122,6 @@
   display: flex;
   align-items: center;
   gap: var(--space-12);
-  padding: 14px var(--space-16);
 }
 
 .ac-filter-label {
@@ -186,9 +184,11 @@
  * 안이 밖보다 세서 보드가 두 쪽으로 갈라져 보였다 — 둘을 같은 단계로 맞췄다.
  */
 /*
- * Board — 1202 판에서 한 상자가 카드 두 장으로 갈라졌다(gap 16).
- * 카드 면은 Body 와 같은 gray/800 이고 1px border/divider 로만 갈린다 —
- * 사이 틈이 Body 면을 그대로 보여 주므로 두 장이 또렷하게 나뉜다.
+ * Board — 한 상자다. 안쪽을 1px 로 두 칸(목록 / 상세)으로 가른다.
+ *
+ * 1202 판 프레임은 이것을 카드 두 장(gap 16, 각자 테두리)으로 갈라 놨지만 따르지 않았다 —
+ * 조치 완료 탭은 "내용"만 가져오고 뼈대는 미확인 탭과 같아야 한다. 탭을 오갈 때마다
+ * 보드 껍데기가 바뀌면 같은 화면으로 읽히지 않는다.
  */
 .ac-board {
   /*
@@ -203,22 +203,21 @@
   min-height: 0;
   display: flex;
   align-items: stretch;
-  gap: var(--space-16);
-}
-
-.ac-open,
-.ac-detail {
-  display: flex;
-  flex-direction: column;
-  border: var(--border-width-thin) solid var(--border-divider);
+  border: var(--border-width-thin) solid var(--border-default);
   border-radius: var(--radius-container);
-  background-color: var(--bg-panel);
   overflow: hidden;
 }
 
+/*
+ * 바깥 테두리와 안쪽 칸 나누는 선을 같은 단계로 둔다 — Figma 는 안쪽이 border/strong 이라
+ * 밖보다 세서 보드가 두 쪽으로 갈라져 보였다.
+ */
 .ac-open {
   flex: 1 1 auto;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  border-right: var(--border-width-thin) solid var(--border-default);
 }
 
 /* ---------- 미확인 / 조치 완료 탭 ---------- */
@@ -228,7 +227,7 @@
   align-items: stretch;
   gap: var(--space-8);
   height: var(--ac-head-h);
-  padding: 0 var(--space-16) 0 var(--space-4);
+  padding-right: var(--space-12);
   border-bottom: var(--border-width-thin) solid var(--border-divider);
 }
 
@@ -248,7 +247,7 @@
   gap: 10px;
   padding: 0 var(--space-16);
   border: 0;
-  border-bottom: 2px solid transparent;
+  border-bottom: 3px solid transparent;
   background: none;
   color: var(--text-secondary);
   font-family: inherit;
@@ -296,6 +295,7 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
+  background-color: var(--bg-inset);
 }
 
 .ac-col-head {
@@ -689,6 +689,8 @@
 .ac-detail {
   flex: none;
   width: 700px;
+  display: flex;
+  flex-direction: column;
 }
 
 /*
