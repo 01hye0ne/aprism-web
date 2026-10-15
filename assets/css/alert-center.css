@@ -175,6 +175,15 @@
  * 안이 밖보다 세서 보드가 두 쪽으로 갈라져 보였다 — 둘을 같은 단계로 맞췄다.
  */
 .ac-board {
+  /*
+   * 두 칸의 머리 높이를 한 값으로 묶는다. 안 묶으면 왼쪽은 탭 높이(12+20+12+3),
+   * 오른쪽은 이전·다음 버튼 높이(12+28+12)로 따로 자라서 5px 어긋났고,
+   * 보드를 가로지르는 1px 밑줄이 두 칸 사이에서 턱이 졌다.
+   * 안쪽 요소는 패딩이 아니라 가운데 정렬로 자리를 잡는다 — 그래야 탭 글자(20)와
+   * 버튼(28)처럼 높이가 다른 것이 같은 띠 안에 함께 선다.
+   */
+  --ac-head-h: 48px;
+
   flex: 1 1 auto;
   min-height: 0;
   display: flex;
@@ -196,15 +205,17 @@
 .ac-panel-head {
   flex: none;
   display: flex;
-  align-items: center;
+  align-items: stretch;
   gap: var(--space-8);
+  height: var(--ac-head-h);
   padding-right: var(--space-12);
   border-bottom: var(--border-width-thin) solid var(--border-divider);
 }
 
+/* 탭은 머리 높이를 꽉 채운다 — 밑줄이 머리 아래 선에 붙어야 하기 때문이다. */
 .ac-tabs {
   display: flex;
-  align-items: center;
+  align-items: stretch;
 }
 
 /*
@@ -215,7 +226,7 @@
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  padding: var(--space-12) var(--space-16);
+  padding: 0 var(--space-16);
   border: 0;
   border-bottom: 3px solid transparent;
   background: none;
@@ -408,7 +419,8 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: var(--space-12) var(--space-20);
+  height: var(--ac-head-h);
+  padding: 0 var(--space-20);
   border-bottom: var(--border-width-thin) solid var(--border-divider);
 }
 
