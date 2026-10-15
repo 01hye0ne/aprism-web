@@ -767,6 +767,9 @@
   color: var(--text-tertiary);
 }
 
+/* inline-flex 가 UA 의 hidden 처리를 덮으므로 다시 눌러 준다(.dropdown-menu 와 같은 사정). */
+.ac-draft[hidden] { display: none; }
+
 .ac-draft::before {
   content: "";
   width: 6px;

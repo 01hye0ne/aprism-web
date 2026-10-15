@@ -512,10 +512,23 @@
     var hasDraft = chosen.length > 0 || !!state.memo[a.id];
     return '<div class="ac-actions">' +
       '<span class="ac-head-spacer"></span>' +
-      (hasDraft ? '<p class="ac-draft t-caption">임시저장된 상태</p>' : "") +
+      '<p class="ac-draft t-caption" data-ac-draft' + (hasDraft ? "" : " hidden") + '>임시저장된 상태</p>' +
       '<button type="button" class="btn btn-accent is-md" data-ac-done' +
         (chosen.length ? "" : " disabled") + '>조치 완료</button>' +
     '</div>';
+  }
+
+  /*
+   * 조치를 고르거나 메모를 칠 때 바뀌는 것은 둘뿐이다 — 임시저장 표시와 [조치 완료] 의 켜짐.
+   * 그 둘만 손댄다. 판을 통째로 다시 그리면 상세 칸이 새 DOM 이 되면서 스크롤이 맨 위로 튀고
+   * 누른 캡슐에서 포커스가 빠진다(아래로 내려 캡슐을 눌렀는데 화면이 위로 올라가던 문제).
+   */
+  function syncActions(a) {
+    var chosen = state.chosen[a.id] || [];
+    var draft = $("[data-ac-draft]", detail);
+    var doneBtn = $("[data-ac-done]", detail);
+    if (draft) { draft.hidden = !(chosen.length || state.memo[a.id]); }
+    if (doneBtn) { doneBtn.disabled = !chosen.length; }
   }
 
   function wireDetail(a, done) {
@@ -528,15 +541,17 @@
         var i = cur.indexOf(t);
         if (i > -1) { cur.splice(i, 1); } else { cur = cur.concat([t]); }
         state.chosen[a.id] = cur;
-        renderDetail();
+        cap.setAttribute("aria-pressed", i > -1 ? "false" : "true");
+        syncActions(a);
       });
     });
 
     var memo = $("[data-ac-memo]", detail);
     if (memo) {
-      memo.addEventListener("input", function () { state.memo[a.id] = memo.value; });
-      // 임시저장 표시는 포커스를 잃을 때 한 번만 갱신한다 — 글자마다 다시 그리면 커서가 튄다.
-      memo.addEventListener("blur", function () { renderDetail(); });
+      memo.addEventListener("input", function () {
+        state.memo[a.id] = memo.value;
+        syncActions(a);
+      });
     }
 
     var doneBtn = $("[data-ac-done]", detail);
