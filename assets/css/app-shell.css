@@ -2854,6 +2854,118 @@ input.field-box { outline: 0; }
 .field-option:focus-visible { background-color: var(--state-hover-raised); outline: 0; }
 .field-option[aria-selected="true"] { color: var(--color-blue-300); }
 
+/* ── Preset Chip (Figma Preset Chip 1499:40329 · 1531:42451 AI 추천) ──── */
+/*
+ * "무엇을 했는지" 를 고르는 알약이다. 여러 개 고를 수 있어 라디오가 아니라 aria-pressed 토글이다.
+ *
+ * 세 가지를 색이 아니라 서로 다른 수단으로 말한다 — 색만 쓰면 다크에서 셋이 뭉친다.
+ *   추천  파란 테두리 + [AI 추천] 꼬리표   (DELTA 가 미는 것)
+ *   선택  체크 표시 + 파란 면              (내가 고른 것)
+ *   둘 다 테두리 · 꼬리표 · 체크가 함께 선다
+ * 꼬리표를 다는 것은 Figma 판이다. 알림 센터처럼 범례 한 줄을 둘 자리가 없는 좁은 칸에서도
+ * 칩 혼자 "이건 AI 가 민 것" 을 말할 수 있어야 한다.
+ */
+.preset-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex: none;
+  padding: var(--space-4) var(--space-4) var(--space-4) var(--space-12);
+  border: var(--border-width-thin) solid var(--border-default);
+  max-width: 100%;
+  border-radius: var(--radius-pill);
+  background-color: transparent;
+  color: var(--text-secondary);
+  font-family: inherit;
+  font-size: var(--font-size-13);
+  line-height: var(--font-line-height-18);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/* 꼬리표가 없는 칩은 오른쪽도 12 로 — 한쪽만 6 이면 글자가 치우쳐 보인다. */
+.preset-chip:not(:has(.preset-chip-ai)) { padding-right: var(--space-12); }
+
+.preset-chip:hover { background-color: var(--state-hover); color: var(--text-primary); }
+
+.preset-chip:focus-visible {
+  outline: var(--border-width-strong) solid var(--border-focus);
+  outline-offset: 1px;
+}
+
+.preset-chip[data-ai] { border-color: var(--border-brand); color: var(--fg-link); }
+
+.preset-chip[aria-pressed="true"] {
+  border-color: var(--border-strong);
+  background-color: var(--status-info-bg);
+  color: var(--text-primary);
+}
+
+.preset-chip[data-ai][aria-pressed="true"] { border-color: var(--border-brand); }
+
+.preset-chip[aria-pressed="true"]::before {
+  content: "";
+  flex: none;
+  width: 14px;
+  height: 14px;
+  background-color: currentColor;
+  -webkit-mask-image: var(--ic-check);
+  mask-image: var(--ic-check);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+}
+
+.preset-chip-ai {
+  flex: none;
+  padding: 0 var(--space-4);
+  border: var(--border-width-thin) solid var(--border-brand);
+  border-radius: var(--radius-4);
+  color: var(--fg-link);
+  font-size: var(--font-size-12);
+  line-height: var(--font-line-height-18);
+  font-weight: 400;
+}
+
+/* ── Toast (Figma UI_99 1605:38529) ──────────────────────────── */
+/*
+ * 방금 한 일을 알리고 되돌릴 틈을 준다. 확인 대화상자 대신이라 막지 않는다 — 떠 있어도 화면은 그대로 쓴다.
+ * 면은 bg/inverse(밝은 면)다. 관제 화면은 거의 다 어두워서, 잠깐 떴다 사라지는 것은 뒤집어야 눈에 든다.
+ */
+.toast {
+  position: absolute;
+  left: 50%;
+  bottom: var(--space-20);
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  padding: var(--space-4) var(--space-4) var(--space-4) var(--space-16);
+  border-radius: var(--radius-pill);
+  background-color: var(--bg-inverse);
+  color: var(--text-on-inverse);
+  /* Figma Elevation/3/Popover — tokens.css 에 그림자 토큰이 없어 값을 그대로 적는다. */
+  box-shadow: 0 2px 6px -1px rgb(23 23 25 / 8%), 0 8px 20px -4px rgb(23 23 25 / 14%);
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+.toast[hidden] { display: none; }
+
+/*
+ * 되돌리기는 밝은 면 위에 앉는다. --fg-link 는 페이지 테마를 따라가므로(다크에서 blue/500)
+ * 이 면에서는 흐리다 — 라이트 모드가 링크에 쓰는 blue/700 을 원시값으로 직접 쓴다. 흰 면 대비 4.66:1.
+ */
+.toast .toast-undo {
+  color: var(--color-blue-700);
+  background-color: transparent;
+}
+
+.toast .toast-undo:hover { background-color: var(--color-alpha-gray-950-8); }
+
 /* ── 점검 항목 (체크박스 목록) ─────────────────────────────── */
 .check-group { display: flex; flex-direction: column; gap: var(--space-8); }
 

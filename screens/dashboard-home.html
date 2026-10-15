@@ -19,10 +19,10 @@
   }
   </script>
   <link rel="stylesheet" href="../assets/css/tokens.css?v=df3f45ff" />
-  <link rel="stylesheet" href="../assets/css/app-shell.css?v=440efa9e" />
+  <link rel="stylesheet" href="../assets/css/app-shell.css?v=66602241" />
   <link rel="stylesheet" href="../assets/css/map-overlays.css?v=6bbdf88e" />
   <link rel="stylesheet" href="../assets/css/text-parts.css?v=e38e19ea" />
-  <link rel="stylesheet" href="../assets/css/monitor.css?v=afebdb56" />
+  <link rel="stylesheet" href="../assets/css/monitor.css?v=7eb17f4f" />
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
@@ -321,12 +321,12 @@
                   <div class="ma-divider" aria-hidden="true"></div>
                   <!-- 상황 조치 — 선택지가 셋뿐이라 드롭다운 대신 늘 펼쳐 둔 라디오 목록이다(펼친 목록이
                        [확인 처리] 와 지도 점을 덮던 문제). 고르기 전에는 [확인 처리] 가 꺼져 있다. -->
-                  <div class="ma-act" role="radiogroup" aria-labelledby="ma-act-label">
-                    <span class="t-label-1" id="ma-act-label">상황 조치</span>
-                    <div class="ma-options" data-ma-options></div>
+                  <div class="ma-act" role="group" aria-labelledby="ma-act-label">
+                    <span class="ma-act-label t-caption" id="ma-act-label">조치 내용 <span class="ma-act-note">(여러 개 선택 가능)</span></span>
+                    <div class="ma-presets" data-ma-options></div>
                   </div>
                 </div>
-                <button type="button" class="btn btn-accent ma-confirm" data-ma-confirm>확인 처리</button>
+                <button type="button" class="btn btn-accent ma-confirm" data-ma-confirm>조치 완료</button>
               </section>
               <div class="map-bot" data-map-bot hidden>
                 <div class="map-bot-tip" data-map-bot-tip hidden>
@@ -361,6 +361,13 @@
                   <div><dt>담당 로봇</dt><dd data-map-card-robot>ROBOT 01</dd></div>
                 </dl>
               </div>
+            </div>
+
+            <!-- 조치 완료 토스트 — 되돌릴 틈을 주는 자리다(UI_99 1605:38529). 확인 대화상자를 쓰지 않기로
+                 했으므로(인터뷰: "확인창까지 들어가면 사람이 필요 없다") 실수는 여기서 받아낸다. 5초 뒤 사라진다. -->
+            <div class="toast" data-ma-toast hidden role="status" aria-live="polite">
+              <span class="toast-msg t-label-2" data-ma-toast-msg></span>
+              <button type="button" class="btn btn-ghost is-xs toast-undo" data-ma-undo>되돌리기</button>
             </div>
 
             <!-- AI Assist Panel · Figma UI_00 Design System 121:665 (state=closed 기본, 우측 토글로 opened) -->
@@ -1618,7 +1625,7 @@
 <script src="../assets/js/map-model.js?v=0f88c871"></script>
 <script src="../assets/js/map.js?v=035ddcc9"></script>
 <script src="../assets/js/robot-stage.js?v=d114bf18"></script>
-<script src="../assets/js/monitor.js?v=2a351559"></script>
+<script src="../assets/js/monitor.js?v=3f3fbd27"></script>
 <script src="../assets/js/grid-overlay.js?v=164e4f2a"></script>
 </body>
 </html>

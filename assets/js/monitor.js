@@ -52,33 +52,37 @@
   // 그 자리 위에 쪽지가 선다. sum 은 쪽지의 원인 요약(두 줄), acts 는 "상황 조치" 선택지다.
   // live 는 쪽지 라이브 뷰에 까는 임시 그림(assets/img/alert-live-*.webp) — 디자이너가 준 검출 캡처 두 장을
   // 배관 · 펌프 계열(discharge)과 나머지(ppe)로 나눠 붙였다. 알림 내용과 딱 맞는 그림은 아니다.
+  /*
+   * acts — 조치 내용 칩. ai:true 는 DELTA 가 미는 것이고 칩에 [AI 추천] 꼬리표가 붙는다.
+   * 여러 개 고를 수 있다: 현장에서는 "무전 연락 + 작업 중지" 처럼 둘을 같이 하는 일이 흔하다.
+   */
   var WARNINGS = [
     { sev: "warning", robot: 0, wp: "WP-03", live: "discharge", where: "APRO 4F · WP-03 냉각수 배관 밸브", time: "10:11:19",
       title: "누출감지 · 냉각수 배관 밸브",
       sum: "밸브 이음부에서 누출 패턴이 신뢰도 0.87 로 검출됐습니다. 임계 0.70 을 넘었고 연속 2프레임에서 나왔습니다.",
-      acts: ["현장 점검 요청", "다음 순회 재측정", "추이 관찰"] },
+      acts: [{ t: "현장 점검 요청", ai: true }, { t: "다음 순회 재측정" }, { t: "추이 관찰" }] },
     { sev: "warning", robot: 1, wp: "WP-06", live: "discharge", where: "Robot 02 · WP-06 수배전반", time: "10:09:42",
       title: "부분방전 · 이상 점수 9.41",
       sum: "이상 점수 9.41 로 임계 9.23 을 넘었습니다. PRPD 패턴이 코로나 방전 유형과 일치합니다.",
-      acts: ["재진단 예약", "현장 점검 요청", "추이 관찰"] },
+      acts: [{ t: "재진단 예약", ai: true }, { t: "현장 점검 요청" }, { t: "추이 관찰" }] },
     { sev: "warning", robot: 1, wp: "WP-12", live: "discharge", where: "Robot 02 · WP-12 냉각 펌프 P-2", time: "10:06:05",
       title: "진동 상승 · 냉각 펌프 P-2",
       sum: "진동 RMS 4.8 mm/s 로 주의 기준 4.5 를 넘었습니다. 최근 3회 측정에서 계속 오르고 있습니다.",
-      acts: ["베어링 점검 요청", "다음 순회 재측정", "추이 관찰"] },
+      acts: [{ t: "베어링 점검 요청", ai: true }, { t: "다음 순회 재측정" }, { t: "추이 관찰" }] },
     { sev: "warning", robot: 4, wp: "WP-02", live: "ppe", where: "Robot 05 · WP-02 발전기 베어링", time: "10:03:27",
       title: "과열 · 발전기 베어링 68.4℃",
       sum: "베어링 표면 온도 68.4℃ 로 주의 기준 65℃ 를 넘었습니다. 주변 온도보다 31℃ 높습니다.",
-      acts: ["윤활 상태 점검 요청", "열화상 재촬영", "추이 관찰"] },
+      acts: [{ t: "윤활 상태 점검 요청", ai: true }, { t: "열화상 재촬영" }, { t: "추이 관찰" }] },
     { sev: "warning", robot: 1, wp: "WP-20", live: "discharge", where: "Robot 02 · WP-20 공기 압축기 C-1", time: "10:01:12",
       title: "압력 편차 · 공기 압축기 C-1",
       sum: "토출 압력 7.9 bar 로 정상 범위(8.2~8.8) 아래입니다. 흡입 필터가 막혔을 가능성이 있습니다.",
-      acts: ["필터 점검 요청", "재측정 예약", "추이 관찰"] }
+      acts: [{ t: "필터 점검 요청", ai: true }, { t: "재측정 예약" }, { t: "추이 관찰" }] }
   ];
 
   var CRITICAL = { sev: "critical", robot: 0, wp: "WP-04", live: "ppe", where: "터빈 2 / Unit 03 · WP-04 N₂ 배관 압력계", time: "10:12:40",
     title: "지하발전소 B3 터빈 2 NG 1건 발견",
     sum: "Spiral Casing Pr. 측정값 90 이 기준값 87 을 넘었습니다. 최근 3회 측정이 잇달아 올라 NG 로 판정했습니다.",
-    acts: ["현장 무전 연락 · 작업 중지 요청", "로봇 정지 · 현장 점검 요청", "재측정 후 판단"] };
+    acts: [{ t: "현장 무전 연락 · 작업 중지 요청", ai: true }, { t: "로봇 정지 · 현장 점검 요청", ai: true }, { t: "재측정 후 판단" }] };
 
   // 검토용 단계 — 주소 끝 #… 로 고른다. few 는 알림은 있지만 Delta 종합 기준에 못 미친 판이다.
   var SETS = {
@@ -504,11 +508,14 @@
     var confirm = $("[data-ma-confirm]", box);
     var opening = false;
 
-    // 고른 조치. 알림을 새로 열 때마다 비운다 — 조치를 골라야 [확인 처리] 가 켜진다.
+    // 고른 조치. 알림을 새로 열 때마다 비운다 — 하나 이상 골라야 [조치 완료] 가 켜진다.
     function chosen() {
-      var on = $("input:checked", options);
-      return on ? on.value : "";
+      return $$("[aria-pressed='true']", options).map(function (chip) {
+        return chip.getAttribute("data-act");
+      });
     }
+
+    function syncConfirm() { confirm.disabled = !chosen().length; }
 
     function fill(a) {
       box.classList.toggle("is-critical", a.sev === "critical");
@@ -522,23 +529,28 @@
       live.style.backgroundImage = a.live ? "url(" + liveSrc(a) + ")" : "";
       live.classList.toggle("has-photo", !!a.live);
       options.textContent = "";
-      a.acts.forEach(function (label) {
-        var row = el("label", "ma-option");
-        var input = el("input");
-        input.type = "radio";
-        input.name = "ma-act";
-        input.value = label;
-        var dot = el("span", "ma-radio");
-        dot.setAttribute("aria-hidden", "true");
-        row.appendChild(input);
-        row.appendChild(dot);
-        row.appendChild(el("span", "t-body-3", label));
-        options.appendChild(row);
+      a.acts.forEach(function (act) {
+        var chip = el("button", "preset-chip");
+        chip.type = "button";
+        chip.setAttribute("data-act", act.t);
+        chip.setAttribute("aria-pressed", "false");
+        chip.appendChild(el("span", null, act.t));
+        // DELTA 가 미는 칩만 꼬리표를 단다 — 쪽지에는 범례 한 줄을 둘 자리가 없다.
+        if (act.ai) {
+          chip.setAttribute("data-ai", "");
+          chip.appendChild(el("span", "preset-chip-ai", "AI 추천"));
+        }
+        options.appendChild(chip);
       });
       confirm.disabled = true;
     }
 
-    options.addEventListener("change", function () { confirm.disabled = !chosen(); });
+    options.addEventListener("click", function (event) {
+      var chip = event.target.closest(".preset-chip");
+      if (!chip) { return; }
+      chip.setAttribute("aria-pressed", chip.getAttribute("aria-pressed") === "true" ? "false" : "true");
+      syncConfirm();
+    });
 
     /*
      * v2.2 — 사람이 찍힌 검출 캡처(ppe) 자리에 비식별화가 적용된 현장 그림을 쓴다(디자이너가 준 그림,
@@ -624,15 +636,141 @@
       render();
     }
 
+    /* ================================================================
+     * 조치 완료 — 쪽지가 "오늘 확인 완료" 로 빨려 들어간다 (UI_99 1610:54101)
+     *
+     * 처리한 알림이 어디로 갔는지 눈으로 따라갈 수 있게 한다. 전체 660ms.
+     *   ① 완료 목록 맨 위에 빈 칸이 열린다            180ms
+     *   ② 쪽지가 그 칸으로 접히며 날아간다            480ms · ease-in
+     *   ③ 닿으면 목록에서 빠지고 새 항목이 초록으로 반짝인다 · 토스트 5초
+     *
+     * 날아가는 것은 분신이다 — 진짜 쪽지는 --x/--y 로 웨이포인트에 매달려 있어서
+     * 거기에 이동 transform 을 겹치면 기준점이 꼬인다(monitor.css .ma-flyer).
+     * 되돌리기를 5초간 주므로 확인 대화상자는 두지 않는다.
+     * ================================================================ */
+    var slow = window.matchMedia("(prefers-reduced-motion: reduce)");
+    var toast = $("[data-ma-toast]");
+    var toastMsg = $("[data-ma-toast-msg]");
+    var undoBtn = $("[data-ma-undo]");
+    var toastTimer = null;
+    var lastDone = null;   // 되돌릴 거리 — 토스트가 떠 있는 동안만 들고 있다
+    var busy = false;
+
+    function showToast(a) {
+      if (!toast) { return; }
+      toastMsg.textContent = "조치 완료 · " + a.title;
+      toast.hidden = false;
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(hideToast, 5000);
+    }
+
+    function hideToast() {
+      clearTimeout(toastTimer);
+      if (toast) { toast.hidden = true; }
+      lastDone = null;
+    }
+
+    // 완료 목록 맨 위에 들어갈 칸의 높이를 미리 잰다 — 빈 칸을 그만큼 열어야 자리가 안 튄다.
+    function measureDone(rec) {
+      var ghost = doneItem(rec);
+      ghost.style.cssText = "position:absolute;visibility:hidden;pointer-events:none";
+      doneList.appendChild(ghost);
+      var h = ghost.getBoundingClientRect().height;
+      ghost.remove();
+      return h;
+    }
+
+    function flyTo(from, to) {
+      var dx = (to.left + to.width / 2) - (from.left + from.width / 2);
+      var dy = (to.top + to.height / 2) - (from.top + from.height / 2);
+      var sx = to.width / from.width;
+      var sy = to.height / from.height;
+      // 가로로 더 많이 움직이면 세로로 접고, 세로로 더 움직이면 가로로 접는다.
+      var horiz = Math.abs(dx) > Math.abs(dy);
+      var mid = horiz ? "polygon(0% 34%,100% 0%,100% 100%,0% 66%)"
+                      : "polygon(0% 0%,100% 0%,64% 100%,36% 100%)";
+      var end = horiz ? "polygon(0% 44%,100% 20%,100% 80%,0% 56%)"
+                      : "polygon(20% 0%,80% 0%,56% 100%,44% 100%)";
+      return [
+        { transform: "none", clipPath: "polygon(0% 0%,100% 0%,100% 100%,0% 100%)", opacity: 1, offset: 0 },
+        { transform: "translate(" + dx * 0.25 + "px," + dy * 0.25 + "px) scale(.9,.9)", clipPath: mid, opacity: 1, offset: 0.45 },
+        { transform: "translate(" + dx + "px," + dy + "px) scale(" + sx + "," + sy + ")", clipPath: end, opacity: 0.2, offset: 1 }
+      ];
+    }
+
+    function commit(a, rec) {
+      DONE.forEach(function (d) { d.fresh = false; });
+      DONE.unshift(rec);
+      if (extra.indexOf(a) >= 0) { extra.splice(extra.indexOf(a), 1); } else { resolved.push(a); }
+      lastDone = { a: a, rec: rec };
+      render();
+      showToast(a);
+      busy = false;
+    }
+
     confirm.addEventListener("click", function () {
       var a = picked;
-      var how = chosen();
-      if (!a || !how) { return; }
-      DONE.forEach(function (d) { d.fresh = false; });
-      DONE.unshift({ time: clock(), title: a.title, how: how, who: "홍길동", fresh: true });
-      if (extra.indexOf(a) >= 0) { extra.splice(extra.indexOf(a), 1); } else { resolved.push(a); }
+      var picks = chosen();
+      if (busy || !a || !picks.length) { return; }
+      busy = true;
+      hideToast();
+
+      var rec = { time: clock(), title: a.title, how: picks.join(" · "), who: "홍길동", fresh: true };
+      var from = box.getBoundingClientRect();
+      // 분신을 먼저 띄우고 진짜 쪽지를 닫는다 — 순서가 바뀌면 잴 자리가 사라진다.
+      var flyer = box.cloneNode(true);
+      flyer.removeAttribute("data-map-alert");
+      flyer.removeAttribute("id");
+      flyer.classList.add("ma-flyer");
+      flyer.hidden = false;
+      flyer.setAttribute("aria-hidden", "true");
+      flyer.style.cssText = "left:" + from.left + "px;top:" + from.top + "px;" +
+                            "width:" + from.width + "px;height:" + from.height + "px;transform:none";
+      document.body.appendChild(flyer);
       close();
+
+      // 동작 줄이기 — 날아가는 대신 150ms 페이드다(UI_99 STEP 4).
+      if (slow.matches) {
+        flyer.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 150 }).finished
+          .catch(function () {})
+          .then(function () { flyer.remove(); commit(a, rec); });
+        return;
+      }
+
+      var slot = el("div", "done-slot");
+      slot.setAttribute("aria-hidden", "true");
+      doneList.insertBefore(slot, doneList.firstChild);
+      var h = measureDone(rec);
+
+      slot.animate([{ height: "0px" }, { height: h + "px" }], { duration: 180, easing: "ease-out", fill: "forwards" })
+        .finished.catch(function () {}).then(function () {
+          var to = slot.isConnected ? slot.getBoundingClientRect() : doneList.getBoundingClientRect();
+          return flyer.animate(flyTo(from, to),
+            { duration: 480, easing: "cubic-bezier(.55,0,.75,.2)", fill: "forwards" }).finished;
+        })
+        .catch(function () {})
+        .then(function () {
+          flyer.remove();
+          slot.remove();
+          commit(a, rec);
+        });
     });
+
+    if (undoBtn) {
+      undoBtn.addEventListener("click", function () {
+        if (!lastDone || busy) { return; }
+        var a = lastDone.a, rec = lastDone.rec;
+        var i = DONE.indexOf(rec);
+        if (i >= 0) { DONE.splice(i, 1); }
+        var r = resolved.indexOf(a);
+        if (r >= 0) { resolved.splice(r, 1); } else { extra.unshift(a); }
+        hideToast();
+        render();
+      });
+    }
+
+    // 단계를 바꾸면(주소 #…) 들고 있던 되돌리기도 버린다.
+    document.addEventListener("aprism:monitor-reset", hideToast);
 
     // 지도가 다른 웨이포인트로 옮겨 가며 쪽지를 닫았다 — 목록의 고른 표시도 놓는다.
     document.addEventListener("aprism:map-alert", function (event) {
@@ -674,6 +812,7 @@
     resolved = [];
     DONE = DONE_BASE.slice();
     note.close();
+    document.dispatchEvent(new CustomEvent("aprism:monitor-reset"));
     render();
   }
 
