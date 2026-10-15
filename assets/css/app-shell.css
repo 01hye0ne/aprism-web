@@ -2894,37 +2894,37 @@ input.field-box { outline: 0; }
 .field-option:focus-visible { background-color: var(--state-hover-raised); outline: 0; }
 .field-option[aria-selected="true"] { color: var(--color-blue-300); }
 
-/* ── Preset Chip (Figma Preset Chip 1499:40329 · 1531:42451 AI 추천) ──── */
+/* ── Preset Chip (Figma Capsule · 알림 센터와 지도 쪽지가 함께 쓴다) ──── */
 /*
  * "무엇을 했는지" 를 고르는 알약이다. 여러 개 고를 수 있어 라디오가 아니라 aria-pressed 토글이다.
+ * 알림 센터(.ac-capsule)에 있던 것을 그대로 올렸다 — 같은 알림을 두 화면에서 보는데
+ * 칩 생김새가 다르면 같은 것으로 읽히지 않는다. 알림 센터 쪽이 기준이다.
  *
- * 세 가지를 색이 아니라 서로 다른 수단으로 말한다 — 색만 쓰면 다크에서 셋이 뭉친다.
- *   추천  파란 테두리 + [AI 추천] 꼬리표   (DELTA 가 미는 것)
- *   선택  체크 표시 + 파란 면              (내가 고른 것)
- *   둘 다 테두리 · 꼬리표 · 체크가 함께 선다
- * 꼬리표를 다는 것은 Figma 판이다. 알림 센터처럼 범례 한 줄을 둘 자리가 없는 좁은 칸에서도
- * 칩 혼자 "이건 AI 가 민 것" 을 말할 수 있어야 한다.
+ * 세 가지를 색이 아니라 서로 다른 채널로 말한다 — 색만 쓰면 다크에서 셋이 뭉친다.
+ *   추천  파란 테두리 · 파란 글자   (DELTA 가 미는 것)
+ *   선택  체크 표시 + 파란 면
+ *   둘 다 테두리 · 체크 · 면이 함께 선다
+ *
+ * Figma 는 추천을 6px 점으로 달았는데 뺐다. 이 시스템에서 점은 "상태"다(위험 · 주의 · Online).
+ * 같은 모양에 "AI 가 골랐다"는 다른 뜻을 얹으면 말이 겹친다. 정작 고른 칩에서는
+ * blue/500 점이 blue/900 면 위라 거의 보이지도 않았다.
  */
 .preset-chip {
   display: inline-flex;
   align-items: center;
   gap: var(--space-4);
-  flex: none;
-  padding: var(--space-4) var(--space-4) var(--space-4) var(--space-12);
-  border: var(--border-width-thin) solid var(--border-default);
-  max-width: 100%;
+  height: 28px;
+  padding: var(--space-4) var(--space-8);
+  border: var(--border-width-thin) solid var(--border-strong);
   border-radius: var(--radius-pill);
-  background-color: transparent;
+  background: none;
   color: var(--text-secondary);
   font-family: inherit;
   font-size: var(--font-size-13);
   line-height: var(--font-line-height-18);
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
   cursor: pointer;
 }
-
-/* 꼬리표가 없는 칩은 오른쪽도 12 로 — 한쪽만 6 이면 글자가 치우쳐 보인다. */
-.preset-chip:not(:has(.preset-chip-ai)) { padding-right: var(--space-12); }
 
 .preset-chip:hover { background-color: var(--state-hover); color: var(--text-primary); }
 
@@ -2933,15 +2933,36 @@ input.field-box { outline: 0; }
   outline-offset: 1px;
 }
 
-.preset-chip[data-ai] { border-color: var(--border-brand); color: var(--fg-link); }
+/* DELTA 추천 — 테두리가 맡는다. 무엇이 추천인지는 머리의 "DELTA 추천" 배지나 칸 이름이 알려 준다. */
+.preset-chip[data-delta] {
+  border-color: var(--border-brand);
+  color: var(--fg-link);
+}
 
+/*
+ * 고른 칩 — status/info/bg 면 + border/brand, 그리고 앞에 체크.
+ *
+ * 체크가 있어야 하는 까닭: 추천(테두리·글자 파랑)과 선택(면 파랑)이 둘 다 파랑으로 말해서
+ * 면 유무로만 갈렸다 — 한 줄에 섞여 있으면 무엇을 골랐는지 한눈에 세어지지 않았다.
+ *
+ * 흰 면(bg/inverse)으로 올리지 않은 까닭: 그 면은 이 시스템에서 가장 센 버튼의 자리다.
+ * 조치 칩은 입력이고 [조치 완료] 가 그것을 확정하는 동작인데,
+ * 입력이 확정보다 무거워지면 위계가 뒤집힌다.
+ */
 .preset-chip[aria-pressed="true"] {
-  border-color: var(--border-strong);
+  border-color: var(--border-brand);
   background-color: var(--status-info-bg);
   color: var(--text-primary);
 }
 
-.preset-chip[data-ai][aria-pressed="true"] { border-color: var(--border-brand); }
+/*
+ * 추천이 아닌데 고른 것은 테두리를 중립으로 둔다 — 테두리가 "추천" 만 말하게 하려면
+ * 고르는 것만으로 파래져서는 안 된다. :not() 으로 [data-delta] 보다 세게 걸어
+ * 규칙 차례와 상관없이 추천 쪽 파랑이 이긴다.
+ */
+.preset-chip[aria-pressed="true"]:not([data-delta]) {
+  border-color: var(--border-strong);
+}
 
 .preset-chip[aria-pressed="true"]::before {
   content: "";
@@ -2957,17 +2978,6 @@ input.field-box { outline: 0; }
   mask-position: center;
   -webkit-mask-size: contain;
   mask-size: contain;
-}
-
-.preset-chip-ai {
-  flex: none;
-  padding: 0 var(--space-4);
-  border: var(--border-width-thin) solid var(--border-brand);
-  border-radius: var(--radius-4);
-  color: var(--fg-link);
-  font-size: var(--font-size-12);
-  line-height: var(--font-line-height-18);
-  font-weight: 400;
 }
 
 /* ── Toast (Figma UI_99 1605:38529) ──────────────────────────── */

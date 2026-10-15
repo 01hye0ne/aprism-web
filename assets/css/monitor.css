@@ -876,12 +876,22 @@
   clip-path: polygon(50% 0, 100% 100%, 0 100%);
 }
 
-/* ── 머리 — 배지 · 제목 · [크게보기] · 닫기가 한 줄 ─────────── */
-.ma-head {
+/* ── 머리 세 줄 — 배지+닫기 · 제목+크게보기 · 발생 시각 ────────── */
+/*
+ * 줄마다 왼쪽은 읽을 것, 오른쪽은 누를 것이다. 한 줄에 다 넣었더니 제목이 길 때
+ * 배지와 버튼이 서로 밀려 기준선이 어긋났다. 세 줄은 서로 붙여 한 덩이로 읽히게 한다.
+ */
+.ma-head,
+.ma-title-row {
   display: flex;
   align-items: center;
   gap: var(--space-8);
 }
+
+/* 배지 줄과 제목 줄은 머리 한 덩이다 — 칸 사이(12)를 되돌려 4 로 붙인다. */
+.ma-title-row { margin-top: calc(var(--space-12) * -1 + var(--space-4)); }
+
+.ma-head .ma-close { margin-left: auto; }
 
 /* Badge Status=Warning · Critical — 알림 센터 .ac-sev-badge 와 같은 알약이다. */
 .ma-badge {
@@ -1029,19 +1039,15 @@
 }
 
 /* ── DELTA 조치 제안 (Figma DELTA Suggestion 1531:42356) ────── */
-/*
- * 알림 센터의 카드와 같은 덩이인데 면이 다르다 — 거기선 무채색 패널이고 여기선 파란 면이다.
- * 쪽지는 지도 위에 떠 있어 뒤가 비치므로, 무채색으로 두면 DELTA 칸이 배경에 묻힌다.
- * status/info 는 "AI 가 하는 말" 자리라 뜻도 맞는다.
- */
+/* 알림 센터 .ac-delta 와 같은 카드다 — 면 · 테두리 · 안쪽 여백까지 같이 간다. */
 .ma-delta {
   display: flex;
   flex-direction: column;
   gap: var(--space-8);
-  padding: var(--space-12);
-  border: var(--border-width-thin) solid var(--status-info-border);
+  padding: var(--space-16) var(--space-12) var(--space-12);
+  border: var(--border-width-thin) solid var(--border-default);
   border-radius: var(--radius-container);
-  background-color: var(--status-info-bg);
+  background-color: var(--bg-panel);
 }
 
 .ma-delta-mark {
@@ -1154,10 +1160,12 @@
 .ma-act-label { color: var(--text-tertiary); }
 .ma-act-note { font-weight: 400; }
 
+/* 알림 센터 .ac-presets 와 같은 간격(6)이다. */
 .ma-presets {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-4);
+  align-items: center;
+  gap: 6px;
 }
 
 .ma-confirm:focus-visible {

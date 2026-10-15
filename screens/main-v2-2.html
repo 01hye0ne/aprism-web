@@ -21,11 +21,11 @@
   }
   </script>
   <link rel="stylesheet" href="../assets/css/tokens.css?v=df3f45ff" />
-  <link rel="stylesheet" href="../assets/css/app-shell.css?v=d2c6e8c2" />
+  <link rel="stylesheet" href="../assets/css/app-shell.css?v=c176d7de" />
   <link rel="stylesheet" href="../assets/css/map-overlays.css?v=6bbdf88e" />
   <link rel="stylesheet" href="../assets/css/icons-outline.css?v=83872c0c" />
   <link rel="stylesheet" href="../assets/css/text-parts.css?v=e38e19ea" />
-  <link rel="stylesheet" href="../assets/css/monitor.css?v=6a266e1e" />
+  <link rel="stylesheet" href="../assets/css/monitor.css?v=4278b6dc" />
   <link rel="stylesheet" href="../assets/css/palette-neutral.css?v=0c969aea" />
   <link rel="stylesheet" href="../assets/css/delta-v3.css?v=b1562ee4" />
   <style>
@@ -414,14 +414,18 @@
                    같은 알림을 두 화면에서 보는데 짜임이 다르면 같은 것으로 읽히지 않는다. -->
               <section class="map-alert" data-map-alert hidden aria-labelledby="ma-title">
 
+                <!-- 머리는 세 줄이다. 한 줄에 다 넣으면 제목이 길 때 배지 · 버튼 · 제목이 서로 밀려
+                     줄마다 기준선이 어긋난다. 줄마다 왼쪽은 읽을 것, 오른쪽은 누를 것으로 갈라 세운다. -->
                 <div class="ma-head">
                   <span class="ma-badge t-label-2" data-ma-badge><span class="badge-dot"></span><span data-ma-sev>주의</span></span>
+                  <button type="button" class="ma-close" data-ma-close aria-label="닫기">
+                    <span class="i i-16" style="--i:var(--ic-close)" aria-hidden="true"></span>
+                  </button>
+                </div>
+                <div class="ma-title-row">
                   <h3 class="ma-title t-title-2" id="ma-title" data-ma-title></h3>
                   <button type="button" class="btn btn-secondary is-xs ma-zoom-open" data-ma-zoom>
                     <span class="i i-16" style="--i:var(--ic-expand)" aria-hidden="true"></span>크게보기
-                  </button>
-                  <button type="button" class="ma-close" data-ma-close aria-label="닫기">
-                    <span class="i i-16" style="--i:var(--ic-close)" aria-hidden="true"></span>
                   </button>
                 </div>
                 <p class="ma-stamp t-caption" data-ma-stamp></p>
@@ -1701,7 +1705,7 @@
 <script src="../assets/js/map-model.js?v=0f88c871"></script>
 <script src="../assets/js/map.js?v=035ddcc9"></script>
 <script src="../assets/js/robot-stage.js?v=d114bf18"></script>
-<script src="../assets/js/monitor.js?v=df99c07e"></script>
+<script src="../assets/js/monitor.js?v=5c33ca64"></script>
 <script src="../assets/js/mission-scope.js?v=b5f75429"></script>
 <script src="../assets/js/delta-pulse.js?v=2d0afced"></script>
 <script src="../assets/js/delta-chat.js?v=54fb0c47"></script>

@@ -1075,88 +1075,10 @@
   gap: 6px;
 }
 
-/* Figma Capsule — 높이 28, padding 4/8, gap 4, radius/pill. */
-.ac-capsule {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-4);
-  height: 28px;
-  padding: var(--space-4) var(--space-8);
-  border: var(--border-width-thin) solid var(--border-strong);
-  border-radius: var(--radius-pill);
-  background: none;
-  color: var(--text-secondary);
-  font-family: inherit;
-  font-size: var(--font-size-13);
-  line-height: var(--font-line-height-18);
-  font-weight: var(--font-weight-medium);
-  cursor: pointer;
-}
-
-.ac-capsule:hover { background-color: var(--state-hover); color: var(--text-primary); }
-
-.ac-capsule:focus-visible {
-  outline: var(--border-width-strong) solid var(--border-focus);
-  outline-offset: 1px;
-}
-
 /*
- * DELTA 추천 — 테두리가 맡는다.
- *
- * Figma 는 나머지와 테두리·글자색이 같고 6px 점만 달랐는데 점을 뺐다. 두 가지 때문이다 —
- *   · 이 시스템에서 점은 "상태"다(위험 · 주의 · Online 배지). 같은 모양에 "AI 가 골랐다"는
- *     다른 뜻을 얹으면 말이 겹친다.
- *   · 정작 고른 캡슐에서는 blue/500 점이 blue/900 면 위라 거의 보이지 않았다.
- *
- * 그래서 채널을 셋으로 갈랐다 — 테두리 = 추천, 체크 = 선택, 면 = 선택.
- * 무엇이 추천인지는 머리의 "DELTA 추천" 배지가 알려 준다.
+ * 조치 칩은 공용 .preset-chip 이다(app-shell.css). 지도 쪽지도 같은 것을 쓴다 —
+ * 같은 알림을 두 화면에서 보는데 칩 생김새가 다르면 같은 것으로 읽히지 않는다.
  */
-.ac-capsule[data-delta] {
-  border-color: var(--border-brand);
-  color: var(--fg-link);
-}
-
-/*
- * 고른 캡슐 — status/info/bg 면 + border/brand, 그리고 앞에 체크.
- *
- * 체크가 있어야 하는 까닭: 추천(테두리·글자 파랑)과 선택(면 파랑)이 둘 다 파랑으로 말해서
- * 면 유무로만 갈렸다 — 한 줄에 섞여 있으면 무엇을 골랐는지 한눈에 세어지지 않았다.
- * 추천은 테두리가, 선택은 체크가 맡게 꼴로 갈랐다.
- *
- * 흰 면(bg/inverse)으로 올리지 않은 까닭: 그 면은 이 시스템에서 가장 센 버튼
- * (.btn-primary · 인수인계 카드의 [보고서에 넣기])의 자리다. 조치 캡슐은 입력이고
- * [조치 완료] 가 그것을 확정하는 동작인데, 입력이 확정보다 무거워지면 위계가 뒤집힌다.
- */
-.ac-capsule[aria-pressed="true"] {
-  border-color: var(--border-brand);
-  background-color: var(--status-info-bg);
-  color: var(--text-primary);
-}
-
-/*
- * 추천이 아닌데 고른 것은 테두리를 중립으로 둔다 — 테두리가 "추천"만 말하게 하려면
- * 고르는 것만으로 파래져서는 안 된다. :not() 으로 [data-delta] 보다 세게 걸어
- * 규칙 차례와 상관없이 추천 쪽 파랑이 이긴다.
- */
-.ac-capsule[aria-pressed="true"]:not([data-delta]) {
-  border-color: var(--border-strong);
-}
-
-.ac-capsule[aria-pressed="true"]::before {
-  content: "";
-  flex: none;
-  width: 14px;
-  height: 14px;
-  background-color: currentColor;
-  -webkit-mask-image: var(--ic-check);
-  mask-image: var(--ic-check);
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  -webkit-mask-position: center;
-  mask-position: center;
-  -webkit-mask-size: contain;
-  mask-size: contain;
-}
 
 /* ── 메모 ────────────────────────────────────────────────── */
 .ac-memo textarea {

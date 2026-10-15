@@ -573,11 +573,9 @@
         chip.setAttribute("data-act", act.t);
         chip.setAttribute("aria-pressed", "false");
         chip.appendChild(el("span", null, act.t));
-        // DELTA 가 미는 칩만 꼬리표를 단다 — 쪽지에는 범례 한 줄을 둘 자리가 없다.
-        if (act.ai) {
-          chip.setAttribute("data-ai", "");
-          chip.appendChild(el("span", "preset-chip-ai", "AI 추천"));
-        }
+        // 추천은 테두리가 맡는다(app-shell .preset-chip[data-delta]) — 칸 이름이 "AI 추천 조치" 라
+        // 꼬리표를 따로 달 까닭이 없다. 알림 센터와 같은 표시다.
+        if (act.ai) { chip.setAttribute("data-delta", ""); }
         options.appendChild(chip);
       });
       confirm.disabled = true;

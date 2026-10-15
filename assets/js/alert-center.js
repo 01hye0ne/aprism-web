@@ -651,7 +651,7 @@
       '<div class="ac-presets">' +
         a.acts.map(function (c) {
           var on = chosen.indexOf(c.t) > -1;
-          return '<button type="button" class="ac-capsule" data-act="' + esc(c.t) + '"' +
+          return '<button type="button" class="preset-chip" data-act="' + esc(c.t) + '"' +
             (c.delta ? ' data-delta' : "") + ' aria-pressed="' + (on ? "true" : "false") + '">' +
             esc(c.t) +
           '</button>';
