@@ -794,29 +794,66 @@
  * 아래에 더 있다는 표시다. 스크롤 상자 안에 sticky 로 붙어 칸 바닥에 늘 머물고,
  * 끝까지 내려가면(.is-end) 사라진다 — 바닥에서도 떠 있으면 마지막 줄을 가리는 얼룩이 된다.
  *
- * margin-top 이 제 높이(44)와 앞 간격(flex gap)을 함께 되돌린다. 안 그러면 이 칸만큼
+ * margin-top 이 제 높이와 앞 간격(flex gap)을 함께 되돌린다. 안 그러면 이 칸만큼
  * 스크롤 길이가 늘어 끝에 빈 자리가 생긴다. 상자마다 gap 이 달라 값이 둘이다.
  *
- * 면은 bg/frame 으로 번지고(상세 칸 뒤에 비치는 면이다) 그 위에 약한 blur 를 얹는다.
- * mask 가 위쪽으로 투명해지므로 흐림도 함께 옅어진다.
+ * 경계가 보이던 진짜 까닭: backdrop-filter 를 가진 칸에는 제 mask 가 먹지 않는다
+ * (Chromium. 재 보면 mask 를 떼어 낸 것과 픽셀이 똑같다). 그래서 흐림은 띠 위쪽
+ * 끝에서 뚝 끊겼고, 눈에 보이던 가로줄이 그 자리다. 예전엔 면이 gradient 라
+ * 색만 부드러웠지 흐림은 늘 칼로 자른 모양이었다.
+ *
+ * 그래서 두 겹으로 나눈다 — 바깥(이 칸)은 mask 만 들고, 면과 흐림은 ::before 가
+ * 진다. 자식은 부모 mask 에 제대로 깎이므로 색과 흐림이 같이 옅어진다.
+ *
+ * 곡선도 하나로 모은다. 전에는 면 25% · mask 45% 로 구간이 달라 둘을 곱한 실제
+ * 투명도에 꺾임이 생겼다. 이제 mask 하나가 다 맡는다. 직선 ramp 는 시작·끝이 띠로
+ * 보여서(마하 밴드) 가운데가 가파르고 양끝이 완만한 S 자로 끊어 적고, 높이도
+ * 44 -> 72 로 늘려 같은 변화를 더 긴 거리에 펴 놓는다.
  */
+:root {
+  --ac-fade-mask: linear-gradient(
+    to top,
+    rgb(0 0 0 / 100%) 0%,
+    rgb(0 0 0 / 99%) 14%,
+    rgb(0 0 0 / 96%) 24%,
+    rgb(0 0 0 / 90%) 33%,
+    rgb(0 0 0 / 81%) 41%,
+    rgb(0 0 0 / 70%) 49%,
+    rgb(0 0 0 / 57%) 57%,
+    rgb(0 0 0 / 44%) 64%,
+    rgb(0 0 0 / 31%) 71%,
+    rgb(0 0 0 / 20%) 79%,
+    rgb(0 0 0 / 11%) 86%,
+    rgb(0 0 0 / 5%) 93%,
+    rgb(0 0 0 / 0%) 100%
+  );
+}
+
 .ac-scroll-fade {
+  --ac-fade-h: 72px;
   position: sticky;
   bottom: 0;
   z-index: 1;
   flex: none;
-  height: 44px;
+  height: var(--ac-fade-h);
   pointer-events: none;
-  background: linear-gradient(to top, var(--bg-frame) 25%, transparent);
-  -webkit-backdrop-filter: blur(3px);
-  backdrop-filter: blur(3px);
-  -webkit-mask-image: linear-gradient(to top, #000 45%, transparent);
-  mask-image: linear-gradient(to top, #000 45%, transparent);
+  -webkit-mask-image: var(--ac-fade-mask);
+  mask-image: var(--ac-fade-mask);
   transition: opacity 140ms ease;
 }
 
-.ac-detail-contents > .ac-scroll-fade { margin-top: calc(-44px - var(--space-20)); }
-.ac-record > .ac-scroll-fade { margin-top: calc(-44px - var(--space-16)); }
+.ac-scroll-fade::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-color: var(--bg-frame);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+
+
+.ac-detail-contents > .ac-scroll-fade { margin-top: calc(-1 * var(--ac-fade-h) - var(--space-20)); }
+.ac-record > .ac-scroll-fade { margin-top: calc(-1 * var(--ac-fade-h) - var(--space-16)); }
 
 .is-end > .ac-scroll-fade { opacity: 0; }
 
