@@ -594,7 +594,7 @@
           var on = chosen.indexOf(c.t) > -1;
           return '<button type="button" class="ac-capsule" data-act="' + esc(c.t) + '"' +
             (c.delta ? ' data-delta' : "") + ' aria-pressed="' + (on ? "true" : "false") + '">' +
-            esc(c.t) + (c.delta ? '<span class="ac-capsule-dot" aria-hidden="true"></span>' : "") +
+            esc(c.t) +
           '</button>';
         }).join("") +
       '</div>' +
