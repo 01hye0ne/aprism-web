@@ -442,30 +442,20 @@
  * ========================================================== */
 
 /* ── 오늘 조치 요약 만들기 · DELTA 인수인계 요약 ───────────── */
-/* 버튼만 DELTA 면이다 — status/info/bg 에 border/brand. 카드는 .ac-delta 와 같은 꼴이다. */
-.ac-summary-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  flex: none;
-  padding: var(--space-4) 10px;
-  border: var(--border-width-thin) solid var(--border-brand);
-  border-radius: var(--radius-6);
-  background-color: var(--status-info-bg);
-  color: var(--text-primary);
-  font-family: inherit;
-  cursor: pointer;
-}
+/*
+ * 버튼은 Button Secondary · Size=xSmall 을 그대로 쓴다(.btn.btn-secondary.is-xs).
+ * Figma 는 파란 면(status/info/bg + border/brand)이었는데 바꿨다 —
+ *   · status/info/bg 는 상태 면 토큰이지 버튼 토큰이 아니다. 버튼 사다리는
+ *     inverse(흰 면) > accent(blue/700) > secondary > ghost 이고 파랗게 꽉 찬 칸은 없다.
+ *   · 그 자리는 탭 · 건수 · 단계 배지가 있는 머리 띠다. 거기서 가장 센 것은 단계(위험 · 주의)여야
+ *     하는데, 파란 면 버튼이 빨간 배지를 눌렀다. 요약 만들기는 거들어 주는 일이지 다급한 일이 아니다.
+ *   · 같은 성격의 이웃인 [보고서 내보내기] 도 secondary 다. 둘 다 "문서를 만들어 내는" 일이다.
+ * DELTA 와의 연결은 면이 아니라 마크가 맡는다 — 카드에서 쓴 방법과 같다.
+ */
+.ac-summary-btn .i { color: var(--fg-link); }
 
 /* inline-flex 가 UA 의 hidden 처리를 덮으므로 다시 눌러 준다(.ac-draft · .dropdown-menu 와 같다). */
 .ac-summary-btn[hidden] { display: none; }
-
-.ac-summary-btn:hover { background-color: var(--color-blue-800); }
-
-.ac-summary-btn:focus-visible {
-  outline: var(--border-width-strong) solid var(--border-focus);
-  outline-offset: 1px;
-}
 
 .ac-handover-slot {
   flex: none;
