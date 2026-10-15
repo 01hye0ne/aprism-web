@@ -782,6 +782,46 @@ button {
  */
 .context-panel.is-collapsed .panel-head { gap: 0; }
 
+/* ---------- v2.2 관제 머리줄 ---------- */
+/*
+ * v2.2 의 패널 머리줄 규칙이다. 지금까지 monitor.css(.v2-2)와 delta-v3.css(.v3)에 흩어져 있어
+ * 같은 셸을 쓰는 다른 v2.2 화면(미션 설정 · 사전 점검)에는 닿지 않았다. 셸 규칙이니 셸 파일로 모은다.
+ * body 를 붙여 .v2 · .sian 판을 이긴다 — 파일 싣는 순서에 기대지 않으려는 것이다.
+ *
+ *   접기 버튼을 왼쪽으로  오른쪽 끝은 지도 왼쪽 위 모서리, 곧 Delta 삼각판 옆이다.
+ *                       작은 아이콘 둘이 나란히 서면 어느 쪽이 Delta 인지 읽히지 않는다.
+ *   gap 20 -> 8         버튼과 패널 이름은 한 덩이로 읽혀야 한다.
+ *   이름 13/18 -> 14/20  패널 이름을 한 단계 키운다(자간 · 굵기는 그대로).
+ *   구분선은 12 에서     양끝까지 그으면 패널 오른쪽에 테두리가 없어 지도 깎인 모서리 앞에서
+ *                       "잘린 선" 으로 읽힌다. 선 자리(1px)는 두고 색만 지워 높이를 지킨다.
+ */
+body.v2-2 .panel-head {
+  position: relative;
+  gap: var(--space-8);
+  border-bottom-color: transparent;
+}
+
+body.v2-2 .panel-head button { order: -1; }
+
+body.v2-2 .panel-head .section-label {
+  font-size: var(--font-size-14);
+  line-height: var(--font-line-height-20);
+}
+
+body.v2-2 .panel-head::after {
+  content: "";
+  position: absolute;
+  left: var(--space-12);
+  right: var(--space-12);
+  bottom: calc(var(--border-width-thin) * -1);
+  height: var(--border-width-thin);
+  background-color: var(--border-default);
+}
+
+/* 접히면 안쪽 폭이 아이콘 하나뿐이다 — 위에서 되살린 gap 을 다시 없앤다(바로 위 .is-collapsed 규칙과 같은 이유). */
+body.v2-2 .context-panel.is-collapsed .panel-head { gap: 0; }
+body.v2-2 .context-panel.is-collapsed .panel-head::after { opacity: 0; }
+
 /*
  * 사이트 이름과 터빈 선택이 bg/accent 면 위로 올라갔다.
  * 폭을 고정해 둔다 — 패널이 접힐 때 좁아진 폭에 맞춰 글이 다시 흐르면 보기 흉하다.
@@ -2707,7 +2747,7 @@ button {
 }
 
 .mp-header h2 { color: var(--text-primary); }
-.mp-header p { color: var(--color-gray-450); }
+.mp-header p { color: var(--text-tertiary); }
 
 /* 카드 안의 옅은 구분선(Divider · border/subtle). */
 .mp-divider {
@@ -2986,7 +3026,7 @@ input.field-box { outline: 0; }
 .check-group-head .count {
   font-size: var(--font-size-12);
   line-height: var(--font-line-height-18);
-  color: var(--color-gray-450);
+  color: var(--text-tertiary);
 }
 
 .check-list {
@@ -3097,21 +3137,25 @@ input.field-box { outline: 0; }
 
 /* 마지막 줄의 선을 지우지 않는다 — Figma 가 네 변 중 아래만, 모든 줄에 긋는다. */
 
-.sum-row .i { flex: none; color: var(--color-gray-450); }
+.sum-row .i { flex: none; color: var(--text-tertiary); }
 
 .sum-row .label {
   flex: 1 1 auto;
   font-size: var(--font-size-14);
   line-height: var(--font-line-height-20);
   font-weight: 800;
-  color: var(--color-gray-400);
+  /*
+   * 원시값(gray/400 · #6aa7e7)을 박아 뒀었다. 둘 다 다크 기준 값이라 라이트에서 글이 흐려졌다 —
+   * 이름값 토큰으로 바꾼다. 다크에서 보이는 색은 그대로고 라이트만 제 색을 찾는다.
+   */
+  color: var(--text-secondary);
 }
 
 .sum-row .value {
   padding: var(--space-4);
   font-size: var(--font-size-14);
   line-height: var(--font-line-height-22);
-  color: #6aa7e7;
+  color: var(--fg-link);
 }
 
 /* ── 바닥 CTA ──────────────────────────────────────────────
@@ -3123,12 +3167,12 @@ input.field-box { outline: 0; }
   align-items: center;
   justify-content: center;
   gap: var(--space-8);
-  height: 40px;
+  height: var(--size-control-lg);
   padding: 0 var(--space-20);
   border: 0;
   border-radius: 0 0 var(--radius-card) var(--radius-card);
-  background-color: var(--color-blue-700);
-  color: #ffffff;
+  background-color: var(--comp-button-accent-bg-default);
+  color: var(--comp-button-accent-text-default);
   font-size: var(--font-size-14);
   line-height: var(--font-line-height-20);
   font-weight: 800;
@@ -3165,7 +3209,7 @@ input.field-box { outline: 0; }
   line-height: var(--font-line-height-18);
   font-weight: 500;
   letter-spacing: 0.04em;
-  color: var(--color-gray-450);
+  color: var(--text-tertiary);
 }
 
 /* Figma Badge Status=Normal Emphasis=Text — dot + 라벨만, 면 없음. */
@@ -3196,12 +3240,17 @@ input.field-box { outline: 0; }
 }
 
 /* 마지막 줄도 선을 남긴다 — Figma 가 네 줄 모두 아래 변에 긋는다. */
-.precheck-row.is-active { background-color: var(--border-divider); }
+/*
+ * 지금 확인 중인 줄. 면에 border/divider 를 깔고 있었다 — 테두리 토큰을 면에 쓰면 이름이 거짓말을 한다.
+ * 값이 같은 면 토큰(다크 gray/700)으로 바꾼다. 라이트는 한 단 옅어진다(gray/200 -> gray/100) —
+ * 바탕이 이미 밝은 쪽이라 그 편이 맞다.
+ */
+.precheck-row.is-active { background-color: var(--state-hover); }
 
 .precheck-row .i { flex: none; }
 .precheck-row.is-done .i { color: var(--status-safe-text); }
 .precheck-row.is-running .i,
-.precheck-row.is-pending .i { color: var(--color-gray-450); }
+.precheck-row.is-pending .i { color: var(--text-tertiary); }
 
 .precheck-row .label {
   flex: 1 1 auto;
@@ -3303,6 +3352,12 @@ input.field-box { outline: 0; }
 }
 
 /* ── 사전 점검 바닥 액션 (취소 · 미션 시작) ────────────────── */
+/*
+ * 손으로 만든 .btn-line 두 개였다. 흰 면([취소])과 회색 면([미션 시작])을 원시값으로 박아 둬서
+ * 두 가지가 어긋나 있었다 — 보조 동작이 사다리 꼭대기(흰 면)에 서서 주 동작보다 밝았고,
+ * 점검을 통과해 disabled 가 풀려도 [미션 시작] 은 꺼진 모습 그대로였다(켜진 꼴이 아예 없었다).
+ * 공용 .btn 사다리로 옮겨 둘 다 사라진다 — Accent(주) > Secondary(보조), 꺼진 꼴은 사다리가 갖고 있다.
+ */
 .mp-actions {
   flex: none;
   display: flex;
@@ -3310,6 +3365,12 @@ input.field-box { outline: 0; }
   padding-top: var(--space-4);
 }
 
+.mp-actions .btn { flex: 1 1 0; }
+
+/*
+ * v1 판(시안 1 · 시안 2)은 아직 손으로 만든 이 버튼을 쓴다 — 그 화면들의 겉모습은 그대로 둔다.
+ * 새로 고친 쪽(미션 설정 · 사전 점검)만 위의 .btn 사다리로 넘어갔다.
+ */
 .mp-actions .btn-line {
   flex: 1 1 0;
   display: inline-flex;

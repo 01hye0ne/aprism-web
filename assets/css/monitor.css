@@ -397,25 +397,19 @@
  * 패널 안 구분선 — 양끝까지 긋지 않고 글 줄(12)과 같은 자리에서 시작하고 끝낸다.
  * 끝까지 가면 패널 오른쪽에 테두리가 없어 지도 깎인 모서리 앞에서 "잘린 선" 으로 읽혔다(디자이너 확정).
  * 선 자리(1px)는 그대로 두고 색만 지워, 높이가 바뀌지 않게 한다.
+ * 머리줄(.panel-head)도 같은 규칙인데, 다른 v2.2 화면도 쓰므로 app-shell.css 로 옮겼다.
  */
-.v2-2 .panel-head,
-.v2-2 .ah-sec + .ah-sec { position: relative; }
-.v2-2 .panel-head { border-bottom-color: transparent; }
-.v2-2 .ah-sec + .ah-sec { border-top-color: transparent; }
+.v2-2 .ah-sec + .ah-sec { position: relative; border-top-color: transparent; }
 
-.v2-2 .panel-head::after,
 .v2-2 .ah-sec + .ah-sec::before {
   content: "";
   position: absolute;
   left: var(--space-12);
   right: var(--space-12);
+  top: calc(var(--border-width-thin) * -1);
   height: var(--border-width-thin);
   background-color: var(--border-default);
 }
-
-.v2-2 .panel-head::after { bottom: calc(var(--border-width-thin) * -1); }
-.v2-2 .ah-sec + .ah-sec::before { top: calc(var(--border-width-thin) * -1); }
-.v2-2 .context-panel.is-collapsed .panel-head::after { opacity: 0; }
 
 /* 정렬 안내 — 거르기 줄 오른쪽 끝(예전 "최근 24시간" 자리). */
 .ah-filter .ah-order { margin-left: auto; padding-left: var(--space-4); }

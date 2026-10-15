@@ -216,7 +216,8 @@
     function run(list, index) {
       list.innerHTML = initial[index];
       var scope = list.closest(".mission-panel") || document;
-      var startBtn = scope.querySelector(".btn-line.is-start");
+      // 버튼 모양이 판마다 다르다(v1 은 .btn-line, v2.2 는 .btn) — 하는 일로 잡는다.
+      var startBtn = scope.querySelector(".mp-actions [data-sian-go='monitor']");
       if (startBtn) { startBtn.disabled = true; }
       var rows = $$("[data-precheck-row]", list);
       var tag = list.querySelector("[data-precheck-tag]");

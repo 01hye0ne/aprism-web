@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>사전 점검 — APRISM</title>
-  <meta name="description" content="APRISM 통합 관제 메인 · 사전 점검 — 시안 1(좌측 패널 전환형) 판" />
+  <meta name="description" content="APRISM 통합 관제 메인 · 사전 점검 — v2.2 플로우의 둘째 단계. 끝나면 v2.2 통합 관제 메인으로 넘어간다" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/static/woff2/SUIT.css" />
@@ -19,8 +19,9 @@
   }
   </script>
   <link rel="stylesheet" href="../assets/css/tokens.css?v=df3f45ff" />
-  <link rel="stylesheet" href="../assets/css/app-shell.css?v=66602241" />
+  <link rel="stylesheet" href="../assets/css/app-shell.css?v=096ce130" />
   <link rel="stylesheet" href="../assets/css/map-overlays.css?v=6bbdf88e" />
+  <link rel="stylesheet" href="../assets/css/icons-outline.css?v=83872c0c" />
   <link rel="stylesheet" href="../assets/css/text-parts.css?v=e38e19ea" />
   <link rel="stylesheet" href="../assets/css/sian.css?v=4c392770" />
   <style>
@@ -39,7 +40,7 @@
 </head>
 <!-- 시안 1(좌측 패널 전환형) 과 같은 판이다. 여는 단계만 사전 점검으로 고정한다 —
      넷이 다 통과하면 그대로 모니터링으로 넘어간다(sian.js). -->
-<body class="sian sian-1" data-stage="precheck" data-stage-start="precheck" data-monitor-href="./dashboard-home.html" data-stage-hold="precheck" data-level="normal">
+<body class="sian sian-1 v2-2" data-stage="precheck" data-stage-start="precheck" data-monitor-href="./main-v2-2.html" data-stage-hold="precheck" data-level="normal">
 
 <!-- Robot Dog Walk 리그(assets/robot-dog/ 핸드오프)의 공용 defs — 카드 썸네일이 url(#rd-*) 로 참조한다. -->
 <svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute" xmlns="http://www.w3.org/2000/svg">
@@ -333,9 +334,11 @@
               </span>
             </div>
 
+            <!-- 주 동작은 [미션 시작] 이다. 예전에는 [취소] 가 흰 면(사다리 꼭대기)이고 미션 시작이
+                 회색이라 위계가 뒤집혀 있었다 — v2.2 사다리(Accent > Secondary)로 바로잡았다. -->
             <div class="mp-actions">
-              <button type="button" class="btn-line is-cancel" data-sian-go="setup">취소</button>
-              <button type="button" class="btn-line is-start" data-sian-go="monitor" disabled>미션 시작</button>
+              <button type="button" class="btn btn-secondary is-md" data-sian-go="setup">취소</button>
+              <button type="button" class="btn btn-accent is-md" data-sian-go="monitor" disabled>미션 시작</button>
             </div>
           </section>
 
@@ -1582,10 +1585,10 @@
 
 <script src="../assets/js/theme.js?v=7145a122"></script>
 <script src="../assets/js/prism-orb.js?v=03386460"></script>
-<script src="../assets/js/screen.js?v=6bf0828f"></script>
+<script src="../assets/js/screen.js?v=5ad50b7b"></script>
 <script src="../assets/js/map-model.js?v=0f88c871"></script>
 <script src="../assets/js/map.js?v=035ddcc9"></script>
-<script src="../assets/js/sian.js?v=971be8c2"></script>
+<script src="../assets/js/sian.js?v=66e7faf6"></script>
 <script src="../assets/js/grid-overlay.js?v=164e4f2a"></script>
 </body>
 </html>

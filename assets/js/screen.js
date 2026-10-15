@@ -1636,7 +1636,8 @@ window.APRISM_TEXT = (function () {
 
     var pending = Array.prototype.slice.call(list.querySelectorAll("[data-precheck-row]"));
     var tag = list.querySelector("[data-precheck-tag]");
-    var startBtn = document.querySelector(".btn-line.is-start");
+    // 버튼 모양이 판마다 다르다(v1 은 .btn-line, v2.2 는 .btn) — 하는 일로 잡는다.
+    var startBtn = document.querySelector(".mp-actions [data-sian-go='monitor']");
     // 간격은 CSS 가 정한다(--precheck-step) — 게이지가 차는 시간과 같은 값이어야 한다.
     var STEP = parseFloat(getComputedStyle(list).getPropertyValue("--precheck-step")) || 1400;
 
