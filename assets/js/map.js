@@ -339,6 +339,8 @@
     placeCard();
     placeBot();
     placeWp();
+    if (planStale) { layPlan(); }
+    placePlan();   // 미션 설정 — 번호 · 화살촉
   }
 
   /*
@@ -3820,6 +3822,187 @@
     ln.parts = [];
   }
 
+  /* ---------- 미션 설정 — 번호 · 방향 · 짚기 ----------
+   *
+   * 설정 화면의 지도는 "오늘 어디를 어떤 차례로 도는가" 를 보이는 자리다. 셋을 얹는다.
+   *   번호    들르는 차례. 왼쪽 점검항목에 붙은 번호와 같은 것이다
+   *   화살촉  가는 방향. 길을 따라 일정 간격으로
+   *   짚기    줄에 손을 얹으면 그 자리와 앞뒤 구간이 같이 밝아진다(양쪽 다 된다)
+   *
+   * 셋 다 three.js 가 아니라 화면 위 HTML 이다 — 글자와 화살촉은 배율이 바뀌어도 또렷해야 하고
+   * 색은 토큰을 그대로 따라야 한다. 자리는 frame() 마다 투영해서 다시 잡는다(placePlan).
+   */
+  var planBox = null;      // 번호 · 화살촉을 담는 판
+  var planDots = {};       // id -> { el, at }
+  var planArrows = [];     // { el, at, to, a, b } — a·b 는 이 화살촉이 놓인 구간의 두 끝
+  var planHot = null;      // 지금 짚은 자리
+  // 계획이 지도보다 먼저 올 수 있다 — 카메라가 아직 없으면 깔지 못하니 "깔 것이 남았다" 를 들고 있는다.
+  var planStale = false;
+
+  function planLayer() {
+    if (planBox) { return planBox; }
+    planBox = document.createElement("div");
+    planBox.className = "map-plan";
+    planBox.hidden = true;
+    hit.appendChild(planBox);
+    planBox.addEventListener("pointerover", function (event) {
+      var node = event.target.closest("[data-plan-wp]");
+      hotPlan(node ? node.getAttribute("data-plan-wp") : null, true);
+    });
+    planBox.addEventListener("pointerleave", function () { hotPlan(null, true); });
+    // 번호를 누르면 왼쪽 목록의 그 줄로 간다 — 줄의 [지도] 단추와 짝이다.
+    planBox.addEventListener("click", function (event) {
+      var node = event.target.closest("[data-plan-wp]");
+      if (!node) { return; }
+      document.dispatchEvent(new CustomEvent("aprism:mission-pick", {
+        detail: { id: node.getAttribute("data-plan-wp") }
+      }));
+    });
+    return planBox;
+  }
+
+  function clearPlan() {
+    if (!planBox) { return; }
+    planBox.textContent = "";
+    planBox.hidden = true;
+    planDots = {};
+    planArrows = [];
+    planHot = null;
+  }
+
+  // 길 위의 어디쯤인지(잰 거리). 자리가 길의 꼭짓점에 딱 떨어지지 않으므로 선분에 내려 재야 한다.
+  function arcAt(turns, mile, p) {
+    var best = 0, near = Infinity;
+    for (var i = 1; i < turns.length; i += 1) {
+      var a = turns[i - 1], b = turns[i];
+      var vx = b.x - a.x, vz = b.z - a.z;
+      var len2 = vx * vx + vz * vz;
+      var t = len2 ? Math.max(0, Math.min(1, ((p.x - a.x) * vx + (p.z - a.z) * vz) / len2)) : 0;
+      var dx = a.x + vx * t - p.x, dz = a.z + vz * t - p.z;
+      var d = dx * dx + dz * dz;
+      if (d < near) { near = d; best = mile[i - 1] + (mile[i] - mile[i - 1]) * t; }
+    }
+    return best;
+  }
+
+  var ARROW_GAP = 5;   // m — 이보다 긴 구간에는 화살촉을 더 놓는다(구간당 최대 셋)
+
+  function layPlan() {
+    if (!missionPlan || !onLane || !onLane.plan) { planStale = false; clearPlan(); return; }
+    if (!camera) { planStale = true; clearPlan(); return; }
+    planStale = false;
+    var box = planLayer();
+    box.textContent = "";
+    box.hidden = false;
+    planDots = {};
+    planArrows = [];
+
+    var book = onLane.book || onLane.plan;
+    function spotOf(id) {
+      var k = book && book.names ? book.names.indexOf(id) : -1;
+      return (k > 0 && book.wpWorld && book.wpWorld[k - 1]) ? book.wpWorld[k - 1] : null;
+    }
+
+    function dot(id, text, skip) {
+      var at = spotOf(id);
+      if (!at) { return; }
+      var node = document.createElement("button");
+      node.type = "button";
+      node.className = "map-plan-wp" + (skip ? " is-skip" : "");
+      node.setAttribute("data-plan-wp", id);
+      node.setAttribute("aria-label", id + (skip ? " · 건너뜀" : " · " + text + "번째"));
+      node.title = id;
+      node.textContent = text;
+      box.appendChild(node);
+      planDots[id] = { el: node, at: at };
+    }
+
+    missionPlan.stops.forEach(function (id, i) { dot(id, String(i + 1), false); });
+    // 끈 자리도 남는다. 번호는 없다 — 차례에서 빠졌다는 뜻이다.
+    missionPlan.skip.forEach(function (id) { dot(id, "", true); });
+
+    var turns = onLane.turns;
+    if (!turns || turns.length < 2) { return; }
+    var names = onLane.plan.names;
+    var mile = [0], total = 0, i;
+    for (i = 1; i < turns.length; i += 1) {
+      total += turns[i].distanceTo(turns[i - 1]);
+      mile.push(total);
+    }
+
+    // 구간 경계 — 도커에서 떠나 자리마다 들르고 도커로 돌아온다(폐회로).
+    var edge = [0];
+    for (i = 1; i < names.length; i += 1) {
+      edge.push(arcAt(turns, mile, onLane.plan.wpWorld[i - 1]));
+    }
+    edge.push(total);
+
+    for (var k = 0; k < edge.length - 1; k += 1) {
+      var from = edge[k], span2 = edge[k + 1] - from;
+      // 아주 짧은 구간에도 하나는 놓는다 — 촉이 없으면 방향도 없고 짚어도 반응이 없다.
+      if (span2 < 0.6) { continue; }
+      var count = Math.max(1, Math.min(3, Math.floor(span2 / ARROW_GAP)));
+      for (var n = 1; n <= count; n += 1) {
+        var at = from + span2 * n / (count + 1);
+        var tip = document.createElement("span");
+        tip.className = "map-plan-arrow";
+        box.appendChild(tip);
+        planArrows.push({
+          el: tip,
+          at: alongRoute(turns, mile, at),
+          to: alongRoute(turns, mile, Math.min(total, at + 0.5)),
+          a: names[k] || "DOCK",
+          b: names[k + 1] || "DOCK"
+        });
+      }
+    }
+    placePlan();
+  }
+
+  function placePlan() {
+    if (!planBox || planBox.hidden) { return; }
+    Object.keys(planDots).forEach(function (id) { put(planDots[id].el, planDots[id].at); });
+    planArrows.forEach(function (tip) {
+      var p = onCanvas(tip.at), q = onCanvas(tip.to);
+      /*
+       * 가는 쪽 기준으로 왼편에 한 칸 비켜 놓는다. 한 바퀴를 돌고 오는 길은 같은 복도를
+       * 되짚는 일이 많은데, 길 한가운데에 그대로 두면 갈 때와 올 때의 촉이 겹쳐 ✕ 가 됐다.
+       * 되짚는 쪽은 방향이 반대라 반대편으로 비켜서 저절로 두 줄이 된다.
+       */
+      var len = Math.hypot(q.x - p.x, q.y - p.y) || 1;
+      var off = 5;
+      var ox = -(q.y - p.y) / len * off, oy = (q.x - p.x) / len * off;
+      tip.el.style.left = (p.x + ox).toFixed(1) + "px";
+      tip.el.style.top = (p.y + oy).toFixed(1) + "px";
+      /*
+       * +45 는 화살촉 모양에서 온다 — 네모의 위·오른쪽 변만 그은 "⌐" 라 모서리가 북동(-45°)을 본다.
+       * 가는 쪽 각도에 그만큼 되돌려 줘야 촉이 진행 방향을 가리킨다.
+       */
+      var deg = Math.atan2(q.y - p.y, q.x - p.x) * 180 / Math.PI + 45;
+      tip.el.style.transform = "translate(-50%, -50%) rotate(" + deg.toFixed(1) + "deg)";
+    });
+  }
+
+  function hotPlan(id, tell) {
+    if (planHot === id) { return; }
+    planHot = id;
+    Object.keys(planDots).forEach(function (k) {
+      planDots[k].el.classList.toggle("is-hot", k === id);
+    });
+    planArrows.forEach(function (tip) {
+      tip.el.classList.toggle("is-hot", !!id && (tip.a === id || tip.b === id));
+    });
+    if (tell) {
+      document.dispatchEvent(new CustomEvent("aprism:mission-hover", { detail: { id: id, from: "map" } }));
+    }
+  }
+
+  // 왼쪽 목록에서 줄에 손을 얹었다.
+  document.addEventListener("aprism:mission-hover", function (event) {
+    if (!event.detail || event.detail.from === "map") { return; }
+    hotPlan(event.detail.id || null, false);
+  });
+
   function replanMission() {
     var id = activeRobot();
     var ln = lanes[String(id)];
@@ -3831,6 +4014,7 @@
       dropLane(ln);
       drawRoute(book.world, ln.bot, id, book);
       showLane(id, true);
+      clearPlan();
       frame();
       return;
     }
@@ -3846,6 +4030,7 @@
     if (pts.length < 2) {
       dropLane(ln);
       layWaypoints();
+      clearPlan();
       frame();
       return;
     }
@@ -3860,6 +4045,7 @@
       wpWorld: res.stops.slice(1).map(world), dockWorld: world(res.stops[0])
     });
     showLane(id, true);
+    layPlan();
     frame();
   }
 

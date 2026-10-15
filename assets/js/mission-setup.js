@@ -340,6 +340,44 @@
     if (row) { toggle(row.getAttribute("data-wp")); }
   });
 
+  /*
+   * 짚기 — 줄에 손을 얹으면 지도의 그 자리와 앞뒤 구간이 밝아진다. 반대쪽도 같다(map.js).
+   * 고르는 것(체크)과는 다른 일이라 상태를 따로 둔다 — 손만 지나가도 계획이 바뀌면 안 된다.
+   */
+  function hover(id) {
+    document.dispatchEvent(new CustomEvent("aprism:mission-hover", {
+      detail: { id: id, from: "panel" }
+    }));
+  }
+
+  list.addEventListener("pointerover", function (event) {
+    if (drag) { return; }
+    var row = event.target.closest(".check-row");
+    hover(row ? row.getAttribute("data-wp") : null);
+  });
+  list.addEventListener("pointerleave", function () { if (!drag) { hover(null); } });
+  list.addEventListener("focusin", function (event) {
+    var row = event.target.closest(".check-row");
+    if (row) { hover(row.getAttribute("data-wp")); }
+  });
+
+  // 지도 쪽에서 짚었다 — 같은 줄을 밝힌다.
+  document.addEventListener("aprism:mission-hover", function (event) {
+    if (!event.detail || event.detail.from !== "map") { return; }
+    var id = event.detail.id;
+    $$(".check-row", list).forEach(function (row) {
+      row.classList.toggle("is-hot", row.getAttribute("data-wp") === id);
+    });
+  });
+
+  // 지도의 번호를 눌렀다 — 그 줄로 데려간다.
+  document.addEventListener("aprism:mission-pick", function (event) {
+    var row = event.detail && list.querySelector('.check-row[data-wp="' + event.detail.id + '"]');
+    if (!row) { return; }
+    row.focus();
+    if (row.scrollIntoView) { row.scrollIntoView({ block: "nearest", behavior: "smooth" }); }
+  });
+
   list.addEventListener("keydown", function (event) {
     var grip = event.target.closest("[data-mp-grip]");
     if (grip && (event.key === "ArrowUp" || event.key === "ArrowDown")) {
