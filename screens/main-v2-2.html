@@ -469,7 +469,9 @@
                 <div class="ma-actions">
                   <!-- 안전진단 화면은 아직 없다 — 자리만 잡았다(알림 줄의 [보고서]와 같다). -->
                   <button type="button" class="btn btn-secondary" data-ma-more title="안전진단 화면 준비 중">안전진단에서 확인</button>
-                  <button type="button" class="btn btn-primary ma-confirm" data-ma-confirm>조치 완료</button>
+                  <!-- Figma 는 Primary(흰 면)지만 Accent 로 둔다 — 알림 센터의 같은 [조치 완료] 와
+                       색이 달라지면 같은 동작으로 읽히지 않는다. 두 화면에서 하나로 간다. -->
+                  <button type="button" class="btn btn-accent ma-confirm" data-ma-confirm>조치 완료</button>
                 </div>
               </section>
               <div class="map-bot" data-map-bot hidden>
