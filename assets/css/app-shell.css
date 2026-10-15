@@ -618,9 +618,10 @@ button {
 .account-menu .menu-item { padding-left: var(--space-8); }
 .signal-menu .menu-item { padding-right: var(--space-8); }
 
+/* 떠 있는 메뉴라 면이 bg/raised 다 — hover 는 거기서 한 단 올라가는 값을 쓴다. */
 .menu-item:hover,
 .menu-item:focus-visible {
-  background-color: var(--state-hover);
+  background-color: var(--state-hover-raised);
   outline: none;
 }
 
@@ -2850,7 +2851,7 @@ input.field-box { outline: 0; }
 }
 
 .field-option:hover,
-.field-option:focus-visible { background-color: var(--state-hover); outline: 0; }
+.field-option:focus-visible { background-color: var(--state-hover-raised); outline: 0; }
 .field-option[aria-selected="true"] { color: var(--color-blue-300); }
 
 /* ── 점검 항목 (체크박스 목록) ─────────────────────────────── */
