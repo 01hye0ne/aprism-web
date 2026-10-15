@@ -43,6 +43,18 @@
  * DELTA 인수인계 요약, 그리고 등급별 건수 분할이다.
  * ============================================================ */
 
+/* ---------- 브라우저 기본 여백 ---------- */
+/*
+ * 화면 쪽 <style> 의 리셋이 h1~h3 · p 만 덮는다. 이 화면은 <figure> 와 <dl> · <dd> 도 쓰는데
+ * 그쪽 UA 기본값이 살아 있어 스냅숏이 왼쪽에서 40 들어가고(figure margin: 1em 40px)
+ * 메타 칸이 그만큼 더 밀렸다(dl margin: 1em 0, dd margin-inline-start: 40px).
+ * 낱개 클래스마다 margin:0 을 다는 대신 이 화면 안에서 한 번에 지운다 —
+ * 나중에 <dl> 이나 <figure> 를 더 써도 같은 일이 되풀이되지 않는다.
+ */
+.ac-body figure,
+.ac-body dl,
+.ac-body dd { margin: 0; }
+
 /* ---------- Body — GNB 오른쪽 전체 면 ---------- */
 /*
  * Figma: padding 20, gap 12, bg/frame, 위 두 모서리만 radius/container.
