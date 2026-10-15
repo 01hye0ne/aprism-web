@@ -645,7 +645,7 @@
     var hasDelta = a.acts.some(function (c) { return c.delta; });
     return '<section class="ac-acts">' +
       '<div class="ac-acts-head">' +
-        '<h3 class="t-label-1">조치 내용 (여러 개 선택 가능)</h3>' +
+        '<h3 class="t-label-1">조치 내용 <span class="ac-label-note">(여러 개 선택 가능)</span></h3>' +
         (hasDelta ? '<span class="badge t-caption"><span class="badge-dot" aria-hidden="true"></span>DELTA 추천</span>' : "") +
       '</div>' +
       '<div class="ac-presets">' +
@@ -662,7 +662,7 @@
 
   function memoBlock(a) {
     return '<section class="ac-memo field">' +
-      '<label class="field-label" for="ac-memo">메모 (선택)</label>' +
+      '<label class="field-label" for="ac-memo">메모 <span class="ac-label-note">(선택)</span></label>' +
       '<textarea id="ac-memo" data-ac-memo maxlength="500" ' +
         'placeholder="현장에 전달한 내용을 적어 주세요">' + esc(state.memo[a.id] || "") + '</textarea>' +
       '<span class="field-helper t-caption">교대 인수인계에 필요한 내용을 남깁니다. 최대 500자.</span>' +
