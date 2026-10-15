@@ -599,6 +599,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-16);
+  /* 흐름 · 스크롤은 .ac-detail-contents 와 함께 위에서 받는다. */
 }
 
 .ac-record-title {
@@ -732,27 +733,37 @@
   outline-offset: 1px;
 }
 
+/*
+ * 위쪽 여백은 여기 두지 않는다. 스크롤 상자 바깥에 있으면 글이 머리 밑선에서 20 떨어진 자리에서
+ * 잘려 올라가 빈 띠가 남는다 — 여백은 스크롤 상자 안쪽(padding-top)에 둬서 같이 밀려 올라가게 한다.
+ */
 .ac-detail-body {
   flex: 1 1 auto;
   min-height: 0;
   display: flex;
   flex-direction: column;
   gap: var(--space-20);
-  padding: var(--space-20);
+  padding: 0 var(--space-20) var(--space-20);
   overflow: hidden;
 }
 
 /*
- * 스크롤은 본문만 한다 — 아래 동작 줄([조치 완료])은 늘 보인다.
+ * 스크롤은 본문만 한다 — 미확인 탭의 아래 동작 줄([조치 완료])은 늘 보인다.
  * Figma 는 Detail Body 가 Contents(fill) + Actions 로 짜여 있어 같은 뜻이다.
+ * 조치 완료 탭의 기록(.ac-record)도 같은 상자다 — 길면 여기서 스크롤한다.
  */
-.ac-detail-contents {
+.ac-detail-contents,
+.ac-record {
   flex: 1 1 auto;
   min-height: 0;
+  padding-top: var(--space-20);
+  overflow-y: auto;
+}
+
+.ac-detail-contents {
   display: flex;
   flex-direction: column;
   gap: var(--space-20);
-  overflow-y: auto;
 }
 
 /* ── 제목 덩이 ───────────────────────────────────────────── */
@@ -1079,16 +1090,19 @@
  * 방식을 둘로 가르는 까닭도 같다(Chrome 은 ::-webkit-, Firefox 는 표준 속성).
  */
 .ac-list::-webkit-scrollbar,
-.ac-detail-contents::-webkit-scrollbar {
+.ac-detail-contents::-webkit-scrollbar,
+.ac-record::-webkit-scrollbar {
   width: 12px;
   height: 12px;
 }
 
 .ac-list::-webkit-scrollbar-track,
-.ac-detail-contents::-webkit-scrollbar-track { background: transparent; }
+.ac-detail-contents::-webkit-scrollbar-track,
+.ac-record::-webkit-scrollbar-track { background: transparent; }
 
 .ac-list::-webkit-scrollbar-thumb,
-.ac-detail-contents::-webkit-scrollbar-thumb {
+.ac-detail-contents::-webkit-scrollbar-thumb,
+.ac-record::-webkit-scrollbar-thumb {
   border: 4px solid transparent;
   border-radius: var(--radius-pill);
   background-clip: padding-box;
@@ -1096,11 +1110,13 @@
 }
 
 .ac-list::-webkit-scrollbar-thumb:hover,
-.ac-detail-contents::-webkit-scrollbar-thumb:hover { background-color: var(--border-strong); }
+.ac-detail-contents::-webkit-scrollbar-thumb:hover,
+.ac-record::-webkit-scrollbar-thumb:hover { background-color: var(--border-strong); }
 
 @supports not selector(::-webkit-scrollbar) {
   .ac-list,
-  .ac-detail-contents {
+  .ac-detail-contents,
+  .ac-record {
     scrollbar-width: thin;
     scrollbar-color: var(--border-default) transparent;
   }
