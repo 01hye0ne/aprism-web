@@ -871,7 +871,9 @@
       trigger.addEventListener("click", function (event) {
         event.stopPropagation();
         var open = sel.hasAttribute("data-open");
-        closeAll(sel);
+        // 자기 것까지 모두 닫는다. closeAll(sel) 로 자기를 빼면 열려 있던 것이 안 닫혀
+        // 한 번 연 뒤에는 다시 눌러도 접히지 않는다.
+        closeAll();
         if (open) { return; }
         sel.setAttribute("data-open", "");
         trigger.setAttribute("aria-expanded", "true");
