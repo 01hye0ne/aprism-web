@@ -293,8 +293,7 @@
 /* Figma Badge(면 없음) — padding 4, gap 4. */
 .ac-head-badges .badge { padding: var(--space-4); }
 
-.badge-warning { color: var(--status-warning-text); }
-.badge-warning .badge-dot { background-color: var(--status-warning-icon); }
+/* .badge-warning 은 app-shell.css 의 배지 묶음으로 옮겼다 — 미션 설정도 같은 배지를 쓴다. */
 
 /* ---------- 목록 ---------- */
 /*

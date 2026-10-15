@@ -1536,12 +1536,17 @@ window.APRISM_TEXT = (function () {
   // ------------------------------------------------------------------
   (function () {
     // 체크박스: 클릭 / Space / Enter 로 토글, "N개 선택" 갱신
-    var rows = Array.prototype.slice.call(document.querySelectorAll('.check-row[role="checkbox"]'));
+    // 미션 설정의 계획표 줄은 mission-setup.js 가 맡는다 — 순서 · 배터리까지 같이 움직여야 한다.
+    var rows = Array.prototype.slice.call(
+      document.querySelectorAll('.check-row[role="checkbox"]')
+    ).filter(function (row) { return !row.closest("[data-mp-plan]"); });
     var countEl = document.querySelector(".check-group-head .count");
 
     function refreshCount() {
       if (!countEl) { return; }
-      var n = document.querySelectorAll('.check-row[aria-checked="true"]').length;
+      var n = rows.filter(function (row) {
+        return row.getAttribute("aria-checked") === "true";
+      }).length;
       countEl.textContent = n + "개 선택";
     }
 
@@ -1604,6 +1609,10 @@ window.APRISM_TEXT = (function () {
           sel.removeAttribute("data-open");
           trigger.setAttribute("aria-expanded", "false");
           menu.hidden = true;
+          // 고른 값이 바뀌었다고 알린다 — 미션 설정은 로봇이 바뀌면 배터리를 다시 센다.
+          document.dispatchEvent(new CustomEvent("aprism:select", {
+            detail: { select: sel, value: opt.textContent.trim() }
+          }));
         });
       });
 
