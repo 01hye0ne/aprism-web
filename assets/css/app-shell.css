@@ -1130,6 +1130,29 @@ body.v2-2 .context-panel.is-collapsed .panel-head::after { opacity: 0; }
   color: var(--text-primary);
 }
 
+/* Figma Icon Button Size=xSmall — 24 정사각. 좁은 칸(쪽지 머리)에서 쓴다. */
+.icon-button.is-xs {
+  width: var(--size-icon-24);
+  height: var(--size-icon-24);
+}
+
+/*
+ * Figma Icon Button Type=Secondary — 면과 테두리를 Button Secondary 와 나눠 쓴다.
+ * (지도 도구 막대는 테두리를 뺀 제 판을 따로 들고 있다 — .map-tools .icon-button.is-secondary)
+ */
+.icon-button.is-secondary {
+  border: var(--border-width-thin) solid var(--comp-button-secondary-border-default);
+  background-color: var(--comp-button-secondary-bg-default);
+  color: var(--comp-button-secondary-text-default);
+}
+
+.icon-button.is-secondary:hover { background-color: var(--comp-button-secondary-bg-hover); }
+
+.icon-button:focus-visible {
+  outline: var(--border-width-strong) solid var(--border-focus);
+  outline-offset: 1px;
+}
+
 /* ---------- Main ---------- */
 /* Figma 의 Margin 프레임이다. 왼쪽 여백이 없어져 지도가 사이트 패널에 붙는다. */
 .main {

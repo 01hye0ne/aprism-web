@@ -21,11 +21,11 @@
   }
   </script>
   <link rel="stylesheet" href="../assets/css/tokens.css?v=df3f45ff" />
-  <link rel="stylesheet" href="../assets/css/app-shell.css?v=c176d7de" />
+  <link rel="stylesheet" href="../assets/css/app-shell.css?v=122fcf81" />
   <link rel="stylesheet" href="../assets/css/map-overlays.css?v=6bbdf88e" />
   <link rel="stylesheet" href="../assets/css/icons-outline.css?v=83872c0c" />
   <link rel="stylesheet" href="../assets/css/text-parts.css?v=e38e19ea" />
-  <link rel="stylesheet" href="../assets/css/monitor.css?v=4278b6dc" />
+  <link rel="stylesheet" href="../assets/css/monitor.css?v=fcd82872" />
   <link rel="stylesheet" href="../assets/css/palette-neutral.css?v=0c969aea" />
   <link rel="stylesheet" href="../assets/css/delta-v3.css?v=b1562ee4" />
   <style>
@@ -406,73 +406,71 @@
                 <p class="map-wp-read" data-map-wp-read></p>
                 <button type="button" class="btn btn-ghost map-wp-more" data-map-wp-more>상세보기</button>
               </div>
-              <!-- 알림 쪽지 — Figma Messages(948:31737). 왼쪽 알림 목록에서 하나를 고르면 그 알림이 난
-                   웨이포인트 위에 선다. 내용은 monitor.js 가 채우고, 자리는 map.js 가 웨이포인트를 따라 잡는다. -->
-              <!-- 알림 쪽지 — UI_99 1604:36202. 왼쪽 알림 목록에서 하나를 고르면 그 알림이 난
-                   웨이포인트 위에 선다. 내용은 monitor.js 가 채우고, 자리는 map.js 가 웨이포인트를 따라 잡는다.
-                   칸의 생김새(배지 · 사진+메타 · DELTA 카드 · 오탐 막대 · 칩)는 알림 센터와 같은 것을 쓴다 —
-                   같은 알림을 두 화면에서 보는데 짜임이 다르면 같은 것으로 읽히지 않는다. -->
+              <!-- 알림 쪽지 — Figma UI_00 1211:16646 "알림 팝오버".
+                   Contents(머리 · 사진+메타 · DELTA 제안 · 조치) 아래 선을 긋고 Actions 를 따로 세운다.
+                   칸의 생김새(배지 · 감지 칩 · DELTA 카드 · 오탐 막대 · 조치 칩)는 알림 센터와 같은 것을 쓴다. -->
               <section class="map-alert" data-map-alert hidden aria-labelledby="ma-title">
 
-                <!-- 머리는 세 줄이다. 한 줄에 다 넣으면 제목이 길 때 배지 · 버튼 · 제목이 서로 밀려
-                     줄마다 기준선이 어긋난다. 줄마다 왼쪽은 읽을 것, 오른쪽은 누를 것으로 갈라 세운다. -->
-                <div class="ma-head">
-                  <span class="ma-badge t-label-2" data-ma-badge><span class="badge-dot"></span><span data-ma-sev>주의</span></span>
-                  <button type="button" class="ma-close" data-ma-close aria-label="닫기">
-                    <span class="i i-16" style="--i:var(--ic-close)" aria-hidden="true"></span>
-                  </button>
-                </div>
-                <div class="ma-title-row">
-                  <h3 class="ma-title t-title-2" id="ma-title" data-ma-title></h3>
-                  <button type="button" class="btn btn-secondary is-xs ma-zoom-open" data-ma-zoom>
-                    <span class="i i-16" style="--i:var(--ic-expand)" aria-hidden="true"></span>크게보기
-                  </button>
-                </div>
-                <p class="ma-stamp t-caption" data-ma-stamp></p>
-
-                <!-- 사진 + 메타 — 알림 센터 .ac-d-snap-meta 와 같은 짜임. 쪽지는 좁아서 미션 · 로봇은 뺀다. -->
-                <div class="ma-snap-meta">
-                  <figure class="ma-snap"><img data-ma-img alt="" /></figure>
-                  <dl class="ma-meta">
-                    <div class="ma-meta-row">
-                      <dt class="t-caption">위치</dt>
-                      <dd><span class="ma-wp" data-ma-wp></span><span class="t-body-4" data-ma-place></span></dd>
+                <div class="ma-contents">
+                  <!-- 머리 — 왼쪽은 읽을 것 한 덩이(배지 · 제목 · 발생 시각), 오른쪽은 아이콘 버튼 둘. -->
+                  <div class="ma-head">
+                    <div class="ma-title-block">
+                      <span class="ma-badge t-label-2" data-ma-badge><span class="badge-dot"></span><span data-ma-sev>주의</span></span>
+                      <h3 class="ma-title t-title-1" id="ma-title" data-ma-title></h3>
+                      <p class="ma-stamp t-caption" data-ma-stamp></p>
                     </div>
-                    <div class="ma-meta-row">
-                      <dt class="t-caption">감지</dt>
-                      <dd><span class="ma-chip t-caption" data-ma-detect></span></dd>
+                    <button type="button" class="icon-button is-xs" data-ma-zoom aria-label="검출 장면 크게보기" title="크게보기">
+                      <span class="i i-16" style="--i:var(--ic-expand)" aria-hidden="true"></span>
+                    </button>
+                    <button type="button" class="icon-button is-xs is-secondary" data-ma-close aria-label="닫기">
+                      <span class="i i-16" style="--i:var(--ic-close)" aria-hidden="true"></span>
+                    </button>
+                  </div>
+
+                  <!-- 사진이 위(16:9 꽉), 메타가 아래. -->
+                  <div class="ma-snap-meta">
+                    <figure class="ma-snap"><img data-ma-img alt="" /></figure>
+                    <dl class="ma-meta">
+                      <div class="ma-meta-row">
+                        <dt class="t-caption">위치</dt>
+                        <dd><span class="ma-wp" data-ma-wp></span><span class="t-body-4" data-ma-place></span></dd>
+                      </div>
+                      <div class="ma-meta-row">
+                        <dt class="t-caption">감지</dt>
+                        <dd><span class="ma-chip t-caption" data-ma-detect></span></dd>
+                      </div>
+                    </dl>
+                  </div>
+
+                  <!-- DELTA 조치 제안 — 쪽지판은 권고 한 줄 + 오탐 막대까지다. 근거 3줄은 알림 센터에 둔다. -->
+                  <section class="ma-delta">
+                    <div class="ma-delta-mark">
+                      <span class="i i-16" style="--i:var(--ic-cpu)" aria-hidden="true"></span>
+                      <span class="t-label-2">DELTA 조치 제안</span>
                     </div>
-                  </dl>
-                </div>
+                    <p class="ma-delta-lead t-label-1" data-ma-lead></p>
+                    <div class="ma-fp" data-ma-fp>
+                      <span class="ma-fp-label t-caption">오탐 가능성</span>
+                      <span class="ma-fp-meter" data-ma-fp-meter role="img"><i></i></span>
+                      <span class="ma-fp-value"><b class="t-label-2" data-ma-fp-label></b><span class="t-caption" data-ma-fp-pct></span></span>
+                    </div>
+                  </section>
 
-                <!-- DELTA 조치 제안 — 쪽지판은 권고 한 줄 + 오탐 막대까지다.
-                     근거 3줄은 알림 센터(와 크게보기)에 둔다. -->
-                <section class="ma-delta">
-                  <div class="ma-delta-mark">
-                    <span class="i i-16" style="--i:var(--ic-cpu)" aria-hidden="true"></span>
-                    <span class="t-label-2">DELTA 조치 제안</span>
+                  <!-- 조치 — DELTA 가 미는 칩만 세우고, 나머지는 같은 줄 오른쪽 안내가 가리킨다. -->
+                  <div class="ma-act" role="group" aria-labelledby="ma-act-label">
+                    <div class="ma-act-head">
+                      <span class="t-label-2" id="ma-act-label">AI 추천 조치</span>
+                      <span class="ma-act-hint t-caption">다른 조치는 크게보기에서</span>
+                    </div>
+                    <div class="ma-presets" data-ma-options></div>
                   </div>
-                  <p class="ma-delta-lead t-title-2" data-ma-lead></p>
-                  <div class="ma-fp" data-ma-fp>
-                    <span class="ma-fp-label t-caption">오탐 가능성</span>
-                    <span class="ma-fp-meter" data-ma-fp-meter role="img"><i></i></span>
-                    <span class="ma-fp-value"><b class="t-label-2" data-ma-fp-label></b><span class="t-caption" data-ma-fp-pct></span></span>
-                  </div>
-                </section>
-
-                <!-- 조치 — DELTA 가 미는 칩만 세운다. 나머지는 크게보기에서(바로 아래 안내). -->
-                <div class="ma-act" role="group" aria-labelledby="ma-act-label">
-                  <span class="ma-act-label t-caption" id="ma-act-label">AI 추천 조치</span>
-                  <div class="ma-presets" data-ma-options></div>
                 </div>
 
-                <div class="ma-foot">
-                  <span class="ma-foot-hint t-caption">다른 조치는 크게보기에서</span>
-                  <button type="button" class="btn btn-accent ma-confirm" data-ma-confirm>조치 완료</button>
+                <div class="ma-actions">
+                  <!-- 안전진단 화면은 아직 없다 — 자리만 잡았다(알림 줄의 [보고서]와 같다). -->
+                  <button type="button" class="btn btn-secondary" data-ma-more title="안전진단 화면 준비 중">안전진단에서 확인</button>
+                  <button type="button" class="btn btn-primary ma-confirm" data-ma-confirm>조치 완료</button>
                 </div>
-
-                <!-- 안전진단 화면은 아직 없다 — 자리만 잡았다(알림 줄의 [보고서]와 같다). -->
-                <a class="ma-more t-body-4" href="#" data-ma-more title="안전진단 화면 준비 중">안전진단에서 보기 →</a>
               </section>
               <div class="map-bot" data-map-bot hidden>
                 <div class="map-bot-tip" data-map-bot-tip hidden>
