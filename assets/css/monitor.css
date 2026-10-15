@@ -562,10 +562,16 @@
 .done-how .i { flex: none; margin-right: calc(var(--space-16) * -1 + var(--space-4)); }
 .done-how > span:last-child { flex: none; }
 
-.done-item.is-new { animation: done-new 1.2s ease; }
+/*
+ * 막 들어온 줄이 잠깐 초록으로 빛난다 — "여기로 들어왔다" 를 눈이 따라갈 자리다.
+ * 예전에는 bg/surface/selected(밝은 회색)였는데, 그 면은 이 화면에서 "고른 것" 이 쓰는 색이라
+ * 방금 처리한 것이 골라진 것처럼 읽혔다. 초록은 status/safe 로, 끝났다는 뜻과 맞는다.
+ * 처음 1/4 은 머물렀다가 사그라든다 — 바로 빠지면 눈이 못 따라잡는다.
+ */
+.done-item.is-new { animation: done-new 1.2s ease-out; }
 
 @keyframes done-new {
-  0% { background-color: var(--bg-selected); }
+  0%, 25% { background-color: color-mix(in srgb, var(--status-safe-icon) 30%, transparent); }
   100% { background-color: transparent; }
 }
 
@@ -1935,11 +1941,13 @@
 .ma-flyer::after { display: none; }
 
 /* 빈 칸 — 완료 목록 맨 위가 먼저 열려서 "여기로 들어간다" 를 미리 보여 준다. */
+/*
+ * 빈 칸 — 자리만 연다. 색을 입히지 않는다.
+ * 초록 점선 테두리를 두르고 있었는데, 바로 뒤에 들어올 줄도 초록으로 빛나서 초록이 두 번 나왔다.
+ * 빛나는 것은 도착한 줄 하나면 된다 — 빈 칸은 그 자리를 비워 주는 일만 한다.
+ */
 .done-slot {
   flex: none;
-  border: var(--border-width-strong) dashed var(--status-safe-border);
-  border-radius: var(--radius-card);
-  background-color: color-mix(in srgb, var(--status-safe-bg) 60%, transparent);
   overflow: hidden;
 }
 
