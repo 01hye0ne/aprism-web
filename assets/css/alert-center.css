@@ -452,6 +452,13 @@
  *   · 같은 성격의 이웃인 [보고서 내보내기] 도 secondary 다. 둘 다 "문서를 만들어 내는" 일이다.
  * DELTA 와의 연결은 면이 아니라 마크가 맡는다 — 카드에서 쓴 방법과 같다.
  */
+/*
+ * 머리 띠는 align-items: stretch 다(탭이 밑줄 때문에 높이를 꽉 채워야 한다).
+ * 이 버튼은 높이가 24 로 못 박혀 있어 늘어나지 못하고 띠 위쪽에 붙는다 — 가운데로 내린다.
+ * 옆의 단계 배지는 높이가 auto 라 늘어난 뒤 제 안에서 가운데 정렬되므로 손댈 것이 없다.
+ */
+.ac-summary-btn { align-self: center; }
+
 .ac-summary-btn .i { color: var(--fg-link); }
 
 /* inline-flex 가 UA 의 hidden 처리를 덮으므로 다시 눌러 준다(.ac-draft · .dropdown-menu 와 같다). */
