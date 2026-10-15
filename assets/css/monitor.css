@@ -836,11 +836,12 @@
   left: var(--x, 50%);
   top: var(--y, 50%);
   z-index: 5;
-  width: 338px;
+  /* Figma 1604:36202 — 370 폭, padding 16, 칸 사이 12. */
+  width: 370px;
   display: flex;
   flex-direction: column;
-  gap: var(--space-20);
-  padding: var(--space-12);
+  gap: var(--space-12);
+  padding: var(--space-16);
   border-radius: var(--radius-container);
   background-image: linear-gradient(
     180deg,
@@ -875,98 +876,222 @@
   clip-path: polygon(50% 0, 100% 100%, 0 100%);
 }
 
-.ma-infos {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-8);
-  min-width: 0;
-}
-
+/* ── 머리 — 배지 · 제목 · [크게보기] · 닫기가 한 줄 ─────────── */
 .ma-head {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: var(--space-8);
 }
 
-/* Badge Status=Warning · Critical, Emphasis=Solid — bg/surface/subtle 면, 점과 글이 단계색. */
+/* Badge Status=Warning · Critical — 알림 센터 .ac-sev-badge 와 같은 알약이다. */
 .ma-badge {
   display: inline-flex;
   align-items: center;
   gap: var(--space-4);
-  height: 26px;
+  flex: none;
   padding: var(--space-4) var(--space-12) var(--space-4) var(--space-8);
+  border: var(--border-width-thin) solid var(--status-warning-border);
   border-radius: var(--radius-pill);
-  background-color: var(--bg-cell);
+  background-color: var(--status-warning-bg);
   color: var(--status-warning-text);
   white-space: nowrap;
 }
 
 .ma-badge .badge-dot { background-color: var(--status-warning-icon); }
-.map-alert.is-critical .ma-badge { color: var(--status-critical-text); }
+
+.map-alert.is-critical .ma-badge {
+  border-color: var(--status-critical-border);
+  background-color: var(--status-critical-bg);
+  color: var(--status-critical-text);
+}
+
 .map-alert.is-critical .ma-badge .badge-dot { background-color: var(--status-critical-icon); }
 
-.ma-time { color: var(--text-secondary); white-space: nowrap; }
-
+/*
+ * 제목은 두 줄까지 접는다. 한 줄 말줄임으로 두면 "지하발전소 B3 터빈 2 NG 1건 발견" 처럼
+ * 긴 제목이 "…2" 에서 잘려, 무슨 알림인지가 사라진다 — 쪽지에서 제일 중요한 글이다.
+ */
 .ma-title {
+  flex: 1 1 auto;
+  min-width: 0;
   margin: 0;
   color: var(--text-primary);
+  word-break: keep-all;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
-/* 라이브 뷰 — 16:9 (쪽지 안쪽 폭 314 에서 177). Figma 는 236 높이였다(디자이너 요청으로 바꿨다). */
-.ma-live {
-  aspect-ratio: 16 / 9;
-  /* 임시 그림(monitor.js live)이 깔린다. 비율이 달라 가운데를 기준으로 꽉 채우고 가장자리를 자른다. */
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
-  border-radius: var(--radius-4);
-  background-color: #262626;
+/* [크게보기] 는 그림 위 알약에서 머리줄 버튼으로 나왔다 — 그림이 작아져 위에 얹을 자리가 없다. */
+.ma-zoom-open { flex: none; }
+.ma-zoom-open[hidden] { display: none; }
+
+.ma-close {
+  flex: none;
+  display: inline-flex;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text-tertiary);
+  cursor: pointer;
 }
 
-/*
- * [크게보기] — 라이브 뷰 오른쪽 위 8 안쪽에 겹쳐 뜨는 작은 알약. 누르는 대상(그림) 바로 위라
- * 무엇을 키우는지 분명하고, 쪽지 높이도 늘지 않는다. 그림 위에서도 읽히게 어두운 반투명 면이다.
- * 그림이 없는 알림(E-STOP)에서는 숨긴다.
- */
-.ma-live { position: relative; }
+.ma-close:hover { color: var(--text-primary); }
 
-.ma-zoom-open {
-  position: absolute;
-  top: var(--space-8);
-  right: var(--space-8);
+.ma-close:focus-visible {
+  outline: var(--border-width-strong) solid var(--border-focus);
+  outline-offset: 2px;
+}
+
+/* 발생 일시 — 제목 바로 아래. 머리줄과 한 덩이라 위 간격을 되돌린다. */
+.ma-stamp {
+  margin: calc(var(--space-12) * -1 + var(--space-4)) 0 0;
+  color: var(--text-tertiary);
+}
+
+/* ── 사진 + 메타 (알림 센터 .ac-d-snap-meta) ─────────────────── */
+.ma-snap-meta {
+  display: flex;
+  gap: var(--space-12);
+}
+
+.ma-snap {
+  flex: none;
+  width: 130px;
+  height: 90px;
+  margin: 0;
+  border: var(--border-width-thin) solid var(--border-default);
+  border-radius: var(--radius-6);
+  background-color: var(--bg-frame);
+  overflow: hidden;
+}
+
+.ma-snap[hidden] { display: none; }
+
+.ma-snap img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ma-meta {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  margin: 0;
+}
+
+.ma-meta-row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-12);
+}
+
+.ma-meta-row > dt {
+  flex: none;
+  width: 32px;
+  margin: 0;
+  color: var(--text-tertiary);
+}
+
+.ma-meta-row > dd {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-4) var(--space-8);
+  min-width: 0;
+  margin: 0;
+  color: var(--text-primary);
+}
+
+/* 웨이포인트 번호는 자릿수가 흔들리면 안 되는 값이라 고정폭이다(알림 센터와 같다). */
+.ma-wp {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-13);
+  line-height: var(--font-line-height-20);
+  letter-spacing: 0.02em;
+}
+
+/* 감지 칩 — 알림 센터 .ac-d-chip. */
+.ma-chip {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-4);
-  height: 24px;
-  padding: 0 var(--space-8) 0 var(--space-4);
-  border: 0;
-  border-radius: var(--radius-4);
-  background-color: rgb(7 10 16 / 60%);
-  color: var(--color-gray-0);
-  font-family: inherit;
-  cursor: pointer;
-  -webkit-backdrop-filter: blur(4px);
-  backdrop-filter: blur(4px);
+  padding: var(--space-2) var(--space-8);
+  border: var(--border-width-thin) solid var(--border-default);
+  border-radius: var(--radius-control);
+  background-color: var(--bg-inset);
+  color: var(--text-primary);
 }
 
-.ma-zoom-open:hover { background-color: rgb(7 10 16 / 80%); }
-
-.ma-zoom-open:focus-visible {
-  outline: var(--border-width-strong) solid var(--border-focus);
-  outline-offset: 1px;
-}
-
-.ma-live:not(.has-photo) .ma-zoom-open { display: none; }
-
+/* ── DELTA 조치 제안 (Figma DELTA Suggestion 1531:42356) ────── */
 /*
- * 크게보기 창 — 화면을 어둡게 덮고(color/alpha/Dark/600) 가운데에 카드 하나.
- * 카드 bg/surface/raised · border/subtle · radius 8 · 패딩 16 · 사이 12. 머리에 단계 배지 · 제목 · 시각 · 닫기.
- * 그림은 원래 비율 그대로, 높이 700(화면 75% 넘지 않게) · 폭은 화면 90% 안에서.
+ * 알림 센터의 카드와 같은 덩이인데 면이 다르다 — 거기선 무채색 패널이고 여기선 파란 면이다.
+ * 쪽지는 지도 위에 떠 있어 뒤가 비치므로, 무채색으로 두면 DELTA 칸이 배경에 묻힌다.
+ * status/info 는 "AI 가 하는 말" 자리라 뜻도 맞는다.
  */
+.ma-delta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  padding: var(--space-12);
+  border: var(--border-width-thin) solid var(--status-info-border);
+  border-radius: var(--radius-container);
+  background-color: var(--status-info-bg);
+}
+
+.ma-delta-mark {
+  display: flex;
+  align-items: center;
+  /* 6 은 space 스케일에 없다 — 알림 센터 .ac-delta-mark 와 같은 값으로 적는다. */
+  gap: 6px;
+  color: var(--fg-link);
+}
+
+.ma-delta-lead {
+  margin: 0;
+  color: var(--text-primary);
+}
+
+/* 오탐 가능성 막대 — 알림 센터 .ac-fp 와 같다. */
+.ma-fp {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ma-fp-label { flex: none; color: var(--text-secondary); }
+
+.ma-fp-meter {
+  flex: 1 1 auto;
+  height: 6px;
+  border-radius: 3px;
+  background-color: var(--comp-chart-track);
+  overflow: hidden;
+}
+
+.ma-fp-meter > i {
+  display: block;
+  width: var(--ma-fp, 0%);
+  height: 100%;
+  border-radius: 3px;
+  background-color: var(--comp-chart-positive);
+}
+
+.ma-fp-value {
+  flex: none;
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-4);
+}
+
+.ma-fp-value b { color: var(--status-safe-text); }
+.ma-fp-value span { color: var(--text-secondary); }
+
 .ma-zoom {
   position: fixed;
   inset: 0;
@@ -1014,18 +1139,6 @@
   background-color: #262626;
 }
 
-/* 원인 요약 — 두 줄까지, 넘치면 말줄임. */
-.ma-sum {
-  margin: 0;
-  color: var(--text-secondary);
-  word-break: keep-all;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
 /*
  * 조치 내용 — 칩 여러 개를 고른다(app-shell .preset-chip · Figma Preset Chip 1499:40329).
  * 라디오 줄에서 칩으로 바꿨다: 현장에서는 "무전 연락 + 작업 중지" 처럼 둘을 같이 하는 일이 흔한데
@@ -1047,19 +1160,38 @@
   gap: var(--space-4);
 }
 
-/* Menu Divider — 위아래 4 · 1px. Figma 선 색이 토큰이 아니라 raw #86888B 40% 다. */
-.ma-divider {
-  height: 1px;
-  margin: var(--space-4) 0;
-  background-color: rgb(134 136 139 / 40%);
-}
-
 .ma-confirm:focus-visible {
   outline: var(--border-width-strong) solid var(--border-focus);
   outline-offset: 1px;
 }
 
-.ma-confirm { width: 100%; }
+/*
+ * 바닥 — 안내 글과 주 동작이 한 줄이다(Figma Actions). 버튼이 폭을 꽉 채우고 있었는데,
+ * 쪽지는 지도 위 작은 칸이라 꽉 찬 면이 지도를 한 번 더 가린다. 글은 왼쪽, 버튼은 오른쪽 끝.
+ */
+.ma-foot {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+}
+
+.ma-foot-hint {
+  flex: 1 1 auto;
+  min-width: 0;
+  color: var(--text-tertiary);
+}
+
+.ma-confirm { flex: none; }
+
+/* 안전진단 화면은 아직 없다 — 자리만 잡았다. */
+.ma-more {
+  align-self: flex-end;
+  margin-top: calc(var(--space-12) * -1 + var(--space-4));
+  color: var(--fg-link);
+  text-decoration: none;
+}
+
+.ma-more:hover { text-decoration: underline; }
 
 /*
  * 타임라인 — 수행 중인 칸은 밝은 회색 면(gray/200)에 어두운 글자다(2026-09-21 디자이너 결정, 시안 C).

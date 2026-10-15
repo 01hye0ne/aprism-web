@@ -58,30 +58,36 @@
    */
   var WARNINGS = [
     { sev: "warning", robot: 0, wp: "WP-03", live: "discharge", where: "APRO 4F · WP-03 냉각수 배관 밸브", time: "10:11:19",
-      title: "누출감지 · 냉각수 배관 밸브",
+      title: "누출감지 · 냉각수 배관 밸브", detect: "누출감지",
       sum: "밸브 이음부에서 누출 패턴이 신뢰도 0.87 로 검출됐습니다. 임계 0.70 을 넘었고 연속 2프레임에서 나왔습니다.",
+      lead: "밸브 이음부 현장 점검을 요청하세요.", fp: 15, fpLabel: "낮음",
       acts: [{ t: "현장 점검 요청", ai: true }, { t: "다음 순회 재측정" }, { t: "추이 관찰" }] },
     { sev: "warning", robot: 1, wp: "WP-06", live: "discharge", where: "Robot 02 · WP-06 수배전반", time: "10:09:42",
-      title: "부분방전 · 이상 점수 9.41",
+      title: "부분방전 · 이상 점수 9.41", detect: "부분방전",
       sum: "이상 점수 9.41 로 임계 9.23 을 넘었습니다. PRPD 패턴이 코로나 방전 유형과 일치합니다.",
+      lead: "재진단을 예약해 PRPD 패턴을 다시 확인하세요.", fp: 22, fpLabel: "보통",
       acts: [{ t: "재진단 예약", ai: true }, { t: "현장 점검 요청" }, { t: "추이 관찰" }] },
     { sev: "warning", robot: 1, wp: "WP-12", live: "discharge", where: "Robot 02 · WP-12 냉각 펌프 P-2", time: "10:06:05",
-      title: "진동 상승 · 냉각 펌프 P-2",
+      title: "진동 상승 · 냉각 펌프 P-2", detect: "진동감지",
       sum: "진동 RMS 4.8 mm/s 로 주의 기준 4.5 를 넘었습니다. 최근 3회 측정에서 계속 오르고 있습니다.",
+      lead: "베어링 점검을 요청하세요.", fp: 18, fpLabel: "낮음",
       acts: [{ t: "베어링 점검 요청", ai: true }, { t: "다음 순회 재측정" }, { t: "추이 관찰" }] },
     { sev: "warning", robot: 4, wp: "WP-02", live: "ppe", where: "Robot 05 · WP-02 발전기 베어링", time: "10:03:27",
-      title: "과열 · 발전기 베어링 68.4℃",
+      title: "과열 · 발전기 베어링 68.4℃", detect: "온도감지",
       sum: "베어링 표면 온도 68.4℃ 로 주의 기준 65℃ 를 넘었습니다. 주변 온도보다 31℃ 높습니다.",
+      lead: "윤활 상태 점검을 요청하세요.", fp: 25, fpLabel: "보통",
       acts: [{ t: "윤활 상태 점검 요청", ai: true }, { t: "열화상 재촬영" }, { t: "추이 관찰" }] },
     { sev: "warning", robot: 1, wp: "WP-20", live: "discharge", where: "Robot 02 · WP-20 공기 압축기 C-1", time: "10:01:12",
-      title: "압력 편차 · 공기 압축기 C-1",
+      title: "압력 편차 · 공기 압축기 C-1", detect: "계기인식",
       sum: "토출 압력 7.9 bar 로 정상 범위(8.2~8.8) 아래입니다. 흡입 필터가 막혔을 가능성이 있습니다.",
+      lead: "흡입 필터 점검을 요청하세요.", fp: 30, fpLabel: "보통",
       acts: [{ t: "필터 점검 요청", ai: true }, { t: "재측정 예약" }, { t: "추이 관찰" }] }
   ];
 
   var CRITICAL = { sev: "critical", robot: 0, wp: "WP-04", live: "ppe", where: "터빈 2 / Unit 03 · WP-04 N₂ 배관 압력계", time: "10:12:40",
-    title: "지하발전소 B3 터빈 2 NG 1건 발견",
+    title: "지하발전소 B3 터빈 2 NG 1건 발견", detect: "계기인식",
     sum: "Spiral Casing Pr. 측정값 90 이 기준값 87 을 넘었습니다. 최근 3회 측정이 잇달아 올라 NG 로 판정했습니다.",
+    lead: "현장에 무전으로 작업 중지를 요청하세요.", fp: 8, fpLabel: "낮음",
     acts: [{ t: "현장 무전 연락 · 작업 중지 요청", ai: true }, { t: "로봇 정지 · 현장 점검 요청", ai: true }, { t: "재측정 후 판단" }] };
 
   // 검토용 단계 — 주소 끝 #… 로 고른다. few 는 알림은 있지만 Delta 종합 기준에 못 미친 판이다.
@@ -500,13 +506,29 @@
     if (!box) { return { open: function () {}, close: function () {} }; }
 
     var sev = $("[data-ma-sev]", box);
-    var time = $("[data-ma-time]", box);
     var title = $("[data-ma-title]", box);
-    var sum = $("[data-ma-sum]", box);
-    var live = $(".ma-live", box);
+    var stamp = $("[data-ma-stamp]", box);
+    var snap = $(".ma-snap", box);
+    var img = $("[data-ma-img]", box);
     var options = $("[data-ma-options]", box);
     var confirm = $("[data-ma-confirm]", box);
     var opening = false;
+
+    /*
+     * 위치 이름 — where 는 "터빈 2 / Unit 03 · WP-04 N₂ 배관 압력계" 꼴이다.
+     * 웨이포인트 번호는 따로 칸이 있으니, 그 뒤만 떼어 이름으로 쓴다.
+     */
+    function placeOf(a) {
+      var i = a.where.indexOf(a.wp);
+      return i < 0 ? a.where : a.where.slice(i + a.wp.length).trim();
+    }
+
+    // 발생 일시 — 날짜는 상태 바 시계에서 읽는다. 이 화면은 하루를 통째로 흉내 내므로 둘이 같은 날이어야 한다.
+    function stampOf(a) {
+      var utc = $(".utc-clock .num");
+      var day = (utc && (utc.textContent.match(/^\d{4}-\d{2}-\d{2}/) || [])[0]) || "";
+      return (day ? day + " " : "") + a.time + " 발생";
+    }
 
     // 고른 조치. 알림을 새로 열 때마다 비운다 — 하나 이상 골라야 [조치 완료] 가 켜진다.
     function chosen() {
@@ -520,16 +542,32 @@
     function fill(a) {
       box.classList.toggle("is-critical", a.sev === "critical");
       sev.textContent = a.sev === "critical" ? "위험" : "주의";
-      time.textContent = a.time;
       title.textContent = a.title;
       title.title = a.title;
-      sum.textContent = a.sum;
-      sum.title = a.sum;
-      // 라이브 뷰 — 그림이 없는 알림(E-STOP 등)은 빈 면(#262626)으로 남고 [크게보기] 도 숨는다.
-      live.style.backgroundImage = a.live ? "url(" + liveSrc(a) + ")" : "";
-      live.classList.toggle("has-photo", !!a.live);
+      stamp.textContent = stampOf(a);
+
+      $("[data-ma-wp]", box).textContent = a.wp || "";
+      $("[data-ma-place]", box).textContent = placeOf(a);
+      $("[data-ma-detect]", box).textContent = a.detect || "";
+
+      // 그림이 없는 알림(E-STOP 등)은 사진 칸과 [크게보기] 를 함께 접는다.
+      snap.hidden = !a.live;
+      $("[data-ma-zoom]", box).hidden = !a.live;
+      if (a.live) {
+        img.src = liveSrc(a);
+        img.alt = a.title + " — 검출 장면";
+      }
+
+      $("[data-ma-lead]", box).textContent = a.lead || a.sum;
+      var fp = $("[data-ma-fp]", box);
+      fp.style.setProperty("--ma-fp", (a.fp || 0) + "%");
+      $("[data-ma-fp-meter]", box).setAttribute("aria-label", "오탐 가능성 " + (a.fp || 0) + "퍼센트");
+      $("[data-ma-fp-label]", box).textContent = a.fpLabel || "";
+      $("[data-ma-fp-pct]", box).textContent = (a.fp || 0) + "%";
+
+      // 쪽지에는 DELTA 가 미는 칩만 세운다 — 나머지는 "다른 조치는 크게보기에서" 가 안내한다.
       options.textContent = "";
-      a.acts.forEach(function (act) {
+      a.acts.filter(function (act) { return act.ai; }).forEach(function (act) {
         var chip = el("button", "preset-chip");
         chip.type = "button";
         chip.setAttribute("data-act", act.t);
@@ -771,6 +809,9 @@
 
     // 단계를 바꾸면(주소 #…) 들고 있던 되돌리기도 버린다.
     document.addEventListener("aprism:monitor-reset", hideToast);
+
+    var closeBtn = $("[data-ma-close]", box);
+    if (closeBtn) { closeBtn.addEventListener("click", close); }
 
     // 지도가 다른 웨이포인트로 옮겨 가며 쪽지를 닫았다 — 목록의 고른 표시도 놓는다.
     document.addEventListener("aprism:map-alert", function (event) {
