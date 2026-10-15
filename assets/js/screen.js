@@ -1644,8 +1644,13 @@ window.APRISM_TEXT = (function () {
     function complete(row) {
       row.classList.remove("is-running", "is-active", "is-pending");
       row.classList.add("is-done");
+      /*
+       * 통과한 줄은 체크 동그라미다. 예전에는 --ic-delta 를 썼는데, 그 이름이 세트마다 다른 그림이다 —
+       * 기본 세트에서는 "체크 동그라미" 지만 v2.2 아웃라인 세트에서는 DELTA 브랜드 마크(네모 넷)다.
+       * 그래서 v2.2 를 입히자 완료 표시가 로고로 바뀌어 버렸다. 양쪽에서 뜻이 같은 이름으로 바꾼다.
+       */
       var icon = row.querySelector(".i");
-      if (icon) { icon.style.setProperty("--i", "var(--ic-delta)"); }
+      if (icon) { icon.style.setProperty("--i", "var(--ic-check-circle)"); }
       var meta = row.querySelector(".meta");
       if (meta) {
         meta.textContent = row.getAttribute("data-done-meta") || "";
