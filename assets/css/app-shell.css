@@ -3322,7 +3322,9 @@ input.field-box { outline: 0; }
 }
 
 /* ── 바닥 CTA ──────────────────────────────────────────────
- * Figma "Action" — 카드 폭 꽉, height 40, accent 면, 아래 모서리만 라운드.
+ * Figma "Action" — 카드 폭 꽉, height 40, accent 면.
+ * Figma 는 아래 모서리만 깎았는데 네 모서리를 다 깎는다 — 패널 바닥에 붙어 있지 않고
+ * 여백 안에 떠 있는 단추라, 위만 각지면 위가 무언가에 붙어 있는 것처럼 보인다.
  */
 .mp-cta {
   flex: none;
@@ -3333,7 +3335,7 @@ input.field-box { outline: 0; }
   height: var(--size-control-lg);
   padding: 0 var(--space-20);
   border: 0;
-  border-radius: 0 0 var(--radius-card) var(--radius-card);
+  border-radius: var(--radius-card);
   background-color: var(--comp-button-accent-bg-default);
   color: var(--comp-button-accent-text-default);
   font-size: var(--font-size-14);
