@@ -465,7 +465,7 @@
 
   function renderNth(rows) {
     rows = rows || visible();
-    var i = rows.findIndex(function (a) { return a.id === picked(); });
+    var i = rows.findIndex(function (a) { return a.id === shown(); });
     $("[data-ac-nth]").textContent = rows.length ? (i + 1) + " / " + rows.length : "0 / 0";
     $("[data-ac-prev]").disabled = i <= 0;
     $("[data-ac-next]").disabled = i < 0 || i >= rows.length - 1;
@@ -478,7 +478,40 @@
     if (next) { pick(next.id); }
   }
 
+  /*
+   * 손을 얹은 줄 — 고른 줄과 다른 것이다. 미리 보여 주기만 하고 고르지는 않는다.
+   * 그래서 왼쪽의 선택 표시(aria-selected)와 state.picked 는 건드리지 않는다.
+   * 오른쪽 칸이 지금 무엇을 그리는지는 늘 shown() 하나로 답한다.
+   */
+  var hoverId = null;
+  var hoverTimer = null;
+
+  function shown() { return hoverId || picked(); }
+
+  function preview(id) {
+    clearTimeout(hoverTimer);
+    if (id === shown()) { return; }
+    // 오른쪽 칸 안에 포커스가 있으면(메모를 치는 중) 지우지 않는다.
+    if (detail.contains(document.activeElement)) { return; }
+    // 목록을 빠르게 훑고 지나갈 때 줄마다 다시 그리지 않도록 조금 기다린다.
+    hoverTimer = setTimeout(function () {
+      hoverId = id;
+      renderNth();
+      renderDetail();
+    }, 60);
+  }
+
+  function previewOff() {
+    clearTimeout(hoverTimer);
+    if (hoverId === null) { return; }
+    hoverId = null;
+    renderNth();
+    renderDetail();
+  }
+
   function pick(id) {
+    clearTimeout(hoverTimer);
+    hoverId = null;
     setPicked(id);
     var focus = null;
     $$("[data-id]", list).forEach(function (row) {
@@ -501,6 +534,8 @@
   }
 
   function refresh() {
+    clearTimeout(hoverTimer);
+    hoverId = null;
     var rows = visible();
     if (!picked() || !rows.some(function (a) { return a.id === picked(); })) {
       setPicked(rows.length ? rows[0].id : null);
@@ -511,7 +546,7 @@
   }
 
   function renderDetail() {
-    var a = alertOf(picked());
+    var a = alertOf(shown());
     if (!a) {
       detail.innerHTML = '<p class="ac-empty t-body-3">' +
         (visible().length ? "왼쪽 목록에서 알림을 고르세요." : "표시할 알림이 없습니다.") + '</p>';
@@ -848,6 +883,17 @@
         refresh();
       });
     });
+
+    /*
+     * 줄에 손을 얹으면 오른쪽 칸이 먼저 바뀐다. 줄마다 거는 대신 목록에 한 번만 걸어
+     * 다시 그려도 살아 있게 한다. 날짜 머리(data-id 가 없다) 위를 지날 때는 직전에
+     * 보던 것을 그대로 둔다 — 지나가다 한 번 깜빡이는 쪽이 더 거슬린다.
+     */
+    list.addEventListener("mouseover", function (event) {
+      var row = event.target.closest("[data-id]");
+      if (row) { preview(row.getAttribute("data-id")); }
+    });
+    list.addEventListener("mouseleave", previewOff);
 
     $("[data-ac-prev]").addEventListener("click", function () { step(-1); });
     $("[data-ac-next]").addEventListener("click", function () { step(1); });
