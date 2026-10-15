@@ -45,11 +45,19 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--space-12);
-  padding: var(--space-20);
-  border-radius: var(--radius-container) var(--radius-container) 0 0;
-  background-color: var(--bg-frame);
+  gap: var(--space-16);
+  padding: var(--space-24);
+  border-radius: var(--radius-container) 0 0 0;
+  background-color: var(--bg-panel);
   overflow: hidden;
+}
+
+/* Breadcrumb + 제목 줄은 한 덩이다(Figma Page Head, gap 12). */
+.ac-page-head {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
 }
 
 /* ---------- Breadcrumb ---------- */
@@ -93,8 +101,9 @@
 }
 
 /*
- * Figma Badge Dot=true — padding 4/12/4/8, gap 4, radius/pill.
- * 면은 bg/inset 으로 올렸다(Figma 는 gray/750 이라 Body 면과 같았다).
+ * Figma Badge Dot=true — padding 4/12/4/8, gap 4, radius/pill, 면 gray/750.
+ * 색은 위험 계열이다(1202:16161) — 1177 판의 파랑에서 바뀌었다.
+ * 미확인이 남아 있다는 뜻이라 이쪽이 맞다.
  */
 .ac-count-badge {
   display: inline-flex;
@@ -102,17 +111,19 @@
   gap: var(--space-4);
   padding: var(--space-4) var(--space-12) var(--space-4) var(--space-8);
   border-radius: var(--radius-pill);
-  background-color: var(--bg-inset);
-  color: var(--status-info-text);
+  background-color: var(--bg-frame);
+  color: var(--status-critical-text);
 }
 
-.ac-count-badge .badge-dot { background-color: var(--status-info-icon); }
+.ac-count-badge .badge-dot { background-color: var(--status-critical-icon); }
 
 /* ---------- Filter Bar ---------- */
 .ac-filter {
+  flex: none;
   display: flex;
   align-items: center;
   gap: var(--space-12);
+  padding: 14px var(--space-16);
 }
 
 .ac-filter-label {
@@ -174,11 +185,15 @@
  * Figma 는 바깥 테두리 border/default, 안쪽 칸 나누는 선 border/strong 이었다.
  * 안이 밖보다 세서 보드가 두 쪽으로 갈라져 보였다 — 둘을 같은 단계로 맞췄다.
  */
+/*
+ * Board — 1202 판에서 한 상자가 카드 두 장으로 갈라졌다(gap 16).
+ * 카드 면은 Body 와 같은 gray/800 이고 1px border/divider 로만 갈린다 —
+ * 사이 틈이 Body 면을 그대로 보여 주므로 두 장이 또렷하게 나뉜다.
+ */
 .ac-board {
   /*
-   * 두 칸의 머리 높이를 한 값으로 묶는다. 안 묶으면 왼쪽은 탭 높이(12+20+12+3),
-   * 오른쪽은 이전·다음 버튼 높이(12+28+12)로 따로 자라서 5px 어긋났고,
-   * 보드를 가로지르는 1px 밑줄이 두 칸 사이에서 턱이 졌다.
+   * 두 카드의 머리 높이를 한 값으로 묶는다. 안 묶으면 왼쪽은 탭 높이,
+   * 오른쪽은 이전·다음 버튼 높이로 따로 자라서 어긋난다.
    * 안쪽 요소는 패딩이 아니라 가운데 정렬로 자리를 잡는다 — 그래야 탭 글자(20)와
    * 버튼(28)처럼 높이가 다른 것이 같은 띠 안에 함께 선다.
    */
@@ -188,17 +203,22 @@
   min-height: 0;
   display: flex;
   align-items: stretch;
-  border: var(--border-width-thin) solid var(--border-default);
+  gap: var(--space-16);
+}
+
+.ac-open,
+.ac-detail {
+  display: flex;
+  flex-direction: column;
+  border: var(--border-width-thin) solid var(--border-divider);
   border-radius: var(--radius-container);
+  background-color: var(--bg-panel);
   overflow: hidden;
 }
 
 .ac-open {
   flex: 1 1 auto;
   min-width: 0;
-  display: flex;
-  flex-direction: column;
-  border-right: var(--border-width-thin) solid var(--border-default);
 }
 
 /* ---------- 미확인 / 조치 완료 탭 ---------- */
@@ -208,7 +228,7 @@
   align-items: stretch;
   gap: var(--space-8);
   height: var(--ac-head-h);
-  padding-right: var(--space-12);
+  padding: 0 var(--space-16) 0 var(--space-4);
   border-bottom: var(--border-width-thin) solid var(--border-divider);
 }
 
@@ -228,7 +248,7 @@
   gap: 10px;
   padding: 0 var(--space-16);
   border: 0;
-  border-bottom: 3px solid transparent;
+  border-bottom: 2px solid transparent;
   background: none;
   color: var(--text-secondary);
   font-family: inherit;
@@ -276,7 +296,6 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
-  background-color: var(--bg-inset);
 }
 
 .ac-col-head {
@@ -402,12 +421,274 @@
 .ac-row:focus-within .ac-c-act .btn,
 .ac-row[aria-selected="true"] .ac-c-act .btn { visibility: visible; }
 
+/* ==========================================================
+ * 조치 완료 탭 — Figma 1202:16151 "SD-08 알림 센터 · B안 · 조치 완료 기록 상세"
+ *
+ * 미확인 탭과 줄 모양이 다르다. 미확인은 "무엇이 났나"(단계 · 발생 · 위치)를 보여 주고,
+ * 조치 완료는 "무엇을 했나"(조치 시각 · 조치 내용 · 원 등급 · 담당)를 보여 준다.
+ * 날짜가 바뀌는 자리에 날짜 머리가 들어간다.
+ * ========================================================== */
+
+/* ── 오늘 조치 요약 만들기 · DELTA 인수인계 요약 ───────────── */
+/* 둘 다 DELTA 면이다 — status/info/bg 에 border/brand. */
+.ac-summary-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+  padding: var(--space-4) 10px;
+  border: var(--border-width-thin) solid var(--border-brand);
+  border-radius: var(--radius-6);
+  background-color: var(--status-info-bg);
+  color: var(--text-primary);
+  font-family: inherit;
+  cursor: pointer;
+}
+
+/* inline-flex 가 UA 의 hidden 처리를 덮으므로 다시 눌러 준다(.ac-draft · .dropdown-menu 와 같다). */
+.ac-summary-btn[hidden] { display: none; }
+
+.ac-summary-btn:hover { background-color: var(--color-blue-800); }
+
+.ac-summary-btn:focus-visible {
+  outline: var(--border-width-strong) solid var(--border-focus);
+  outline-offset: 1px;
+}
+
+.ac-handover-slot {
+  flex: none;
+  padding: var(--space-12);
+  border-bottom: var(--border-width-thin) solid var(--border-divider);
+}
+
+.ac-handover-slot[hidden] { display: none; }
+
+.ac-handover {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: var(--space-12) 14px;
+  border: var(--border-width-thin) solid var(--border-brand);
+  border-radius: var(--radius-container);
+  background-color: var(--status-info-bg);
+}
+
+.ac-handover-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+}
+
+.ac-handover-mark {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--fg-link);
+}
+
+.ac-handover-when { color: var(--text-tertiary); }
+
+/*
+ * Ghost 기본 글자색은 blue/500 인데 이 카드 면이 blue/900 이라 [닫기] 가 묻힌다.
+ * Figma 도 여기만 gray/400 이다 — 카드 안에서만 되돌린다.
+ */
+.ac-handover .btn-ghost { color: var(--text-secondary); }
+.ac-handover .btn-ghost:hover { color: var(--text-primary); }
+
+.ac-handover-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+}
+
+.ac-handover-row {
+  display: flex;
+  gap: var(--space-12);
+}
+
+.ac-handover-row > dt {
+  flex: none;
+  width: 64px;
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.ac-handover-row > dd {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.ac-handover-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: var(--space-8);
+}
+
+/* ── 날짜 머리 ───────────────────────────────────────────── */
+/* Figma Date 1202:16048 — 높이 28, padding 5/16, 면 gray/750. */
+.ac-date-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  height: 28px;
+  padding: 5px var(--space-16);
+  background-color: var(--bg-frame);
+  border-bottom: var(--border-width-thin) solid var(--border-divider);
+}
+
+.ac-date-row .ac-date-count { color: var(--text-tertiary); }
+
+/* ── 조치 완료 줄 ────────────────────────────────────────── */
+/* Figma Done 1202:16057 — 높이 40, padding 0/16, gap 12. 왼쪽 띠가 없다. */
+.ac-done-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  height: 40px;
+  padding: 0 var(--space-16);
+  border-bottom: var(--border-width-thin) solid var(--border-divider);
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.ac-done-row:last-child { border-bottom: 0; }
+.ac-done-row:hover { background-color: var(--state-hover); }
+
+.ac-done-row[aria-selected="true"],
+.ac-done-row[aria-selected="true"]:hover { background-color: var(--bg-raised); }
+
+.ac-done-row:focus-visible {
+  outline: var(--border-width-strong) solid var(--border-focus);
+  outline-offset: -2px;
+}
+
+/* 열 폭 — 열 머리와 줄이 같은 값을 쓴다. */
+.ac-dc-check { flex: none; width: var(--size-icon-16); color: var(--status-safe-icon); }
+.ac-dc-time  { flex: none; width: 44px; color: var(--text-secondary); }
+.ac-dc-body  { flex: 1 1 auto; min-width: 0; display: flex; align-items: center; gap: var(--space-8); }
+/* Figma 는 96 인데 가장 긴 값("위험 어제 23:51")이 들어가지 않는다 — 들어갈 만큼만 넓혔다. */
+.ac-dc-sev   { flex: none; width: 112px; display: flex; align-items: center; gap: 6px; }
+.ac-dc-who   { flex: none; width: 48px; color: var(--text-secondary); }
+
+/* 제목과 조치 내용이 한 줄에 나란히 선다 — 조치가 남는 폭을 가진다. */
+.ac-dc-body > .ac-dc-title { flex: none; max-width: 55%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ac-dc-body > .ac-dc-act { flex: 1 1 auto; min-width: 0; color: var(--text-tertiary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.ac-dc-sev > .ac-sev-dot {
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-pill);
+}
+
+.ac-dc-sev > span:last-child { color: var(--text-tertiary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ac-done-row[data-sev="critical"] .ac-sev-dot { background-color: var(--status-critical-icon); }
+.ac-done-row[data-sev="warning"] .ac-sev-dot { background-color: var(--status-warning-icon); }
+.ac-dc-who { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ── 조치 기록(오른쪽 칸) ────────────────────────────────── */
+/*
+ * 입력이 없는 판이다 — 캡슐도 메모도 읽기만 한다. 그래서 아래 동작 줄이 없고
+ * 본문이 위에서부터 쌓인다(Figma Detail Body vertical: hug).
+ */
+.ac-record {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+}
+
+.ac-record-title {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ac-record-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ac-record-title-row h2 { margin: 0; }
+
+.ac-record-age {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+}
+
+/* 조치 시각은 safe 색이다 — 끝난 일이라는 표시다(Figma 1202:16224). */
+.ac-record-at { color: var(--status-safe-text); }
+.ac-record-by { color: var(--text-tertiary); }
+
+.ac-record-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.ac-record-section > h3 {
+  margin: 0;
+  color: var(--text-tertiary);
+  font-weight: var(--font-weight-regular);
+}
+
+/* 끝난 조치는 고를 수 없다 — 면 bg/selected + border/brand 로 굳은 모습이다. */
+.ac-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.ac-chip-done {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px var(--space-12);
+  border: var(--border-width-thin) solid var(--border-brand);
+  border-radius: var(--radius-pill);
+  background-color: var(--bg-selected);
+  color: var(--text-primary);
+}
+
+.ac-memo-box {
+  padding: 10px var(--space-12);
+  border: var(--border-width-thin) solid var(--border-divider);
+  border-radius: var(--radius-6);
+  background-color: var(--bg-inset);
+  color: var(--text-secondary);
+}
+
+.ac-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+}
+
+.ac-info-row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-12);
+}
+
+.ac-info-row > dt {
+  flex: none;
+  width: 40px;
+  margin: 0;
+  color: var(--text-tertiary);
+}
+
+.ac-info-row > dd { min-width: 0; margin: 0; }
+.ac-info-delta { color: var(--fg-link); }
+
 /* ---------- 선택 상세 ---------- */
 .ac-detail {
   flex: none;
   width: 700px;
-  display: flex;
-  flex-direction: column;
 }
 
 /*

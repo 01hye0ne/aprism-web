@@ -1,38 +1,57 @@
 /*
- * 알림 센터 (SD-08) — Figma 1177:15915.
+ * 알림 센터 (SD-08).
  *
- * 목록 · 상세 · 필터를 여기서 그린다. screen.js 는 쓰지 않는다 — 통합 관제 메인 전용 코드가
- * 대부분이고 이 화면에 없는 요소를 찾으므로, 필요한 조각(Status Bar 드롭다운 · Select)만 여기 둔다.
+ *   미확인 탭      Figma 1177:15915 "B안 · 미확인 선택 상세"
+ *   조치 완료 탭   Figma 1202:16151 "B안 · 조치 완료 기록 상세"
  *
- * 건수는 데이터에서 센다. Figma 의 숫자는 서로 맞지 않았다 —
- * 제목 "미확인 11건", 탭 "미확인 11건 / 조치 완료 11건", 탭 옆 배지 "위험 3 · 주의 1",
- * 필터 "전체 22 · 위험 8 · 주의 14". 아래 ALERTS 는 그 숫자가 전부 맞아떨어지게 짰다 —
- *   전체 22 = 미확인 11(위험 4 · 주의 7) + 조치 완료 11(위험 4 · 주의 7)
+ * 두 탭은 줄 모양도 오른쪽 칸도 다르다 —
+ *   미확인은 "무엇이 났나"(단계 · 발생 · 위치 · 미션)를 보여 주고 조치를 입력받는다.
+ *   조치 완료는 "무엇을 했나"(조치 시각 · 조치 내용 · 원 등급 · 담당)를 보여 주고 입력이 없다.
+ * 조치 완료 목록은 조치한 날짜로 묶이고(오늘 · 어제 · 날짜), 탭마다 마지막으로 고른 항목을 따로 기억한다.
+ *
+ * screen.js 는 쓰지 않는다 — 통합 관제 메인 전용 코드가 대부분이고 이 화면에 없는 요소를 찾는다.
+ * 필요한 조각(Status Bar 드롭다운 · Select)만 아래에 작게 두었다.
+ *
+ * 건수는 모두 데이터에서 센다. 1202 판이 적어 둔 숫자와 맞아떨어진다 —
+ *   전체 22 = 미확인 11(위험 3 · 주의 8) + 조치 완료 11(위험 5 · 주의 6)
  *   등급 합계 = 위험 8 · 주의 14
- * 배지와 탭 숫자는 데이터를 센 값이라 앞으로도 어긋나지 않는다.
  */
 (function () {
   "use strict";
 
   function $(sel, root) { return (root || document).querySelector(sel); }
   function $$(sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); }
+  function esc(t) {
+    return String(t).replace(/[&<>"]/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
+    });
+  }
 
   var SEV_LABEL = { critical: "위험", warning: "주의" };
   var SEV_ICON = { critical: "--ic-error", warning: "--ic-warning" };
+
+  // 조치 완료 목록을 묶는 날짜. rank 가 큰 쪽이 위다.
+  var DAYS = {
+    today: { label: "오늘", rank: 3 },
+    yesterday: { label: "어제", rank: 2 },
+    "d-1011": { label: "10월 11일 (일)", rank: 1 }
+  };
 
   // ==================================================================
   // 알림 데이터
   //
   // sev    위험(critical) · 주의(warning). 알림 정책을 따른다 — NG 판정 · 안전 감지는 위험,
-  //        기준치를 넘은 이상징후(누출 · 부분방전 · 진동 · 과열 · 압력)는 주의다.
-  // day    today · yesterday. [기간] 필터가 본다.
+  //        기준치를 넘은 이상징후(누출 · 농도 · 진동 · 과열 · 압력)는 주의다.
+  // day    발생한 날. time 은 발생 시각이다.
   // live   스냅숏 그림(assets/img/alert-live-*.webp). 디자이너가 준 검출 캡처 세 장이라
   //        알림 내용과 딱 맞는 그림은 아니다 — v2.2 monitor.js 와 같은 사정이다.
-  // lead   DELTA 조치 제안 한 줄. why 는 그 근거 세 줄, fp 는 오탐 가능성(%)이다.
+  // lead   DELTA 조치 제안 한 줄. why 는 근거, fp 는 오탐 가능성(%)이다.
   // acts   조치 내용 선택지. delta:true 가 DELTA 추천이다.
-  // done   조치 완료된 알림 — 처리 시각 · 처리자 · 고른 조치가 들어 있다.
+  // done   조치가 끝난 알림. done.day 는 "조치한" 날이라 발생한 날과 다를 수 있다
+  //        (어제 23:51 에 난 알림을 오늘 08:33 에 조치한 B-3 이 그렇다).
   // ==================================================================
   var ALERTS = [
+    /* ---- 미확인 11건 (위험 3 · 주의 8) ---- */
     { id: "A-1", sev: "critical", day: "today", time: "10:11:19", stamp: "2026-10-13 10:11:19",
       title: "안전모 미착용 작업자 감지", wp: "WP-07", place: "지하발전소 B3 터빈 2",
       mission: "B3 터빈 정기점검", detect: "안전감지", robot: "R-07", live: "ppe",
@@ -66,8 +85,11 @@
       acts: [{ t: "현장 확인", delta: true }, { t: "주간 재촬영", delta: true },
              { t: "설비 담당 전달" }, { t: "오탐 처리" }] },
 
-    { id: "A-4", sev: "critical", day: "yesterday", time: "어제 20:47", stamp: "2026-10-12 20:47:03",
-      title: "가스 누출 경보 · 농도 기준 초과", wp: "WP-09", place: "옥외 저장탱크 T-3 밸브실",
+    /* 농도가 기준을 넘은 이상징후다 — 알림 정책상 주의다(NG 판정만 위험).
+       1177 판에서는 "가스 누출 경보"(위험)였는데, 1202 판의 등급 합계(미확인 위험 3)에 맞추면서
+       정책에도 맞는 쪽으로 돌렸다. */
+    { id: "A-4", sev: "warning", day: "yesterday", time: "어제 20:47", stamp: "2026-10-12 20:47:03",
+      title: "가스 농도 기준 초과", wp: "WP-09", place: "옥외 저장탱크 T-3 밸브실",
       mission: "옥외 저장탱크 순찰", detect: "가스감지", robot: "R-03", live: "discharge",
       lead: "밸브실 출입을 막고 환기부터 해야 합니다.",
       why: ["측정 농도 42 ppm · 경보 기준 25 ppm 초과",
@@ -154,91 +176,131 @@
       acts: [{ t: "설비 담당 전달", delta: true }, { t: "주간 재촬영", delta: true },
              { t: "현장 확인" }, { t: "오탐 처리" }] },
 
-    /* ---- 조치 완료 11건 (위험 4 · 주의 7) ---- */
-    { id: "B-1", sev: "critical", day: "today", time: "09:41:08", stamp: "2026-10-13 09:41:08",
-      title: "터빈 1 NG 2건 발견", wp: "WP-05", place: "지하발전소 B3 터빈 1",
-      mission: "B3 터빈 정기점검", detect: "계기판독", robot: "R-07", live: "discharge",
-      lead: "설비 담당 전달이 필요했습니다.", why: ["측정값 2건이 기준값을 넘음"],
-      fp: 11, fpLabel: "낮음", acts: [{ t: "설비 담당 전달" }, { t: "재측정 요청" }],
-      done: { at: "09:52", by: "홍길동", picked: ["설비 담당 전달", "재측정 요청"],
-              memo: "설비 2팀 김 반장에게 전달. 오후 재측정 예정." } },
-    { id: "B-2", sev: "critical", day: "today", time: "09:22:47", stamp: "2026-10-13 09:22:47",
-      title: "방호문 개방 상태 지속", wp: "WP-11", place: "지하발전소 B3 방호문",
-      mission: "B3 설비 순회", detect: "안전감지", robot: "R-05", live: "ppe",
-      lead: "현장 확인이 필요했습니다.", why: ["개방 상태가 9분 이어짐"],
-      fp: 9, fpLabel: "낮음", acts: [{ t: "현장 확인" }],
-      done: { at: "09:30", by: "홍길동", picked: ["현장 확인"], memo: "" } },
-    { id: "B-3", sev: "critical", day: "yesterday", time: "어제 18:35", stamp: "2026-10-12 18:35:12",
-      title: "펌프실 침수 의심", wp: "WP-14", place: "지하발전소 B4 펌프실",
-      mission: "B3 설비 순회", detect: "외관검사", robot: "R-05", live: "discharge",
-      lead: "배수 요청이 필요했습니다.", why: ["바닥 반사 패턴 신뢰도 0.88"],
-      fp: 22, fpLabel: "보통", acts: [{ t: "배수 요청" }, { t: "현장 확인" }],
-      done: { at: "어제 19:04", by: "이영희", picked: ["배수 요청", "현장 확인"],
-              memo: "결로로 확인. 배수 불필요." } },
-    { id: "B-4", sev: "critical", day: "yesterday", time: "어제 16:09", stamp: "2026-10-12 16:09:55",
-      title: "비상정지 발동 · 로봇 구동 차단", wp: "WP-08", place: "지하발전소 B3 터빈 2",
-      mission: "B3 터빈 정기점검", detect: "비상정지", robot: "R-07", live: "ppe",
-      lead: "해제 절차가 필요했습니다.", why: ["관제사가 직접 발동"],
-      fp: 0, fpLabel: "없음", acts: [{ t: "해제 절차 진행" }],
-      done: { at: "어제 16:21", by: "이영희", picked: ["해제 절차 진행"],
-              memo: "현장 안전 확인 뒤 해제." } },
-    { id: "B-5", sev: "warning", day: "today", time: "09:18:22", stamp: "2026-10-13 09:18:22",
-      title: "소음 상승 · 송풍기 F-2", wp: "WP-16", place: "지하발전소 B3 송풍기",
-      mission: "B3 설비 순회", detect: "소음측정", robot: "R-05", live: "discharge",
-      lead: "추이 관찰로 두면 되겠습니다.", why: ["82 dB · 주의 기준 80 dB 초과"],
-      fp: 28, fpLabel: "보통", acts: [{ t: "추이 관찰" }],
-      done: { at: "09:24", by: "홍길동", picked: ["추이 관찰"], memo: "" } },
-    { id: "B-6", sev: "warning", day: "today", time: "09:05:40", stamp: "2026-10-13 09:05:40",
-      title: "절연 저항 하락 · 배전반 D-1", wp: "WP-06", place: "지하발전소 B3 수배전반",
-      mission: "B3 전기실 순회", detect: "절연측정", robot: "R-02", live: "discharge",
-      lead: "재진단 예약이 필요했습니다.", why: ["저항값이 기준 아래로 내려감"],
-      fp: 16, fpLabel: "낮음", acts: [{ t: "재진단 예약" }],
-      done: { at: "09:15", by: "홍길동", picked: ["재진단 예약"], memo: "11시 재진단 예약." } },
-    { id: "B-7", sev: "warning", day: "today", time: "08:52:11", stamp: "2026-10-13 08:52:11",
-      title: "먼지 농도 상승 · 집진기 주변", wp: "WP-18", place: "지하발전소 B3 집진기",
-      mission: "B3 설비 순회", detect: "분진감지", robot: "R-05", live: "discharge",
-      lead: "필터 점검 요청이 필요했습니다.", why: ["분진 농도가 기준치를 넘음"],
-      fp: 23, fpLabel: "보통", acts: [{ t: "필터 점검 요청" }],
-      done: { at: "09:01", by: "홍길동", picked: ["필터 점검 요청"], memo: "" } },
-    { id: "B-8", sev: "warning", day: "yesterday", time: "어제 22:40", stamp: "2026-10-12 22:40:05",
-      title: "조도 부족 · 순찰 구간 T-3", wp: "WP-01", place: "옥외 저장탱크 T-3 입구",
-      mission: "옥외 저장탱크 순찰", detect: "외관검사", robot: "R-03", live: "deid",
-      lead: "주간 재촬영이 필요했습니다.", why: ["야간 조도로 판독 신뢰도가 낮음"],
-      fp: 34, fpLabel: "보통", acts: [{ t: "주간 재촬영" }],
-      done: { at: "어제 22:48", by: "이영희", picked: ["주간 재촬영"], memo: "오늘 주간 순찰에 포함." } },
-    { id: "B-9", sev: "warning", day: "yesterday", time: "어제 19:55", stamp: "2026-10-12 19:55:31",
-      title: "밸브 개도 편차 · V-7", wp: "WP-09", place: "옥외 저장탱크 T-3 밸브실",
-      mission: "옥외 저장탱크 순찰", detect: "계기판독", robot: "R-03", live: "discharge",
-      lead: "다음 순회 재측정이 필요했습니다.", why: ["개도 지침이 설정값과 6% 차이"],
-      fp: 20, fpLabel: "낮음", acts: [{ t: "다음 순회 재측정" }],
-      done: { at: "어제 20:03", by: "이영희", picked: ["다음 순회 재측정"], memo: "" } },
-    { id: "B-10", sev: "warning", day: "yesterday", time: "어제 17:12", stamp: "2026-10-12 17:12:48",
-      title: "온도 상승 · 변압기 TR-2", wp: "WP-07", place: "지하발전소 B3 변압기",
-      mission: "B3 전기실 순회", detect: "열화상", robot: "R-02", live: "discharge",
-      lead: "열화상 재촬영이 필요했습니다.", why: ["표면 온도가 주의 기준을 넘음"],
-      fp: 14, fpLabel: "낮음", acts: [{ t: "열화상 재촬영" }],
-      done: { at: "어제 17:25", by: "이영희", picked: ["열화상 재촬영"], memo: "부하 상승 구간으로 확인." } },
-    { id: "B-11", sev: "warning", day: "yesterday", time: "어제 15:30", stamp: "2026-10-12 15:30:02",
-      title: "누유 흔적 · 감속기 G-3", wp: "WP-13", place: "지하발전소 B4 감속기",
-      mission: "B3 설비 순회", detect: "누출감지", robot: "R-05", live: "discharge",
-      lead: "현장 점검 요청이 필요했습니다.", why: ["바닥 유막 패턴이 검출됨"],
-      fp: 25, fpLabel: "보통", acts: [{ t: "현장 점검 요청" }],
-      done: { at: "어제 15:44", by: "이영희", picked: ["현장 점검 요청"], memo: "" } }
+    /* ---- 조치 완료 11건 (위험 5 · 주의 6) — Figma 1202:16199 Done List ---- */
+    { id: "B-1", sev: "critical", day: "today", time: "09:48:12", stamp: "2026-10-13 09:48:12",
+      title: "안전모 미착용 작업자 감지", wp: "WP-10", place: "지하발전소 B3 작업구역",
+      mission: "B3 터빈 정기점검", detect: "안전감지", robot: "R-07 · CAM-13", live: "ppe",
+      done: { day: "today", at: "09:54", by: "김현대", took: "발생 후 6분",
+              picked: ["전화 안내", "안전모 착용 확인"], memo: "작업반장 통화 · 즉시 착용 확인",
+              delta: "AI 추천 그대로 사용 (전화 안내 · 안전모 착용 확인)" } },
+
+    { id: "B-2", sev: "critical", day: "today", time: "09:36:40", stamp: "2026-10-13 09:36:40",
+      title: "위험 구역 내 작업자 체류", wp: "WP-11", place: "지하발전소 B3 방호문 안쪽",
+      mission: "B3 설비 순회", detect: "안전감지", robot: "R-05 · CAM-04", live: "ppe",
+      done: { day: "today", at: "09:41", by: "홍길동", took: "발생 후 5분",
+              picked: ["작업 중지 요청", "현장 확인"], memo: "설비 2팀 자재 반입 중 · 통제선 재설치",
+              delta: "AI 추천 그대로 사용 (작업 중지 요청 · 현장 확인)" } },
+
+    { id: "B-3", sev: "critical", day: "yesterday", time: "어제 23:51", stamp: "2026-10-12 23:51:07",
+      title: "작업자 쓰러짐 의심", wp: "WP-15", place: "지하발전소 B4 펌프실",
+      mission: "B3 설비 순회", detect: "안전감지", robot: "R-05 · CAM-09", live: "deid",
+      done: { day: "today", at: "08:33", by: "김현대", took: "발생 후 8시간 42분",
+              picked: ["현장 확인", "전화 안내"],
+              memo: "야간 무인 구간 · 교대 인수 뒤 현장 확인. 쪼그려 작업으로 확인됨",
+              delta: "AI 추천 가운데 일부만 사용 (현장 확인)" } },
+
+    { id: "B-4", sev: "warning", day: "today", time: "09:20:11", stamp: "2026-10-13 09:20:11",
+      title: "안전화 미착용 감지", wp: "WP-10", place: "지하발전소 B3 작업구역",
+      mission: "B3 터빈 정기점검", detect: "안전감지", robot: "R-07 · CAM-13", live: "ppe",
+      done: { day: "today", at: "09:26", by: "이수진", took: "발생 후 6분",
+              picked: ["전화 안내", "보호구 착용 확인"], memo: "",
+              delta: "AI 추천 그대로 사용 (전화 안내 · 보호구 착용 확인)" } },
+
+    { id: "B-5", sev: "warning", day: "today", time: "09:19:35", stamp: "2026-10-13 09:19:35",
+      title: "소화기 지정 위치 이탈", wp: "WP-13", place: "지하발전소 B3 계단참",
+      mission: "B3 설비 순회", detect: "외관검사", robot: "R-05 · CAM-02", live: "discharge",
+      done: { day: "today", at: "09:26", by: "이수진", took: "발생 후 7분",
+              picked: ["현장 확인", "설비 담당 전달"], memo: "청소 중 이동 · 원위치 완료",
+              delta: "AI 추천 그대로 사용 (현장 확인 · 설비 담당 전달)" } },
+
+    { id: "B-6", sev: "warning", day: "today", time: "08:52:49", stamp: "2026-10-13 08:52:49",
+      title: "배관 결로 과다", wp: "WP-03", place: "지하발전소 B3 냉각수 배관",
+      mission: "B3 터빈 정기점검", detect: "누출감지", robot: "R-07 · CAM-06", live: "discharge",
+      done: { day: "today", at: "09:02", by: "홍길동", took: "발생 후 10분",
+              picked: ["오탐 처리"], memo: "누출 아님 · 결로로 확인",
+              delta: "AI 추천을 쓰지 않음 (추천: 현장 점검 요청)" } },
+
+    { id: "B-7", sev: "critical", day: "yesterday", time: "어제 16:05", stamp: "2026-10-12 16:05:22",
+      title: "출입 제한구역 무단 진입 감지", wp: "WP-17", place: "지하발전소 B4 고압반실",
+      mission: "B3 전기실 순회", detect: "안전감지", robot: "R-02 · CAM-11", live: "ppe",
+      done: { day: "yesterday", at: "16:07", by: "홍길동", took: "발생 후 2분",
+              picked: ["작업 중지 요청"], memo: "협력사 인원 · 출입 교육 재안내",
+              delta: "AI 추천 그대로 사용 (작업 중지 요청)" } },
+
+    { id: "B-8", sev: "warning", day: "yesterday", time: "어제 18:40", stamp: "2026-10-12 18:40:16",
+      title: "진동 센서 값 상승", wp: "WP-12", place: "지하발전소 B3 냉각 펌프",
+      mission: "B3 터빈 정기점검", detect: "진동측정", robot: "R-07 · CAM-08", live: "discharge",
+      done: { day: "yesterday", at: "18:52", by: "이수진", took: "발생 후 12분",
+              picked: ["설비 담당 전달"], memo: "",
+              delta: "AI 추천 그대로 사용 (설비 담당 전달)" } },
+
+    { id: "B-9", sev: "warning", day: "yesterday", time: "어제 14:27", stamp: "2026-10-12 14:27:58",
+      title: "바닥 물고임 감지", wp: "WP-15", place: "지하발전소 B4 펌프실",
+      mission: "B3 설비 순회", detect: "외관검사", robot: "R-05 · CAM-09", live: "discharge",
+      done: { day: "yesterday", at: "14:40", by: "김현대", took: "발생 후 13분",
+              picked: ["현장 확인"], memo: "배수구 막힘 · 청소 요청",
+              delta: "AI 추천 가운데 일부만 사용 (현장 확인)" } },
+
+    { id: "B-10", sev: "critical", day: "d-1011", time: "09:02:31", stamp: "2026-10-11 09:02:31",
+      title: "가스 농도 경보 연동", wp: "WP-09", place: "옥외 저장탱크 T-3 밸브실",
+      mission: "옥외 저장탱크 순찰", detect: "가스감지", robot: "R-03 · CAM-01", live: "discharge",
+      done: { day: "d-1011", at: "09:05", by: "홍길동", took: "발생 후 3분",
+              picked: ["현장 확인", "작업 중지 요청"], memo: "고정식 감지기 경보와 동시 · 환기 뒤 정상",
+              delta: "AI 추천 그대로 사용 (현장 확인 · 작업 중지 요청)" } },
+
+    { id: "B-11", sev: "warning", day: "d-1011", time: "11:13:04", stamp: "2026-10-11 11:13:04",
+      title: "안전모 미착용 작업자 감지", wp: "WP-04", place: "옥외 저장탱크 T-3 계단",
+      mission: "옥외 저장탱크 순찰", detect: "안전감지", robot: "R-03 · CAM-05", live: "ppe",
+      done: { day: "d-1011", at: "11:15", by: "이수진", took: "발생 후 2분",
+              picked: ["전화 안내", "보호구 착용 확인"], memo: "",
+              delta: "AI 추천 그대로 사용 (전화 안내 · 보호구 착용 확인)" } }
   ];
 
+  /*
+   * DELTA 인수인계 요약 — Figma 1202:16192. 조치 완료 탭에서만 뜬다.
+   * 숫자와 웨이포인트는 위 데이터와 맞아떨어진다 —
+   * 오늘 조치 6건(위험 3), 보호구 미착용 3회, 미확인 위험 3건(WP-07 2건 · WP-02).
+   */
+  var HANDOVER = {
+    when: "오늘 08:00–10:15 · 조치 6건 기준",
+    items: [
+      ["조치", "오늘 6건 조치 · 위험 3건 · 평균 6분"],
+      ["반복", "보호구 미착용 3회 (B3 작업구역 · T-3 계단). 작업 전 안내가 필요해 보여요"],
+      ["남은 위험", "미확인 위험 3건: WP-07 2건 · WP-02. 탱크 T-3 외벽 균열은 어제부터 남아 있어요"],
+      ["다음 근무", "옥외 저장탱크 순찰(가스 농도 · 난간 개방) 묶음을 먼저 확인해 주세요"]
+    ]
+  };
+
   // ==================================================================
-  // 상태
+  // 상태 — 고른 항목은 탭마다 따로 기억한다
+  // (Figma 설명: "탭마다 마지막으로 선택한 항목을 따로 기억한다").
   // ==================================================================
   var state = {
-    tab: "open",            // open · done
+    tab: "open",
     mission: "전체 미션",
     period: "전체 기간",
     sort: "위험 우선",
     sev: { all: true, critical: false, warning: false },
-    picked: null,           // 고른 알림 id
-    chosen: {},             // id -> 고른 조치 목록
-    memo: {}                // id -> 메모
+    picked: { open: null, done: null },
+    chosen: {},
+    memo: {},
+    handover: true
   };
+
+  function isDone(a) { return !!a.done; }
+  function inTab(a) { return state.tab === "done" ? isDone(a) : !isDone(a); }
+  function dayOf(a) { return a.done ? a.done.day : a.day; }
+  function picked() { return state.picked[state.tab]; }
+  function setPicked(id) { state.picked[state.tab] = id; }
+
+  // 정렬 열쇠 — 미확인은 발생 시각, 조치 완료는 조치 시각으로 센다.
+  function order(a) {
+    var t = a.done ? a.done.at : a.time;
+    var m = t.match(/(\d{1,2}):(\d{2})/) || [0, 0, 0];
+    return (dayOf(a) === "today" ? 10000 : 0) + Number(m[1]) * 100 + Number(m[2]);
+  }
+
+  function dayRank(a) { return (DAYS[dayOf(a)] || { rank: 0 }).rank; }
 
   var SORT = {
     "위험 우선": function (a, b) {
@@ -249,52 +311,117 @@
     "오래된순": function (a, b) { return order(a) - order(b); }
   };
 
-  // 정렬 열쇠 — 어제는 오늘보다 작다. 시각은 "어제 21:02" 처럼 접두가 붙으므로 숫자만 뽑는다.
-  function order(a) {
-    var hhmm = (a.time.match(/(\d{1,2}):(\d{2})/) || [0, 0, 0]);
-    return (a.day === "today" ? 1 : 0) * 10000 + Number(hhmm[1]) * 100 + Number(hhmm[2]);
-  }
-
-  function inTab(a) { return state.tab === "done" ? !!a.done : !a.done; }
-
   function visible() {
+    var rule = SORT[state.sort] || SORT["위험 우선"];
     var list = ALERTS.filter(function (a) {
       if (!inTab(a)) { return false; }
       if (state.mission !== "전체 미션" && a.mission !== state.mission) { return false; }
-      if (state.period === "오늘" && a.day !== "today") { return false; }
+      if (state.period === "오늘" && dayOf(a) !== "today") { return false; }
       if (!state.sev.all) {
         if (a.sev === "critical" && !state.sev.critical) { return false; }
         if (a.sev === "warning" && !state.sev.warning) { return false; }
       }
       return true;
     });
-    list.sort(SORT[state.sort] || SORT["위험 우선"]);
+    // 조치 완료는 조치한 날짜로 먼저 묶고 그 안에서 정렬한다. 미확인은 날짜 구분 없이 한 줄기다.
+    list.sort(function (a, b) {
+      if (state.tab === "done") {
+        var d = dayRank(b) - dayRank(a);
+        if (d) { return d; }
+      }
+      return rule(a, b);
+    });
     return list;
   }
 
   function countBy(sev, done) {
-    return ALERTS.filter(function (a) {
-      return a.sev === sev && (done ? !!a.done : !a.done);
-    }).length;
+    return ALERTS.filter(function (a) { return a.sev === sev && isDone(a) === done; }).length;
   }
-
-  // ==================================================================
-  // 그리기 — 목록
-  // ==================================================================
-  var list = $("[data-ac-list]");
-  var detail = $("[data-ac-detail]");
 
   function icon(name, size) {
     return '<span class="i i-' + size + '" style="--i:var(' + name + ')" aria-hidden="true"></span>';
   }
 
+  // ==================================================================
+  // 그리기 — 열 머리 · 목록
+  // ==================================================================
+  var colHead = $("[data-ac-colhead]");
+  var list = $("[data-ac-list]");
+  var detail = $("[data-ac-detail]");
+  var slot = $("[data-ac-handover]");
+
+  // 두 탭은 열이 다르다 — 미확인은 "무엇이 났나", 조치 완료는 "무엇을 했나" 쪽이다.
+  function renderColHead() {
+    colHead.innerHTML = state.tab === "done"
+      ? '<span class="ac-dc-check" role="columnheader"><span class="ac-sr">상태</span></span>' +
+        '<span class="ac-dc-time" role="columnheader">조치</span>' +
+        '<span class="ac-dc-body" role="columnheader">알림 · 조치 내용</span>' +
+        '<span class="ac-dc-sev" role="columnheader">원 등급 · 발생</span>' +
+        '<span class="ac-dc-who" role="columnheader">담당</span>'
+      : '<span class="ac-c-sev" role="columnheader"><span class="ac-sr">단계</span></span>' +
+        '<span class="ac-c-time" role="columnheader">발생</span>' +
+        '<span class="ac-c-title" role="columnheader">알림</span>' +
+        '<span class="ac-c-place" role="columnheader">웨이포인트 · 위치</span>' +
+        '<span class="ac-c-mission" role="columnheader">미션</span>' +
+        '<span class="ac-c-act" role="columnheader"><span class="ac-sr">동작</span></span>';
+  }
+
   /*
-   * 줄은 role="row" 다. 줄 안에 [보고서] 버튼이 들어가므로 줄 자체를 button 으로 두면
+   * 줄은 role="row" 다. 줄 안에 버튼이 들어가므로 줄 자체를 button 으로 두면
    * button 안에 button 이 된다 — grid 짜임으로 두고 줄에 tabindex 를 준다.
-   * 위/아래 화살표로 줄을 옮기고, Enter · Space 로 고른다.
    */
+  function openRow(a, sel) {
+    return '<div class="ac-row" role="row" data-id="' + a.id + '" data-sev="' + a.sev + '"' +
+        ' tabindex="' + (sel ? "0" : "-1") + '" aria-selected="' + (sel ? "true" : "false") + '">' +
+        '<span class="ac-stripe" aria-hidden="true"></span>' +
+        '<span class="ac-c-sev" role="gridcell">' + icon(SEV_ICON[a.sev], 16) +
+          '<span class="ac-sr">' + SEV_LABEL[a.sev] + '</span></span>' +
+        '<span class="ac-c-time ac-mono" role="gridcell">' + esc(a.time) + '</span>' +
+        '<span class="ac-c-title t-label-1" role="gridcell">' + esc(a.title) + '</span>' +
+        '<span class="ac-c-place" role="gridcell">' +
+          '<span class="ac-wp ac-mono-label">' + esc(a.wp) + '</span>' +
+          '<span class="ac-place t-body-4">' + esc(a.place) + '</span>' +
+        '</span>' +
+        '<span class="ac-c-mission t-caption" role="gridcell">' + esc(a.mission) + '</span>' +
+        '<span class="ac-c-act" role="gridcell">' +
+          '<button type="button" class="btn btn-ghost is-xs" data-report>보고서</button>' +
+        '</span>' +
+      '</div>';
+  }
+
+  /*
+   * 조치 완료 줄 — Figma 1202:16057. 왼쪽 단계 띠가 없다(끝난 일이라 목록에서 단계로 외칠 까닭이 없다).
+   * 대신 체크 표시가 서고, 단계는 "원 등급 · 발생" 칸에 점 + 글자로 조용히 남는다.
+   */
+  /*
+   * "원 등급 · 발생" 칸에는 초를 떼고 적는다. 끝 두 자리만 떼면 "어제 23:51" 이 "어제 23" 이 되므로
+   * HH:MM:SS 꼴일 때만 떼고, "어제 23:51" 처럼 이미 짧은 것은 그대로 둔다.
+   */
+  function shortTime(t) { return t.replace(/^(\d{1,2}:\d{2}):\d{2}$/, "$1"); }
+
+  function doneRow(a, sel) {
+    var d = a.done;
+    return '<div class="ac-done-row" role="row" data-id="' + a.id + '" data-sev="' + a.sev + '"' +
+        ' tabindex="' + (sel ? "0" : "-1") + '" aria-selected="' + (sel ? "true" : "false") + '">' +
+        '<span class="ac-dc-check" role="gridcell">' + icon("--ic-check", 16) +
+          '<span class="ac-sr">조치 완료</span></span>' +
+        '<span class="ac-dc-time ac-mono" role="gridcell">' + esc(d.at) + '</span>' +
+        '<span class="ac-dc-body" role="gridcell">' +
+          '<span class="ac-dc-title t-label-2">' + esc(a.title) + '</span>' +
+          '<span class="ac-dc-act t-caption">' + esc(d.picked.join(", ")) + '</span>' +
+        '</span>' +
+        '<span class="ac-dc-sev t-caption" role="gridcell">' +
+          '<span class="ac-sev-dot" aria-hidden="true"></span>' +
+          '<span>' + SEV_LABEL[a.sev] + " " + esc(shortTime(a.time)) + '</span>' +
+        '</span>' +
+        '<span class="ac-dc-who t-caption" role="gridcell">' + esc(d.by) + '</span>' +
+      '</div>';
+  }
+
   function renderList() {
     var rows = visible();
+    renderColHead();
+    slot.hidden = !(state.tab === "done" && state.handover);
 
     if (!rows.length) {
       list.innerHTML = '<p class="ac-empty t-body-3">조건에 맞는 알림이 없습니다.</p>';
@@ -302,25 +429,21 @@
       return;
     }
 
-    list.innerHTML = rows.map(function (a) {
-      var sel = a.id === state.picked;
-      return '<div class="ac-row" role="row" data-id="' + a.id + '" data-sev="' + a.sev + '"' +
-          ' tabindex="' + (sel ? "0" : "-1") + '" aria-selected="' + (sel ? "true" : "false") + '">' +
-          '<span class="ac-stripe" aria-hidden="true"></span>' +
-          '<span class="ac-c-sev" role="gridcell">' + icon(SEV_ICON[a.sev], 16) +
-            '<span class="ac-sr">' + SEV_LABEL[a.sev] + '</span></span>' +
-          '<span class="ac-c-time ac-mono" role="gridcell">' + a.time + '</span>' +
-          '<span class="ac-c-title t-label-1" role="gridcell">' + a.title + '</span>' +
-          '<span class="ac-c-place" role="gridcell">' +
-            '<span class="ac-wp ac-mono-label">' + a.wp + '</span>' +
-            '<span class="ac-place t-body-4">' + a.place + '</span>' +
-          '</span>' +
-          '<span class="ac-c-mission t-caption" role="gridcell">' + a.mission + '</span>' +
-          '<span class="ac-c-act" role="gridcell">' +
-            '<button type="button" class="btn btn-ghost is-xs" data-report>보고서</button>' +
-          '</span>' +
+    var html = "";
+    var day = null;
+    rows.forEach(function (a) {
+      // 조치 완료는 날짜가 바뀌는 자리마다 날짜 머리가 들어간다(Figma Date 1202:16048).
+      if (state.tab === "done" && dayOf(a) !== day) {
+        day = dayOf(a);
+        var n = rows.filter(function (x) { return dayOf(x) === day; }).length;
+        html += '<div class="ac-date-row" role="row">' +
+          '<span class="t-label-2" role="gridcell">' + esc(DAYS[day].label) + '</span>' +
+          '<span class="ac-date-count ac-mono" role="gridcell">' + n + '</span>' +
         '</div>';
-    }).join("");
+      }
+      html += state.tab === "done" ? doneRow(a, a.id === picked()) : openRow(a, a.id === picked());
+    });
+    list.innerHTML = html;
 
     $$("[data-id]", list).forEach(function (row) {
       row.addEventListener("click", function () { pick(row.getAttribute("data-id")); });
@@ -333,7 +456,8 @@
         }
       });
       // 줄의 [보고서] — 줄을 고르는 것과 다른 동작이라 전파를 끊는다.
-      $(".btn", row).addEventListener("click", function (event) { event.stopPropagation(); });
+      var report = $(".btn", row);
+      if (report) { report.addEventListener("click", function (e) { e.stopPropagation(); }); }
     });
 
     renderNth(rows);
@@ -341,21 +465,21 @@
 
   function renderNth(rows) {
     rows = rows || visible();
-    var i = rows.findIndex(function (a) { return a.id === state.picked; });
-    $("[data-ac-nth]").textContent = rows.length ? (i + 1) + "/" + rows.length : "0/0";
+    var i = rows.findIndex(function (a) { return a.id === picked(); });
+    $("[data-ac-nth]").textContent = rows.length ? (i + 1) + " / " + rows.length : "0 / 0";
     $("[data-ac-prev]").disabled = i <= 0;
     $("[data-ac-next]").disabled = i < 0 || i >= rows.length - 1;
   }
 
   function step(delta) {
     var rows = visible();
-    var i = rows.findIndex(function (a) { return a.id === state.picked; });
+    var i = rows.findIndex(function (a) { return a.id === picked(); });
     var next = rows[i + delta];
     if (next) { pick(next.id); }
   }
 
   function pick(id) {
-    state.picked = id;
+    setPicked(id);
     var focus = null;
     $$("[data-id]", list).forEach(function (row) {
       var on = row.getAttribute("data-id") === id;
@@ -370,20 +494,16 @@
   }
 
   // ==================================================================
-  // 그리기 — 선택 상세
+  // 그리기 — 오른쪽 칸
   // ==================================================================
   function alertOf(id) {
     return ALERTS.filter(function (a) { return a.id === id; })[0] || null;
   }
 
-  /*
-   * 목록이 바뀐 뒤 다시 그린다. 고른 알림이 사라졌으면(필터 · 탭을 바꿨거나 조치를 끝냈거나)
-   * 보이는 첫 알림을 고른다 — 오른쪽 칸을 빈 채로 두지 않는다.
-   */
   function refresh() {
     var rows = visible();
-    if (!state.picked || !rows.some(function (a) { return a.id === state.picked; })) {
-      state.picked = rows.length ? rows[0].id : null;
+    if (!picked() || !rows.some(function (a) { return a.id === picked(); })) {
+      setPicked(rows.length ? rows[0].id : null);
     }
     renderCounts();
     renderList();
@@ -391,50 +511,14 @@
   }
 
   function renderDetail() {
-    var a = alertOf(state.picked);
+    var a = alertOf(picked());
     if (!a) {
-      // 거르고 나니 목록이 비었을 때와, 목록은 있는데 아직 안 골랐을 때는 할 말이 다르다.
       detail.innerHTML = '<p class="ac-empty t-body-3">' +
         (visible().length ? "왼쪽 목록에서 알림을 고르세요." : "표시할 알림이 없습니다.") + '</p>';
       return;
     }
-    var done = a.done;
-    var chosen = done ? done.picked.slice() : (state.chosen[a.id] || []);
-
-    detail.innerHTML =
-      '<div class="ac-detail-contents">' +
-        '<div class="ac-d-title-block">' +
-          '<p class="ac-d-age t-caption">' + a.stamp + ' 발생</p>' +
-          '<div class="ac-d-title-row">' +
-            '<span class="ac-sev-badge t-label-2' + (a.sev === "warning" ? " is-warning" : "") + '">' +
-              '<span class="badge-dot" aria-hidden="true"></span>' + SEV_LABEL[a.sev] +
-            '</span>' +
-            '<h2 class="t-title-1">' + a.title + '</h2>' +
-          '</div>' +
-        '</div>' +
-
-        '<div class="ac-d-snap-meta">' +
-          '<figure class="ac-d-snap">' +
-            '<img src="../assets/img/alert-live-' + a.live + '.webp" alt="' + a.title + ' 검출 장면" />' +
-          '</figure>' +
-          '<dl class="ac-d-meta">' +
-            metaRow("미션", '<span class="t-body-4">' + a.mission + '</span>') +
-            metaRow("위치",
-              '<span class="ac-mono-label">' + a.wp + '</span>' +
-              '<span class="t-body-4">' + a.place + '</span>' +
-              '<a class="t-caption" href="./main-v2-2.html">지도에서 보기</a>') +
-            metaRow("감지", '<span class="ac-d-chip t-caption">' + a.detect + '</span>') +
-            metaRow("로봇", '<span class="ac-d-robot ac-mono">' + a.robot + '</span>') +
-          '</dl>' +
-        '</div>' +
-
-        deltaCard(a) +
-        actsBlock(a, chosen, done) +
-        memoBlock(a, done) +
-      '</div>' +
-      actionsRow(a, chosen, done);
-
-    wireDetail(a, done);
+    detail.innerHTML = a.done ? recordHtml(a) : openHtml(a);
+    if (!a.done) { wireDetail(a); }
   }
 
   function metaRow(label, value) {
@@ -442,13 +526,52 @@
            '<dd>' + value + '</dd></div>';
   }
 
+  function snapMeta(a, rows) {
+    return '<div class="ac-d-snap-meta">' +
+      '<figure class="ac-d-snap">' +
+        '<img src="../assets/img/alert-live-' + a.live + '.webp" alt="' + esc(a.title) + ' 검출 장면" />' +
+      '</figure>' +
+      '<dl class="ac-d-meta">' + rows + '</dl>' +
+    '</div>';
+  }
+
+  function sevBadge(a, prefix) {
+    return '<span class="ac-sev-badge t-label-2' + (a.sev === "warning" ? " is-warning" : "") + '">' +
+      '<span class="badge-dot" aria-hidden="true"></span>' + prefix + SEV_LABEL[a.sev] + '</span>';
+  }
+
+  /* ── 미확인 — 조치를 입력받는 판 (Figma 1177:15981) ───────── */
+  function openHtml(a) {
+    var chosen = state.chosen[a.id] || [];
+    return '<div class="ac-detail-contents">' +
+        '<div class="ac-d-title-block">' +
+          '<p class="ac-d-age t-caption">' + esc(a.stamp) + ' 발생</p>' +
+          '<div class="ac-d-title-row">' + sevBadge(a, "") +
+            '<h2 class="t-title-1">' + esc(a.title) + '</h2>' +
+          '</div>' +
+        '</div>' +
+        snapMeta(a,
+          metaRow("미션", '<span class="t-body-4">' + esc(a.mission) + '</span>') +
+          metaRow("위치",
+            '<span class="ac-mono-label">' + esc(a.wp) + '</span>' +
+            '<span class="t-body-4">' + esc(a.place) + '</span>' +
+            '<a class="t-caption" href="./main-v2-2.html">지도에서 보기</a>') +
+          metaRow("감지", '<span class="ac-d-chip t-caption">' + esc(a.detect) + '</span>') +
+          metaRow("로봇", '<span class="ac-d-robot ac-mono">' + esc(a.robot) + '</span>')) +
+        deltaCard(a) +
+        actsBlock(a, chosen) +
+        memoBlock(a) +
+      '</div>' +
+      actionsRow(a, chosen);
+  }
+
   function deltaCard(a) {
     return '<section class="ac-delta">' +
       '<div class="ac-delta-mark">' + icon("--ic-cpu", 16) +
         '<span class="t-label-2">DELTA 조치 제안</span></div>' +
-      '<h3 class="t-title-2">' + a.lead + '</h3>' +
+      '<h3 class="t-title-2">' + esc(a.lead) + '</h3>' +
       '<ul class="ac-delta-reasons">' +
-        a.why.map(function (w) { return '<li class="t-body-4">' + w + '</li>'; }).join("") +
+        a.why.map(function (w) { return '<li class="t-body-4">' + esc(w) + '</li>'; }).join("") +
       '</ul>' +
       '<div class="ac-fp" style="--ac-fp:' + a.fp + '%">' +
         '<span class="ac-fp-label t-caption">오탐 가능성</span>' +
@@ -459,56 +582,35 @@
     '</section>';
   }
 
-  function actsBlock(a, chosen, done) {
+  function actsBlock(a, chosen) {
     var hasDelta = a.acts.some(function (c) { return c.delta; });
     return '<section class="ac-acts">' +
       '<div class="ac-acts-head">' +
-        '<h3 class="t-label-1">조치 내용' + (done ? "" : " (여러 개 선택 가능)") + '</h3>' +
-        (hasDelta && !done
-          ? '<span class="badge t-caption"><span class="badge-dot" aria-hidden="true"></span>DELTA 추천</span>'
-          : "") +
+        '<h3 class="t-label-1">조치 내용 (여러 개 선택 가능)</h3>' +
+        (hasDelta ? '<span class="badge t-caption"><span class="badge-dot" aria-hidden="true"></span>DELTA 추천</span>' : "") +
       '</div>' +
       '<div class="ac-presets">' +
         a.acts.map(function (c) {
           var on = chosen.indexOf(c.t) > -1;
-          return '<button type="button" class="ac-capsule" data-act="' + c.t + '"' +
-            (c.delta && !done ? ' data-delta' : "") +
-            ' aria-pressed="' + (on ? "true" : "false") + '"' + (done ? " disabled" : "") + '>' +
-            c.t + (c.delta && !done ? '<span class="ac-capsule-dot" aria-hidden="true"></span>' : "") +
+          return '<button type="button" class="ac-capsule" data-act="' + esc(c.t) + '"' +
+            (c.delta ? ' data-delta' : "") + ' aria-pressed="' + (on ? "true" : "false") + '">' +
+            esc(c.t) + (c.delta ? '<span class="ac-capsule-dot" aria-hidden="true"></span>' : "") +
           '</button>';
         }).join("") +
       '</div>' +
     '</section>';
   }
 
-  function memoBlock(a, done) {
-    if (done) {
-      return '<section class="ac-memo field">' +
-        '<span class="field-label">메모</span>' +
-        '<p class="t-body-3' + (done.memo ? "" : " ac-memo-empty") + '">' +
-          (done.memo || "남긴 메모가 없습니다.") + '</p>' +
-      '</section>';
-    }
+  function memoBlock(a) {
     return '<section class="ac-memo field">' +
       '<label class="field-label" for="ac-memo">메모 (선택)</label>' +
       '<textarea id="ac-memo" data-ac-memo maxlength="500" ' +
-        'placeholder="현장에 전달한 내용을 적어 주세요">' + (state.memo[a.id] || "") + '</textarea>' +
+        'placeholder="현장에 전달한 내용을 적어 주세요">' + esc(state.memo[a.id] || "") + '</textarea>' +
       '<span class="field-helper t-caption">교대 인수인계에 필요한 내용을 남깁니다. 최대 500자.</span>' +
     '</section>';
   }
 
-  /*
-   * 아래 동작 줄.
-   * 조치 완료는 조치를 하나라도 골라야 켜진다 — v2.2 알림 쪽지와 같은 규칙이다.
-   * "임시저장된 상태" 는 Figma 에서 Ghost 버튼이었다. 누를 수 없는 상태 문구라 버튼에서 뺐다.
-   */
-  function actionsRow(a, chosen, done) {
-    if (done) {
-      return '<div class="ac-actions">' +
-        '<span class="ac-head-spacer"></span>' +
-        '<p class="ac-draft t-caption">' + done.at + ' · ' + done.by + ' 조치 완료</p>' +
-      '</div>';
-    }
+  function actionsRow(a, chosen) {
     var hasDraft = chosen.length > 0 || !!state.memo[a.id];
     return '<div class="ac-actions">' +
       '<span class="ac-head-spacer"></span>' +
@@ -518,22 +620,77 @@
     '</div>';
   }
 
+  /* ── 조치 완료 — 기록만 읽는 판 (Figma 1202:16214) ────────── */
+  /*
+   * 입력이 없다. 끝난 일이라 조치 시각 · 담당 · 소요가 제목 바로 아래 오고(미확인 판은 발생 시각이
+   * 제목 위에 온다 — 거기서는 "언제 났나"가, 여기서는 "언제 끝냈나"가 먼저다),
+   * 아래로 조치 내용 · 메모 · 처리 정보가 쌓인다. 아래 동작 줄이 없다.
+   */
+  function recordHtml(a) {
+    var d = a.done;
+    return '<div class="ac-record">' +
+      '<div class="ac-record-title">' +
+        '<div class="ac-record-title-row">' + sevBadge(a, "원 등급 ") +
+          '<h2 class="t-title-1">' + esc(a.title) + '</h2>' +
+        '</div>' +
+        '<p class="ac-record-age">' +
+          '<span class="ac-record-at t-label-1">' + esc(DAYS[d.day].label) + ' ' + esc(d.at) + '</span>' +
+          '<span class="ac-record-by t-caption">조치 · ' + esc(d.by) + ' · ' + esc(d.took) + '</span>' +
+        '</p>' +
+      '</div>' +
+      snapMeta(a,
+        metaRow("발생", '<span class="ac-mono">' + esc(a.stamp) + '</span>') +
+        metaRow("미션", '<span class="t-body-4">' + esc(a.mission) + '</span>') +
+        metaRow("위치",
+          '<span class="ac-mono-label">' + esc(a.wp) + '</span>' +
+          '<span class="t-body-4">' + esc(a.place) + '</span>') +
+        metaRow("감지", '<span class="ac-d-chip t-caption">' + esc(a.detect) + '</span>') +
+        metaRow("로봇", '<span class="ac-d-robot ac-mono">' + esc(a.robot) + '</span>')) +
+
+      '<section class="ac-record-section">' +
+        '<h3 class="t-caption">조치 내용</h3>' +
+        '<div class="ac-chips">' +
+          d.picked.map(function (t) {
+            return '<span class="ac-chip-done t-label-2">' + esc(t) + '</span>';
+          }).join("") +
+        '</div>' +
+      '</section>' +
+
+      '<section class="ac-record-section">' +
+        '<h3 class="t-caption">메모</h3>' +
+        '<p class="ac-memo-box t-body-4' + (d.memo ? "" : " ac-memo-empty") + '">' +
+          (d.memo ? esc(d.memo) : "남긴 메모가 없습니다.") + '</p>' +
+      '</section>' +
+
+      '<section class="ac-record-section">' +
+        '<h3 class="t-caption">처리 정보</h3>' +
+        '<dl class="ac-info">' +
+          infoRow("담당", '<span class="t-body-4">' + esc(d.by) + '</span>') +
+          infoRow("소요", '<span class="t-body-4">' + esc(d.took) + '</span>') +
+          infoRow("DELTA", '<span class="ac-info-delta t-body-4">' + esc(d.delta) + '</span>') +
+        '</dl>' +
+      '</section>' +
+    '</div>';
+  }
+
+  function infoRow(label, value) {
+    return '<div class="ac-info-row"><dt class="t-caption">' + label + '</dt><dd>' + value + '</dd></div>';
+  }
+
   /*
    * 조치를 고르거나 메모를 칠 때 바뀌는 것은 둘뿐이다 — 임시저장 표시와 [조치 완료] 의 켜짐.
    * 그 둘만 손댄다. 판을 통째로 다시 그리면 상세 칸이 새 DOM 이 되면서 스크롤이 맨 위로 튀고
-   * 누른 캡슐에서 포커스가 빠진다(아래로 내려 캡슐을 눌렀는데 화면이 위로 올라가던 문제).
+   * 누른 캡슐에서 포커스가 빠진다.
    */
   function syncActions(a) {
     var chosen = state.chosen[a.id] || [];
     var draft = $("[data-ac-draft]", detail);
-    var doneBtn = $("[data-ac-done]", detail);
+    var btn = $("[data-ac-done]", detail);
     if (draft) { draft.hidden = !(chosen.length || state.memo[a.id]); }
-    if (doneBtn) { doneBtn.disabled = !chosen.length; }
+    if (btn) { btn.disabled = !chosen.length; }
   }
 
-  function wireDetail(a, done) {
-    if (done) { return; }
-
+  function wireDetail(a) {
     $$("[data-act]", detail).forEach(function (cap) {
       cap.addEventListener("click", function () {
         var t = cap.getAttribute("data-act");
@@ -554,18 +711,27 @@
       });
     }
 
-    var doneBtn = $("[data-ac-done]", detail);
-    if (doneBtn) {
-      doneBtn.addEventListener("click", function () {
-        a.done = { at: nowHM(), by: "홍길동",
-                   picked: (state.chosen[a.id] || []).slice(),
-                   memo: state.memo[a.id] || "" };
+    var btn = $("[data-ac-done]", detail);
+    if (btn) {
+      btn.addEventListener("click", function () {
+        var acts = (state.chosen[a.id] || []).slice();
+        a.done = { day: "today", at: nowHM(), by: "홍길동", took: "방금",
+                   picked: acts, memo: state.memo[a.id] || "", delta: deltaUse(a, acts) };
         delete state.chosen[a.id];
         delete state.memo[a.id];
-        state.picked = null;
+        setPicked(null);
         refresh();
       });
     }
+  }
+
+  // 처리 정보의 "DELTA" 줄 — 고른 조치가 추천과 얼마나 겹치는지로 적는다.
+  function deltaUse(a, acts) {
+    var rec = a.acts.filter(function (c) { return c.delta; }).map(function (c) { return c.t; });
+    var used = rec.filter(function (t) { return acts.indexOf(t) > -1; });
+    if (!used.length) { return "AI 추천을 쓰지 않음 (추천: " + rec.join(" · ") + ")"; }
+    if (used.length === rec.length) { return "AI 추천 그대로 사용 (" + rec.join(" · ") + ")"; }
+    return "AI 추천 가운데 일부만 사용 (" + used.join(" · ") + ")";
   }
 
   function nowHM() {
@@ -574,7 +740,7 @@
   }
 
   // ==================================================================
-  // 그리기 — 건수(제목 배지 · 탭 · 탭 옆 배지 · 등급 필터)
+  // 그리기 — 건수 · 인수인계 요약
   // ==================================================================
   function renderCounts() {
     var openCrit = countBy("critical", false), openWarn = countBy("warning", false);
@@ -585,25 +751,54 @@
     $("[data-ac-count-open]").textContent = open + "건";
     $("[data-ac-count-done]").textContent = closed + "건";
 
-    var crit = state.tab === "done" ? doneCrit : openCrit;
-    var warn = state.tab === "done" ? doneWarn : openWarn;
-    $("[data-ac-badge-crit]").textContent = "위험 " + crit;
-    $("[data-ac-badge-warn]").textContent = "주의 " + warn;
+    // 탭 옆 배지는 그 탭의 단계별 건수다.
+    $("[data-ac-badge-crit]").textContent = "위험 " + (state.tab === "done" ? doneCrit : openCrit);
+    $("[data-ac-badge-warn]").textContent = "주의 " + (state.tab === "done" ? doneWarn : openWarn);
 
+    // 등급 필터는 두 탭을 합친 전체 건수다.
     $("[data-ac-f-all]").textContent = "전체 " + ALERTS.length;
     $("[data-ac-f-crit]").textContent = "위험 " + (openCrit + doneCrit);
     $("[data-ac-f-warn]").textContent = "주의 " + (openWarn + doneWarn);
+
+    // [오늘 조치 요약 만들기] 는 조치 완료 탭에만 선다 — 끝난 조치를 묶는 일이다.
+    $("[data-ac-summary]").hidden = state.tab !== "done";
+  }
+
+  function renderHandover() {
+    slot.innerHTML = '<section class="ac-handover">' +
+      '<div class="ac-handover-head">' +
+        '<span class="ac-handover-mark">' + icon("--ic-cpu", 16) +
+          '<span class="t-label-2">DELTA 인수인계 요약</span></span>' +
+        '<span class="ac-handover-when t-caption">' + esc(HANDOVER.when) + '</span>' +
+        '<span class="ac-head-spacer"></span>' +
+        '<button type="button" class="btn btn-ghost is-xs" data-ac-handover-close>닫기</button>' +
+      '</div>' +
+      '<dl class="ac-handover-list">' +
+        HANDOVER.items.map(function (it) {
+          return '<div class="ac-handover-row">' +
+            '<dt class="t-label-2">' + esc(it[0]) + '</dt>' +
+            '<dd class="t-body-4">' + esc(it[1]) + '</dd></div>';
+        }).join("") +
+      '</dl>' +
+      '<div class="ac-handover-actions">' +
+        '<button type="button" class="btn btn-secondary is-xs">초안 수정</button>' +
+        '<button type="button" class="btn btn-primary is-xs">보고서에 넣기</button>' +
+      '</div>' +
+    '</section>';
+
+    $("[data-ac-handover-close]", slot).addEventListener("click", function () {
+      state.handover = false;
+      slot.hidden = true;
+    });
   }
 
   // ==================================================================
   // 조작 걸기
   // ==================================================================
   function wire() {
-    // 탭
     $$("[data-ac-tab]").forEach(function (tab) {
       tab.addEventListener("click", function () {
         state.tab = tab.getAttribute("data-ac-tab");
-        state.picked = null;
         $$("[data-ac-tab]").forEach(function (t) {
           t.setAttribute("aria-selected", t === tab ? "true" : "false");
         });
@@ -625,16 +820,20 @@
         $$("[data-ac-sev]").forEach(function (b) {
           b.setAttribute("aria-checked", state.sev[b.getAttribute("data-ac-sev")] ? "true" : "false");
         });
-        state.picked = null;
+        setPicked(null);
         refresh();
       });
     });
 
-    // 이전 · 다음
     $("[data-ac-prev]").addEventListener("click", function () { step(-1); });
     $("[data-ac-next]").addEventListener("click", function () { step(1); });
 
-    // Select 세 개 — 고르면 거르거나 다시 정렬한다.
+    $("[data-ac-summary]").addEventListener("click", function () {
+      state.handover = true;
+      renderHandover();
+      slot.hidden = false;
+    });
+
     selects({
       "ac-f-mission": function (v) { state.mission = v; },
       "ac-f-period": function (v) { state.period = v; },
@@ -687,7 +886,7 @@
           closeAll();
           if (onPick) {
             onPick(opt.textContent);
-            state.picked = null;
+            setPicked(null);
             refresh();
           }
         });
@@ -736,5 +935,6 @@
 
   // ==================================================================
   wire();
+  renderHandover();
   refresh();
 })();

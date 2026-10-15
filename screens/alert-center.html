@@ -18,7 +18,7 @@
   <link rel="stylesheet" href="../assets/css/app-shell.css?v=0b459d85" />
   <link rel="stylesheet" href="../assets/css/icons-outline.css?v=83872c0c" />
   <link rel="stylesheet" href="../assets/css/text-parts.css?v=e38e19ea" />
-  <link rel="stylesheet" href="../assets/css/alert-center.css?v=fe0f531f" />
+  <link rel="stylesheet" href="../assets/css/alert-center.css?v=47e2e96d" />
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
@@ -127,6 +127,7 @@
     <!-- ---------- Body ---------- -->
     <main class="ac-body">
 
+      <div class="ac-page-head">
       <!-- Breadcrumb — Figma 는 "알림 이력" 이었다. 제목(h1)이 "알림 센터" 라
            한 화면에 이름이 둘이 된다. 제목 쪽으로 맞췄다. -->
       <nav class="ac-crumb t-body-4" aria-label="현재 위치">
@@ -152,6 +153,7 @@
             보고서 내보내기
           </button>
         </div>
+      </div>
       </div>
 
       <!-- Filter Bar -->
@@ -248,29 +250,31 @@
             <!-- 탭 옆 배지는 그 탭의 단계별 건수다 — 탭을 바꾸면 같이 바뀐다. -->
             <div class="ac-head-badges">
               <span class="badge badge-danger t-caption">
-                <span class="badge-dot" aria-hidden="true"></span><span data-ac-badge-crit>위험 4</span>
+                <span class="badge-dot" aria-hidden="true"></span><span data-ac-badge-crit>위험 3</span>
               </span>
               <span class="badge badge-warning t-caption">
-                <span class="badge-dot" aria-hidden="true"></span><span data-ac-badge-warn>주의 7</span>
+                <span class="badge-dot" aria-hidden="true"></span><span data-ac-badge-warn>주의 8</span>
               </span>
             </div>
+            <!-- Figma 1202:16190 — 끝난 조치를 묶어 인수인계 초안을 만든다. 조치 완료 탭에만 선다. -->
+            <button type="button" class="ac-summary-btn t-label-2" data-ac-summary hidden>
+              <span class="i i-16" style="--i:var(--ic-cpu)" aria-hidden="true"></span>
+              오늘 조치 요약 만들기
+            </button>
           </div>
 
           <!--
             줄마다 [보고서] 버튼이 들어가므로 줄을 button 으로 둘 수 없다(button 중첩).
             grid 짜임으로 두고 줄에 tabindex 를 준다 — 위/아래 화살표로 옮기고 Enter 로 고른다.
           -->
+          <!-- DELTA 인수인계 요약(Figma 1202:16191 Handover Slot) — 조치 완료 탭 목록 위에 선다. -->
+          <div class="ac-handover-slot" data-ac-handover hidden></div>
+
           <div class="ac-list-wrap" role="grid" aria-label="알림 목록">
+            <!-- 열이 탭마다 다르다(미확인은 발생 · 위치 · 미션, 조치 완료는 조치 · 원 등급 · 담당).
+                 alert-center.js 의 renderColHead() 가 채운다. -->
             <div role="rowgroup">
-              <div class="ac-col-head t-caption" role="row">
-                <span class="ac-c-sev" role="columnheader"><span class="ac-sr">단계</span></span>
-                <span class="ac-c-time" role="columnheader">발생</span>
-                <span class="ac-c-title" role="columnheader">알림</span>
-                <span class="ac-c-place" role="columnheader">웨이포인트 · 위치</span>
-                <span class="ac-c-mission" role="columnheader">미션</span>
-                <!-- Figma 는 빈 64 칸이었다 — 줄의 [보고서] 가 서는 자리다. -->
-                <span class="ac-c-act" role="columnheader"><span class="ac-sr">동작</span></span>
-              </div>
+              <div class="ac-col-head t-caption" role="row" data-ac-colhead></div>
             </div>
             <div class="ac-list" role="rowgroup" data-ac-list></div>
           </div>
@@ -284,7 +288,7 @@
             <button type="button" class="ac-nav" data-ac-prev aria-label="이전 알림">
               <span class="i i-16" style="--i:var(--ic-chevron-left)" aria-hidden="true"></span>
             </button>
-            <span class="ac-nth ac-mono" data-ac-nth>1/11</span>
+            <span class="ac-nth ac-mono" data-ac-nth>1 / 11</span>
             <button type="button" class="ac-nav" data-ac-next aria-label="다음 알림">
               <span class="i i-16" style="--i:var(--ic-chevron-right)" aria-hidden="true"></span>
             </button>
@@ -299,6 +303,6 @@
 </div>
 
 <script src="../assets/js/theme.js?v=7145a122"></script>
-<script src="../assets/js/alert-center.js?v=6bc6c989"></script>
+<script src="../assets/js/alert-center.js?v=9721fd4e"></script>
 </body>
 </html>
