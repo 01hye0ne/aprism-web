@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>APRISM — 시안 1 이후 달라진 점</title>
+  <meta name="description" content="자문받은 시안 1-A(좌측 패널형) · 1-B(모달형)에서 지금 v2.2 까지 무엇이 왜 바뀌었는지 한 장으로" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/static/woff2/SUIT.css" />
+  <link rel="stylesheet" href="./assets/css/tokens.css?v=9cceac77" />
+  <link rel="stylesheet" href="./assets/css/base.css?v=6c992126" />
+  <style>
+    /* 비교 한 장 — 꾸밈은 여기에 둔다. 값은 토큰만 쓴다. (policy.html · token-names.html 과 같은 짜임) */
+    .site-main { max-width: 1180px; }
+    .lead b { color: var(--text-primary); }
+    .toc { display: flex; flex-wrap: wrap; gap: var(--space-8); margin: var(--space-24) 0 0; padding: 0; list-style: none; }
+    .toc a {
+      display: inline-block; padding: var(--space-4) var(--space-12);
+      border: var(--border-width-thin) solid var(--border-default); border-radius: var(--radius-pill);
+      color: var(--text-secondary); font-size: var(--font-size-13); text-decoration: none;
+    }
+    .toc a:hover { color: var(--text-primary); border-color: var(--border-strong); }
+
+    .pol { margin-top: var(--space-48); scroll-margin-top: var(--space-16); }
+    .pol h2 { margin: 0 0 var(--space-4); font-size: var(--font-size-20); line-height: var(--font-line-height-28); }
+    .pol .meta { margin: 0 0 var(--space-16); color: var(--text-tertiary); font-size: var(--font-size-12); }
+    .pol p, .pol li { color: var(--text-secondary); font-size: var(--font-size-14); line-height: var(--font-line-height-22); word-break: keep-all; }
+    .pol ul { margin: 0; padding-left: var(--space-20); }
+    .pol b { color: var(--text-primary); }
+
+    /* 화면 셋 나란히 — 전 · 전 · 후 */
+    .shots { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-12); }
+    .shot { margin: 0; }
+    .shot img {
+      display: block; width: 100%; height: auto;
+      border: var(--border-width-thin) solid var(--border-divider); border-radius: var(--radius-card);
+    }
+    .shot figcaption { margin-top: var(--space-8); color: var(--text-tertiary); font-size: var(--font-size-12); line-height: var(--font-line-height-18); }
+    .shot figcaption b { color: var(--text-primary); font-weight: 600; }
+    .shot.is-now img { border-color: var(--border-strong); }
+    @media (max-width: 760px) { .shots { grid-template-columns: 1fr; } }
+
+    /* 한 줄 요약 */
+    .gist { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--space-8); margin-top: var(--space-24); }
+    .gist div { padding: var(--space-12) var(--space-16); border: var(--border-width-thin) solid var(--border-divider); border-radius: var(--radius-card); }
+    .gist .k { color: var(--text-tertiary); font-size: var(--font-size-12); }
+    .gist .v { margin-top: var(--space-4); color: var(--text-primary); font-size: var(--font-size-14); font-weight: 600; line-height: var(--font-line-height-22); word-break: keep-all; }
+
+    /* 달라진 점 — 번호 · 주제 | 시안 1 | v2.2 */
+    .chg { width: 100%; border-collapse: collapse; font-size: var(--font-size-13); }
+    .chg th, .chg td { padding: var(--space-12); border-bottom: var(--border-width-thin) solid var(--border-divider); text-align: left; vertical-align: top; line-height: var(--font-line-height-20); word-break: keep-all; }
+    .chg thead th { color: var(--text-tertiary); font-size: var(--font-size-12); font-weight: 600; }
+    .chg tbody th { width: 168px; color: var(--text-primary); font-size: var(--font-size-14); font-weight: 700; }
+    .chg tbody th .n { display: block; color: var(--text-tertiary); font-size: var(--font-size-12); font-weight: 500; font-variant-numeric: tabular-nums; }
+    .chg td { color: var(--text-tertiary); width: 34%; }
+    .chg td.now { color: var(--text-primary); }
+    .chg .why { display: block; margin-top: var(--space-8); color: var(--text-secondary); font-size: var(--font-size-12); }
+    .chg .why::before { content: "왜 — "; color: var(--text-tertiary); }
+    .scroll { overflow-x: auto; }
+    @media (max-width: 760px) {
+      .chg thead { display: none; }
+      .chg tr { display: block; padding: var(--space-12) 0; border-bottom: var(--border-width-thin) solid var(--border-divider); }
+      .chg th, .chg td { display: block; width: auto; padding: var(--space-4) 0; border: 0; }
+      .chg td::before { display: block; color: var(--text-tertiary); font-size: var(--font-size-12); font-weight: 600; }
+      .chg td:nth-of-type(1)::before { content: "시안 1-A · 1-B"; }
+      .chg td:nth-of-type(2)::before { content: "v2.2"; }
+    }
+
+    .more { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-12); }
+    @media (max-width: 760px) { .more { grid-template-columns: 1fr; } }
+
+    .open {
+      padding: var(--space-12) var(--space-16);
+      border: var(--border-width-thin) solid var(--status-warning-border); border-radius: var(--radius-card);
+    }
+    .open h3 { margin: 0 0 var(--space-8); font-size: var(--font-size-14); color: var(--status-warning-text); }
+    .links { display: flex; flex-wrap: wrap; gap: var(--space-8) var(--space-16); margin-top: var(--space-12); font-size: var(--font-size-13); }
+    .links a { color: var(--text-secondary); }
+    .links a:hover { color: var(--text-primary); }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span class="brand-name">APRISM</span>
+    </div>
+    <a href="./index.html" class="theme-toggle" style="text-decoration:none">목록으로</a>
+  </header>
+
+  <main class="site-main">
+    <section class="intro">
+      <p class="eyebrow">Since Sian 1</p>
+      <h1>시안 1 이후 달라진 점</h1>
+      <p class="lead">자문받은 <b>시안 1-A(좌측 패널형) · 1-B(모달형)</b>(2026.09.17)에서
+        지금의 <b>v2.2 미션 기준 화면</b>(2026.10.12~)까지 무엇이 왜 바뀌었는지 한 장으로 정리했습니다.
+        사이에 v2(통합판, 09.21)와 v2.1(Delta 창형, 09.28 · 10.06 클라이언트 회의)을 거쳤습니다.</p>
+      <ul class="toc">
+        <li><a href="#screens">화면 비교</a></li>
+        <li><a href="#changes">달라진 점 8</a></li>
+        <li><a href="#flow">미션 설정 · 알림 센터</a></li>
+        <li><a href="#next">남은 것</a></li>
+      </ul>
+      <div class="gist">
+        <div><p class="k">화면의 기준</p><p class="v">장소 · 최근 24시간 → 미션 하나</p></div>
+        <div><p class="k">Delta</p><p class="v">알림 하나 해설 → 전체 알림 종합 판단</p></div>
+        <div><p class="k">경고 표현</p><p class="v">위험 · 주의 같은 테두리 → 강약을 크게 가름</p></div>
+        <div><p class="k">조치</p><p class="v">화면을 덮는 모달 → 지도 위 쪽지에서 바로</p></div>
+      </div>
+    </section>
+
+    <section class="pol" id="screens">
+      <h2>화면 비교</h2>
+      <p class="meta">같은 상황(위험 알림이 있는 모니터링)을 지금 퍼블리싱 화면에서 찍었습니다.</p>
+      <div class="shots">
+        <figure class="shot">
+          <a href="./screens/sian-1.html#critical"><img src="./assets/img/compare/sian1a-monitor.webp" width="1280" height="610" alt="시안 1-A 모니터링 위험 화면 — 왼쪽 알림 히스토리 아래 Delta 가 패널 절반을 차지하고, 지도 테두리가 빨갛다" loading="lazy" /></a>
+          <figcaption><b>시안 1-A · 좌측 패널형</b><br />알림 히스토리 + 아래 절반 Delta 해설</figcaption>
+        </figure>
+        <figure class="shot">
+          <a href="./screens/sian-2.html#critical"><img src="./assets/img/compare/sian1b-monitor.webp" width="1280" height="610" alt="시안 1-B 모니터링 위험 화면 — 미확인 알림 카드 두 장, 지도 아래 Delta 띠, 로봇 세 대 카드" loading="lazy" /></a>
+          <figcaption><b>시안 1-B · 모달형</b><br />미확인 알림 카드 + 지도 아래 Delta 띠</figcaption>
+        </figure>
+        <figure class="shot is-now">
+          <a href="./screens/main-v2-2.html"><img src="./assets/img/compare/v22-main.webp" width="1280" height="610" alt="v2.2 메인 — 상태바에 미션 이름, 왼쪽 최신 알림 한 줄 목록과 오늘 확인 완료, 지도 왼쪽 위 Delta 창, 오른쪽 로봇 한 대와 타임라인" loading="lazy" /></a>
+          <figcaption><b>v2.2 · 미션 기준 화면</b><br />미션 고르기 · 한 줄 알림 · 모서리 Delta</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="pol" id="changes">
+      <h2>달라진 점 8</h2>
+      <p class="meta">왼쪽이 시안 1, 오른쪽이 지금입니다.</p>
+      <div class="scroll">
+        <table class="chg">
+          <thead><tr><th scope="col">주제</th><th scope="col">시안 1-A · 1-B</th><th scope="col">v2.2</th></tr></thead>
+          <tbody>
+            <tr>
+              <th scope="row"><span class="n">01</span>화면의 기준</th>
+              <td>상태바에 장소(지하 4층)만. 알림은 최근 24시간을 모두 보여 지금 돌고 있는 순회와 섞였다.</td>
+              <td class="now">상태바에서 <b>미션</b>을 고른다. 고른 미션 하나로 최신 알림 · 로봇 패널(배정된 로봇만) · 지도 층이 같이 바뀐다. 미션이 끝나면 알림은 알림 센터로 간다.
+                <span class="why">관제자가 실제로 지켜보는 단위가 "이번 순회"다(10/06 클라이언트 회의).</span></td>
+            </tr>
+            <tr>
+              <th scope="row"><span class="n">02</span>알림 목록</th>
+              <td>1-A 는 세 줄짜리 항목에 조치 상태 문장까지, 1-B 는 큰 카드라 한 화면에 두 건 남짓 보였다.</td>
+              <td class="now">위치 · 제목 · 시간 <b>두 줄 목록</b>. 위험 · 주의로 거르고 "오래된 순 · 위험 우선"으로 정렬한다. 끝난 건은 아래 <b>오늘 확인 완료</b>로 내려가 남은 일과 한 일이 갈린다.
+                <span class="why">많이 쌓였을 때 훑는 속도와, 무엇이 남았는지가 먼저 보여야 한다.</span></td>
+            </tr>
+            <tr>
+              <th scope="row"><span class="n">03</span>Delta(AI)의 역할</th>
+              <td>1-A 는 고른 알림 하나를 큰 글씨로 해설하고 행동 버튼 셋 · 입력창이 늘 열려 패널 절반을 썼다. 1-B 는 지도 아래 띠 하나.</td>
+              <td class="now">알림 하나가 아니라 <b>전체 알림을 종합</b>해 판단한다("위험 1건 포함 6건 누적"). 지도 왼쪽 위 모서리의 작은 창으로 접힘 · 펼침 · 대화를 오가고, 입력창은 열었을 때만 보이며 너비를 끌어 조절한다.
+                <span class="why">알림을 고를 때마다 같은 말을 따라 하던 해설은 목록과 겹쳤다. AI 는 여러 건을 묶어 볼 때 쓸모가 있다.</span></td>
+            </tr>
+            <tr>
+              <th scope="row"><span class="n">04</span>경고의 강약</th>
+              <td>위험은 지도 네 변에 빨간 테, 주의도 네 변에 노란 테. 세기가 같아 늘 경보 상태처럼 보였다.</td>
+              <td class="now"><b>위험</b>은 네 변 빛 + Delta 판이 빛을 낸다. <b>주의</b>는 Delta 모서리에만 노란 빛을 둔다. 화면의 경고 색은 하나(가장 높은 단계)로 맞췄다.
+                <span class="why">주의가 잦은 현장에서 늘 켜진 경보는 무뎌진다 — 위험이 확실히 튀도록 주의를 덜어냈다.</span></td>
+            </tr>
+            <tr>
+              <th scope="row"><span class="n">05</span>알림 확인 · 조치</th>
+              <td>1-B 는 화면을 덮는 큰 모달에서 ① 확인 ② 지점 ③ 조치를 차례로. 지도와 다른 알림이 가려졌다. 1-A 는 Delta 버튼으로.</td>
+              <td class="now">알림을 고르면 <b>지도 위 웨이포인트 옆 쪽지</b>가 뜬다. 사진 · 위치 · DELTA 조치 제안을 보고 조치 칩(여러 개)을 골라 [조치 완료] — 줄이 오늘 확인 완료로 내려가고 되돌리기 토스트가 남는다.
+                <span class="why">어디서 일어났는지(지도)를 보면서 처리해야 판단이 빠르고, 화면을 떠나지 않는다.</span></td>
+            </tr>
+            <tr>
+              <th scope="row"><span class="n">06</span>로봇 패널</th>
+              <td>연결된 로봇 전체(11대 연결 · 3대 수행중)가 대상. 1-B 는 세 대를 카드로 나열하고 자동복귀 · E-STOP 이 "수행 로봇 전체" 버튼이었다.</td>
+              <td class="now">미션에 <b>배정된 로봇만</b>, 한 대씩 크게 넘겨 본다("2대 배정 · 1대 수행중"). 자동복귀 · E-STOP 은 보고 있는 로봇 옆에 붙었다. 미션 밖 로봇은 [로봇 현황]이 맡는다.
+                <span class="why">비상 버튼은 대상이 분명해야 한다.</span></td>
+            </tr>
+            <tr>
+              <th scope="row"><span class="n">07</span>색 · 버튼 위계</th>
+              <td>파랑이 선택된 타임라인 칸 · 버튼 · 링크 · 상태에 두루 쓰여 무엇이 중요한지 흐려졌다.</td>
+              <td class="now"><b>"파랑은 상태이거나 지금 할 단 하나의 행동."</b> 지금 칸은 흰 면, 이동 · 보조는 회색 글자. 버튼은 6단계(Danger 빨강은 E-STOP 만 · Accent 파랑은 영역당 하나 · Primary · Secondary · Ghost · Icon).
+                <span class="why">색이 뜻을 하나만 가져야 경고색이 경고로 읽힌다.</span></td>
+            </tr>
+            <tr>
+              <th scope="row"><span class="n">08</span>지도 · 바탕 정돈</th>
+              <td>지도 길 점선과 타임라인 점선이 달랐고, 바탕의 밝기 단계가 정해져 있지 않았다.</td>
+              <td class="now">남은 길 점선을 타임라인 점선과 같은 무늬로 맞췄다. 바탕은 GNB · 알림 목록 · 관제 프레임 세 단으로 정리했고 라이트 테마도 같은 순서를 따른다. 아이콘은 아웃라인 세트로 바꾸고 16px 용을 따로 둔다.
+                <span class="why">같은 뜻은 같은 모양으로 — 지도와 목록이 한 화면처럼 읽힌다.</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="pol" id="flow">
+      <h2>미션 설정 · 알림 센터</h2>
+      <p class="meta">시안 1 에서는 메인 화면 안 단계 버튼으로 오가던 것을, v2.2 에서는 앞뒤 화면으로 나눴습니다.</p>
+      <div class="more">
+        <figure class="shot">
+          <a href="./screens/sian-2.html#setup"><img src="./assets/img/compare/sian1b-setup.webp" width="1280" height="610" alt="시안 1-B 미션 설정 — 지도 위에 뜬 모달 폼" loading="lazy" /></a>
+          <figcaption><b>시안 1-B 미션 설정</b> — 지도를 덮는 모달, 소요시간은 고정 값</figcaption>
+        </figure>
+        <figure class="shot is-now">
+          <a href="./screens/mission-setup.html"><img src="./assets/img/compare/v22-setup.webp" width="1280" height="610" alt="v2.2 미션 설정 — 점검항목에 차례 번호가 붙고 지도에 같은 번호와 방향 화살촉, 아래 배터리 막대" loading="lazy" /></a>
+          <figcaption><b>v2.2 미션 설정</b> — 점검항목 · 순서 · 로봇을 바꾸면 지도의 길(차례 번호 · 방향)과 소요시간 · 배터리(복귀 예비 20%)가 같이 움직인다</figcaption>
+        </figure>
+        <figure class="shot">
+          <a href="./screens/sian-2.html#critical-detail"><img src="./assets/img/compare/sian1b-detail.webp" width="1280" height="610" alt="시안 1-B 알림 상세 — 화면을 덮는 큰 모달, 사진 · 지점 · 조치 세 칸" loading="lazy" /></a>
+          <figcaption><b>시안 1-B 알림 상세</b> — 한 건씩 큰 모달에서 확인 처리</figcaption>
+        </figure>
+        <figure class="shot is-now">
+          <a href="./screens/alert-center.html"><img src="./assets/img/compare/v22-alert-center.webp" width="1280" height="610" alt="v2.2 알림 센터 — 미확인 · 조치 완료 탭, 미션 · 등급 · 기간 거르기, 오른쪽에 사진과 DELTA 조치 제안, 조치 칩" loading="lazy" /></a>
+          <figcaption><b>v2.2 알림 센터</b> — 미션이 끝난 알림까지 한곳에. 미션 · 등급 · 기간으로 거르고, DELTA 조치 제안(오탐 가능성 포함)을 보고 여러 조치를 한 번에</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="pol" id="next">
+      <h2>남은 것</h2>
+      <div class="open">
+        <h3>아직 정하지 않은 것</h3>
+        <ul>
+          <li><b>Delta 종합 기준과 행동 버튼 문구</b> — 지금은 임시 규칙(주의 + 위험 5건 이상 · 위험 1건이라도 있으면 위험)이고, 버튼은 모두 Secondary 로 둔 상태.</li>
+          <li><b>지도의 현장 사진 표현</b> — 배관 같은 세부가 없어 현장 사진으로 보완하기로 함(10/06 회의). 비식별화 패턴과 함께 진행 예정.</li>
+          <li><b>보고서 화면</b> — 알림마다 [보고서] 자리만 있고 설계 전.</li>
+        </ul>
+      </div>
+      <p class="links">
+        <a href="./screens/sian-1.html">시안 1-A 열기</a>
+        <a href="./screens/sian-2.html">시안 1-B 열기</a>
+        <a href="./screens/main-v2-2.html">v2.2 열기</a>
+        <a href="./policy.html">화면 정책</a>
+      </p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <span>APRISM · 시안 1 이후 달라진 점 · 2026-10-16 기준</span>
+  </footer>
+  <script src="./assets/js/theme.js?v=7145a122"></script>
+</body>
+</html>
