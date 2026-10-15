@@ -782,6 +782,37 @@
   gap: var(--space-20);
 }
 
+/* ── 스크롤 칸 아래쪽 흐림 ───────────────────────────────── */
+/*
+ * 아래에 더 있다는 표시다. 스크롤 상자 안에 sticky 로 붙어 칸 바닥에 늘 머물고,
+ * 끝까지 내려가면(.is-end) 사라진다 — 바닥에서도 떠 있으면 마지막 줄을 가리는 얼룩이 된다.
+ *
+ * margin-top 이 제 높이(44)와 앞 간격(flex gap)을 함께 되돌린다. 안 그러면 이 칸만큼
+ * 스크롤 길이가 늘어 끝에 빈 자리가 생긴다. 상자마다 gap 이 달라 값이 둘이다.
+ *
+ * 면은 bg/frame 으로 번지고(상세 칸 뒤에 비치는 면이다) 그 위에 약한 blur 를 얹는다.
+ * mask 가 위쪽으로 투명해지므로 흐림도 함께 옅어진다.
+ */
+.ac-scroll-fade {
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+  flex: none;
+  height: 44px;
+  pointer-events: none;
+  background: linear-gradient(to top, var(--bg-frame) 25%, transparent);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+  -webkit-mask-image: linear-gradient(to top, #000 45%, transparent);
+  mask-image: linear-gradient(to top, #000 45%, transparent);
+  transition: opacity 140ms ease;
+}
+
+.ac-detail-contents > .ac-scroll-fade { margin-top: calc(-44px - var(--space-20)); }
+.ac-record > .ac-scroll-fade { margin-top: calc(-44px - var(--space-16)); }
+
+.is-end > .ac-scroll-fade { opacity: 0; }
+
 /* ── 제목 덩이 ───────────────────────────────────────────── */
 .ac-d-title-block { display: flex; flex-direction: column; gap: var(--space-8); }
 .ac-d-age { color: var(--text-tertiary); }

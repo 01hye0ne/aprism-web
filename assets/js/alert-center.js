@@ -519,7 +519,31 @@
     }
     detail.innerHTML = a.done ? recordHtml(a) : openHtml(a);
     if (!a.done) { wireDetail(a); }
+    watchFade($(a.done ? ".ac-record" : ".ac-detail-contents", detail));
   }
+
+  /*
+   * 스크롤 칸 아래쪽 흐림을 붙이고 상태를 따라간다 — 끝까지 내려가면 .is-end 로 지운다.
+   * 창 크기가 바뀌면 넘침 여부도 바뀌므로 지금 칸의 갱신 함수를 들고 있다가 다시 부른다.
+   */
+  var fadeUpdate = null;
+
+  function watchFade(box) {
+    fadeUpdate = null;
+    if (!box) { return; }
+    var fade = document.createElement("div");
+    fade.className = "ac-scroll-fade";
+    fade.setAttribute("aria-hidden", "true");
+    box.appendChild(fade);
+
+    fadeUpdate = function () {
+      box.classList.toggle("is-end", box.scrollTop + box.clientHeight >= box.scrollHeight - 1);
+    };
+    box.addEventListener("scroll", fadeUpdate, { passive: true });
+    fadeUpdate();
+  }
+
+  window.addEventListener("resize", function () { if (fadeUpdate) { fadeUpdate(); } });
 
   function metaRow(label, value) {
     return '<div class="ac-d-meta-row"><dt class="t-caption">' + label + '</dt>' +
