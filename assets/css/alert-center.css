@@ -464,27 +464,29 @@
 /* inline-flex 가 UA 의 hidden 처리를 덮으므로 다시 눌러 준다(.ac-draft · .dropdown-menu 와 같다). */
 .ac-summary-btn[hidden] { display: none; }
 
+/* 여백 없이 목록 폭을 꽉 채운다 — 아래 선은 카드가 들고 있다. */
 .ac-handover-slot {
   flex: none;
-  padding: var(--space-12);
-  border-bottom: var(--border-width-thin) solid var(--border-divider);
 }
 
 .ac-handover-slot[hidden] { display: none; }
 
 /*
- * DELTA 조치 제안(.ac-delta)과 같은 카드다 — 둘 다 DELTA 가 쓴 글이라 같은 꼴이어야 한다.
+ * DELTA 조치 제안(.ac-delta)과 같은 면이다 — 둘 다 DELTA 가 쓴 글이라 같은 꼴이어야 한다.
  * Figma 1202 는 이 카드만 파란 면(status/info/bg + border/brand)으로 그렸는데,
  * 그러면 한 제품 안에서 DELTA 카드가 두 가지 꼴이 된다. 조치 제안 쪽으로 맞췄다 —
  * 파랑은 머리의 DELTA 표시(fg/link)가 맡고, 면은 조용히 둔다.
+ *
+ * 떠 있는 카드가 아니라 목록 맨 위에 깔리는 띠다. 둥근 모와 좌우 테두리를 걷고
+ * 아래 선만 남긴다 — 목록 줄과 같은 선이라 요약이 목록의 머리처럼 읽힌다.
+ * 왼쪽 여백 19 는 줄(.ac-row)과 같다. DELTA 표시가 체크 표시와 세로로 맞는다.
  */
 .ac-handover {
   display: flex;
   flex-direction: column;
   gap: var(--space-8);
-  padding: var(--space-16) var(--space-12) var(--space-12);
-  border: var(--border-width-thin) solid var(--border-default);
-  border-radius: var(--radius-container);
+  padding: var(--space-12) var(--space-12) var(--space-12) 19px;
+  border-bottom: var(--border-width-thin) solid var(--border-divider);
   background-color: var(--bg-panel);
 }
 
