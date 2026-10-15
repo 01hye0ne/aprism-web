@@ -22,7 +22,7 @@
   <link rel="stylesheet" href="../assets/css/app-shell.css?v=122fcf81" />
   <link rel="stylesheet" href="../assets/css/map-overlays.css?v=6bbdf88e" />
   <link rel="stylesheet" href="../assets/css/text-parts.css?v=e38e19ea" />
-  <link rel="stylesheet" href="../assets/css/monitor.css?v=a8006fb7" />
+  <link rel="stylesheet" href="../assets/css/monitor.css?v=807de409" />
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
@@ -340,16 +340,18 @@
 
                     <!-- DELTA 조치 제안 (Size=Small) — 쪽지판은 권고 한 줄 + 오탐 막대까지다. 근거 3줄은 알림 센터에 둔다. -->
                     <section class="ma-delta">
-                      <div class="ma-delta-mark">
-                        <span class="i i-16" style="--i:var(--ic-cpu)" aria-hidden="true"></span>
-                        <span class="t-label-2">DELTA 조치 제안</span>
+                      <div class="ma-delta-head">
+                        <div class="ma-delta-mark">
+                          <span class="i i-16" style="--i:var(--ic-cpu)" aria-hidden="true"></span>
+                          <span class="t-label-2">DELTA 조치 제안</span>
+                        </div>
+                        <div class="ma-fp" data-ma-fp>
+                          <span class="ma-fp-label t-caption">오탐 가능성</span>
+                          <span class="ma-fp-meter" data-ma-fp-meter role="img"><i></i></span>
+                          <span class="ma-fp-value"><b class="t-label-2" data-ma-fp-label></b><span class="t-caption" data-ma-fp-pct></span></span>
+                        </div>
                       </div>
                       <p class="ma-delta-lead t-label-1" data-ma-lead></p>
-                      <div class="ma-fp" data-ma-fp>
-                        <span class="ma-fp-label t-caption">오탐 가능성</span>
-                        <span class="ma-fp-meter" data-ma-fp-meter role="img"><i></i></span>
-                        <span class="ma-fp-value"><b class="t-label-2" data-ma-fp-label></b><span class="t-caption" data-ma-fp-pct></span></span>
-                      </div>
                     </section>
 
                     <!-- 조치 — DELTA 가 미는 칩만 세우고, 나머지는 같은 줄 오른쪽 안내가 가리킨다. -->

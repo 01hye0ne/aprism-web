@@ -963,7 +963,12 @@
  */
 .ma-snap {
   flex: none;
-  aspect-ratio: 16 / 9;
+  /*
+   * 2.4:1 이다. 16:9 면 370 폭에서 207px — 쪽지 높이의 3분의 1 을 사진 혼자 먹었다.
+   * object-fit: cover 가 위아래를 더 깊게 자르지만, 검출 장면은 사람·설비가 가로로 놓이는
+   * 일이 많아 가운데 띠에 피사체가 남는다. 온전한 장면은 바로 위 [크게보기] 가 맡는다.
+   */
+  aspect-ratio: 2.4 / 1;
   margin: 0;
   border-top: var(--border-width-thin) solid var(--border-default);
   border-bottom: var(--border-width-thin) solid var(--border-default);
@@ -1059,9 +1064,22 @@
   background-color: var(--bg-panel);
 }
 
+/*
+ * 제목과 오탐 막대가 한 줄 양끝에 선다. Figma DELTA Suggestion 의 Head 가
+ * "DELTA Mark + Spacer" 인 자리 — 그 빈 자리에 오탐을 들인다.
+ * 따로 한 줄을 쓰면 카드가 세 줄이 되는데, 쪽지에서 읽을 것은 권고 한 줄뿐이다.
+ */
+.ma-delta-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-8);
+}
+
 .ma-delta-mark {
   display: flex;
   align-items: center;
+  flex: none;
   /* 6 은 space 스케일에 없다 — 알림 센터 .ac-delta-mark 와 같은 값으로 적는다. */
   gap: 6px;
   color: var(--fg-link);
@@ -1072,17 +1090,20 @@
   color: var(--text-primary);
 }
 
-/* 오탐 가능성 막대 — 알림 센터 .ac-fp 와 같다. */
+/* 오탐 가능성 막대 — 알림 센터 .ac-fp 와 같은 짜임이되, 제목 줄에 얹히니 폭을 못 박는다. */
 .ma-fp {
+  flex: none;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-8);
 }
 
 .ma-fp-label { flex: none; color: var(--text-secondary); }
 
 .ma-fp-meter {
-  flex: 1 1 auto;
+  /* 늘어나지 않는다 — 제목이 길어지면 막대가 아니라 제목이 줄어야 한다. */
+  flex: none;
+  width: 56px;
   height: 6px;
   border-radius: 3px;
   background-color: var(--comp-chart-track);
@@ -1201,7 +1222,8 @@
   justify-content: flex-end;
   align-items: center;
   gap: var(--space-8);
-  padding: var(--space-12);
+  /* 위아래만 8 이다 — 버튼 하나뿐인 줄이라 12 는 헐겁다. 좌우는 몸과 같은 12 로 맞춘다. */
+  padding: var(--space-8) var(--space-12);
 }
 
 /*
