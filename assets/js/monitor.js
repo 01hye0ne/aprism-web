@@ -362,7 +362,16 @@
     $("[data-ah-count='warning']").textContent = warn;
 
     doneList.textContent = "";
-    DONE.forEach(function (d) { doneList.appendChild(doneItem(d)); });
+    DONE.forEach(function (d) {
+      doneList.appendChild(doneItem(d));
+      /*
+       * 한 번 빛나면 끝이다. fresh 를 켜 둔 채로 두었더니, 이 목록은 알림을 고를 때마다
+       * 통째로 다시 그려지는 탓에 그때마다 줄이 처음 들어온 것처럼 또 초록으로 빛났다.
+       * 지우는 자리는 여기여야 한다 — doneItem() 은 빈 칸 높이를 재는 분신(measureDone)도
+       * 만들기 때문에, 거기서 지우면 분신이 표시를 먹고 진짜 줄이 못 빛난다.
+       */
+      d.fresh = false;
+    });
     doneCount.textContent = DONE.length + "건";
     // 다시 그리면 내용 길이가 바뀌어 스크롤 자리도 바뀔 수 있다 — 그림자를 다시 맞춘다.
     $$(".ah-box").forEach(shade);
@@ -735,7 +744,7 @@
     }
 
     function commit(a, rec) {
-      DONE.forEach(function (d) { d.fresh = false; });
+      // fresh 를 내리는 일은 render() 한 곳이 맡는다 — 두 곳에서 손대면 어느 쪽이 늦는지에 따라 달라진다.
       DONE.unshift(rec);
       if (extra.indexOf(a) >= 0) { extra.splice(extra.indexOf(a), 1); } else { resolved.push(a); }
       lastDone = { a: a, rec: rec };
