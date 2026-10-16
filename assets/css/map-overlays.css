@@ -223,7 +223,7 @@
   width: 20px;
   height: 20px;
   padding: 0;
-  border: 1.5px solid var(--bg-page, #070a10);
+  border: 2px solid var(--bg-page, #070a10);   /* 정수 — 1.5 는 배율 1 에서 1 로 내려가 번호가 쏠려 보였다 */
   border-radius: var(--radius-pill, 999px);
   background: var(--bg-cell, #2c3443);
   color: var(--text-primary, #e7ebf2);

@@ -132,6 +132,16 @@
    *   stairTags  두 층을 잇는 계단 입구에 "↓ B4" · "↑ B3" 칩을 단다.
    *   arriveOverview 직접 층을 옮기면(층 버튼 · 계단) 도착한 층을 줌아웃해 한눈에 담는다. 트래킹 이동은 제외.
    */
+  /*
+   * 지도 위 DOM 표식(쪽지 · 로봇 · 팝오버 · 번호 알)의 자리는 화면 픽셀 격자에 맞춰 둔다(2026-10-16).
+   * 3D 좌표에서 온 값은 512.5px 처럼 반 픽셀에 걸리는데, 배율 1 모니터에서 크롬이 테두리는 격자에 붙이고
+   * 안쪽 면은 번지게 그려 고리와 가운데 점이 어긋나 보였다. 레티나(배율 2)는 0.5px 단위로 맞춘다.
+   */
+  function snapPx(v) {
+    var d = window.devicePixelRatio || 1;
+    return (Math.round(v * d) / d) + "px";
+  }
+
   var OPT = {
     radius: 32,
     enter: 0.2,
@@ -1147,8 +1157,8 @@
     x = Math.min(c.width - half - 8, Math.max(half + 8, x));
     y = Math.min(c.height - 8, Math.max(tall + 8, y));
 
-    card.style.setProperty("--x", x.toFixed(1) + "px");
-    card.style.setProperty("--y", y.toFixed(1) + "px");
+    card.style.setProperty("--x", snapPx(x));
+    card.style.setProperty("--y", snapPx(y));
   }
 
   // 고른 것을 바꾼다. 같은 것을 다시 누르면 놓는다.
@@ -1936,8 +1946,8 @@
     if (dx * dx + dy * dy > 0.01) {
       botBox.style.setProperty("--flip", dx < 0 ? "-1" : "1");
     }
-    botBox.style.setProperty("--x", ax.toFixed(1) + "px");
-    botBox.style.setProperty("--y", ay.toFixed(1) + "px");
+    botBox.style.setProperty("--x", snapPx(ax));
+    botBox.style.setProperty("--y", snapPx(ay));
 
     /*
      * 배율을 따라 표식도 커진다.
@@ -2048,8 +2058,8 @@
     var tall = wpBox.offsetHeight + 12 || 96;
     x = Math.min(c.width - half - 8, Math.max(half + 8, x));
     y = Math.min(c.height - 8, Math.max(tall + 8, y));
-    wpBox.style.setProperty("--x", x.toFixed(1) + "px");
-    wpBox.style.setProperty("--y", y.toFixed(1) + "px");
+    wpBox.style.setProperty("--x", snapPx(x));
+    wpBox.style.setProperty("--y", snapPx(y));
   }
 
   /*
@@ -2073,9 +2083,9 @@
      */
     var cy = below ? Math.max(-8, Math.min(y, H - tall - 8))
                    : Math.min(H + 8, Math.max(tall + 8, y));
-    alertBox.style.setProperty("--x", cx.toFixed(1) + "px");
-    alertBox.style.setProperty("--y", cy.toFixed(1) + "px");
-    alertBox.style.setProperty("--tail", tail.toFixed(1) + "px");
+    alertBox.style.setProperty("--x", snapPx(cx));
+    alertBox.style.setProperty("--y", snapPx(cy));
+    alertBox.style.setProperty("--tail", snapPx(tail));
   }
 
   /*
@@ -3202,8 +3212,8 @@
 
   function put(node, world, dy) {
     var p = onCanvas(world);
-    node.style.left = p.x.toFixed(1) + "px";
-    node.style.top = (p.y + (dy || 0)).toFixed(1) + "px";
+    node.style.left = snapPx(p.x);
+    node.style.top = snapPx(p.y + (dy || 0));
   }
 
   function arrow() { return trav.down ? "↓" : "↑"; }
@@ -3972,8 +3982,8 @@
       var len = Math.hypot(q.x - p.x, q.y - p.y) || 1;
       var off = 5;
       var ox = -(q.y - p.y) / len * off, oy = (q.x - p.x) / len * off;
-      tip.el.style.left = (p.x + ox).toFixed(1) + "px";
-      tip.el.style.top = (p.y + oy).toFixed(1) + "px";
+      tip.el.style.left = snapPx(p.x + ox);
+      tip.el.style.top = snapPx(p.y + oy);
       /*
        * +45 는 화살촉 모양에서 온다 — 네모의 위·오른쪽 변만 그은 "⌐" 라 모서리가 북동(-45°)을 본다.
        * 가는 쪽 각도에 그만큼 되돌려 줘야 촉이 진행 방향을 가리킨다.
