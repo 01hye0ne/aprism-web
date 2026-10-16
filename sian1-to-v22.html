@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>APRISM — 시안 1 피드백 반영 화면</title>
-  <meta name="description" content="자문받은 시안 1-A(좌측 패널형) · 1-B(모달형)에서 지금 v2.2 까지 달라진 점 7가지 — 한 화면에 주제 하나" />
+  <meta name="description" content="자문받은 시안 1-A(좌측 패널형) · 1-B(모달형)에서 지금 v2.2 까지 달라진 점 7가지와 층 여러 개일 때 관제 화면 제안 — 한 화면에 주제 하나" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/static/woff2/SUIT.css" />
   <link rel="stylesheet" href="./assets/css/tokens.css?v=9cceac77" />
   <link rel="stylesheet" href="./assets/css/base.css?v=6c992126" />
@@ -91,6 +91,29 @@
     .frame .lbl.is-now { color: var(--text-primary); }
     .cap { margin: var(--space-8) 0 0; color: var(--text-tertiary); font-size: var(--font-size-12); }
 
+    /* 제안 장 — 왼쪽 A · B · C 칸이 오른쪽 그림 단추를 겸한다 */
+    .lead-s { margin: 0 0 var(--space-24); color: var(--text-secondary); font-size: var(--font-size-14); line-height: var(--font-line-height-22); word-break: keep-all; }
+    .opts { display: flex; flex-direction: column; gap: var(--space-8); margin: 0; padding: 0; list-style: none; }
+    .opts button {
+      display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: var(--space-4) var(--space-12); width: 100%;
+      padding: var(--space-12) var(--space-16); text-align: left;
+      border: var(--border-width-thin) solid var(--border-divider); border-radius: var(--radius-card);
+      background: transparent; color: var(--text-tertiary); font: inherit; cursor: pointer;
+      transition: background-color 300ms ease, border-color 300ms ease, color 300ms ease;
+    }
+    .opts button:hover { border-color: var(--border-default); }
+    .opts button[aria-pressed="true"] { background-color: var(--bg-panel); border-color: var(--border-strong); color: var(--text-secondary); }
+    .opts .key {
+      grid-row: span 2; display: grid; place-items: center; width: 28px; height: 28px;
+      border-radius: var(--radius-pill); background-color: var(--bg-cell); color: var(--text-secondary);
+      font-size: var(--font-size-13); font-weight: 700;
+    }
+    .opts button[aria-pressed="true"] .key { background-color: var(--bg-inverse); color: var(--text-on-inverse); }
+    .opts .t { color: var(--text-secondary); font-size: var(--font-size-14); font-weight: 700; }
+    .opts button[aria-pressed="true"] .t { color: var(--text-primary); }
+    .opts .d { font-size: var(--font-size-13); line-height: var(--font-line-height-20); word-break: keep-all; }
+    .pic.no-tabs .tabs { display: none; }
+
     /* 표지 */
     .cover .txt h1 { margin: var(--space-8) 0 var(--space-16); color: var(--text-primary); font-size: var(--font-size-40); line-height: var(--font-line-height-48); word-break: keep-all; }
     .cover .lead { margin: 0 0 var(--space-32); color: var(--text-secondary); font-size: var(--font-size-16); line-height: var(--font-line-height-26); word-break: keep-all; }
@@ -131,7 +154,7 @@
 </head>
 <body>
   <a href="./index.html" class="back">목록으로</a>
-  <p class="pager" aria-live="polite"><b data-pager-now>00</b> / 07</p>
+  <p class="pager" aria-live="polite"><b data-pager-now>00</b> / 08</p>
 
   <main>
     <!-- 표지 -->
@@ -149,6 +172,7 @@
           <li><a href="#s5">알림 확인 · 조치 <span>모달 → 지도 위 팝오버</span></a></li>
           <li><a href="#s6">색 · 위계 · 화면 정돈 <span>한 뜻 한 모양</span></a></li>
           <li><a href="#s7">로봇 패널 <span>전체 → 배정된 로봇</span></a></li>
+          <li><a href="#s8">층 여러 개일 때 관제 화면 <span>제안</span></a></li>
         </ol>
       </div>
       <figure class="pic">
@@ -285,6 +309,26 @@
         </div>
       </figure>
     </section>
+    <section class="slide" id="s8" aria-labelledby="s8-title">
+      <div class="txt">
+        <p class="num">08 · 제안</p>
+        <h2 id="s8-title">층 여러 개일 때 관제 화면</h2>
+        <p class="lead-s">층마다 로봇이 1대씩 돌 때, 전체 건물에서 시작해 필요한 층으로 들어가는 구성을 제안함.</p>
+        <ul class="opts" data-opts>
+          <li><button type="button" data-opt="A"><span class="key">A</span><span class="t">전체 건물 (기본)</span><span class="d">B3 · B4를 쌓아 두 로봇의 위치와 경로, 알림 위치를 한 화면에 표시함. 위치와 미션은 상단 바(전체 건물 + 미션 선택)에서만 표시함.</span></button></li>
+          <li><button type="button" data-opt="B"><span class="key">B</span><span class="t">층에 마우스 올림 (B4)</span><span class="d">올린 층은 밝아지고 다른 층은 흐려짐. 커서 옆에 층 요약(로봇 · 알림 · 오늘 점검)과 "누르면 상세로 들어가요" 안내가 뜸.</span></button></li>
+          <li><button type="button" data-opt="C"><span class="key">C</span><span class="t">층 진입 = 로봇별 상세</span><span class="d">층마다 로봇이 1대라, 층을 누르면 바로 기존 로봇 상세로 들어감. 상단 바가 "전체 건물 › 지하 4층 + 미션 선택"으로 바뀌고, "전체 건물"을 누르면 돌아감.</span></button></li>
+        </ul>
+      </div>
+      <figure class="pic no-tabs">
+        <div class="tabs" role="group" aria-label="화면 고르기"></div>
+        <div class="frame">
+          <img data-tab="A" data-key="A" data-default src="./assets/img/compare/08-a-building.webp" alt="A. 전체 건물 — B3 · B4 두 층을 쌓아 Robot 01 · 02 위치와 알림 위치를 한 화면에, 상단 바에 전체 건물과 통합 순회 현황" loading="lazy" />
+          <img data-tab="B" data-key="B" src="./assets/img/compare/08-b-hover.webp" alt="B. B4 층에 마우스를 올림 — B4 는 밝아지고 B3 는 흐려지며, 커서 옆에 B4 지하 4층 요약과 누르면 Robot 02 상세로 들어가요 안내" loading="lazy" />
+          <img data-tab="C" data-key="C" src="./assets/img/compare/08-c-detail.webp" alt="C. 지하 4층에 들어온 Robot 02 상세 — 상단 바가 전체 건물 › 지하 4층과 미션 선택, 지도는 B4 한 층, 오른쪽 Robot 02 와 타임라인" loading="lazy" />
+        </div>
+      </figure>
+    </section>
   </main>
 
   <script src="./assets/js/theme.js?v=7145a122"></script>
@@ -329,8 +373,22 @@
             i.classList.toggle("is-on", on);
             btns[n].setAttribute("aria-pressed", on ? "true" : "false");
           });
+          // 제안 장 — 왼쪽 칸 표시를 그림과 맞춘다
+          var key = img.getAttribute("data-key");
+          if (key) {
+            Array.prototype.forEach.call(pic.parentNode.querySelectorAll("[data-opt]"), function (b) {
+              b.setAttribute("aria-pressed", b.getAttribute("data-opt") === key ? "true" : "false");
+            });
+          }
         }
         show(start);
+        // 제안 장 — 왼쪽 칸을 누르면 그 그림으로
+        Array.prototype.forEach.call(pic.parentNode.querySelectorAll("[data-opt]"), function (b) {
+          b.addEventListener("click", function () {
+            var img = imgs.filter(function (i) { return i.getAttribute("data-key") === b.getAttribute("data-opt"); })[0];
+            if (img) { show(img); }
+          });
+        });
       });
 
       // 장 넘기기 — 넓은 화면에서는 휠 · 방향키 · 목차를 한 장씩, 천천히 미끄러지게 옮긴다.
