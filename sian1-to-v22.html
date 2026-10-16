@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>APRISM — 시안 1 피드백 반영 화면</title>
-  <meta name="description" content="자문받은 시안 1-A(좌측 패널형) · 1-B(모달형)에서 지금 v2.2 까지 달라진 점 7가지 — 한 화면에 주제 하나" />
+  <meta name="description" content="자문받은 시안 1-A(좌측 패널형) · 1-B(모달형)에서 지금 v2.2 까지 달라진 점 8가지 — 한 화면에 주제 하나" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/static/woff2/SUIT.css" />
   <link rel="stylesheet" href="./assets/css/tokens.css?v=9cceac77" />
   <link rel="stylesheet" href="./assets/css/base.css?v=6c992126" />
@@ -131,7 +131,7 @@
 </head>
 <body>
   <a href="./index.html" class="back">목록으로</a>
-  <p class="pager" aria-live="polite"><b data-pager-now>00</b> / 07</p>
+  <p class="pager" aria-live="polite"><b data-pager-now>00</b> / 08</p>
 
   <main>
     <!-- 표지 -->
@@ -149,6 +149,7 @@
           <li><a href="#s5">알림 확인 · 조치 <span>모달 → 지도 위 쪽지</span></a></li>
           <li><a href="#s6">로봇 패널 <span>전체 → 배정된 로봇</span></a></li>
           <li><a href="#s7">색 · 위계 · 화면 정돈 <span>한 뜻 한 모양</span></a></li>
+          <li><a href="#s8">쪽지에서 조치하기 <span>어디로 갔는지 보이게</span></a></li>
         </ol>
       </div>
       <figure class="pic">
@@ -281,6 +282,25 @@
         </div>
       </figure>
     </section>
+    <section class="slide" id="s8" aria-labelledby="s8-title">
+      <div class="txt">
+        <p class="num">08</p>
+        <h2 id="s8-title">쪽지에서 조치하기</h2>
+        <div class="blk"><p class="k">시안 1-B</p><p>큰 모달에서 조치 내용을 드롭다운으로 하나 고르고 [확인 처리]. 처리한 알림이 어디로 갔는지는 화면에서 따라갈 수 없었음.</p></div>
+        <div class="blk now"><p class="k">v2.2</p><p>지도 위 쪽지에서 DELTA 추천 조치를 <b>여러 개</b> 골라 [조치 완료]. 쪽지가 접히며 <b>오늘 확인 완료</b> 맨 위로 날아 들어가고, 새 줄이 초록으로 한 번 빛남. 남은 알림에 맞춰 Delta 판단도 바로 바뀌고(위험 → 주의), 5초 동안 <b>되돌리기</b>가 남음.</p></div>
+        <p class="why">처리한 일이 어디로 갔는지 눈으로 따라가야 "끝났다"는 확신이 생김. 확인 대화상자 대신 되돌리기를 두어, 빠르게 처리해도 실수를 바로 돌이킬 수 있음.</p>
+      </div>
+      <figure class="pic">
+        <div class="tabs" role="group" aria-label="화면 고르기"></div>
+        <div class="frame">
+          <img data-tab="시안 1-B" src="./assets/img/compare/05-1b.webp" alt="시안 1-B 알림 상세 모달 — 조치 내용 드롭다운과 확인 처리 버튼" loading="lazy" />
+          <img data-tab="v2.2 흐름 ▶" data-default data-anim src="./assets/img/compare/08-v22-flow.webp" alt="v2.2 조치 흐름 — 알림을 누르면 지도 위 쪽지가 열리고, 추천 조치 두 개를 고른 뒤 조치 완료를 누르면 쪽지가 오늘 확인 완료로 날아 들어가 초록으로 빛나고 되돌리기 토스트가 뜬다" loading="lazy" />
+          <img data-tab="① 쪽지 열기" src="./assets/img/compare/08-v22-1-open.webp" alt="① 알림을 누르면 웨이포인트 옆에 쪽지가 열린다 — 사진, 위치, DELTA 조치 제안, AI 추천 조치" loading="lazy" />
+          <img data-tab="② 조치 고르기" src="./assets/img/compare/08-v22-2-pick.webp" alt="② 추천 조치 두 개를 고르면 조치 완료가 켜진다" loading="lazy" />
+          <img data-tab="③ 완료 · 되돌리기" src="./assets/img/compare/08-v22-3-done.webp" alt="③ 조치 완료 뒤 — 알림이 오늘 확인 완료 맨 위로 옮겨 초록으로 빛나고, Delta 는 주의로 바뀌고, 아래에 되돌리기 토스트" loading="lazy" />
+        </div>
+      </figure>
+    </section>
   </main>
 
   <script src="./assets/js/theme.js?v=7145a122"></script>
@@ -318,6 +338,10 @@
         function show(img) {
           imgs.forEach(function (i, n) {
             var on = i === img;
+            if (on && i.hasAttribute("data-anim") && i.getAttribute("data-started")) {
+              i.src = i.getAttribute("src").split("#")[0] + "#" + Date.now();
+            }
+            if (on) { i.setAttribute("data-started", "1"); }
             i.classList.toggle("is-on", on);
             btns[n].setAttribute("aria-pressed", on ? "true" : "false");
           });
@@ -344,6 +368,9 @@
         n = Math.max(0, Math.min(slides.length - 1, n));
         var from = window.scrollY, to = slides[n].offsetTop;
         mark(n);
+        // 움직이는 그림이 있는 장은 들어올 때 처음부터 다시 튼다
+        var anim = slides[n].querySelector("img[data-anim].is-on");
+        if (anim) { anim.src = anim.getAttribute("src").split("#")[0] + "#" + Date.now(); }
         if (history.replaceState) { history.replaceState(null, "", "#" + slides[n].id); }
         if (!DUR || Math.abs(to - from) < 2) { window.scrollTo(0, to); return; }
         busy = true;
