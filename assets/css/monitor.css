@@ -2122,23 +2122,37 @@
 /* 사진이 없는 알림(비상정지 등) — 사진 칸을 접고 아래 칸을 불투명하게 */
 .ma-v3.no-snap .ma-snap { display: none; }
 
-/* 아래 칸 — 바탕색(raised). 사진 아래 끝에 40 올라타 DELTA 카드가 사진 위에 얹혀 보인다. */
+/*
+ * 아래 칸 — 사진 아래 끝에 40 올라타 DELTA 카드가 사진 위에 얹혀 보인다.
+ * 위는 지금 밝기(raised) 그대로, 아래로 갈수록 --ma-sink 까지 눌러 흰 카드를 받쳐 준다(10/16 디자이너).
+ * 판 전체를 어둡게 하면 지도와 구분이 안 된다 — 위쪽 밝기와 테두리가 지도와의 경계를 맡는다.
+ * 처음 40 은 투명이다(사진 끝이 녹아드는 자리).
+ */
+.v2-2 { --ma-sink: var(--color-gray-850); }
+:root[data-theme="light"] .v2-2 { --ma-sink: var(--color-gray-100); }
 .ma-v3 .ma-lower {
   margin-top: -40px;
   border-radius: 0 0 var(--radius-4) var(--radius-4);
+  background: linear-gradient(to bottom, transparent 0, transparent 40px, var(--bg-raised) 40px, var(--ma-sink) 100%);
 }
+.ma-v3.no-snap .ma-lower { background: linear-gradient(to bottom, var(--bg-raised), var(--ma-sink)); }
 .ma-v3.no-snap .ma-lower { margin-top: 0; }
 /* DELTA 카드 둘레 여백 8 — 카드 폭 352(Figma 10/16 수정, 4 → 8) */
 .ma-v3 .ma-lower-in { padding: var(--space-8); }
 
 /* DELTA 조치 제안 — Size=Small · bg/raised · border/default · r8 · padding 8 · gap 12 */
+/* 판의 무게 — 테두리 없이 모서리 12 · 여백 12 · 낮은 그림자(10/16). 안쪽은 흰 면 · 옅은 선 · 글자 세 톤만. */
 .ma-v3 .ma-delta {
   gap: var(--space-12);
-  padding: var(--space-8);
-  border-radius: var(--radius-8);
+  padding: var(--space-12);
+  border: 0;
+  border-radius: 12px;
   background-color: var(--bg-raised);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 18%), 0 10px 24px -10px rgb(0 0 0 / 45%);
 }
-.ma-v3 .ma-delta-mark { gap: var(--space-4); color: var(--comp-gnb-text-brand); }
+/* 파랑은 체크 상자 하나만 — 제목은 짙은 회색, 앞의 작은 표식만 파랑으로 남긴다 */
+.ma-v3 .ma-delta-mark { gap: var(--space-4); color: var(--text-secondary); }
+.ma-v3 .ma-delta-mark .i { color: var(--comp-gnb-text-brand); }
 .ma-v3 .ma-fp { gap: var(--space-8); color: var(--text-secondary); }
 .ma-v3 .ma-fp-value { display: inline; color: var(--status-safe-text); }
 .ma-v3 .ma-fp-value.is-mid { color: var(--status-warning-text); }
@@ -2147,18 +2161,15 @@
 .ma-v3 .ma-delta-lead {
   font-size: var(--font-size-14);
   line-height: var(--font-line-height-22);
-  font-weight: 400;
+  font-weight: 700;
   word-break: keep-all;
 }
 
 /* 조치 체크리스트 — Lists · bg/map-chip · border/default · r4. 줄 사이 선 1. */
+/* 체크리스트 — 칸 바탕 · 바깥 테두리를 걷고 줄 사이 옅은 선(gray/100)만 남긴다 */
 .ma-checks {
   display: flex;
   flex-direction: column;
-  border: var(--border-width-thin) solid var(--border-default);
-  border-radius: var(--radius-4);
-  background-color: var(--bg-map-chip);
-  overflow: hidden;
 }
 .ma-check {
   display: flex;
@@ -2166,9 +2177,9 @@
   gap: var(--space-8);
   width: 100%;
   min-height: 38px;
-  padding: var(--space-8) var(--space-8) var(--space-8) var(--space-12);
+  padding: var(--space-8) 0;
   border: 0;
-  border-bottom: var(--border-width-thin) solid var(--border-default);
+  border-bottom: var(--border-width-thin) solid var(--color-gray-100);
   background: transparent;
   color: var(--text-primary);
   font: inherit;
@@ -2178,7 +2189,7 @@
   cursor: pointer;
 }
 .ma-check:last-child { border-bottom: 0; }
-.ma-check:hover { background-color: var(--state-hover); }
+.ma-check:hover .ma-check-label { color: var(--text-primary); text-decoration: underline; text-underline-offset: 3px; }
 .ma-check:focus-visible { outline: var(--border-width-strong) solid var(--border-focus); outline-offset: -2px; }
 .ma-check-box {
   flex: none;
@@ -2201,8 +2212,8 @@
   flex: none;
   padding: var(--space-4) var(--space-8);
   border-radius: var(--radius-4);
-  background-color: var(--bg-accent);
-  color: var(--text-on-inverse);
+  background-color: var(--comp-button-accent-bg-default);
+  color: var(--color-gray-0);
   font-size: var(--font-size-13);
   line-height: var(--font-line-height-18);
   font-weight: 500;
