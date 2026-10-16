@@ -1999,18 +1999,3 @@
 @media (prefers-reduced-motion: reduce) {
   .done-item.is-new { animation: none; }
 }
-
-/* ==================================================================
- * Delta 범위 머리글 — "전체 미션" (2026-10-16 디자이너)
- * 화면은 미션 하나를 보지만 Delta · 테두리 빛은 전체 미션의 알림을 본다.
- * 제목 위 한 줄로 둔다 — 제목 옆에 붙이면 접힌 창(약 220px)에서 제목이 잘린다.
- * ================================================================== */
-.v2-2.v3 .delta3-title { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
-.v2-2.v3 .delta3-title p { flex: none; }
-.v2-2 .delta3-scope {
-  color: var(--text-tertiary);
-  font-size: var(--font-size-12);
-  line-height: var(--font-line-height-18);
-  font-weight: 600;
-  letter-spacing: 0.02em;
-}
