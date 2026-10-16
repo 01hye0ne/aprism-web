@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko" data-theme="dark">
+<html lang="ko" data-theme="dark" class="js">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -10,11 +10,11 @@
   <link rel="stylesheet" href="./assets/css/base.css?v=6c992126" />
   <style>
     /*
-     * 발표형 한 장 — 화면 높이 하나에 주제 하나(스크롤이 장마다 멈춘다).
+     * 발표형 한 장 — 화면 높이 하나에 주제 하나. 넓은 화면에서는 휠 · 방향키 한 번에 한 장씩
+     * 천천히 미끄러지고(아래 스크립트), 들어온 장의 글과 그림이 차례로 떠오른다.
      * 왼쪽 글 · 오른쪽 화면. 화면은 주제에 해당하는 부분만 잘라 2배로 찍은 것이고,
      * 위 단추로 시안 1-A · 1-B · v2.2 를 바꿔 본다. 값은 토큰만 쓴다.
      */
-    html { scroll-snap-type: y mandatory; scroll-behavior: smooth; }
     body { margin: 0; background-color: var(--bg-page); }
 
     .back {
@@ -35,7 +35,6 @@
     .slide {
       box-sizing: border-box;
       height: 100vh; height: 100dvh;
-      scroll-snap-align: start;
       display: grid;
       grid-template-columns: minmax(320px, 30%) minmax(0, 1fr);
       gap: var(--space-40);
@@ -77,7 +76,7 @@
       grid-area: 1 / 1; width: 100%; height: auto; max-height: calc(100dvh - 176px);
       object-fit: contain; object-position: left top;
       border-radius: var(--radius-card);
-      opacity: 0; transition: opacity 180ms ease;
+      opacity: 0; transition: opacity 420ms ease;
     }
     .frame img.is-on { opacity: 1; }
     /* 나란히 보기 — 단추 없이 셋을 한 번에(세로로 긴 목록 · 오른쪽 칸) */
@@ -102,11 +101,24 @@
     .toc a:hover { color: var(--text-primary); }
     .toc a span { color: var(--text-tertiary); }
 
-    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .frame img { transition: none; } }
+    /* 들어오는 장 — 글은 위에서부터 차례로, 그림은 조금 늦게 떠오른다 */
+    .js .slide .txt > *, .js .slide .pic {
+      opacity: 0; transform: translateY(20px);
+      transition: opacity 800ms cubic-bezier(0.22, 0.61, 0.36, 1), transform 1000ms cubic-bezier(0.22, 0.61, 0.36, 1);
+    }
+    .js .slide.is-in .txt > *, .js .slide.is-in .pic { opacity: 1; transform: none; }
+    .js .slide.is-in .txt > :nth-child(2) { transition-delay: 80ms; }
+    .js .slide.is-in .txt > :nth-child(3) { transition-delay: 160ms; }
+    .js .slide.is-in .txt > :nth-child(4) { transition-delay: 240ms; }
+    .js .slide.is-in .txt > :nth-child(5) { transition-delay: 320ms; }
+    .js .slide.is-in .pic { transition-delay: 200ms; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .frame img, .js .slide .txt > *, .js .slide .pic { transition: none; transform: none; }
+    }
 
     /* 좁은 화면 — 장 높이를 풀고 위아래로 쌓는다 */
     @media (max-width: 900px) {
-      html { scroll-snap-type: none; }
       .slide { height: auto; grid-template-columns: minmax(0, 1fr); gap: var(--space-20); padding: var(--space-48) var(--space-16) var(--space-32); }
       .frame img { display: none; max-height: none; opacity: 1; }
       .frame.is-row { grid-auto-flow: row; }
@@ -127,7 +139,7 @@
         <p class="num">SIAN 1 FEEDBACK</p>
         <h1 id="s0-title">시안 1 피드백<br />반영 화면</h1>
         <p class="lead">자문받은 <b>시안 1-A(좌측 패널형) · 1-B(모달형)</b>(2026.09.17)에서
-          지금의 <b>v2.2 미션 기준 화면</b>까지. 사이에 v2(09.21) · v2.1(09.28, 10.06 클라이언트 회의)을 거쳤습니다.</p>
+          지금의 <b>v2.2 미션 기준 화면</b>까지 반영한 내용을 정리함. 사이에 v2(09.21) · v2.1(09.28, 10.06 클라이언트 회의)을 거침.</p>
         <ol class="toc">
           <li><a href="#s1">화면의 기준 <span>장소 → 미션</span></a></li>
           <li><a href="#s2">알림 목록 <span>카드 → 두 줄 목록</span></a></li>
@@ -149,9 +161,9 @@
       <div class="txt">
         <p class="num">01</p>
         <h2 id="s1-title">화면의 기준</h2>
-        <div class="blk"><p class="k">시안 1-A · 1-B</p><p>상태바에 장소(지하 4층)만 있었다. 알림은 최근 24시간을 모두 보여, 지금 돌고 있는 순회와 섞였다.</p></div>
-        <div class="blk now"><p class="k">v2.2</p><p>상태바에서 <b>미션</b>을 고른다. 고른 미션 하나로 최신 알림 · 로봇 패널 · 지도 층이 같이 바뀌고, 미션이 끝나면 알림은 알림 센터로 간다.</p></div>
-        <p class="why">관제자가 실제로 지켜보는 단위는 "이번 순회"다(10/06 클라이언트 회의).</p>
+        <div class="blk"><p class="k">시안 1-A · 1-B</p><p>상태바에 장소(지하 4층)만 있음. 알림은 최근 24시간을 모두 보여 줘, 지금 돌고 있는 순회와 섞임.</p></div>
+        <div class="blk now"><p class="k">v2.2</p><p>상태바에서 <b>미션</b>을 고름. 고른 미션 하나로 최신 알림 · 로봇 패널 · 지도 층이 같이 바뀌고, 미션이 끝나면 알림은 알림 센터로 이동함.</p></div>
+        <p class="why">관제자가 실제로 지켜보는 단위는 "이번 순회"임(10/06 클라이언트 회의).</p>
       </div>
       <figure class="pic">
         <div class="tabs" role="group" aria-label="화면 고르기"></div>
@@ -167,9 +179,9 @@
       <div class="txt">
         <p class="num">02</p>
         <h2 id="s2-title">알림 목록</h2>
-        <div class="blk"><p class="k">시안 1-A · 1-B</p><p>1-A 는 세 줄 항목에 조치 상태 문장까지, 1-B 는 큰 카드라 한 화면에 두 건 남짓 보였다.</p></div>
-        <div class="blk now"><p class="k">v2.2</p><p>위치 · 제목 · 시간 <b>두 줄 목록</b>. 위험 · 주의로 거르고 "오래된 순 · 위험 우선"으로 정렬한다. 끝난 건은 아래 <b>오늘 확인 완료</b>로 내려가 남은 일과 한 일이 갈린다.</p></div>
-        <p class="why">많이 쌓였을 때 훑는 속도와, 무엇이 남았는지가 먼저 보여야 한다.</p>
+        <div class="blk"><p class="k">시안 1-A · 1-B</p><p>1-A는 세 줄 항목에 조치 상태 문장까지 들어가고, 1-B는 큰 카드라 한 화면에 두 건 남짓만 보임.</p></div>
+        <div class="blk now"><p class="k">v2.2</p><p>위치 · 제목 · 시간 <b>두 줄 목록</b>. 위험 · 주의로 거르고 "오래된 순 · 위험 우선"으로 정렬함. 끝난 건은 아래 <b>오늘 확인 완료</b>로 내려가 남은 일과 한 일이 구분됨.</p></div>
+        <p class="why">많이 쌓였을 때 빨리 훑을 수 있어야 하고, 무엇이 남았는지가 먼저 보여야 함.</p>
       </div>
       <figure class="pic">
         <div class="frame is-row">
@@ -184,9 +196,9 @@
       <div class="txt">
         <p class="num">03</p>
         <h2 id="s3-title">Delta(AI)의 역할</h2>
-        <div class="blk"><p class="k">시안 1-A · 1-B</p><p>1-A 는 고른 알림 하나를 큰 글씨로 해설하고, 행동 버튼 셋과 입력창이 늘 열려 패널 절반을 썼다. 1-B 는 지도 아래 띠 하나.</p></div>
-        <div class="blk now"><p class="k">v2.2</p><p>알림 하나가 아니라 <b>전체 알림을 종합</b>해 판단한다("위험 1건 포함 6건 누적"). 지도 왼쪽 위 모서리의 작은 창으로 접힘 · 펼침 · 대화를 오가고, 입력창은 열었을 때만 보이며 너비를 끌어 조절한다.</p></div>
-        <p class="why">알림을 고를 때마다 같은 말을 따라 하던 해설은 목록과 겹쳤다. AI 는 여러 건을 묶어 볼 때 쓸모가 있다.</p>
+        <div class="blk"><p class="k">시안 1-A · 1-B</p><p>1-A는 고른 알림 하나를 큰 글씨로 해설하고, 행동 버튼 셋과 입력창이 늘 열려 있어 패널 절반을 차지함. 1-B는 지도 아래 띠 하나.</p></div>
+        <div class="blk now"><p class="k">v2.2</p><p>알림 하나가 아니라 <b>전체 알림을 종합</b>해 판단함("위험 1건 포함 6건 누적"). 지도 왼쪽 위 모서리의 작은 창에서 접힘 · 펼침 · 대화를 오가고, 입력창은 열었을 때만 보이며 너비를 끌어 조절할 수 있음.</p></div>
+        <p class="why">알림을 고를 때마다 같은 내용을 반복하던 해설은 목록과 겹침. AI는 여러 건을 묶어 볼 때 쓸모가 있음.</p>
       </div>
       <figure class="pic">
         <div class="tabs" role="group" aria-label="화면 고르기"></div>
@@ -202,9 +214,9 @@
       <div class="txt">
         <p class="num">04</p>
         <h2 id="s4-title">경고의 강약</h2>
-        <div class="blk"><p class="k">시안 1-A · 1-B</p><p>위험은 지도 네 변에 빨간 테, 주의도 네 변에 노란 테. 세기가 같아 늘 경보 상태처럼 보였다.</p></div>
-        <div class="blk now"><p class="k">v2.2</p><p><b>위험</b>은 네 변 빛과 Delta 판의 빛. <b>주의</b>는 Delta 모서리에만 노란 빛. 화면의 경고 색은 하나(가장 높은 단계)로 맞췄다.</p></div>
-        <p class="why">주의가 잦은 현장에서 늘 켜진 경보는 무뎌진다 — 위험이 확실히 튀도록 주의를 덜어냈다.</p>
+        <div class="blk"><p class="k">시안 1-A · 1-B</p><p>위험은 지도 네 변에 빨간 테, 주의도 네 변에 노란 테. 세기가 같아 늘 경보 상태처럼 보임.</p></div>
+        <div class="blk now"><p class="k">v2.2</p><p><b>위험</b>은 네 변 빛과 Delta 판의 빛. <b>주의</b>는 Delta 모서리에만 노란 빛. 화면의 경고 색은 하나(가장 높은 단계)로 맞춤.</p></div>
+        <p class="why">주의가 잦은 현장에서 늘 켜진 경보는 무뎌짐 — 위험이 확실히 튀도록 주의를 덜어냄.</p>
       </div>
       <figure class="pic">
         <div class="tabs" role="group" aria-label="화면 고르기"></div>
@@ -221,9 +233,9 @@
       <div class="txt">
         <p class="num">05</p>
         <h2 id="s5-title">알림 확인 · 조치</h2>
-        <div class="blk"><p class="k">시안 1-A · 1-B</p><p>1-B 는 화면을 덮는 큰 모달에서 ① 확인 ② 지점 ③ 조치를 차례로 — 지도와 다른 알림이 가려졌다. 1-A 는 Delta 버튼으로.</p></div>
-        <div class="blk now"><p class="k">v2.2</p><p>알림을 고르면 <b>지도 위 웨이포인트 옆 쪽지</b>가 뜬다. 사진 · 위치 · DELTA 조치 제안을 보고 조치를 골라 [조치 완료] — 줄이 오늘 확인 완료로 내려가고 되돌리기가 남는다.</p></div>
-        <p class="why">어디서 일어났는지(지도)를 보면서 처리해야 판단이 빠르고, 화면을 떠나지 않는다.</p>
+        <div class="blk"><p class="k">시안 1-A · 1-B</p><p>1-B는 화면을 덮는 큰 모달에서 ① 확인 ② 지점 ③ 조치를 차례로 진행해, 지도와 다른 알림이 가려짐. 1-A는 Delta 버튼으로 처리.</p></div>
+        <div class="blk now"><p class="k">v2.2</p><p>알림을 고르면 <b>지도 위 웨이포인트 옆 쪽지</b>가 뜸. 사진 · 위치 · DELTA 조치 제안을 보고 조치를 골라 [조치 완료] — 줄이 오늘 확인 완료로 내려가고 되돌리기가 남음.</p></div>
+        <p class="why">어디서 일어났는지(지도)를 보면서 처리해야 판단이 빠르고, 화면을 떠나지 않아도 됨.</p>
       </div>
       <figure class="pic">
         <div class="tabs" role="group" aria-label="화면 고르기"></div>
@@ -238,9 +250,9 @@
       <div class="txt">
         <p class="num">06</p>
         <h2 id="s6-title">로봇 패널</h2>
-        <div class="blk"><p class="k">시안 1-A · 1-B</p><p>연결된 로봇 전체(11대 연결 · 3대 수행중)가 대상. 1-B 는 세 대를 카드로 나열하고 자동복귀 · E-STOP 이 "수행 로봇 전체" 버튼이었다.</p></div>
-        <div class="blk now"><p class="k">v2.2</p><p>미션에 <b>배정된 로봇만</b>("2대 배정 · 1대 수행중"), 한 대씩 크게 넘겨 본다. 자동복귀 · E-STOP 은 보고 있는 로봇 옆에. 미션 밖 로봇은 [로봇 현황]이 맡는다.</p></div>
-        <p class="why">비상 버튼은 누르는 대상이 분명해야 한다.</p>
+        <div class="blk"><p class="k">시안 1-A · 1-B</p><p>연결된 로봇 전체(11대 연결 · 3대 수행중)가 대상. 1-B는 세 대를 카드로 나열하고, 자동복귀 · E-STOP이 "수행 로봇 전체" 버튼이었음.</p></div>
+        <div class="blk now"><p class="k">v2.2</p><p>미션에 <b>배정된 로봇만</b>("2대 배정 · 1대 수행중") 한 대씩 크게 넘겨 봄. 자동복귀 · E-STOP은 보고 있는 로봇 옆에 둠. 미션 밖 로봇은 [로봇 현황]에서 다룸.</p></div>
+        <p class="why">비상 버튼은 누르는 대상이 분명해야 함.</p>
       </div>
       <figure class="pic">
         <div class="frame is-col">
@@ -255,9 +267,9 @@
       <div class="txt">
         <p class="num">07</p>
         <h2 id="s7-title">색 · 버튼 위계</h2>
-        <div class="blk"><p class="k">시안 1-A · 1-B</p><p>파랑이 지금 타임라인 칸 · 버튼 · 링크 · 상태에 두루 쓰여 무엇이 중요한지 흐려졌다.</p></div>
-        <div class="blk now"><p class="k">v2.2</p><p><b>"파랑은 상태이거나 지금 할 단 하나의 행동."</b> 지금 칸은 흰 면, 이동 · 보조는 회색 글자. 버튼은 6단계 — 빨강은 E-STOP 만, 파랑 면은 영역당 하나.</p></div>
-        <p class="why">색이 뜻을 하나만 가져야 경고색이 경고로 읽힌다.</p>
+        <div class="blk"><p class="k">시안 1-A · 1-B</p><p>파랑이 지금 타임라인 칸 · 버튼 · 링크 · 상태에 두루 쓰여, 무엇이 중요한지 흐려짐.</p></div>
+        <div class="blk now"><p class="k">v2.2</p><p><b>"파랑은 상태이거나 지금 할 단 하나의 행동."</b> 지금 칸은 흰 면, 이동 · 보조는 회색 글자. 버튼은 6단계로 나눔 — 빨강은 E-STOP만, 파랑 면은 영역당 하나.</p></div>
+        <p class="why">색이 뜻을 하나만 가져야 경고색이 경고로 읽힘.</p>
       </div>
       <figure class="pic">
         <div class="frame is-row">
@@ -272,9 +284,9 @@
       <div class="txt">
         <p class="num">08</p>
         <h2 id="s8-title">지도 · 바탕 정돈</h2>
-        <div class="blk"><p class="k">시안 1-A · 1-B</p><p>지도의 길 점선과 타임라인 점선이 달랐고, 바탕의 밝기 단계가 정해져 있지 않았다.</p></div>
-        <div class="blk now"><p class="k">v2.2</p><p>남은 길 점선을 타임라인 점선과 같은 무늬로 맞췄다. 바탕은 GNB · 알림 목록 · 관제 프레임 <b>세 단</b>으로 정리했고, 라이트 테마도 같은 순서를 따른다. 아이콘은 아웃라인 세트로 바꾸고 16px 용을 따로 둔다.</p></div>
-        <p class="why">같은 뜻은 같은 모양으로 — 지도와 목록이 한 화면처럼 읽힌다.</p>
+        <div class="blk"><p class="k">시안 1-A · 1-B</p><p>지도의 길 점선과 타임라인 점선이 달랐고, 바탕의 밝기 단계가 정해져 있지 않았음.</p></div>
+        <div class="blk now"><p class="k">v2.2</p><p>남은 길 점선을 타임라인 점선과 같은 무늬로 맞춤. 바탕은 GNB · 알림 목록 · 관제 프레임 <b>세 단</b>으로 정리했고, 라이트 테마도 같은 순서를 따름. 아이콘은 아웃라인 세트로 바꾸고 16px용을 따로 둠.</p></div>
+        <p class="why">같은 뜻은 같은 모양으로 — 지도와 목록이 한 화면처럼 읽힘.</p>
       </div>
       <figure class="pic">
         <div class="tabs" role="group" aria-label="화면 고르기"></div>
@@ -329,27 +341,84 @@
         show(start);
       });
 
-      // 지금 장 번호 · 방향키로 장 넘기기
+      // 장 넘기기 — 넓은 화면에서는 휠 · 방향키 · 목차를 한 장씩, 천천히 미끄러지게 옮긴다.
+      // 브라우저 기본 부드러운 스크롤은 빠르고 속도를 못 바꿔서, 직접 1.1초 ease-in-out 으로 옮긴다.
       var slides = Array.prototype.slice.call(document.querySelectorAll(".slide"));
       var now = document.querySelector("[data-pager-now]");
-      var cur = 0;
+      var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      var wide = window.matchMedia("(min-width: 901px)");
+      var DUR = reduce ? 0 : 1100;
+      var cur = 0, busy = false, lockUntil = 0;
+
+      function mark(n) {
+        cur = n;
+        now.textContent = (n < 10 ? "0" : "") + n;
+        slides.forEach(function (s, k) { if (k === n) { s.classList.add("is-in"); } });
+      }
+      function ease(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
+      function go(n) {
+        n = Math.max(0, Math.min(slides.length - 1, n));
+        var from = window.scrollY, to = slides[n].offsetTop;
+        mark(n);
+        if (history.replaceState) { history.replaceState(null, "", "#" + slides[n].id); }
+        if (!DUR || Math.abs(to - from) < 2) { window.scrollTo(0, to); return; }
+        busy = true;
+        var t0 = performance.now();
+        (function step(t) {
+          var k = Math.min(1, (t - t0) / DUR);
+          window.scrollTo(0, from + (to - from) * ease(k));
+          if (k < 1) { requestAnimationFrame(step); }
+          else { busy = false; lockUntil = performance.now() + 450; }   // 트랙패드 관성 휠을 흘려 보낸다
+        })(t0);
+      }
+
+      // 손으로 끌거나 좁은 화면에서는 보이는 장을 따라간다
       if ("IntersectionObserver" in window) {
         var io = new IntersectionObserver(function (es) {
           es.forEach(function (e) {
-            if (e.isIntersecting) { cur = slides.indexOf(e.target); now.textContent = (cur < 10 ? "0" : "") + cur; }
+            if (!e.isIntersecting) { return; }
+            e.target.classList.add("is-in");
+            if (!busy && e.intersectionRatio >= 0.55) { mark(slides.indexOf(e.target)); }
           });
-        }, { threshold: 0.6 });
+        }, { threshold: [0.2, 0.55] });
         slides.forEach(function (s) { io.observe(s); });
+      } else {
+        slides.forEach(function (s) { s.classList.add("is-in"); });
       }
-      document.addEventListener("keydown", function (e) {
-        if (e.target.closest && e.target.closest("input, textarea")) { return; }
-        var step = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 }[e.key];
-        if (!step) { return; }
-        var next = Math.max(0, Math.min(slides.length - 1, cur + step));
-        if (next === cur) { return; }
+
+      window.addEventListener("wheel", function (e) {
+        if (!wide.matches || e.ctrlKey) { return; }
         e.preventDefault();
-        slides[next].scrollIntoView({ block: "start" });
+        if (busy || performance.now() < lockUntil || Math.abs(e.deltaY) < 8) { return; }
+        go(cur + (e.deltaY > 0 ? 1 : -1));
+      }, { passive: false });
+
+      document.addEventListener("keydown", function (e) {
+        if (!wide.matches) { return; }
+        if (e.target.closest && e.target.closest("input, textarea, button")) { if (e.key === " ") { return; } }
+        var step = { ArrowDown: 1, ArrowRight: 1, PageDown: 1, " ": 1, ArrowUp: -1, ArrowLeft: -1, PageUp: -1 }[e.key];
+        if (e.key === "Home") { e.preventDefault(); go(0); return; }
+        if (e.key === "End") { e.preventDefault(); go(slides.length - 1); return; }
+        if (!step) { return; }
+        e.preventDefault();
+        if (!busy) { go(cur + (e.shiftKey && e.key === " " ? -1 : step)); }
       });
+
+      Array.prototype.forEach.call(document.querySelectorAll('a[href^="#s"]'), function (a) {
+        a.addEventListener("click", function (e) {
+          var t = document.getElementById(a.getAttribute("href").slice(1));
+          if (!t || !wide.matches) { return; }
+          e.preventDefault();
+          go(slides.indexOf(t));
+        });
+      });
+
+      // 창 크기가 바뀌면 지금 장 맨 위에 다시 맞춘다
+      window.addEventListener("resize", function () { if (wide.matches && !busy) { window.scrollTo(0, slides[cur].offsetTop); } });
+
+      // 주소의 #s3 처럼 장을 집어 열면 그 장에서 시작한다
+      var first = slides.indexOf(document.getElementById((location.hash || "").slice(1)));
+      if (first > 0) { window.scrollTo(0, slides[first].offsetTop); mark(first); } else { mark(0); }
     })();
   </script>
 </body>
