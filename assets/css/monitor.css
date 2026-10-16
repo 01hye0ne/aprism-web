@@ -2014,32 +2014,8 @@
   border-radius: var(--radius-4);
 }
 .map-alert.ma-v3::after { background-color: var(--bg-raised); }
-.ma-v3 > :not(.ma-bg) { position: relative; z-index: 2; }
-
-.ma-v3 .ma-bg {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: inherit;
-}
-.ma-v3 .ma-bg[hidden] { display: none; }
-
-/* 정보 hover — 사진 전체를 한 겹 눌러 글이 읽히게 한다 */
-.map-alert.ma-v3::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  border-radius: inherit;
-  background-color: color-mix(in srgb, var(--bg-map-chip) 50%, transparent);
-  opacity: 0;
-  transition: opacity 160ms ease;
-  pointer-events: none;
-}
-.map-alert.ma-v3.is-info::before { opacity: 1; }
+.ma-v3 > * { position: relative; }
+.ma-v3 .ma-lower { z-index: 2; }
 
 /* 머리 — Head 368 · padding 12 · gap 8 · bg/raised */
 .ma-v3 .ma-head {
@@ -2084,19 +2060,42 @@
 .ma-menu button:hover, .ma-menu button:focus-visible { background-color: var(--state-hover-raised); outline: none; }
 .ma-menu button[hidden] { display: none; }
 
-/* 사진 칸 — 368 × 207(16:9) 창. 사진은 카드 바탕이라 여기는 비어 있다. */
+/*
+ * 사진 칸 — 사진을 제 가로 비율대로 폭에 꽉 채운다. Figma 는 사진을 카드 전체 바탕(세로)으로 깔았는데,
+ * 검출 장면은 1.5 : 1 ~ 2 : 1 가로 그림이라 양옆이 다 잘렸다(10/16 디자이너). 그래서 위쪽만 사진이고
+ * 아래 끝 64px 은 바탕색으로 녹아든다. 그 위로 DELTA 카드가 40 올라타 Figma 의 겹침을 남긴다.
+ */
 .ma-v3 .ma-snap {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 10px;
-  aspect-ratio: 16 / 9;
-  padding: var(--space-12);
+  display: block;
+  aspect-ratio: auto;
+  min-height: 120px;
+  padding: 0;
   border: 0;
   background: none;
-  overflow: visible;
+  overflow: hidden;
 }
-.ma-v3 .ma-info { margin-left: auto; }
+.ma-v3 .ma-shot {
+  display: block;
+  width: 100%;
+  height: auto;
+  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 64px), transparent);
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 64px), transparent);
+}
+.ma-v3 .ma-shot[hidden] { display: none; }
+/* 정보 hover — 사진을 한 겹 눌러 글이 읽히게 한다(state=info hover · bg/map-chip 50%) */
+.ma-v3 .ma-snap::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background-color: color-mix(in srgb, var(--bg-map-chip) 50%, transparent);
+  opacity: 0;
+  transition: opacity 160ms ease;
+  pointer-events: none;
+}
+.ma-v3.is-info .ma-snap::before { opacity: 1; }
+.ma-v3 .ma-snap > .ma-meta { position: absolute; top: var(--space-12); left: var(--space-12); z-index: 2; }
+.ma-v3 .ma-info { position: absolute; top: var(--space-12); right: var(--space-12); z-index: 2; }
 
 .ma-v3 .ma-meta {
   gap: var(--space-8);
@@ -2114,26 +2113,13 @@
 
 /* 사진이 없는 알림(비상정지 등) — 사진 칸을 접고 아래 칸을 불투명하게 */
 .ma-v3.no-snap .ma-snap { display: none; }
-.ma-v3.no-snap .ma-lower { background: var(--bg-raised); }
-.ma-v3.no-snap .ma-lower::before { display: none; }
 
-/* 아래 칸 — 위가 투명한 그라데이션 + 흐림 4(Figma 는 위에서 아래로 짙어지는 progressive blur) */
+/* 아래 칸 — 바탕색(raised). 사진 아래 끝에 40 올라타 DELTA 카드가 사진 위에 얹혀 보인다. */
 .ma-v3 .ma-lower {
+  margin-top: -40px;
   border-radius: 0 0 var(--radius-4) var(--radius-4);
-  background: linear-gradient(to bottom, color-mix(in srgb, var(--bg-raised) 0%, transparent), var(--bg-raised));
 }
-.ma-v3 .ma-lower::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  border-radius: inherit;
-  -webkit-backdrop-filter: blur(4px);
-  backdrop-filter: blur(4px);
-  -webkit-mask-image: linear-gradient(to bottom, transparent, #000);
-  mask-image: linear-gradient(to bottom, transparent, #000);
-  pointer-events: none;
-}
+.ma-v3.no-snap .ma-lower { margin-top: 0; }
 .ma-v3 .ma-lower-in { padding: var(--space-4); }
 
 /* DELTA 조치 제안 — Size=Small · bg/raised · border/default · r8 · padding 8 · gap 12 */

@@ -20,12 +20,12 @@
     }
   }
   </script>
-  <link rel="stylesheet" href="../assets/css/tokens.css?v=9cceac77" />
+  <link rel="stylesheet" href="../assets/css/tokens.css?v=650d5169" />
   <link rel="stylesheet" href="../assets/css/app-shell.css?v=d3dbbcdc" />
   <link rel="stylesheet" href="../assets/css/map-overlays.css?v=d6d55106" />
   <link rel="stylesheet" href="../assets/css/icons-outline.css?v=6b866a80" />
   <link rel="stylesheet" href="../assets/css/text-parts.css?v=e38e19ea" />
-  <link rel="stylesheet" href="../assets/css/monitor.css?v=444303d5" />
+  <link rel="stylesheet" href="../assets/css/monitor.css?v=155c99c3" />
   <link rel="stylesheet" href="../assets/css/palette-neutral.css?v=0c969aea" />
   <link rel="stylesheet" href="../assets/css/delta-v3.css?v=b1562ee4" />
   <style>
@@ -413,8 +413,6 @@
                    · [크게보기] 대신 [더보기] — 크게 보기 · 패널에 고정(도킹)을 고른다.
                    · 조치는 체크리스트, 메모는 접혀 있다. -->
               <section class="map-alert ma-v3" data-map-alert hidden aria-labelledby="ma-title">
-                <img class="ma-bg" data-ma-img alt="" />
-
                 <div class="ma-head">
                   <div class="ma-title-block">
                     <span class="ma-badge t-label-2" data-ma-badge><span class="badge-dot"></span><span data-ma-sev>주의</span></span>
@@ -435,8 +433,10 @@
                   </button>
                 </div>
 
-                <!-- 사진 칸 — 비어 있는 창이다(사진은 카드 바탕). 오른쪽 위 [정보] 에 손을 얹으면 메타가 뜬다. -->
+                <!-- 사진 칸 — 사진은 제 가로 비율대로 꽉 채운다(세로로 깔면 양옆이 잘린다 · 10/16 디자이너).
+                     아래 끝은 바탕색으로 녹아들고, 그 위로 DELTA 카드가 조금 올라탄다. 오른쪽 위 [정보] 에 손을 얹으면 메타가 뜬다. -->
                 <div class="ma-snap" data-ma-snap>
+                  <img class="ma-shot" data-ma-img alt="" />
                   <dl class="ma-meta" id="ma-meta" data-ma-meta>
                     <div class="ma-meta-row"><dt>위치</dt><dd><span class="ma-wp" data-ma-wp></span><span class="ma-place" data-ma-place></span></dd></div>
                     <div class="ma-meta-row"><dt>감지</dt><dd data-ma-detect></dd></div>
@@ -450,7 +450,8 @@
                 <div class="ma-lower">
                   <div class="ma-lower-in">
                     <!-- DELTA 조치 제안 (Size=Small) — 권고 한 줄 · 조치 체크리스트 · 메모가 한 카드 -->
-                    <section class="ma-delta" aria-labelledby="ma-delta-label">
+                    <!-- 라이트로 뒤집은 판 — Figma 는 이 카드에만 Semantic=Light 를 걸었다(tokens.css .is-light-scope). -->
+                    <section class="ma-delta is-light-scope" aria-labelledby="ma-delta-label">
                       <div class="ma-delta-head">
                         <div class="ma-delta-mark">
                           <span class="i i-16" style="--i:var(--ic-delta)" aria-hidden="true"></span>
