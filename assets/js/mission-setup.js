@@ -42,7 +42,10 @@
   var SPEED = 0.5;      // m/s — 로봇의 순회 속도
   var RESERVE = 20;     // 복귀 예비 %. 이만큼은 남겨 두어야 스스로 충전소로 돌아온다
   var MOVE_RATE = 1.3;  // 이동 중 소모 %/분
-  var INSP_RATE = 0.9;  // 점검 중 소모 %/분 (멈춰서 재기만 하니 이동보다 덜 쓴다)
+  var INSP_RATE = 0.3;  // 점검 중 소모 %/분 (멈춰서 재기만 하니 이동보다 훨씬 덜 쓴다)
+  // 머무는 시간(data-dwell)은 모니터링 타임라인의 웨이포인트별 시간(19 · 21 · 16 · 16분)에서 이동을 뺀 값이다.
+  // 그래서 예상 소요시간이 1시간 남짓이 되고, 위 소모율로 ROBOT 01(96%)이 끝나면 70%대가 남는다 —
+  // 모니터링에서 같은 로봇이 4번째 칸을 도는 지금 78% 인 것과 이어진다(2026-10-16).
 
   // D = 충전 스테이션(출발·복귀). n* 는 통로가 갈라지는 자리다.
   // 웨이포인트는 미션 모니터링과 같은 것이다(2026-10-16 디자이너) — 지도(map.js) ROBOT 01 의 WP-01 ~ 04,
@@ -88,17 +91,21 @@
     });
   })();
 
+  // 60분이 넘으면 "1시간 12분" 으로 읽는다.
+  function hm(min) { return min < 60 ? min + "분" : Math.floor(min / 60) + "시간" + (min % 60 ? " " + (min % 60) + "분" : ""); }
+
   function span(a, b) { return (SPAN[a] && SPAN[a][b]) || 0; }
 
   /* ================================================================
    * 로봇 — 이름 · 배터리 · 지금 서 있는 자리
    * 충전소(D) 밖에 있으면 미션을 시작하기 전에 거기까지 가는 구간이 먼저 붙는다.
-   * ROBOT 01 은 순회에서 돌아오는 길이라 통로 한가운데(n7)에 있고 배터리가 적다 —
+   * 미션을 도는 로봇은 모니터링과 같은 ROBOT 01 이다(충전소에서 가득 찬 채 출발).
+   * ROBOT 02 는 다른 순회에서 돌아오는 길이라 통로(n7)에 있고 배터리가 적다 —
    * 배터리가 모자라 못 떠나는 경우를 실제로 눌러 볼 수 있어야 이 셈이 보인다.
    * ================================================================ */
   var ROBOTS = {
-    "ROBOT 01": { bat: 31, at: "n7" },
-    "ROBOT 02": { bat: 82, at: "D" },
+    "ROBOT 01": { bat: 96, at: "D" },
+    "ROBOT 02": { bat: 31, at: "n7" },
     "ROBOT 03": { bat: 91, at: "D" }
   };
 
@@ -115,8 +122,8 @@
       })();
     var value = box && box.querySelector("[data-select-value]");
     var text = value ? value.textContent : "";
-    var key = (text.match(/ROBOT\s*\d+/i) || ["ROBOT 02"])[0].toUpperCase();
-    return { key: key, spec: ROBOTS[key] || ROBOTS["ROBOT 02"] };
+    var key = (text.match(/ROBOT\s*\d+/i) || ["ROBOT 01"])[0].toUpperCase();
+    return { key: key, spec: ROBOTS[key] || ROBOTS["ROBOT 01"] };
   }
 
   /* ================================================================
@@ -228,7 +235,7 @@
     var was = Math.round(trip(FIRST, bot.spec).sec / 60);
     if (timeEl) {
       timeEl.innerHTML = n
-        ? (min !== was ? '<s class="was">' + was + "분</s>" : "") + "약 " + min + "분"
+        ? (min !== was ? '<s class="was">' + hm(was) + "</s>" : "") + "약 " + hm(min)
         : "—";
       if (lastMin !== null && lastMin !== min) { flash(timeEl); }
     }
