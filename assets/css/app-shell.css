@@ -328,6 +328,11 @@ button {
   background-color: currentColor;
 }
 
+/* theme.js 가 SVG 로 다시 그린 뒤에는 <i> 를 숨긴다(배율이 소수인 모니터에서 굵기를 고르게 · 10/16). */
+.signal-bars.is-svg i { display: none; }
+.signal-bars .signal-svg { display: block; }
+.signal-bars .signal-svg .off { fill: var(--comp-chart-track); }
+
 .signal-bars i:nth-child(1) { height: 5px; }
 .signal-bars i:nth-child(2) { height: 8px; }
 .signal-bars i:nth-child(3) { height: 11px; }

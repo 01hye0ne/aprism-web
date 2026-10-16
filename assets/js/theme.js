@@ -58,3 +58,68 @@
     });
   }
 })();
+
+/*
+ * Signal 막대 — 배율이 소수인 모니터(Windows 125% · 150%)에서 막대마다 굵기가 달라 보이던 것(2026-10-16).
+ * CSS 상자로는 크롬이 1/64px 단위로 배치하고 가장자리를 번지게 그려 막을 수 없었다.
+ * 그래서 막대를 기기 픽셀 정수로 셈한 SVG(shape-rendering: crispEdges)로 다시 그린다 — 칸 사이에 걸려도
+ * 가장자리가 반 칸씩 번지지 않는다. 마크업(<i> 넷 · data-level)과 색(currentColor · 꺼진 칸은 chart-track)은 그대로다.
+ */
+(function () {
+  var HEIGHTS = [5, 8, 11, 14];
+  function draw(b) {
+    var d = window.devicePixelRatio || 1;
+    var w = Math.round(3 * d), g = Math.round(2 * d);
+    var hs = HEIGHTS.map(function (h) { return Math.round(h * d); });
+    var W = 4 * w + 3 * g, H = hs[3];
+    // data-level 이 없으면 넷 다 켠다(상태 바 신호) — Number(null) 은 0 이라 따로 본다.
+    var raw = b.getAttribute("data-level");
+    var level = raw === null || raw === "" ? 4 : Number(raw);
+    if (isNaN(level)) { level = 4; }
+    var svg = b.querySelector("svg.signal-svg");
+    if (!svg) {
+      svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      svg.setAttribute("class", "signal-svg");
+      svg.setAttribute("aria-hidden", "true");
+      svg.setAttribute("shape-rendering", "crispEdges");
+      b.appendChild(svg);
+    }
+    svg.setAttribute("width", String(W / d));
+    svg.setAttribute("height", String(H / d));
+    svg.setAttribute("viewBox", "0 0 " + W + " " + H);
+    svg.innerHTML = hs.map(function (h, k) {
+      return '<rect x="' + k * (w + g) + '" y="' + (H - h) + '" width="' + w + '" height="' + h + '"' +
+        (k < level ? ' fill="currentColor"' : ' class="off"') + "/>";
+    }).join("");
+    b.classList.add("is-svg");
+    // SVG 자신의 왼쪽 위가 칸 사이에 걸리면 crispEdges 도 반 칸 번진다 — 모자라는 만큼 민다.
+    svg.style.transform = "";
+    var r = svg.getBoundingClientRect();
+    var ox = (Math.round(r.left * d) - r.left * d) / d;
+    var oy = (Math.round(r.top * d) - r.top * d) / d;
+    if (Math.abs(ox) > 0.001 || Math.abs(oy) > 0.001) { svg.style.transform = "translate(" + ox.toFixed(4) + "px," + oy.toFixed(4) + "px)"; }
+  }
+  function all() { Array.prototype.forEach.call(document.querySelectorAll(".signal-bars"), draw); }
+  var t = null;
+  function later() { clearTimeout(t); t = setTimeout(all, 30); }
+  if (document.readyState === "loading") { document.addEventListener("DOMContentLoaded", all); } else { all(); }
+  window.addEventListener("load", later);
+  window.addEventListener("resize", later);
+  // 배율이 바뀌면(창을 다른 모니터로) 다시 그린다. 단계(data-level)가 바뀌어도 다시 그린다.
+  if (window.matchMedia) {
+    (function watch() {
+      var mq = window.matchMedia("(resolution: " + (window.devicePixelRatio || 1) + "dppx)");
+      var on = function () { if (mq.removeEventListener) { mq.removeEventListener("change", on); } else { mq.removeListener(on); } all(); watch(); };
+      if (mq.addEventListener) { mq.addEventListener("change", on); } else if (mq.addListener) { mq.addListener(on); }
+    })();
+  }
+  if (window.MutationObserver) {
+    new MutationObserver(function (ms) {
+      for (var i = 0; i < ms.length; i += 1) {
+        var m = ms[i];
+        if (m.type === "attributes" && m.target.classList && m.target.classList.contains("signal-bars")) { draw(m.target); }
+        else if (m.type === "childList") { later(); }
+      }
+    }).observe(document.documentElement, { subtree: true, childList: true, attributes: true, attributeFilter: ["data-level"] });
+  }
+})();
