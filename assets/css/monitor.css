@@ -2008,10 +2008,12 @@
  *   · 위치 · 감지 · 로봇은 [정보] 에 손을 얹으면 뜬다 — 사진 위에 bg/map-chip 50% 를 깐다(state=info hover).
  *   · 조치는 체크리스트(Lists), 메모는 접힌 채로(메모/Property 1=Default).
  * ================================================================== */
+/* 바깥 모서리 16 — 안쪽 DELTA 카드(12)보다 한 단 크게 둔다(10/16 디자이너, Figma 4 에서 올림). */
 .map-alert.ma-v3 {
+  --ma-r: 16px;
   isolation: isolate;
   border-color: var(--border-strong);
-  border-radius: var(--radius-4);
+  border-radius: var(--ma-r);
 }
 .map-alert.ma-v3::after { background-color: var(--bg-raised); }
 .ma-v3 > * { position: relative; }
@@ -2020,7 +2022,7 @@
 /* 머리 — Head 368 · padding 12 · gap 8 · bg/raised */
 .ma-v3 .ma-head {
   padding: var(--space-12);
-  border-radius: var(--radius-4) var(--radius-4) 0 0;
+  border-radius: var(--ma-r) var(--ma-r) 0 0;
   background-color: var(--bg-raised);
 }
 .ma-v3 .ma-title { font-size: var(--font-size-18); line-height: var(--font-line-height-26); font-weight: 700; }
@@ -2132,7 +2134,7 @@
 :root[data-theme="light"] .v2-2 { --ma-sink: var(--color-gray-100); }
 .ma-v3 .ma-lower {
   margin-top: -40px;
-  border-radius: 0 0 var(--radius-4) var(--radius-4);
+  border-radius: 0 0 var(--ma-r) var(--ma-r);
   background: linear-gradient(to bottom, transparent 0, transparent 40px, var(--bg-raised) 40px, var(--ma-sink) 100%);
 }
 .ma-v3.no-snap .ma-lower { background: linear-gradient(to bottom, var(--bg-raised), var(--ma-sink)); }
