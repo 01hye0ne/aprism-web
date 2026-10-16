@@ -1999,3 +1999,253 @@
 @media (prefers-reduced-motion: reduce) {
   .done-item.is-new { animation: none; }
 }
+
+/* ==================================================================
+ * 알림 팝오버 v3 — v2.2 (Figma UI_00 1233:16460 "알림 팝오버", 2026-10-16)
+ * DELTA 조치가 먼저 눈에 들어오게 정보 글을 걷었다. 예전 판(v2 · v2.1)은 위 .map-alert 그대로다.
+ *   · 사진이 카드 전체의 바탕(Figma 루트 fill IMAGE)이다. 머리는 raised 면으로 덮고,
+ *     아래 칸은 위가 투명한 그라데이션 + 흐림으로 사진 위에 얹는다(Frame 1597882807).
+ *   · 위치 · 감지 · 로봇은 [정보] 에 손을 얹으면 뜬다 — 사진 위에 bg/map-chip 50% 를 깐다(state=info hover).
+ *   · 조치는 체크리스트(Lists), 메모는 접힌 채로(메모/Property 1=Default).
+ * ================================================================== */
+.map-alert.ma-v3 {
+  isolation: isolate;
+  border-color: var(--border-strong);
+  border-radius: var(--radius-4);
+}
+.map-alert.ma-v3::after { background-color: var(--bg-raised); }
+.ma-v3 > :not(.ma-bg) { position: relative; z-index: 2; }
+
+.ma-v3 .ma-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+}
+.ma-v3 .ma-bg[hidden] { display: none; }
+
+/* 정보 hover — 사진 전체를 한 겹 눌러 글이 읽히게 한다 */
+.map-alert.ma-v3::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+  background-color: color-mix(in srgb, var(--bg-map-chip) 50%, transparent);
+  opacity: 0;
+  transition: opacity 160ms ease;
+  pointer-events: none;
+}
+.map-alert.ma-v3.is-info::before { opacity: 1; }
+
+/* 머리 — Head 368 · padding 12 · gap 8 · bg/raised */
+.ma-v3 .ma-head {
+  padding: var(--space-12);
+  border-radius: var(--radius-4) var(--radius-4) 0 0;
+  background-color: var(--bg-raised);
+}
+.ma-v3 .ma-title { font-size: var(--font-size-18); line-height: var(--font-line-height-26); font-weight: 700; }
+
+/* [더보기] 메뉴 — 크게 보기 · 패널에 고정 */
+.ma-more-box { position: relative; flex: none; }
+.ma-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  z-index: 3;
+  min-width: 136px;
+  margin: 0;
+  padding: var(--space-4);
+  list-style: none;
+  border: var(--border-width-thin) solid var(--border-default);
+  border-radius: var(--radius-4);
+  background-color: var(--bg-raised);
+  box-shadow: 0 8px 20px -4px rgb(0 0 0 / 30%);
+}
+.ma-menu[hidden] { display: none; }
+.ma-menu button {
+  display: block;
+  width: 100%;
+  padding: var(--space-8) var(--space-12);
+  border: 0;
+  border-radius: var(--radius-4);
+  background: transparent;
+  color: var(--text-primary);
+  font: inherit;
+  font-size: var(--font-size-13);
+  line-height: var(--font-line-height-18);
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.ma-menu button:hover, .ma-menu button:focus-visible { background-color: var(--state-hover-raised); outline: none; }
+.ma-menu button[hidden] { display: none; }
+
+/* 사진 칸 — 368 × 207(16:9) 창. 사진은 카드 바탕이라 여기는 비어 있다. */
+.ma-v3 .ma-snap {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  aspect-ratio: 16 / 9;
+  padding: var(--space-12);
+  border: 0;
+  background: none;
+  overflow: visible;
+}
+.ma-v3 .ma-info { margin-left: auto; }
+
+.ma-v3 .ma-meta {
+  gap: var(--space-8);
+  padding: 0;
+  opacity: 0;
+  transition: opacity 160ms ease;
+}
+.ma-v3.is-info .ma-meta { opacity: 1; }
+.ma-v3 .ma-meta-row { gap: var(--space-12); align-items: baseline; }
+.ma-v3 .ma-meta-row > dt { font-size: var(--font-size-12); line-height: var(--font-line-height-18); }
+.ma-v3 .ma-meta-row > dd { font-size: var(--font-size-12); line-height: var(--font-line-height-18); }
+.ma-v3 .ma-wp { font-size: var(--font-size-12); line-height: var(--font-line-height-18); font-weight: 500; letter-spacing: 0; }
+.ma-v3 .ma-place { font-size: var(--font-size-13); line-height: var(--font-line-height-20); }
+.ma-v3 .ma-robot { font-family: var(--font-family-mono); font-size: var(--font-size-13); color: var(--text-secondary); }
+
+/* 사진이 없는 알림(비상정지 등) — 사진 칸을 접고 아래 칸을 불투명하게 */
+.ma-v3.no-snap .ma-snap { display: none; }
+.ma-v3.no-snap .ma-lower { background: var(--bg-raised); }
+.ma-v3.no-snap .ma-lower::before { display: none; }
+
+/* 아래 칸 — 위가 투명한 그라데이션 + 흐림 4(Figma 는 위에서 아래로 짙어지는 progressive blur) */
+.ma-v3 .ma-lower {
+  border-radius: 0 0 var(--radius-4) var(--radius-4);
+  background: linear-gradient(to bottom, color-mix(in srgb, var(--bg-raised) 0%, transparent), var(--bg-raised));
+}
+.ma-v3 .ma-lower::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000);
+  mask-image: linear-gradient(to bottom, transparent, #000);
+  pointer-events: none;
+}
+.ma-v3 .ma-lower-in { padding: var(--space-4); }
+
+/* DELTA 조치 제안 — Size=Small · bg/raised · border/default · r8 · padding 8 · gap 12 */
+.ma-v3 .ma-delta {
+  gap: var(--space-12);
+  padding: var(--space-8);
+  border-radius: var(--radius-8);
+  background-color: var(--bg-raised);
+}
+.ma-v3 .ma-delta-mark { gap: var(--space-4); color: var(--comp-gnb-text-brand); }
+.ma-v3 .ma-fp { gap: var(--space-8); color: var(--text-secondary); }
+.ma-v3 .ma-fp-value { display: inline; color: var(--status-safe-text); }
+.ma-v3 .ma-fp-value.is-mid { color: var(--status-warning-text); }
+.ma-v3 .ma-fp-value.is-high { color: var(--status-critical-text); }
+.ma-v3 .ma-act { gap: var(--space-4); }
+.ma-v3 .ma-delta-lead {
+  font-size: var(--font-size-14);
+  line-height: var(--font-line-height-22);
+  font-weight: 400;
+  word-break: keep-all;
+}
+
+/* 조치 체크리스트 — Lists · bg/map-chip · border/default · r4. 줄 사이 선 1. */
+.ma-checks {
+  display: flex;
+  flex-direction: column;
+  border: var(--border-width-thin) solid var(--border-default);
+  border-radius: var(--radius-4);
+  background-color: var(--bg-map-chip);
+  overflow: hidden;
+}
+.ma-check {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  width: 100%;
+  min-height: 38px;
+  padding: var(--space-8) var(--space-8) var(--space-8) var(--space-12);
+  border: 0;
+  border-bottom: var(--border-width-thin) solid var(--border-default);
+  background: transparent;
+  color: var(--text-primary);
+  font: inherit;
+  font-size: var(--font-size-14);
+  line-height: var(--font-line-height-22);
+  text-align: left;
+  cursor: pointer;
+}
+.ma-check:last-child { border-bottom: 0; }
+.ma-check:hover { background-color: var(--state-hover); }
+.ma-check:focus-visible { outline: var(--border-width-strong) solid var(--border-focus); outline-offset: -2px; }
+.ma-check-box {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  box-sizing: border-box;
+  border: var(--border-width-thin) solid var(--border-default);
+  border-radius: var(--radius-4);
+  background-color: var(--bg-panel);
+  color: var(--color-gray-0);
+}
+.ma-check-box .i { width: 14px; height: 14px; opacity: 0; }
+.ma-check[aria-checked="true"] .ma-check-box { border-color: transparent; background-color: var(--comp-gnb-brand); }
+.ma-check[aria-checked="true"] .ma-check-box .i { opacity: 1; }
+.ma-check-label { flex: 1 1 auto; min-width: 0; }
+/* AI 추천 꼬리표 — Tag/Emphasis=Brand */
+.ma-check-tag {
+  flex: none;
+  padding: var(--space-4) var(--space-8);
+  border-radius: var(--radius-4);
+  background-color: var(--bg-accent);
+  color: var(--text-on-inverse);
+  font-size: var(--font-size-13);
+  line-height: var(--font-line-height-18);
+  font-weight: 500;
+}
+
+/* 메모 — 기본은 접힘. 펼치면 Field(bg/map-chip 50% · padding 12) */
+.ma-memo { display: flex; flex-direction: column; gap: var(--space-8); }
+.ma-memo-row { display: flex; align-items: center; gap: var(--space-4); color: var(--text-tertiary); }
+.ma-memo-row > span { flex: 1 1 auto; }
+.ma-memo-row .icon-button .i { transition: transform 160ms ease; }
+.ma-memo.is-open .ma-memo-row .icon-button .i { transform: rotate(180deg); }
+.ma-memo-field {
+  display: block;
+  width: 100%;
+  min-height: 68px;
+  box-sizing: border-box;
+  padding: var(--space-12);
+  border: 0;
+  border-radius: var(--radius-4);
+  background-color: color-mix(in srgb, var(--bg-map-chip) 50%, transparent);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: var(--font-size-14);
+  line-height: var(--font-line-height-22);
+  resize: vertical;
+}
+.ma-memo-field::placeholder { color: var(--text-tertiary); }
+.ma-memo-field:focus-visible { outline: var(--border-width-thin) solid var(--border-focus); }
+.ma-memo-field[hidden] { display: none; }
+
+.ma-v3 .ma-actions { padding: var(--space-12); }
+
+/* 패널에 고정(도킹) — 웨이포인트를 따라다니지 않고 지도 칸 오른쪽 위(지도 도구 옆)에 선다 */
+.map-alert.ma-v3.is-docked {
+  left: auto;
+  right: 64px;
+  top: var(--space-16);
+  transform: none;
+}
+.map-alert.ma-v3.is-docked::after { display: none; }
+.ma-v3 .ma-fp-value span { color: inherit; }

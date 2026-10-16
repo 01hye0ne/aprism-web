@@ -23,9 +23,9 @@
   <link rel="stylesheet" href="../assets/css/tokens.css?v=9cceac77" />
   <link rel="stylesheet" href="../assets/css/app-shell.css?v=d3dbbcdc" />
   <link rel="stylesheet" href="../assets/css/map-overlays.css?v=d6d55106" />
-  <link rel="stylesheet" href="../assets/css/icons-outline.css?v=83872c0c" />
+  <link rel="stylesheet" href="../assets/css/icons-outline.css?v=6b866a80" />
   <link rel="stylesheet" href="../assets/css/text-parts.css?v=e38e19ea" />
-  <link rel="stylesheet" href="../assets/css/monitor.css?v=bcfaa9b4" />
+  <link rel="stylesheet" href="../assets/css/monitor.css?v=444303d5" />
   <link rel="stylesheet" href="../assets/css/palette-neutral.css?v=0c969aea" />
   <link rel="stylesheet" href="../assets/css/delta-v3.css?v=b1562ee4" />
   <style>
@@ -406,77 +406,85 @@
                 <p class="map-wp-read" data-map-wp-read></p>
                 <button type="button" class="btn btn-ghost map-wp-more" data-map-wp-more>상세보기</button>
               </div>
-              <!-- 알림 쪽지 — Figma UI_00 1211:16646 "알림 팝오버".
-                   Contents(머리 · 사진+메타 · DELTA 제안 · 조치) 아래 선을 긋고 Actions 를 따로 세운다.
-                   칸의 생김새(배지 · 감지 칩 · DELTA 카드 · 오탐 막대 · 조치 칩)는 알림 센터와 같은 것을 쓴다. -->
-              <section class="map-alert" data-map-alert hidden aria-labelledby="ma-title">
+              <!-- 알림 팝오버 v3 — Figma UI_00 1233:16460 "알림 팝오버" (2026-10-16).
+                   DELTA 조치가 눈에 먼저 들어오게 정보 글을 걷었다.
+                   · 사진이 카드 전체의 바탕이고, 아래 칸(DELTA · 버튼)은 그라데이션 + 흐림으로 사진 위에 얹힌다.
+                   · 위치 · 감지 · 로봇은 사진 위 [정보] 에 손을 얹으면 뜬다(state=info hover).
+                   · [크게보기] 대신 [더보기] — 크게 보기 · 패널에 고정(도킹)을 고른다.
+                   · 조치는 체크리스트, 메모는 접혀 있다. -->
+              <section class="map-alert ma-v3" data-map-alert hidden aria-labelledby="ma-title">
+                <img class="ma-bg" data-ma-img alt="" />
 
-                <div class="ma-contents">
-                  <!-- 머리 — 왼쪽은 읽을 것 한 덩이(배지 · 제목 · 발생 시각), 오른쪽은 아이콘 버튼 둘. -->
-                  <div class="ma-head">
-                    <div class="ma-title-block">
-                      <span class="ma-badge t-label-2" data-ma-badge><span class="badge-dot"></span><span data-ma-sev>주의</span></span>
-                      <h3 class="ma-title t-title-1" id="ma-title" data-ma-title></h3>
-                      <p class="ma-stamp t-caption" data-ma-stamp></p>
-                    </div>
-                    <button type="button" class="icon-button is-xs" data-ma-zoom aria-label="검출 장면 크게보기" title="크게보기">
-                      <span class="i i-16" style="--i:var(--ic-expand)" aria-hidden="true"></span>
-                    </button>
-                    <button type="button" class="icon-button is-xs is-secondary" data-ma-close aria-label="닫기">
-                      <span class="i i-16" style="--i:var(--ic-close)" aria-hidden="true"></span>
-                    </button>
+                <div class="ma-head">
+                  <div class="ma-title-block">
+                    <span class="ma-badge t-label-2" data-ma-badge><span class="badge-dot"></span><span data-ma-sev>주의</span></span>
+                    <h3 class="ma-title" id="ma-title" data-ma-title></h3>
+                    <p class="ma-stamp t-caption" data-ma-stamp></p>
                   </div>
+                  <div class="ma-more-box">
+                    <button type="button" class="icon-button is-xs" data-ma-menu-btn aria-haspopup="menu" aria-expanded="false" aria-label="더보기" title="더보기">
+                      <span class="i i-16" style="--i:var(--ic-more-vertical)" aria-hidden="true"></span>
+                    </button>
+                    <ul class="ma-menu" data-ma-menu role="menu" hidden>
+                      <li role="none"><button type="button" role="menuitem" data-ma-zoom>크게 보기</button></li>
+                      <li role="none"><button type="button" role="menuitem" data-ma-dock>패널에 고정</button></li>
+                    </ul>
+                  </div>
+                  <button type="button" class="icon-button is-xs" data-ma-close aria-label="닫기">
+                    <span class="i i-16" style="--i:var(--ic-close)" aria-hidden="true"></span>
+                  </button>
+                </div>
 
-                  <!-- 사진은 쪽지 폭을 꽉 채운다(Figma 1211:16658) — 위아래 선만 두르고, 글만 12 안쪽으로 들어온다. -->
-                  <figure class="ma-snap"><img data-ma-img alt="" /></figure>
+                <!-- 사진 칸 — 비어 있는 창이다(사진은 카드 바탕). 오른쪽 위 [정보] 에 손을 얹으면 메타가 뜬다. -->
+                <div class="ma-snap" data-ma-snap>
+                  <dl class="ma-meta" id="ma-meta" data-ma-meta>
+                    <div class="ma-meta-row"><dt>위치</dt><dd><span class="ma-wp" data-ma-wp></span><span class="ma-place" data-ma-place></span></dd></div>
+                    <div class="ma-meta-row"><dt>감지</dt><dd data-ma-detect></dd></div>
+                    <div class="ma-meta-row"><dt>로봇</dt><dd class="ma-robot" data-ma-robot></dd></div>
+                  </dl>
+                  <button type="button" class="icon-button is-xs ma-info" data-ma-info aria-label="위치 · 감지 · 로봇 정보" aria-describedby="ma-meta">
+                    <span class="i i-16" style="--i:var(--ic-info)" aria-hidden="true"></span>
+                  </button>
+                </div>
 
-                  <div class="ma-body">
-                    <dl class="ma-meta">
-                      <div class="ma-meta-row">
-                        <dt class="t-caption">위치</dt>
-                        <dd><span class="ma-wp" data-ma-wp></span><span class="t-body-4" data-ma-place></span></dd>
-                      </div>
-                      <div class="ma-meta-row">
-                        <dt class="t-caption">감지</dt>
-                        <dd><span class="ma-chip t-caption" data-ma-detect></span></dd>
-                      </div>
-                    </dl>
-
-                    <!-- DELTA 조치 제안 (Size=Small) — 쪽지판은 권고 한 줄 + 오탐 막대까지다. 근거 3줄은 알림 센터에 둔다. -->
-                    <section class="ma-delta">
+                <div class="ma-lower">
+                  <div class="ma-lower-in">
+                    <!-- DELTA 조치 제안 (Size=Small) — 권고 한 줄 · 조치 체크리스트 · 메모가 한 카드 -->
+                    <section class="ma-delta" aria-labelledby="ma-delta-label">
                       <div class="ma-delta-head">
                         <div class="ma-delta-mark">
-                          <span class="i i-16" style="--i:var(--ic-cpu)" aria-hidden="true"></span>
-                          <span class="t-label-2">DELTA 조치 제안</span>
+                          <span class="i i-16" style="--i:var(--ic-delta)" aria-hidden="true"></span>
+                          <span class="t-caption" id="ma-delta-label">DELTA 조치 제안</span>
                         </div>
                         <div class="ma-fp" data-ma-fp>
-                          <span class="ma-fp-label t-caption">오탐 가능성</span>
-                          <span class="ma-fp-meter" data-ma-fp-meter role="img"><i></i></span>
-                          <span class="ma-fp-value"><b class="t-label-2" data-ma-fp-label></b><span class="t-caption" data-ma-fp-pct></span></span>
+                          <span class="t-caption">오탐 가능성</span>
+                          <span class="ma-fp-value t-caption"><span data-ma-fp-label></span>(<span data-ma-fp-pct></span>)</span>
                         </div>
                       </div>
-                      <p class="ma-delta-lead t-label-1" data-ma-lead></p>
-                    </section>
-
-                    <!-- 조치 — DELTA 가 미는 칩만 세우고, 나머지는 같은 줄 오른쪽 안내가 가리킨다. -->
-                    <div class="ma-act" role="group" aria-labelledby="ma-act-label">
-                      <div class="ma-act-head">
-                        <span class="t-label-2" id="ma-act-label">AI 추천 조치</span>
-                        <span class="ma-act-hint t-caption">다른 조치는 크게보기에서</span>
+                      <div class="ma-act">
+                        <p class="ma-delta-lead" data-ma-lead></p>
+                        <div class="ma-checks" role="group" aria-label="조치 내용" data-ma-options></div>
                       </div>
-                      <div class="ma-presets" data-ma-options></div>
-                    </div>
+                      <div class="ma-memo" data-ma-memo>
+                        <div class="ma-memo-row">
+                          <span class="t-label-2" id="ma-memo-label">메모 (선택)</span>
+                          <button type="button" class="icon-button is-xs" data-ma-memo-btn aria-expanded="false" aria-controls="ma-memo-field" aria-label="메모 펼치기">
+                            <span class="i i-16" style="--i:var(--ic-chevron-down)" aria-hidden="true"></span>
+                          </button>
+                        </div>
+                        <textarea class="ma-memo-field" id="ma-memo-field" data-ma-memo-field rows="2" hidden
+                                  aria-labelledby="ma-memo-label" placeholder="예) 현장 작업자 대피 확인, 안전 요원 배치 후 재가동 준비"></textarea>
+                      </div>
+                    </section>
+                  </div>
+                  <div class="ma-actions">
+                    <!-- 안전진단 화면은 아직 없다 — 자리만 잡았다. -->
+                    <button type="button" class="btn btn-secondary" data-ma-more title="안전진단 화면 준비 중">안전진단에서 확인</button>
+                    <button type="button" class="btn btn-accent ma-confirm" data-ma-confirm>조치 완료</button>
                   </div>
                 </div>
-
-                <div class="ma-actions">
-                  <!-- 안전진단 화면은 아직 없다 — 자리만 잡았다(알림 줄의 [보고서]와 같다). -->
-                  <button type="button" class="btn btn-secondary" data-ma-more title="안전진단 화면 준비 중">안전진단에서 확인</button>
-                  <!-- Figma 는 Primary(흰 면)지만 Accent 로 둔다 — 알림 센터의 같은 [조치 완료] 와
-                       색이 달라지면 같은 동작으로 읽히지 않는다. 두 화면에서 하나로 간다. -->
-                  <button type="button" class="btn btn-accent ma-confirm" data-ma-confirm>조치 완료</button>
-                </div>
               </section>
+
               <div class="map-bot" data-map-bot hidden>
                 <div class="map-bot-tip" data-map-bot-tip hidden>
                   <div class="map-card-head">
@@ -1708,7 +1716,7 @@
 <script src="../assets/js/map-model.js?v=0f88c871"></script>
 <script src="../assets/js/map.js?v=d39f6275"></script>
 <script src="../assets/js/robot-stage.js?v=d114bf18"></script>
-<script src="../assets/js/monitor.js?v=856be208"></script>
+<script src="../assets/js/monitor.js?v=56d92611"></script>
 <script src="../assets/js/mission-scope.js?v=b5f75429"></script>
 <script src="../assets/js/delta-pulse.js?v=2d0afced"></script>
 <script src="../assets/js/delta-chat.js?v=54fb0c47"></script>

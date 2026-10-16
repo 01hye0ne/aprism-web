@@ -522,6 +522,9 @@
     var options = $("[data-ma-options]", box);
     var confirm = $("[data-ma-confirm]", box);
     var opening = false;
+    // v2.2 팝오버 v3(Figma 1233:16460) — 조치는 체크리스트, [더보기] 메뉴 · 도킹 · 정보 hover · 접힌 메모.
+    var V3 = box.classList.contains("ma-v3");
+    var docked = false;   // 패널에 고정 — 알림을 바꿔 열어도 유지한다
 
     /*
      * 위치 이름 — where 는 "터빈 2 / Unit 03 · WP-04 N₂ 배관 압력계" 꼴이다.
@@ -541,7 +544,7 @@
 
     // 고른 조치. 알림을 새로 열 때마다 비운다 — 하나 이상 골라야 [조치 완료] 가 켜진다.
     function chosen() {
-      return $$("[aria-pressed='true']", options).map(function (chip) {
+      return $$("[aria-pressed='true'], [aria-checked='true']", options).map(function (chip) {
         return chip.getAttribute("data-act");
       });
     }
@@ -560,8 +563,10 @@
       $("[data-ma-detect]", box).textContent = a.detect || "";
 
       // 그림이 없는 알림(E-STOP 등)은 사진 칸과 [크게보기] 를 함께 접는다.
-      snap.hidden = !a.live;
+      if (V3) { box.classList.toggle("no-snap", !a.live); img.hidden = !a.live; } else { snap.hidden = !a.live; }
       $("[data-ma-zoom]", box).hidden = !a.live;
+      var robotEl = $("[data-ma-robot]", box);
+      if (robotEl) { robotEl.textContent = "R-" + ("0" + ((a.robot || 0) + 1)).slice(-2); }
       if (a.live) {
         img.src = liveSrc(a);
         img.alt = a.title + " — 검출 장면";
@@ -570,12 +575,41 @@
       $("[data-ma-lead]", box).textContent = a.lead || a.sum;
       var fp = $("[data-ma-fp]", box);
       fp.style.setProperty("--ma-fp", (a.fp || 0) + "%");
-      $("[data-ma-fp-meter]", box).setAttribute("aria-label", "오탐 가능성 " + (a.fp || 0) + "퍼센트");
+      var meter = $("[data-ma-fp-meter]", box);
+      if (meter) { meter.setAttribute("aria-label", "오탐 가능성 " + (a.fp || 0) + "퍼센트"); }
+      var fpVal = $(".ma-fp-value", box);
+      if (fpVal) {
+        fpVal.classList.toggle("is-mid", (a.fp || 0) >= 20 && (a.fp || 0) < 40);
+        fpVal.classList.toggle("is-high", (a.fp || 0) >= 40);
+      }
       $("[data-ma-fp-label]", box).textContent = a.fpLabel || "";
       $("[data-ma-fp-pct]", box).textContent = (a.fp || 0) + "%";
 
-      // 쪽지에는 DELTA 가 미는 칩만 세운다 — 나머지는 "다른 조치는 크게보기에서" 가 안내한다.
       options.textContent = "";
+      if (V3) {
+        // 체크리스트 — 조치를 모두 세우고, DELTA 가 미는 것은 [AI 추천] 을 달고 미리 체크해 둔다(Figma Default).
+        a.acts.slice().sort(function (x, y) { return (y.ai ? 1 : 0) - (x.ai ? 1 : 0); }).forEach(function (act) {
+          var row = el("button", "ma-check");
+          row.type = "button";
+          row.setAttribute("role", "checkbox");
+          row.setAttribute("data-act", act.t);
+          row.setAttribute("aria-checked", act.ai ? "true" : "false");
+          var boxEl = el("span", "ma-check-box");
+          var mark = el("span", "i");
+          mark.style.setProperty("--i", "var(--ic-check)");
+          mark.setAttribute("aria-hidden", "true");
+          boxEl.appendChild(mark);
+          row.appendChild(boxEl);
+          row.appendChild(el("span", "ma-check-label", act.t));
+          if (act.ai) { row.appendChild(el("span", "ma-check-tag", "AI 추천")); }
+          options.appendChild(row);
+        });
+        memoReset();
+        menuClose();
+        syncConfirm();
+        return;
+      }
+      // 쪽지에는 DELTA 가 미는 칩만 세운다 — 나머지는 "다른 조치는 크게보기에서" 가 안내한다.
       a.acts.filter(function (act) { return act.ai; }).forEach(function (act) {
         var chip = el("button", "preset-chip");
         chip.type = "button";
@@ -591,6 +625,12 @@
     }
 
     options.addEventListener("click", function (event) {
+      var row = event.target.closest(".ma-check");
+      if (row) {
+        row.setAttribute("aria-checked", row.getAttribute("aria-checked") === "true" ? "false" : "true");
+        syncConfirm();
+        return;
+      }
       var chip = event.target.closest(".preset-chip");
       if (!chip) { return; }
       chip.setAttribute("aria-pressed", chip.getAttribute("aria-pressed") === "true" ? "false" : "true");
@@ -605,6 +645,64 @@
     function liveSrc(a) {
       if (useDeid && a.live === "ppe") { return "../assets/img/alert-live-deid.webp"; }
       return "../assets/img/alert-live-" + a.live + ".webp";
+    }
+
+    // ---------- v3: [더보기] 메뉴 · 도킹 · 정보 hover · 메모 ----------
+    var menuBtn = $("[data-ma-menu-btn]", box);
+    var menu = $("[data-ma-menu]", box);
+    var dockBtn = $("[data-ma-dock]", box);
+    var infoBtn = $("[data-ma-info]", box);
+    var memoBox = $("[data-ma-memo]", box);
+    var memoBtn = $("[data-ma-memo-btn]", box);
+    var memoField = $("[data-ma-memo-field]", box);
+
+    function menuClose() {
+      if (!menu || menu.hidden) { return; }
+      menu.hidden = true;
+      menuBtn.setAttribute("aria-expanded", "false");
+    }
+    function setDock(on) {
+      docked = on;
+      box.classList.toggle("is-docked", on);
+      if (dockBtn) { dockBtn.textContent = on ? "고정 풀기" : "패널에 고정"; }
+    }
+    if (menuBtn && menu) {
+      menuBtn.addEventListener("click", function (event) {
+        event.stopPropagation();
+        var open = menu.hidden;
+        menu.hidden = !open;
+        menuBtn.setAttribute("aria-expanded", open ? "true" : "false");
+        if (open) { var first = $("button:not([hidden])", menu); if (first) { first.focus(); } }
+      });
+      menu.addEventListener("click", function () { menuClose(); });
+      document.addEventListener("click", function (event) { if (!event.target.closest || !event.target.closest(".ma-more-box")) { menuClose(); } });
+      menu.addEventListener("keydown", function (event) {
+        if (event.key === "Escape") { event.stopPropagation(); menuClose(); menuBtn.focus(); }
+      });
+    }
+    if (dockBtn) { dockBtn.addEventListener("click", function () { setDock(!docked); }); }
+    if (infoBtn) {
+      var infoOn = function () { box.classList.add("is-info"); };
+      var infoOff = function () { box.classList.remove("is-info"); };
+      infoBtn.addEventListener("mouseenter", infoOn);
+      infoBtn.addEventListener("mouseleave", infoOff);
+      infoBtn.addEventListener("focus", infoOn);
+      infoBtn.addEventListener("blur", infoOff);
+    }
+    function memoSet(open) {
+      if (!memoBox) { return; }
+      memoBox.classList.toggle("is-open", open);
+      memoField.hidden = !open;
+      memoBtn.setAttribute("aria-expanded", open ? "true" : "false");
+      memoBtn.setAttribute("aria-label", open ? "메모 접기" : "메모 펼치기");
+    }
+    function memoReset() { if (memoField) { memoField.value = ""; } memoSet(false); }
+    if (memoBtn) {
+      memoBtn.addEventListener("click", function () {
+        var open = memoField.hidden;
+        memoSet(open);
+        if (open) { memoField.focus(); }
+      });
     }
 
     // ---------- 크게보기 ----------
@@ -629,7 +727,7 @@
     function closeZoom() {
       if (!zoomBox || zoomBox.hidden) { return false; }
       zoomBox.hidden = true;
-      if (!box.hidden && zoomBtn) { zoomBtn.focus(); }
+      if (!box.hidden) { (V3 && menuBtn ? menuBtn : zoomBtn) && (V3 && menuBtn ? menuBtn : zoomBtn).focus(); }
       return true;
     }
 
@@ -760,7 +858,8 @@
       busy = true;
       hideToast();
 
-      var rec = { time: clock(), title: a.title, how: picks.join(" · "), who: "홍길동", fresh: true };
+      var rec = { time: clock(), title: a.title, how: picks.join(" · "), who: "홍길동", fresh: true,
+                  memo: memoField ? memoField.value.trim() : "" };
       var from = box.getBoundingClientRect();
       // 분신을 먼저 띄우고 진짜 쪽지를 닫는다 — 순서가 바뀌면 잴 자리가 사라진다.
       var flyer = box.cloneNode(true);
