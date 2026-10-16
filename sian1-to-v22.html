@@ -146,10 +146,10 @@
           <li><a href="#s2">알림 목록 <span>카드 → 두 줄 목록</span></a></li>
           <li><a href="#s3">Delta(AI)의 역할 <span>해설 → 종합 판단</span></a></li>
           <li><a href="#s4">경고의 강약 <span>같은 테 → 강약 분리</span></a></li>
-          <li><a href="#s5">알림 확인 · 조치 <span>모달 → 지도 위 쪽지</span></a></li>
+          <li><a href="#s5">알림 확인 · 조치 <span>모달 → 지도 위 팝오버</span></a></li>
           <li><a href="#s6">로봇 패널 <span>전체 → 배정된 로봇</span></a></li>
           <li><a href="#s7">색 · 위계 · 화면 정돈 <span>한 뜻 한 모양</span></a></li>
-          <li><a href="#s8">쪽지에서 조치하기 <span>어디로 갔는지 보이게</span></a></li>
+          <li><a href="#s8">팝오버에서 조치하기 <span>어디로 갔는지 보이게</span></a></li>
         </ol>
       </div>
       <figure class="pic">
@@ -235,14 +235,14 @@
         <p class="num">05</p>
         <h2 id="s5-title">알림 확인 · 조치</h2>
         <div class="blk"><p class="k">시안 1-A · 1-B</p><p>1-B는 화면을 덮는 큰 모달에서 ① 확인 ② 지점 ③ 조치를 차례로 진행해, 지도와 다른 알림이 가려짐. 1-A는 Delta 버튼으로 처리.</p></div>
-        <div class="blk now"><p class="k">v2.2</p><p>알림을 고르면 <b>지도 위 웨이포인트 옆 쪽지</b>가 뜸. 사진 · 위치 · DELTA 조치 제안을 보고 조치를 골라 [조치 완료] — 줄이 오늘 확인 완료로 내려가고 되돌리기가 남음.</p></div>
+        <div class="blk now"><p class="k">v2.2</p><p>알림을 고르면 <b>지도 위 웨이포인트 옆 팝오버</b>가 뜸. 사진 · 위치 · DELTA 조치 제안을 보고 조치를 골라 [조치 완료] — 줄이 오늘 확인 완료로 내려가고 되돌리기가 남음.</p></div>
         <p class="why">어디서 일어났는지(지도)를 보면서 처리해야 판단이 빠르고, 화면을 떠나지 않아도 됨.</p>
       </div>
       <figure class="pic">
         <div class="tabs" role="group" aria-label="화면 고르기"></div>
         <div class="frame">
           <img data-tab="시안 1-B" src="./assets/img/compare/05-1b.webp" alt="시안 1-B 알림 상세 — 화면을 덮는 큰 모달, 사진 · 지점 · 조치 세 칸" loading="lazy" />
-          <img data-tab="v2.2" src="./assets/img/compare/05-v22.webp" alt="v2.2 지도 쪽지 — 웨이포인트 옆에 위험 배지, 사진, 위치, DELTA 조치 제안, AI 추천 조치, 조치 완료" loading="lazy" />
+          <img data-tab="v2.2" src="./assets/img/compare/05-v22.webp" alt="v2.2 지도 팝오버 — 웨이포인트 옆에 위험 배지, 사진, 위치, DELTA 조치 제안, AI 추천 조치, 조치 완료" loading="lazy" />
         </div>
       </figure>
     </section>
@@ -285,17 +285,17 @@
     <section class="slide" id="s8" aria-labelledby="s8-title">
       <div class="txt">
         <p class="num">08</p>
-        <h2 id="s8-title">쪽지에서 조치하기</h2>
+        <h2 id="s8-title">팝오버에서 조치하기</h2>
         <div class="blk"><p class="k">시안 1-B</p><p>큰 모달에서 조치 내용을 드롭다운으로 하나 고르고 [확인 처리]. 처리한 알림이 어디로 갔는지는 화면에서 따라갈 수 없었음.</p></div>
-        <div class="blk now"><p class="k">v2.2</p><p>지도 위 쪽지에서 DELTA 추천 조치를 <b>여러 개</b> 골라 [조치 완료]. 쪽지가 접히며 <b>오늘 확인 완료</b> 맨 위로 날아 들어가고, 새 줄이 초록으로 한 번 빛남. 남은 알림에 맞춰 Delta 판단도 바로 바뀌고(위험 → 주의), 5초 동안 <b>되돌리기</b>가 남음.</p></div>
+        <div class="blk now"><p class="k">v2.2</p><p>지도 위 팝오버에서 DELTA 추천 조치를 <b>여러 개</b> 골라 [조치 완료]. 팝오버가 접히며 <b>오늘 확인 완료</b> 맨 위로 날아 들어가고, 새 줄이 초록으로 한 번 빛남. 남은 알림에 맞춰 Delta 판단도 바로 바뀌고(위험 → 주의), 5초 동안 <b>되돌리기</b>가 남음.</p></div>
         <p class="why">처리한 일이 어디로 갔는지 눈으로 따라가야 "끝났다"는 확신이 생김. 확인 대화상자 대신 되돌리기를 두어, 빠르게 처리해도 실수를 바로 돌이킬 수 있음.</p>
       </div>
       <figure class="pic">
         <div class="tabs" role="group" aria-label="화면 고르기"></div>
         <div class="frame">
           <img data-tab="시안 1-B" src="./assets/img/compare/05-1b.webp" alt="시안 1-B 알림 상세 모달 — 조치 내용 드롭다운과 확인 처리 버튼" loading="lazy" />
-          <img data-tab="v2.2 흐름 ▶" data-default data-anim src="./assets/img/compare/08-v22-flow.webp" alt="v2.2 조치 흐름 — 알림을 누르면 지도 위 쪽지가 열리고, 추천 조치 두 개를 고른 뒤 조치 완료를 누르면 쪽지가 오늘 확인 완료로 날아 들어가 초록으로 빛나고 되돌리기 토스트가 뜬다" loading="lazy" />
-          <img data-tab="① 쪽지 열기" src="./assets/img/compare/08-v22-1-open.webp" alt="① 알림을 누르면 웨이포인트 옆에 쪽지가 열린다 — 사진, 위치, DELTA 조치 제안, AI 추천 조치" loading="lazy" />
+          <img data-tab="v2.2 흐름 ▶" data-default data-anim src="./assets/img/compare/08-v22-flow.webp" alt="v2.2 조치 흐름 — 알림을 누르면 지도 위 팝오버가 열리고, 추천 조치 두 개를 고른 뒤 조치 완료를 누르면 팝오버가 오늘 확인 완료로 날아 들어가 초록으로 빛나고 되돌리기 토스트가 뜬다" loading="lazy" />
+          <img data-tab="① 팝오버 열기" src="./assets/img/compare/08-v22-1-open.webp" alt="① 알림을 누르면 웨이포인트 옆에 팝오버가 열린다 — 사진, 위치, DELTA 조치 제안, AI 추천 조치" loading="lazy" />
           <img data-tab="② 조치 고르기" src="./assets/img/compare/08-v22-2-pick.webp" alt="② 추천 조치 두 개를 고르면 조치 완료가 켜진다" loading="lazy" />
           <img data-tab="③ 완료 · 되돌리기" src="./assets/img/compare/08-v22-3-done.webp" alt="③ 조치 완료 뒤 — 알림이 오늘 확인 완료 맨 위로 옮겨 초록으로 빛나고, Delta 는 주의로 바뀌고, 아래에 되돌리기 토스트" loading="lazy" />
         </div>
