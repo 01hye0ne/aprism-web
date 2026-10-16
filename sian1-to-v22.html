@@ -92,7 +92,6 @@
     .cap { margin: var(--space-8) 0 0; color: var(--text-tertiary); font-size: var(--font-size-12); }
 
     /* 제안 장 — 왼쪽 A · B · C 칸이 오른쪽 그림 단추를 겸한다 */
-    .lead-s { margin: 0 0 var(--space-24); color: var(--text-secondary); font-size: var(--font-size-14); line-height: var(--font-line-height-22); word-break: keep-all; }
     .opts { display: flex; flex-direction: column; gap: var(--space-8); margin: 0; padding: 0; list-style: none; }
     .opts button {
       display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: var(--space-4) var(--space-12); width: 100%;
@@ -313,7 +312,6 @@
       <div class="txt">
         <p class="num">08 · 제안</p>
         <h2 id="s8-title">층 여러 개일 때 관제 화면</h2>
-        <p class="lead-s">층마다 로봇이 1대씩 돌 때, 전체 건물에서 시작해 필요한 층으로 들어가는 구성을 제안함.</p>
         <ul class="opts" data-opts>
           <li><button type="button" data-opt="A"><span class="key">A</span><span class="t">전체 건물 (기본)</span><span class="d">B3 · B4를 쌓아 두 로봇의 위치와 경로, 알림 위치를 한 화면에 표시함. 위치와 미션은 상단 바(전체 건물 + 미션 선택)에서만 표시함.</span></button></li>
           <li><button type="button" data-opt="B"><span class="key">B</span><span class="t">층에 마우스 올림 (B4)</span><span class="d">올린 층은 밝아지고 다른 층은 흐려짐. 커서 옆에 층 요약(로봇 · 알림 · 오늘 점검)과 "누르면 상세로 들어가요" 안내가 뜸.</span></button></li>
