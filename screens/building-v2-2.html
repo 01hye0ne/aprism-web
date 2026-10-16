@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<!-- data-delta="glass" — 위험 Delta 를 빛으로(2026-10-12 채택). ?delta=off 로 이전 판을 본다.
+     data-glow="top" — 빛은 왼쪽 위 모서리(Delta 아이콘 자리)에서 나온다(10/13 채택). ?glow=off 로 아래 빛을 본다. -->
+<html lang="ko" data-theme="dark" data-delta="glass" data-glow="top">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>v2.2 · 전체 층 현황 — APRISM</title>
+  <meta name="description" content="v2.2 — 건물 전체를 층으로 쌓아 본다. 층에 올리면 요약, 누르면 그 층 미션 모니터링으로 들어간다" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/static/woff2/SUIT.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" />
+  <!-- 지도(3D)가 쓰는 three.js. 모듈이라 bare specifier 를 여기서 이어 준다. -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+  <link rel="stylesheet" href="../assets/css/tokens.css?v=650d5169" />
+  <link rel="stylesheet" href="../assets/css/app-shell.css?v=c7969c6b" />
+  <link rel="stylesheet" href="../assets/css/map-overlays.css?v=96f51348" />
+  <link rel="stylesheet" href="../assets/css/icons-outline.css?v=6b866a80" />
+  <link rel="stylesheet" href="../assets/css/text-parts.css?v=e38e19ea" />
+  <link rel="stylesheet" href="../assets/css/monitor.css?v=b8f9eb15" />
+  <link rel="stylesheet" href="../assets/css/palette-neutral.css?v=0c969aea" />
+  <link rel="stylesheet" href="../assets/css/delta-v3.css?v=b1562ee4" />
+  <link rel="stylesheet" href="../assets/css/building.css?v=a6611238" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
+
+    body {
+      background-color: var(--bg-page);
+      color: var(--text-primary);
+      font-family: var(--font-family-sans);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    h1, h2, h3, p { margin: 0; }
+  </style>
+</head>
+<!-- 전체 층 현황 — 다른 디자이너의 다중 로봇 종합 관제 시안(2026-10-16)을 v2.2 디자인 시스템으로 옮겼다.
+     메인 v2.2 와 같은 상황(위험 1 · 주의 5)이다. Delta · 테두리는 원래 전체 알림을 보므로 여기서도 같다. -->
+<body class="v2 v3 v2-2 is-building" data-level="critical" data-delta-copy="keyword">
+
+<div class="app">
+
+  <!-- ---------- Status Bar · 전체 폭 ---------- -->
+  <header class="status-bar">
+    <div class="status-bar-left">
+      <span class="status-bar-logo">
+        <span class="i" style="--i:var(--ic-brand-mark)" role="img" aria-label="APRISM"></span>
+      </span>
+      <!-- 전체 건물 › (층) — 층에 들어가면 이 줄이 메인 v2.2 의 "지하 N층 [미션]" 으로 이어진다. -->
+      <span class="status-bar-place t-title-1" data-bld-crumb>전체 건물</span>
+      <!-- 미션 고르기 — 층별로 묶었다. 고르면 그 층으로 들어가 메인 v2.2 가 그 미션으로 열린다.
+           점은 그 미션의 가장 높은 알림 단계다(메인과 같다). -->
+      <div class="scope-menu-box" data-bld-menu-box>
+        <button type="button" class="scope-trigger" data-bld-trigger
+                aria-haspopup="true" aria-expanded="false" aria-label="미션 고르기">
+          <span class="t-title-1">통합 순회 현황</span>
+          <span class="i i-16" style="--i:var(--ic-chevron-down)" aria-hidden="true"></span>
+        </button>
+        <div class="dropdown-menu scope-menu bld-menu" data-bld-menu role="menu" aria-label="미션" hidden></div>
+      </div>
+    </div>
+
+    <div class="status-bar-right">
+      <!-- Account · 누르면 계정 메뉴가 내려온다 (Figma Account 컴포넌트 Opened) -->
+      <div class="status-menu" data-status-menu>
+        <button type="button" class="account-chip" data-menu-trigger
+                aria-haspopup="true" aria-expanded="false">
+          <span class="i i-16" style="--i:var(--ic-user)" aria-hidden="true"></span>
+          <span class="t-label-2">홍길동</span>
+          <span class="t-label-2 account-sep" aria-hidden="true">|</span>
+          <span class="t-label-2">관제운영</span>
+        </button>
+        <div class="dropdown-menu account-menu" role="menu" aria-label="계정" hidden>
+          <a class="menu-item" role="menuitem" href="#">
+            <span class="i i-16" style="--i:var(--ic-user)" aria-hidden="true"></span>
+            <span class="t-label-2">내 계정 정보</span>
+          </a>
+          <a class="menu-item" role="menuitem" href="#">
+            <span class="i i-16" style="--i:var(--ic-lock)" aria-hidden="true"></span>
+            <span class="t-label-2">비밀번호 변경</span>
+          </a>
+          <!-- 수행 중인 로봇이 있으면 로그아웃은 잠기고 [관제사 교대] 가 열린다(screen.js).
+               UI_99 1319:89664 — 로봇 임무는 교대 중에도 이어진다. -->
+          <button type="button" class="menu-item" role="menuitem" data-modal-open="logout" data-logout-item>
+            <span class="i i-16" style="--i:var(--ic-power)" aria-hidden="true"></span>
+            <span class="t-label-2">로그아웃</span>
+          </button>
+          <button type="button" class="menu-item" role="menuitem" data-modal-open="shift" data-shift-item hidden>
+            <span class="i i-16" style="--i:var(--ic-users)" aria-hidden="true"></span>
+            <span class="t-label-2">관제사 교대</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Signal · 누르면 서버·네트워크 상태가 내려온다 (Figma Signal 컴포넌트 Opened) -->
+      <div class="status-menu" data-status-menu>
+        <button type="button" class="signal-chip" data-menu-trigger
+                aria-haspopup="true" aria-expanded="false" aria-label="통신 상태">
+          <span class="signal-bars"><i></i><i></i><i></i><i></i></span>
+        </button>
+        <div class="dropdown-menu signal-menu" role="menu" aria-label="통신 상태" hidden>
+          <div class="menu-item" role="menuitem">
+            <span class="t-label-2">AI Server</span>
+            <span class="badge badge-normal t-caption"><span class="badge-dot"></span>Online</span>
+          </div>
+          <div class="menu-item" role="menuitem">
+            <span class="t-label-2">DB server</span>
+            <span class="badge badge-normal t-caption"><span class="badge-dot"></span>Online</span>
+          </div>
+          <div class="menu-item" role="menuitem">
+            <span class="t-label-2">Network</span>
+            <span class="signal-bars menu-signal"><i></i><i></i><i></i><i></i></span>
+          </div>
+        </div>
+      </div>
+
+      <span class="utc-clock">
+        <span class="i i-16" style="--i:var(--ic-clock)"></span>
+        <span class="t-caption num">2026-08-26T10:11:24Z</span>
+      </span>
+    </div>
+  </header>
+
+  <div class="app-content">
+
+    <!-- ---------- GNB Rail ---------- -->
+    <nav class="gnb-rail" aria-label="전역 내비게이션">
+      <div class="gnb-items">
+        <a class="gnb-item" href="#" aria-current="page">
+          <span class="gnb-icon"><span class="i i-20" style="--i:var(--ic-home)"></span></span><span>관제</span>
+        </a>
+        <a class="gnb-item" href="#"><span class="gnb-icon"><span class="i i-20" style="--i:var(--ic-shield)"></span></span><span>안전진단</span></a>
+        <a class="gnb-item" href="#"><span class="gnb-icon"><span class="i i-20" style="--i:var(--ic-bot)"></span></span><span>로봇</span></a>
+        <a class="gnb-item" href="#"><span class="gnb-icon"><span class="i i-20" style="--i:var(--ic-cpu)"></span></span><span>AI</span></a>
+        <a class="gnb-item" href="#"><span class="gnb-icon"><span class="i i-20" style="--i:var(--ic-calendar)"></span></span><span>스케줄러</span></a>
+        <a class="gnb-item" href="#"><span class="gnb-icon"><span class="i i-20" style="--i:var(--ic-delta)"></span></span><span>Delta</span></a>
+        <a class="gnb-item" href="#"><span class="gnb-icon"><span class="i i-20" style="--i:var(--ic-document)"></span></span><span>보고서</span></a>
+        <a class="gnb-item" href="#"><span class="gnb-icon"><span class="i i-20" style="--i:var(--ic-users)"></span></span><span>계정관리</span></a>
+      </div>
+      <a class="gnb-item" href="#"><span class="gnb-icon"><span class="i i-20" style="--i:var(--ic-settings)"></span></span><span>환경설정</span></a>
+    </nav>
+
+    <!-- ---------- Container · bg/surface/default 면 ---------- -->
+    <div class="content-surface">
+
+      <!-- 최신 알림 — 메인 v2.2 와 같은 부품이다. 여기는 미션을 고르기 전이라 모든 미션의 알림을 본다.
+           줄을 누르면 그 알림이 난 층 · 미션으로 들어간다(building.js). -->
+      <aside class="context-panel" id="site-panel" aria-label="관제">
+
+        <div class="panel-head">
+          <p class="t-overline section-label">관제</p>
+          <button type="button" data-panel-toggle
+                  aria-expanded="true" aria-controls="site-panel" aria-label="관제 패널 접기">
+            <span class="i i-20" style="--i:var(--ic-panel-left)"></span>
+          </button>
+        </div>
+
+        <div class="ah-body">
+          <div class="ah-head">
+            <!-- 제목은 아래 "오늘 확인 완료" 와 같은 Title/2 다 — 같은 패널의 형제 칸이다(v2.2 위계 정리).
+                 제목 줄은 이름 + 이동만. 정렬 안내는 목록을 다루는 거르기 줄로 내려갔다. -->
+            <h2 class="t-title-2" id="ah-title">최신 알림</h2>
+            <button type="button" class="btn btn-ghost is-xs ah-all" data-ah-all>전체보기</button>
+          </div>
+
+          <!-- 처리 필요 — 거르기(Button Small · 고른 것 Accent) · 정렬 · 목록 -->
+          <section class="ah-sec" aria-labelledby="ah-title">
+            <div class="ah-filter">
+              <div class="ah-caps" role="group" aria-label="위험도로 거르기">
+                <button type="button" class="btn is-xs" data-ah-filter="all" aria-pressed="true">전체 <span class="num" data-ah-count="all">0</span></button>
+                <button type="button" class="btn is-xs" data-ah-filter="critical" aria-pressed="false">위험 <span class="num" data-ah-count="critical">0</span></button>
+                <button type="button" class="btn is-xs" data-ah-filter="warning" aria-pressed="false">주의 <span class="num" data-ah-count="warning">0</span></button>
+              </div>
+              <span class="ah-order t-caption">전체 미션 · 위험 우선</span>
+            </div>
+            <div class="ah-box has-fade">
+              <div class="ah-list" data-ah-list role="list"></div>
+            </div>
+          </section>
+
+          <!-- 오늘 확인 완료 — 머리(Title/2 + 건수 배지) · 목록 -->
+          <section class="ah-sec" aria-labelledby="done-title">
+            <div class="done-head">
+              <h3 class="t-title-2" id="done-title">오늘 확인 완료</h3>
+              <span class="badge done-count t-caption"><span class="badge-dot"></span><span class="num" data-done-count>0건</span></span>
+            </div>
+            <div class="ah-box">
+              <div class="ah-list" data-done-list role="list"></div>
+            </div>
+          </section>
+        </div>
+
+      </aside>
+
+      <!-- ---------- Main ---------- -->
+      <main class="main">
+        <!-- 알림 단계(엣지 글로우 · AI 패널 색)는 monitor.js 가 body[data-level] 에 맞춰 바꾼다.
+             Figma ver.2 는 위험(critical) 상태로 그려져 있어 그것을 기본으로 둔다. -->
+        <div class="two-col is-critical">
+          <!-- ============================================================
+               Delta · 시안 3 — Figma UI_00 826:8887 ver.2
+                 접힘 997:20173 (260×268, 지도 왼쪽 위 모서리)
+                 펼침 997:21163 (395×295, 지도 한가운데 · 머리를 잡아 옮긴다)
+               둘은 같은 요소다. [+] 가 .is-open 을 붙이면 창으로 갈아입는다(screen.js).
+               문구 · 조치 버튼 · 단계 색은 ver.2 와 같이 monitor.js 가 채운다.
+               빛은 Figma 에서 받은 SVG 세 장 그대로다 — 다시 그리지 않았다.
+               ============================================================ -->
+          <section class="delta3" data-ai-panel data-delta3 aria-label="Delta AI 요약">
+
+            <!-- 쌓임 순서는 Figma 레이어 그대로다. 아래에서 위로 카드 - 빛 - 표식 이라
+                 DOM 도 그 차례로 둔다(z-index 를 안 쓴다 — 빛에 층을 주면 그 안에서만
+                 섞여 아래 카드까지 하드라이트가 닿지 않는다).
+                 펼침에서는 표식이 창 머리가 되므로 CSS 가 order 로 맨 위로 올린다. -->
+            <div class="delta3-card">
+              <div class="delta3-head">
+                <p class="ai-line-1">위험 1건 포함 6건 누적</p>
+                <button type="button" class="delta3-plus" data-ai-toggle
+                        aria-expanded="false" aria-label="Delta 창 열기">
+                  <span class="i i-16" aria-hidden="true"></span>
+                </button>
+              </div>
+
+              <div class="delta3-body">
+                <p class="ai-line-2">위험 알림부터 조치하고, 겹치는 주의 알림은 한꺼번에 점검 계획을 세우는 것을 권합니다.</p>
+              </div>
+
+              <!-- 조치 줄 — 맨 끝 [돋보기] 로 묻기 칸을 연다. -->
+              <div class="delta3-suggest">
+                <!-- 메인 v2.2 의 위험 종합 판단과 같은 세 버튼이다(monitor.js deltaActions). 파랑은 첫째 하나 —
+                     여기서는 위험 알림이 난 미션으로 들어간다. 나머지 둘은 자리만 잡았다. -->
+                <div class="ai-actions" data-ai-actions>
+                  <button type="button" class="btn is-md btn-primary" data-bld-go-critical>위험 1건부터 조치</button>
+                  <button type="button" class="btn is-md btn-secondary">주의 5건 묶어서 확인</button>
+                  <button type="button" class="btn is-md btn-secondary">현장 점검 한꺼번에 요청</button>
+                </div>
+                <button type="button" class="delta3-ask" data-ai-ask-open
+                        aria-expanded="false" aria-controls="ai-ask" aria-label="Delta 에게 묻기 열기">
+                  <span class="i i-16" aria-hidden="true"></span>
+                </button>
+              </div>
+
+              <div class="ai-input" id="ai-ask" hidden>
+                <input type="text" class="ai-input-ph" placeholder="무엇이든 물어보세요"
+                       aria-label="Delta 에게 묻기" autocomplete="off" data-ai-ask />
+                <button type="button" class="ai-send" aria-label="보내기">
+                  <span class="i i-16" style="--i:var(--ic-arrow-right)"></span>
+                </button>
+              </div>
+            </div>
+
+            <span class="delta3-light" aria-hidden="true">
+              <img class="lc" src="../assets/img/delta-light-circle.svg" width="480" height="480" alt="" />
+              <img class="blob b1" src="../assets/img/delta-light-blob-1.svg" width="148.847" height="201.902" alt="" />
+              <img class="blob b2" src="../assets/img/delta-light-blob-2.svg" width="148.847" height="201.902" alt="" />
+            </span>
+
+            <!-- 모서리 표식 — 접힘에서는 왼쪽 위 삼각 탭에 Delta 가 앉는다(Figma 1069:17536).
+                 펼침에서는 이 줄이 창 머리가 되고, 여기를 잡아 창을 옮긴다. -->
+            <div class="delta3-name" data-delta3-drag>
+              <span class="delta3-name-in">
+                <!-- Delta 표식 — 세 상태 도트(디자이너 핸드오프 "세 상태 도트 모션 그래픽").
+                     정상이면 흰 점 셋이 가만히 있고, 주의면 1-2-3 으로 번갈아 켜지고,
+                     위험이면 셋이 한꺼번에 깜빡인다. 단계는 body[data-level] 이 정한다. -->
+                <span class="delta-dots" data-delta-dots aria-hidden="true">
+                  <svg viewBox="0 0 20 20" fill="none">
+                    <g><rect class="dd-1" x="0" y="12" width="8" height="8" rx="2" /></g>
+                    <g><rect class="dd-2" x="0" y="0" width="8" height="8" rx="2" /></g>
+                    <g><rect class="dd-3" x="12" y="0" width="8" height="8" rx="2" /></g>
+                  </svg>
+                </span>
+                <b>DELTA</b>
+              </span>
+              <button type="button" class="delta3-close" data-delta3-close aria-label="Delta 창 닫기">
+                <span class="i i-16" aria-hidden="true"></span>
+              </button>
+            </div>
+
+          </section>
+          <span class="map-view" aria-hidden="true">
+            <!-- 전체 층 3D — 같은 전주기 맵 모델(map-model.js)을 층마다 떼어 위아래로 쌓는다(assets/js/building.js). -->
+            <canvas class="map-scene" data-bld-scene></canvas>
+          </span>
+
+          <!-- 테두리에서 안쪽으로 뛰는 빛 · 깎인 모서리 · 모서리 삼각판 — 메인 v2.2 와 같다. -->
+          <span class="edge-light" aria-hidden="true"></span>
+          <span class="edge-corner" aria-hidden="true"></span>
+          <span class="corner-tab" aria-hidden="true"></span>
+
+          <!-- ---------- Map Panel · 전체 층 ---------- -->
+          <section class="map-panel col-9" aria-label="전체 층 배치도">
+            <div class="map-canvas" data-bld-hit>
+              <div class="map-tools">
+                <!-- 층 — [전체] 가 이 화면이다. 층을 누르면 그 층으로 들어가 미션 모니터링으로 넘어간다.
+                     버튼의 점은 그 층에서 가장 높은 알림 단계다. -->
+                <div class="map-floors bld-floors" role="group" aria-label="층" data-bld-floors>
+                  <button type="button" class="map-floor" data-bld-floor="all" aria-pressed="true">전체</button>
+                </div>
+                <button type="button" class="icon-button" data-bld-zoom="in" aria-label="확대">
+                  <span class="i i-20" style="--i:var(--ic-zoom-in)"></span>
+                </button>
+                <button type="button" class="icon-button" data-bld-zoom="out" aria-label="축소">
+                  <span class="i i-20" style="--i:var(--ic-zoom-out)"></span>
+                </button>
+                <button type="button" class="icon-button" data-bld-home aria-label="전체 보기">
+                  <span class="i i-20" style="--i:var(--ic-target)"></span>
+                </button>
+              </div>
+
+              <!-- 층 이름표 · 로봇 · 알림 표식 — 자리는 building.js 가 3D 좌표에서 옮겨 잡는다. -->
+              <div class="bld-labels" data-bld-labels></div>
+
+              <!-- 건물 요약 — 왼쪽 아래. Delta 가 왼쪽 위 모서리를 쓴다. -->
+              <div class="bld-sum" data-bld-sum>
+                <p class="t-caption bld-sum-label">전체 건물</p>
+                <p class="bld-sum-num"><b class="num" data-bld-sum-floors>2</b><span class="t-label-2">개 층</span></p>
+                <dl class="bld-sum-rows" data-bld-sum-rows></dl>
+              </div>
+
+              <!-- 층에 손을 얹으면 뜨는 요약 -->
+              <div class="bld-tip" data-bld-tip hidden role="tooltip"></div>
+
+              <p class="bld-hint t-caption" data-bld-hint>층에 마우스를 올리면 요약, 누르면 그 층 미션 모니터링으로 들어가요</p>
+              <p class="bld-loading t-caption" data-bld-loading>층별 3D 맵을 불러오는 중이에요</p>
+            </div>
+          </section>
+
+          <!-- ---------- 로봇 현황 · 운행 흐름 · 다음 일정 ---------- -->
+          <div class="floating col-3">
+            <section class="right-panel bld-panel" aria-label="로봇 현황">
+
+              <div class="panel-card bld-card is-fleet">
+                <div class="bld-card-head">
+                  <h2 class="t-title-2">로봇 현황</h2>
+                  <p class="robot-counts t-caption">
+                    <span class="i i-16" style="--i:var(--ic-bot)" aria-hidden="true"></span>
+                    <span data-bld-count>12대</span>
+                    <span class="badge badge-info t-caption"><span class="badge-dot"></span><span data-bld-running>3대 수행중</span></span>
+                  </p>
+                </div>
+                <div class="bld-fleet-filter" role="group" aria-label="층으로 거르기" data-bld-fleet-filter></div>
+                <div class="bld-fleet" data-bld-fleet role="list"></div>
+              </div>
+
+              <div class="panel-card bld-card">
+                <div class="bld-card-head">
+                  <h3 class="t-title-2">운행 흐름</h3>
+                  <span class="t-caption num bld-meta">06:00 ~ 14:00</span>
+                </div>
+                <div class="bld-gantt" data-bld-gantt></div>
+                <div class="bld-legend t-caption">
+                  <span><i class="is-run"></i>순회</span>
+                  <span><i class="is-move"></i>이동 · 복귀</span>
+                  <span><i class="is-chg"></i>충전</span>
+                  <span><i class="is-plan"></i>예정</span>
+                </div>
+              </div>
+
+              <div class="panel-card bld-card">
+                <div class="bld-card-head">
+                  <h3 class="t-title-2">다음 일정</h3>
+                </div>
+                <ul class="bld-sched" data-bld-sched></ul>
+              </div>
+
+            </section>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/js/theme.js?v=9b8397b6"></script>
+<script src="../assets/js/prism-orb.js?v=03386460"></script>
+<script src="../assets/js/screen.js?v=f3340135"></script>
+<script src="../assets/js/map-model.js?v=0f88c871"></script>
+<script src="../assets/js/building.js?v=2e4a9ef2"></script>
+<script src="../assets/js/delta-pulse.js?v=2d0afced"></script>
+<script src="../assets/js/delta-v3.js?v=6842c15b"></script>
+<script src="../assets/js/delta-resize.js?v=2541bd65"></script>
+<script src="../assets/js/grid-overlay.js?v=164e4f2a"></script>
+</body>
+</html>

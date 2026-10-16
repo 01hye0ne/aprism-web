@@ -2819,7 +2819,10 @@
     readFloors();
     if (!floors.length) { return; }
     // 기본은 로봇이 선 층이다. 모델에 그 층이 없으면 가장 깊은 층으로 연다.
-    floorNow = floorOf(ROBOT_ON) ? ROBOT_ON : floors[0].id;
+    // 미션 고르기(mission-scope.js)가 모델이 오기 전에 층을 정했으면 그 층으로 연다 —
+    // 전체 층 현황에서 다른 층 미션으로 들어온 경우다(?mission=). 그때는 층 버튼이 아직 듣지 않는다.
+    var want = window.APRISM_FLOOR_WANT;
+    floorNow = floorOf(want) ? want : floorOf(ROBOT_ON) ? ROBOT_ON : floors[0].id;
     floors.forEach(function (f) { floorFade[f.id] = f.id === floorNow ? 1 : 0; });
     tellFloor();
 

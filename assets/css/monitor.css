@@ -40,6 +40,25 @@
 
 .status-bar-place { color: var(--text-primary); white-space: nowrap; }
 
+/* 전체 건물 › — 전체 층 현황으로 나가는 길(v2.2 · 2026-10-16). 지금 자리(층)보다 한 단 물러난 글색이다. */
+.status-bar-crumb {
+  color: var(--text-tertiary);
+  white-space: nowrap;
+  text-decoration: none;
+}
+.status-bar-crumb:hover { color: var(--text-primary); }
+.status-bar-crumb:focus-visible { outline: var(--border-width-strong) solid var(--border-focus); outline-offset: 2px; border-radius: var(--radius-4); }
+.status-bar-sep { margin: 0 var(--space-8); color: var(--text-tertiary); }
+
+/* 층 버튼 맨 위 [전체] — 링크라 버튼처럼 가운데 맞춘다 */
+a.map-floor {
+  display: grid;
+  place-items: center;
+  text-decoration: none;
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-12);
+}
+
 /* ---------- 셸 배치 ---------- */
 /* Figma Margin — 위 · 오른쪽 · 아래 8, 왼쪽 0. */
 .v2 .main { padding: var(--space-8) var(--space-8) var(--space-8) 0; }

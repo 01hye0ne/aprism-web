@@ -29,6 +29,23 @@
   if (!trigger || !menu || !cards.length) { return; }
 
   var current = MISSIONS[0] || null;
+  // 전체 층 현황(building-v2-2.html)에서 층 · 미션을 골라 들어오면 ?mission= 이 붙어 온다.
+  var asked = /[?&]mission=([^&#]+)/.exec(location.search);
+  if (asked) {
+    try {
+      var want = decodeURIComponent(asked[1].replace(/\+/g, " "));
+      if (MISSIONS.indexOf(want) >= 0) { current = want; }
+    } catch (e) { /* 깨진 주소면 첫 미션 */ }
+  }
+
+  // 전체 건물로 나가는 링크 — 테마 같은 보기 설정은 들고 간다.
+  var keep = (location.search.match(/[?&](theme|palette|delta|glow)=[\w-]+/g) || [])
+    .map(function (q) { return q.slice(1); }).join("&");
+  if (keep) {
+    Array.prototype.forEach.call(document.querySelectorAll("[data-building-link]"), function (a) {
+      a.setAttribute("href", a.getAttribute("href").split("?")[0] + "?" + keep);
+    });
+  }
   var levels = window.APRISM_ALERT_LEVELS || {};   // 미션 → 가장 높은 알림 단계(monitor.js)
 
   function missionOf(card) { return MISSIONS[Number(card.getAttribute("data-robot"))] || null; }
@@ -106,6 +123,7 @@
     }
 
     var floor = floorOf(m);
+    if (floor) { window.APRISM_FLOOR_WANT = floor; }   // 지도가 아직 안 섰으면 map.js 가 이 층으로 연다
     var floorBtn = floor && document.querySelector("[data-map-floor='" + floor + "']");
     if (floorBtn && floorBtn.getAttribute("aria-pressed") !== "true") { floorBtn.click(); }
 

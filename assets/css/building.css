@@ -1,0 +1,415 @@
+/* ==================================================================
+ * 전체 층 현황 — v2.2 (screens/building-v2-2.html · assets/js/building.js)
+ * 셸 · 알림 목록 · 우측 유리 패널 · 도구 레일은 메인 v2.2 부품 그대로이고,
+ * 여기는 이 화면에만 있는 것(층 이름표 · 로봇 점 · 알림 표식 · 요약 · 로봇 현황 줄 · 운행 흐름)이다.
+ * 색은 모두 토큰이다. 파랑은 상태(수행중 로봇)에만 쓴다 — 층 손 얹기는 무채색으로 밝힌다.
+ * ================================================================== */
+
+/* ---------- 상태바 — 전체 건물 › 층 ---------- */
+.is-building .status-bar-place { margin-right: var(--space-4); }
+.bld-menu { min-width: 320px; }
+.bld-menu-floor {
+  padding: var(--space-8) var(--space-12) var(--space-4);
+  color: var(--text-tertiary);
+}
+.bld-menu-floor:not(:first-child) {
+  margin-top: var(--space-4);
+  border-top: var(--border-width-thin) solid var(--border-divider);
+}
+.bld-menu .scope-item { display: flex; align-items: center; gap: var(--space-8); }
+.bld-menu-sub { margin-left: auto; padding-left: var(--space-16); color: var(--text-tertiary); }
+
+/* ---------- 층 표식(알림 줄 · 로봇 줄 · 이름표에 함께 쓰는 꼬리표) ---------- */
+.bld-floor-tag {
+  flex: none;
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-4);
+  background-color: var(--bg-raised);
+  color: var(--text-secondary);
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-12);
+  line-height: var(--font-line-height-18);
+}
+
+/* 알림 줄 — 층 · 미션 한 줄이 더 붙는다 */
+.ah-scope {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  min-width: 0;
+  color: var(--text-tertiary);
+}
+.ah-scope > span:last-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* 단계 점 + 글 */
+.bld-sev { display: inline-flex; align-items: center; gap: var(--space-4); }
+.bld-sev-dot {
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background-color: var(--text-tertiary);
+}
+.bld-sev[data-sev="warning"] { color: var(--status-warning-text); }
+.bld-sev[data-sev="warning"] .bld-sev-dot { background-color: var(--status-warning-icon); }
+.bld-sev[data-sev="critical"] { color: var(--status-critical-text); }
+.bld-sev[data-sev="critical"] .bld-sev-dot { background-color: var(--status-critical-icon); }
+
+/* ---------- 지도 칸 ---------- */
+.is-building .map-canvas { position: relative; overflow: hidden; }
+.is-building .map-canvas.is-pick { cursor: pointer; }
+
+/* 층 버튼의 단계 점 — 오른쪽 위 */
+.bld-floors .map-floor { position: relative; }
+.bld-floors .map-floor.is-hover { background-color: var(--state-hover); color: var(--text-primary); }
+.bld-floor-dot {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-pill);
+}
+.bld-floor-dot[data-sev="warning"] { background-color: var(--status-warning-icon); }
+.bld-floor-dot[data-sev="critical"] { background-color: var(--status-critical-icon); }
+
+.bld-labels {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+.bld-labels > * {
+  position: absolute;
+  white-space: nowrap;
+  left: 0;
+  top: 0;
+  transition: opacity 300ms ease;
+  will-change: transform;
+}
+
+/* 층 이름표 — 층 오른쪽 위 모서리에서 선을 뽑아 붙인다 */
+.bld-ftag {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text-primary);
+  font: inherit;
+  text-align: left;
+  pointer-events: auto;
+  cursor: pointer;
+}
+.bld-ftag-line {
+  width: 32px;
+  margin-top: -1px;
+  border-top: var(--border-width-thin) solid var(--text-tertiary);
+}
+.bld-ftag-txt {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  transform: translateY(-50%);
+  margin-top: 0;
+}
+.bld-ftag { transform-origin: 0 0; }
+.bld-ftag > .bld-ftag-line { transform: translateY(-50%); }
+.bld-ftag-name { display: flex; align-items: baseline; gap: var(--space-8); }
+.bld-ftag-name b {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-20);
+  line-height: var(--font-line-height-28);
+  font-weight: 600;
+}
+.bld-ftag-name .t-label-2 { color: var(--text-secondary); }
+.bld-ftag-sub { display: flex; align-items: center; gap: var(--space-8); color: var(--text-secondary); }
+.bld-ftag.is-hot .bld-ftag-line { border-color: var(--text-primary); }
+.bld-ftag.is-hot .bld-ftag-name .t-label-2 { color: var(--text-primary); }
+.bld-ftag:focus-visible { outline: var(--border-width-strong) solid var(--border-focus); outline-offset: 4px; border-radius: var(--radius-4); }
+
+/* 알림 표식 — 주의는 노랑 · 위험은 빨강 + 퍼지는 고리 */
+.bld-alert {
+  display: grid;
+  place-items: center;
+  width: 0;
+  height: 0;
+}
+.bld-alert .i {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  transform: translate(-50%, -100%);
+}
+.bld-alert.is-warning .i { color: var(--status-warning-icon); }
+.bld-alert.is-critical .i { color: var(--status-critical-icon); }
+.bld-alert.is-critical::before {
+  content: "";
+  position: absolute;
+  left: -8px;
+  top: -8px;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--status-critical-icon);
+  border-radius: 50%;
+  animation: bld-ring 1.6s ease-out infinite;
+}
+@keyframes bld-ring {
+  from { transform: scale(0.6); opacity: 0.9; }
+  to { transform: scale(2.6); opacity: 0; }
+}
+
+/* 로봇 점 — 메인 지도 로봇(.map-bot)의 작은 판. 수행중만 파랑(상태)이고 나머지는 회색이다. */
+.bld-bot { width: 0; height: 0; }
+.bld-bot > i {
+  position: absolute;
+  left: -6px;
+  top: -6px;
+  width: 12px;
+  height: 12px;
+  box-sizing: border-box;
+  border: 2px solid var(--bg-page);
+  border-radius: 50%;
+  background-color: var(--text-tertiary);
+}
+.bld-bot.is-run > i { background-color: var(--color-blue-500); box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-blue-500) 28%, transparent); }
+.bld-bot.is-off > i { background-color: var(--bg-page); border-color: var(--text-tertiary); }
+.bld-bot-name {
+  position: absolute;
+  left: 0;
+  top: 8px;
+  transform: translateX(-50%);
+  padding: 0 4px;
+  border-radius: var(--radius-4);
+  background-color: var(--bg-panel);
+  color: var(--text-secondary);
+  font-size: var(--font-size-12);
+  line-height: var(--font-line-height-18);
+  white-space: nowrap;
+}
+.bld-bot.is-run .bld-bot-name { color: var(--text-primary); }
+.bld-bot.is-marked > i { transform: scale(1.4); }
+.bld-bot.is-marked .bld-bot-name { background-color: var(--text-primary); color: var(--bg-page); }
+
+/* 건물 요약 — 왼쪽 아래 */
+.bld-sum {
+  position: absolute;
+  left: var(--space-20);
+  bottom: var(--space-20);
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  pointer-events: none;
+  transition: opacity 300ms ease;
+}
+.bld-sum-label { color: var(--text-tertiary); }
+.bld-sum-num { display: flex; align-items: baseline; gap: var(--space-4); }
+.bld-sum-num b {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-48);
+  line-height: var(--font-line-height-56);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+.bld-sum-num .t-label-2 { color: var(--text-secondary); }
+.bld-sum-rows { display: flex; flex-direction: column; gap: 2px; margin: var(--space-4) 0 0; }
+.bld-sum-rows > div { display: flex; align-items: center; gap: var(--space-8); }
+.bld-sum-rows dt { width: 28px; color: var(--text-tertiary); }
+.bld-sum-rows dd { margin: 0; color: var(--text-secondary); }
+
+/* 층 요약 — 손 따라 뜬다. 메인 지도 쪽지(.map-card)와 같은 유리 면 */
+.bld-tip {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  min-width: 224px;
+  padding: var(--space-12);
+  border-radius: var(--radius-8);
+  background-color: var(--map-glass-bg, var(--bg-raised));
+  -webkit-backdrop-filter: var(--map-glass-blur, none);
+  backdrop-filter: var(--map-glass-blur, none);
+  box-shadow: var(--map-glass-edge, none), 0 8px 20px -4px rgb(0 0 0 / 30%);
+  pointer-events: none;
+}
+.bld-tip[hidden] { display: none; }
+.bld-tip-head { display: flex; align-items: baseline; gap: var(--space-8); }
+.bld-tip-head b { font-family: var(--font-family-mono); font-size: var(--font-size-16); line-height: var(--font-line-height-24); font-weight: 600; }
+.bld-tip-rows { display: flex; flex-direction: column; gap: var(--space-4); margin: 0; }
+.bld-tip-rows > div { display: flex; align-items: center; gap: var(--space-12); }
+.bld-tip-rows dt { width: 32px; color: var(--text-tertiary); }
+.bld-tip-rows dd { margin: 0; }
+.bld-tip-go b { color: var(--text-primary); font-weight: 500; }
+.bld-tip-go {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-top: var(--space-8);
+  border-top: var(--border-width-thin) solid var(--border-divider);
+  color: var(--text-secondary);
+}
+
+.bld-hint,
+.bld-loading {
+  position: absolute;
+  left: 50%;
+  z-index: 1;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  pointer-events: none;
+}
+.bld-hint {
+  bottom: var(--space-20);
+  padding: var(--space-4) var(--space-12);
+  border-radius: var(--radius-pill);
+  background-color: var(--bg-map-chip);
+  color: var(--text-secondary);
+  transition: opacity 300ms ease;
+}
+.bld-loading { top: 50%; color: var(--text-tertiary); }
+
+/* 들어가는 중 — 지도 위 글은 걷는다 */
+.is-entering .bld-sum,
+.is-entering .bld-hint { opacity: 0; }
+
+/* ---------- 우측 — 로봇 현황 · 운행 흐름 · 다음 일정 ---------- */
+.bld-panel { overflow: hidden; }
+.v2 .bld-panel > .bld-card { padding: var(--space-8); gap: var(--space-8); }
+.v2 .bld-panel > .bld-card + .bld-card { border-top: var(--border-width-thin) solid var(--border-default); }
+.bld-card.is-fleet { flex: 1 1 auto; min-height: 0; }
+.bld-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-8);
+  padding: var(--space-4) var(--space-4) 0;
+}
+.bld-card-head .robot-counts { display: flex; align-items: center; gap: var(--space-4); margin: 0; color: var(--text-secondary); }
+.bld-meta { color: var(--text-tertiary); }
+
+.bld-fleet-filter { display: flex; gap: var(--space-4); padding: 0 var(--space-4); }
+
+.bld-fleet {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+.bld-robot {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  width: 100%;
+  padding: var(--space-8) var(--space-12);
+  border: 0;
+  border-radius: var(--radius-8);
+  background-color: var(--bg-cell);
+  color: var(--text-primary);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.bld-robot:hover { background-color: var(--state-hover-raised, var(--bg-raised)); }
+.bld-robot:focus-visible { outline: var(--border-width-strong) solid var(--border-focus); outline-offset: -2px; }
+.bld-robot.is-offline { color: var(--text-tertiary); }
+.bld-robot-top { display: flex; align-items: center; gap: var(--space-8); }
+.bld-robot-top .badge { margin-left: auto; }
+.bld-robot-mission { color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bld-robot-foot { display: flex; align-items: center; gap: var(--space-8); }
+.bld-robot-count { width: 40px; color: var(--text-tertiary); text-align: right; }
+.bld-bar {
+  flex: 1 1 auto;
+  height: 4px;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background-color: var(--comp-chart-track);
+}
+.bld-bar > i { display: block; height: 100%; border-radius: inherit; background-color: var(--text-secondary); }
+.bld-robot .battery { flex: none; }
+
+/* 운행 흐름 */
+.bld-gantt { display: flex; flex-direction: column; gap: var(--space-4); padding: 0 var(--space-4); }
+.bld-g-row {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  gap: var(--space-8);
+  align-items: center;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+}
+button.bld-g-row { cursor: pointer; }
+button.bld-g-row:hover .bld-g-name { color: var(--text-primary); }
+.bld-g-ticks { position: relative; height: 18px; color: var(--text-tertiary); }
+.bld-g-ticks > span { position: absolute; transform: translateX(-50%); }
+.bld-g-ticks > span:first-child { transform: none; }
+.bld-g-ticks > span:last-child { transform: translateX(-100%); }
+.bld-g-body { position: relative; display: flex; flex-direction: column; gap: var(--space-4); }
+.bld-g-name { color: var(--text-tertiary); }
+.bld-g-track {
+  position: relative;
+  height: 12px;
+  border-radius: var(--radius-2);
+  background-color: var(--bg-cell);
+}
+.bld-g-track > i {
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  border-radius: var(--radius-2);
+}
+.bld-g-track > .is-run, .bld-legend .is-run { background-color: var(--color-blue-500); }
+.bld-g-track > .is-move, .bld-legend .is-move { background-color: var(--text-tertiary); }
+.bld-g-track > .is-chg, .bld-legend .is-chg { background-color: var(--border-strong); }
+.bld-g-track > .is-plan { background-color: transparent; box-shadow: inset 0 0 0 1px currentColor; opacity: 0.8; }
+.bld-g-track > .is-run.is-plan { color: var(--color-blue-500); }
+.bld-g-track > .is-move.is-plan { color: var(--text-tertiary); }
+.bld-g-track > .is-chg.is-plan { color: var(--border-strong); }
+.bld-legend .is-plan { box-shadow: inset 0 0 0 1px var(--text-tertiary); }
+.bld-g-now {
+  position: absolute;
+  top: -4px;
+  bottom: -2px;
+  left: calc(32px + (100% - 32px) * var(--x));
+  border-left: var(--border-width-thin) solid var(--text-primary);
+  pointer-events: none;
+}
+.bld-g-now > b {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  transform: translate(-50%, -2px);
+  padding: 0 4px;
+  border-radius: var(--radius-2);
+  background-color: var(--text-primary);
+  color: var(--bg-page);
+  font-weight: 500;
+}
+.bld-gantt { padding-top: var(--space-8); }
+.bld-legend { display: flex; flex-wrap: wrap; gap: var(--space-12); padding: 0 var(--space-4) var(--space-4); color: var(--text-tertiary); }
+.bld-legend > span { display: inline-flex; align-items: center; gap: var(--space-4); }
+.bld-legend i { width: 10px; height: 8px; border-radius: var(--radius-2); }
+
+/* 다음 일정 */
+.bld-sched { display: flex; flex-direction: column; gap: var(--space-8); margin: 0; padding: 0 var(--space-4) var(--space-4); list-style: none; }
+.bld-sched-item { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: var(--space-8); align-items: baseline; }
+.bld-sched-time { color: var(--text-tertiary); }
+
+@media (prefers-reduced-motion: reduce) {
+  .bld-alert.is-critical::before { animation: none; opacity: 0.5; }
+}

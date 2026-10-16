@@ -25,7 +25,7 @@
   <link rel="stylesheet" href="../assets/css/map-overlays.css?v=96f51348" />
   <link rel="stylesheet" href="../assets/css/icons-outline.css?v=6b866a80" />
   <link rel="stylesheet" href="../assets/css/text-parts.css?v=e38e19ea" />
-  <link rel="stylesheet" href="../assets/css/monitor.css?v=f2ff77e7" />
+  <link rel="stylesheet" href="../assets/css/monitor.css?v=b8f9eb15" />
   <link rel="stylesheet" href="../assets/css/palette-neutral.css?v=0c969aea" />
   <link rel="stylesheet" href="../assets/css/delta-v3.css?v=b1562ee4" />
   <style>
@@ -119,6 +119,9 @@
         <span class="i" style="--i:var(--ic-brand-mark)" role="img" aria-label="APRISM"></span>
       </span>
       <!-- Figma Status Bar ver.2 — 로고 옆에 층 이름(Title/1)이 붙는다. -->
+      <!-- 전체 건물 › — 누르면 전체 층 현황(building-v2-2.html)으로 돌아간다(2026-10-16). -->
+      <a class="status-bar-crumb t-title-1" href="building-v2-2.html" data-building-link>전체 건물</a>
+      <span class="status-bar-sep t-title-1" aria-hidden="true">›</span>
       <span class="status-bar-place t-title-1" data-floor-label>지하 4층</span>
       <!-- v2.2 — 미션 고르기. 화면 전체(최신 알림 · 로봇 패널 · 지도 층)가 이 미션을 본다(mission-scope.js).
            메뉴의 점은 그 미션에 있는 가장 높은 알림 단계다(주의 노랑 · 위험 빨강). -->
@@ -372,6 +375,8 @@
               <!-- 층 — 지하 4층 · 지하 3층. 누르면 그 층으로 갈아탄다(assets/js/map.js).
                    계단을 눌러도 옮겨 간다. -->
               <div class="map-floors" role="group" aria-label="층">
+                <!-- [전체] — 층을 쌓아 보는 전체 층 현황으로 나간다(building-v2-2.html). -->
+                <a class="map-floor is-all" href="building-v2-2.html" data-building-link aria-label="전체 층 현황">전체</a>
                 <button type="button" class="map-floor" data-map-floor="B3" aria-pressed="false">B3</button>
                 <button type="button" class="map-floor" data-map-floor="B4" aria-pressed="true">B4</button>
               </div>
@@ -1715,10 +1720,10 @@
 <script src="../assets/js/prism-orb.js?v=03386460"></script>
 <script src="../assets/js/screen.js?v=f3340135"></script>
 <script src="../assets/js/map-model.js?v=0f88c871"></script>
-<script src="../assets/js/map.js?v=a7232fa3"></script>
+<script src="../assets/js/map.js?v=b57457cc"></script>
 <script src="../assets/js/robot-stage.js?v=d114bf18"></script>
 <script src="../assets/js/monitor.js?v=56d92611"></script>
-<script src="../assets/js/mission-scope.js?v=b5f75429"></script>
+<script src="../assets/js/mission-scope.js?v=e94231fd"></script>
 <script src="../assets/js/delta-pulse.js?v=2d0afced"></script>
 <script src="../assets/js/delta-chat.js?v=54fb0c47"></script>
 <script src="../assets/js/delta-v3.js?v=6842c15b"></script>
