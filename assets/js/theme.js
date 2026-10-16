@@ -81,18 +81,19 @@
       svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
       svg.setAttribute("class", "signal-svg");
       svg.setAttribute("aria-hidden", "true");
-      svg.setAttribute("shape-rendering", "crispEdges");
       b.appendChild(svg);
     }
     svg.setAttribute("width", String(W / d));
     svg.setAttribute("height", String(H / d));
     svg.setAttribute("viewBox", "0 0 " + W + " " + H);
     svg.innerHTML = hs.map(function (h, k) {
-      return '<rect x="' + k * (w + g) + '" y="' + (H - h) + '" width="' + w + '" height="' + h + '"' +
+      // 모서리는 막대 폭의 절반 — CSS 때의 둥근 머리(radius/card 가 3px 폭에 눌린 모양)와 같다.
+      // 곧은 변은 정수 기기 픽셀에 놓여 있어 crispEdges 없이도 또렷하다(둥근 끝만 부드럽게 섞인다).
+      return '<rect x="' + k * (w + g) + '" y="' + (H - h) + '" width="' + w + '" height="' + h + '" rx="' + (w / 2) + '"' +
         (k < level ? ' fill="currentColor"' : ' class="off"') + "/>";
     }).join("");
     b.classList.add("is-svg");
-    // SVG 자신의 왼쪽 위가 칸 사이에 걸리면 crispEdges 도 반 칸 번진다 — 모자라는 만큼 민다.
+    // SVG 자신의 왼쪽 위가 칸 사이에 걸리면 곧은 변도 반 칸 번진다 — 모자라는 만큼 민다.
     svg.style.transform = "";
     var r = svg.getBoundingClientRect();
     var ox = (Math.round(r.left * d) - r.left * d) / d;
