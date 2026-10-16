@@ -2078,17 +2078,25 @@
   display: block;
   width: 100%;
   height: auto;
+  transition: filter 200ms ease, transform 200ms ease;
   -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 64px), transparent);
   mask-image: linear-gradient(to bottom, #000 calc(100% - 64px), transparent);
 }
 .ma-v3 .ma-shot[hidden] { display: none; }
-/* 정보 hover — 사진을 한 겹 눌러 글이 읽히게 한다(state=info hover · bg/map-chip 50%) */
+/*
+ * 정보 hover — Figma state=info hover(10/16 수정).
+ *   · 사진에 배경 흐림 10(Frame 1597882809 BACKGROUND_BLUR 10). 가장자리가 비지 않게 조금 키운다.
+ *   · 위가 bg/raised 이고 아래로 투명해지는 그라데이션 + bg/map-chip 50% — 메타 글이 또렷하게 읽힌다.
+ */
+.ma-v3.is-info .ma-shot { filter: blur(10px); transform: scale(1.08); }
 .ma-v3 .ma-snap::before {
   content: "";
   position: absolute;
   inset: 0;
   z-index: 1;
-  background-color: color-mix(in srgb, var(--bg-map-chip) 50%, transparent);
+  background:
+    linear-gradient(to bottom, var(--bg-raised), color-mix(in srgb, var(--bg-raised) 0%, transparent)),
+    color-mix(in srgb, var(--bg-map-chip) 50%, transparent);
   opacity: 0;
   transition: opacity 160ms ease;
   pointer-events: none;
@@ -2120,7 +2128,8 @@
   border-radius: 0 0 var(--radius-4) var(--radius-4);
 }
 .ma-v3.no-snap .ma-lower { margin-top: 0; }
-.ma-v3 .ma-lower-in { padding: var(--space-4); }
+/* DELTA 카드 둘레 여백 8 — 카드 폭 352(Figma 10/16 수정, 4 → 8) */
+.ma-v3 .ma-lower-in { padding: var(--space-8); }
 
 /* DELTA 조치 제안 — Size=Small · bg/raised · border/default · r8 · padding 8 · gap 12 */
 .ma-v3 .ma-delta {
