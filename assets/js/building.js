@@ -199,27 +199,34 @@
 
   function buildMenu() {
     menu.textContent = "";
-    // 표 머리 — 미션 · 층 · 로봇(메인 v2.2 mission-scope.js 와 같다)
+    // 표 머리 — 수행 · 미션 · 층 · 로봇(메인 v2.2 mission-scope.js 와 같다, 10/19)
     var head = el("div", "scope-head t-caption");
     head.setAttribute("aria-hidden", "true");
-    ["", "미션", "층", "로봇"].forEach(function (t) { head.appendChild(el("span", null, t)); });
+    ["수행", "미션", "층", "로봇"].forEach(function (t) { head.appendChild(el("span", null, t)); });
     menu.appendChild(head);
     [["run", "수행중"], ["idle", "대기"], ["done", "완료"]].forEach(function (g) {
-      var list = MISSION_LIST.filter(function (m) { return stateOf(m) === g[0]; });
-      if (!list.length) { return; }
-      menu.appendChild(el("p", "scope-group t-caption", g[1]));
-      list.forEach(function (m) {
-        var item = el("button", "menu-item scope-item");
+      MISSION_LIST.filter(function (m) { return stateOf(m) === g[0]; }).forEach(function (m) {
+        var item = el("button", "menu-item scope-item is-" + g[0]);
         item.type = "button";
         item.setAttribute("role", "menuitem");
-        var dot = el("span", "scope-dot");
+        // 수행 — 수행중 파란 점 · 대기 빈 고리 · 완료 빈칸
+        var run = el("span", "scope-run");
+        run.setAttribute("data-run", g[0]);
+        run.title = g[1];
+        item.appendChild(run);
+        // 알림 단계는 이름 뒤 기호(ⓧ · △)
+        var name = el("span", "scope-name");
+        name.appendChild(el("span", "t-label-2", m));
         var s = topSev(alertsOf(m));
         if (s) {
-          dot.setAttribute("data-sev", s);
-          dot.title = s === "critical" ? "위험 알림 있음" : "주의 알림 있음";
+          var sev = icon(s === "critical" ? "error" : "warning");
+          sev.classList.add("scope-sev");
+          sev.setAttribute("data-sev", s);
+          sev.removeAttribute("aria-hidden");
+          sev.title = s === "critical" ? "위험 알림 있음" : "주의 알림 있음";
+          name.appendChild(sev);
         }
-        item.appendChild(dot);
-        item.appendChild(el("span", "t-label-2", m));
+        item.appendChild(name);
         var fl = el("span", "scope-floors");
         MISSION_FLOORS[m].forEach(function (f) { fl.appendChild(el("span", "floor-tag num", f)); });
         item.appendChild(fl);

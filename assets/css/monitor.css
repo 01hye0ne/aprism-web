@@ -354,15 +354,6 @@ a.map-floor {
 .scope-item { padding-left: var(--space-8); }
 .scope-item[aria-checked="true"] { background-color: var(--bg-selected); }
 
-.scope-dot {
-  flex: none;
-  width: 8px;
-  height: 8px;
-  border-radius: var(--radius-full);
-}
-
-.scope-dot[data-sev="warning"] { background-color: var(--status-warning-icon); }
-.scope-dot[data-sev="critical"] { background-color: var(--status-critical-icon); }
 
 /*
  * v2.2 색 위계(2026-10-12 디자이너 확정)
@@ -2458,10 +2449,10 @@ a.map-floor {
 .ah-where > .floor-tag:first-child { margin-left: 0; }
 
 /*
- * 미션 메뉴 — 표처럼 읽는다(10/19 디자이너). 머리(미션 · 층 · 로봇) 한 줄 + 상태 묶음(수행중 · 대기 · 완료).
- * 열은 머리와 줄이 같은 격자를 쓴다: 점 8 · 미션 · 층 64 · 로봇 72.
+ * 미션 메뉴 — 표처럼 읽는다(10/19 디자이너). 머리(수행 · 미션 · 층 · 로봇) 한 줄 + 줄마다 구분선.
+ * 상태 묶음 머리는 "수행" 열이 맡는다. 열은 머리와 줄이 같은 격자를 쓴다: 수행 32 · 미션 · 층 64 · 로봇 72.
  */
-.scope-menu { --scope-cols: 8px minmax(160px, 1fr) 64px 72px; }
+.scope-menu { --scope-cols: 32px minmax(160px, 1fr) 64px 72px; }
 .scope-head,
 .scope-menu .scope-item {
   display: grid;
@@ -2474,14 +2465,20 @@ a.map-floor {
   border-bottom: var(--border-width-thin) solid var(--border-divider);
   color: var(--text-tertiary);
 }
-.scope-group {
-  padding: var(--space-8) var(--space-12) var(--space-4);
-  color: var(--text-tertiary);
-}
-.scope-group:not(:nth-child(2)) {
-  margin-top: var(--space-4);
-  border-top: var(--border-width-thin) solid var(--border-divider);
-}
+.scope-head > span:first-child { text-align: center; }
+.scope-menu .scope-item + .scope-item { box-shadow: inset 0 1px 0 var(--border-default); }
+
+/* 수행 — 수행중 파란 점(상태 파랑 · 배지 점과 같다) · 대기 빈 고리 · 완료 빈칸 */
+.scope-run { justify-self: center; width: 8px; height: 8px; border-radius: var(--radius-full); }
+.scope-run[data-run="run"] { background-color: var(--status-info-icon); }
+.scope-run[data-run="idle"] { box-shadow: inset 0 0 0 1.5px var(--text-tertiary); }
+
+/* 미션 이름 + 알림 기호(ⓧ 위험 · △ 주의 — 최신 알림 목록과 같은 기호) */
+.scope-name { display: flex; align-items: center; gap: var(--space-4); min-width: 0; }
+.scope-sev { flex: none; color: var(--status-warning-icon); }
+.scope-sev[data-sev="critical"] { color: var(--status-critical-icon); }
+/* 끝난 미션은 한 단 물러난다 */
+.scope-item.is-done .scope-name > .t-label-2 { color: var(--text-secondary); }
 .scope-floors { display: inline-flex; gap: var(--space-4); }
 /* 메뉴 면이 bg/raised 라 꼬리표(raised)가 묻힌다 — 메뉴 안에서는 한 단 낮은 bg/cell */
 .scope-menu .floor-tag { background-color: var(--bg-cell); }

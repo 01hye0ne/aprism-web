@@ -90,12 +90,16 @@
     }).join(" · ");
   }
 
-  // 표 머리 — 미션 · 층 · 로봇(10/19 디자이너). 상태 묶음 머리는 그 아래 줄마다 선다.
+  /*
+   * 표 머리 — 수행 · 미션 · 층 · 로봇(10/19 디자이너). 상태 묶음 머리(수행중 · 대기 · 완료)는 없애고 "수행" 열이 맡는다.
+   *   수행중 파란 점(상태 파랑) · 대기 빈 고리 · 완료 빈칸. 줄 순서는 수행중 → 대기 → 완료 그대로다.
+   * 알림 단계는 점이 아니라 미션 이름 뒤 기호(ⓧ 위험 · △ 주의)로 — 수행 점과 색 점이 둘이면 뜻이 겹친다.
+   */
   function menuHead() {
     var head = document.createElement("div");
     head.className = "scope-head t-caption";
     head.setAttribute("aria-hidden", "true");
-    ["", "미션", "층", "로봇"].forEach(function (t) {
+    ["수행", "미션", "층", "로봇"].forEach(function (t) {
       var c = document.createElement("span");
       c.textContent = t;
       head.appendChild(c);
@@ -103,50 +107,47 @@
     return head;
   }
 
+  function span(cls, text) {
+    var n = document.createElement("span");
+    if (cls) { n.className = cls; }
+    if (text != null) { n.textContent = text; }
+    return n;
+  }
+
   function buildMenu() {
     menu.textContent = "";
     menu.appendChild(menuHead());
     GROUPS.forEach(function (g) {
-      var list = names().filter(function (m) { return stateOf(m) === g[0]; });
-      if (!list.length) { return; }
-      var head = document.createElement("p");
-      head.className = "scope-group t-caption";
-      head.textContent = g[1];
-      menu.appendChild(head);
-      list.forEach(function (m) {
+      names().filter(function (m) { return stateOf(m) === g[0]; }).forEach(function (m) {
         var item = document.createElement("button");
         item.type = "button";
-        item.className = "menu-item scope-item";
+        item.className = "menu-item scope-item is-" + g[0];
         item.setAttribute("role", "menuitemradio");
         item.setAttribute("aria-checked", m === current ? "true" : "false");
 
-        var dot = document.createElement("span");
-        dot.className = "scope-dot";
+        var run = span("scope-run");
+        run.setAttribute("data-run", g[0]);
+        run.title = g[1];
+        item.appendChild(run);
+
+        var name = span("scope-name");
+        name.appendChild(span("t-label-2", m));
         if (levels[m]) {
-          dot.setAttribute("data-sev", levels[m]);
-          dot.title = levels[m] === "critical" ? "위험 알림 있음" : "주의 알림 있음";
+          var sev = span("i i-16 scope-sev");
+          sev.setAttribute("data-sev", levels[m]);
+          sev.style.setProperty("--i", "var(--ic-" + (levels[m] === "critical" ? "error" : "warning") + ")");
+          sev.title = levels[m] === "critical" ? "위험 알림 있음" : "주의 알림 있음";
+          name.appendChild(sev);
         }
-        var text = document.createElement("span");
-        text.className = "t-label-2";
-        text.textContent = m;
-        item.appendChild(dot);
-        item.appendChild(text);
+        item.appendChild(name);
 
         // 지나는 층 — 차례대로(B3 → B4)
-        var fl = document.createElement("span");
-        fl.className = "scope-floors";
-        floorsOf(m).forEach(function (f) {
-          var tag = document.createElement("span");
-          tag.className = "floor-tag num";
-          tag.textContent = f;
-          fl.appendChild(tag);
-        });
+        var fl = span("scope-floors");
+        floorsOf(m).forEach(function (f) { fl.appendChild(span("floor-tag num", f)); });
         item.appendChild(fl);
-        var rb = document.createElement("span");
-        rb.className = "scope-robots num";
-        rb.textContent = robotsOf(m);
-        item.appendChild(rb);
-        item.setAttribute("aria-label", m + " · " + floorsOf(m).join(" → ") + " · Robot " + robotsOf(m));
+        item.appendChild(span("scope-robots num", robotsOf(m)));
+        item.setAttribute("aria-label", m + " · " + g[1] + " · " + floorsOf(m).join(" → ") + " · Robot " + robotsOf(m) +
+          (levels[m] ? " · " + (levels[m] === "critical" ? "위험" : "주의") + " 알림" : ""));
 
         item.addEventListener("click", function () {
           closeMenu();
