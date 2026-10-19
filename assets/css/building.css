@@ -315,8 +315,8 @@
 
 /*
  * 로봇 줄 — Figma 1260:15802(10/19 2차). bg/cell · r4 · 바깥 여백 없음.
- *   위 덩이(여백 8/8/4/8 · 간격 4 · 아래 border/divider 1)  층 꼬리표 + 이름(14 / ExtraBold) · 미션 · 진행 막대 + 수(mono 13)
- *   아래 줄(28 높이)  상태 · 배터리 · 신호 세 칸이 폭을 나누고 칸 사이를 border/divider 1 로 가른다(면 없음)
+ *   위 덩이(여백 8/8/4/8 · 간격 4 · 아래 border/default 1)  층 꼬리표 + 이름(14 / ExtraBold) · 미션 · 진행 막대 + 수(mono 13)
+ *   아래 줄(28 높이)  상태 · 배터리 · 신호 세 칸이 폭을 나누고 칸 사이를 border/default 1 로 가른다(면 없음)
  */
 .bld-robot {
   display: flex;
@@ -341,7 +341,7 @@
   flex-direction: column;
   gap: var(--space-4);
   padding: var(--space-8) var(--space-8) var(--space-4);
-  border-bottom: var(--border-width-thin) solid var(--border-divider);
+  border-bottom: var(--border-width-thin) solid var(--border-default);   /* 10/19 divider → default 로 한 단 진하게 */
 }
 .bld-robot-top { display: flex; align-items: center; gap: var(--space-8); }
 .bld-robot-name { font-size: var(--font-size-14); line-height: var(--font-line-height-20); font-weight: 800; }
@@ -375,7 +375,7 @@
   padding: var(--space-4);
   white-space: nowrap;
 }
-.bld-chip + .bld-chip { border-left: var(--border-width-thin) solid var(--border-divider); }
+.bld-chip + .bld-chip { border-left: var(--border-width-thin) solid var(--border-default); }
 .bld-chip.badge { border: 0; }
 
 /* 운행 흐름 */
