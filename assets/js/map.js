@@ -247,6 +247,24 @@
       done: 0xffcc00, left: 0xeeda6b, dot: 0xf8ebae      // warning
     }
   ];
+  /*
+   * 임시 경로(10/19 디자이너 "정상 작동하는 것처럼") — 수행 중인 다른 미션도 지도에 길이 보이게.
+   * 순번 = data-robot 이라 빈 자리를 건너뛰고 넣는다(forEach 는 빈 칸을 건너뛴다).
+   * floor — 로봇이 도는 층(screen.js APRISM_ROBOT_FLOORS 와 같다). 없으면 ROBOT_ON.
+   * at — 진행도(웨이포인트 n/20)에 맞춘 자리. 경유지는 대략의 비율이고 길찾기가 빈 통로로 붙인다.
+   */
+  ROBOTS[4] = {
+    name: "ROBOT 05", at: 0.1, floor: "B3",           // 발전기실 설비 점검 · 1/20(WP-02 로 가는 중)
+    dock: [0.86, 0.30],
+    stops: [[0.62, 0.30], [0.62, 0.70], [0.88, 0.70]],
+    done: 0x89b9ed, left: 0x4990e0, dot: 0xc7ddf8
+  };
+  ROBOTS[10] = {
+    name: "ROBOT 11", at: 0.15, floor: "B3",          // 전기실 열화상 점검 · 3/20
+    dock: [0.12, 0.90],
+    stops: [[0.12, 0.55], [0.45, 0.55], [0.45, 0.20], [0.15, 0.20]],
+    done: 0x89b9ed, left: 0x4990e0, dot: 0xc7ddf8
+  };
 
   // 모델을 이 크기(가장 긴 변)로 키워서 다룬다. 이유는 build() 에 적어 두었다.
   var SPAN_UNITS = 120;
@@ -2845,7 +2863,7 @@
     // 층을 오가는 로봇의 길은 층마다 알아서 켜고 끈다(travelSync). 골라져 있으면 늘 깐다.
     var ln = lanes[activeRobot()];
     if (ln && ln.travel) { showLane(activeRobot(), true); return; }
-    if (floorNow === ROBOT_ON) { showLane(activeRobot(), true); }
+    if (floorNow === ((ln && ln.floor) || ROBOT_ON)) { showLane(activeRobot(), true); }
     else { showLane(-1, true); }
   }
 
@@ -3935,7 +3953,7 @@
     if (!modelBox) { return null; }
     var size = modelBox.getSize(new THREE.Vector3());
     function frac(f) { return { X: f[0] * size.x * NAV.unit, Y: (1 - f[1]) * size.z * NAV.unit }; }
-    var fid = ROBOT_ON;
+    var fid = bot.floor || ROBOT_ON;
     var dock = frac(bot.dock);
     var count = railWaypoints().length || WAYPOINTS;
     var names = ["DOCK"];
@@ -4394,6 +4412,7 @@
       // 도커 -> WP-01 … -> 같은 도커 폐회로(미터 좌표 · 장애물 여유). 못 만들면 예전 길로 둔다.
       var planned = planRobot(bot, id);
       drawRoute(planned ? planned.world : layRoute(box, [bot.dock].concat(bot.stops)), bot, id, planned);
+      if (bot.floor && lanes[String(id)]) { lanes[String(id)].floor = bot.floor; }
     });
     crossLane();
     layRobots();
