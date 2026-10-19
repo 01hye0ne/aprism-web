@@ -2572,8 +2572,12 @@ a.map-floor {
  */
 /* 10/19 2차 — 패널은 지도 바탕보다는 밝아야 한다(다크도 바탕 gray/950 < 패널). 지도 바탕을 gray/300 으로 한 단 내리고 패널은 gray/100 유리로 한 단 올렸다.
    차례: 지도 바탕 gray/300 < 패널 gray/100 유리 · 안 상자 < 흰 카드. */
+/* 10/19 3차 — 다크(바닥 → 덩이 L* +24)만큼 대비를 내려고 지도 바탕을 gray/450 으로 내렸다(바닥 L* 78 · 바탕 69).
+   전체 층 현황은 지도 위에 글(층 요약 · 단계)이 바로 얹혀 어두운 바탕에서 안 읽혀 gray/300 그대로 둔다. */
 :root[data-theme="light"] .v2-2 .two-col,
-:root[data-theme="light"] .v2-2 .map-view { background-color: var(--color-gray-300); }
+:root[data-theme="light"] .v2-2 .map-view { background-color: var(--color-gray-450); }
+:root[data-theme="light"] .v2-2.is-building .two-col,
+:root[data-theme="light"] .v2-2.is-building .map-view { background-color: var(--color-gray-300); }
 :root[data-theme="light"] .v2-2 .floating .right-panel { --map-glass-bg: color-mix(in srgb, var(--color-gray-100) 80%, transparent); }
 /* 지금 도는 칸(.is-running)은 짙은 면 그대로 — "지금 여기" 는 대비가 가장 센 면이다(색 규칙 5). */
 :root[data-theme="light"] .v2-2 .timeline .timeline-item:not(.is-running) .step-card,

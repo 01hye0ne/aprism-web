@@ -170,16 +170,17 @@
    * 10/19 디자이너 3차 — 다크와 같은 차례로: 바탕(가장 어둡다) < 바닥 < 설비 · 벽(가장 밝다).
    * 4차 — 그림자를 더 진하게 · 대비를 더 세게: 앰비언트를 줄이고(2.0 → 0.4) 방향광을 키웠다(0.6 → 2.8).
    * 그림자는 방향광이 가려진 자리라 방향광 몫이 클수록 진해진다. 덩이는 lift(스스로 밝기, 바닥은 0)로 띄워 그림자와 따로 논다.
-   * 화면 실측(밝기) 바탕 213 · 바닥 227 · 그림자 ≈180 · 해 등진 옆면 182 · 해 받는 옆면 245 · 윗면 255.
+   * 5차 — 다크의 바닥 → 덩이 대비(L* +24)만큼: 바닥 · 바탕을 어둡게(바탕 gray/450 · monitor.css).
+   * 화면 실측(L*) 바탕 69 · 바닥 78 · 해 등진 옆면 80 · 해 받는 옆면 99.7 · 윗면 100. 다크는 3 · 11 · 27 · 30 · 35.
    * 덩이 면은 옅은 회색이고, 입체는 조명이 가른다 — 윗면 빛(TOP_LIGHT) > 해 받는 옆면 > 해 등진 옆면.
    * 라이트 조명은 applyTheme 이 바꾼다(앰비언트 AMB_LIGHT · 방향광 KEY_LIGHT_LIGHT · 반구광 아래색 HEMI_GROUND_LIGHT).
    */
   var LIGHT = {
-    face: { floor: 0xc4c9d1, wall: 0xd6dae1, equipment: 0xd0d5dc, stairs: 0xdde1e7, other: 0xd6dae1 },
+    face: { floor: 0xa3a9b3, wall: 0xd0d4db, equipment: 0xcbd0d8, stairs: 0xd8dce3, other: 0xd0d4db },
     edge: 0x8b94a1, ghost: 0xeef0f3, grid: 0xaab1bd,
     pickFace: 0x6b7586, pickLine: 0x2b2f36, hoverLine: 0x4b4f57
   };
-  var LIGHT_LIFT = 0.9;
+  var LIGHT_LIFT = 1.2;
 
   /*
    * 제안 팔레트(?palette=neutral · 톤 실험실 비교용) — 다크 남색을 같은 명도의 무채색으로.
@@ -2662,7 +2663,7 @@
   var topLight = null, keyLight = null, hemiLight = null, ambLight = null;
   var AMB_LIGHT = 0.4;   // 라이트 앰비언트 — 낮을수록 그림자가 진하다(4차)
   // 라이트 반구광 아래쪽 색 — 다크의 거의 검정(0x05070c)이면 해를 등진 옆면이 바닥보다 어두워진다
-  var HEMI_GROUND_LIGHT = 0x9aa3b2;
+  var HEMI_GROUND_LIGHT = 0xd8dde5;
   var TOP_LIGHT = 0.9;   // 라이트 윗면 빛 세기
   var KEY_LIGHT_LIGHT = 2.8;   // 라이트 옆면 빛(방향광) 세기 — 낮출수록 옆면 두 쪽 차이가 줄어든다
 
