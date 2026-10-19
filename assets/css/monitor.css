@@ -48,6 +48,7 @@
 }
 .status-bar-crumb:hover { color: var(--text-primary); }
 .status-bar-crumb:focus-visible { outline: var(--border-width-strong) solid var(--border-focus); outline-offset: 2px; border-radius: var(--radius-4); }
+.status-bar-sep { margin: 0 var(--space-8); color: var(--text-tertiary); }
 
 /* 층 버튼 맨 위 [전체] — 링크라 버튼처럼 가운데 맞춘다 */
 a.map-floor {
