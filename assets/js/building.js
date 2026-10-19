@@ -40,10 +40,18 @@
   var FNAME = { B3: "지하 3층", B4: "지하 4층" };
 
   // 미션은 메인 v2.2 의 로봇 데이터(screen.js)와 같다. 층은 미션 이름에서 나온다.
-  var MISSIONS = {
-    B3: ["지하 3층 발전기실 설비 점검", "지하 3층 공조 설비 순회", "지하 3층 전기실 열화상 점검"],
-    B4: ["지하 4층 정기 순회 점검", "지하 4층 야간 순회 점검", "지하 4층 유틸리티 순회"]
+  // 10/19 — 미션은 층에 속하지 않는다. 미션마다 지나는 층을 차례대로 든다(메인 v2.2 screen.js 와 같다).
+  var MISSION_FLOORS = {
+    "정기 순회 점검": ["B3", "B4"],
+    "야간 순회 점검": ["B4"],
+    "발전기실 설비 점검": ["B3"],
+    "공조 설비 순회": ["B3"],
+    "유틸리티 순회": ["B4"],
+    "전기실 열화상 점검": ["B3"]
   };
+  var MISSION_LIST = Object.keys(MISSION_FLOORS);
+  // 그 층을 지나는 미션
+  function missionsOn(f) { return MISSION_LIST.filter(function (m) { return MISSION_FLOORS[m].indexOf(f) >= 0; }); }
 
   /*
    * 로봇 — 메인 v2.2 로봇 카드와 같은 값이다(번호 · 상태 배지 · 배터리 · 신호).
@@ -53,17 +61,17 @@
    *   uv    층 바닥 위 자리(0~1). building.js 가 열린 바닥으로 옮겨 앉힌다.
    */
   var ROBOTS = [
-    { n: 1,  floor: "B4", st: "run",  mission: "지하 4층 정기 순회 점검",     now: "N₂ 배관 압력 점검",     done: 3,  total: 20, bat: 78, sig: 4, uv: [0.42, 0.40] },
-    { n: 2,  floor: "B4", st: "done", mission: "지하 4층 정기 순회 점검",     now: "복귀 중",               done: 20, total: 20, bat: 18, chg: false, sig: 2, uv: [0.70, 0.66], moving: true },
+    { n: 1,  floor: "B4", st: "run",  mission: "정기 순회 점검",     now: "N₂ 배관 압력 점검",     done: 3,  total: 20, bat: 78, sig: 4, uv: [0.42, 0.40] },
+    { n: 2,  floor: "B3", st: "done", mission: "정기 순회 점검",     now: "복귀 중",               done: 20, total: 20, bat: 18, chg: false, sig: 2, uv: [0.62, 0.66], moving: true },   // B3 → 계단 → B4 도크
     { n: 3,  floor: "B4", st: "idle", mission: null,                          now: "대기 중",               bat: 35, chg: true, sig: 3, uv: [0.90, 0.92], dock: true },
-    { n: 4,  floor: "B4", st: "done", mission: "지하 4층 야간 순회 점검",     now: "순회 완료",             done: 20, total: 20, bat: 92, sig: 4, uv: [0.76, 0.92], dock: true },
-    { n: 5,  floor: "B3", st: "run",  mission: "지하 3층 발전기실 설비 점검", now: "발전기 베어링 진동 측정", done: 1, total: 20, bat: 64, sig: 3, uv: [0.50, 0.30] },
+    { n: 4,  floor: "B4", st: "done", mission: "야간 순회 점검",     now: "순회 완료",             done: 20, total: 20, bat: 92, sig: 4, uv: [0.76, 0.92], dock: true },
+    { n: 5,  floor: "B3", st: "run",  mission: "발전기실 설비 점검", now: "발전기 베어링 진동 측정", done: 1, total: 20, bat: 64, sig: 3, uv: [0.50, 0.30] },
     { n: 6,  floor: "B4", st: "idle", mission: null,                          now: "충전 중",               bat: 8,  chg: true, sig: 2, uv: [0.90, 0.80], dock: true },
-    { n: 7,  floor: "B3", st: "done", mission: "지하 3층 공조 설비 순회",     now: "순회 완료",             done: 20, total: 20, bat: 96, chg: true, sig: 4, uv: [0.10, 0.92], dock: true },
+    { n: 7,  floor: "B3", st: "done", mission: "공조 설비 순회",     now: "순회 완료",             done: 20, total: 20, bat: 96, chg: true, sig: 4, uv: [0.10, 0.92], dock: true },
     { n: 8,  floor: "B3", st: "idle", mission: null,                          now: "대기 중",               bat: 47, sig: 3, uv: [0.24, 0.92], dock: true },
-    { n: 9,  floor: "B4", st: "done", mission: "지하 4층 유틸리티 순회",      now: "순회 완료",             done: 20, total: 20, bat: 88, sig: 4, uv: [0.76, 0.80], dock: true },
+    { n: 9,  floor: "B4", st: "done", mission: "유틸리티 순회",      now: "순회 완료",             done: 20, total: 20, bat: 88, sig: 4, uv: [0.76, 0.80], dock: true },
     { n: 10, floor: "B3", st: "off",  mission: null,                          now: "통신 끊김",             bat: 29, sig: 0, uv: [0.30, 0.62] },
-    { n: 11, floor: "B3", st: "run",  mission: "지하 3층 전기실 열화상 점검", now: "배전반실 열화상 점검",  done: 3,  total: 20, bat: 71, sig: 4, uv: [0.66, 0.58] },
+    { n: 11, floor: "B3", st: "run",  mission: "전기실 열화상 점검", now: "배전반실 열화상 점검",  done: 3,  total: 20, bat: 71, sig: 4, uv: [0.66, 0.58] },
     { n: 12, floor: "B3", st: "idle", mission: null,                          now: "충전 중",               bat: 55, chg: true, sig: 3, uv: [0.10, 0.80], dock: true }
   ];
   var BADGE = {
@@ -79,17 +87,16 @@
    * 그 로봇의 미션 · 층으로 묶인다. uv 는 층 위 표식 자리(임시).
    */
   var ALERTS = [
-    { sev: "critical", robot: 1, where: "터빈 2 / Unit 03 · WP-04 N₂ 배관 압력계", time: "10:12:40", title: "지하발전소 B3 터빈 2 NG 1건 발견", uv: [0.38, 0.34] },
-    { sev: "warning",  robot: 1, where: "APRO 4F · WP-03 냉각수 배관 밸브",       time: "10:11:19", title: "누출감지 · 냉각수 배관 밸브", uv: [0.30, 0.52] },
-    { sev: "warning",  robot: 2, where: "Robot 02 · WP-06 수배전반",              time: "10:09:42", title: "부분방전 · 이상 점수 9.41", uv: [0.62, 0.22] },
-    { sev: "warning",  robot: 2, where: "Robot 02 · WP-12 냉각 펌프 P-2",         time: "10:06:05", title: "진동 상승 · 냉각 펌프 P-2", uv: [0.64, 0.46] },
-    { sev: "warning",  robot: 5, where: "Robot 05 · WP-02 발전기 베어링",         time: "10:03:27", title: "과열 · 발전기 베어링 68.4℃", uv: [0.56, 0.24] },
-    { sev: "warning",  robot: 2, where: "Robot 02 · WP-20 공기 압축기 C-1",       time: "10:01:12", title: "압력 편차 · 공기 압축기 C-1", uv: [0.50, 0.74] }
+    { sev: "critical", robot: 1, floor: "B4", where: "터빈 2 / Unit 03 · WP-04 N₂ 배관 압력계", time: "10:12:40", title: "지하발전소 B3 터빈 2 NG 1건 발견", uv: [0.38, 0.34] },
+    { sev: "warning",  robot: 1, floor: "B4", where: "APRO 4F · WP-03 냉각수 배관 밸브",       time: "10:11:19", title: "누출감지 · 냉각수 배관 밸브", uv: [0.30, 0.52] },
+    { sev: "warning",  robot: 2, floor: "B3", where: "Robot 02 · WP-06 수배전반",              time: "10:09:42", title: "부분방전 · 이상 점수 9.41", uv: [0.62, 0.22] },
+    { sev: "warning",  robot: 2, floor: "B3", where: "Robot 02 · WP-12 냉각 펌프 P-2",         time: "10:06:05", title: "진동 상승 · 냉각 펌프 P-2", uv: [0.64, 0.46] },
+    { sev: "warning",  robot: 5, floor: "B3", where: "Robot 05 · WP-02 발전기 베어링",         time: "10:03:27", title: "과열 · 발전기 베어링 68.4℃", uv: [0.56, 0.24] },
+    { sev: "warning",  robot: 2, floor: "B4", where: "Robot 02 · WP-20 공기 압축기 C-1",       time: "10:01:12", title: "압력 편차 · 공기 압축기 C-1", uv: [0.50, 0.74] }
   ];
   ALERTS.forEach(function (a) {
-    var r = robotNo(a.robot);
-    a.floor = r.floor;
-    a.mission = r.mission;
+    // 층은 알림이 난 웨이포인트의 층이다(로봇이 지금 선 층이 아니다 — 메인 v2.2 monitor.js 와 같다).
+    a.mission = robotNo(a.robot).mission;
   });
 
   var DONE = [
@@ -139,9 +146,15 @@
     if (w) { out.push("주의 " + w); }
     return out.join(" · ");
   }
+  // 미션으로 들어갈 때 열 층 — 그 미션 로봇이 선 층(수행중 먼저), 없으면 미션의 첫 층. 메인도 같은 층으로 연다.
+  function floorFor(m) {
+    var mine = ROBOTS.filter(function (r) { return r.mission === m; })
+      .sort(function (a, b) { return (a.st === "run" ? 0 : 1) - (b.st === "run" ? 0 : 1); });
+    return mine.length ? mine[0].floor : MISSION_FLOORS[m][0];
+  }
   // 층에 들어갈 때 열 미션 — 알림이 가장 높은 미션, 없으면 수행 중인 미션, 그것도 없으면 첫 미션.
   function missionFor(f) {
-    var list = MISSIONS[f];
+    var list = missionsOn(f);
     var best = null, rank = -1;
     list.forEach(function (m) {
       var s = topSev(alertsOf(m));
@@ -176,11 +189,21 @@
     menu.hidden = true;
   }
 
+  // 미션 메뉴 — 메인 v2.2 와 같이 상태별(수행중 · 대기 · 완료)로 묶고 지나는 층 꼬리표를 단다(10/19).
+  function stateOf(m) {
+    var mine = ROBOTS.filter(function (r) { return r.mission === m; });
+    if (mine.some(function (r) { return r.st === "run"; })) { return "run"; }
+    if (mine.length && mine.every(function (r) { return r.st === "done"; })) { return "done"; }
+    return "idle";
+  }
+
   function buildMenu() {
     menu.textContent = "";
-    FLOORS.forEach(function (f) {
-      menu.appendChild(el("p", "bld-menu-floor t-caption", FNAME[f]));
-      MISSIONS[f].forEach(function (m) {
+    [["run", "수행중"], ["idle", "대기"], ["done", "완료"]].forEach(function (g) {
+      var list = MISSION_LIST.filter(function (m) { return stateOf(m) === g[0]; });
+      if (!list.length) { return; }
+      menu.appendChild(el("p", "bld-menu-floor t-caption", g[1]));
+      list.forEach(function (m) {
         var item = el("button", "menu-item scope-item");
         item.type = "button";
         item.setAttribute("role", "menuitem");
@@ -192,9 +215,10 @@
         }
         item.appendChild(dot);
         item.appendChild(el("span", "t-label-2", m));
-        var who = ROBOTS.filter(function (r) { return r.mission === m; }).map(rname).join(" · ");
-        if (who) { item.appendChild(el("span", "t-caption bld-menu-sub", who)); }
-        item.addEventListener("click", function () { closeMenu(); enter(f, m); });
+        var fl = el("span", "bld-menu-sub");
+        MISSION_FLOORS[m].forEach(function (f) { fl.appendChild(el("span", "bld-floor-tag num", f)); });
+        item.appendChild(fl);
+        item.addEventListener("click", function () { closeMenu(); enter(floorFor(m), m); });
         menu.appendChild(item);
       });
     });
@@ -230,6 +254,7 @@
 
     var where = el("span", "ah-where t-caption");
     where.appendChild(icon("target"));
+    where.appendChild(el("span", "floor-tag num", a.floor));   // 층 꼬리표는 웨이포인트 이름 앞(10/19)
     var wp = /WP-\d+.*$/.exec(a.where);   // 위치는 웨이포인트만(10/19, 메인 v2.2 와 같다)
     where.appendChild(el("span", null, wp ? wp[0] : a.where));
     where.appendChild(el("span", "num", a.time));
@@ -240,7 +265,6 @@
 
     // 어느 층 · 미션의 알림인지 — 미션을 고르기 전 화면이라 이 줄이 하나 더 붙는다.
     var scope = el("span", "ah-scope t-caption");
-    scope.appendChild(el("span", "bld-floor-tag num", a.floor));
     scope.appendChild(el("span", null, a.mission));
 
     node.appendChild(where);
@@ -974,7 +998,7 @@
       rows.appendChild(d);
     }
     row("로봇", bots.length + "대 · " + run + "대 수행중");
-    row("미션", MISSIONS[f].length + "건");
+    row("미션", missionsOn(f).length + "건 지남");
     row("알림", list.length ? sevCount(list) : "없음", topSev(list));
     tip.appendChild(rows);
     var go = el("p", "t-caption bld-tip-go");
@@ -1043,7 +1067,7 @@
     layout(false);
     tip.hidden = true;
     body.classList.add("is-entering");
-    if (crumb) { crumb.textContent = "전체 건물 › " + FNAME[f]; }
+    if (crumb) { crumb.textContent = "전체 건물 › " + mission; }   // 메인 v2.2 상태바(전체 건물 › 미션)로 이어진다
     $$("[data-bld-floor]").forEach(function (b) { b.classList.toggle("is-on", b.getAttribute("data-bld-floor") === f); });
     setTimeout(function () { location.href = mainUrl(mission); }, reduce ? 0 : 760);
   }

@@ -3421,6 +3421,11 @@
 
     trav.floor = trav.phase === "walk" ? trav.up : (trav.phase === "stair" ? "stair" : trav.low);
     trav.lane.floor = trav.floor;
+    // 고른 로봇이 선 층이 바뀌면 알린다 — 층 판의 로봇 표시가 따라 옮긴다(mission-scope.js, 10/19).
+    if (tracked && trav.floor !== "stair" && trav.floor !== trav.saidFloor) {
+      trav.saidFloor = trav.floor;
+      document.dispatchEvent(new CustomEvent("aprism:robot-floor", { detail: { floor: trav.floor } }));
+    }
 
     var here = where(trav.s);
     var ahead = where(Math.min(trav.s3, trav.s + 1.5));

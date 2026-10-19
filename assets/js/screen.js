@@ -786,6 +786,27 @@ window.APRISM_TEXT = (function () {
     }
   ];
 
+  /*
+   * v2.2 — 미션은 층에 속하지 않는다(10/19 디자이너). 미션 하나가 B3 를 돌고 B4 로 내려갈 수 있다.
+   * 그래서 v2.2 에서는 이름에서 "지하 N층" 을 떼고, 지나는 층을 차례대로 따로 든다.
+   * 예전 판(v2 · v2.1)은 클라이언트가 본 판이라 이름을 그대로 둔다 — 이 파일을 같이 쓴다.
+   *   APRISM_MISSION_FLOORS  미션 → 지나는 층(차례)
+   *   APRISM_ROBOT_FLOORS    로봇(data-robot) → 지금 선 층. 실데이터가 붙기 전 임시 값이다.
+   */
+  if (document.body.classList.contains("v2-2")) {
+    ROBOTS.forEach(function (r) { if (r.mission) { r.mission = r.mission.replace(/^지하\s*\d+층\s+/, ""); } });
+    window.APRISM_MISSION_FLOORS = {
+      "정기 순회 점검": ["B3", "B4"],
+      "야간 순회 점검": ["B4"],
+      "발전기실 설비 점검": ["B3"],
+      "공조 설비 순회": ["B3"],
+      "유틸리티 순회": ["B4"],
+      "전기실 열화상 점검": ["B3"]
+    };
+    // Robot 02 는 B3 를 돌고 계단으로 B4 도크로 복귀하는 중이다(지도 층 이동 시연 ?demo=travel 과 같다).
+    window.APRISM_ROBOT_FLOORS = ["B4", "B3", "B4", "B4", "B3", "B4", "B3", "B3", "B4", "B3", "B3", "B3"];
+  }
+
   // 로봇마다 맡은 미션 이름(순번 = data-robot). 미션이 없으면 null.
   // v2.2 의 미션 범위(mission-scope.js) · 알림 묶기(monitor.js)가 읽는다.
   window.APRISM_ROBOT_MISSIONS = ROBOTS.map(function (r) {

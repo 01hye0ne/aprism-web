@@ -4,7 +4,8 @@
  * 화면 전체가 미션 하나를 본다. 상태바의 미션 고르기가 그 기준이다.
  *   왼쪽 최신 알림   그 미션의 알림만 (monitor.js 가 aprism:scope 를 듣는다)
  *   오른쪽 로봇 패널  그 미션의 로봇만 — 화살표도 그 안에서만 넘긴다
- *   지도             미션 이름의 층(지하 N층 → BN)으로 넘어간다
+ *   지도             고른 로봇이 선 층으로 연다. 층 판은 미션이 지나는 층만 켠다(10/19 — 미션은 여러 층을 지난다).
+ *                    미션 모니터링이라 고른 로봇이 층을 옮기면 지도도 따라간다(map.js 층 이동)
  * 미션 밖 로봇은 [로봇 현황] 이 맡는다. 거기서 다른 미션 로봇을 고르면 그 미션으로 넘어간다.
  *
  * Delta · 테두리 색은 미션과 상관없이 전체 알림을 본다(인덱스 "확인이 필요한 것").
@@ -33,7 +34,8 @@
   var asked = /[?&]mission=([^&#]+)/.exec(location.search);
   if (asked) {
     try {
-      var want = decodeURIComponent(asked[1].replace(/\+/g, " "));
+      // 예전 주소(지하 N층 …)로 와도 받는다 — 10/19 부터 미션 이름에 층이 없다.
+      var want = decodeURIComponent(asked[1].replace(/\+/g, " ")).replace(/^지하\s*\d+층\s+/, "");
       if (MISSIONS.indexOf(want) >= 0) { current = want; }
     } catch (e) { /* 깨진 주소면 첫 미션 */ }
   }
@@ -57,9 +59,22 @@
     return list;
   }
 
-  function floorOf(m) {
-    var hit = /지하\s*(\d+)\s*층/.exec(m || "");
-    return hit ? "B" + hit[1] : null;
+  /*
+   * 층 — 10/19 디자이너. 미션은 층에 속하지 않고 여러 층을 지난다(screen.js APRISM_MISSION_FLOORS).
+   * 지도는 고른 로봇이 선 층으로 열고, 층 판은 그 미션이 지나는 층만 켠다.
+   */
+  var MFLOORS = window.APRISM_MISSION_FLOORS || {};
+  var RFLOORS = window.APRISM_ROBOT_FLOORS || [];
+  function floorsOf(m) { return MFLOORS[m] || []; }
+  function robotFloor(card) { return card ? RFLOORS[Number(card.getAttribute("data-robot"))] || null : null; }
+
+  // 미션 상태 — 로봇 카드 배지에서 읽는다. 하나라도 수행중이면 수행중, 다 완료면 완료, 나머지는 대기.
+  var GROUPS = [["run", "수행중"], ["idle", "대기"], ["done", "완료"]];
+  function stateOf(m) {
+    var mine = cards.filter(function (c) { return missionOf(c) === m; });
+    if (mine.some(function (c) { return c.querySelector(".robot-lists .badge-info"); })) { return "run"; }
+    if (mine.length && mine.every(function (c) { return c.querySelector(".robot-lists .badge-normal"); })) { return "done"; }
+    return "idle";
   }
 
   function closeMenu() {
@@ -69,31 +84,67 @@
 
   function buildMenu() {
     menu.textContent = "";
-    names().forEach(function (m) {
-      var item = document.createElement("button");
-      item.type = "button";
-      item.className = "menu-item scope-item";
-      item.setAttribute("role", "menuitemradio");
-      item.setAttribute("aria-checked", m === current ? "true" : "false");
+    GROUPS.forEach(function (g) {
+      var list = names().filter(function (m) { return stateOf(m) === g[0]; });
+      if (!list.length) { return; }
+      var head = document.createElement("p");
+      head.className = "scope-group t-caption";
+      head.textContent = g[1];
+      menu.appendChild(head);
+      list.forEach(function (m) {
+        var item = document.createElement("button");
+        item.type = "button";
+        item.className = "menu-item scope-item";
+        item.setAttribute("role", "menuitemradio");
+        item.setAttribute("aria-checked", m === current ? "true" : "false");
 
-      var dot = document.createElement("span");
-      dot.className = "scope-dot";
-      if (levels[m]) {
-        dot.setAttribute("data-sev", levels[m]);
-        dot.title = levels[m] === "critical" ? "위험 알림 있음" : "주의 알림 있음";
-      }
-      var text = document.createElement("span");
-      text.className = "t-label-2";
-      text.textContent = m;
+        var dot = document.createElement("span");
+        dot.className = "scope-dot";
+        if (levels[m]) {
+          dot.setAttribute("data-sev", levels[m]);
+          dot.title = levels[m] === "critical" ? "위험 알림 있음" : "주의 알림 있음";
+        }
+        var text = document.createElement("span");
+        text.className = "t-label-2";
+        text.textContent = m;
+        item.appendChild(dot);
+        item.appendChild(text);
 
-      item.appendChild(dot);
-      item.appendChild(text);
-      item.addEventListener("click", function () {
-        closeMenu();
-        apply(m, false);
+        // 지나는 층 — 차례대로(B3 → B4)
+        var fl = document.createElement("span");
+        fl.className = "scope-floors";
+        floorsOf(m).forEach(function (f) {
+          var tag = document.createElement("span");
+          tag.className = "floor-tag num";
+          tag.textContent = f;
+          fl.appendChild(tag);
+        });
+        item.appendChild(fl);
+
+        item.addEventListener("click", function () {
+          closeMenu();
+          apply(m, false);
+        });
+        menu.appendChild(item);
       });
-      menu.appendChild(item);
     });
+  }
+
+  // 층 판 — 미션이 지나지 않는 층은 끈다. 고른 로봇이 선 층에는 로봇 표시를 붙인다.
+  function markFloors(m, here) {
+    var on = floorsOf(m);
+    Array.prototype.forEach.call(document.querySelectorAll("[data-map-floor]"), function (btn) {
+      var id = btn.getAttribute("data-map-floor");
+      var out = on.length > 0 && on.indexOf(id) < 0;
+      btn.disabled = out;
+      btn.classList.toggle("is-out", out);
+      btn.title = out ? "이 미션이 지나지 않는 층" : "";
+      btn.classList.toggle("has-robot", id === here);
+    });
+  }
+
+  function pressedCard() {
+    return cards.filter(function (c) { return c.getAttribute("aria-pressed") === "true"; })[0] || null;
   }
 
   /*
@@ -122,7 +173,11 @@
       }
     }
 
-    var floor = floorOf(m);
+    // 지도는 고른 로봇이 선 층으로 연다. 로봇 층을 모르면 미션의 첫 층.
+    var card = pressedCard();
+    var here = card && !card.hidden ? robotFloor(card) : null;
+    var floor = here || floorsOf(m)[0] || null;
+    markFloors(m, here);
     if (floor) { window.APRISM_FLOOR_WANT = floor; }   // 지도가 아직 안 섰으면 map.js 가 이 층으로 연다
     var floorBtn = floor && document.querySelector("[data-map-floor='" + floor + "']");
     if (floorBtn && floorBtn.getAttribute("aria-pressed") !== "true") { floorBtn.click(); }
@@ -151,6 +206,16 @@
     var card = event.target.closest && event.target.closest(".robot-strip .robot-card[data-robot]");
     if (card && card.hidden) { apply(missionOf(card), true); }
   }, true);
+
+  // 로봇을 바꿔 고르면 로봇 표시를 옮긴다. 지도가 로봇을 따라 층을 옮기면(map.js aprism:robot-floor) 그 층으로.
+  document.addEventListener("click", function (event) {
+    var card = event.target.closest && event.target.closest(".robot-strip .robot-card[data-robot]");
+    if (card) { window.setTimeout(function () { markFloors(current, robotFloor(pressedCard())); }, 0); }
+  });
+  document.addEventListener("aprism:robot-floor", function (event) {
+    var f = event.detail && event.detail.floor;
+    if (f) { markFloors(current, f); }
+  });
 
   document.addEventListener("aprism:alert-levels", function (event) {
     levels = event.detail || {};

@@ -546,7 +546,8 @@ a.map-floor {
 .ah-where { color: var(--text-tertiary); }
 .ah-item[aria-pressed="true"] .ah-where { color: var(--text-primary); }
 
-.ah-where > span:nth-child(2),
+.ah-where > span:nth-child(2):not(.floor-tag),
+.ah-where > .floor-tag + span,
 .ah-title > span:last-child,
 .done-title > span:first-child,
 .done-how > span:nth-child(2) {
@@ -2417,4 +2418,50 @@ a.map-floor {
   gap: var(--space-8);
   padding: var(--space-4);
   border-radius: var(--radius-container);
+}
+
+/*
+ * 층 꼬리표 — v2.2(10/19). 미션이 여러 층을 지나므로 알림 줄(웨이포인트 이름 앞) · 미션 메뉴에 층을 단다.
+ * 전체 층 현황의 .bld-floor-tag 와 같은 모양이다(bg/raised · mono 12 · secondary).
+ */
+.floor-tag {
+  flex: none;
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-4);
+  background-color: var(--bg-raised);
+  color: var(--text-secondary);
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-12);
+  line-height: var(--font-line-height-18);
+}
+.ah-where .floor-tag { margin-left: var(--space-2, 2px); }
+
+/* 미션 메뉴 — 상태별 묶음 머리 · 미션마다 지나는 층 */
+.scope-group {
+  padding: var(--space-8) var(--space-12) var(--space-4);
+  color: var(--text-tertiary);
+}
+.scope-group:not(:first-child) {
+  margin-top: var(--space-4);
+  border-top: var(--border-width-thin) solid var(--border-divider);
+}
+.scope-item { display: flex; align-items: center; gap: var(--space-8); }
+.scope-floors { display: inline-flex; gap: var(--space-4); margin-left: auto; padding-left: var(--space-16); }
+
+/* 지도 층 판 — 미션이 지나지 않는 층은 꺼 둔다. 고른 로봇이 선 층에는 로봇 점(상태 파랑)을 단다. */
+.map-floor.is-out,
+.map-floor:disabled {
+  color: var(--text-disabled);
+  cursor: default;
+}
+.map-floor.is-out:hover { background-color: transparent; color: var(--text-disabled); }
+.map-floor.has-robot::after {
+  content: "";
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background-color: var(--status-info-icon);
 }
