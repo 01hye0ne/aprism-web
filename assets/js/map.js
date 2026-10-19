@@ -1683,7 +1683,7 @@
    * 라이트 표식 색 — 우측 목록 표식(라이트 상태 토큰)과 같은 값이다(10/19 · 위험 red/500 채도 기준).
    *   safe green/400 · caution yellow/600 · current blue/650. 위험 · 회색은 다크와 같다.
    */
-  var WP_TINT_LIGHT = { safe: 0x0fa83f, caution: 0xbd7c0c, current: 0x0d8df9 };
+  var WP_TINT_LIGHT = { safe: 0x14c552, caution: 0xe1ab13, current: 0x0d8df9 };
   function wpTint(tone) {
     return (isLight() && WP_TINT_LIGHT[tone]) || WP_TINT[tone] || WP_TINT.upcoming;
   }
