@@ -259,23 +259,23 @@
     node.setAttribute("role", "listitem");
     node.setAttribute("aria-pressed", "false");
 
-    var where = el("span", "ah-where t-caption");
-    where.appendChild(icon("target"));
-    where.appendChild(el("span", "floor-tag num", a.floor));   // 층 꼬리표는 웨이포인트 이름 앞(10/19)
-    var wp = /WP-\d+.*$/.exec(a.where);   // 위치는 웨이포인트만(10/19, 메인 v2.2 와 같다)
-    where.appendChild(el("span", null, wp ? wp[0] : a.where));
-    where.appendChild(el("span", "num", a.time));
-
+    // 무슨 일(위험도 + 알림명 + 시각)이 첫 줄, 어디서(층 · 웨이포인트)가 둘째 줄 — 메인 v2.2 와 같다(10/19).
     var title = el("span", "ah-title t-label-2");
     title.appendChild(icon(a.sev === "critical" ? "error" : "warning"));
     title.appendChild(el("span", null, a.title));
+    title.appendChild(el("span", "ah-time t-caption num", a.time));
+
+    var where = el("span", "ah-where t-caption");
+    where.appendChild(el("span", "floor-tag num", a.floor));   // 층 꼬리표는 웨이포인트 이름 앞(10/19)
+    var wp = /WP-\d+.*$/.exec(a.where);   // 위치는 웨이포인트만(10/19, 메인 v2.2 와 같다)
+    where.appendChild(el("span", "ah-wp", wp ? wp[0] : a.where));
 
     // 어느 층 · 미션의 알림인지 — 미션을 고르기 전 화면이라 이 줄이 하나 더 붙는다.
     var scope = el("span", "ah-scope t-caption");
     scope.appendChild(el("span", null, a.mission));
 
-    node.appendChild(where);
     node.appendChild(title);
+    node.appendChild(where);
     node.appendChild(scope);
     node.addEventListener("mouseenter", function () { setHot(a.floor, null, true); });
     node.addEventListener("mouseleave", function () { setHot(null); });

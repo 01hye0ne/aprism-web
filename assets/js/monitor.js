@@ -250,12 +250,13 @@
     node.setAttribute("aria-pressed", a === picked ? "true" : "false");
 
     var where = el("span", "ah-where t-caption");
-    where.appendChild(icon("target"));
+    // v2.2 — 위치 줄 앞 표적 아이콘은 뺐다(10/19 디자이너). 층 꼬리표가 이미 "위치" 신호다.
+    if (!scoped) { where.appendChild(icon("target")); }
     // v2.2 — 층 꼬리표는 웨이포인트 이름 앞(10/19 디자이너). 미션이 여러 층을 지나므로 줄마다 층을 말한다.
     if (scoped && a.floor) { where.appendChild(el("span", "floor-tag num", a.floor)); }
     // v2.2 — 위치는 웨이포인트만 "WP-nn 웨이포인트명"(10/19 디자이너). 로봇 · 설비 단위 앞말은 뺀다.
-    where.appendChild(el("span", null, scoped ? wpPlace(a) : a.where));
-    where.appendChild(el("span", "num", a.time));
+    where.appendChild(el("span", "ah-wp", scoped ? wpPlace(a) : a.where));
+    if (!scoped) { where.appendChild(el("span", "num", a.time)); }
 
     // 알림 제목은 Label/2(13/500) 다 — 한 단계 내렸다(디자이너 요청).
     // 화면의 Label/1(14/800)이 목록마다 깔려 "다 중요해 보이는" 것을 푸는 쪽이다.
@@ -263,8 +264,16 @@
     title.appendChild(icon(a.sev === "critical" ? "error" : "warning"));
     title.appendChild(el("span", null, a.title));
 
-    node.appendChild(where);
-    node.appendChild(title);
+    if (scoped) {
+      // v2.2 — 무슨 일(위험도 + 알림명)이 첫 줄, 어디서가 둘째 줄(10/19 디자이너). 타임라인 · 오늘 확인 완료처럼 이름이 먼저다.
+      // 시각은 첫 줄 오른쪽 — 목록이 "오래된 순" 이라 정렬 기준이 위에 보이게.
+      title.appendChild(el("span", "ah-time t-caption num", a.time));
+      node.appendChild(title);
+      node.appendChild(where);
+    } else {
+      node.appendChild(where);
+      node.appendChild(title);
+    }
     // 고르면 그 알림이 난 웨이포인트 위에 쪽지가 선다. 같은 것을 다시 누르면 닫는다.
     // Delta 문구는 목록 전체를 종합한 것이라 바뀌지 않는다.
     node.addEventListener("click", function () {
