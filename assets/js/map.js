@@ -1703,7 +1703,9 @@
           (kind === "completed" ? (item.getAttribute("data-wp-result") || "safe") : kind),
         name: title ? title.textContent : "",
         // 측정 요약은 목록에 그리지 않는다. 값만 속성에 있고, 보여 주는 곳은 지도 쪽지다.
-        read: item.getAttribute("data-wp-read") || ""
+        read: item.getAttribute("data-wp-read") || "",
+        // 시각 · 소요 — v2.2 타임라인은 지난 칸의 시각을 감추므로 쪽지가 말한다(10/19).
+        time: item.getAttribute("data-wp-time") || ""
       };
     });
   }
@@ -2065,6 +2067,8 @@
       window.APRISM_TEXT.fill(wpRead, info.read ||
         (info.kind === "upcoming" ? "아직 가지 않은 자리입니다." : "측정 항목 확인 중"));
     }
+    var wpTime = wpBox.querySelector("[data-map-wp-time]");
+    if (wpTime) { wpTime.textContent = info.time || ""; wpTime.hidden = !info.time; }
     wpBox.hidden = false;
     placeWp();
   }

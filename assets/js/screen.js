@@ -1134,14 +1134,29 @@ window.APRISM_TEXT = (function () {
     titleRow.appendChild(el("span", "t-label-1 step-title", step.title));
 
     var head = el("div", "step-head");
-    head.appendChild(metaRow);
-    head.appendChild(titleRow);
-
     var card = el("div", "step-card");
-    card.appendChild(head);
-
-    if (step.desc) {
-      card.appendChild(el("p", "t-caption step-desc", step.desc));
+    var v22 = document.body.classList.contains("v2-2");
+    if (v22) {
+      /*
+       * v2.2(10/19 디자이너) — 번호 옆에 지점 이름(한 줄), 그 아래 설명, 시각 · 소요는 맨 아래.
+       * 시각 줄은 지금 도는 칸과 알림이 난 지난 칸(주의 · 위험)에만 보인다(CSS). 정상으로 지난 칸 · 안 간 칸은
+       * 시각을 감춘다 — 예정은 진행 막대의 "종료 예상" 이, 지난 칸 시각은 지도 쪽지가 말한다(data-wp-time).
+       */
+      titleRow.insertBefore(metaRow.firstChild, titleRow.firstChild);
+      head.appendChild(titleRow);
+      card.appendChild(head);
+      if (step.desc) { card.appendChild(el("p", "t-caption step-desc", step.desc)); }
+      if (step.time) {
+        times.className = "step-times step-times-foot";
+        card.appendChild(times);
+      }
+    } else {
+      head.appendChild(metaRow);
+      head.appendChild(titleRow);
+      card.appendChild(head);
+      if (step.desc) {
+        card.appendChild(el("p", "t-caption step-desc", step.desc));
+      }
     }
 
     var wrap = el("div", "step-wrap");
@@ -1156,6 +1171,7 @@ window.APRISM_TEXT = (function () {
     var item = el("article", "timeline-item " + meta.klass);
     item.setAttribute("data-waypoint", wpId(index));
     item.setAttribute("data-wp-state", kind);
+    if (step.time) { item.setAttribute("data-wp-time", step.time + (step.duration ? " · " + step.duration : "")); }
     if (kind === "completed") {
       item.setAttribute("data-wp-result", step.result || "safe");
       item.setAttribute("data-wp-read", step.read || "측정 6항목 · 기준 이내");
