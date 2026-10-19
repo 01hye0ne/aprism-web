@@ -1532,6 +1532,7 @@
    */
   // 점 속을 막는 바탕색 — 테마를 따른다(라이트는 v2.2 만). 재질 색이 곱해지므로 라이트에선 옅은 상태색 속이 된다.
   function stopFill() { return isLight() ? "#eef0f3" : "#0a0f18"; }
+  var stopBacks = [];   // 웨이포인트 속 판들 — 테마가 바뀌면 바탕색을 다시 넣는다
 
   function stopTexture(kind) {
     if (stopArt[kind]) { return stopArt[kind]; }
@@ -1559,12 +1560,23 @@
       return;
     }
 
-    // 속은 바탕색으로 막는다 — 길이 비쳐 보이면 점이 아니라 얼룩이 된다.
+    /*
+     * 속 판 — 흰 원 하나. 재질 색(바탕색)을 곱해 따로 깐다(stopDots 의 back).
+     * 10/19 — 예전엔 속을 고리 그림 안에 바탕색으로 칠했는데, 고리 그림 전체에 상태색을 곱하므로
+     * 라이트(밝은 속)에서는 속까지 초록 · 노랑으로 물들어 꽉 찬 점이 됐다. 다크는 속이 거의 검정이라 티가 안 났다.
+     */
+    if (kind === "disc") {
+      ink.beginPath();
+      ink.arc(mid, mid, mid - 9, 0, Math.PI * 2);
+      ink.fillStyle = "#ffffff";
+      ink.fill();
+      return;
+    }
+
+    // 고리 · 가운데 점만 그린다. 속은 속 판이 막는다 — 길이 비쳐 보이면 점이 아니라 얼룩이 된다.
     var full = kind === "full";
     ink.beginPath();
     ink.arc(mid, mid, mid - 9, 0, Math.PI * 2);
-    ink.fillStyle = stopFill();
-    ink.fill();
     ink.lineWidth = full ? 9 : 6;
     ink.strokeStyle = "#ffffff";
     ink.stroke();
@@ -1635,6 +1647,17 @@
     );
     // 길보다 나중에 그린다. 굵어진 길이 점을 덮어 버리기 때문이다.
     dots.renderOrder = 3;
+    // 속 판 — 상태색을 입지 않는 바탕색 원을 고리 바로 밑에 깐다. 자식이라 층 · 보이기를 같이 탄다.
+    if (kind === "ring" || kind === "full") {
+      var back = new THREE.Points(dots.geometry, new THREE.PointsMaterial({
+        color: new THREE.Color(stopFill()), map: stopTexture("disc"), size: size || 15, sizeAttenuation: false,
+        transparent: true, opacity: 0.95, depthWrite: false, depthTest: false
+      }));
+      back.renderOrder = 2.9;
+      back.raycast = function () {};
+      stopBacks.push(back);
+      dots.add(back);
+    }
     return dots;
   }
 
@@ -2662,6 +2685,7 @@
     });
     if (onLane) { showLane(onLane.id, true); }
 
+    stopBacks.forEach(function (b) { b.material.color.set(stopFill()); });
     // 웨이포인트 · 도킹 그림은 같은 캔버스에 다시 그린다 — 쓰는 재질이 모두 따라온다.
     Object.keys(stopArt).forEach(function (kind) {
       drawStop(kind, stopArt[kind].image);
