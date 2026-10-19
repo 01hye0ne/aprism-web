@@ -2625,3 +2625,11 @@ a.map-floor {
     rgb(255 232 224) 42%,
     rgb(255 255 255 / 0%) 56%);
 }
+
+/* 10/19 — 라이트에서 고른 버튼은 한 색: 알림 거르기(전체 · 위험 · 주의)도 로봇 현황 층 버튼처럼 Button Inverse(gray/950 면 · 흰 글).
+   다크는 그대로(gray/200 — 어두운 패널에서 순백은 E-STOP 보다 먼저 눈에 들어온다). */
+:root[data-theme="light"] .v2-2 .ah-caps .btn[aria-pressed="true"] {
+  background-color: var(--comp-button-inverse-bg-default);
+  color: var(--comp-button-inverse-text-default);
+}
+:root[data-theme="light"] .v2-2 .ah-caps .btn[aria-pressed="true"]:hover { background-color: var(--comp-button-inverse-bg-hover); }
