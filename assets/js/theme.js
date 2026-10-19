@@ -23,6 +23,11 @@
 
   function apply(theme) {
     root.setAttribute("data-theme", theme);
+    // 상단 바 라이트 / 다크 버튼(v2.2 .theme-chip) — 누르면 갈 모드를 말한다.
+    if (button && button.classList.contains("theme-chip")) {
+      button.setAttribute("aria-label", theme === "light" ? "다크 모드로 바꾸기" : "라이트 모드로 바꾸기");
+      button.title = theme === "light" ? "다크 모드" : "라이트 모드";
+    }
     if (label) {
       label.textContent = theme === "light" ? "Light" : "Dark";
     }
@@ -55,6 +60,11 @@
       var next = root.getAttribute("data-theme") === "light" ? "dark" : "light";
       apply(next);
       save(next);
+      // 주소에 ?theme= 가 박혀 있으면 같이 바꾼다 — 안 그러면 새로 고치거나 다른 화면으로 넘어갈 때(링크가 주소의 보기 설정을 들고 간다)
+      // 예전 모드로 되돌아간다.
+      if (forced() && window.history && history.replaceState) {
+        history.replaceState(null, "", location.href.replace(/([?&]theme=)(light|dark)/, "$1" + next));
+      }
     });
   }
 })();

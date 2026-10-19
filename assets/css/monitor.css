@@ -2419,6 +2419,8 @@ a.map-floor {
   padding: var(--space-4);
   border-radius: var(--radius-container);
 }
+/* 층 판은 바깥 여백 없이 층 버튼 상자(.map-floors)가 판을 꽉 채운다(10/19 디자이너). */
+.v2-2 .map-tools-box.is-floors { padding: 0; }
 
 /*
  * 층 꼬리표 — v2.2(10/19). 미션이 여러 층을 지나므로 알림 줄(웨이포인트 이름 앞) · 미션 메뉴에 층을 단다.

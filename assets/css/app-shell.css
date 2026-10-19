@@ -308,6 +308,27 @@ button {
 /* 이름과 직책 사이 구분선. Figma 에서도 글자 "|" 다. */
 .account-sep { color: var(--text-tertiary); }
 
+/*
+ * 라이트 / 다크 — v2.2 상단 바, 홍길동(계정) 왼쪽(10/19 디자이너). 계정 칩과 같은 면 · 테두리 · 높이 28 의 정사각.
+ * 아이콘은 지금과 반대 모드다 — 다크에서는 해(lightMode), 라이트에서는 달(darkMode). 누르면 갈 곳을 보인다.
+ */
+.theme-chip {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: var(--border-width-thin) solid var(--border-divider);
+  border-radius: var(--radius-card);
+  background-color: var(--bg-cell);
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+.theme-chip:hover { border-color: var(--border-strong); color: var(--text-primary); }
+.theme-chip:focus-visible { outline: var(--border-width-strong) solid var(--border-focus); outline-offset: 2px; }
+.theme-chip .i { --i: var(--ic-light-mode); }
+:root[data-theme="light"] .theme-chip .i { --i: var(--ic-dark-mode); }
+
 .signal-chip {
   height: 26px;
   padding: 6px var(--space-8);
