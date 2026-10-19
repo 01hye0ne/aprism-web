@@ -7,6 +7,7 @@
  *   mosaic      칸마다 평균색 하나
  *   hatch       줄무늬 · 줄 굵기 = 칸 평균 밝기(점 단위 정보는 이미 없다)
  *   silhouette  줄무늬 · 줄 굵기 고정 — 칸 사이 차이도 없다
+ *   grid        격자 모자이크 — 칸 평균색 타일 사이에 검은 틈 + 감지 상자 · 라벨(10/19 디자이너, Figma UI_99 1818:67890)
  *
  * 기본은 가로 일자 줄(0°)이다(2026-10-12 디자이너가 사선 대신 고름).
  * 각도를 57° 로 두면 로고 A 의 다리 기울기가 된다(brand-mark.svg 실측 — 꼭짓점 (14.3, 0.2) → 밑 (3.2, 17.1)).
@@ -38,8 +39,15 @@
     range: 39,
     tint: true,
     ink: "#FFFFFF",
-    paper: "#000000"
+    paper: "#000000",
+    // 격자 모자이크 — Figma 셰이더(픽셀화) 값: size 18 · gap 2 · 평균색 100%. 화면 px 기준이라 그릴 때 캔버스 배율을 곱한다.
+    gcell: 18,
+    ggap: 2,
+    glabel: true
   };
+
+  // 감지 라벨 — 사람마다 하나. 시안 글(Figma "person/안전모o")을 그대로 쓴다.
+  var LABELS = ["person/안전모o", "person/안전모o"];
 
   var views = {};
   Array.prototype.forEach.call(document.querySelectorAll("[data-view]"), function (c) {
@@ -174,6 +182,71 @@
     ctx.putImageData(out, 0, 0);
   }
 
+  /*
+   * 격자 모자이크 — 칸 평균색 타일, 칸 사이 틈은 검정(Figma background 프레임 #000).
+   * 칸 · 틈 · 라벨은 화면 px 로 잡는다(k = 캔버스 점 / 화면 점) — Figma 값이 화면 크기라서.
+   * 감지 상자 테두리는 blue/500(1px, 안쪽), 라벨 탭은 blue/600 면 + gray/50 글자 12 · 여백 4, 상자 위에 붙는다.
+   */
+  function paintGrid(src, regs) {
+    var ctx = views.grid;
+    if (!ctx) { return; }
+    var cv = ctx.canvas;
+    var k = cv.width / (cv.clientWidth || cv.width);
+    var c = P.gcell * k, g = P.ggap * k;
+    var out = ctx.createImageData(W, H);
+    out.data.set(src);
+    var d = out.data;
+    regs.forEach(function (r) {
+      var cs = cellsOfSize(src, r, c);
+      for (var y = cs.y0; y < cs.y1; y++) {
+        var fy = (y - r[1]) % c;
+        var row = Math.floor((y - r[1]) / c);
+        for (var x = cs.x0; x < cs.x1; x++) {
+          var fx = (x - r[0]) % c;
+          var i = (y * W + x) * 4;
+          // 틈은 칸 오른쪽 · 아래에 둔다 — 상자 왼쪽 위에서 첫 칸이 바로 시작한다.
+          if (fx >= c - g || fy >= c - g) { d[i] = 0; d[i + 1] = 0; d[i + 2] = 0; continue; }
+          var j = (row * cs.cols + Math.floor((x - r[0]) / c)) * 4;
+          d[i] = cs.sum[j]; d[i + 1] = cs.sum[j + 1]; d[i + 2] = cs.sum[j + 2];
+        }
+      }
+    });
+    ctx.putImageData(out, 0, 0);
+    if (!P.glabel) { return; }
+
+    var css = getComputedStyle(document.documentElement);
+    var line = css.getPropertyValue("--color-blue-500").trim() || "#6AA7E7";
+    var tab = css.getPropertyValue("--color-blue-600").trim() || "#4990E0";
+    var ink = css.getPropertyValue("--color-gray-50").trim() || "#F7F8FA";
+    ctx.save();
+    ctx.font = "400 " + (12 * k) + "px 'SUIT Variable', SUIT, sans-serif";
+    ctx.textBaseline = "top";
+    regs.forEach(function (r, ri) {
+      var bw = 1 * k, pad = 4 * k, th = 15 * k;
+      ctx.lineWidth = bw;
+      ctx.strokeStyle = line;
+      ctx.strokeRect(r[0] + bw / 2, r[1] + bw / 2, r[2] - r[0] - bw, r[3] - r[1] - bw);
+      // 라벨 탭 — 상자 폭에 맞춘다(Figma 탭 127 = 상자 127). 글이 길면 글 폭까지 늘어난다.
+      var text = LABELS[ri] || "person";
+      var tw = Math.max(r[2] - r[0], ctx.measureText(text).width + pad * 2);
+      var h = th + pad * 2;
+      ctx.fillStyle = tab;
+      ctx.fillRect(r[0], r[1] - h, tw, h);
+      ctx.fillStyle = ink;
+      ctx.fillText(text, r[0] + pad, r[1] - h + pad + 1 * k);
+    });
+    ctx.restore();
+  }
+
+  // cellsOf 와 같되 칸 크기를 따로 받는다(격자 모자이크는 제 칸 크기를 쓴다).
+  function cellsOfSize(src, r, c) {
+    var keep = P.cell;
+    P.cell = c;
+    var cs = cellsOf(src, r);
+    P.cell = keep;
+    return cs;
+  }
+
   function draw(t) {
     if (!ready) { return; }
     var cam = camera(t || 0);
@@ -184,7 +257,11 @@
     var regs = regions(cam);
     var cellSets = regs.map(function (r) { return cellsOf(src, r); });
     ["source", "mosaic", "hatch", "silhouette"].forEach(function (k) { paint(k, src, regs, cellSets); });
+    paintGrid(src, regs);
   }
+
+  // 격자 모자이크는 화면 px 로 그리므로 창 크기가 바뀌면 다시 그린다.
+  window.addEventListener("resize", function () { if (!P.move) { draw(performance.now()); } });
 
   var running = false;
   function loop(t) {
