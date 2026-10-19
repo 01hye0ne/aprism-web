@@ -2280,7 +2280,8 @@ a.map-floor {
   cursor: pointer;
 }
 .ma-check:last-child { border-bottom: 0; }
-.ma-check:hover .ma-check-label { color: var(--text-primary); text-decoration: underline; text-underline-offset: 3px; }
+/* hover 는 글자색만 밝힌다 — 밑줄은 뺐다(10/19 디자이너). 밑줄은 링크처럼 읽혀 "누르면 어디로 간다" 로 오해된다. */
+.ma-check:hover .ma-check-label { color: var(--text-primary); }
 .ma-check:focus-visible { outline: var(--border-width-strong) solid var(--border-focus); outline-offset: -2px; }
 .ma-check-box {
   flex: none;
