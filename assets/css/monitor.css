@@ -2580,3 +2580,7 @@ a.map-floor {
 :root[data-theme="light"] .v2-2 .robot-strip.is-carousel .robot-row { background-color: var(--bg-raised); }
 /* 흰 카드 위 번호 칸(bg/panel = gray/50)이 묻히므로 한 단 낮은 bg/cell */
 :root[data-theme="light"] .v2-2 .timeline .timeline-item:not(.is-running) .step-no { background-color: var(--bg-cell); }
+
+/* 라이트 — 지금 도는 칸 표식은 상태 파랑(info/icon)으로. 공용 규칙의 main/400 은 다크용 옅은 파랑이라 흰 면에서 탁했다(10/19). */
+/* 알림이 걸린 칸은 그 단계 색이 앞선다(app-shell.css data-wp-alert). */
+:root[data-theme="light"] .v2-2 .is-running:not([data-wp-alert]) .rail-mark { color: var(--status-info-icon); }

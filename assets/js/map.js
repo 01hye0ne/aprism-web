@@ -1678,6 +1678,14 @@
     upcoming: 0x8894aa,   // gray/450 언저리 — 아직 아무 일도 없었다는 뜻이다
     skipped: 0x4e576a     // gray/600 — 미션 설정에서 꺼 둔 자리. 있지만 이번엔 안 간다
   };
+  /*
+   * 라이트 표식 색 — 우측 목록 표식(라이트 상태 토큰)과 같은 값이다(10/19 · 위험 red/500 채도 기준).
+   *   safe green/400 · caution yellow/600 · current blue/650. 위험 · 회색은 다크와 같다.
+   */
+  var WP_TINT_LIGHT = { safe: 0x0fa83f, caution: 0xbd7c0c, current: 0x0d8df9 };
+  function wpTint(tone) {
+    return (isLight() && WP_TINT_LIGHT[tone]) || WP_TINT[tone] || WP_TINT.upcoming;
+  }
   var WP_HALO = 0xffffff;   // 고른 것을 두르는 바깥 고리. 상태색 위에 얹기만 한다.
 
   var wpMarks = [];    // 지금 깔려 있는 표식들
@@ -1803,9 +1811,10 @@
 
     Object.keys(bucket).forEach(function (key) {
       var tone = key.split("|")[1];
-      var mark = stopDots(bucket[key], WP_TINT[tone] || WP_TINT.upcoming,
+      var mark = stopDots(bucket[key], wpTint(tone),
         tone === "upcoming" ? "ring" : "full", 15);
       mark.userData.floor = key.split("|")[0];
+      mark.userData.tone = tone;   // 테마가 바뀌면 applyTheme 이 이 이름으로 다시 칠한다
       scene.add(mark);
       wpMarks.push(mark);
     });
@@ -2690,6 +2699,7 @@
     if (onLane) { showLane(onLane.id, true); }
 
     stopBacks.forEach(function (b) { b.material.color.set(stopFill()); });
+    wpMarks.forEach(function (m) { if (m.userData.tone) { m.material.color.setHex(wpTint(m.userData.tone)); } });
     // 웨이포인트 · 도킹 그림은 같은 캔버스에 다시 그린다 — 쓰는 재질이 모두 따라온다.
     Object.keys(stopArt).forEach(function (kind) {
       drawStop(kind, stopArt[kind].image);
