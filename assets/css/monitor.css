@@ -2506,5 +2506,7 @@ a.map-floor {
 .v2-2 .is-running .step-times-foot,
 .v2-2 .timeline-item[data-wp-state="completed"] .step-times-foot,
 .v2-2 .timeline-item[data-wp-alert] .step-times-foot { display: flex; }
+/* 시각 줄이 있는 칸은 아래 여백 12 → 8 — 작은 시각 글자 밑에 12 가 남아 칸이 아래로 처져 보였다(10/19). */
+.v2-2 .step-card:has(> .step-times-foot) { padding-bottom: var(--space-8); }
 .map-wp-time { margin: 0; color: var(--text-tertiary); }
 .map-wp-time[hidden] { display: none; }
