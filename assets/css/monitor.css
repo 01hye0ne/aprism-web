@@ -1186,12 +1186,12 @@ a.map-floor {
 /*
  * v2.2 — 단계 칩의 표식을 점에서 기호로(10/19 디자이너). 목록 줄(.ah-title)과 같은 ⓧ · △ 라
  * 목록에서 누른 줄과 팝오버가 같은 모양으로 이어진다. 점(●)은 "상태"(수행중 · 완료 …)에만 남는다.
- * 기호 크기 16 · 간격 4 는 목록과 같다. 왼쪽 여백은 기호 몫만큼 8 → 6 으로 줄여 알약 무게를 맞춘다.
+ * Figma 는 Badge(48:78) 인스턴스에서 Dot 끄고 Icon 켬 — Icon / error(29:12) 14 · status/critical/icon(알림 팝오버 1233:16460).
+ * 여백 8/12 · 간격 4 는 Badge 그대로다.
  */
-.ma-badge-ic { --i: var(--ic-warning); color: var(--status-warning-icon); }
+.ma-badge-ic { --i: var(--ic-warning); width: 14px; height: 14px; color: var(--status-warning-icon); }
 .map-alert.is-critical .ma-badge-ic,
 .ma-zoom.is-critical .ma-badge-ic { --i: var(--ic-error); color: var(--status-critical-icon); }
-.ma-badge:has(.ma-badge-ic) { padding-left: 6px; }
 
 /* 높이를 정하고 폭은 그림 비율대로 따라가게 둔다 — 폭을 못 박으면 좌우에 빈 띠가 생긴다. */
 .ma-zoom-img {
