@@ -166,9 +166,14 @@
    * lift(스스로 밝아지는 정도)는 밝은 면에서 하얗게 날아가므로 줄인다(LIGHT_LIFT 를 곱한다).
    * 지도는 회의 3번(현장 사진 표현)에서 다시 손볼 자리라, 여기 값은 다크와 같은 위계만 옮긴 것이다.
    */
+  /*
+   * 10/19 디자이너 — 다크와 대비를 맞췄다. 회색 덩이가 밝은 바탕 위에서 "무거운 판" 으로 떠 경로 · 웨이포인트보다 셌다.
+   * 다크는 바탕 → 바닥이 한 단, 바닥 → 벽이 두 단쯤이다. 라이트도 그 간격(명도 L* 바닥 -4 · 벽 -12 · 설비 -16)으로 줄였다.
+   * 면 색은 조명을 받아 화면에서 한 단 어둡게 나오므로 그만큼 올려 잡은 값이다.
+   */
   var LIGHT = {
-    face: { floor: 0xeceef1, wall: 0xb4bcc9, equipment: 0x9aa5b6, stairs: 0xc3cad5, other: 0xb0b8c6 },
-    edge: 0x5d6773, ghost: 0xe3e6eb, grid: 0xaab1bd,
+    face: { floor: 0xf6f7f9, wall: 0xdce0e6, equipment: 0xc2c9d4, stairs: 0xe2e6eb, other: 0xd8dce3 },
+    edge: 0x8b94a1, ghost: 0xeef0f3, grid: 0xaab1bd,
     pickFace: 0x6b7586, pickLine: 0x2b2f36, hoverLine: 0x4b4f57
   };
   var LIGHT_LIFT = 0.15;

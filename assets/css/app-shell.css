@@ -2562,6 +2562,12 @@ body.v2-2 .context-panel.is-collapsed .panel-head::after { opacity: 0; }
   /* 지도 위에 더해지도록. 어두운 지도 위에서도 선이 옅어지지 않는다. */
   mix-blend-mode: plus-lighter;
 }
+/*
+ * 라이트(10/19 디자이너) — 밝은 바탕에 빛을 더하면(plus-lighter) 흰색에 가까워져 글로우가 거의 안 보였다.
+ * 라이트에서는 색을 그대로 얹는다 — 밝은 바탕 위에서는 "물드는" 것이 빛나는 것으로 읽힌다.
+ */
+:root[data-theme="light"] .v2-2 .two-col.is-warning > .edge-light,
+:root[data-theme="light"] .v2-2 .two-col.is-critical > .edge-light { mix-blend-mode: normal; }
 
 /*
  * 두 줄 다 같은 모양이고 시차만 다르다. 색 테두리 바로 안쪽(2px)에 붙어 있다 —

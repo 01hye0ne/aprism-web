@@ -48,6 +48,12 @@
   var SCALE = 0.9;                       /* 그림 크기 손잡이. 1 이 기준이고 작을수록 줄어든다 */
 
   var RING = 0x323846;                   /* 바닥 다이얼 눈금 — Figma 826:12682 */
+  /*
+   * 라이트 눈금(10/19 디자이너) — 다크 눈금을 그대로 쓰면 밝은 칸 위에 검은 점선이 떠 너무 셌다.
+   * 다크의 칸 면 ↔ 눈금 대비(약 1.35:1)를 라이트 칸 면(gray/200 쯤)에 옮긴 값이다.
+   */
+  var RING_LIGHT = 0xbcc2cc;
+  function ringHex() { return document.documentElement.getAttribute("data-theme") === "light" ? RING_LIGHT : RING; }
   var ARC_TAIL = 0x3b79d5;               /* 방향 호 꼬리 */
   var ARC_HEAD = 0x4990e0;               /* 방향 호 머리 */
   var ARC_PEAK = 0x9fcdff;               /* 가장 밝은 칸 — 여기가 로봇이 보는 쪽이다 */
@@ -163,6 +169,9 @@
 
     var dial = buildDial(THREE);
     scene.add(dial.group);
+    if (window.MutationObserver) {
+      new MutationObserver(function () { dial.retone(); }).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+    }
 
     var dog = buildDog(THREE);
     var turn = new THREE.Group();          /* 방향만 맡는 바깥 틀 — 동작 클립은 안쪽을 돌린다 */
@@ -334,7 +343,8 @@
     var group = new THREE.Group();
     var cells = [];
 
-    var base = new THREE.Color(RING);
+    var base = new THREE.Color(ringHex());
+    var ticks = [];
     var tail = new THREE.Color(ARC_TAIL);
     var head = new THREE.Color(ARC_HEAD);
     var peak = new THREE.Color(ARC_PEAK);
@@ -344,7 +354,9 @@
       var a1 = (i + 1) * step - GAP / 2;
 
       /* 눈금 — Figma 바닥 링과 같은 굵기(≈1.5px). */
-      group.add(ribbon(THREE, a0, a1, R * 0.024, RING, 1, 0).mesh);
+      var tick = ribbon(THREE, a0, a1, R * 0.024, ringHex(), 1, 0);
+      ticks.push(tick.mat);
+      group.add(tick.mesh);
 
       /* 불 — 꺼져 있을 때는 투명이라 눈금만 보인다. */
       var lamp = ribbon(THREE, a0, a1, R * 0.075, ARC_HEAD, 0, 0.003);
@@ -354,7 +366,8 @@
 
     /* 대각 표식 — 링 바깥으로 뾰족한 작은 삼각(Figma 826:12682). */
     var TIP = R * 0.075, HALF = 3.2 * Math.PI / 180;
-    var face = new THREE.MeshBasicMaterial({ color: RING, side: THREE.DoubleSide });
+    var face = new THREE.MeshBasicMaterial({ color: ringHex(), side: THREE.DoubleSide });
+    ticks.push(face);
     for (var m = 0; m < 4; m++) {
       var a = m * Math.PI / 2;
       var geo = new THREE.BufferGeometry().setFromPoints([
@@ -379,6 +392,11 @@
 
     return {
       group: group,
+      /* 테마가 바뀌면 눈금 · 대각 표식 색을 다시 넣는다. 켜진 칸은 다음 aim 에서 base 부터 다시 섞는다. */
+      retone: function () {
+        base.setHex(ringHex());
+        ticks.forEach(function (m) { m.color.setHex(ringHex()); });
+      },
       aim: function (heading) {
         glowPivot.rotation.y = heading;
         for (var i = 0; i < cells.length; i++) {
