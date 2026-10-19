@@ -2633,3 +2633,85 @@ a.map-floor {
   color: var(--comp-button-inverse-text-default);
 }
 :root[data-theme="light"] .v2-2 .ah-caps .btn[aria-pressed="true"]:hover { background-color: var(--comp-button-inverse-bg-hover); }
+
+/* ── 설비 팝오버 — Figma Map / Facility Popover(UI_99 1826:44373, 10/19) ────────────────
+ * 너비 248 · 여백 14 · 칸 사이 10 · 모서리 10. 머리(꼬리표 · 이름 · 닫기) → 사진 220×132(r6) → 정보 세 줄(사이 6).
+ * Figma 는 색이 변수에 묶이지 않은 값이라 가장 가까운 토큰으로 옮겼다:
+ *   면 #2B313D 92% → gray/750 · 꼬리표 #C7CCD6 → gray/300 · 꼬리표 글 #2B313D → gray/750
+ *   이름 · 값 #F7F8FA → text/primary · 열쇠 #9EA8BB → text/tertiary · 닫기 #C7CCD6 → text/secondary · 사진 바탕 #3A4252 → gray/700
+ * 라이트는 Figma 에 없다 — 흰 면(bg/raised 92%)으로 뒤집고 나머지는 의미 토큰이 따라간다. */
+.v2-2 .map-card {
+  --fac-bg: color-mix(in srgb, var(--color-gray-750) 92%, transparent);
+  width: 248px;
+  min-width: 0;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 10px;
+  background-color: var(--fac-bg);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 8%), 0 6px 16px rgb(0 0 0 / 35%);
+  /* 꼬리 8 + 2 — 설비 꼭대기에서 10 위 */
+  transform: translate(-50%, calc(-100% - 10px));
+}
+:root[data-theme="light"] .v2-2 .map-card {
+  --fac-bg: color-mix(in srgb, var(--bg-raised) 92%, transparent);
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 6%), 0 6px 16px rgb(0 0 0 / 14%);
+}
+/* 꼬리 — 14×8 삼각, 면과 같은 색 */
+.v2-2 .map-card::after {
+  left: 50%;
+  bottom: -8px;
+  width: 14px;
+  height: 8px;
+  transform: translateX(-50%);
+  border: 0;
+  background-color: var(--fac-bg);
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+}
+.v2-2 .map-card-head { gap: var(--space-8); margin-bottom: 0; }
+.v2-2 .map-card-tag {
+  flex: none;
+  padding: 2px var(--space-8);
+  border-radius: 999px;
+  background-color: var(--color-gray-300);
+  color: var(--color-gray-750);
+  font-size: 11px;
+  line-height: 1.4;
+  font-weight: 600;
+}
+.v2-2 .map-card-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text-primary);
+  font-size: 15px;
+  line-height: 1.4;
+  font-weight: 700;
+}
+/* 닫기 — Figma Icon/Close: 12px 칸을 꽉 채운 X · 선 1.6(아이콘 세트의 X 보다 가늘다) */
+.v2-2 .map-card-close { width: 12px; height: 12px; align-items: center; justify-content: center; color: var(--text-secondary); }
+.v2-2 .map-card-close .i {
+  width: 12px;
+  height: 12px;
+  --i: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M.6.6l10.8 10.8M11.4.6L.6 11.4' stroke='%23000' stroke-width='1.6'/%3E%3C/svg%3E") !important;
+}
+.v2-2 .map-card-close:hover { color: var(--text-primary); }
+.v2-2 .map-card-photo {
+  height: 132px;
+  border-radius: 6px;
+  overflow: hidden;
+  background-color: var(--color-gray-700);
+}
+:root[data-theme="light"] .v2-2 .map-card-photo { background-color: var(--bg-cell); }
+.v2-2 .map-card-photo[hidden] { display: none; }
+.v2-2 .map-card-photo img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.v2-2 .map-card-rows { gap: 6px; }
+.v2-2 .map-card-rows dt,
+.v2-2 .map-card-rows dd { font-size: 12px; line-height: 1.4; }
+.v2-2 .map-card-rows dt { color: var(--text-tertiary); }
+.v2-2 .map-card-rows dd { color: var(--text-primary); font-weight: 600; }
+.v2-2 .map-card[hidden] { display: none; }
