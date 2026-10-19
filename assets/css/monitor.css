@@ -2516,5 +2516,8 @@ a.map-floor {
 .v2-2 .timeline-item { min-height: 0; }
 .v2-2 .step-wrap { padding: var(--space-4) 0; }
 .v2-2 .rail-stub { height: 14px; }
+/* 지금 도는 칸만 이름이 굵다(800) — 나머지는 500 으로 물려 "지금 여기" 가 한눈에 갈린다(10/19).
+   400 은 어두운 칸 위 14px 에서 흐려 보여 500 에 둔다. 번호 칸은 그대로다. */
+.v2-2 .timeline-item:not(.is-running) .step-title { font-weight: 500; }
 .map-wp-time { margin: 0; color: var(--text-tertiary); }
 .map-wp-time[hidden] { display: none; }
