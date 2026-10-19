@@ -26,11 +26,27 @@
     }
     .back:hover { color: var(--text-primary); border-color: var(--border-strong); }
 
+    /* 페이지네이션 — 1~8장에서 왼쪽 아래. 표지(00)에서는 숨긴다. ‹ 01 … 08 › */
     .pager {
-      position: fixed; left: var(--space-16); bottom: var(--space-16); z-index: 3;
-      color: var(--text-tertiary); font-size: var(--font-size-12); font-variant-numeric: tabular-nums;
+      position: fixed; left: var(--space-48); bottom: var(--space-16); z-index: 3;
+      display: flex; align-items: center; gap: var(--space-2, 2px);
+      padding: var(--space-4);
+      border: var(--border-width-thin) solid var(--border-divider); border-radius: var(--radius-pill);
+      background-color: var(--bg-panel);
+      font-size: var(--font-size-12); font-variant-numeric: tabular-nums;
+      transition: opacity 300ms ease;
     }
-    .pager b { color: var(--text-primary); }
+    .pager[hidden] { display: flex; opacity: 0; pointer-events: none; }
+    .pager button {
+      min-width: 28px; height: 28px; padding: 0 var(--space-4);
+      border: 0; border-radius: var(--radius-pill);
+      background: transparent; color: var(--text-tertiary);
+      font: inherit; cursor: pointer;
+    }
+    .pager button:hover:not(:disabled) { color: var(--text-primary); background-color: var(--bg-cell); }
+    .pager button[aria-current="page"] { background-color: var(--bg-inverse); color: var(--text-on-inverse); font-weight: 700; }
+    .pager button:disabled { opacity: 0.35; cursor: default; }
+    .pager .arw { font-size: var(--font-size-16); line-height: 1; }
 
     .slide {
       box-sizing: border-box;
@@ -153,7 +169,7 @@
 </head>
 <body>
   <a href="./index.html" class="back">목록으로</a>
-  <p class="pager" aria-live="polite"><b data-pager-now>00</b> / 08</p>
+  <nav class="pager" aria-label="페이지" data-pager hidden></nav>
 
   <main>
     <!-- 표지 -->
@@ -394,7 +410,25 @@
       // 장 넘기기 — 넓은 화면에서는 휠 · 방향키 · 목차를 한 장씩, 천천히 미끄러지게 옮긴다.
       // 브라우저 기본 부드러운 스크롤은 빠르고 속도를 못 바꿔서, 직접 1.1초 ease-in-out 으로 옮긴다.
       var slides = Array.prototype.slice.call(document.querySelectorAll(".slide"));
-      var now = document.querySelector("[data-pager-now]");
+      var pager = document.querySelector("[data-pager]");
+      // 페이지 단추 — ‹ · 01 ~ 08 · ›. 표지는 목차가 있으니 넣지 않는다.
+      var prevB = document.createElement("button");
+      prevB.type = "button"; prevB.className = "arw"; prevB.textContent = "‹"; prevB.setAttribute("aria-label", "이전 장");
+      prevB.addEventListener("click", function () { go(cur - 1); });
+      pager.appendChild(prevB);
+      var pageBtns = slides.slice(1).map(function (sl, k) {
+        var b = document.createElement("button");
+        b.type = "button"; b.textContent = (k + 1 < 10 ? "0" : "") + (k + 1);
+        var h = sl.querySelector("h2");
+        b.setAttribute("aria-label", (k + 1) + "장" + (h ? " · " + h.textContent : ""));
+        b.addEventListener("click", function () { go(k + 1); });
+        pager.appendChild(b);
+        return b;
+      });
+      var nextB = document.createElement("button");
+      nextB.type = "button"; nextB.className = "arw"; nextB.textContent = "›"; nextB.setAttribute("aria-label", "다음 장");
+      nextB.addEventListener("click", function () { go(cur + 1); });
+      pager.appendChild(nextB);
       var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       var wide = window.matchMedia("(min-width: 901px)");
       var DUR = reduce ? 0 : 1100;
@@ -402,7 +436,12 @@
 
       function mark(n) {
         cur = n;
-        now.textContent = (n < 10 ? "0" : "") + n;
+        pager.hidden = n === 0;
+        pageBtns.forEach(function (b, k) {
+          if (k + 1 === n) { b.setAttribute("aria-current", "page"); } else { b.removeAttribute("aria-current"); }
+        });
+        prevB.disabled = n <= 1;
+        nextB.disabled = n >= slides.length - 1;
         slides.forEach(function (s, k) { if (k === n) { s.classList.add("is-in"); } });
       }
       function ease(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
