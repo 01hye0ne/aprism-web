@@ -2157,7 +2157,8 @@ a.map-floor {
 }
 .ma-v3.is-info .ma-snap::before { opacity: 1; }
 .ma-v3 .ma-snap > .ma-meta { position: absolute; top: var(--space-12); left: var(--space-12); z-index: 2; }
-.ma-v3 .ma-info { position: absolute; top: var(--space-12); right: var(--space-12); z-index: 2; }
+/* 정보 버튼 — 사진 위라 16 은 잘 안 보였다(10/19 디자이너). 아이콘 20 · 누르는 칸 28. 오른쪽 위 끝선은 그대로 12 안쪽. */
+.ma-v3 .ma-info { position: absolute; top: var(--space-8); right: var(--space-8); z-index: 2; width: 28px; height: 28px; }
 
 .ma-v3 .ma-meta {
   gap: var(--space-8);
