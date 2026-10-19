@@ -49,6 +49,8 @@
 .status-bar-crumb:hover { color: var(--text-primary); }
 .status-bar-crumb:focus-visible { outline: var(--border-width-strong) solid var(--border-focus); outline-offset: 2px; border-radius: var(--radius-4); }
 .status-bar-sep { margin: 0 var(--space-8); color: var(--text-tertiary); }
+/* 화살표 양옆은 8 하나로(10/19 디자이너) — 칩 상자의 margin-left 12 가 더해져 오른쪽만 20 이었다. */
+.status-bar-sep + .scope-menu-box { margin-left: 0; }
 
 /* 층 버튼 맨 위 [전체] — 링크라 버튼처럼 가운데 맞춘다 */
 a.map-floor {

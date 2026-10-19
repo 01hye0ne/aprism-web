@@ -10,6 +10,7 @@
 /* 층으로 들어가는 동안(.is-entering)은 메인 v2.2 상태바와 같게 — 회색 "전체 건물" › [미션]. 화면이 바뀌어도 상태바가 튀지 않는다. */
 .is-entering .status-bar-place[data-bld-crumb] { color: var(--text-tertiary); }
 .is-entering .status-bar-place[data-bld-crumb]::after { content: "›"; margin: 0 var(--space-8); color: var(--text-tertiary); }
+.is-entering .status-bar-place[data-bld-crumb] + .scope-menu-box { margin-left: 0; }
 
 /* ---------- 층 표식(알림 줄 · 로봇 줄 · 이름표에 함께 쓰는 꼬리표) ---------- */
 .bld-floor-tag {
