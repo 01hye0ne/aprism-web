@@ -970,6 +970,23 @@
   })();
 
   /*
+   * 지도에서 웨이포인트를 직접 눌렀다 — 그 자리에 남은 알림이 있으면 알림 목록에서 누른 것과 같은
+   * 팝오버(조치 제안 · 조치 완료)를 연다. 알림이 없는 웨이포인트는 지금처럼 웨이포인트 쪽지(10/19 디자이너).
+   * 한 자리에 여럿이면 위험 먼저, 같은 단계면 먼저 난 것.
+   */
+  document.addEventListener("aprism:waypoint", function (event) {
+    var d = event.detail || {};
+    if (d.from !== "map" || !d.id) { return; }
+    var robot = activeRobot();
+    var here = items().filter(function (a) { return a.wp === d.id && a.robot === robot; });
+    if (!here.length) { return; }
+    here.sort(function (x, y) {
+      return (x.sev === "critical" ? 0 : 1) - (y.sev === "critical" ? 0 : 1) || (x.time < y.time ? -1 : x.time > y.time ? 1 : 0);
+    });
+    note.open(here[0]);
+  });
+
+  /*
    * 검토용 — 주소의 #normal · #few · #warning · #critical 로 단계를 고른다.
    * 주소에 아무것도 없으면 화면이 정한 기본값을 쓴다(body[data-monitor-default]).
    * ver.2 는 위험 판을 기본으로 보여 주고, 시안 3 은 Figma 기본 상태(알림 없음)로 연다.
