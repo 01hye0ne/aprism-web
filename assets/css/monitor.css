@@ -328,10 +328,11 @@ a.map-floor {
   display: inline-flex;
   align-items: center;
   gap: var(--space-4);
-  padding: var(--space-2) var(--space-8);
+  /* 고를 수 있는 칸이라는 걸 면으로 알린다(10/19 디자이너) — 상태바 바탕(bg/page) 위 한 단 올라온 bg/cell. */
+  padding: var(--space-4) var(--space-8) var(--space-4) var(--space-12);
   border: 0;
   border-radius: var(--radius-control);
-  background: none;
+  background-color: var(--bg-cell);
   /* 미션명은 화면 전체의 기준이라 상태바에서 가장 높은 위계다 — fg/primary. */
   color: var(--text-primary);
   font: inherit;
@@ -342,7 +343,7 @@ a.map-floor {
 .scope-trigger .i { color: var(--text-secondary); }
 
 .scope-trigger:hover,
-.scope-trigger[aria-expanded="true"] { background-color: var(--state-hover); }
+.scope-trigger[aria-expanded="true"] { background-color: var(--bg-raised); }
 
 .scope-trigger:focus-visible {
   outline: var(--border-width-strong) solid var(--border-focus);
