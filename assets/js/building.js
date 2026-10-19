@@ -277,7 +277,9 @@
     where.appendChild(el("span", "ah-wp", wp ? wp[0] : a.where));
 
     // 어느 층 · 미션의 알림인지 — 미션을 고르기 전 화면이라 이 줄이 하나 더 붙는다.
+    // 미션 줄은 글자 칩 대신 회색 아이콘으로 표시한다 — 칩은 값(층) 자리라서(10/19).
     var scope = el("span", "ah-scope t-caption");
+    scope.appendChild(icon("way"));
     scope.appendChild(el("span", null, a.mission));
 
     node.appendChild(title);
