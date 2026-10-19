@@ -182,9 +182,9 @@
           라이트 테마 · 전체 층 현황 화면)까지 반영함.</p>
         <ol class="toc">
           <li><a href="#s1">화면의 기준 · 알림 목록 <span>장소 → 미션 · 두 줄 목록</span></a></li>
-          <li><a href="#s2">Delta(AI)의 역할 <span>해설 → 종합 판단</span></a></li>
+          <li><a href="#s2">알림 확인 · 조치 <span>모달 → 지도 위 팝오버</span></a></li>
           <li><a href="#s3">경고의 강약 <span>같은 테 → 강약 분리</span></a></li>
-          <li><a href="#s4">알림 확인 · 조치 <span>모달 → 지도 위 팝오버</span></a></li>
+          <li><a href="#s4">Delta(AI)의 역할 <span>해설 → 종합 판단</span></a></li>
           <li><a href="#s5">색 · 위계 · 화면 정돈 <span>한 뜻 한 모양</span></a></li>
           <li><a href="#s6">로봇 패널 <span>전체 → 배정된 로봇</span></a></li>
           <li><a href="#s7">층 여러 개일 때 관제 화면 <span>전체 층 현황</span></a></li>
@@ -219,17 +219,20 @@
     <section class="slide" id="s2" aria-labelledby="s2-title">
       <div class="txt">
         <p class="num">02</p>
-        <h2 id="s2-title">Delta(AI)의 역할</h2>
-        <div class="blk"><p class="k">시안 1-A · 1-B</p><p>1-A는 고른 알림 하나를 큰 글씨로 해설하고, 행동 버튼 셋과 입력창이 늘 열려 있어 패널 절반을 차지함. 1-B는 지도 아래 띠 하나.</p></div>
-        <div class="blk now"><p class="k">v2.2</p><p>알림 하나가 아니라 <b>전체 알림을 종합</b>해 판단함("위험 1건 포함 6건 누적"). 지도 왼쪽 위 모서리의 작은 창에서 접힘 · 펼침 · 대화를 오가고, 입력창은 열었을 때만 보이며 너비를 끌어 조절할 수 있음. 전체 층 현황 화면에서도 같은 판이 남은 알림의 가장 높은 단계를 따라감.</p></div>
-        <p class="why">알림을 고를 때마다 같은 내용을 반복하던 해설은 목록과 겹침. AI는 여러 건을 묶어 볼 때 쓸모가 있음.</p>
+        <h2 id="s2-title">알림 확인 · 조치</h2>
+        <div class="blk"><p class="k">시안 1-A · 1-B</p><p>1-B는 화면을 덮는 큰 모달에서 ① 확인 ② 지점 ③ 조치를 차례로 진행하고, 조치는 드롭다운으로 하나만 고름. 지도와 다른 알림이 가려지고, 처리한 알림이 어디로 갔는지 따라갈 수 없었음. 1-A는 Delta 버튼으로 처리.</p></div>
+        <div class="blk now"><p class="k">v2.2</p><p>알림을 고르면 <b>지도 위 웨이포인트 옆 팝오버</b>가 뜸. 사진은 사람을 <b>격자 모자이크</b>로 가리고, 아래 DELTA 조치 제안은 <b>체크리스트</b> — AI 추천 조치는 미리 체크되어 있고 더 고를 수 있음(메모는 접혀 있음). [조치 완료] — 팝오버가 접히며 <b>오늘 확인 완료</b> 맨 위로 날아 들어가 초록으로 한 번 빛나고, Delta 판단도 바로 바뀜. 5초 동안 <b>되돌리기</b>가 남음. [전체보기]를 누르면 <b>알림 센터</b>에서 지난 미션까지 미션 · 등급 · 기간으로 필터링해서 한곳에서 처리함.</p></div>
+        <p class="why">어디서 일어났는지(지도)를 보면서 처리해야 판단이 빠름. 처리한 일이 어디로 갔는지 눈으로 따라가야 "끝났다"는 확신이 생기고, 확인 대화상자 대신 되돌리기로 실수를 바로 돌이킬 수 있음.</p>
       </div>
       <figure class="pic">
         <div class="tabs" role="group" aria-label="화면 고르기"></div>
         <div class="frame">
-          <img data-tab="시안 1-A" src="./assets/img/compare/03-1a.webp" alt="시안 1-A Delta — 고른 알림 해설, 행동 버튼 셋, 늘 열린 입력창" loading="lazy" />
-          <img data-tab="시안 1-B" src="./assets/img/compare/03-1b.webp" alt="시안 1-B Delta — 지도 아래 띠 하나" loading="lazy" />
-          <img data-tab="v2.2" src="./assets/img/compare-1020/03-v22.webp" alt="v2.2 Delta 펼침 — 위험 1건 포함 6건 누적, 조치 버튼 셋, 아래 묻기 칸" loading="lazy" />
+          <img data-tab="시안 1-B" src="./assets/img/compare/05-1b.webp" alt="시안 1-B 알림 상세 모달 — 조치 내용 드롭다운과 확인 처리 버튼" loading="lazy" />
+          <img data-tab="v2.2 흐름 ▶" data-default data-anim src="./assets/img/compare-1020/05-v22-flow.webp" alt="v2.2 조치 흐름 — 알림을 누르면 지도 위 팝오버가 열리고, 추천 조치 두 개를 고른 뒤 조치 완료를 누르면 팝오버가 오늘 확인 완료로 날아 들어가 초록으로 빛나고 되돌리기 토스트가 뜬다" loading="lazy" />
+          <img data-tab="① 팝오버 열기" src="./assets/img/compare-1020/05-v22-1-open.webp" alt="① 알림을 누르면 웨이포인트 옆에 팝오버가 열린다 — 격자 모자이크 사진, DELTA 조치 제안 체크리스트, AI 추천 두 개는 미리 체크" loading="lazy" />
+          <img data-tab="② 조치 더 고르기" src="./assets/img/compare-1020/05-v22-2-pick.webp" alt="② 추천 밖 조치(재측정 후 판단)도 더 골라 셋을 체크" loading="lazy" />
+          <img data-tab="③ 완료 · 되돌리기" src="./assets/img/compare-1020/05-v22-3-done.webp" alt="③ 조치 완료 뒤 — 알림이 오늘 확인 완료 맨 위로 옮겨 초록으로 빛나고, Delta 는 주의로 바뀌고, 아래에 되돌리기 토스트" loading="lazy" />
+          <img data-tab="④ 전체보기 · 알림 센터" src="./assets/img/compare-1020/05-v22-4-center.webp" alt="④ 최신 알림의 전체보기를 누르면 열리는 알림 센터 — 미확인 · 조치 완료 탭, 미션 · 등급 · 기간 필터, 오른쪽에 사진과 DELTA 조치 제안, 조치 여러 개 선택" loading="lazy" />
         </div>
       </figure>
     </section>
@@ -256,20 +259,17 @@
     <section class="slide" id="s4" aria-labelledby="s4-title">
       <div class="txt">
         <p class="num">04</p>
-        <h2 id="s4-title">알림 확인 · 조치</h2>
-        <div class="blk"><p class="k">시안 1-A · 1-B</p><p>1-B는 화면을 덮는 큰 모달에서 ① 확인 ② 지점 ③ 조치를 차례로 진행하고, 조치는 드롭다운으로 하나만 고름. 지도와 다른 알림이 가려지고, 처리한 알림이 어디로 갔는지 따라갈 수 없었음. 1-A는 Delta 버튼으로 처리.</p></div>
-        <div class="blk now"><p class="k">v2.2</p><p>알림을 고르면 <b>지도 위 웨이포인트 옆 팝오버</b>가 뜸. 사진은 사람을 <b>격자 모자이크</b>로 가리고, 아래 DELTA 조치 제안은 <b>체크리스트</b> — AI 추천 조치는 미리 체크되어 있고 더 고를 수 있음(메모는 접혀 있음). [조치 완료] — 팝오버가 접히며 <b>오늘 확인 완료</b> 맨 위로 날아 들어가 초록으로 한 번 빛나고, Delta 판단도 바로 바뀜. 5초 동안 <b>되돌리기</b>가 남음. [전체보기]를 누르면 <b>알림 센터</b>에서 지난 미션까지 미션 · 등급 · 기간으로 필터링해서 한곳에서 처리함.</p></div>
-        <p class="why">어디서 일어났는지(지도)를 보면서 처리해야 판단이 빠름. 처리한 일이 어디로 갔는지 눈으로 따라가야 "끝났다"는 확신이 생기고, 확인 대화상자 대신 되돌리기로 실수를 바로 돌이킬 수 있음.</p>
+        <h2 id="s4-title">Delta(AI)의 역할</h2>
+        <div class="blk"><p class="k">시안 1-A · 1-B</p><p>1-A는 고른 알림 하나를 큰 글씨로 해설하고, 행동 버튼 셋과 입력창이 늘 열려 있어 패널 절반을 차지함. 1-B는 지도 아래 띠 하나.</p></div>
+        <div class="blk now"><p class="k">v2.2</p><p>알림 하나가 아니라 <b>전체 알림을 종합</b>해 판단함("위험 1건 포함 6건 누적"). 지도 왼쪽 위 모서리의 작은 창에서 접힘 · 펼침 · 대화를 오가고, 입력창은 열었을 때만 보이며 너비를 끌어 조절할 수 있음. 전체 층 현황 화면에서도 같은 판이 남은 알림의 가장 높은 단계를 따라감.</p></div>
+        <p class="why">알림을 고를 때마다 같은 내용을 반복하던 해설은 목록과 겹침. AI는 여러 건을 묶어 볼 때 쓸모가 있음.</p>
       </div>
       <figure class="pic">
         <div class="tabs" role="group" aria-label="화면 고르기"></div>
         <div class="frame">
-          <img data-tab="시안 1-B" src="./assets/img/compare/05-1b.webp" alt="시안 1-B 알림 상세 모달 — 조치 내용 드롭다운과 확인 처리 버튼" loading="lazy" />
-          <img data-tab="v2.2 흐름 ▶" data-default data-anim src="./assets/img/compare-1020/05-v22-flow.webp" alt="v2.2 조치 흐름 — 알림을 누르면 지도 위 팝오버가 열리고, 추천 조치 두 개를 고른 뒤 조치 완료를 누르면 팝오버가 오늘 확인 완료로 날아 들어가 초록으로 빛나고 되돌리기 토스트가 뜬다" loading="lazy" />
-          <img data-tab="① 팝오버 열기" src="./assets/img/compare-1020/05-v22-1-open.webp" alt="① 알림을 누르면 웨이포인트 옆에 팝오버가 열린다 — 격자 모자이크 사진, DELTA 조치 제안 체크리스트, AI 추천 두 개는 미리 체크" loading="lazy" />
-          <img data-tab="② 조치 더 고르기" src="./assets/img/compare-1020/05-v22-2-pick.webp" alt="② 추천 밖 조치(재측정 후 판단)도 더 골라 셋을 체크" loading="lazy" />
-          <img data-tab="③ 완료 · 되돌리기" src="./assets/img/compare-1020/05-v22-3-done.webp" alt="③ 조치 완료 뒤 — 알림이 오늘 확인 완료 맨 위로 옮겨 초록으로 빛나고, Delta 는 주의로 바뀌고, 아래에 되돌리기 토스트" loading="lazy" />
-          <img data-tab="④ 전체보기 · 알림 센터" src="./assets/img/compare-1020/05-v22-4-center.webp" alt="④ 최신 알림의 전체보기를 누르면 열리는 알림 센터 — 미확인 · 조치 완료 탭, 미션 · 등급 · 기간 필터, 오른쪽에 사진과 DELTA 조치 제안, 조치 여러 개 선택" loading="lazy" />
+          <img data-tab="시안 1-A" src="./assets/img/compare/03-1a.webp" alt="시안 1-A Delta — 고른 알림 해설, 행동 버튼 셋, 늘 열린 입력창" loading="lazy" />
+          <img data-tab="시안 1-B" src="./assets/img/compare/03-1b.webp" alt="시안 1-B Delta — 지도 아래 띠 하나" loading="lazy" />
+          <img data-tab="v2.2" src="./assets/img/compare-1020/03-v22.webp" alt="v2.2 Delta 펼침 — 위험 1건 포함 6건 누적, 조치 버튼 셋, 아래 묻기 칸" loading="lazy" />
         </div>
       </figure>
     </section>
