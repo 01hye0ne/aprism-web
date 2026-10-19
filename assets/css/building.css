@@ -295,7 +295,14 @@
 .bld-card-head .robot-counts { display: flex; align-items: center; gap: var(--space-4); margin: 0; color: var(--text-secondary); }
 .bld-meta { color: var(--text-tertiary); }
 
-.bld-fleet-filter { display: flex; gap: var(--space-4); padding: 0 var(--space-4); }
+/* 층 거르기 — Button Size=xSmall. 고른 것 Primary(inverse 면), 나머지 Secondary(Figma 10/19). */
+.bld-fleet-filter { display: flex; gap: var(--space-4); padding: 0; }
+.bld-fleet-filter .btn-inverse {
+  border-color: transparent;
+  background-color: var(--comp-button-inverse-bg-default);
+  color: var(--comp-button-inverse-text-default);
+}
+.bld-fleet-filter .btn-inverse:hover { background-color: var(--comp-button-inverse-bg-hover); }
 
 .bld-fleet {
   flex: 1 1 auto;
@@ -306,14 +313,19 @@
   overflow-y: auto;
   scrollbar-width: thin;
 }
+
+/*
+ * 로봇 줄 — Figma 1260:15802. bg/cell · r4 · 여백 4.
+ *   위 덩이(여백 4 · 간격 4)  층 꼬리표 + 이름(14 / ExtraBold) · 미션(Caption · secondary) · 진행 막대 + 수(mono 13)
+ *   아래 줄(간격 4)            상태 · 배터리 · 신호 세 칸이 폭을 나눈다(bg/map-chip · r4 · 26 높이)
+ */
 .bld-robot {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
   width: 100%;
-  padding: var(--space-8) var(--space-12);
+  padding: var(--space-4);
   border: 0;
-  border-radius: var(--radius-8);
+  border-radius: var(--radius-4);
   background-color: var(--bg-cell);
   color: var(--text-primary);
   font: inherit;
@@ -322,12 +334,20 @@
 }
 .bld-robot:hover { background-color: var(--state-hover-raised, var(--bg-raised)); }
 .bld-robot:focus-visible { outline: var(--border-width-strong) solid var(--border-focus); outline-offset: -2px; }
-.bld-robot.is-offline { color: var(--text-tertiary); }
+.bld-robot.is-offline .bld-robot-name { color: var(--text-tertiary); }
+.bld-robot-body { display: flex; flex-direction: column; gap: var(--space-4); padding: var(--space-4); }
 .bld-robot-top { display: flex; align-items: center; gap: var(--space-8); }
-.bld-robot-top .badge { margin-left: auto; }
+.bld-robot-name { font-size: var(--font-size-14); line-height: var(--font-line-height-20); font-weight: 800; }
 .bld-robot-mission { color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.bld-robot-foot { display: flex; align-items: center; gap: var(--space-8); }
-.bld-robot-count { width: 40px; color: var(--text-tertiary); text-align: right; }
+.bld-robot-prog { display: flex; align-items: center; gap: var(--space-8); height: 18px; }
+.bld-robot-count {
+  flex: none;
+  width: 40px;
+  color: var(--text-tertiary);
+  font-size: var(--font-size-13);
+  line-height: var(--font-line-height-18);
+  text-align: right;
+}
 .bld-bar {
   flex: 1 1 auto;
   height: 4px;
@@ -336,7 +356,21 @@
   background-color: var(--comp-chart-track);
 }
 .bld-bar > i { display: block; height: 100%; border-radius: inherit; background-color: var(--text-secondary); }
-.bld-robot .battery { flex: none; }
+.bld-robot-foot { display: flex; gap: var(--space-4); }
+.bld-chip {
+  flex: 1 1 0;
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  height: 26px;
+  padding: var(--space-4);
+  border-radius: var(--radius-4);
+  background-color: var(--bg-map-chip);
+  white-space: nowrap;
+}
+.bld-chip.badge { border: 0; }
 
 /* 운행 흐름 */
 .bld-gantt { display: flex; flex-direction: column; gap: var(--space-4); padding: 0 var(--space-4); }

@@ -301,6 +301,15 @@
    * ================================================================== */
   var fleetFloor = "all";
 
+  /*
+   * 로봇 줄 — Figma "Building / 로봇 현황" 의 로봇 줄(1260:15802, 10/19 디자이너 수정).
+   *   위    층 꼬리표 · 이름 / 미션 · 지금 하는 일 / 진행 막대 · 지나온 수
+   *   아래  상태 · 배터리 · 신호 세 칸(bg/map-chip) — 메인 로봇 카드의 Mission · Battery · Signal 과 같은 값이다.
+   */
+  var SIG = { 4: "Strong", 3: "Good", 2: "Weak", 1: "Weak", 0: "끊김" };
+
+  function chip(cls) { return el("span", "bld-chip" + (cls ? " " + cls : "")); }
+
   function fleetRow(r) {
     var node = el("button", "bld-robot" + (r.st === "off" ? " is-offline" : ""));
     node.type = "button";
@@ -308,25 +317,31 @@
     node.setAttribute("data-floor", r.floor);
     node.setAttribute("aria-label", rname(r) + " · " + FNAME[r.floor] + " · " + r.now);
 
+    var body = el("span", "bld-robot-body");
     var top = el("span", "bld-robot-top");
-    top.appendChild(el("span", "t-label-1 bld-robot-name", rname(r)));
     top.appendChild(el("span", "bld-floor-tag num", r.floor));
-    var b = BADGE[r.st];
-    var badge = el("span", "badge " + b.cls + " t-caption");
-    badge.appendChild(el("span", "badge-dot"));
-    badge.appendChild(document.createTextNode(b.text));
-    top.appendChild(badge);
+    top.appendChild(el("span", "bld-robot-name", rname(r)));
+    body.appendChild(top);
+    body.appendChild(el("span", "bld-robot-mission t-caption", r.mission ? r.mission + " · " + r.now : r.now));
 
-    var mis = el("span", "bld-robot-mission t-caption", r.mission ? r.mission + " · " + r.now : r.now);
-
-    var foot = el("span", "bld-robot-foot");
+    var prog = el("span", "bld-robot-prog");
     var bar = el("span", "bld-bar");
     var fill = el("i");
     fill.style.width = (r.total ? Math.round(r.done / r.total * 100) : 0) + "%";
     bar.appendChild(fill);
-    foot.appendChild(bar);
-    foot.appendChild(el("span", "t-caption num bld-robot-count", r.total ? r.done + "/" + r.total : "—"));
+    prog.appendChild(bar);
+    prog.appendChild(el("span", "num bld-robot-count", r.total ? r.done + "/" + r.total : "—"));
+    body.appendChild(prog);
 
+    var foot = el("span", "bld-robot-foot");
+    // 상태
+    var b = BADGE[r.st];
+    var st = chip("badge " + b.cls);
+    st.appendChild(el("span", "badge-dot"));
+    st.appendChild(el("span", "t-caption", b.text));
+    foot.appendChild(st);
+    // 배터리
+    var bc = chip();
     var bat = el("span", "battery" + (r.bat <= 20 ? " is-critical" : r.bat <= 40 ? " is-warning" : "") + (r.chg ? " is-charging" : ""));
     var bb = el("span", "battery-body");
     var bf = el("span", "battery-fill");
@@ -341,10 +356,20 @@
     bat.appendChild(bb);
     bat.appendChild(el("span", "battery-tip"));
     bat.appendChild(el("span", "t-caption num", r.bat + "%"));
-    foot.appendChild(bat);
+    bc.appendChild(bat);
+    foot.appendChild(bc);
+    // 신호 — 막대는 theme.js 가 SVG 로 다시 그린다(data-level)
+    var sc = chip();
+    var sig = el("span", "battery" + (r.sig <= 2 ? " is-warning" : ""));
+    var bars = el("span", "signal-bars");
+    bars.setAttribute("data-level", String(r.sig));
+    for (var i = 0; i < 4; i += 1) { bars.appendChild(el("i")); }
+    sig.appendChild(bars);
+    sig.appendChild(el("span", "t-caption", SIG[r.sig]));
+    sc.appendChild(sig);
+    foot.appendChild(sc);
 
-    node.appendChild(top);
-    node.appendChild(mis);
+    node.appendChild(body);
     node.appendChild(foot);
 
     node.addEventListener("mouseenter", function () { setHot(r.floor, null, true); markRobot(r, true); });
@@ -356,7 +381,7 @@
   function renderRight() {
     var running = ROBOTS.filter(function (r) { return r.st === "run"; }).length;
     var cnt = $("[data-bld-count]");
-    if (cnt) { cnt.textContent = ROBOTS.length + "대"; }
+    if (cnt) { cnt.textContent = ROBOTS.length + "대 연결"; }
     var run = $("[data-bld-running]");
     if (run) { run.textContent = running + "대 수행중"; }
 
@@ -364,7 +389,8 @@
     ff.textContent = "";
     [["all", "전체", ROBOTS.length]].concat(FLOORS.map(function (f) { return [f, f, robotsOn(f).length]; }))
       .forEach(function (x) {
-        var b = el("button", "btn is-xs");
+        // 고른 층은 흰 면(Button Primary · inverse), 나머지는 Secondary — Figma 10/19
+        var b = el("button", "btn is-xs " + (fleetFloor === x[0] ? "btn-inverse" : "btn-secondary"));
         b.type = "button";
         b.setAttribute("aria-pressed", fleetFloor === x[0] ? "true" : "false");
         b.appendChild(document.createTextNode(x[1] + " "));
