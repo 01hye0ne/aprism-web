@@ -178,7 +178,7 @@
   var LIGHT = {
     face: { floor: 0xa3a9b3, wall: 0xd0d4db, equipment: 0xcbd0d8, stairs: 0xd8dce3, other: 0xd0d4db },
     edge: 0x8b94a1, ghost: 0xeef0f3, grid: 0x8a93a5,
-    pickFace: 0xe6e9ef, pickLine: 0x4e576a, hoverLine: 0x4b4f57
+    pickFace: 0xe6e9ef, pickLine: 0x4e576a, hoverLine: 0x93979e
   };
   var LIGHT_LIFT = 1.2;
 
@@ -202,7 +202,7 @@
    */
   var PICK_FACE = 0xafb7c8;   // gray/400. 눌린 설비가 물드는 면 색
   var PICK_LINE = 0xe0e3e9;   // gray/200. 고른 설비 외곽선 — 순백(gray/0)은 눈이 아프다.
-  var HOVER_LINE = 0xd1d5de;  // gray/300. 손이 얹힌 설비 외곽선
+  var HOVER_LINE = 0x9aa1ae;  // 손이 얹힌 설비 외곽선 — gray/300 60% 를 덩이 위에 얹은 색(선을 불투명으로 바꾸며 색으로 옮겼다, 10/19)
 
   // 삼각형이 이 비율만큼 모이면 "넓은 면"으로 친다. 둥글린 자리는 한둘씩이라 걸러진다.
   var FACE_SHARE = 0.01;
@@ -1114,10 +1114,10 @@
       color: color, linewidth: width, transparent: true, opacity: alpha,
       /*
        * 깊이를 본다 — 앞에 선 벽 · 설비 위로 선이 비쳐 지나가면 지저분하다(10/19 디자이너).
-       * 선이 제 덩이 모서리에 딱 붙어 있어 같은 깊이끼리 다투므로 앞으로 살짝 당긴다(polygonOffset).
+       * 선이 제 덩이 모서리에 딱 붙어 있어 같은 깊이끼리 다투면 군데군데 끊긴다 —
+       * 그어 넣을 때 카메라 쪽으로 살짝 당긴다(drawOutline). polygonOffset 은 화면을 보는 띠라 듣지 않았다.
        */
-      depthWrite: false, depthTest: true,
-      polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -8
+      depthWrite: false, depthTest: true
     });
     mat.resolution.set(view.clientWidth || 1, view.clientHeight || 1);
     fatMats.push(mat);
@@ -1136,6 +1136,9 @@
       return;
     }
     var line = silhouette(item);
+    // 카메라 쪽으로 모델 반지름의 1% 당긴다 — 화각 10° 라 화면 자리는 그대로, 깊이만 제 면 앞에 선다.
+    var nx = dirV.x * span * 0.01, ny = dirV.y * span * 0.01, nz = dirV.z * span * 0.01;
+    for (var k = 0; k < line.length; k += 3) { line[k] += nx; line[k + 1] += ny; line[k + 2] += nz; }
     pens.forEach(function (pen) {
       if (!line.length) { pen.visible = false; return; }
       pen.geometry.setPositions(line);
@@ -2696,8 +2699,9 @@
      * 반투명 선은 마디에서 두 번 겹쳐 모서리마다 검은 점이 찍혔다(10/19 디자이너).
      */
     if (pickPens.length === 2) {
-      pickPens[0].material.opacity = light ? 0 : 0.14;
-      pickPens[1].material.opacity = light ? 1 : 0.85;
+      // 번짐은 두 테마 모두 끈다 — 6px 반투명 띠가 꼭짓점마다 세 번 겹쳐 흰 점이 됐다(10/19 디자이너 "끊기는 느낌").
+      pickPens[0].material.opacity = 0;
+      pickPens[1].material.opacity = 1;   // 반투명이면 마디에서 두 번 겹쳐 점이 찍힌다 — 두 테마 모두 불투명
     }
     hoverPens.forEach(function (pen) { pen.material.color.setHex(set.hoverLine); });
     if (gridMesh) {
@@ -4380,7 +4384,7 @@
      * 손만 얹힌 것은 얇고 옅은 선 한 줄이다. 둘의 차이가 곧 hover 와 selected 의 차이다.
      */
     pickPens = [outlinePen(6, PICK_LINE, 0.14), outlinePen(2, PICK_LINE, 0.85)];
-    hoverPens = [outlinePen(1.6, HOVER_LINE, 0.6)];
+    hoverPens = [outlinePen(1.6, HOVER_LINE, 1)];   // 불투명 — 마디 점 없이(10/19). 옅게는 색으로 낸다
 
     // 로봇마다 제 고리를 깐다. 바닥 격자는 첫 로봇이 만들고 나머지가 나눠 쓴다.
     // 깔아만 두고 보이지는 않는다 — 지금 고른 로봇의 것 하나만 켠다.
