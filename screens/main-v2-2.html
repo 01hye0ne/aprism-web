@@ -25,7 +25,7 @@
   <link rel="stylesheet" href="../assets/css/map-overlays.css?v=96f51348" />
   <link rel="stylesheet" href="../assets/css/icons-outline.css?v=6b866a80" />
   <link rel="stylesheet" href="../assets/css/text-parts.css?v=e38e19ea" />
-  <link rel="stylesheet" href="../assets/css/monitor.css?v=f5fc7140" />
+  <link rel="stylesheet" href="../assets/css/monitor.css?v=a2da8c1b" />
   <link rel="stylesheet" href="../assets/css/palette-neutral.css?v=0c969aea" />
   <link rel="stylesheet" href="../assets/css/delta-v3.css?v=b1562ee4" />
   <style>
@@ -417,10 +417,11 @@
                    · 위치 · 감지 · 로봇은 사진 위 [정보] 에 손을 얹으면 뜬다(state=info hover).
                    · [크게보기] 대신 [더보기] — 크게 보기 · 패널에 고정(도킹)을 고른다.
                    · 조치는 체크리스트, 메모는 접혀 있다. -->
+              <!-- 단계 칩의 표식은 점이 아니라 목록과 같은 기호다 — 위험 ⓧ · 주의 △(10/19 디자이너, 표식 모양 = 단계). -->
               <section class="map-alert ma-v3" data-map-alert hidden aria-labelledby="ma-title">
                 <div class="ma-head">
                   <div class="ma-title-block">
-                    <span class="ma-badge t-label-2" data-ma-badge><span class="badge-dot"></span><span data-ma-sev>주의</span></span>
+                    <span class="ma-badge t-label-2" data-ma-badge><span class="i i-16 ma-badge-ic" aria-hidden="true"></span><span data-ma-sev>주의</span></span>
                     <h3 class="ma-title" id="ma-title" data-ma-title></h3>
                     <p class="ma-stamp t-caption" data-ma-stamp></p>
                   </div>
@@ -1705,7 +1706,7 @@
 <div class="ma-zoom" data-ma-zoom-box hidden role="dialog" aria-modal="true" aria-labelledby="ma-zoom-title">
   <div class="ma-zoom-card">
     <div class="ma-zoom-head">
-      <span class="ma-badge t-label-2" data-ma-zoom-badge><span class="badge-dot"></span><span data-ma-zoom-sev>주의</span></span>
+      <span class="ma-badge t-label-2" data-ma-zoom-badge><span class="i i-16 ma-badge-ic" aria-hidden="true"></span><span data-ma-zoom-sev>주의</span></span>
       <h3 class="t-title-2 ma-zoom-title" id="ma-zoom-title" data-ma-zoom-title></h3>
       <span class="t-caption num ma-zoom-time" data-ma-zoom-time></span>
       <button type="button" class="icon-button ma-zoom-close" data-ma-zoom-close aria-label="닫기">
