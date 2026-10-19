@@ -19,7 +19,7 @@
   }
   </script>
   <link rel="stylesheet" href="../assets/css/tokens.css?v=35bfd155" />
-  <link rel="stylesheet" href="../assets/css/app-shell.css?v=31d1ab2f" />
+  <link rel="stylesheet" href="../assets/css/app-shell.css?v=3159bab5" />
   <link rel="stylesheet" href="../assets/css/map-overlays.css?v=96f51348" />
   <link rel="stylesheet" href="../assets/css/icons-outline.css?v=88bcd8fb" />
   <link rel="stylesheet" href="../assets/css/text-parts.css?v=e38e19ea" />
@@ -110,11 +110,6 @@
       </div>
 
       <div class="status-bar-right">
-      <!-- 라이트 / 다크 — 지금과 반대 모드의 아이콘을 보인다(Figma Icon / lightMode 1267:21859 · darkMode 1267:21858, 10/19).
-           누르면 바꾸고 브라우저에 기억한다(theme.js). -->
-      <button type="button" class="theme-chip" data-theme-toggle aria-label="라이트 모드로 바꾸기">
-        <span class="i i-16" aria-hidden="true"></span>
-      </button>
         <!-- Account · 누르면 계정 메뉴가 내려온다 (Figma Account 컴포넌트 Opened) -->
         <div class="status-menu" data-status-menu>
           <button type="button" class="account-chip" data-menu-trigger
@@ -139,6 +134,12 @@
             </button>
           </div>
         </div>
+
+      <!-- 라이트 / 다크 — 홍길동(계정) 오른쪽(10/19). 지금과 반대 모드의 아이콘을 보인다(Figma Icon / lightMode 1267:21859 · darkMode 1267:21858, 10/19).
+           누르면 바꾸고 브라우저에 기억한다(theme.js). -->
+      <button type="button" class="theme-chip" data-theme-toggle aria-label="라이트 모드로 바꾸기">
+        <span class="i i-16" aria-hidden="true"></span>
+      </button>
 
         <!-- Signal · 누르면 서버·네트워크 상태가 내려온다 (Figma Signal 컴포넌트 Opened) -->
         <div class="status-menu" data-status-menu>
