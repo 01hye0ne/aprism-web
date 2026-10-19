@@ -211,7 +211,7 @@
 
   var aiActions = $("[data-ai-actions]");
   var scoped = body.hasAttribute("data-mission-scope");   // v2.2 — 미션 범위
-  var withReport = list.hasAttribute("data-ah-report");   // v2.2 — 알림마다 [보고서]
+  var withReport = list.hasAttribute("data-ah-report");   // v2.2 — 알림마다 [안전진단](10/19 · 예전 [보고서])
   var mission = scoped ? missionOf({ robot: 0 }) : null;
 
   var level = "critical";
@@ -233,6 +233,11 @@
     return all.length ? "warning" : "normal";
   }
 
+  function wpPlace(a) {
+    var m = /WP-\d+.*$/.exec(a.where || "");
+    return m ? m[0] : a.where;
+  }
+
   function item(a) {
     var node = el("button", "ah-item is-" + a.sev);
     node.type = "button";
@@ -241,7 +246,8 @@
 
     var where = el("span", "ah-where t-caption");
     where.appendChild(icon("target"));
-    where.appendChild(el("span", null, a.where));
+    // v2.2 — 위치는 웨이포인트만 "WP-nn 웨이포인트명"(10/19 디자이너). 로봇 · 설비 단위 앞말은 뺀다.
+    where.appendChild(el("span", null, scoped ? wpPlace(a) : a.where));
     where.appendChild(el("span", "num", a.time));
 
     // 알림 제목은 Label/2(13/500) 다 — 한 단계 내렸다(디자이너 요청).
@@ -259,18 +265,18 @@
     });
     if (!withReport) { return node; }
 
-    // [보고서] 는 알림 버튼 안에 넣을 수 없다(버튼 안 버튼) — 한 줄을 감싸고 오른쪽 아래에 얹는다.
-    // 보고서 화면은 아직 없다 — 자리만 잡았다.
+    // [안전진단] 은 알림 버튼 안에 넣을 수 없다(버튼 안 버튼) — 한 줄을 감싸고 오른쪽 아래에 얹는다.
+    // 10/19 디자이너 — [보고서] 를 [안전진단] 으로 바꿨다. 안전진단 화면은 아직 없다 — 자리만 잡았다.
     var row = el("div", "ah-row");
     row.setAttribute("role", "listitem");
     node.removeAttribute("role");
     // 평소엔 아이콘만, 그 줄에 올라가면 글자가 붙는다 — 알림마다 반복돼 글자까지 늘 서 있으면 목록이 시끄럽다.
     var report = el("button", "btn btn-ghost is-xs ah-report");
     report.type = "button";
-    report.title = "보고서 화면 준비 중";
-    report.setAttribute("aria-label", "보고서");
-    report.appendChild(icon("document"));
-    report.appendChild(el("span", "ah-report-label", "보고서"));
+    report.title = "안전진단 화면 준비 중";
+    report.setAttribute("aria-label", "안전진단");
+    report.appendChild(icon("shield"));
+    report.appendChild(el("span", "ah-report-label", "안전진단"));
     row.appendChild(node);
     row.appendChild(report);
     return row;

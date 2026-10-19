@@ -230,7 +230,8 @@
 
     var where = el("span", "ah-where t-caption");
     where.appendChild(icon("target"));
-    where.appendChild(el("span", null, a.where));
+    var wp = /WP-\d+.*$/.exec(a.where);   // 위치는 웨이포인트만(10/19, 메인 v2.2 와 같다)
+    where.appendChild(el("span", null, wp ? wp[0] : a.where));
     where.appendChild(el("span", "num", a.time));
 
     var title = el("span", "ah-title t-label-2");
@@ -248,7 +249,20 @@
     node.addEventListener("mouseenter", function () { setHot(a.floor, null, true); });
     node.addEventListener("mouseleave", function () { setHot(null); });
     node.addEventListener("click", function () { enter(a.floor, a.mission); });
-    return node;
+
+    // [안전진단] — 메인 v2.2 목록과 같은 자리 · 모양(monitor.js). 화면은 아직 없다.
+    var row = el("div", "ah-row");
+    row.setAttribute("role", "listitem");
+    node.removeAttribute("role");
+    var go = el("button", "btn btn-ghost is-xs ah-report");
+    go.type = "button";
+    go.title = "안전진단 화면 준비 중";
+    go.setAttribute("aria-label", "안전진단");
+    go.appendChild(icon("shield"));
+    go.appendChild(el("span", "ah-report-label", "안전진단"));
+    row.appendChild(node);
+    row.appendChild(go);
+    return row;
   }
 
   function doneRow(d) {

@@ -25,7 +25,7 @@
   <link rel="stylesheet" href="../assets/css/map-overlays.css?v=96f51348" />
   <link rel="stylesheet" href="../assets/css/icons-outline.css?v=6b866a80" />
   <link rel="stylesheet" href="../assets/css/text-parts.css?v=e38e19ea" />
-  <link rel="stylesheet" href="../assets/css/monitor.css?v=c40075b5" />
+  <link rel="stylesheet" href="../assets/css/monitor.css?v=78403b5f" />
   <link rel="stylesheet" href="../assets/css/palette-neutral.css?v=0c969aea" />
   <link rel="stylesheet" href="../assets/css/delta-v3.css?v=b1562ee4" />
   <style>
@@ -372,14 +372,8 @@
           <section class="map-panel col-9" aria-label="설비 배치도">
             <div class="map-canvas">
               <div class="map-tools">
-              <!-- 층 — 지하 4층 · 지하 3층. 누르면 그 층으로 갈아탄다(assets/js/map.js).
-                   계단을 눌러도 옮겨 간다. -->
-              <div class="map-floors" role="group" aria-label="층">
-                <!-- [전체] — 층을 쌓아 보는 전체 층 현황으로 나간다(building-v2-2.html). -->
-                <a class="map-floor is-all" href="building-v2-2.html" data-building-link aria-label="전체 층 현황">전체</a>
-                <button type="button" class="map-floor" data-map-floor="B3" aria-pressed="false">B3</button>
-                <button type="button" class="map-floor" data-map-floor="B4" aria-pressed="true">B4</button>
-              </div>
+                <!-- 10/19 — 조작 버튼 판과 층 판을 둘로 나눴다. 층 판은 조작 버튼 아래에 따로 선다. -->
+                <div class="map-tools-box">
                 <button type="button" class="icon-button" data-map-zoom-in aria-label="확대">
                   <span class="i i-20" style="--i:var(--ic-zoom-in)"></span>
                 </button>
@@ -395,6 +389,17 @@
                 <button type="button" class="icon-button is-secondary" aria-label="영상 리플레이">
                   <span class="i i-20" style="--i:var(--ic-play)"></span>
                 </button>
+                </div>
+                <div class="map-tools-box is-floors">
+                  <!-- 층 — 지하 4층 · 지하 3층. 누르면 그 층으로 갈아탄다(assets/js/map.js).
+                       계단을 눌러도 옮겨 간다. -->
+                  <div class="map-floors" role="group" aria-label="층">
+                <!-- [전체] — 층을 쌓아 보는 전체 층 현황으로 나간다(building-v2-2.html). -->
+                <a class="map-floor is-all" href="building-v2-2.html" data-building-link aria-label="전체 층 현황">전체</a>
+                <button type="button" class="map-floor" data-map-floor="B3" aria-pressed="false">B3</button>
+                <button type="button" class="map-floor" data-map-floor="B4" aria-pressed="true">B4</button>
+              </div>
+                </div>
               </div>
               <!-- 지도 위의 로봇·웨이포인트·설비 쪽지. 자리와 내용은 모두
                    assets/js/map.js 가 채운다. 기본은 hidden 이다. -->
@@ -1723,7 +1728,7 @@
 <script src="../assets/js/map-model.js?v=0f88c871"></script>
 <script src="../assets/js/map.js?v=b57457cc"></script>
 <script src="../assets/js/robot-stage.js?v=d114bf18"></script>
-<script src="../assets/js/monitor.js?v=56d92611"></script>
+<script src="../assets/js/monitor.js?v=a67d8dd1"></script>
 <script src="../assets/js/mission-scope.js?v=e94231fd"></script>
 <script src="../assets/js/delta-pulse.js?v=2d0afced"></script>
 <script src="../assets/js/delta-chat.js?v=54fb0c47"></script>

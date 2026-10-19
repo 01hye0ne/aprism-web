@@ -25,7 +25,7 @@
   <link rel="stylesheet" href="../assets/css/map-overlays.css?v=96f51348" />
   <link rel="stylesheet" href="../assets/css/icons-outline.css?v=6b866a80" />
   <link rel="stylesheet" href="../assets/css/text-parts.css?v=e38e19ea" />
-  <link rel="stylesheet" href="../assets/css/monitor.css?v=c40075b5" />
+  <link rel="stylesheet" href="../assets/css/monitor.css?v=78403b5f" />
   <link rel="stylesheet" href="../assets/css/palette-neutral.css?v=0c969aea" />
   <link rel="stylesheet" href="../assets/css/delta-v3.css?v=b1562ee4" />
   <link rel="stylesheet" href="../assets/css/building.css?v=874d48b9" />
@@ -299,11 +299,9 @@
           <section class="map-panel col-9" aria-label="전체 층 배치도">
             <div class="map-canvas" data-bld-hit>
               <div class="map-tools">
-                <!-- 층 — [전체] 가 이 화면이다. 층을 누르면 그 층으로 들어가 미션 모니터링으로 넘어간다.
-                     버튼의 점은 그 층에서 가장 높은 알림 단계다. -->
-                <div class="map-floors bld-floors" role="group" aria-label="층" data-bld-floors>
-                  <button type="button" class="map-floor" data-bld-floor="all" aria-pressed="true">전체</button>
-                </div>
+                <!-- 10/19 — 조작 버튼 판과 층 판을 둘로 나눴다. 층 판은 조작 버튼 아래에 따로 선다. -->
+                <div class="map-tools-box">
+                
                 <button type="button" class="icon-button" data-bld-zoom="in" aria-label="확대">
                   <span class="i i-20" style="--i:var(--ic-zoom-in)"></span>
                 </button>
@@ -313,6 +311,14 @@
                 <button type="button" class="icon-button" data-bld-home aria-label="전체 보기">
                   <span class="i i-20" style="--i:var(--ic-target)"></span>
                 </button>
+                </div>
+                <div class="map-tools-box is-floors">
+                  <!-- 층 — [전체] 가 이 화면이다. 층을 누르면 그 층으로 들어가 미션 모니터링으로 넘어간다.
+                     버튼의 점은 그 층에서 가장 높은 알림 단계다. -->
+                <div class="map-floors bld-floors" role="group" aria-label="층" data-bld-floors>
+                  <button type="button" class="map-floor" data-bld-floor="all" aria-pressed="true">전체</button>
+                </div>
+                </div>
               </div>
 
               <!-- 층 이름표 · 로봇 · 알림 표식 — 자리는 building.js 가 3D 좌표에서 옮겨 잡는다. -->
@@ -383,7 +389,7 @@
 <script src="../assets/js/prism-orb.js?v=03386460"></script>
 <script src="../assets/js/screen.js?v=f3340135"></script>
 <script src="../assets/js/map-model.js?v=0f88c871"></script>
-<script src="../assets/js/building.js?v=06680972"></script>
+<script src="../assets/js/building.js?v=30d50ce2"></script>
 <script src="../assets/js/delta-pulse.js?v=2d0afced"></script>
 <script src="../assets/js/delta-v3.js?v=6842c15b"></script>
 <script src="../assets/js/delta-resize.js?v=2541bd65"></script>
