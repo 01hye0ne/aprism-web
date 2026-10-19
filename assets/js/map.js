@@ -2647,9 +2647,13 @@
    * 덩이 색은 paintOne 이 base 에서 매번 다시 섞으므로 base 만 바꾸면 된다.
    * 격자(GridHelper)는 색이 꼭짓점에 구워져 있어 꼭짓점 색을 새로 채운다.
    */
+  var topLight = null;
+  var TOP_LIGHT = 0.9;   // 라이트 윗면 빛 세기
+
   function applyTheme() {
     if (!THEMED || !tone) { return; }
     var light = isLight();
+    if (topLight) { topLight.intensity = light ? TOP_LIGHT : 0; }
     // 라이트 · 제안 팔레트 · 지금 다크 — 셋 중 하나의 판을 고른다.
     var set = light ? LIGHT : (isNeutral() ? NEUTRAL : {
       face: null, edge: EDGE, ghost: GHOST, grid: GRID, pickFace: PICK_FACE, pickLine: PICK_LINE, hoverLine: HOVER_LINE
@@ -4276,6 +4280,15 @@
     var key = new THREE.DirectionalLight(0xffffff, 1);
     scene.add(key);
     scene.add(key.target);
+    /*
+     * 윗면 빛 — 라이트에서만 켠다(10/19 디자이너 · 가장 밝은 면인 윗면을 더 밝게).
+     * 곧장 아래로 내리쬐므로 옆면(법선이 수평)에는 0 이고 윗면에만 더해진다 — 윗면 · 옆면 차이가 커진다.
+     * 바닥도 윗면이라 같이 밝아져 지도 바탕(gray/300)보다 한 단 위에 선다. 다크(바탕 < 바닥)와 같은 차례라 그대로 둔다.
+     */
+    topLight = new THREE.DirectionalLight(0xffffff, 0);
+    topLight.position.set(0, 1, 0);
+    scene.add(topLight);
+    scene.add(topLight.target);
 
     var model = build(gltf.scene);
     scene.add(model);
