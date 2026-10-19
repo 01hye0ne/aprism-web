@@ -384,7 +384,7 @@
         '</span>' +
         '<span class="ac-c-mission t-caption" role="gridcell">' + esc(a.mission) + '</span>' +
         '<span class="ac-c-act" role="gridcell">' +
-          '<button type="button" class="btn btn-ghost is-xs" data-report>보고서</button>' +
+          '<button type="button" class="btn btn-ghost is-xs" data-report>안전진단</button>' +
         '</span>' +
       '</div>';
   }
@@ -455,7 +455,7 @@
           pick(row.getAttribute("data-id"));
         }
       });
-      // 줄의 [보고서] — 줄을 고르는 것과 다른 동작이라 전파를 끊는다.
+      // 줄의 [안전진단](10/19 · 예전 [보고서]) — 줄을 고르는 것과 다른 동작이라 전파를 끊는다.
       var report = $(".btn", row);
       if (report) { report.addEventListener("click", function (e) { e.stopPropagation(); }); }
     });

@@ -32,7 +32,7 @@
  *     동시에 켜질 수 없다. -> 전체만 켠 상태로 시작한다.
  * 12. 오탐 가능성 막대에 채움이 없었다(12% 인데 빈 막대). -> 12% 를 실제로 채운다.
  * 13. 빈 Action Slot(64x28)이 줄마다 있고 열 머리에도 빈 칸이 있었다.
- *     v2.2 는 알림마다 [보고서]가 있다 — 그 자리로 채웠다.
+ *     v2.2 는 알림마다 [안전진단](예전 [보고서])이 있다 — 그 자리로 채웠다.
  *
  * ---- 조치 완료 탭 (Figma 1202:16151) -------------------------
  * 그 프레임은 조치 완료 탭만이 아니라 화면 껍데기까지 손본 판이었다 —
@@ -426,11 +426,15 @@
 .ac-row[aria-selected="true"],
 .ac-row[aria-selected="true"]:hover { background-color: var(--bg-raised); }
 
-/* 줄의 [보고서] — 고르거나 손이 닿을 때만 나온다. 40 높이 줄에 늘 떠 있으면 목록이 시끄럽다. */
+/* 줄의 [안전진단](10/19 · 예전 [보고서]) — 고르거나 손이 닿을 때만 나온다. 40 높이 줄에 늘 떠 있으면 목록이 시끄럽다. */
 .ac-row .ac-c-act .btn { visibility: hidden; }
 .ac-row:hover .ac-c-act .btn,
 .ac-row:focus-within .ac-c-act .btn,
 .ac-row[aria-selected="true"] .ac-c-act .btn { visibility: visible; }
+/* 보조 행동이라 무채색 — 메인 v2.2 목록의 [안전진단] 과 같다(색 위계: 파랑은 상태 또는 지금 할 단 하나). */
+.ac-row .ac-c-act .btn { color: var(--text-secondary); }
+.ac-row .ac-c-act .btn:hover,
+.ac-row .ac-c-act .btn:focus-visible { color: var(--text-primary); }
 
 /* ==========================================================
  * 조치 완료 탭 — Figma 1202:16151 "SD-08 알림 센터 · B안 · 조치 완료 기록 상세"
