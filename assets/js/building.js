@@ -178,7 +178,6 @@
   /* ==================================================================
    * 상태바 — 전체 건물 › 층 · 미션 고르기
    * ================================================================== */
-  var crumb = $("[data-bld-crumb]");
   var menuBox = $("[data-bld-menu-box]");
   var trigger = $("[data-bld-trigger]");
   var menu = $("[data-bld-menu]");
@@ -1081,7 +1080,9 @@
     layout(false);
     tip.hidden = true;
     body.classList.add("is-entering");
-    if (crumb) { crumb.textContent = "전체 건물 › " + mission; }   // 메인 v2.2 상태바(전체 건물 › 미션)로 이어진다
+    // 넘어가는 동안 상태바를 메인 v2.2 모양(전체 건물 › [미션 칩])으로 바꿔 둔다 — 10/19 디자이너.
+    // 예전엔 이름 줄에 미션을 붙이고 칩은 "통합 순회 현황" 그대로라 두 미션이 함께 보였다.
+    if (trigger) { trigger.querySelector(".t-title-2").textContent = mission; }
     $$("[data-bld-floor]").forEach(function (b) { b.classList.toggle("is-on", b.getAttribute("data-bld-floor") === f); });
     setTimeout(function () { location.href = mainUrl(mission); }, reduce ? 0 : 760);
   }
@@ -1093,7 +1094,7 @@
     mode = "all";
     cur = null;
     body.classList.remove("is-entering");
-    if (crumb) { crumb.textContent = "전체 건물"; }
+    if (trigger) { trigger.querySelector(".t-title-2").textContent = "통합 순회 현황"; }
     $$("[data-bld-floor]").forEach(function (b) { b.classList.toggle("is-on", b.getAttribute("data-bld-floor") === "all"); });
     layout(true);
   });
