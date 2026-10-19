@@ -803,8 +803,8 @@ window.APRISM_TEXT = (function () {
       "유틸리티 순회": ["B4"],
       "전기실 열화상 점검": ["B3"]
     };
-    // Robot 02 는 B3 를 돌고 계단으로 B4 도크로 복귀하는 중이다(지도 층 이동 시연 ?demo=travel 과 같다).
-    window.APRISM_ROBOT_FLOORS = ["B4", "B3", "B4", "B4", "B3", "B4", "B3", "B3", "B4", "B3", "B3", "B3"];
+    // Robot 02 는 B3(WP-01~12)를 돌고 계단으로 내려와 B4(WP-13~20)를 돈 뒤 B4 도크로 복귀하는 중이다(map.js crossLane).
+    window.APRISM_ROBOT_FLOORS = ["B4", "B4", "B4", "B4", "B3", "B4", "B3", "B3", "B4", "B3", "B3", "B3"];
   }
 
   // 로봇마다 맡은 미션 이름(순번 = data-robot). 미션이 없으면 null.

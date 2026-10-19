@@ -62,7 +62,7 @@
    */
   var ROBOTS = [
     { n: 1,  floor: "B4", st: "run",  mission: "정기 순회 점검",     now: "N₂ 배관 압력 점검",     done: 3,  total: 20, bat: 78, sig: 4, uv: [0.42, 0.40] },
-    { n: 2,  floor: "B3", st: "done", mission: "정기 순회 점검",     now: "복귀 중",               done: 20, total: 20, bat: 18, chg: false, sig: 2, uv: [0.62, 0.66], moving: true },   // B3 → 계단 → B4 도크
+    { n: 2,  floor: "B4", st: "done", mission: "정기 순회 점검",     now: "복귀 중",               done: 20, total: 20, bat: 18, chg: false, sig: 2, uv: [0.70, 0.66], moving: true },   // B3(WP-01~12) → 계단 → B4(WP-13~20) → B4 도크로 복귀 중
     { n: 3,  floor: "B4", st: "idle", mission: null,                          now: "대기 중",               bat: 35, chg: true, sig: 3, uv: [0.90, 0.92], dock: true },
     { n: 4,  floor: "B4", st: "done", mission: "야간 순회 점검",     now: "순회 완료",             done: 20, total: 20, bat: 92, sig: 4, uv: [0.76, 0.92], dock: true },
     { n: 5,  floor: "B3", st: "run",  mission: "발전기실 설비 점검", now: "발전기 베어링 진동 측정", done: 1, total: 20, bat: 64, sig: 3, uv: [0.50, 0.30] },
@@ -87,7 +87,7 @@
    * 그 로봇의 미션 · 층으로 묶인다. uv 는 층 위 표식 자리(임시).
    */
   var ALERTS = [
-    { sev: "critical", robot: 1, floor: "B4", where: "터빈 2 / Unit 03 · WP-04 N₂ 배관 압력계", time: "10:12:40", title: "지하발전소 B3 터빈 2 NG 1건 발견", uv: [0.38, 0.34] },
+    { sev: "critical", robot: 1, floor: "B4", where: "터빈 2 / Unit 03 · WP-04 N₂ 배관 압력계", time: "10:12:40", title: "지하발전소 터빈 2 NG 1건 발견", uv: [0.38, 0.34] },
     { sev: "warning",  robot: 1, floor: "B4", where: "APRO 4F · WP-03 냉각수 배관 밸브",       time: "10:11:19", title: "누출감지 · 냉각수 배관 밸브", uv: [0.30, 0.52] },
     { sev: "warning",  robot: 2, floor: "B3", where: "Robot 02 · WP-06 수배전반",              time: "10:09:42", title: "부분방전 · 이상 점수 9.41", uv: [0.62, 0.22] },
     { sev: "warning",  robot: 2, floor: "B3", where: "Robot 02 · WP-12 냉각 펌프 P-2",         time: "10:06:05", title: "진동 상승 · 냉각 펌프 P-2", uv: [0.64, 0.46] },

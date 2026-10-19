@@ -1739,8 +1739,20 @@
      * book 은 처음 깐 한 바퀴다. 길을 다시 깔아도 좌표집은 그대로 둔다.
      */
     var book = onLane.book || onLane.plan;
+    var segs = onLane.segs;   // 층을 건너는 길(v2.2 crossLane) — [위층 토막, 계단, 아래층 토막]
 
     function spotOf(id, i) {
+      // 층을 건너는 길 — 앞의 split 칸은 위층 토막에, 나머지는 아래층 토막에 고르게 놓는다.
+      if (segs) {
+        var k = onLane.split;
+        var top = i < k;
+        var seg = top ? segs[0] : segs[2];
+        var n = top ? k : list.length - k;
+        var j = top ? i : i - k;
+        var p = pointAt(seg.pts, seg.mi, seg.len * (j + 0.5) / Math.max(1, n));
+        p.userData = { floor: seg.floor };
+        return p;
+      }
       if (book && book.names) {
         var k = book.names.indexOf(id);
         if (k > 0 && book.wpWorld && book.wpWorld[k - 1]) { return book.wpWorld[k - 1].clone(); }
@@ -1749,21 +1761,33 @@
       return alongRoute(onLane.turns, onLane.mile, onLane.total * (i / list.length));
     }
 
+    // 표식은 층 · 색마다 한 벌 — 층을 건너는 길이면 보는 층의 것만 켠다(wpFloorSync).
     var bucket = {};
     list.forEach(function (info, i) {
       var spot = spotOf(info.id, i);
-      wpSpots.push({ id: info.id, spot: spot, info: info });
-      (bucket[info.tone] = bucket[info.tone] || []).push(spot);
+      var fl = (spot.userData && spot.userData.floor) || "";
+      wpSpots.push({ id: info.id, spot: spot, info: info, floor: fl });
+      var key = fl + "|" + info.tone;
+      (bucket[key] = bucket[key] || []).push(spot);
     });
 
-    Object.keys(bucket).forEach(function (tone) {
-      var mark = stopDots(bucket[tone], WP_TINT[tone] || WP_TINT.upcoming,
+    Object.keys(bucket).forEach(function (key) {
+      var tone = key.split("|")[1];
+      var mark = stopDots(bucket[key], WP_TINT[tone] || WP_TINT.upcoming,
         tone === "upcoming" ? "ring" : "full", 15);
+      mark.userData.floor = key.split("|")[0];
       scene.add(mark);
       wpMarks.push(mark);
     });
+    wpFloorSync();
 
     haloWaypoint();
+  }
+
+  // 층을 건너는 길의 표식 — 보는 층의 것만 보인다(층 이름이 없는 표식은 손대지 않는다).
+  function wpFloorSync() {
+    wpMarks.forEach(function (m) { if (m.userData.floor) { m.visible = m.userData.floor === floorNow; } });
+    if (wpHalo && wpHalo.userData.floor) { wpHalo.visible = wpHalo.userData.floor === floorNow; }
   }
 
   function haloWaypoint() {
@@ -1777,6 +1801,8 @@
     if (!found.length || !scene) { return; }
     wpHalo = stopDots(found.map(function (w) { return w.spot; }), WP_HALO, "halo", 28);
     wpHalo.renderOrder = 4;
+    wpHalo.userData.floor = found[0].floor || "";
+    if (wpHalo.userData.floor) { wpHalo.visible = wpHalo.userData.floor === floorNow; }
     scene.add(wpHalo);
   }
 
@@ -1786,6 +1812,7 @@
     var w = view.clientWidth || 1, h = view.clientHeight || 1;
     var near = null, best = 14 * 14;
     wpSpots.forEach(function (mark) {
+      if (mark.floor && mark.floor !== floorNow) { return; }
       var p = mark.spot.clone().project(camera);
       var x = (p.x * 0.5 + 0.5) * w, y = (-p.y * 0.5 + 0.5) * h;
       var gap = (x - px) * (x - px) + (y - py) * (y - py);
@@ -1930,6 +1957,10 @@
    */
   function placeBot() {
     if (!botBox || !onLane || botBox.hidden) { return; }
+    // 층을 건너는 길(crossLane)의 로봇은 제 층에서만 보인다 — B4 에 선 로봇이 B3 화면에 뜨면 안 된다.
+    var away = onLane.floor && onLane.floor !== "stair" && floors.length && onLane.floor !== floorNow;
+    botBox.style.visibility = away ? "hidden" : "";
+    if (away) { return; }
 
     var v = view.getBoundingClientRect();
     var c = hit.getBoundingClientRect();
@@ -2113,9 +2144,18 @@
     if (chosenWp && from === "panel") {
       var found = wpSpots.filter(function (w) { return w.id === chosenWp; })[0];
       if (found && renderer) {
-        var z = Math.max(zoom, 2.4);
-        setFocusWorld(found.spot);     // 고른 웨이포인트가 기준이다
-        glide(yaw, pitch, z, aimAt(found.spot, z));
+        var go = function () {
+          var z = Math.max(zoom, 2.4);
+          setFocusWorld(found.spot);     // 고른 웨이포인트가 기준이다
+          glide(yaw, pitch, z, aimAt(found.spot, z));
+          placeWp();
+        };
+        // 다른 층의 웨이포인트(알림)면 그 층으로 먼저 옮긴 뒤 다가간다(v2.2 · 10/19).
+        if (found.floor && found.floor !== floorNow) {
+          goFloor(found.floor, "button");
+          var wait = function () { if (floorBusy) { window.setTimeout(wait, 60); } else { go(); } };
+          window.setTimeout(wait, 60);
+        } else { go(); }
       }
     }
     if (from !== "panel") {
@@ -2721,6 +2761,7 @@
       node.textContent = floorLabel(floorNow);
     });
     document.dispatchEvent(new CustomEvent("aprism:floor", { detail: { floor: floorNow } }));
+    wpFloorSync();
   }
 
   // 로봇 · 길 · 웨이포인트는 로봇이 선 층에만 깔린다.
@@ -3144,7 +3185,8 @@
     part.left.geometry.instanceCount = n - k;
   }
 
-  function travelBuild(up, low) {
+  // tour — 위층에서 계단에 닿기 전에 들를 자리(모델 상자 비율 [x, z]). 없으면 계단 앞에서 바로 출발한다(시연).
+  function travelBuild(up, low, tour) {
     var box = modelBox, size = box.getSize(new THREE.Vector3());
     function world(fx, fz) { return new THREE.Vector3(box.min.x + fx * size.x, 0, box.min.z + fz * size.z); }
     var bot = ROBOTS[1];
@@ -3155,8 +3197,10 @@
       return b.exit.distanceTo(dest[0]) < a.exit.distanceTo(dest[0]) ? b : a;
     });
     var start = flight.entry.clone().add(new THREE.Vector3(14, 0, -10));
+    var via = (tour || []).map(function (q) { return world(q[0], q[1]); });
+    if (via.length) { start = via.shift(); }
 
-    var aPts = routeOnNav(up, [start, flight.entry]);
+    var aPts = routeOnNav(up, [start].concat(via).concat([flight.entry]));
     // 위층 출입 지점 -> 층계참 -> 단을 하나씩 -> 아래층 입구 -> 아래층 출입 지점
     var sPts = [flight.entry].concat(flight.path.map(function (q) { return q.clone(); })).concat([flight.exit]);
     var bPts = routeOnNav(low, [flight.exit].concat(dest));
@@ -3296,7 +3340,10 @@
       part.done.visible = on; part.left.visible = on;
     });
     trav.fan.visible = tracked && (trav.floor === floorNow || trav.floor === "stair" || both);
-    if (tracked) { wpMarks.forEach(function (m) { m.visible = floorNow === trav.low; }); }
+    if (tracked) {
+      wpMarks.forEach(function (m) { m.visible = floorNow === (m.userData.floor || trav.low); });
+      if (wpHalo) { wpHalo.visible = floorNow === (wpHalo.userData.floor || trav.low); }
+    }
 
     // 트래킹 — 칩(층 이동 중)
     var chipOn = tracked && trav.phase === "stair";
@@ -3467,6 +3514,38 @@
     if (was) { onLane = null; }
     layRobots();
     plan();
+  }
+
+  /*
+   * 층을 건너는 길 — v2.2(10/19 디자이너). 미션은 층에 속하지 않는다.
+   * 정기 순회 점검의 ROBOT 02 는 B3 를 돌고(WP-01~12) 계단으로 내려와 B4 를 돌고(WP-13~20) B4 도크로 간다.
+   * 층 이동 시연(travelBuild)의 길을 그대로 쓰되 움직이지 않는다 — 지금은 B4 를 거의 다 돈 자리다.
+   * 고른 로봇이 이 로봇이면 토막 · 표식은 보는 층의 것만 켜진다(travelSync · wpFloorSync).
+   * 실데이터가 붙으면 trav.s 만 로봇 위치로 옮기면 된다(그때 travelTick 이 층을 따라간다).
+   */
+  // tour — B3 를 한 바퀴 도는 자리(모델 상자 비율). 길찾기가 벽을 피해 이어 준다.
+  var CROSS = { up: "B3", low: "B4", split: 12, at: 0.92,
+    tour: [[0.62, 0.30], [0.30, 0.30], [0.20, 0.55], [0.45, 0.70], [0.70, 0.62]] };
+  function crossLane() {
+    if (!document.body.classList.contains("v2-2") || floors.length < 2 || trav) { return; }
+    var built = travelBuild(CROSS.up, CROSS.low, CROSS.tour);
+    if (!built) { return; }
+    trav = built;
+    lanes["1"] = built.lane;
+    built.lane.segs = built.segs;
+    built.lane.split = CROSS.split;
+    trav.s = built.s3 * CROSS.at;
+    trav.phase = "walk2";
+    trav.floor = CROSS.low;
+    trav.saidFloor = CROSS.low;
+    built.lane.floor = CROSS.low;
+    var here = where(trav.s), ahead = where(Math.min(trav.s3, trav.s + 1.5));
+    built.lane.here.copy(here);
+    built.lane.ahead.copy(ahead);
+    built.segs.forEach(function (part) { showPart(part, trav.s); });
+    built.fan.position.copy(here);
+    built.fan.position.y += span * 0.002;
+    built.fan.rotation.y = Math.atan2(ahead.x - here.x, ahead.z - here.z);
   }
 
   /*
@@ -4229,6 +4308,7 @@
       var planned = planRobot(bot, id);
       drawRoute(planned ? planned.world : layRoute(box, [bot.dock].concat(bot.stops)), bot, id, planned);
     });
+    crossLane();
     layRobots();
     // 계획표는 지도(three.js 를 받아 온다)보다 먼저 선다 — 그동안 온 계획을 여기서 받는다.
     if (missionPlan) { replanMission(); }

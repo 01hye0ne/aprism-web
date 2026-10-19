@@ -92,6 +92,9 @@
     lead: "현장에 무전으로 작업 중지를 요청하세요.", fp: 8, fpLabel: "낮음",
     acts: [{ t: "현장 무전 연락 · 작업 중지 요청", ai: true }, { t: "로봇 정지 · 현장 점검 요청", ai: true }, { t: "재측정 후 판단" }] };
 
+  // v2.2 — 제목의 층(B3)이 층 꼬리표(B4)와 어긋나 뺐다(10/19 디자이너). 예전 판(v2 · v2.1)은 그대로다.
+  if (body.classList.contains("v2-2")) { CRITICAL.title = "지하발전소 터빈 2 NG 1건 발견"; }
+
   // 검토용 단계 — 주소 끝 #… 로 고른다. few 는 알림은 있지만 Delta 종합 기준에 못 미친 판이다.
   var SETS = {
     normal: function () { return []; },
