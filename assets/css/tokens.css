@@ -64,6 +64,7 @@
   --color-red-200: #FFA69A;
   --color-red-300: #FF6B72;
   --color-red-500: #FF383C;
+  --color-red-600: #DC322A;   /* 10/19 — 500 · 700 사이. 라이트 위험 칩 기호(status/critical/icon-subtle) */
   --color-red-700: #B92B18;
   --color-red-800: #8A2012;
   --color-red-900: #421A13;
@@ -333,7 +334,7 @@
   --status-warning-border: var(--color-yellow-300);
   --status-warning-text: var(--color-yellow-700);
   --status-warning-icon: var(--color-yellow-700);
-  --status-critical-icon-subtle: var(--color-red-500);
+  --status-critical-icon-subtle: var(--color-red-600);
 }
 
 /*
@@ -473,7 +474,7 @@
   --status-warning-icon: var(--color-yellow-700);
   --state-hover-raised: var(--color-gray-100);
   color-scheme: light;
-  --status-critical-icon-subtle: var(--color-red-500);
+  --status-critical-icon-subtle: var(--color-red-600);
 }
 
 /* ---------- Semantic · Dark ---------- */
