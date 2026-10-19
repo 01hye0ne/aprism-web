@@ -2508,5 +2508,13 @@ a.map-floor {
 .v2-2 .timeline-item[data-wp-alert] .step-times-foot { display: flex; }
 /* 시각 줄이 있는 칸은 아래 여백 12 → 8 — 작은 시각 글자 밑에 12 가 남아 칸이 아래로 처져 보였다(10/19). */
 .v2-2 .step-card:has(> .step-times-foot) { padding-bottom: var(--space-8); }
+/*
+ * 칸 사이 간격을 8 하나로(10/19). 안 간 칸은 칸 높이 최소값(68) 때문에 아래가 비어 사이가 24 로 벌어졌고,
+ * 나머지는 위 8 + 아래 4 = 12 였다. 최소 높이를 풀고 위아래 4 씩 둔다.
+ * 표식이 카드 첫 줄 가운데에 오도록 레일 머리 선도 4 만큼 줄인다(18 → 14).
+ */
+.v2-2 .timeline-item { min-height: 0; }
+.v2-2 .step-wrap { padding: var(--space-4) 0; }
+.v2-2 .rail-stub { height: 14px; }
 .map-wp-time { margin: 0; color: var(--text-tertiary); }
 .map-wp-time[hidden] { display: none; }
