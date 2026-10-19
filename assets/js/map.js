@@ -177,7 +177,7 @@
    */
   var LIGHT = {
     face: { floor: 0xa3a9b3, wall: 0xd0d4db, equipment: 0xcbd0d8, stairs: 0xd8dce3, other: 0xd0d4db },
-    edge: 0x8b94a1, ghost: 0xeef0f3, grid: 0xaab1bd,
+    edge: 0x8b94a1, ghost: 0xeef0f3, grid: 0x8a93a5,
     pickFace: 0x6b7586, pickLine: 0x2b2f36, hoverLine: 0x4b4f57
   };
   var LIGHT_LIFT = 1.2;
