@@ -666,7 +666,7 @@
      */
     var useDeid = body.classList.contains("v2-2");
     function liveSrc(a) {
-      if (useDeid && a.live === "ppe") { return "../assets/img/alert-live-deid-grid.webp"; }
+      if (useDeid && a.live === "ppe") { return "../assets/img/alert-live-deid-grid.webp?v=12"; }   // 그림을 바꾸면 v 를 올린다(캐시)
       return "../assets/img/alert-live-" + a.live + ".webp";
     }
 
