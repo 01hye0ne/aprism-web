@@ -1139,8 +1139,8 @@ window.APRISM_TEXT = (function () {
     if (v22) {
       /*
        * v2.2(10/19 디자이너) — 번호 옆에 지점 이름(한 줄), 그 아래 설명, 시각 · 소요는 맨 아래.
-       * 시각 줄은 지금 도는 칸과 알림이 난 지난 칸(주의 · 위험)에만 보인다(CSS). 정상으로 지난 칸 · 안 간 칸은
-       * 시각을 감춘다 — 예정은 진행 막대의 "종료 예상" 이, 지난 칸 시각은 지도 쪽지가 말한다(data-wp-time).
+       * 시각 줄은 지금 도는 칸 · 지난 칸에 보인다(CSS, 왼쪽 정렬 — 10/19 2차). 안 간 칸만 감춘다 —
+       * 예정은 진행 막대의 "종료 예상" 이 말한다. 지도 쪽지에도 시각 · 소요가 붙는다(data-wp-time).
        */
       titleRow.insertBefore(metaRow.firstChild, titleRow.firstChild);
       head.appendChild(titleRow);
