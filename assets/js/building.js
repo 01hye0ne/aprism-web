@@ -332,6 +332,9 @@
     var counts = { all: all.length, critical: 0, warning: 0 };
     all.forEach(function (a) { counts[a.sev] += 1; });
     $$("[data-ah-count]").forEach(function (n) { n.textContent = counts[n.getAttribute("data-ah-count")]; });
+    // 테두리 · Delta 판 단계 = 남은 알림 중 가장 높은 단계(메인 v2.2 monitor.js 와 같은 신호, 10/19)
+    var top = counts.critical ? "critical" : counts.warning ? "warning" : null;
+    document.dispatchEvent(new CustomEvent("aprism:severity", { detail: { level: top, glow: top } }));
     $$("[data-ah-filter]").forEach(function (b) {
       b.setAttribute("aria-pressed", b.getAttribute("data-ah-filter") === filter ? "true" : "false");
     });
