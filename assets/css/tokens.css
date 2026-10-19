@@ -231,8 +231,8 @@
   --comp-gnb-brand: var(--color-blue-600);
   --bg-page: var(--color-gray-200);
   --bg-panel: var(--color-gray-50);
-  --comp-button-accent-bg-hover: var(--color-blue-800);
-  --comp-button-accent-bg-pressed: var(--color-blue-900);
+  --comp-button-accent-bg-hover: var(--color-blue-900);
+  --comp-button-accent-bg-pressed: var(--color-blue-950);
   --comp-button-danger-bg-hover: var(--color-red-800);
   --comp-button-danger-bg-pressed: var(--color-red-900);
   --state-hover: var(--color-gray-100);
@@ -261,7 +261,7 @@
   --input-border-default: var(--color-gray-500);
   --border-focus: var(--color-blue-500);
   --border-strong: var(--color-gray-0);
-  --comp-button-accent-bg-default: var(--color-blue-700);
+  --comp-button-accent-bg-default: var(--color-blue-800);
   --comp-button-accent-bg-disabled: var(--color-gray-100);
   --comp-button-accent-text-default: var(--color-gray-0);
   --comp-button-accent-text-disabled: var(--color-gray-400);
@@ -333,6 +333,7 @@
   --status-warning-border: var(--color-yellow-300);
   --status-warning-text: var(--color-yellow-700);
   --status-warning-icon: var(--color-yellow-700);
+  --status-critical-icon-subtle: var(--color-red-500);
 }
 
 /*
@@ -369,8 +370,8 @@
   --comp-gnb-brand: var(--color-blue-600);
   --bg-page: var(--color-gray-200);
   --bg-panel: var(--color-gray-50);
-  --comp-button-accent-bg-hover: var(--color-blue-800);
-  --comp-button-accent-bg-pressed: var(--color-blue-900);
+  --comp-button-accent-bg-hover: var(--color-blue-900);
+  --comp-button-accent-bg-pressed: var(--color-blue-950);
   --comp-button-danger-bg-hover: var(--color-red-800);
   --comp-button-danger-bg-pressed: var(--color-red-900);
   --state-hover: var(--color-gray-100);
@@ -398,7 +399,7 @@
   --input-border-default: var(--color-gray-500);
   --border-focus: var(--color-blue-500);
   --border-strong: var(--color-gray-0);
-  --comp-button-accent-bg-default: var(--color-blue-700);
+  --comp-button-accent-bg-default: var(--color-blue-800);
   --comp-button-accent-bg-disabled: var(--color-gray-100);
   --comp-button-accent-text-default: var(--color-gray-0);
   --comp-button-accent-text-disabled: var(--color-gray-400);
@@ -472,6 +473,7 @@
   --status-warning-icon: var(--color-yellow-700);
   --state-hover-raised: var(--color-gray-100);
   color-scheme: light;
+  --status-critical-icon-subtle: var(--color-red-500);
 }
 
 /* ---------- Semantic · Dark ---------- */
@@ -624,6 +626,7 @@
   --status-warning-border: var(--color-yellow-700);
   --status-warning-text: var(--color-yellow-300);
   --status-warning-icon: var(--color-yellow-500);
+  --status-critical-icon-subtle: var(--color-red-300);
 }
 
 /*

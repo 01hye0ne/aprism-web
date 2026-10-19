@@ -1190,8 +1190,10 @@ a.map-floor {
  * 여백 8/12 · 간격 4 는 Badge 그대로다.
  */
 .ma-badge-ic { --i: var(--ic-warning); width: 14px; height: 14px; color: var(--status-warning-icon); }
+/* 위험 칩의 기호는 글자와 명도차를 줄인 status/critical/icon-subtle(다크 red-300)이다(10/19 디자이너).
+   목록 · 지도의 위험 기호는 그대로 진한 status/critical/icon(red-500) — 칩 안에서만 글자와 한 톤으로 묶는다. */
 .map-alert.is-critical .ma-badge-ic,
-.ma-zoom.is-critical .ma-badge-ic { --i: var(--ic-error); color: var(--status-critical-icon); }
+.ma-zoom.is-critical .ma-badge-ic { --i: var(--ic-error); color: var(--status-critical-icon-subtle); }
 
 /* 높이를 정하고 폭은 그림 비율대로 따라가게 둔다 — 폭을 못 박으면 좌우에 빈 띠가 생긴다. */
 .ma-zoom-img {
@@ -2279,12 +2281,14 @@ a.map-floor {
 .ma-check[aria-checked="true"] .ma-check-box { border-color: transparent; background-color: var(--comp-gnb-brand); }
 .ma-check[aria-checked="true"] .ma-check-box .i { opacity: 1; }
 .ma-check-label { flex: 1 1 auto; min-width: 0; }
-/* AI 추천 꼬리표 — Tag/Emphasis=Brand */
+/* AI 추천 꼬리표 — Tag/Emphasis=Brand.
+ * 면은 체크 상자와 같은 comp/gnb/brand(blue-600)다(10/19) — 버튼(blue-800)보다 한 단 옅어야
+ * 단 하나의 행동인 [조치 완료]가 가장 진하게 읽힌다. 예전엔 버튼과 같은 색이라 작은 꼬리표가 더 세 보였다. */
 .ma-check-tag {
   flex: none;
   padding: var(--space-2) var(--space-8);
   border-radius: var(--radius-4);
-  background-color: var(--comp-button-accent-bg-default);
+  background-color: var(--comp-gnb-brand);
   color: var(--color-gray-0);
   font-size: var(--font-size-13);
   line-height: var(--font-line-height-18);
