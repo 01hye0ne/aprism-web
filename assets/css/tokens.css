@@ -79,6 +79,9 @@
   --color-yellow-200: #F8EBAE;
   --color-yellow-300: #EEDA6B;
   --color-yellow-500: #FFCC00;
+  /* 10/19 — 라이트 주의 기호. 700(#8C7400)은 노랑을 어둡게만 내려 올리브로 탁했다.
+     색상을 호박 쪽(49° → 39°)으로 돌려 밝기를 살렸다. 흰 면 3.6:1 · gray/100 3.2:1(그래픽 3:1 이상). */
+  --color-yellow-600: #B87A00;
   --color-yellow-700: #8C7400;
   --color-yellow-900: #383116;
 
@@ -333,7 +336,7 @@
   --status-warning-bg: var(--color-yellow-100);
   --status-warning-border: var(--color-yellow-300);
   --status-warning-text: var(--color-yellow-700);
-  --status-warning-icon: var(--color-yellow-700);
+  --status-warning-icon: var(--color-yellow-600);
   --status-critical-icon-subtle: var(--color-red-600);
 }
 
@@ -471,7 +474,7 @@
   --status-warning-bg: var(--color-yellow-100);
   --status-warning-border: var(--color-yellow-300);
   --status-warning-text: var(--color-yellow-700);
-  --status-warning-icon: var(--color-yellow-700);
+  --status-warning-icon: var(--color-yellow-600);
   --state-hover-raised: var(--color-gray-100);
   color-scheme: light;
   --status-critical-icon-subtle: var(--color-red-600);
