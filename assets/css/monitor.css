@@ -2030,6 +2030,9 @@ a.map-floor {
 /* 바깥 모서리 16 — 안쪽 DELTA 카드(12)보다 한 단 크게 둔다(10/16 디자이너, Figma 4 에서 올림). */
 .map-alert.ma-v3 {
   --ma-r: 16px;
+  /* 안쪽 칸의 모서리 — 테두리 1 안쪽 곡선(16 - 1)에 맞춘다. 16 그대로면 칸 모서리가 테두리 곡선에서 떨어져
+     모서리에서만 틈이 벌어져 바깥 줄이 둥글게 안 감긴 것처럼 보였다(10/19). */
+  --ma-r-in: calc(var(--ma-r) - 1px);
   isolation: isolate;
   border-color: var(--border-strong);
   border-radius: var(--ma-r);
@@ -2044,7 +2047,7 @@ a.map-floor {
 /* 머리 — Head 368 · padding 12 · gap 8 · bg/raised */
 .ma-v3 .ma-head {
   padding: var(--space-12);
-  border-radius: var(--ma-r) var(--ma-r) 0 0;
+  border-radius: var(--ma-r-in) var(--ma-r-in) 0 0;
   background-color: var(--bg-raised);
 }
 .ma-v3 .ma-title { font-size: var(--font-size-18); line-height: var(--font-line-height-26); font-weight: 700; }
@@ -2156,30 +2159,35 @@ a.map-floor {
 :root[data-theme="light"] .v2-2 { --ma-sink: var(--color-gray-100); }
 .ma-v3 .ma-lower {
   margin-top: -40px;
-  border-radius: 0 0 var(--ma-r) var(--ma-r);
+  border-radius: 0 0 var(--ma-r-in) var(--ma-r-in);
 }
 /*
  * 이음새 없이(10/19 디자이너) — 위 끝은 사진이 녹아드는 40 동안 투명에서 raised 로 서서히 차오르고(딱 끊기던 줄),
  * 아래 끝은 버튼 줄 유리와 같은 색(--ma-sink 62%)으로 끝난다. 아래로 갈수록 흐림도 버튼 줄만큼 짙어진다(::before).
  */
 .ma-v3 .ma-lower-in {
-  background: linear-gradient(to bottom,
-    transparent 0, var(--bg-raised) 40px,
-    color-mix(in srgb, var(--ma-sink) 62%, transparent) 100%);
+  background: linear-gradient(to bottom, transparent 0, var(--bg-raised) 40px, transparent 100%);
 }
+/*
+ * 아래 칸(DELTA 둘레)과 버튼 줄은 유리 한 장이다(10/19) — 칸마다 따로 칠하면 흐림이 칸 경계에서 끊겨 판이 둘로 나뉘어 보였다.
+ * 유리(색 --ma-sink 62% · 흐림 18)는 아래 칸 전체 뒤에 한 번만 깔고, 위쪽은 사진이 녹아드는 자리부터 서서히 드러난다.
+ * 위 칸(.ma-lower-in)은 raised 에서 투명으로 풀려 이 유리 위에 얹힌다.
+ */
 .ma-v3 .ma-lower::before {
   content: "";
   position: absolute;
   inset: 40px 0 0;
   z-index: -1;
+  border-radius: inherit;
+  background-color: color-mix(in srgb, var(--ma-sink) 62%, transparent);
   -webkit-backdrop-filter: blur(18px) saturate(140%);
   backdrop-filter: blur(18px) saturate(140%);
-  -webkit-mask-image: linear-gradient(to bottom, transparent, #000);
-  mask-image: linear-gradient(to bottom, transparent, #000);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 120px);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 120px);
   pointer-events: none;
 }
-.ma-v3.no-snap .ma-lower::before { inset: 0; }
-.ma-v3.no-snap .ma-lower-in { background: linear-gradient(to bottom, var(--bg-raised), color-mix(in srgb, var(--ma-sink) 62%, transparent)); }
+.ma-v3.no-snap .ma-lower::before { inset: 0; -webkit-mask-image: none; mask-image: none; }
+.ma-v3.no-snap .ma-lower-in { background: linear-gradient(to bottom, var(--bg-raised), transparent); }
 .ma-v3.no-snap .ma-lower { margin-top: 0; }
 /* DELTA 카드 둘레 여백 8 — 카드 폭 352(Figma 10/16 수정, 4 → 8) */
 .ma-v3 .ma-lower-in { padding: var(--space-8); }
@@ -2305,10 +2313,8 @@ a.map-floor {
  */
 .ma-v3 .ma-actions {
   padding: var(--space-12);
-  border-radius: 0 0 var(--ma-r) var(--ma-r);
-  background-color: color-mix(in srgb, var(--ma-sink) 62%, transparent);
-  -webkit-backdrop-filter: blur(18px) saturate(140%);
-  backdrop-filter: blur(18px) saturate(140%);
+  border-radius: 0 0 var(--ma-r-in) var(--ma-r-in);
+  background: none;   /* 유리는 아래 칸(.ma-lower::before)이 버튼 줄까지 한 장으로 깐다 */
 }
 
 /* 패널에 고정(도킹) — 웨이포인트를 따라다니지 않고 지도 칸 오른쪽 위(지도 도구 옆)에 선다 */
