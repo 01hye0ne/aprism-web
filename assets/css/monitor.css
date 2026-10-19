@@ -2558,3 +2558,17 @@ a.map-floor {
 :root[data-theme="light"] .v2-2 .rail-line,
 :root[data-theme="light"] .v2-2 .is-running .rail-line,
 :root[data-theme="light"] .v2-2 .is-pending .rail-line { background-color: var(--bg-raised); }
+
+/*
+ * 라이트 오른쪽 패널 위계(10/19 디자이너) — 다크와 같은 차례로 쌓는다.
+ *   다크  패널(gray/750 55% 유리) < 안 상자(로봇 칸 · 웨이포인트 목록, 더 어둡게) < 카드(bg/cell, 가장 밝다)
+ *   라이트 예전엔 패널이 흰 유리(가장 밝음)이고 카드(gray/100)가 그보다 어두웠다.
+ * 패널을 gray/200 유리로 한 단 내리고, 카드(웨이포인트 칸 · 로봇 상태 줄)는 흰 면으로 올린다.
+ * 전체 층 현황(building.css)의 로봇 줄 · 운행 막대도 같은 규칙이다.
+ */
+:root[data-theme="light"] .v2-2 .floating .right-panel { --map-glass-bg: color-mix(in srgb, var(--color-gray-200) 80%, transparent); }
+/* 지금 도는 칸(.is-running)은 짙은 면 그대로 — "지금 여기" 는 대비가 가장 센 면이다(색 규칙 5). */
+:root[data-theme="light"] .v2-2 .timeline .timeline-item:not(.is-running) .step-card,
+:root[data-theme="light"] .v2-2 .robot-strip.is-carousel .robot-row { background-color: var(--bg-raised); }
+/* 흰 카드 위 번호 칸(bg/panel = gray/50)이 묻히므로 한 단 낮은 bg/cell */
+:root[data-theme="light"] .v2-2 .timeline .timeline-item:not(.is-running) .step-no { background-color: var(--bg-cell); }

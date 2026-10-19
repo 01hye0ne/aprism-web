@@ -455,7 +455,7 @@ button.bld-g-row:hover .bld-g-name { color: var(--text-primary); }
  * 다크는 패널(유리 gray/750 55%)이 어둡고 카드(bg/cell)가 한 단 밝다. 라이트는 흰 유리(70%) 위에
  * gray/100 카드라 거꾸로 카드가 더 어두웠다. 패널은 gray/200 유리로 한 단 내리고, 카드는 흰 면(bg/raised)으로 올린다.
  */
-:root[data-theme="light"] .is-building .bld-panel { --map-glass-bg: color-mix(in srgb, var(--color-gray-200) 80%, transparent); }
+/* 패널 면은 메인 v2.2 와 함께 monitor.css 가 맡는다(라이트 오른쪽 패널 gray/200 유리). */
 :root[data-theme="light"] .is-building .bld-robot,
 :root[data-theme="light"] .is-building .bld-g-track { background-color: var(--bg-raised); }
 :root[data-theme="light"] .is-building .bld-robot:hover { background-color: var(--color-gray-50); }
