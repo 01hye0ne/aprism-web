@@ -118,7 +118,7 @@
     <!-- 10/19 디자이너 시안 — Figma UI_99 1818:67890 "비식별화". 칸 18 · 틈 2(검정) · 감지 상자 테두리 1 · 위 라벨(클래스/안전모). -->
     <figure class="view">
       <canvas data-view="grid" width="960" height="640"></canvas>
-      <figcaption><b>격자 모자이크 · 감지 라벨</b><span>칸 평균색 사이에 검은 틈을 두어 타일로 읽힌다. 감지 상자와 라벨(클래스 / 안전모 착용)을 함께 그린다. 크기는 화면 px 기준(Figma 값).</span></figcaption>
+      <figcaption><b>격자 모자이크 · 감지 라벨</b><span>칸 평균색 둥근 타일(Delta 점과 같은 모서리 비율 25%) 사이에 검은 틈을 둔다. 감지 상자와 라벨(클래스 / 안전모 착용)을 함께 그린다. 크기는 화면 px 기준(Figma 값).</span></figcaption>
     </figure>
   </main>
 
@@ -198,6 +198,10 @@
       <label for="ggap">칸 틈 (px) <output data-out="ggap"></output></label>
       <input type="range" id="ggap" data-p="ggap" min="0" max="6" step="0.5" />
     </div>
+    <div class="row">
+      <label for="ground">모서리 둥글기 (%) <output data-out="ground"></output></label>
+      <input type="range" id="ground" data-p="ground" min="0" max="50" step="1" />
+    </div>
     <div class="row check">
       <input type="checkbox" id="glabel" data-p="glabel" />
       <label for="glabel">감지 상자 · 라벨 보이기</label>
@@ -212,6 +216,6 @@
   </aside>
 
   <script src="../assets/js/hatch-sample.js?v=b150cee2"></script>
-  <script src="../assets/js/deid-lab.js?v=90c9fc33"></script>
+  <script src="../assets/js/deid-lab.js?v=f45848e4"></script>
 </body>
 </html>

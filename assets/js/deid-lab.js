@@ -7,7 +7,7 @@
  *   mosaic      칸마다 평균색 하나
  *   hatch       줄무늬 · 줄 굵기 = 칸 평균 밝기(점 단위 정보는 이미 없다)
  *   silhouette  줄무늬 · 줄 굵기 고정 — 칸 사이 차이도 없다
- *   grid        격자 모자이크 — 칸 평균색 타일 사이에 검은 틈 + 감지 상자 · 라벨(10/19 디자이너, Figma UI_99 1818:67890)
+ *   grid        격자 모자이크 — 칸 평균색 둥근 타일(Delta 점 비율) 사이에 검은 틈 + 감지 상자 · 라벨(10/19 디자이너, Figma UI_99 1818:67890)
  *
  * 기본은 가로 일자 줄(0°)이다(2026-10-12 디자이너가 사선 대신 고름).
  * 각도를 57° 로 두면 로고 A 의 다리 기울기가 된다(brand-mark.svg 실측 — 꼭짓점 (14.3, 0.2) → 밑 (3.2, 17.1)).
@@ -43,6 +43,8 @@
     // 격자 모자이크 — Figma 셰이더(픽셀화) 값: size 18 · gap 2 · 평균색 100%. 화면 px 기준이라 그릴 때 캔버스 배율을 곱한다.
     gcell: 18,
     ggap: 2,
+    // 칸 모서리 — Delta 점(8 네모 · rx 2)과 같은 비율, 한 변의 25%(10/19 디자이너)
+    ground: 25,
     glabel: true
   };
 
@@ -193,6 +195,7 @@
     var cv = ctx.canvas;
     var k = cv.width / (cv.clientWidth || cv.width);
     var c = P.gcell * k, g = P.ggap * k;
+    var tile = c - g, rad = Math.min(tile / 2, tile * P.ground / 100);
     var out = ctx.createImageData(W, H);
     out.data.set(src);
     var d = out.data;
@@ -205,9 +208,14 @@
           var fx = (x - r[0]) % c;
           var i = (y * W + x) * 4;
           // 틈은 칸 오른쪽 · 아래에 둔다 — 상자 왼쪽 위에서 첫 칸이 바로 시작한다.
-          if (fx >= c - g || fy >= c - g) { d[i] = 0; d[i + 1] = 0; d[i + 2] = 0; continue; }
+          if (fx >= tile || fy >= tile) { d[i] = 0; d[i + 1] = 0; d[i + 2] = 0; continue; }
+          // 둥근 네모 — 점 가운데(+0.5)에서 모서리 원까지 거리로 덮임을 잰다. 가장자리 1px 은 검정과 섞는다.
+          var px = fx + 0.5, py = fy + 0.5;
+          var ex = Math.max(rad - px, px - (tile - rad), 0);
+          var ey = Math.max(rad - py, py - (tile - rad), 0);
+          var cov = rad > 0 ? Math.min(1, Math.max(0, rad - Math.sqrt(ex * ex + ey * ey) + 0.5)) : 1;
           var j = (row * cs.cols + Math.floor((x - r[0]) / c)) * 4;
-          d[i] = cs.sum[j]; d[i + 1] = cs.sum[j + 1]; d[i + 2] = cs.sum[j + 2];
+          d[i] = cs.sum[j] * cov; d[i + 1] = cs.sum[j + 1] * cov; d[i + 2] = cs.sum[j + 2] * cov;
         }
       }
     });
