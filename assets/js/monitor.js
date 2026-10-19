@@ -660,12 +660,13 @@
     });
 
     /*
-     * v2.2 — 사람이 찍힌 검출 캡처(ppe) 자리에 비식별화가 적용된 현장 그림을 쓴다(디자이너가 준 그림,
-     * 비교판 screens/deid-lab.html 의 줄무늬 결과). 실제로는 서버가 이미 가린 영상을 보낸다는 뜻이다.
+     * v2.2 — 사람이 찍힌 검출 캡처(ppe) 자리에 비식별화가 적용된 현장 그림을 쓴다. 실제로는 서버가 이미 가린 영상을 보낸다는 뜻이다.
+     * 10/19 디자이너 — 줄무늬(alert-live-deid.webp)에서 격자 모자이크로 바꿨다. 비교판 screens/deid-lab.html 의
+     * "격자 모자이크 · 감지 라벨" 을 팝오버 폭(370)에서 칸 18 · 틈 2 · 모서리 16% 로 뽑은 그림이다.
      */
     var useDeid = body.classList.contains("v2-2");
     function liveSrc(a) {
-      if (useDeid && a.live === "ppe") { return "../assets/img/alert-live-deid.webp"; }
+      if (useDeid && a.live === "ppe") { return "../assets/img/alert-live-deid-grid.webp"; }
       return "../assets/img/alert-live-" + a.live + ".webp";
     }
 
