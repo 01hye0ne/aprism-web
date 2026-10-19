@@ -697,3 +697,145 @@
  */
 :root { --state-hover-raised: var(--color-gray-100); }
 :root[data-theme="dark"] { --state-hover-raised: var(--color-gray-600); }
+
+/*
+ * 다크 범위 — 라이트 화면 안에서 한 덩이만 다크로 칠한다(.is-light-scope 의 거울).
+ * 위 :root[data-theme="dark"] 의미 토큰을 그대로 옮긴 것이다 — 다크 값을 고치면 여기도 같이 고친다.
+ * 쓰는 곳: v2.2 지도 알림 팝오버의 DELTA 조치 제안 — 라이트에선 다크로 뒤집는다(10/19 디자이너).
+ * 다크 화면에선 같은 카드가 .is-light-scope 로 라이트가 된다. 어느 테마든 팝오버 안에서 반대 색 판이다.
+ */
+:root[data-theme="light"] .is-dark-scope {
+  color-scheme: dark;
+  --comp-alert-default-bg: var(--color-blue-500);
+  --comp-alert-default-edge: var(--color-blue-300);
+  --comp-alert-default-text: var(--color-blue-950);
+  --comp-alert-default-glow-core: var(--color-glow-blue-core);
+  --comp-alert-default-glow-halo: var(--color-glow-blue-halo);
+  --comp-alert-default-on-edge: var(--color-blue-950);
+  --comp-alert-critical-bg: var(--color-red-300);
+  --comp-alert-critical-edge: var(--color-red-300);
+  --comp-alert-critical-text: var(--color-red-900);
+  --comp-alert-critical-glow-core: var(--color-glow-red-core);
+  --comp-alert-critical-glow-halo: var(--color-glow-red-halo);
+  --comp-alert-critical-on-edge: var(--color-gray-950);
+  --comp-alert-safe-bg: var(--color-green-200);
+  --comp-alert-safe-edge: var(--color-green-300);
+  --comp-alert-safe-text: var(--color-green-900);
+  --comp-alert-safe-glow-core: var(--color-glow-green-core);
+  --comp-alert-safe-glow-halo: var(--color-glow-green-halo);
+  --comp-alert-safe-on-edge: var(--color-gray-950);
+  --comp-alert-warning-bg: var(--color-yellow-300);
+  --comp-alert-warning-edge: var(--color-yellow-300);
+  --comp-alert-warning-text: var(--color-yellow-900);
+  --comp-alert-warning-glow-core: var(--color-glow-yellow-core);
+  --comp-alert-warning-glow-halo: var(--color-glow-yellow-halo);
+  --comp-alert-warning-on-edge: var(--color-gray-950);
+  --bg-accent: var(--color-blue-600);
+  --comp-gnb-brand: var(--color-blue-700);
+  --bg-page: var(--color-gray-950);
+  --bg-panel: var(--color-gray-800);
+  --comp-button-accent-bg-hover: var(--color-blue-400);
+  --comp-button-accent-bg-pressed: var(--color-blue-300);
+  --comp-button-danger-bg-hover: var(--color-red-300);
+  --comp-button-danger-bg-pressed: var(--color-red-100);
+  --state-hover: var(--color-gray-700);
+  --comp-button-inverse-bg-hover: var(--color-gray-100);
+  --comp-button-inverse-bg-pressed: var(--color-gray-200);
+  --state-pressed: var(--color-gray-700);
+  --bg-inverse: var(--color-gray-0);
+  --comp-gnb-bg: var(--color-gray-900);
+  --comp-modal-dim: var(--color-alpha-gray-950-60);
+  --bg-cell: var(--color-gray-750);
+  --bg-frame: var(--color-gray-750);
+  --bg-inset: var(--color-alpha-gray-950-18);
+  --bg-map-chip: var(--color-alpha-gray-900-50);
+  --bg-glass: var(--color-alpha-gray-600-40);
+  --bg-raised: var(--color-gray-700);
+  --bg-selected: var(--color-gray-600);
+  --border-brand: var(--color-blue-500);
+  --comp-input-border: var(--color-gray-500);
+  --comp-input-border-hover: var(--color-gray-400);
+  --border-default: var(--color-gray-650);
+  --border-divider: var(--color-gray-700);
+  --border-on-glass: var(--color-alpha-white-8);
+  --effect-glass-edge: var(--color-alpha-white-14);
+  --effect-glass-shadow: var(--color-alpha-gray-950-55);
+  --border-focus: var(--color-blue-700);
+  --border-strong: var(--color-gray-600);
+  --comp-button-accent-bg-default: var(--color-blue-700);
+  --comp-button-accent-bg-disabled: var(--color-gray-600);
+  --comp-button-accent-text-default: var(--color-gray-0);
+  --comp-button-accent-text-disabled: var(--color-gray-400);
+  --comp-button-danger-bg-default: var(--color-red-700);
+  --comp-button-danger-bg-disabled: var(--color-gray-600);
+  --comp-button-danger-text-default: var(--color-gray-0);
+  --comp-button-danger-text-disabled: var(--color-gray-400);
+  --comp-button-focus: var(--color-blue-700);
+  --comp-button-ghost-bg-hover: var(--state-hover);
+  --comp-button-ghost-bg-pressed: var(--state-pressed);
+  --comp-button-ghost-text-default: var(--color-blue-500);
+  --comp-button-ghost-text-disabled: var(--color-gray-400);
+  --comp-button-ghost-text-pressed: var(--color-gray-50);
+  --comp-button-inverse-bg-default: var(--color-gray-0);
+  --comp-button-inverse-bg-disabled: var(--color-gray-600);
+  --comp-button-inverse-text-default: var(--color-gray-950);
+  --comp-button-inverse-text-disabled: var(--color-gray-450);
+  --comp-button-secondary-bg-default: var(--color-gray-650);
+  --comp-button-secondary-bg-disabled: var(--color-gray-600);
+  --comp-button-secondary-bg-hover: var(--color-gray-850);
+  --comp-button-secondary-bg-pressed: var(--color-gray-900);
+  --comp-button-secondary-border-default: var(--color-gray-600);
+  --comp-button-secondary-border-disabled: var(--color-gray-600);
+  --comp-button-secondary-text-default: var(--color-gray-50);
+  --comp-button-secondary-text-disabled: var(--color-gray-450);
+  --comp-chart-axis: var(--color-gray-600);
+  --comp-chart-series-1: var(--color-blue-500);
+  --comp-chart-series-2: var(--color-blue-300);
+  --comp-chart-series-3: var(--color-blue-100);
+  --comp-chart-series-4: var(--color-blue-700);
+  --comp-chart-grid: var(--color-gray-700);
+  --comp-chart-heat-1: var(--color-gray-650);
+  --comp-chart-heat-2: var(--color-yellow-900);
+  --comp-chart-heat-3: var(--color-yellow-700);
+  --comp-chart-heat-4: var(--color-red-700);
+  --comp-chart-heat-5: var(--color-red-300);
+  --comp-chart-negative: var(--color-red-300);
+  --comp-chart-neutral: var(--color-gray-500);
+  --comp-chart-positive: var(--color-green-300);
+  --comp-chart-track: var(--color-gray-700);
+  --comp-chart-warning: var(--color-yellow-300);
+  --comp-gnb-text-brand: var(--color-blue-500);
+  --text-disabled: var(--color-gray-600);
+  --text-on-inverse: var(--color-gray-950);
+  --fg-link: var(--color-blue-500);
+  --comp-gnb-text-on-brand: var(--color-gray-950);
+  --text-primary: var(--color-gray-50);
+  --text-secondary: var(--color-gray-400);
+  --text-tertiary: var(--color-gray-450);
+  --radius-chart: var(--radius-2);
+  --radius-card: var(--radius-4);
+  --radius-container: var(--radius-8);
+  --radius-control: var(--radius-4);
+  --radius-pill: var(--radius-full);
+  --status-critical-bg: var(--color-red-900);
+  --status-critical-border: var(--color-red-700);
+  --status-critical-text: var(--color-red-200);
+  --status-critical-icon: var(--color-red-500);
+  --status-info-bg: var(--color-blue-900);
+  --status-info-border: var(--color-blue-500);
+  --status-info-text: var(--color-blue-200);
+  --status-info-fg-secondary: var(--color-blue-400);
+  --status-info-icon: var(--color-blue-500);
+  --status-safe-bg: var(--color-green-900);
+  --status-safe-border: var(--color-green-700);
+  --status-safe-text: var(--color-green-300);
+  --status-safe-icon: var(--color-green-300);
+  --status-warning-bg: var(--color-yellow-900);
+  --status-warning-border: var(--color-yellow-700);
+  --status-warning-text: var(--color-yellow-300);
+  --status-warning-icon: var(--color-yellow-500);
+  --status-critical-icon-subtle: var(--color-red-300);
+  --state-hover-raised: var(--color-gray-600);
+}
+
+.is-light-scope, :root[data-theme="light"] .is-dark-scope { color: var(--text-primary); }

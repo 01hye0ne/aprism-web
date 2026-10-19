@@ -20,7 +20,7 @@
     }
   }
   </script>
-  <link rel="stylesheet" href="../assets/css/tokens.css?v=42b70841" />
+  <link rel="stylesheet" href="../assets/css/tokens.css?v=b64812bd" />
   <link rel="stylesheet" href="../assets/css/app-shell.css?v=01264297" />
   <link rel="stylesheet" href="../assets/css/map-overlays.css?v=96f51348" />
   <link rel="stylesheet" href="../assets/css/icons-outline.css?v=88bcd8fb" />
@@ -470,8 +470,9 @@
                 <div class="ma-lower">
                   <div class="ma-lower-in">
                     <!-- DELTA 조치 제안 (Size=Small) — 권고 한 줄 · 조치 체크리스트 · 메모가 한 카드 -->
-                    <!-- 라이트로 뒤집은 판 — Figma 는 이 카드에만 Semantic=Light 를 걸었다(tokens.css .is-light-scope). -->
-                    <section class="ma-delta is-light-scope" aria-labelledby="ma-delta-label">
+                    <!-- 뒤집은 판 — Figma 는 이 카드에만 Semantic=Light 를 걸었다(tokens.css .is-light-scope).
+                         라이트 화면에선 거꾸로 다크로 뒤집는다(.is-dark-scope · 10/19 디자이너). -->
+                    <section class="ma-delta is-light-scope is-dark-scope" aria-labelledby="ma-delta-label">
                       <div class="ma-delta-head">
                         <div class="ma-delta-mark">
                           <span class="i i-16" style="--i:var(--ic-delta)" aria-hidden="true"></span>
