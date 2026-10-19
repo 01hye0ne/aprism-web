@@ -2436,17 +2436,35 @@ a.map-floor {
 }
 .ah-where .floor-tag { margin-left: var(--space-2, 2px); }
 
-/* 미션 메뉴 — 상태별 묶음 머리 · 미션마다 지나는 층 */
+/*
+ * 미션 메뉴 — 표처럼 읽는다(10/19 디자이너). 머리(미션 · 층 · 로봇) 한 줄 + 상태 묶음(수행중 · 대기 · 완료).
+ * 열은 머리와 줄이 같은 격자를 쓴다: 점 8 · 미션 · 층 64 · 로봇 72.
+ */
+.scope-menu { --scope-cols: 8px minmax(160px, 1fr) 64px 72px; }
+.scope-head,
+.scope-menu .scope-item {
+  display: grid;
+  grid-template-columns: var(--scope-cols);
+  column-gap: var(--space-8);
+  align-items: center;
+}
+.scope-head {
+  padding: var(--space-4) var(--space-12) var(--space-8) var(--space-8);
+  border-bottom: var(--border-width-thin) solid var(--border-divider);
+  color: var(--text-tertiary);
+}
 .scope-group {
   padding: var(--space-8) var(--space-12) var(--space-4);
   color: var(--text-tertiary);
 }
-.scope-group:not(:first-child) {
+.scope-group:not(:nth-child(2)) {
   margin-top: var(--space-4);
   border-top: var(--border-width-thin) solid var(--border-divider);
 }
-.scope-item { display: flex; align-items: center; gap: var(--space-8); }
-.scope-floors { display: inline-flex; gap: var(--space-4); margin-left: auto; padding-left: var(--space-16); }
+.scope-floors { display: inline-flex; gap: var(--space-4); }
+/* 메뉴 면이 bg/raised 라 꼬리표(raised)가 묻힌다 — 메뉴 안에서는 한 단 낮은 bg/cell */
+.scope-menu .floor-tag { background-color: var(--bg-cell); }
+.scope-robots { color: var(--text-secondary); font-family: var(--font-family-mono); font-size: var(--font-size-12); line-height: var(--font-line-height-18); white-space: nowrap; }
 
 /* 지도 층 판 — 미션이 지나지 않는 층은 꺼 둔다. 고른 로봇이 선 층에는 로봇 점(상태 파랑)을 단다. */
 .map-floor.is-out,

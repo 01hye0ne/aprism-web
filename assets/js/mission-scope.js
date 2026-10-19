@@ -82,8 +82,30 @@
     menu.hidden = true;
   }
 
+  // 미션에 배정된 로봇 번호 — "01 · 02"
+  function robotsOf(m) {
+    return cards.filter(function (c) { return missionOf(c) === m; }).map(function (c) {
+      var n = Number(c.getAttribute("data-robot")) + 1;
+      return (n < 10 ? "0" : "") + n;
+    }).join(" · ");
+  }
+
+  // 표 머리 — 미션 · 층 · 로봇(10/19 디자이너). 상태 묶음 머리는 그 아래 줄마다 선다.
+  function menuHead() {
+    var head = document.createElement("div");
+    head.className = "scope-head t-caption";
+    head.setAttribute("aria-hidden", "true");
+    ["", "미션", "층", "로봇"].forEach(function (t) {
+      var c = document.createElement("span");
+      c.textContent = t;
+      head.appendChild(c);
+    });
+    return head;
+  }
+
   function buildMenu() {
     menu.textContent = "";
+    menu.appendChild(menuHead());
     GROUPS.forEach(function (g) {
       var list = names().filter(function (m) { return stateOf(m) === g[0]; });
       if (!list.length) { return; }
@@ -120,6 +142,11 @@
           fl.appendChild(tag);
         });
         item.appendChild(fl);
+        var rb = document.createElement("span");
+        rb.className = "scope-robots num";
+        rb.textContent = robotsOf(m);
+        item.appendChild(rb);
+        item.setAttribute("aria-label", m + " · " + floorsOf(m).join(" → ") + " · Robot " + robotsOf(m));
 
         item.addEventListener("click", function () {
           closeMenu();

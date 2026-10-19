@@ -7,17 +7,6 @@
 
 /* ---------- 상태바 — 전체 건물 › 층 ---------- */
 .is-building .status-bar-place { margin-right: var(--space-4); }
-.bld-menu { min-width: 320px; }
-.bld-menu-floor {
-  padding: var(--space-8) var(--space-12) var(--space-4);
-  color: var(--text-tertiary);
-}
-.bld-menu-floor:not(:first-child) {
-  margin-top: var(--space-4);
-  border-top: var(--border-width-thin) solid var(--border-divider);
-}
-.bld-menu .scope-item { display: flex; align-items: center; gap: var(--space-8); }
-.bld-menu-sub { margin-left: auto; padding-left: var(--space-16); color: var(--text-tertiary); }
 
 /* ---------- 층 표식(알림 줄 · 로봇 줄 · 이름표에 함께 쓰는 꼬리표) ---------- */
 .bld-floor-tag {
