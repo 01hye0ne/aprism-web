@@ -178,7 +178,7 @@
   var LIGHT = {
     face: { floor: 0xa3a9b3, wall: 0xd0d4db, equipment: 0xcbd0d8, stairs: 0xd8dce3, other: 0xd0d4db },
     edge: 0x8b94a1, ghost: 0xeef0f3, grid: 0x8a93a5,
-    pickFace: 0x6b7586, pickLine: 0x2b2f36, hoverLine: 0x4b4f57
+    pickFace: 0xe6e9ef, pickLine: 0x4e576a, hoverLine: 0x4b4f57
   };
   var LIGHT_LIFT = 1.2;
 
@@ -1112,7 +1112,12 @@
     var geo = new Fat.LineSegmentsGeometry();
     var mat = new Fat.LineMaterial({
       color: color, linewidth: width, transparent: true, opacity: alpha,
-      depthWrite: false, depthTest: false
+      /*
+       * 깊이를 본다 — 앞에 선 벽 · 설비 위로 선이 비쳐 지나가면 지저분하다(10/19 디자이너).
+       * 선이 제 덩이 모서리에 딱 붙어 있어 같은 깊이끼리 다투므로 앞으로 살짝 당긴다(polygonOffset).
+       */
+      depthWrite: false, depthTest: true,
+      polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -8
     });
     mat.resolution.set(view.clientWidth || 1, view.clientHeight || 1);
     fatMats.push(mat);
@@ -2686,6 +2691,14 @@
     PICKED.setHex(set.pickFace);
     GHOSTC.setHex(set.ghost);
     pickPens.forEach(function (pen) { pen.material.color.setHex(set.pickLine); });
+    /*
+     * 라이트 — 번짐 선을 끄고 또렷한 선을 불투명하게. 짙은 번짐은 흰 덩이 둘레에 회색 얼룩이 되고,
+     * 반투명 선은 마디에서 두 번 겹쳐 모서리마다 검은 점이 찍혔다(10/19 디자이너).
+     */
+    if (pickPens.length === 2) {
+      pickPens[0].material.opacity = light ? 0 : 0.14;
+      pickPens[1].material.opacity = light ? 1 : 0.85;
+    }
     hoverPens.forEach(function (pen) { pen.material.color.setHex(set.hoverLine); });
     if (gridMesh) {
       var c = new THREE.Color(set.grid);
