@@ -259,6 +259,28 @@
     stops: [[0.62, 0.30], [0.62, 0.70], [0.88, 0.70]],
     done: 0x89b9ed, left: 0x4990e0, dot: 0xc7ddf8
   };
+  /*
+   * 완료한 미션(10/19 디자이너) — 지나온 길만 흐리게, 로봇은 도크에. at 1 = 한 바퀴를 돌고 도커로 돌아온 자리.
+   * ended — 상태색(완료 = 초록) 대신 지나온 길 회색을 옅게 깐다. 시야 부채꼴은 없다(서 있는 로봇이다).
+   */
+  ROBOTS[3] = {
+    name: "ROBOT 04", at: 1, floor: "B4", ended: true,   // 야간 순회 점검
+    dock: [0.86, 0.88],
+    stops: [[0.86, 0.45], [0.55, 0.45], [0.55, 0.88]],
+    done: 0x9ea8bb, left: 0x9ea8bb, dot: 0xffffff
+  };
+  ROBOTS[6] = {
+    name: "ROBOT 07", at: 1, floor: "B3", ended: true,   // 공조 설비 순회
+    dock: [0.10, 0.92],
+    stops: [[0.30, 0.92], [0.30, 0.62], [0.10, 0.62]],
+    done: 0x9ea8bb, left: 0x9ea8bb, dot: 0xffffff
+  };
+  ROBOTS[8] = {
+    name: "ROBOT 09", at: 1, floor: "B4", ended: true,   // 유틸리티 순회
+    dock: [0.76, 0.80],
+    stops: [[0.40, 0.80], [0.40, 0.60], [0.76, 0.60]],
+    done: 0x9ea8bb, left: 0x9ea8bb, dot: 0xffffff
+  };
   ROBOTS[10] = {
     name: "ROBOT 11", at: 0.15, floor: "B3",          // 전기실 열화상 점검 · 3/20
     dock: [0.12, 0.90],
@@ -2327,6 +2349,11 @@
     bot.dot = tint.dot;
     // 표식 색을 따로 들지 않는 상태는 지나온 길 색을 그대로 쓴다.
     bot.mark = tint.mark || tint.done;
+    // 완료한 미션 — 지나온 길은 수행 중 로봇의 지나온 길과 같은 회색(옅게는 drawRoute 가), 로봇 표식도 같은 흰빛.
+    if (bot.ended) {
+      var run = (isLight() ? BOT_TINT_LIGHT : BOT_TINT)["수행중"];
+      bot.done = run.done; bot.left = run.done; bot.dot = run.dot; bot.mark = run.mark;
+    }
     return bot;
   }
 
@@ -2388,6 +2415,11 @@
     // 테마가 바뀌면 이 이름표로 찾아 다시 칠한다(applyTheme).
     parts[0].userData.tone = "done";
     parts[1].userData.tone = "left";
+    // 완료한 미션 — 지나온 길을 옅게(벽 뒤 유령선도 같이).
+    if (bot.ended) {
+      parts[0].material.opacity *= 0.4;
+      parts[0].children.forEach(function (ch) { if (ch.material) { ch.material.opacity *= 0.4; } });
+    }
 
     /*
      * 멈춰 서서 볼 자리 일곱 — 우측 미션 목록의 웨이포인트 일곱과 같은 수다.
@@ -2429,7 +2461,7 @@
     var fan = viewFan(bot, here, ahead.x - here.x, ahead.z - here.z);
     fan.visible = false;
     scene.add(fan);
-    parts.push(fan);
+    if (!bot.ended) { parts.push(fan); }   // 도크에 선 로봇은 보는 쪽이 없다
 
     lanes[String(id)] = {
       id: String(id), bot: bot, parts: parts,
