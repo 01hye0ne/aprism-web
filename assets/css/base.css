@@ -461,3 +461,16 @@ a.screen-name:hover {
 .ver-pages a:hover::after { color: var(--text-primary); }
 /* 목록이 든 카드만 길어진다 — 옆 카드가 같이 늘어나 빈 칸이 되지 않게 위로 붙인다 */
 .ver-list { align-items: start; }
+/* 번호 — 쓰는 차례. 3-n 은 관제에서 여는 화면이라 한 단 들인다. */
+.ver-pages a { justify-content: flex-start; }
+.ver-pages a::after { margin-left: auto; }
+.ver-no {
+  flex: none;
+  min-width: 16px;
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-12);
+  color: var(--text-tertiary);
+  font-variant-numeric: tabular-nums;
+}
+.ver-pages .is-sub a { padding-left: var(--space-12); }
+.ver-pages .is-sub .ver-no { min-width: 24px; }
