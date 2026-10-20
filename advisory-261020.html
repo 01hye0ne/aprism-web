@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>APRISM — [자문] 26.10.20</title>
-  <meta name="description" content="자문받은 시안 1-A(좌측 패널형) · 1-B(모달형)를 10.20 기준 v2.2 화면과 비교 — 달라진 점 6가지와 전체 층 현황, 한 화면에 주제 하나" />
+  <meta name="description" content="자문받은 시안 1-A(좌측 패널형) · 1-B(모달형)를 10.20 기준 v2.2 화면과 비교 — 달라진 점 5가지와 전체 층 현황, 한 화면에 주제 하나" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/static/woff2/SUIT.css" />
   <link rel="stylesheet" href="./assets/css/tokens.css?v=b64812bd" />
   <link rel="stylesheet" href="./assets/css/base.css?v=6c992126" />
@@ -183,11 +183,10 @@
         <ol class="toc">
           <li><a href="#s1">화면의 기준 · 알림 목록 <span>장소 → 미션 · 두 줄 목록</span></a></li>
           <li><a href="#s2">알림 확인 · 조치 <span>모달 → 지도 위 팝오버</span></a></li>
-          <li><a href="#s3">Delta 경고의 강약 <span>같은 테 → 강약 분리</span></a></li>
-          <li><a href="#s4">Delta(AI)의 역할 <span>해설 → 종합 판단</span></a></li>
-          <li><a href="#s5">색 · 위계 · 화면 정돈 <span>한 뜻 한 모양</span></a></li>
-          <li><a href="#s6">로봇 패널 <span>전체 → 배정된 로봇</span></a></li>
-          <li><a href="#s7">층 여러 개일 때 관제 화면 <span>전체 층 현황</span></a></li>
+          <li><a href="#s3">Delta 경고의 강약 <span>해설 → 종합 판단 · 강약 분리</span></a></li>
+          <li><a href="#s4">색 · 위계 · 화면 정돈 <span>한 뜻 한 모양</span></a></li>
+          <li><a href="#s5">로봇 패널 <span>전체 → 배정된 로봇</span></a></li>
+          <li><a href="#s6">층 여러 개일 때 관제 화면 <span>전체 층 현황</span></a></li>
         </ol>
       </div>
       <figure class="pic">
@@ -241,17 +240,21 @@
       <div class="txt">
         <p class="num">03</p>
         <h2 id="s3-title">Delta 경고의 강약</h2>
-        <div class="blk"><p class="k">시안 1-A · 1-B</p><p>위험은 지도 네 변에 빨간 테, 주의도 네 변에 노란 테. 세기가 같아 늘 경보 상태처럼 보임.</p></div>
-        <div class="blk now"><p class="k">v2.2</p><p><b>위험</b>은 네 변 빛과 Delta 판의 빛. <b>주의</b>는 Delta 모서리에만 노란 빛. 화면의 경고 색은 하나(가장 높은 단계)로 맞춤. 표식 모양도 단계마다 하나 — 위험 ⓧ · 주의 △, 점 ●은 상태(수행 중 등)에만 씀.</p></div>
-        <p class="why">주의가 잦은 현장에서 늘 켜진 경보는 무뎌짐 — 위험이 확실히 튀도록 주의를 덜어냄.</p>
+        <div class="blk"><p class="k">시안 1-A · 1-B</p><p>1-A는 고른 알림 하나를 큰 글씨로 해설하고 행동 버튼 셋 · 입력창이 늘 열려 패널 절반을 차지함(1-B는 지도 아래 띠 하나). 경고는 위험 · 주의 모두 지도 네 변 테라 세기가 같아 늘 경보 상태처럼 보임.</p></div>
+        <div class="blk now"><p class="k">v2.2</p><p>Delta는 <b>전체 알림을 종합</b>해 판단함("위험 1건 포함 6건 누적"). 지도 왼쪽 위 작은 창에서 접힘 · 펼침 · <b>대화</b>를 오가고, 답 아래 칩으로 지도 · 목록과 이어짐. <b>위험</b>은 네 변 빛과 Delta 판의 빛이 맥박치고, <b>주의</b>는 Delta 모서리에만 노란 빛이 머묾. 경고 색은 하나(가장 높은 단계), 표식은 위험 ⓧ · 주의 △.</p></div>
+        <p class="why">알림마다 반복되던 해설은 목록과 겹침 — AI는 여러 건을 묶어 볼 때 쓸모가 있음. 주의가 잦은 현장에서 늘 켜진 경보는 무뎌지므로 위험만 확실히 튀게 함.</p>
       </div>
       <figure class="pic">
         <div class="tabs" role="group" aria-label="화면 고르기"></div>
         <div class="frame">
+          <img data-tab="시안 1-A" src="./assets/img/compare/03-1a.webp" alt="시안 1-A Delta — 고른 알림 해설, 행동 버튼 셋, 늘 열린 입력창" loading="lazy" />
+          <img data-tab="시안 1-B" src="./assets/img/compare/03-1b.webp" alt="시안 1-B Delta — 지도 아래 띠 하나" loading="lazy" />
           <img data-tab="시안 1 위험" src="./assets/img/compare/04-1-crit.webp" alt="시안 1-A 위험 — 지도 네 변 빨간 테" loading="lazy" />
           <img data-tab="시안 1 주의" src="./assets/img/compare/04-1-warn.webp" alt="시안 1-A 주의 — 지도 네 변 노란 테" loading="lazy" />
           <img data-tab="v2.2 위험 ▶" data-default data-anim src="./assets/img/compare-1020/04-v22-crit.webp" alt="v2.2 위험 화면 녹화 — 네 변 빨간 빛과 Delta 판의 빛이 2.4초마다 두 번 맥박친다" loading="lazy" />
           <img data-tab="v2.2 주의" src="./assets/img/compare-1020/04-v22-warn.webp" alt="v2.2 주의 — 지도 왼쪽 위 Delta 모서리에만 노란 빛" loading="lazy" />
+          <img data-tab="v2.2 Delta 펼침" src="./assets/img/compare-1020/03-v22.webp" alt="v2.2 Delta 펼침 — 위험 1건 포함 6건 누적, 조치 버튼 셋, 아래 묻기 칸" loading="lazy" />
+          <img data-tab="v2.2 대화 흐름 ▶" data-anim src="./assets/img/compare-1020/03-v22-chat.webp" alt="v2.2 Delta 대화 흐름 — 창을 펼쳐 위험 알림부터 설명해 줘를 보내면, 답과 함께 WP-04 지도에서 보기 · 현장 무전 연락 요청 · 재측정 후 판단 칩이 붙는다" loading="lazy" />
         </div>
       </figure>
     </section>
@@ -259,25 +262,7 @@
     <section class="slide" id="s4" aria-labelledby="s4-title">
       <div class="txt">
         <p class="num">04</p>
-        <h2 id="s4-title">Delta(AI)의 역할</h2>
-        <div class="blk"><p class="k">시안 1-A · 1-B</p><p>1-A는 고른 알림 하나를 큰 글씨로 해설하고, 행동 버튼 셋과 입력창이 늘 열려 있어 패널 절반을 차지함. 1-B는 지도 아래 띠 하나.</p></div>
-        <div class="blk now"><p class="k">v2.2</p><p>알림 하나가 아니라 <b>전체 알림을 종합</b>해 판단함("위험 1건 포함 6건 누적"). 지도 왼쪽 위 모서리의 작은 창에서 접힘 · 펼침 · 대화를 오가고, 입력창은 열었을 때만 보이며 너비를 끌어 조절할 수 있음. 전체 층 현황 화면에서도 같은 판이 남은 알림의 가장 높은 단계를 따라감.</p></div>
-        <p class="why">알림을 고를 때마다 같은 내용을 반복하던 해설은 목록과 겹침. AI는 여러 건을 묶어 볼 때 쓸모가 있음.</p>
-      </div>
-      <figure class="pic">
-        <div class="tabs" role="group" aria-label="화면 고르기"></div>
-        <div class="frame">
-          <img data-tab="시안 1-A" src="./assets/img/compare/03-1a.webp" alt="시안 1-A Delta — 고른 알림 해설, 행동 버튼 셋, 늘 열린 입력창" loading="lazy" />
-          <img data-tab="시안 1-B" src="./assets/img/compare/03-1b.webp" alt="시안 1-B Delta — 지도 아래 띠 하나" loading="lazy" />
-          <img data-tab="v2.2" src="./assets/img/compare-1020/03-v22.webp" alt="v2.2 Delta 펼침 — 위험 1건 포함 6건 누적, 조치 버튼 셋, 아래 묻기 칸" loading="lazy" />
-        </div>
-      </figure>
-    </section>
-
-    <section class="slide" id="s5" aria-labelledby="s5-title">
-      <div class="txt">
-        <p class="num">05</p>
-        <h2 id="s5-title">색 · 위계 · 화면 정돈</h2>
+        <h2 id="s4-title">색 · 위계 · 화면 정돈</h2>
         <div class="blk"><p class="k">시안 1-A · 1-B</p><p>파랑이 지금 타임라인 칸 · 버튼 · 링크 · 상태에 두루 쓰여, 무엇이 중요한지 흐려짐. 지도의 길 점선과 타임라인 점선이 달랐고, 바탕의 밝기 단계도 정해져 있지 않았음.</p></div>
         <div class="blk now"><p class="k">v2.2</p><p><b>"파랑은 상태이거나 지금 할 단 하나의 행동."</b> <b>"지금 여기"는 흰색</b>(지도 로봇 · 진행 막대 손잡이 · 지금 칸), 파랑은 상태 이름표. 이동 · 보조는 회색 글자, 버튼은 6단계로 나눔(빨강은 <span class="nw">E-STOP</span>만, 파랑 면은 영역당 하나). 길 점선은 타임라인과 같은 무늬로 맞추고, 바탕은 GNB · 알림 목록 · 관제 프레임 <b>세 단</b>으로 정리함. <b>라이트 테마</b>는 다크와 같은 대비 차례(지도 바탕 &lt; 바닥 &lt; 설비, 패널 &lt; 카드)로 맞추고, 상태색은 위험 빨강과 같은 채도로 맞춤.</p></div>
         <p class="why">색과 모양이 뜻을 하나만 가져야 경고색이 경고로 읽히고, 지도와 목록이 한 화면처럼 읽힘.</p>
@@ -293,10 +278,10 @@
       </figure>
     </section>
 
-    <section class="slide" id="s6" aria-labelledby="s6-title">
+    <section class="slide" id="s5" aria-labelledby="s5-title">
       <div class="txt">
-        <p class="num">06</p>
-        <h2 id="s6-title">로봇 패널</h2>
+        <p class="num">05</p>
+        <h2 id="s5-title">로봇 패널</h2>
         <div class="blk"><p class="k">시안 1-A · 1-B</p><p>연결된 로봇 전체(11대 연결 · 3대 수행중)가 대상. 1-B는 세 대를 카드로 나열하고, 자동복귀 · <span class="nw">E-STOP</span>이 "수행 로봇 전체" 버튼이었음.</p></div>
         <div class="blk now"><p class="k">v2.2</p><p>미션에 <b>배정된 로봇만</b>("2대 배정 · 1대 수행중") 한 대씩 크게 넘겨 봄. 자동복귀 · <span class="nw">E-STOP</span>은 보고 있는 로봇 옆에 둠. 미션 밖 로봇은 [로봇 현황]에서 다룸. 끝난 미션을 고르면 지도에는 지나온 길만 흐리게 남고 로봇은 도크에 서 있음.</p></div>
         <p class="why">비상 버튼은 누르는 대상이 분명해야 함.</p>
@@ -309,10 +294,10 @@
         </div>
       </figure>
     </section>
-    <section class="slide" id="s7" aria-labelledby="s7-title">
+    <section class="slide" id="s6" aria-labelledby="s6-title">
       <div class="txt">
-        <p class="num">07</p>
-        <h2 id="s7-title">층 여러 개일 때 관제 화면</h2>
+        <p class="num">06</p>
+        <h2 id="s6-title">층 여러 개일 때 관제 화면</h2>
         <ul class="opts" data-opts>
           <li><button type="button" data-opt="A"><span class="key">1</span><span class="t">전체 층 현황 (기본)</span><span class="d">B3 · B4를 쌓아 층마다 로봇 위치 · 알림 위치를 한 화면에 표시함. 왼쪽은 전체 미션의 알림(셋째 줄에 미션 이름), 오른쪽은 로봇 현황 · 운행 흐름 · 다음 일정. 상단 바는 "전체 건물 · 통합 순회 현황".</span></button></li>
           <li><button type="button" data-opt="B"><span class="key">2</span><span class="t">층에 마우스 올림 (B4)</span><span class="d">올린 층은 밝아지고 다른 층은 흐려짐. 커서 옆에 층 요약(로봇 · 미션 · 알림)과 "누르면 들어가요 — 정기 순회 점검" 안내가 뜸.</span></button></li>
