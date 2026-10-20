@@ -92,6 +92,9 @@
   // ---------- 화면과 잇는 일 ----------
   function openCritical() {
     var item = document.querySelector("[data-ah-list] .ah-item.is-critical");
+    // 창을 먼저 접는다 — 펼친 창이 지도 가운데에 떠 있어 팝오버를 가렸다(10/20). 대화는 남는다.
+    var tg = document.querySelector("[data-ai-toggle]");
+    if (tg && win.classList.contains("is-open")) { tg.click(); }
     if (item && item.getAttribute("aria-pressed") !== "true") { item.click(); }
   }
   function filterTo(sev) {
@@ -186,6 +189,9 @@
     sync();
     input.focus();
   }
+
+  // 조치 버튼(monitor.js)이 대화를 건다 — 버튼 문구를 내 말로 보낸다.
+  window.APRISM_DELTA = { ask: ask };
 
   input.addEventListener("input", sync);
   input.addEventListener("keydown", function (event) {

@@ -183,7 +183,7 @@
   }
 
   // Delta 를 펼쳤을 때의 행동 버튼 — 알림 여러 건을 한꺼번에 다룬다.
-  // ※ 문구는 아직 정해지지 않은 초안이다. 누르면 아무 일도 하지 않는다.
+  // ※ 문구는 아직 정해지지 않은 초안이다. 누르면 하는 일은 아래 deltaAct(10/20 디자이너 "다 동작되게").
   function deltaActions(j) {
     if (j.level === "critical") {
       return ["위험 " + j.crit + "건부터 조치", "주의 " + j.warn + "건 묶어서 확인", "현장 점검 한꺼번에 요청"];
@@ -215,6 +215,44 @@
   if (!list) { return; }
 
   var aiActions = $("[data-ai-actions]");
+
+  /*
+   * Delta 조치 버튼 — 문구의 첫 낱말로 할 일을 고른다(10/20 디자이너).
+   *   위험 n건부터 조치   → Delta 창을 접고 가장 오래된 위험 알림의 팝오버를 연다(창이 팝오버를 가리지 않게).
+   *   주의 n건 묶어서 확인 → 목록을 주의로 거르고, Delta 가 주의 n건을 묶어 답한다(대화).
+   *   추세 한 번에 보기    → Delta 가 추세를 답한다(대화).
+   *   현장 점검 한꺼번에 요청 → Delta 가 요청을 정리해 답한다(대화). 실제 전송은 아직 없다.
+   * 대화는 delta-chat.js 의 APRISM_DELTA.ask 로 보낸다.
+   */
+  function foldDelta() {
+    var win = $("[data-delta3]");
+    var tg = $("[data-ai-toggle]");
+    if (win && tg && win.classList.contains("is-open")) { tg.click(); }
+  }
+  function askDelta(text) { if (window.APRISM_DELTA) { window.APRISM_DELTA.ask(text); } }
+  function setFilter(sev) {
+    var b = $("[data-ah-filter='" + sev + "']");
+    if (b && b.getAttribute("aria-pressed") !== "true") { b.click(); }
+  }
+  function deltaAct(label) {
+    if (/^위험/.test(label)) {
+      var crit = items().filter(function (a) { return a.sev === "critical" && (!scoped || missionOf(a) === mission); });
+      if (!crit.length) { crit = items().filter(function (a) { return a.sev === "critical"; }); }
+      if (!crit.length) { return; }
+      foldDelta();
+      setFilter("all");
+      if (picked !== crit[0]) { note.open(crit[0]); }
+      return;
+    }
+    if (/^주의/.test(label)) { setFilter("warning"); askDelta(label); return; }
+    askDelta(label);
+  }
+  if (aiActions) {
+    aiActions.addEventListener("click", function (event) {
+      var b = event.target.closest && event.target.closest("button");
+      if (b) { deltaAct(b.textContent.trim()); }
+    });
+  }
   var scoped = body.hasAttribute("data-mission-scope");   // v2.2 — 미션 범위
   var withReport = list.hasAttribute("data-ah-report");   // v2.2 — 알림마다 [안전진단](10/19 · 예전 [보고서])
   var mission = scoped ? missionOf({ robot: 0 }) : null;
