@@ -174,13 +174,16 @@
    * 화면 실측(L*) 바탕 69 · 바닥 78 · 해 등진 옆면 80 · 해 받는 옆면 99.7 · 윗면 100. 다크는 3 · 11 · 27 · 30 · 35.
    * 덩이 면은 옅은 회색이고, 입체는 조명이 가른다 — 윗면 빛(TOP_LIGHT) > 해 받는 옆면 > 해 등진 옆면.
    * 라이트 조명은 applyTheme 이 바꾼다(앰비언트 AMB_LIGHT · 방향광 KEY_LIGHT_LIGHT · 반구광 아래색 HEMI_GROUND_LIGHT).
+   * 10/20 — 덩이 윗면이 순백(L* 100)이라 흰 카드 · 팝오버와 겨뤘다. 윗면만 한 단 내린다: 덩이 면 한 단 어둡게 ·
+   *   lift 1.2 → 0.9 · 윗면 빛 0.9 → 0.4. 윗면 빛이 바닥도 비추므로 바닥 면을 한 단 밝혀(a3a9b3 → acb2bc) 바닥 L* 78 을 지킨다.
+   *   실측 바탕 74 · 바닥 77.5 · 해 등진 옆면 73 · 해 받는 옆면 93 · 윗면 95.5. 순백은 카드에만 남는다.
    */
   var LIGHT = {
-    face: { floor: 0xa3a9b3, wall: 0xd0d4db, equipment: 0xcbd0d8, stairs: 0xd8dce3, other: 0xd0d4db },
+    face: { floor: 0xacb2bc, wall: 0xc8cdd5, equipment: 0xc3c9d2, stairs: 0xd2d6dd, other: 0xc8cdd5 },
     edge: 0x8b94a1, ghost: 0xeef0f3, grid: 0x8a93a5,
     pickFace: 0xe6e9ef, pickLine: 0x4e576a, hoverLine: 0x93979e
   };
-  var LIGHT_LIFT = 1.2;
+  var LIGHT_LIFT = 0.9;
 
   /*
    * 제안 팔레트(?palette=neutral · 톤 실험실 비교용) — 다크 남색을 같은 명도의 무채색으로.
@@ -2739,7 +2742,7 @@
   var AMB_LIGHT = 0.4;   // 라이트 앰비언트 — 낮을수록 그림자가 진하다(4차)
   // 라이트 반구광 아래쪽 색 — 다크의 거의 검정(0x05070c)이면 해를 등진 옆면이 바닥보다 어두워진다
   var HEMI_GROUND_LIGHT = 0xd8dde5;
-  var TOP_LIGHT = 0.9;   // 라이트 윗면 빛 세기
+  var TOP_LIGHT = 0.4;   // 라이트 윗면 빛 세기
   var KEY_LIGHT_LIGHT = 2.8;   // 라이트 옆면 빛(방향광) 세기 — 낮출수록 옆면 두 쪽 차이가 줄어든다
 
   function applyTheme() {
