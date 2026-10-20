@@ -432,3 +432,32 @@ a.screen-name:hover {
     line-height: var(--font-line-height-28);
   }
 }
+
+/* 버전 카드 안 화면 목록 — 화면이 여럿인 판(v2.2). 한 줄에 하나, 줄 사이 1px 선 · 오른쪽 화살표(10/20). */
+.ver-pages {
+  position: relative;
+  z-index: 1;
+  flex-basis: 100%;
+  margin: var(--space-8) 0 0;
+  padding: 0;
+  list-style: none;
+  border-top: var(--border-width-thin) solid var(--border-divider);
+}
+.ver-pages li { border-bottom: var(--border-width-thin) solid var(--border-divider); }
+.ver-pages li:last-child { border-bottom: 0; }
+.ver-pages a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-8);
+  padding: var(--space-8) 0;
+  color: var(--text-secondary);
+  font-size: var(--font-size-13);
+  line-height: var(--font-line-height-20);
+  text-decoration: none;
+}
+.ver-pages a::after { content: "›"; color: var(--text-tertiary); }
+.ver-pages a:hover { color: var(--text-primary); }
+.ver-pages a:hover::after { color: var(--text-primary); }
+/* 목록이 든 카드만 길어진다 — 옆 카드가 같이 늘어나 빈 칸이 되지 않게 위로 붙인다 */
+.ver-list { align-items: start; }

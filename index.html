@@ -6,7 +6,7 @@
   <title>APRISM — 화면 퍼블리싱</title>
   <meta name="description" content="APRISM 공장 환경점검 로봇 관제 대시보드 화면 퍼블리싱" />
   <link rel="stylesheet" href="./assets/css/tokens.css?v=b64812bd" />
-  <link rel="stylesheet" href="./assets/css/base.css?v=6c992126" />
+  <link rel="stylesheet" href="./assets/css/base.css?v=e0751eec" />
 </head>
 <body>
   <header class="site-header">
@@ -128,7 +128,14 @@
             <span class="ver-date">2026.10.12</span>
             <span class="ver-badge">최신</span>
             <a class="ver-ask" href="#ask">확인 1</a>
-            <span class="ver-extra"><a href="./screens/building-v2-2.html">전체 층 현황</a><a href="./screens/mission-setup.html">미션 설정</a><a href="./screens/mission-precheck.html">사전 점검</a><a href="./screens/alert-center.html">알림 센터</a></span>
+            <!-- v2.2 는 화면이 여럿이라 카드 안에 목록으로 둔다(10/20 디자이너). 관제 흐름 차례 — 관제 → 전체 층 → 알림 → 미션 준비. -->
+            <ul class="ver-pages">
+              <li><a href="./screens/main-v2-2.html">미션 관제</a></li>
+              <li><a href="./screens/building-v2-2.html">통합 순회 현황</a></li>
+              <li><a href="./screens/alert-center.html">알림 센터</a></li>
+              <li><a href="./screens/mission-setup.html">미션 설정</a></li>
+              <li><a href="./screens/mission-precheck.html">사전 점검</a></li>
+            </ul>
           </li>
         </ol>
       </article>
