@@ -2885,3 +2885,5 @@ a.map-floor {
  * 막대 바닥은 gray/300 으로 한 단 내리고, 아이콘 판은 웨이포인트 카드와 같은 흰 면(bg/raised)으로 띄운다. */
 :root[data-theme="light"] .v2-2 .progress-track { background-color: var(--color-gray-300); }
 :root[data-theme="light"] .v2-2 .progress-kind { background-color: var(--bg-raised); box-shadow: inset 0 0 0 1px var(--border-divider); }
+/* 다크도 파랑을 뺀다 — 종류 아이콘은 상태가 아니다(색 규칙 1). 웨이포인트 칸과 같은 bg/cell 면(10/20). */
+:root:not([data-theme="light"]) .v2-2 .progress-kind { background-color: var(--bg-cell); }
