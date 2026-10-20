@@ -6,7 +6,7 @@
   <title>APRISM — 화면 퍼블리싱</title>
   <meta name="description" content="APRISM 공장 환경점검 로봇 관제 대시보드 화면 퍼블리싱" />
   <link rel="stylesheet" href="./assets/css/tokens.css?v=b64812bd" />
-  <link rel="stylesheet" href="./assets/css/base.css?v=c6f0f809" />
+  <link rel="stylesheet" href="./assets/css/base.css?v=45f95d13" />
 </head>
 <body>
   <header class="site-header">
@@ -149,15 +149,31 @@
     <!-- 내부 문서 — 디자인 시스템 검토 · 효과 시험. 클라이언트 확인용이 아니라 접어 둔다. -->
     <details class="internal">
       <summary>내부 문서</summary>
-      <ul class="internal-list">
-        <li><a href="./policy.html">화면 정책</a></li>
-        <li><a href="./figma-sync.html">디자인 시스템 기록</a></li>
-        <li><a href="./token-names.html">토큰 이름 대조표</a></li>
-        <li><a href="./sian1-to-v22.html">[자문] 26.10.16</a></li>
-        <li><a href="./advisory-261020.html">[자문] 26.10.20</a></li>
-        <li><a href="./tone-lab.html">톤 실험실</a></li>
-        <li><a href="./screens/deid-lab.html">비식별화 패턴 비교</a></li>
-      </ul>
+      <!-- 세 묶음 — 기준 문서 · 자문 자료 · 실험(10/20 디자이너). -->
+      <div class="internal-groups">
+        <section class="internal-group" aria-label="기준 문서">
+          <p class="internal-label">기준 문서</p>
+          <ul class="internal-list">
+            <li><a href="./policy.html">화면 정책</a></li>
+            <li><a href="./figma-sync.html">디자인 시스템 기록</a></li>
+            <li><a href="./token-names.html">토큰 이름 대조표</a></li>
+          </ul>
+        </section>
+        <section class="internal-group" aria-label="자문 자료">
+          <p class="internal-label">자문 자료</p>
+          <ul class="internal-list">
+            <li><a href="./sian1-to-v22.html">[자문] 26.10.16</a></li>
+            <li><a href="./advisory-261020.html">[자문] 26.10.20</a></li>
+          </ul>
+        </section>
+        <section class="internal-group" aria-label="실험">
+          <p class="internal-label">실험</p>
+          <ul class="internal-list">
+            <li><a href="./tone-lab.html">톤 실험실</a></li>
+            <li><a href="./screens/deid-lab.html">비식별화 패턴 비교</a></li>
+          </ul>
+        </section>
+      </div>
     </details>
   </main>
 
