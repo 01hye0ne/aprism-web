@@ -638,7 +638,8 @@ window.APRISM_TEXT = (function () {
     },
     {
       // State=Returning · 18% · Weak — 미션을 마치고 복귀 중이다
-      mission: "지하 4층 정기 순회 점검",
+      // 10/20 디자이너 — 미션 하나에 로봇 한 대. 정기 순회 점검은 Robot 01 만 남기고 Robot 02 는 배정 없음.
+      mission: "배정된 미션 없음",
       current: "복귀 중",
       steps: [
         { title: "waypoint name", state: "done", time: "08:40 – 08:58", duration: "18분",
@@ -678,22 +679,36 @@ window.APRISM_TEXT = (function () {
       ]
     },
     {
-      // 5 · 수행중 · 64% · Good — 첫 구간을 지나는 중이다
+      // 5 · 수행중 · 64% · Good — B3(WP-01~12)를 돌고 계단으로 내려와 B4 를 도는 중(14/20, 10/20 디자이너).
+      //   B3 · B4 를 둘 다 지나는 경로 예시 — 예전 정기 순회 점검 Robot 02 의 길(map.js crossLane)을 넘겨받았다.
       mission: "지하 3층 발전기실 설비 점검",
       current: "발전기 베어링 진동 측정",
       steps: [
-        { title: "waypoint name", state: "done", time: "10:02 – 10:17", duration: "15분" },
+        { title: "waypoint name", state: "done", time: "07:28 – 07:41", duration: "13분" },
+        { title: "waypoint name", state: "done", time: "07:41 – 07:55", duration: "14분",
+          result: "caution", read: "온도 68.4℃ · 진동 2.1 mm/s" },
+        { title: "waypoint name", state: "done", time: "07:55 – 08:09", duration: "14분" },
+        { title: "waypoint name", state: "done", time: "08:09 – 08:22", duration: "13분" },
+        { title: "waypoint name", state: "done", time: "08:22 – 08:37", duration: "15분" },
+        { title: "waypoint name", state: "done", time: "08:37 – 08:50", duration: "13분",
+          result: "caution", read: "이상 점수 9.41 · PRPD 코로나" },
+        { title: "waypoint name", state: "done", time: "08:50 – 09:03", duration: "13분" },
+        { title: "waypoint name", state: "done", time: "09:03 – 09:17", duration: "14분" },
+        { title: "waypoint name", state: "done", time: "09:17 – 09:30", duration: "13분" },
+        { title: "waypoint name", state: "done", time: "09:30 – 09:44", duration: "14분" },
+        { title: "waypoint name", state: "done", time: "09:44 – 09:57", duration: "13분" },
+        { title: "waypoint name", state: "done", time: "09:57 – 10:10", duration: "13분",
+          result: "caution", read: "진동 4.8 mm/s · 상승 추세" },
+        { title: "waypoint name", state: "done", time: "10:10 – 10:22", duration: "12분",
+          result: "caution", read: "토출 7.9 bar · 정상 8.2~8.8" },
         {
           title: "Generator Bearing Vibration",
           act: "발전기 베어링 진동 측정",
           state: "running",
-          time: "10:17 – 10:31",
+          time: "10:22 – 10:36",
           duration: "14분",
           desc: "진동 스펙트럼을 모으는 중. 기준 대비 과대치를 찾습니다."
-        },
-        { title: "waypoint name", state: "pending" },
-        { title: "waypoint name", state: "pending" },
-        { title: "waypoint name", state: "pending" }
+        }
       ]
     },
     {
@@ -796,15 +811,15 @@ window.APRISM_TEXT = (function () {
   if (document.body.classList.contains("v2-2")) {
     ROBOTS.forEach(function (r) { if (r.mission) { r.mission = r.mission.replace(/^지하\s*\d+층\s+/, ""); } });
     window.APRISM_MISSION_FLOORS = {
-      "정기 순회 점검": ["B3", "B4"],
+      "정기 순회 점검": ["B4"],
       "야간 순회 점검": ["B4"],
-      "발전기실 설비 점검": ["B3"],
+      "발전기실 설비 점검": ["B3", "B4"],
       "공조 설비 순회": ["B3"],
       "유틸리티 순회": ["B4"],
       "전기실 열화상 점검": ["B3"]
     };
-    // Robot 02 는 B3(WP-01~12)를 돌고 계단으로 내려와 B4(WP-13~20)를 돈 뒤 B4 도크로 복귀하는 중이다(map.js crossLane).
-    window.APRISM_ROBOT_FLOORS = ["B4", "B4", "B4", "B4", "B3", "B4", "B3", "B3", "B4", "B3", "B3", "B3"];
+    // Robot 05 는 B3(WP-01~12)를 돌고 계단으로 내려와 B4(WP-13~20)를 도는 중이다(map.js crossLane, 10/20).
+    window.APRISM_ROBOT_FLOORS = ["B4", "B4", "B4", "B4", "B4", "B4", "B3", "B3", "B4", "B3", "B3", "B3"];
   }
 
   // 로봇마다 맡은 미션 이름(순번 = data-robot). 미션이 없으면 null.

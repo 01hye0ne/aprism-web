@@ -62,10 +62,10 @@
    */
   var ROBOTS = [
     { n: 1,  floor: "B4", st: "run",  mission: "정기 순회 점검",     now: "N₂ 배관 압력 점검",     done: 3,  total: 20, bat: 78, sig: 4, uv: [0.42, 0.40] },
-    { n: 2,  floor: "B4", st: "done", mission: "정기 순회 점검",     now: "복귀 중",               done: 20, total: 20, bat: 18, chg: false, sig: 2, uv: [0.70, 0.66], moving: true },   // B3(WP-01~12) → 계단 → B4(WP-13~20) → B4 도크로 복귀 중
+    { n: 2,  floor: "B4", st: "idle", mission: null,                          now: "복귀 중",               bat: 18, chg: false, sig: 2, uv: [0.70, 0.66], moving: true },   // 10/20 — 미션 하나에 로봇 한 대, 배정 없음
     { n: 3,  floor: "B4", st: "idle", mission: null,                          now: "대기 중",               bat: 35, chg: true, sig: 3, uv: [0.90, 0.92], dock: true },
     { n: 4,  floor: "B4", st: "done", mission: "야간 순회 점검",     now: "순회 완료",             done: 20, total: 20, bat: 92, sig: 4, uv: [0.76, 0.92], dock: true },
-    { n: 5,  floor: "B3", st: "run",  mission: "발전기실 설비 점검", now: "발전기 베어링 진동 측정", done: 1, total: 20, bat: 64, sig: 3, uv: [0.50, 0.30] },
+    { n: 5,  floor: "B4", st: "run",  mission: "발전기실 설비 점검", now: "발전기 베어링 진동 측정", done: 13, total: 20, bat: 64, sig: 3, uv: [0.58, 0.30] },   // B3(WP-01~12) → 계단 → B4(10/20)
     { n: 6,  floor: "B4", st: "idle", mission: null,                          now: "충전 중",               bat: 8,  chg: true, sig: 2, uv: [0.90, 0.80], dock: true },
     { n: 7,  floor: "B3", st: "done", mission: "공조 설비 순회",     now: "순회 완료",             done: 20, total: 20, bat: 96, chg: true, sig: 4, uv: [0.10, 0.92], dock: true },
     { n: 8,  floor: "B3", st: "idle", mission: null,                          now: "대기 중",               bat: 47, sig: 3, uv: [0.24, 0.92], dock: true },
@@ -89,10 +89,10 @@
   var ALERTS = [
     { sev: "critical", robot: 1, floor: "B4", where: "터빈 2 / Unit 03 · WP-04 N₂ 배관 압력계", time: "10:12:40", title: "지하발전소 터빈 2 NG 1건 발견", uv: [0.38, 0.34] },
     { sev: "warning",  robot: 1, floor: "B4", where: "APRO 4F · WP-03 냉각수 배관 밸브",       time: "10:11:19", title: "누출감지 · 냉각수 배관 밸브", uv: [0.30, 0.52] },
-    { sev: "warning",  robot: 2, floor: "B3", where: "Robot 02 · WP-06 수배전반",              time: "10:09:42", title: "부분방전 · 이상 점수 9.41", uv: [0.62, 0.22] },
-    { sev: "warning",  robot: 2, floor: "B3", where: "Robot 02 · WP-12 냉각 펌프 P-2",         time: "10:06:05", title: "진동 상승 · 냉각 펌프 P-2", uv: [0.64, 0.46] },
+    { sev: "warning",  robot: 5, floor: "B3", where: "Robot 05 · WP-06 수배전반",              time: "10:09:42", title: "부분방전 · 이상 점수 9.41", uv: [0.62, 0.22] },
+    { sev: "warning",  robot: 5, floor: "B3", where: "Robot 05 · WP-12 냉각 펌프 P-2",         time: "10:06:05", title: "진동 상승 · 냉각 펌프 P-2", uv: [0.64, 0.46] },
     { sev: "warning",  robot: 5, floor: "B3", where: "Robot 05 · WP-02 발전기 베어링",         time: "10:03:27", title: "과열 · 발전기 베어링 68.4℃", uv: [0.56, 0.24] },
-    { sev: "warning",  robot: 2, floor: "B4", where: "Robot 02 · WP-20 공기 압축기 C-1",       time: "10:01:12", title: "압력 편차 · 공기 압축기 C-1", uv: [0.50, 0.74] }
+    { sev: "warning",  robot: 5, floor: "B4", where: "Robot 05 · WP-13 공기 압축기 C-1",       time: "10:01:12", title: "압력 편차 · 공기 압축기 C-1", uv: [0.50, 0.74] }
   ];
   ALERTS.forEach(function (a) {
     // 층은 알림이 난 웨이포인트의 층이다(로봇이 지금 선 층이 아니다 — 메인 v2.2 monitor.js 와 같다).
@@ -116,9 +116,9 @@
   function hm(t) { var p = t.split(":"); return (+p[0]) * 60 + (+p[1]); }
   var GANTT = [
     { n: 1,  bars: [["09:12", "10:11", "run"], ["10:11", "14:00", "run", 1]] },
-    { n: 2,  bars: [["08:40", "10:11", "run"], ["10:11", "10:25", "move", 1], ["10:25", "12:30", "chg", 1]] },
+    { n: 2,  bars: [["08:40", "10:11", "move"], ["10:11", "10:25", "move", 1], ["10:25", "12:30", "chg", 1]] },
     { n: 4,  bars: [["07:20", "09:06", "run"], ["09:06", "09:20", "move"], ["09:20", "10:11", "chg"], ["10:11", "10:40", "chg", 1]] },
-    { n: 5,  bars: [["10:02", "10:11", "run"], ["10:11", "13:40", "run", 1]] },
+    { n: 5,  bars: [["07:28", "10:11", "run"], ["10:11", "11:50", "run", 1]] },
     { n: 7,  bars: [["06:05", "07:16", "run"], ["07:16", "07:30", "move"], ["07:30", "10:11", "chg"], ["11:30", "12:50", "run", 1]] },
     { n: 9,  bars: [["06:00", "06:41", "run"], ["06:41", "06:55", "move"], ["06:55", "08:30", "chg"]] },
     { n: 11, bars: [["09:40", "10:11", "run"], ["10:11", "12:10", "run", 1]] }

@@ -256,10 +256,12 @@
    * floor — 로봇이 도는 층(screen.js APRISM_ROBOT_FLOORS 와 같다). 없으면 ROBOT_ON.
    * at — 진행도(웨이포인트 n/20)에 맞춘 자리. 경유지는 대략의 비율이고 길찾기가 빈 통로로 붙인다.
    */
+  // ROBOT 05 — B3 · B4 를 둘 다 지나는 예시(10/20 디자이너, 예전 정기 순회 점검 ROBOT 02 의 길).
+  //   길은 crossLane 이 B3 둘레(CROSS.tour) → 계단 → B4(아래 stops) 로 깐다. 아래는 길을 못 깔 때의 바탕이다.
   ROBOTS[4] = {
-    name: "ROBOT 05", at: 0.1, floor: "B3",           // 발전기실 설비 점검 · 1/20(WP-02 로 가는 중)
-    dock: [0.86, 0.30],
-    stops: [[0.62, 0.30], [0.62, 0.70], [0.88, 0.70]],
+    name: "ROBOT 05", at: 0.6,
+    dock: [0.72, 0.06],
+    stops: [[0.60, 0.29], [0.30, 0.30], [0.15, 0.20]],
     done: 0x89b9ed, left: 0x4990e0, dot: 0xc7ddf8
   };
   /*
@@ -3353,7 +3355,7 @@
   function travelBuild(up, low, tour) {
     var box = modelBox, size = box.getSize(new THREE.Vector3());
     function world(fx, fz) { return new THREE.Vector3(box.min.x + fx * size.x, 0, box.min.z + fz * size.z); }
-    var bot = ROBOTS[1];
+    var bot = ROBOTS[Number(CROSS_ID)];
     var flights = stairLinks.filter(function (l) { return l.upper === up && l.lower === low; });
     if (!flights.length) { return null; }
     var dest = bot.stops.slice(1).map(function (s) { return world(s[0], s[1]); });
@@ -3382,7 +3384,7 @@
     parts.forEach(function (p) { p.visible = false; scene.add(p); });
 
     var lane = {
-      id: "1", bot: bot, parts: parts, travel: true, floor: up,
+      id: CROSS_ID, bot: bot, parts: parts, travel: true, floor: up,
       here: here, ahead: here.clone(),
       // 웨이포인트는 B4 미션이라 B4 토막 위에 놓는다.
       turns: B.pts, mile: B.mi, total: B.len
@@ -3392,7 +3394,7 @@
       s: 0, s1: A.len, s2: A.len + S.len, s3: A.len + S.len + B.len,
       phase: "walk", dwell: 0, floor: up, t: 0,
       down: floorOf(low).deck < floorOf(up).deck,
-      backup: lanes["1"], seen: false, onStairs: false,
+      backup: lanes[CROSS_ID], seen: false, onStairs: false,
       shrinkAt: 0, badgeAt: 0, arriveAt: 0, gridY0: 0, followFrom: 0
     };
   }
@@ -3408,7 +3410,7 @@
       return n;
     }
     travDom = {
-      pill: el("tr-pill", "<i></i><span>ROBOT 02</span>"),
+      pill: el("tr-pill", "<i></i><span>" + ROBOTS[Number(CROSS_ID)].name + "</span>"),
       badge: el("tr-badge"),
       chip: el("tr-chip")
     };
@@ -3670,7 +3672,7 @@
     if (!trav) { return; }
     if (trav.onStairs) { endStairMove(); }
     trav.lane.parts.forEach(function (p) { scene.remove(p); });
-    lanes["1"] = trav.backup;
+    lanes[CROSS_ID] = trav.backup;
     if (travDom) { travDom.pill.hidden = travDom.badge.hidden = travDom.chip.hidden = true; }
     clearFloorRobots();
     var was = onLane === trav.lane;
@@ -3688,17 +3690,19 @@
    * 실데이터가 붙으면 trav.s 만 로봇 위치로 옮기면 된다(그때 travelTick 이 층을 따라간다).
    */
   // tour — B3 를 한 바퀴 도는 자리(모델 상자 비율). 길찾기가 벽을 피해 이어 준다.
-  var CROSS = { up: "B3", low: "B4", split: 12, at: 0.92,
+  // CROSS_ID — 층을 건너는 로봇(data-robot). atLow — 아래층 토막에서의 자리(0 ~ 1). 10/20 ROBOT 02 → ROBOT 05(14/20).
+  var CROSS_ID = "4";
+  var CROSS = { up: "B3", low: "B4", split: 12, atLow: 0.18,
     tour: [[0.62, 0.30], [0.30, 0.30], [0.20, 0.55], [0.45, 0.70], [0.70, 0.62]] };
   function crossLane() {
     if (!document.body.classList.contains("v2-2") || floors.length < 2 || trav) { return; }
     var built = travelBuild(CROSS.up, CROSS.low, CROSS.tour);
     if (!built) { return; }
     trav = built;
-    lanes["1"] = built.lane;
+    lanes[CROSS_ID] = built.lane;
     built.lane.segs = built.segs;
     built.lane.split = CROSS.split;
-    trav.s = built.s3 * CROSS.at;
+    trav.s = built.s2 + (built.s3 - built.s2) * CROSS.atLow;
     trav.phase = "walk2";
     trav.floor = CROSS.low;
     trav.saidFloor = CROSS.low;
@@ -3723,18 +3727,18 @@
     var built = travelBuild(up, low);
     if (!built) { return; }
     trav = built;
-    lanes["1"] = trav.lane;
+    lanes[CROSS_ID] = trav.lane;
     if (trav.backup) { trav.backup.parts.forEach(function (p) { p.visible = false; }); }
 
     function go() {
       if (floorBusy) { window.setTimeout(go, 60); return; }
-      var card = document.querySelector(".robot-strip .robot-card[data-robot='" + (tracked ? "1" : "0") + "']");
+      var card = document.querySelector(".robot-strip .robot-card[data-robot='" + (tracked ? CROSS_ID : "0") + "']");
       if (tracked) {
         if (card) { card.click(); }
         glide(yaw, pitch, Math.max(zoom, 2.2), trav.lane.here.clone());
       } else {
         // 다른 로봇을 골라 둔다. 카드를 누르면 카메라가 그 로봇(B4)으로 끌려가므로 끌려간 것을 되돌린다.
-        if (card && activeRobot() === "1") {
+        if (card && activeRobot() === CROSS_ID) {
           var keep = target.clone();
           card.click();
           trip = null;
@@ -4485,7 +4489,7 @@
      */
     var first = activeRobot();
     ROBOTS.forEach(function (bot, id) {
-      if (String(id) === first || id === 1) { buildLane(bot, id); }
+      if (String(id) === first || String(id) === CROSS_ID) { buildLane(bot, id); }
       else { lazyBots[String(id)] = bot; }
     });
     crossLane();

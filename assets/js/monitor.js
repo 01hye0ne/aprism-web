@@ -57,19 +57,19 @@
    * 여러 개 고를 수 있다: 현장에서는 "무전 연락 + 작업 중지" 처럼 둘을 같이 하는 일이 흔하다.
    */
   // floor — 알림이 난 웨이포인트의 층(v2.2, 10/19). 미션 하나가 B3 · B4 를 지나므로 줄마다 층 꼬리표가 붙는다.
-  //   Robot 02 는 B3 를 돌고 B4 로 내려온 로봇이다 — WP-06 · 12 는 B3, WP-20 은 B4.
+  //   Robot 05 는 B3 를 돌고 B4 로 내려온 로봇이다 — WP-02 · 06 · 12 는 B3, WP-13 은 B4(10/20, 예전 Robot 02).
   var WARNINGS = [
     { sev: "warning", robot: 0, floor: "B4", wp: "WP-03", live: "discharge", where: "APRO 4F · WP-03 냉각수 배관 밸브", time: "10:11:19",
       title: "누출감지 · 냉각수 배관 밸브", detect: "누출감지",
       sum: "밸브 이음부에서 누출 패턴이 신뢰도 0.87 로 검출됐습니다. 임계 0.70 을 넘었고 연속 2프레임에서 나왔습니다.",
       lead: "밸브 이음부 현장 점검을 요청하세요.", fp: 15, fpLabel: "낮음",
       acts: [{ t: "현장 점검 요청", ai: true }, { t: "다음 순회 재측정" }, { t: "추이 관찰" }] },
-    { sev: "warning", robot: 1, floor: "B3", wp: "WP-06", live: "discharge", where: "Robot 02 · WP-06 수배전반", time: "10:09:42",
+    { sev: "warning", robot: 4, floor: "B3", wp: "WP-06", live: "discharge", where: "Robot 05 · WP-06 수배전반", time: "10:09:42",
       title: "부분방전 · 이상 점수 9.41", detect: "부분방전",
       sum: "이상 점수 9.41 로 임계 9.23 을 넘었습니다. PRPD 패턴이 코로나 방전 유형과 일치합니다.",
       lead: "재진단을 예약해 PRPD 패턴을 다시 확인하세요.", fp: 22, fpLabel: "보통",
       acts: [{ t: "재진단 예약", ai: true }, { t: "현장 점검 요청" }, { t: "추이 관찰" }] },
-    { sev: "warning", robot: 1, floor: "B3", wp: "WP-12", live: "discharge", where: "Robot 02 · WP-12 냉각 펌프 P-2", time: "10:06:05",
+    { sev: "warning", robot: 4, floor: "B3", wp: "WP-12", live: "discharge", where: "Robot 05 · WP-12 냉각 펌프 P-2", time: "10:06:05",
       title: "진동 상승 · 냉각 펌프 P-2", detect: "진동감지",
       sum: "진동 RMS 4.8 mm/s 로 주의 기준 4.5 를 넘었습니다. 최근 3회 측정에서 계속 오르고 있습니다.",
       lead: "베어링 점검을 요청하세요.", fp: 18, fpLabel: "낮음",
@@ -79,7 +79,7 @@
       sum: "베어링 표면 온도 68.4℃ 로 주의 기준 65℃ 를 넘었습니다. 주변 온도보다 31℃ 높습니다.",
       lead: "윤활 상태 점검을 요청하세요.", fp: 25, fpLabel: "보통",
       acts: [{ t: "윤활 상태 점검 요청", ai: true }, { t: "열화상 재촬영" }, { t: "추이 관찰" }] },
-    { sev: "warning", robot: 1, floor: "B4", wp: "WP-20", live: "discharge", where: "Robot 02 · WP-20 공기 압축기 C-1", time: "10:01:12",
+    { sev: "warning", robot: 4, floor: "B4", wp: "WP-13", live: "discharge", where: "Robot 05 · WP-13 공기 압축기 C-1", time: "10:01:12",
       title: "압력 편차 · 공기 압축기 C-1", detect: "계기인식",
       sum: "토출 압력 7.9 bar 로 정상 범위(8.2~8.8) 아래입니다. 흡입 필터가 막혔을 가능성이 있습니다.",
       lead: "흡입 필터 점검을 요청하세요.", fp: 30, fpLabel: "보통",
