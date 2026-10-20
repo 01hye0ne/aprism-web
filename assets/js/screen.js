@@ -1234,11 +1234,6 @@ window.APRISM_TEXT = (function () {
        */
       if (missionName) { missionName.textContent = robot.mission || robot.current; }
       if (title) { title.textContent = (live && (live.act || live.title)) || robot.current; }
-      // 종류 아이콘 — 지금 하는 일의 낱말로 고른다(10/20 디자이너). 온도 · 발열 · 열화상은 온도계, 나머지 측정은 게이지(DS 47:11).
-      var kind = document.querySelector(".progress-kind .i");
-      if (kind && title) {
-        kind.style.setProperty("--i", /온도|발열|열화상|과열/.test(title.textContent) ? "var(--ic-thermometer)" : "var(--ic-gauge)");
-      }
       percent.textContent = Math.round((done / total) * 100) + "%";
 
       if (leftSlot) { leftSlot.textContent = timeLeft(robot); }
