@@ -2011,8 +2011,26 @@
    */
   var lanes = {};   // data-robot 번호 -> 그 로봇의 길을 이루는 것들
 
+  // 로봇 길 한 벌을 깐다 — 처음 열 때 한꺼번에 깔지 않고 고를 때 깐다(아래 laneFor).
+  var lazyBots = {};
+  function buildLane(bot, id) {
+    tintRobot(bot, id);
+    // 길은 도킹 스테이션에서 시작한다.
+    // 도커 -> WP-01 … -> 같은 도커 폐회로(미터 좌표 · 장애물 여유). 못 만들면 예전 길로 둔다.
+    var planned = planRobot(bot, id);
+    drawRoute(planned ? planned.world : layRoute(modelBox, [bot.dock].concat(bot.stops)), bot, id, planned);
+    if (bot.floor && lanes[String(id)]) { lanes[String(id)].floor = bot.floor; }
+  }
+  function laneFor(key) {
+    var bot = lazyBots[key];
+    if (!bot || !scene) { return; }
+    delete lazyBots[key];
+    buildLane(bot, Number(key));
+  }
+
   function showLane(index, keep) {
     var key = String(index);
+    laneFor(key);
     onLane = null;
     Object.keys(lanes).forEach(function (id) {
       var on = id === key;
@@ -2913,6 +2931,7 @@
   function layRobots() {
     if (!floors.length) { return; }
     // 층을 오가는 로봇의 길은 층마다 알아서 켜고 끈다(travelSync). 골라져 있으면 늘 깐다.
+    laneFor(activeRobot());
     var ln = lanes[activeRobot()];
     if (ln && ln.travel) { showLane(activeRobot(), true); return; }
     if (floorNow === ((ln && ln.floor) || ROBOT_ON)) { showLane(activeRobot(), true); }
@@ -4247,6 +4266,7 @@
 
   function replanMission() {
     var id = activeRobot();
+    laneFor(String(id));
     var ln = lanes[String(id)];
     var book = ln && ln.book;
     if (!scene || !book) { return; }
@@ -4458,13 +4478,15 @@
 
     // 로봇마다 제 고리를 깐다. 바닥 격자는 첫 로봇이 만들고 나머지가 나눠 쓴다.
     // 깔아만 두고 보이지는 않는다 — 지금 고른 로봇의 것 하나만 켠다.
+    /*
+     * 길 찾기(A*)가 로봇마다 두 번 돌아 여는 데 3초 남짓 걸렸다(10/20 디자이너 "전체 → B3 로딩"). 
+     * 지금 보는 로봇과 층을 건너는 시연 로봇(ROBOT 02 · crossLane 이 그 길을 바탕으로 쓴다)만 먼저 깔고,
+     * 나머지는 그 로봇을 처음 고를 때 깐다(showLane → laneFor).
+     */
+    var first = activeRobot();
     ROBOTS.forEach(function (bot, id) {
-      tintRobot(bot, id);
-      // 길은 도킹 스테이션에서 시작한다.
-      // 도커 -> WP-01 … -> 같은 도커 폐회로(미터 좌표 · 장애물 여유). 못 만들면 예전 길로 둔다.
-      var planned = planRobot(bot, id);
-      drawRoute(planned ? planned.world : layRoute(box, [bot.dock].concat(bot.stops)), bot, id, planned);
-      if (bot.floor && lanes[String(id)]) { lanes[String(id)].floor = bot.floor; }
+      if (String(id) === first || id === 1) { buildLane(bot, id); }
+      else { lazyBots[String(id)] = bot; }
     });
     crossLane();
     layRobots();
