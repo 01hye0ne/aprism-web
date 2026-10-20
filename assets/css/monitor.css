@@ -2761,3 +2761,91 @@ a.map-floor {
   clip-path: polygon(0 100%, 50% 0, 100% 100%, calc(100% - 1.6px) 100%, 50% 1.8px, 1.6px 100%);
 }
 .map-alert.ma-v3.is-docked::before { display: none; }
+
+/* ── 기본 쪽지(웨이포인트 · 로봇) — 설비 팝오버(Figma 1826:44373)와 한 벌로 (10/20 디자이너) ─────────
+ * 손대지 않은 옛 쪽지라 여백 8/12 · 글 11 · 꼬리 8 네모가 남아 설비 팝오버와 무게가 달랐다.
+ *   판: 여백 14 · 칸 사이 10 · 모서리 10 · 유리 면 · 꼬리 14×8 (설비 팝오버와 같은 값)
+ *   머리: 상태 칩(11 SemiBold 알약) · 이름 15 Bold · 닫기 12 — 번호(WP-02)는 이름보다 한 단 옅게
+ *   몸: 읽은 값 13 · 시각 12 회색 · 로봇은 열쇠/값 줄(12)
+ *   발: [상세보기] 는 이동 행동이라 회색 글자 + 화살표, 1px 선 아래 왼쪽에 붙인다 */
+.v2-2 .map-wp,
+.v2-2 .map-bot-tip {
+  --fac-bg: color-mix(in srgb, var(--color-gray-750) 92%, transparent);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 248px;
+  max-width: 320px;
+  padding: 14px;
+  border: 0;
+  border-radius: 10px;
+  background-color: var(--fac-bg);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 8%), 0 6px 16px rgb(0 0 0 / 35%);
+}
+:root[data-theme="light"] .v2-2 .map-wp,
+:root[data-theme="light"] .v2-2 .map-bot-tip {
+  --fac-bg: color-mix(in srgb, var(--bg-raised) 92%, transparent);
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 6%), 0 6px 16px rgb(0 0 0 / 14%);
+}
+.v2-2 .map-wp[hidden],
+.v2-2 .map-bot-tip[hidden] { display: none; }
+/* 꼬리 8 + 점 반지름 — 웨이포인트 점 위 14 */
+.v2-2 .map-wp { transform: translate(-50%, calc(-100% - 14px)); }
+.v2-2 .map-bot-tip { bottom: calc(100% + 12px); }
+.v2-2 .map-wp::after,
+.v2-2 .map-bot-tip::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  bottom: auto;
+  width: 14px;
+  height: 8px;
+  transform: translateX(-50%);
+  border: 0;
+  background-color: var(--fac-bg);
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+}
+.v2-2 .map-wp .map-card-head,
+.v2-2 .map-bot-tip .map-card-head { margin: 0; }
+.v2-2 .map-wp .map-card-name.t-split { display: flex; gap: 6px; min-width: 0; }
+.v2-2 .map-wp .map-card-name.t-split > .t-part:first-child { flex: none; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+.v2-2 .map-wp .map-card-name.t-split > .t-part + .t-part { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.v2-2 .map-wp-read {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.v2-2 .map-wp-read.t-split { display: flex; flex-wrap: wrap; gap: 2px 12px; }
+.v2-2 .map-wp-time { margin: -6px 0 0; font-size: 12px; line-height: 1.4; }
+.v2-2 .map-wp-more {
+  align-self: stretch;
+  justify-content: flex-start;
+  gap: 2px;
+  height: auto;
+  margin: 0;
+  padding: 10px 0 0;
+  border: 0;
+  border-top: var(--border-width-thin) solid var(--border-divider);
+  border-radius: 0;
+  background: transparent;
+  font-size: 12px;
+  line-height: 1.4;
+  font-weight: 600;
+}
+:root:not([data-theme="light"]) .v2-2 .map-wp-more { border-top-color: rgb(255 255 255 / 8%); }
+.v2-2 .map-wp-more::after {
+  content: "";
+  width: 12px;
+  height: 12px;
+  background-color: currentColor;
+  -webkit-mask: var(--ic-chevron-right) center / contain no-repeat;
+  mask: var(--ic-chevron-right) center / contain no-repeat;
+}
+.v2-2 .map-wp-more:hover { background: transparent; }
+.v2-2 .map-wp .map-card-name.t-split > .t-part + .t-part,
+.v2-2 .map-wp-read.t-split > .t-part + .t-part { margin-left: 0; }
