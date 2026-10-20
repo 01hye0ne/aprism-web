@@ -2595,6 +2595,7 @@ a.map-floor {
  * 판은 거의 불투명한 흰 면으로 막고, 빛은 투명도로 빼지 않고 "색에서 색으로" 흰빛까지 간다 — 채도가 끝까지 산다.
  * 심지는 선명한 빨강, 번지며 산호 → 복숭아 → 흰빛. 마지막 한 칸만 투명으로 흰 판에 녹는다.
  * 3차(10/19) — 다시 연하게: 심지를 산호빛 빨강(255 84 68)으로 한 단 풀고, 번지는 거리도 줄였다(흰빛까지 92% → 78%).
+ * 4차 — 펼친 창 윗변은 한 단 더 연하게(255 128 110). 넓은 머리 띠라 접힌 판의 모서리 심지보다 무겁게 읽혔다.
  */
 :root[data-theme="light"][data-glow="top"][data-delta="glass"] .v2-2 .delta3.is-critical:not(.is-open) .delta3-card,
 :root[data-theme="light"][data-glow="top"][data-delta="glass"] .v2-2 .delta3.is-critical.is-open {
@@ -2618,10 +2619,10 @@ a.map-floor {
 }
 :root[data-theme="light"][data-glow="top"][data-delta="glass"] .v2-2 .delta3.is-critical.is-open {
   background-image: linear-gradient(in oklab to bottom,
-    rgb(255 84 68) 0%,
-    rgb(255 140 120) 8%,
-    rgb(255 196 184) 18%,
-    rgb(255 232 226) 30%,
+    rgb(255 128 110) 0%,
+    rgb(255 170 154) 8%,
+    rgb(255 210 200) 18%,
+    rgb(255 236 231) 30%,
     rgb(255 255 255 / 0%) 44%);
 }
 
