@@ -771,8 +771,9 @@ window.APRISM_TEXT = (function () {
     },
     {
       // 11 · 수행중 · 71% · Strong — 막바지에 가까워졌다
+      // 10/20 디자이너 — 걸어가는 로봇 예시. WP-03 을 마치고 WP-04 로 이동 중이라 붙든 칸이 없다(로봇 3D 는 걷기).
       mission: "지하 3층 전기실 열화상 점검",
-      current: "배전반실 열화상 점검",
+      current: "WP-04 로 이동 중",
       steps: [
         { title: "waypoint name", state: "done", time: "09:40 – 09:58", duration: "18분" },
         { title: "waypoint name", state: "done", time: "09:58 – 10:12", duration: "14분" },
@@ -780,10 +781,8 @@ window.APRISM_TEXT = (function () {
         {
           title: "Switchgear Room Thermal Scan",
           act: "배전반 발열 스캔",
-          state: "running",
-          time: "10:29 – 10:44",
-          duration: "15분",
-          desc: "배전반 발열을 훑는 중. 기준보다 높은 지점을 표시합니다."
+          state: "pending",
+          desc: "배전반 발열을 훑습니다. 기준보다 높은 지점을 표시합니다."
         },
         { title: "waypoint name", state: "pending" }
       ]

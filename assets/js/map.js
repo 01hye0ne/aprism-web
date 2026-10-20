@@ -287,7 +287,7 @@
     done: 0x9ea8bb, left: 0x9ea8bb, dot: 0xffffff
   };
   ROBOTS[10] = {
-    name: "ROBOT 11", at: 0.15, floor: "B3",          // 전기실 열화상 점검 · 3/20
+    name: "ROBOT 11", at: 0.15, floor: "B3", walk: 3,   // 전기실 열화상 점검 · 3/20 — WP-03 → WP-04 로 걸어가는 중(10/20, walkTick)
     dock: [0.12, 0.90],
     stops: [[0.12, 0.55], [0.45, 0.55], [0.45, 0.20], [0.15, 0.20]],
     done: 0x89b9ed, left: 0x4990e0, dot: 0xc7ddf8
@@ -2034,6 +2034,7 @@
     var key = String(index);
     laneFor(key);
     onLane = null;
+    window.setTimeout(walkStart, 0);   // 걷는 로봇의 길이 켜지면 걸음을 건다(walkTick)
     Object.keys(lanes).forEach(function (id) {
       var on = id === key;
       lanes[id].parts.forEach(function (part) { part.visible = on; });
@@ -2510,8 +2511,79 @@
       here: here.clone(), ahead: ahead.clone(),
       plan: plan || null, wps: plan ? plan.wpWorld : null, dock: turns[0].clone(),
       // 좌표집 — 처음 깐 한 바퀴. 길을 다시 깔아도 설비 자리는 여기서 읽는다.
-      book: (was && was.book) || (plan && plan.names ? plan : null)
+      book: (was && was.book) || (plan && plan.names ? plan : null),
+      fan: fan
     };
+    if (bot.walk && plan && plan.wpWorld) { walkSetup(lanes[String(id)], bot.walk); }
+  }
+
+  /*
+   * 걸어가는 로봇(10/20 디자이너 "이동 중인 로봇도 하나") — bot.walk = 지나온 웨이포인트 수(n).
+   * WP-n 에서 WP-(n+1) 로 천천히 걸어간다. 닿으면 잠깐 섰다가 WP-n 쪽에서 다시 걷는다(시연용 반복).
+   * 지나온 실선 · 남은 점선 · 시야 부채꼴 · 로봇 표식이 함께 따라온다. 그 로봇의 길이 켜져 있을 때만 돈다.
+   */
+  var WALK_SECONDS = 14;   // 한 구간(WP-n → n+1)을 걷는 데 드는 시간 — 화면에서 걸음이 보일 만큼
+  var walkLast = 0, walkOn = false;
+  // 길 위에서 점 p 에 가장 가까운 자리의 누적 거리 — 웨이포인트는 꺾인 점 사이 토막 위에 놓인다.
+  function nearMile(ln, p) {
+    var best = 0, bd = Infinity, ab = new THREE.Vector3(), ap = new THREE.Vector3(), q = new THREE.Vector3();
+    for (var i = 1; i < ln.turns.length; i += 1) {
+      var a = ln.turns[i - 1], b = ln.turns[i];
+      ab.subVectors(b, a); ap.subVectors(p, a);
+      var len2 = ab.lengthSq();
+      var t = len2 > 0 ? Math.max(0, Math.min(1, ap.dot(ab) / len2)) : 0;
+      q.copy(a).addScaledVector(ab, t);
+      var d = q.distanceTo(p);
+      if (d < bd) { bd = d; best = ln.mile[i - 1] + (ln.mile[i] - ln.mile[i - 1]) * t; }
+    }
+    return best;
+  }
+  function walkSetup(ln, n) {
+    var a = ln.wps[n - 1], b = ln.wps[n];
+    if (!a || !b) { return; }
+    var m0 = nearMile(ln, a), m1 = nearMile(ln, b);
+    if (!(m1 > m0)) { return; }
+    ln.walk = { from: m0 + (m1 - m0) * 0.12, to: m1 - (m1 - m0) * 0.06, s: m0 + (m1 - m0) * 0.12, rest: 0 };
+    walkPlace(ln);
+  }
+  function walkPlace(ln) {
+    var w = ln.walk, s = w.s;
+    var at = 1;
+    while (at < ln.mile.length - 1 && ln.mile[at] < s) { at += 1; }
+    var here = alongRoute(ln.turns, ln.mile, s);
+    var ahead = alongRoute(ln.turns, ln.mile, Math.min(ln.total, s + span * 0.01));
+    ln.here.copy(here);
+    ln.ahead.copy(ahead);
+    function flat(pts) { var f = []; pts.forEach(function (q) { f.push(q.x, q.y, q.z); }); return f; }
+    var done = ln.parts[0], left = ln.parts[1];
+    if (done && done.geometry) { done.geometry.setPositions(flat(ln.turns.slice(0, at).concat([here]))); done.computeLineDistances(); }
+    if (left && left.geometry) { left.geometry.setPositions(flat([here].concat(ln.turns.slice(at)))); left.computeLineDistances(); }
+    if (ln.fan) {
+      ln.fan.position.copy(here);
+      ln.fan.position.y += span * 0.002;
+      ln.fan.rotation.y = Math.atan2(ahead.x - here.x, ahead.z - here.z);
+    }
+  }
+  function walkTick(t) {
+    var ln = onLane;
+    if (!ln || !ln.walk || !renderer) { walkOn = false; return; }
+    var dt = Math.min(0.1, (t - (walkLast || t)) / 1000);
+    walkLast = t;
+    var w = ln.walk;
+    if (w.rest > 0) { w.rest -= dt; if (w.rest <= 0) { w.s = w.from; } }
+    else {
+      w.s += (w.to - w.from) / WALK_SECONDS * dt;
+      if (w.s >= w.to) { w.s = w.to; w.rest = 2.5; }
+    }
+    walkPlace(ln);
+    frame();
+    window.requestAnimationFrame(walkTick);
+  }
+  function walkStart() {
+    if (walkOn || !onLane || !onLane.walk) { return; }
+    if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) { return; }
+    walkOn = true; walkLast = 0;
+    window.requestAnimationFrame(walkTick);
   }
 
   /* ---------- Focus Point ----------
