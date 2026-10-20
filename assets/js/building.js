@@ -596,6 +596,7 @@
   /*
    * 색 — 메인 지도(map.js)의 다크 · 라이트 팔레트와 같다. 쌓인 판(전체 보기)은 면을 바탕에 묻고
    * 외곽선만 남긴다. 층에 들어가면 면이 제 색으로 차오른다(solid 0 → 1).
+   * 10/20 — 라이트 쌓인 판이 순백(L* 98.6)이라 흰 카드와 겨뤘다. 메인 지도 덩이 윗면(L* 95)에 맞춰 한 단 내렸다(ghost f4f5f7 → eff1f4 · 0.7 → 0.63, 실측 94.7).
    */
   var PAL = {
     dark: {
@@ -604,7 +605,7 @@
       lift: { floor: 0, wall: 0.55, equipment: 0.4, stairs: 0.45, other: 0.4 }
     },
     light: {
-      ghost: 0xf4f5f7, ghostLift: 0.7, edge: 0x5d6773, edgeSolid: 0x5d6773, hotEdge: 0x2b2f36, hotFace: 0xe4e7ec,
+      ghost: 0xeff1f4, ghostLift: 0.63, edge: 0x5d6773, edgeSolid: 0x5d6773, hotEdge: 0x2b2f36, hotFace: 0xe4e7ec,
       face: { floor: 0xeceef1, wall: 0xb4bcc9, equipment: 0x9aa5b6, stairs: 0xc3cad5, other: 0xb0b8c6 },
       lift: { floor: 0, wall: 0.08, equipment: 0.06, stairs: 0.07, other: 0.06 }
     }

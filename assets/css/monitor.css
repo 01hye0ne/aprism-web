@@ -2857,3 +2857,26 @@ a.map-floor {
 :root[data-theme="light"] .v2-2 .ah-box { background-color: var(--bg-raised); }
 :root[data-theme="light"] .v2-2 .ah-item,
 :root[data-theme="light"] .v2-2 .done-item { box-shadow: inset 0 -1px 0 var(--border-divider); }
+
+/* 10/20 디자이너 — 라이트 목록 안쪽 그림자: 회색 그림자 대신 목록 면(흰색)과 같은 색으로 번지게.
+ * 위로 굴렸을 때(is-scrolled) 위 끝, 더 있을 때(has-fade) 아래 끝이 흰 면으로 녹는다 — 회색이 흰 상자에 얼룩처럼 끼지 않는다. */
+:root[data-theme="light"] .v2-2 .ah-box,
+:root[data-theme="light"] .v2-2 .ah-box.is-scrolled { box-shadow: none; }
+:root[data-theme="light"] .v2-2 .ah-box::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 24px;
+  pointer-events: none;
+  background: linear-gradient(var(--bg-raised), color-mix(in srgb, var(--bg-raised) 0%, transparent));
+  opacity: 0;
+  transition: opacity 160ms ease;
+}
+:root[data-theme="light"] .v2-2 .ah-box.is-scrolled::before { opacity: 1; }
+:root[data-theme="light"] .v2-2 .ah-box.has-fade::after {
+  z-index: 1;
+  background: linear-gradient(color-mix(in srgb, var(--bg-raised) 0%, transparent), var(--bg-raised));
+}
