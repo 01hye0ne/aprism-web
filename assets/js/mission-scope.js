@@ -189,6 +189,8 @@
     });
 
     if (countSlot) { countSlot.textContent = shown.length + "대 배정"; }
+    // 좌우 버튼은 넘길 로봇이 2대 이상일 때만(10/20 디자이너 — 지금은 미션 하나에 한 대, 다기종이면 여럿이 붙을 수 있다).
+    Array.prototype.forEach.call(document.querySelectorAll(".rc-nav"), function (nav) { nav.hidden = shown.length < 2; });
     if (runSlot) {
       runSlot.textContent = shown.filter(function (c) { return c.querySelector(".badge-info"); }).length + "대 수행중";
     }
