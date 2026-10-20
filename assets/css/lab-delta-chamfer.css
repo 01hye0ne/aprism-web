@@ -1,0 +1,67 @@
+/*
+ * 실험 — 관제 프레임처럼 Delta 카드의 왼쪽 위도 깎는다 (2026-10-20 디자이너 스케치, 톤 실험실)
+ * screens/lab-delta-chamfer.html 에서만 쓴다(body.lab-chamfer). v2.2 화면은 그대로다.
+ *
+ *   프레임의 깎인 선(x+y=56, delta3 기준)과 나란히, 카드도 왼쪽 위를 45도로 깎는다.
+ *   카드 기준 x+y=40 — 프레임 선과 약 17 떨어진다(다른 변의 여백 20 과 비슷하다).
+ *   이음매는 카드 라운드와 같은 8 로 둥글린다 — 원 중심 (43.314, 8) · (8, 43.314).
+ *   Delta 표식은 v2.2 그대로 프레임 삼각판에 앉는다. 제목은 깎인 선을 피해 오른쪽으로 민다.
+ */
+
+/*
+ * 깎기 — 접힌 카드는 220 고정이라 px 경로로 자른다. 위 · 왼쪽 깎인 자리 말고는 상자 밖까지(-60 · 300)
+ * 열어 두어 카드 그림자(아래 그림자 · 위험의 바깥 번짐)는 그대로 남는다.
+ */
+.v2-2.v3.lab-chamfer .delta3:not(.is-open) .delta3-card {
+  clip-path: path("M 37.657 2.343 A 8 8 0 0 1 43.314 0 L 43.314 -60 L 300 -60 L 300 300 L -60 300 L -60 43.314 L 0 43.314 A 8 8 0 0 1 2.343 37.657 Z");
+  --d3c-edge: var(--effect-glass-edge);
+}
+.v2-2.v3.lab-chamfer .delta3.is-critical:not(.is-open) .delta3-card { --d3c-edge: rgb(255 110 90 / 85%); }
+:root[data-theme="light"] .v2-2.v3.lab-chamfer .delta3.is-critical:not(.is-open) .delta3-card { --d3c-edge: rgb(255 120 96 / 85%); }
+
+/* 제목 — 깎인 선(x+y=40)을 피해 글이 x 36 에서 시작한다(카드 안쪽 4 + 32). */
+.v2-2.v3.lab-chamfer .delta3:not(.is-open) .delta3-head { padding-left: 32px; }
+
+/* 깎인 변의 1px 선 — 윗변 반사선(inset 0 1px)이 사선을 따라 이어진다. */
+.v2-2.v3.lab-chamfer .delta3:not(.is-open) .delta3-card::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 48px;
+  height: 48px;
+  pointer-events: none;
+  background-color: var(--d3c-edge);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg width='48' height='48' viewBox='0 0 48 48' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 43.314A8 8 0 0 1 2.343 37.657L37.657 2.343A8 8 0 0 1 43.314 0H48' stroke='%23000' stroke-width='2'/%3E%3C/svg%3E") 0 0 / 48px 48px no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg width='48' height='48' viewBox='0 0 48 48' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 43.314A8 8 0 0 1 2.343 37.657L37.657 2.343A8 8 0 0 1 43.314 0H48' stroke='%23000' stroke-width='2'/%3E%3C/svg%3E") 0 0 / 48px 48px no-repeat;
+}
+
+/*
+ * 위험 — 깎인 변에도 빛을 둔다. 카드의 안쪽 빛(inset 18 18)과 바깥 번짐(-10 -10)은 둥근 상자 기준이라
+ * 사선에서 뚝 끊긴다. 안쪽은 사선을 따라 붉은 띠 한 겹(::before), 바깥은 프레임 선과 카드 사이를 붉게 물들인다.
+ */
+.v2-2.v3.lab-chamfer .delta3.is-critical:not(.is-open) .delta3-card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 60px;
+  height: 60px;
+  pointer-events: none;
+  /* 60 상자의 135deg 축에서 x+y=40 은 33.3% 자리다. */
+  background: linear-gradient(135deg, transparent 33.3%, rgb(255 72 60 / 55%) 33.4%, transparent 58%);
+}
+.v2-2.v3.lab-chamfer .delta3.is-critical:not(.is-open)::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 120px;
+  height: 120px;
+  pointer-events: none;
+  /* delta3 기준 — 프레임 선 x+y=56(23.3%)부터 카드 사선 x+y=80(33.3%)까지. */
+  background: linear-gradient(135deg, transparent 23.3%, rgb(235 40 40 / 14%) 26%, rgb(235 40 40 / 42%) 33.3%, transparent 33.4%);
+}
+:root[data-theme="light"] .v2-2.v3.lab-chamfer .delta3.is-critical:not(.is-open)::before {
+  background: linear-gradient(135deg, transparent 23.3%, rgb(245 80 60 / 8%) 26%, rgb(245 80 60 / 26%) 33.3%, transparent 33.4%);
+}
