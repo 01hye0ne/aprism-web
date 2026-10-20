@@ -143,9 +143,49 @@
     <div class="dec"><dt>상태색 채도</dt><dd>틴트 단계만 낮추고 <code>300</code>·<code>500</code> 원색은 경보 강도 유지</dd></div>
   </dl>
 
+  <!-- 2026-10-20 — Delta 모서리를 깎지 않는 실험. 느낌이 크게 바뀔 수 있어 v2.2 는 그대로 두고
+       복제 화면(screens/lab-delta-round.html + assets/css/lab-delta-round.css)에만 그렸다. -->
+  <section class="np rc" style="margin-top:0">
+    <h2>실험 — Delta 모서리를 깎지 않고 지도 위에 띄우기 <span style="font-size:12px;color:var(--ui-flag);font-weight:600">실험 중(10/20)</span></h2>
+    <p class="note">
+      관제 프레임 네 모서리를 모두 같은 라운드로 두고, 접힌 Delta 는 지도 위에 뜬 카드 하나로 바꿨습니다.
+      삼각판 · 깎인 선은 걷고, Delta 표식(세 점)은 카드 머리의 제목 왼쪽으로 넣었습니다(지도 위에 따로 띄우면 묻힘).
+      <b>주의</b>는 둥근 왼쪽 위 모서리에서 위 · 왼쪽 변을 따라 퍼지다 사라지고, <b>위험</b>은 네 변 테 그대로입니다.
+      왼쪽은 지금 v2.2, 오른쪽이 실험 화면입니다.
+    </p>
+    <div class="np-bar" role="group" aria-label="화면 상태">
+      <button type="button" data-rc-state="normal">정상</button>
+      <button type="button" data-rc-state="warning">주의</button>
+      <button type="button" data-rc-state="critical" aria-pressed="true">위험</button>
+      <span style="width:12px"></span>
+      <button type="button" data-rc-theme="dark" aria-pressed="true">다크</button>
+      <button type="button" data-rc-theme="light">라이트</button>
+      <span class="np-hint">화면 안을 눌러 Delta 를 펼쳐 볼 수도 있습니다.</span>
+    </div>
+    <div class="np-frames">
+      <figure class="np-frame">
+        <figcaption>지금 v2.2 — 깎인 모서리</figcaption>
+        <div class="np-view"><iframe data-rc-frame="now" title="지금 v2.2"></iframe></div>
+      </figure>
+      <figure class="np-frame">
+        <figcaption>실험 — 둥근 모서리 · 뜬 카드</figcaption>
+        <div class="np-view"><iframe data-rc-frame="round" title="실험 화면"></iframe></div>
+      </figure>
+    </div>
+    <p class="note" style="margin-top:12px">
+      크게 보기 — <a href="./screens/lab-delta-round.html#critical" target="_blank" rel="noopener" style="color:var(--ui-accent)">실험 화면 열기</a>
+      · <a href="./screens/main-v2-2.html#critical" target="_blank" rel="noopener" style="color:var(--ui-accent)">v2.2 열기</a>
+    </p>
+    <p class="note">
+      <b>챙길 것</b> — ① 주의 빛이 "Delta 모서리에서 번진다"는 느낌은 약해집니다(모서리 빛 + 카드 빛이 그 역할).
+      ② 채택하면 Figma(UI_00 826:8887 · 관제 프레임)의 삼각판 · 깎인 선도 걷어야 합니다.
+      ③ 정책 기록의 "주의 엣지 글로우 모서리만 · 깎인 모서리를 변과 한 줄로"는 회의 전 문서 갱신에 같이 넣습니다.
+    </p>
+  </section>
+
   <!-- 2026-10-12 — 위험 Delta 를 면이 아니라 빛으로. 실제 v2.2 화면에서 Delta 자리만 잘라 키워 보인다.
        제안은 ?delta=glass(monitor.css 의 :root[data-delta="glass"]). 회색은 쿨그레이 그대로다. -->
-  <section class="dc" style="margin-top:0">
+  <section class="dc">
     <h2>위험 Delta 를 빛으로 강조 <span style="font-size:12px;color:#5fd382;font-weight:600">v2.2 에 채택(10/12)</span></h2>
     <p class="note">
       붉은 면으로 채운 판은 너무 셌습니다. 레퍼런스처럼 쿨그레이 유리판은 그대로 두고, <b>아래 변에서 붉은 빛이 올라와 사라지게</b> 했습니다.
@@ -456,6 +496,40 @@
 </div>
 
 <script>
+/* 실험 — Delta 둥근 모서리. 지금 v2.2 와 실험 화면을 같은 상태 · 테마로 띄운다. */
+(function () {
+  var frames = document.querySelectorAll("[data-rc-frame]");
+  if (!frames.length) { return; }
+  var cur = { state: "critical", theme: "dark" };
+  function load() {
+    Array.prototype.forEach.call(frames, function (f) {
+      var page = f.getAttribute("data-rc-frame") === "round" ? "lab-delta-round" : "main-v2-2";
+      f.src = "./screens/" + page + ".html?theme=" + cur.theme + "#" + cur.state;
+    });
+    Array.prototype.forEach.call(document.querySelectorAll("[data-rc-state]"), function (b) {
+      b.setAttribute("aria-pressed", b.getAttribute("data-rc-state") === cur.state ? "true" : "false");
+    });
+    Array.prototype.forEach.call(document.querySelectorAll("[data-rc-theme]"), function (b) {
+      b.setAttribute("aria-pressed", b.getAttribute("data-rc-theme") === cur.theme ? "true" : "false");
+    });
+  }
+  function fit() {
+    Array.prototype.forEach.call(frames, function (f) {
+      f.style.transform = "scale(" + ((f.parentNode.clientWidth || 1) / 1920) + ")";
+    });
+  }
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest("[data-rc-state], [data-rc-theme]");
+    if (!b) { return; }
+    if (b.hasAttribute("data-rc-state")) { cur.state = b.getAttribute("data-rc-state"); }
+    else { cur.theme = b.getAttribute("data-rc-theme"); }
+    load();
+  });
+  load();
+  fit();
+  window.addEventListener("resize", fit);
+})();
+
 /* 위험 Delta 비교 — 네 장을 띄우고 Delta 자리만 보이게 옮겨 키운다. */
 (function () {
   var frames = document.querySelectorAll("[data-dc]");
