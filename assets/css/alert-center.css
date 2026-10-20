@@ -904,6 +904,10 @@
 
 .ac-sev-badge.is-warning .badge-dot { background-color: var(--status-warning-icon); }
 
+/* 기호 — 지도 알림 팝오버 .ma-badge-ic 와 같은 14 · 위험은 글자와 한 톤인 icon-subtle(10/20) */
+.ac-sev-badge .ac-sev-ic { --i: var(--ic-error); width: 14px; height: 14px; color: var(--status-critical-icon-subtle); }
+.ac-sev-badge.is-warning .ac-sev-ic { --i: var(--ic-warning); color: var(--status-warning-icon); }
+
 /* ── 스냅숏 + 메타 ───────────────────────────────────────── */
 .ac-d-snap-meta {
   display: flex;
