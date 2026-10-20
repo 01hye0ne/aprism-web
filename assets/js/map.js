@@ -1165,9 +1165,26 @@
     pen.frustumCulled = false;   // 선을 갈아 끼우므로 three 가 잰 반경은 못 믿는다
     pen.renderOrder = 5;
     pen.visible = false;
+    /*
+     * 가려진 토막 — 같은 선을 깊이 없이 옅게 한 벌 더 깐다(10/20 디자이너 "호버하면 선이 끊긴다").
+     * 깊이를 보게 한 뒤로 벽 · 다른 덩이 뒤로 들어간 모서리가 통째로 사라져 외곽선이 토막 나 보였다.
+     * 보이는 데는 본 선이, 가려진 데는 이 옅은 선만 — 길 선(strand)의 벽 뒤 유령선과 같은 셈이다.
+     */
+    if (alpha > 0.5) {
+      var ghostMat = mat.clone();
+      ghostMat.depthTest = false;
+      ghostMat.opacity = OUTLINE_GHOST;
+      ghostMat.resolution.set(view.clientWidth || 1, view.clientHeight || 1);
+      fatMats.push(ghostMat);
+      var ghost = new Fat.LineSegments2(geo, ghostMat);
+      ghost.frustumCulled = false;
+      ghost.renderOrder = 4;
+      pen.add(ghost);
+    }
     scene.add(pen);
     return pen;
   }
+  var OUTLINE_GHOST = 0.28;   // 가려진 외곽선 토막의 불투명도
 
   function drawOutline(pens, item) {
     if (!pens.length) { return; }
@@ -2743,7 +2760,7 @@
     });
     PICKED.setHex(set.pickFace);
     GHOSTC.setHex(set.ghost);
-    pickPens.forEach(function (pen) { pen.material.color.setHex(set.pickLine); });
+    pickPens.forEach(function (pen) { pen.material.color.setHex(set.pickLine); pen.children.forEach(function (g) { g.material.color.setHex(set.pickLine); }); });
     /*
      * 라이트 — 번짐 선을 끄고 또렷한 선을 불투명하게. 짙은 번짐은 흰 덩이 둘레에 회색 얼룩이 되고,
      * 반투명 선은 마디에서 두 번 겹쳐 모서리마다 검은 점이 찍혔다(10/19 디자이너).
@@ -2753,7 +2770,7 @@
       pickPens[0].material.opacity = 0;
       pickPens[1].material.opacity = 1;   // 반투명이면 마디에서 두 번 겹쳐 점이 찍힌다 — 두 테마 모두 불투명
     }
-    hoverPens.forEach(function (pen) { pen.material.color.setHex(set.hoverLine); });
+    hoverPens.forEach(function (pen) { pen.material.color.setHex(set.hoverLine); pen.children.forEach(function (g) { g.material.color.setHex(set.hoverLine); }); });
     if (gridMesh) {
       var c = new THREE.Color(set.grid);
       var col = gridMesh.geometry.getAttribute("color");
