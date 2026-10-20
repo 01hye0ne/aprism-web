@@ -2736,3 +2736,28 @@ a.map-floor {
 :root[data-theme="light"] .ma-v3 .ma-info { color: var(--color-gray-0); }
 :root[data-theme="light"] .ma-v3 .ma-info .i { filter: drop-shadow(0 1px 2px rgb(7 10 16 / 55%)); }
 :root[data-theme="light"] .ma-v3 .ma-info:hover { color: var(--color-gray-0); background-color: rgb(7 10 16 / 28%); }
+
+/* 10/20 디자이너 — 쪽지 아래 꼬리(세모)에도 바깥 줄을 잇는다. 꼬리는 면만 칠해 줄이 꼬리 앞에서 끊겼다.
+ * 꼬리 두 빗변만 남긴 V 를 면(::after) 위에 한 겹 얹는다. 밑변은 그리지 않는다 — 판과 꼬리가 한 면으로 이어진다. */
+.map-alert { --ma-line: var(--border-default); }
+.map-alert.ma-v3 { --ma-line: var(--border-strong); }
+:root[data-theme="light"] .map-alert.ma-v3 { --ma-line: var(--color-gray-300); border-color: var(--ma-line); }
+.map-alert::before {
+  content: "";
+  position: absolute;
+  z-index: 3;
+  left: calc(50% + var(--tail));
+  top: 100%;
+  width: 14px;
+  height: 8px;
+  transform: translateX(-50%);
+  background-color: var(--ma-line);
+  pointer-events: none;
+  clip-path: polygon(0 0, 50% 100%, 100% 0, calc(100% - 1.6px) 0, 50% calc(100% - 1.8px), 1.6px 0);
+}
+.map-alert.is-below::before {
+  top: auto;
+  bottom: 100%;
+  clip-path: polygon(0 100%, 50% 0, 100% 100%, calc(100% - 1.6px) 100%, 50% 1.8px, 1.6px 100%);
+}
+.map-alert.ma-v3.is-docked::before { display: none; }
