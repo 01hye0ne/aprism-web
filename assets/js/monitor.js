@@ -183,7 +183,7 @@
   }
 
   // Delta 를 펼쳤을 때의 행동 버튼 — 알림 여러 건을 한꺼번에 다룬다.
-  // ※ 문구는 아직 정해지지 않은 초안이다. 누르면 하는 일은 아래 deltaAct(10/20 디자이너 "다 동작되게").
+  // ※ 문구는 모두 임시다(10/20 디자이너 — 이름은 아직 정해진 게 없다). 누르면 하는 일은 아래 deltaAct.
   function deltaActions(j) {
     if (j.level === "critical") {
       return ["위험 " + j.crit + "건부터 조치", "주의 " + j.warn + "건 묶어서 확인", "현장 점검 한꺼번에 요청"];
@@ -371,6 +371,8 @@
   });
 
   function tellAi(j, top) {
+    // Delta 대화(delta-chat.js)가 답에 쓰는 건수 — 조치 버튼과 같은 판단(전체 미션)이다.
+    window.APRISM_DELTA_COUNT = { crit: j.crit, warn: j.warn, total: j.total };
     var copy = handover === null ? deltaCopy(j) : {
       tag: "관제사 교대 · 인계",
       line1: "안녕하세요. " + handover + " 님",
