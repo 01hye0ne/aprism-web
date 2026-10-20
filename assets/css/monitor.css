@@ -2594,6 +2594,7 @@ a.map-floor {
  * 예전엔 반투명 빨강(78% → 0%)을 흰 유리(70%) 위에 얹어, 밑의 회색 지도까지 섞여 탁하고 지저분했다.
  * 판은 거의 불투명한 흰 면으로 막고, 빛은 투명도로 빼지 않고 "색에서 색으로" 흰빛까지 간다 — 채도가 끝까지 산다.
  * 심지는 선명한 빨강, 번지며 산호 → 복숭아 → 흰빛. 마지막 한 칸만 투명으로 흰 판에 녹는다.
+ * 3차(10/19) — 다시 연하게: 심지를 산호빛 빨강(255 84 68)으로 한 단 풀고, 번지는 거리도 줄였다(흰빛까지 92% → 78%).
  */
 :root[data-theme="light"][data-glow="top"][data-delta="glass"] .v2-2 .delta3.is-critical:not(.is-open) .delta3-card,
 :root[data-theme="light"][data-glow="top"][data-delta="glass"] .v2-2 .delta3.is-critical.is-open {
@@ -2601,14 +2602,13 @@ a.map-floor {
 }
 :root[data-theme="light"][data-glow="top"][data-delta="glass"] .v2-2 .delta3.is-critical:not(.is-open) .delta3-card {
   background-image:
-    radial-gradient(in oklab 170% 120% at -8% -10%,
-      rgb(255 34 34) 0%,
-      rgb(255 58 44) 16%,
-      rgb(255 110 86) 32%,
-      rgb(255 170 150) 48%,
-      rgb(255 214 204) 62%,
-      rgb(255 240 236) 76%,
-      rgb(255 255 255 / 0%) 92%);
+    radial-gradient(in oklab 150% 100% at -8% -10%,
+      rgb(255 84 68) 0%,
+      rgb(255 130 110) 14%,
+      rgb(255 180 166) 30%,
+      rgb(255 216 208) 44%,
+      rgb(255 239 235) 60%,
+      rgb(255 255 255 / 0%) 78%);
 }
 /* 본문 상자 — 회색 덧칠 · 안쪽 그림자 대신 옅은 흰빛 한 겹. 회색이 빨강과 섞이면 다시 탁해진다. */
 :root[data-theme="light"][data-glow="top"][data-delta="glass"] .v2-2 .delta3.is-critical .delta3-body {
@@ -2618,12 +2618,11 @@ a.map-floor {
 }
 :root[data-theme="light"][data-glow="top"][data-delta="glass"] .v2-2 .delta3.is-critical.is-open {
   background-image: linear-gradient(in oklab to bottom,
-    rgb(255 34 34) 0%,
-    rgb(255 72 52) 8%,
-    rgb(255 128 102) 18%,
-    rgb(255 190 172) 30%,
-    rgb(255 232 224) 42%,
-    rgb(255 255 255 / 0%) 56%);
+    rgb(255 84 68) 0%,
+    rgb(255 140 120) 8%,
+    rgb(255 196 184) 18%,
+    rgb(255 232 226) 30%,
+    rgb(255 255 255 / 0%) 44%);
 }
 
 /* 10/19 — 라이트에서 고른 버튼은 한 색: 알림 거르기(전체 · 위험 · 주의)도 로봇 현황 층 버튼처럼 Button Inverse(gray/950 면 · 흰 글).
