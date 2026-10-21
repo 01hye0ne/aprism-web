@@ -669,3 +669,12 @@ body.ver-3.v2-2 .panel-head::after,
     color-mix(in srgb, var(--comp-alert-warning-glow-halo) 12%, transparent) 50%,
     transparent 100%);
 }
+
+/*
+ * 화살표 양옆 간격을 눈에 보이는 대로 같게(10/21 디자이너) — 면이 있는 칩은 면 가장자리, 면이 없는 쪽은 글자가 기준이다.
+ * 면 없는 쪽은 안쪽 여백 12 가 더해져 20 으로 벌어졌다. 화살표 쪽 여백을 4 로 줄이고 화살표 바깥 4 를 더해 8 로 맞춘다.
+ */
+.ver-3 a.sb-overview { padding-right: var(--space-4); }
+.ver-3 a.sb-overview + .status-bar-sep { margin-left: var(--space-4); }
+.ver-3 .sb-overview.is-on + .status-bar-sep { margin-right: var(--space-4); }
+.ver-3 .sb-overview.is-on ~ .scope-menu-box .scope-trigger { padding-left: var(--space-4); }
