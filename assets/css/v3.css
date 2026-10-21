@@ -55,29 +55,59 @@
 }
 
 /* ==================================================================
- * Delta 위젯형 · 기본 (10/21 디자이너, Figma DS 1320:14679 Card)
- *   접힘 1320:14678  220×220 — 위 요약(글이 아래로 옅어진다) · 아래 머리 40(표식 16 + Mono 13 + [+] 둥근 24)
- *   펼침 1320:14677  295×295 — 위 머리 40 · 요약 · 조치 버튼 · 묻기 칸(radius 12, 보내기 둥근 24)
- *   면은 둘 다 bg/cell → bg/glass 세로 그라데이션(채움 55%) + 안쪽 윗변 반사(inset 0 2 3 -1 effect/glass-edge).
- * 머리 글은 Figma 자리표시자("Thinking...")라 지금 제목 줄(.ai-line-1)을 쓴다 — 펼침에서는 v3-panel.js 가 이름 줄로 옮겨 적는다.
- * 위험 판의 붉은 빛은 v2.2 그대로 두고(색은 아직 디자인 전), 짜임만 새 위젯으로 바꾼다.
+ * Delta 위젯형 · 기본 (10/21 디자이너, Figma DS 1320:14679 Card — 2차 구조)
+ *   Default 1320:14678  220×220 — 머리 40(표식 16 + "Delta" Mono 13) · 아래 요약(글이 아래로 옅어진다)
+ *   Hover   1322:14692  220×220 — 맨 아래 40 줄에 "Delta와 대화" 둥근 단추(폭 가득 · 높이 24) — 누르면 펼친다
+ *   expand  1320:14677  295×637 — 머리 40 · 안쪽 4 · 상자(bg/map-chip · radius/container)
+ *                                  [요약 · 조치 버튼(여백 8 · 사이 8)] [묻기 칸 — 위 선 border/default · 왼쪽 16 · 사방 8]
+ *   면은 셋 다 bg/cell → bg/glass 세로 그라데이션(채움 55%) + 안쪽 윗변 반사(inset 0 2 3 -1 effect/glass-edge) · radius 12.
+ * 색은 Figma 그대로 단계와 상관없이 하나다 — 위험 · 주의의 색 표현은 나중에(10/21 디자이너). 프레임 엣지 글로우는 그대로.
  *
- * v2.2 규칙이 :root[data-delta][data-glow] … 로 무겁게 걸려 있어 같은 무게 이상으로 덮는다(접두 D3).
+ * v2.2 규칙이 :root[data-delta][data-glow] … 로 무겁게 걸려 있어 같은 무게 이상으로 덮는다.
  * ================================================================== */
 
-/* ---------- 공통 면 ---------- */
-:root[data-theme][data-delta][data-glow] body.ver-3.v2-2.v3 .delta3:not(.is-critical):not(.is-open) .delta3-card,
-:root[data-theme][data-delta][data-glow] body.ver-3.v2-2.v3 .delta3.is-open:not(.is-critical) {
+/* ---------- 공통 면 — 단계와 상관없이 하나 ---------- */
+:root[data-theme][data-delta][data-glow] body.ver-3.v2-2.v3 .delta3:not(.is-open) .delta3-card,
+:root[data-theme][data-delta][data-glow] body.ver-3.v2-2.v3 .delta3.is-open {
   background-color: transparent;
   background-image: linear-gradient(to bottom,
     color-mix(in srgb, var(--bg-cell) 55%, transparent),
     color-mix(in srgb, var(--bg-glass) 55%, transparent));
   box-shadow: inset 0 2px 3px -1px var(--effect-glass-edge);
+  border-radius: 12px;
+  animation: none;
 }
-:root[data-theme][data-delta][data-glow] body.ver-3.v2-2.v3 .delta3:not(.is-open) .delta3-card,
-:root[data-theme][data-delta][data-glow] body.ver-3.v2-2.v3 .delta3.is-open { border-radius: 12px; }
+/* 펼친 창은 창 자체가 카드다 — 안쪽 카드 면 · 윗변 분광선(위험)은 걷는다. */
+:root[data-theme][data-delta][data-glow] body.ver-3.v2-2.v3 .delta3.is-open .delta3-card {
+  background: none;
+  box-shadow: none;
+}
+:root[data-theme][data-delta][data-glow] body.ver-3.v2-2.v3 .delta3.is-open::after { display: none; }
 
-/* 요약 글 — Body/3 14/22, 위 fg/primary → 아래 fg/secondary 로 옅어진다. 상자(면 · 선 · 그림자)는 없다. */
+/* 표식 — Icon/Delta 16, 흰 점 셋 그대로(단계 색 · 깜빡임은 나중에). 답을 기다릴 때 도는 모션(is-thinking)은 남긴다. */
+body.ver-3.v2-2.v3 .delta3 .delta3-name .delta-dots { width: 16px; height: 16px; }
+body.ver-3.v2-2.v3[data-level] .delta3 .delta-dots rect {
+  fill: var(--text-primary);
+  animation: none;
+}
+
+/* 머리 — 40 · 사방 8 · 표식과 이름 사이 4. "Delta" 는 Mono/Data/2 13/18 fg/primary. */
+body.ver-3.v2-2.v3 .delta3 .delta3-name {
+  height: 40px;
+  padding: var(--space-8);
+  gap: var(--space-8);
+}
+body.ver-3.v2-2.v3 .delta3 .delta3-name .delta3-name-in { gap: var(--space-4); }
+body.ver-3.v2-2.v3 .delta3 .delta3-name b {
+  display: block;
+  font-family: "JetBrains Mono", var(--font-family-mono, monospace);
+  font-size: var(--font-size-13);
+  line-height: var(--font-line-height-18);
+  font-weight: 400;
+  color: var(--text-primary);
+}
+
+/* 요약 글 — Body/3 14/22, 위 fg/primary → 아래 fg/secondary. 상자(면 · 선 · 그림자)는 없다. */
 :root[data-theme][data-delta][data-glow] body.ver-3.v2-2.v3 .delta3 .delta3-body {
   border: 0;
   border-radius: 0;
@@ -91,18 +121,125 @@ body.ver-3.v2-2.v3 .delta3 .delta3-body > .ai-line-2 {
   color: transparent;
 }
 
-/* 머리 글 — Mono/Data/2 13/18, fg/primary, 한 줄 말줄임. */
-body.ver-3.v2-2.v3 .delta3:not(.is-open) .delta3-head p,
-body.ver-3.v2-2.v3 .delta3.is-open .delta3-name b {
-  font-family: "JetBrains Mono", var(--font-family-mono, monospace);
-  font-size: var(--font-size-13);
-  line-height: var(--font-line-height-18);
-  font-weight: 400;
-  color: var(--text-primary);
+/* ---------- 접힘 220 ---------- */
+/* 판(260) 자체는 눌리지 않는다 — 카드 · 머리만 눌리고, 그 위에 올라갔을 때만 hover 가 된다. */
+body.ver-3.v2-2.v3 .delta3:not(.is-open) { pointer-events: none; }
+body.ver-3.v2-2.v3 .delta3:not(.is-open) .delta3-card,
+body.ver-3.v2-2.v3 .delta3:not(.is-open) .delta3-name { pointer-events: auto; }
+
+/* 머리는 카드 위 40 칸에 앉는다(카드 자리 = 판 안쪽 20). 카드는 그 40 을 비우고 요약부터 채운다. */
+body.ver-3.v2-2.v3 .delta3:not(.is-open) .delta3-name {
+  left: var(--space-20);
+  top: var(--space-20);
+  width: 220px;
+  align-items: center;
+}
+body.ver-3.v2-2.v3 .delta3:not(.is-open) .delta3-name::before { display: none; }
+body.ver-3.v2-2.v3 .delta3:not(.is-open) .delta3-card {
+  padding: 40px 0 0;
+}
+body.ver-3.v2-2.v3 .delta3:not(.is-open) .delta3-body {
+  order: 1;
+  flex: 1 1 auto;
+  padding: 0 var(--space-8);
+}
+/* 요약 칸 180 = 22 × 8 줄. hover 로 아래 단추 줄(40)이 생기면 6 줄 — 넘치면 마지막 줄 끝이 … */
+body.ver-3.v2-2.v3 .delta3:not(.is-open) .delta3-body > .ai-line-2 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 8;
+  overflow: hidden;
 }
 
-/* 둥근 단추 24 — Icon Button · Secondary · pill(Figma). [+] · 보내기 · 닫기가 같은 꼴이다. */
-body.ver-3.v2-2.v3 .delta3 .delta3-plus,
+/* 아래 단추 줄 — 쉴 때는 없고, 카드에 올라가거나(hover) Tab 으로 들어오면(focus) 나타난다. */
+/* 숨길 때도 display 를 끄지 않는다 — 단추가 Tab 순서에 남아 있어야 키보드로 들어와 펼칠 수 있다. */
+body.ver-3.v2-2.v3 .delta3:not(.is-open) .delta3-head {
+  order: 2;
+  height: 0;
+  padding: 0 var(--space-8);
+  overflow: hidden;
+  opacity: 0;
+}
+body.ver-3.v2-2.v3 .delta3:not(.is-open) .delta3-head p { display: none; }
+body.ver-3.v2-2.v3 .delta3:not(.is-open):is(:hover, :focus-within) .delta3-head {
+  height: 40px;
+  padding: var(--space-8);
+  opacity: 1;
+}
+body.ver-3.v2-2.v3 .delta3:not(.is-open):is(:hover, :focus-within) .delta3-body > .ai-line-2 { -webkit-line-clamp: 6; }
+
+/* "Delta와 대화" — Icon Button 꼴(Secondary · pill)을 폭 가득 24 로. 글은 Caption 12/18, 요약과 같은 세로 그라데이션. */
+body.ver-3.v2-2.v3 .delta3 .delta3-plus {
+  flex: 1 1 auto;
+  width: auto;
+  height: 24px;
+  border: var(--border-width-thin) solid var(--comp-button-secondary-border-default);
+  border-radius: var(--radius-pill);
+  background-color: var(--comp-button-secondary-bg-default);
+}
+body.ver-3.v2-2.v3 .delta3 .delta3-plus:hover { background-color: var(--comp-button-secondary-bg-hover); }
+body.ver-3.v2-2.v3 .delta3 .delta3-plus .i { display: none; }
+body.ver-3.v2-2.v3 .delta3 .delta3-plus-label {
+  font-size: var(--font-size-12);
+  line-height: var(--font-line-height-18);
+  font-weight: 400;
+  white-space: nowrap;
+  background-image: linear-gradient(to bottom, var(--text-primary), var(--text-secondary));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+body.ver-3.v2-2.v3 .delta3.is-open .delta3-plus-label { display: none; }
+
+/* ---------- 펼침 295 × 637 ---------- */
+:root[data-theme] body.ver-3.v2-2.v3 .delta3.is-open {
+  width: var(--d3-w, 295px);
+  height: 637px;
+  min-height: 0;
+  max-height: calc(100% - var(--space-16));
+  padding: 0;
+}
+/* 제목 줄은 Figma 에서 빠졌다 — 머리(Delta)와 요약만 남는다. */
+body.ver-3.v2-2.v3 .delta3.is-open .delta3-head { display: none; }
+body.ver-3.v2-2.v3 .delta3.is-open .delta3-card {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: var(--space-4);
+}
+/* 안쪽 상자 — bg/map-chip · radius/container. 요약 · 조치는 사방 8, 묻기 칸은 맨 아래 폭 가득. */
+:root[data-theme][data-delta][data-glow] body.ver-3.v2-2.v3 .delta3.is-open .delta3-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 0;
+  gap: 0;
+  border-radius: var(--radius-container);
+  background-color: var(--bg-map-chip);
+  overflow: hidden;
+}
+body.ver-3.v2-2.v3 .delta3.is-open .delta3-body > .ai-line-2 {
+  flex: 1 1 auto;
+  min-height: 0;
+  margin: var(--space-8) var(--space-8) 0;
+  overflow: hidden;
+}
+body.ver-3.v2-2.v3 .delta3 .delta3-body > .ai-actions {
+  flex: none;
+  gap: var(--space-8);
+  margin: var(--space-8) var(--space-8) 0;
+}
+:root[data-theme] body.ver-3.v2-2.v3 .delta3 .delta3-body .ai-input,
+:root[data-theme] body.ver-3.v2-2.v3 .delta3 .delta3-body .ai-input:focus-within {
+  flex: none;
+  margin: var(--space-8) 0 0;
+  padding: var(--space-8) var(--space-8) var(--space-8) var(--space-16);
+  border: 0;
+  border-top: var(--border-width-thin) solid var(--border-default);
+  border-radius: 0;
+  background: none;
+}
+:root[data-theme] body.ver-3.v2-2.v3 .delta3.is-chat .delta3-body .ai-input { margin: 0; }
+
+/* 둥근 단추 24 — 보내기 · 닫기. Icon Button · Secondary · pill. 보내기는 늘 보인다(v2.2 는 글이 있을 때만). */
 :root[data-theme] body.ver-3.v2-2.v3 .delta3 .delta3-body .ai-send,
 body.ver-3.v2-2.v3 .delta3 .delta3-close {
   width: 24px;
@@ -111,93 +248,14 @@ body.ver-3.v2-2.v3 .delta3 .delta3-close {
   border-radius: var(--radius-pill);
   background-color: var(--comp-button-secondary-bg-default);
   color: var(--comp-button-secondary-text-default);
-}
-body.ver-3.v2-2.v3 .delta3 .delta3-plus:hover,
-:root[data-theme] body.ver-3.v2-2.v3 .delta3 .delta3-body .ai-send:hover,
-body.ver-3.v2-2.v3 .delta3 .delta3-close:hover { background-color: var(--comp-button-secondary-bg-hover); }
-body.ver-3.v2-2.v3 .delta3 .delta3-plus .i,
-body.ver-3.v2-2.v3 .delta3 .delta3-close .i,
-body.ver-3.v2-2.v3 .delta3 .ai-send .i { background-color: currentColor; }
-
-/* Delta 표식 16 — 접힘 · 펼침 같다(v2.2 는 모서리 20 · 창 머리 10). */
-body.ver-3.v2-2.v3 .delta3 .delta3-name .delta-dots { width: 16px; height: 16px; }
-
-/* ---------- 접힘 220 ---------- */
-body.ver-3.v2-2.v3 .delta3:not(.is-open) .delta3-card { padding: 0; }
-/* 요약이 위, 머리가 아래 — DOM 은 머리가 먼저라 순서만 바꾼다. */
-body.ver-3.v2-2.v3 .delta3:not(.is-open) .delta3-body {
-  order: 1;
-  flex: 1 1 auto;
-  padding: var(--space-8) var(--space-8) 0;
-}
-body.ver-3.v2-2.v3 .delta3:not(.is-open) .delta3-body > .ai-line-2 {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 7;            /* 요약 칸 172 = 22 × 7 줄 + 여유 — 넘치면 마지막 줄 끝이 … */
-  overflow: hidden;
-}
-body.ver-3.v2-2.v3 .delta3:not(.is-open) .delta3-head {
-  order: 2;
-  height: 40px;
-  padding: var(--space-8) var(--space-8) var(--space-8) calc(var(--space-8) + 16px + var(--space-4));
-  gap: var(--space-8);
-}
-/*
- * 표식은 머리 줄 왼쪽에 앉는다. 카드 자리(판 안쪽 20) + 머리 8 · 위는 20 + 요약 180 + (40 - 16) / 2.
- * 프레임 모서리 삼각판에 있던 표식이 카드 안으로 들어온 것이다 — 삼각판 면은 v2.2 그대로 비어 남는다.
- */
-body.ver-3.v2-2.v3 .delta3:not(.is-open) .delta3-name {
-  left: calc(var(--space-20) + var(--space-8));
-  top: calc(var(--space-20) + 180px + 12px);
-  width: 16px;
-  height: 16px;
-  padding: 0;
-}
-body.ver-3.v2-2.v3 .delta3:not(.is-open) .delta3-name::before { display: none; }
-
-/* ---------- 펼침 295 ---------- */
-:root[data-theme] body.ver-3.v2-2.v3 .delta3.is-open {
-  width: var(--d3-w, 295px);
-  min-height: 295px;
-  padding: 0;
-}
-body.ver-3.v2-2.v3 .delta3.is-open .delta3-name {
-  height: 40px;
-  padding: var(--space-8);
-  gap: var(--space-8);
-}
-body.ver-3.v2-2.v3 .delta3.is-open .delta3-name .delta3-name-in { gap: var(--space-4); }
-/* 제목은 머리 줄(이름 자리)로 갔다 — 카드 안 제목 줄은 숨긴다. */
-body.ver-3.v2-2.v3 .delta3.is-open .delta3-head { display: none; }
-:root[data-theme][data-delta][data-glow] body.ver-3.v2-2.v3 .delta3.is-open .delta3-body {
-  padding: 0 var(--space-8) var(--space-8);
-  gap: var(--space-8);
-  min-height: 0;
-}
-body.ver-3.v2-2.v3 .delta3.is-open .delta3-body > .ai-line-2 { flex: 1 1 auto; }
-body.ver-3.v2-2.v3 .delta3 .delta3-body > .ai-actions { margin-top: 0; gap: var(--space-8); }
-
-/* 묻기 칸 — 카드 폭 그대로 맨 아래(요약 칸 여백 8 을 걷어 낸다). bg/map-chip · radius 12 · 왼쪽 16 · 사방 8. */
-:root[data-theme] body.ver-3.v2-2.v3 .delta3 .delta3-body .ai-input,
-:root[data-theme] body.ver-3.v2-2.v3 .delta3 .delta3-body .ai-input:focus-within {
-  margin: auto calc(var(--space-8) * -1) calc(var(--space-8) * -1);
-  padding: var(--space-8) var(--space-8) var(--space-8) var(--space-16);
-  border: 0;
-  border-radius: 12px;
-  background-color: var(--bg-map-chip);
-}
-:root[data-theme] body.ver-3.v2-2.v3 .delta3.is-chat .delta3-body .ai-input { margin: 0; }
-/* 보내기는 늘 보인다(Figma) — v2.2 는 글이 있을 때만 나타났다. */
-:root[data-theme] body.ver-3.v2-2.v3 .delta3 .delta3-body .ai-send {
   opacity: 1;
   visibility: visible;
   transform: none;
 }
-/* 펼친 창은 창 자체가 카드다 — 안쪽 카드 면(라이트의 흰 면)을 걷어 한 판으로 둔다. */
-:root[data-theme][data-delta][data-glow] body.ver-3.v2-2.v3 .delta3.is-open .delta3-card {
-  background: none;
-  box-shadow: none;
-}
+:root[data-theme] body.ver-3.v2-2.v3 .delta3 .delta3-body .ai-send:hover,
+body.ver-3.v2-2.v3 .delta3 .delta3-close:hover { background-color: var(--comp-button-secondary-bg-hover); }
+body.ver-3.v2-2.v3 .delta3 .delta3-close .i,
+body.ver-3.v2-2.v3 .delta3 .ai-send .i { background-color: currentColor; }
 
 /* ==================================================================
  * 관제 프레임 모서리 — 깎지 않는다 (10/21 디자이너). 톤 실험실 B 안(lab-delta-round.css)의 프레임 규칙을 그대로 옮겼다.
