@@ -52,7 +52,13 @@
     return "순회 경로 지켜보는 중...";
   }
 
-  function update() { var t = say(); if (out.textContent !== t) { out.textContent = t; } }
+  // 통합 순회 현황에서 층을 펼쳐 보면 그 층이 범위다(building.js 의 APRISM_DELTA_SCOPE).
+  function update() {
+    var scope = window.APRISM_DELTA_SCOPE;
+    var t = say();
+    if (scope && !win.classList.contains("is-thinking")) { t = scope + " " + t; }
+    if (out.textContent !== t) { out.textContent = t; }
+  }
   update();
   new MutationObserver(update).observe(body, { attributes: true, attributeFilter: ["data-level"] });
   new MutationObserver(update).observe(win, { attributes: true, attributeFilter: ["class"] });

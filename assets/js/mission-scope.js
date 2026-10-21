@@ -40,6 +40,9 @@
     } catch (e) { /* 깨진 주소면 첫 미션 */ }
   }
 
+  // v3 — 통합 순회 현황에서 층을 펼쳐 본 뒤 들어오면 ?floor= 도 붙어 온다. 그 미션이 지나는 층이면 그 층으로 처음 연다(10/21).
+  var askedFloor = (/[?&]floor=(B\d+)/.exec(location.search) || [])[1] || null;
+
   // 전체 건물로 나가는 링크 — 테마 같은 보기 설정은 들고 간다.
   var keep = (location.search.match(/[?&](theme|palette|delta|glow)=[\w-]+/g) || [])
     .map(function (q) { return q.slice(1); }).join("&");
@@ -207,6 +210,8 @@
     var card = pressedCard();
     var here = card && !card.hidden ? robotFloor(card) : null;
     var floor = here || floorsOf(m)[0] || null;
+    if (askedFloor && floorsOf(m).indexOf(askedFloor) >= 0) { floor = askedFloor; }
+    askedFloor = null;   // 처음 한 번만 — 뒤에 미션을 바꾸면 로봇 층을 따른다
     markFloors(m, here);
     if (floor) { window.APRISM_FLOOR_WANT = floor; }   // 지도가 아직 안 섰으면 map.js 가 이 층으로 연다
     var floorBtn = floor && document.querySelector("[data-map-floor='" + floor + "']");

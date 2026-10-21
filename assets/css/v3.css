@@ -451,3 +451,28 @@ body.ver-3.v2-2.v3 .delta3.is-open.is-chat .dc-thread {
 /* 로봇 점은 모서리로 한 단 더 붙인다 — 오른쪽 건수 숫자와 닿지 않게. */
 .ver-3 .map-floor.has-robot::after { top: 3px; right: 3px; width: 5px; height: 5px; }
 .ver-3 .map-floor.has-robot .floor-count { margin-right: 2px; }
+
+/* ==================================================================
+ * 통합 순회 현황 · 층 펼치기 (10/21 디자이너) — building.js openFloor
+ * 요약 판이 그 층을 지나는 미션 목록이 된다. 줄 하나가 미션으로 들어가는 단추다(이 층 그대로 연다).
+ * ================================================================== */
+.ver-3 .bld-sum-mission { display: block; }
+.ver-3 .bld-sum-go {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  width: 100%;
+  margin: 0;
+  padding: var(--space-4) var(--space-8);
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--text-primary);
+  text-align: left;
+  cursor: pointer;
+}
+.ver-3 .bld-sum-go:hover { background-color: var(--state-hover); }
+.ver-3 .bld-sum-go .i { flex: none; width: 16px; height: 16px; color: var(--text-tertiary); }
+.ver-3 .bld-sum-go-name { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ver-3 .bld-sum-go .bld-sev { flex: none; color: var(--text-secondary); }
+.ver-3 .bld-fleet-filter[hidden] { display: none; }

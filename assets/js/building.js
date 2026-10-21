@@ -49,6 +49,15 @@
     "유틸리티 순회": ["B4"],
     "전기실 열화상 점검": ["B3"]
   };
+  // v3(10/21) — 화면 사이 임시 값을 메인(screen.js · 미션 하나에 로봇 한 대, 10/20)과 맞춘다.
+  // 정기 순회 점검은 B4 만 돌고, 층을 건너는 예시는 발전기실 설비 점검(Robot 05, B3 → B4)이다.
+  var V3 = body.classList.contains("ver-3");
+  if (V3) {
+    MISSION_FLOORS["정기 순회 점검"] = ["B4"];
+    MISSION_FLOORS["발전기실 설비 점검"] = ["B3", "B4"];
+  }
+  // v3 — 통합 순회 현황 안에서 펼쳐 본 층. null 이면 쌓인 건물 전체(10/21 디자이너).
+  var floorView = null;
   var MISSION_LIST = Object.keys(MISSION_FLOORS);
   // 그 층을 지나는 미션
   function missionsOn(f) { return MISSION_LIST.filter(function (m) { return MISSION_FLOORS[m].indexOf(f) >= 0; }); }
@@ -168,10 +177,12 @@
   /* ==================================================================
    * 메인 v2.2 로 넘어가기 — 테마 · 팔레트 같은 보기 설정은 들고 간다.
    * ================================================================== */
-  function mainUrl(mission) {
+  function mainUrl(mission, floor) {
     var keep = (location.search.match(/[?&](theme|palette|delta|glow)=[\w-]+/g) || [])
       .map(function (s) { return s.slice(1); });
     keep.push("mission=" + encodeURIComponent(mission));
+    // v3 — 층을 펼쳐 본 뒤 들어가면 그 층으로 연다(mission-scope.js 가 받는다).
+    if (V3 && floor && MISSION_FLOORS[mission] && MISSION_FLOORS[mission].indexOf(floor) >= 0) { keep.push("floor=" + floor); }
     return (document.body.classList.contains("ver-3") ? "main-v3.html?" : "main-v2-2.html?") + keep.join("&");
   }
 
@@ -322,7 +333,7 @@
   function renderLeft() {
     var list = $("[data-ah-list]");
     if (!list) { return; }
-    var all = ALERTS.slice().sort(function (a, b) {
+    var all = (floorView ? alertsOn(floorView) : ALERTS).slice().sort(function (a, b) {
       return (RANK[a.sev] - RANK[b.sev]) || (a.time < b.time ? -1 : a.time > b.time ? 1 : 0);
     });
     var shown = all.filter(function (a) { return filter === "all" || a.sev === filter; });
@@ -338,11 +349,13 @@
       var c = { all: list.length };
       list.forEach(function (a) { if (a.floor) { c[a.floor] = (c[a.floor] || 0) + 1; } });
       return c;
-    })(all);
+    })(ALERTS);
     document.dispatchEvent(new CustomEvent("aprism:floor-counts", { detail: window.APRISM_FLOOR_COUNTS }));
     // 테두리 · Delta 판 단계 = 남은 알림 중 가장 높은 단계(메인 v2.2 monitor.js 와 같은 신호, 10/19)
     var top = counts.critical ? "critical" : counts.warning ? "warning" : null;
-    document.dispatchEvent(new CustomEvent("aprism:severity", { detail: { level: top, glow: top } }));
+    // v3 — 단계(body[data-level])도 지금 보는 범위를 따른다. Delta 표식 모션 · 근거 줄이 이 값을 읽는다.
+    if (V3) { body.setAttribute("data-level", top || "normal"); }
+    document.dispatchEvent(new CustomEvent("aprism:severity", { detail: deltaSay(top, all) }));
     $$("[data-ah-filter]").forEach(function (b) {
       b.setAttribute("aria-pressed", b.getAttribute("data-ah-filter") === filter ? "true" : "false");
     });
@@ -451,6 +464,9 @@
 
     var ff = $("[data-bld-fleet-filter]");
     ff.textContent = "";
+    // v3 — 층을 펼쳐 보는 동안은 그 층 로봇만. 층은 지도 층 판에서만 고르므로 거르기 단추는 감춘다.
+    if (floorView) { fleetFloor = floorView; }
+    ff.hidden = !!floorView;
     [["all", "전체", ROBOTS.length]].concat(FLOORS.map(function (f) { return [f, f, robotsOn(f).length]; }))
       .forEach(function (x) {
         // 고른 층은 흰 면(Button Primary · inverse), 나머지는 Secondary — Figma 10/19
@@ -488,6 +504,7 @@
     var rows = el("div", "bld-g-body");
     GANTT.forEach(function (row) {
       var r = robotNo(row.n);
+      if (floorView && r.floor !== floorView) { return; }
       var line = el("button", "bld-g-row");
       line.type = "button";
       line.setAttribute("aria-label", rname(r) + " 운행 흐름 · " + FNAME[r.floor]);
@@ -504,7 +521,7 @@
       line.appendChild(track);
       line.addEventListener("mouseenter", function () { setHot(r.floor, null, true); markRobot(r, true); });
       line.addEventListener("mouseleave", function () { setHot(null); markRobot(r, false); });
-      line.addEventListener("click", function () { enter(r.floor, r.mission); });
+      line.addEventListener("click", function () { if (r.mission) { enter(r.floor, r.mission); } });
       rows.appendChild(line);
     });
     var now = el("span", "bld-g-now");
@@ -540,7 +557,10 @@
   $$("[data-bld-floor]").forEach(function (b) {
     var f = b.getAttribute("data-bld-floor");
     b.classList.toggle("is-on", f === "all");
-    b.addEventListener("click", function () { if (f !== "all") { enter(f, missionFor(f)); } });
+    b.addEventListener("click", function () {
+      if (V3) { if (f === "all") { closeFloor(); } else { openFloor(f); } return; }
+      if (f !== "all") { enter(f, missionFor(f)); }
+    });
     if (f !== "all") {
       b.addEventListener("mouseenter", function () { setHot(f, null, true); });
       b.addEventListener("mouseleave", function () { setHot(null); });
@@ -549,6 +569,11 @@
 
   function renderSum() {
     var rows = $("[data-bld-sum-rows]");
+    if (floorView) { renderFloorSum(rows); return; }
+    var label = $(".bld-sum-label");
+    if (label) { label.textContent = "전체 건물"; }
+    var unitTxt = $(".bld-sum-num .t-label-2");
+    if (unitTxt) { unitTxt.textContent = "개 층"; }
     $("[data-bld-sum-floors]").textContent = FLOORS.length;
     rows.textContent = "";
     var running = ROBOTS.filter(function (r) { return r.st === "run"; }).length;
@@ -568,6 +593,62 @@
       d.appendChild(dd);
       rows.appendChild(d);
     });
+  }
+
+  /*
+   * v3 — 펼친 층의 요약: 이 층을 지나는 미션을 줄로 세운다. 줄을 누르면 그 미션으로, 이 층 그대로 들어간다.
+   * 미션 줄 오른쪽은 그 미션이 이 층에서 낸 알림(위험 · 주의 건수)이다.
+   */
+  function renderFloorSum(rows) {
+    var f = floorView;
+    var ms = missionsOn(f);
+    $(".bld-sum-label").textContent = FNAME[f];
+    $("[data-bld-sum-floors]").textContent = ms.length;
+    $(".bld-sum-num .t-label-2").textContent = "개 미션이 지나요";
+    rows.textContent = "";
+    var bots = robotsOn(f);
+    var r0 = el("div");
+    r0.appendChild(el("dt", "t-caption", "로봇"));
+    r0.appendChild(el("dd", "t-label-2", bots.length + "대 · " + bots.filter(function (r) { return r.st === "run"; }).length + "대 수행중"));
+    rows.appendChild(r0);
+    ms.forEach(function (m) {
+      var here = alertsOf(m).filter(function (a) { return a.floor === f; });
+      var d = el("div", "bld-sum-mission");
+      var go = el("button", "bld-sum-go");
+      go.type = "button";
+      go.setAttribute("aria-label", m + " 미션으로 들어가기");
+      go.appendChild(icon("way"));
+      go.appendChild(el("span", "t-label-2 bld-sum-go-name", m));
+      var dd = el("span", "t-caption bld-sev");
+      var s = topSev(here);
+      if (s) { dd.setAttribute("data-sev", s); }
+      dd.appendChild(el("span", "bld-sev-dot"));
+      dd.appendChild(document.createTextNode(here.length ? sevCount(here) : "알림 없음"));
+      go.appendChild(dd);
+      go.addEventListener("click", function () { enter(f, m); });
+      d.appendChild(go);
+      rows.appendChild(d);
+    });
+  }
+
+  /*
+   * Delta 가 하는 말 — 쌓인 건물은 HTML 에 적힌 문장 그대로, 층을 펼치면 그 층 이야기로 바꾼다(v3).
+   * 근거 줄(v3-panel.js)도 APRISM_DELTA_SCOPE 로 범위를 앞에 붙인다.
+   */
+  var deltaFirst = null;
+  function deltaSay(top, list) {
+    var d = { level: top, glow: top };
+    if (!V3) { return d; }
+    var l1 = $(".ai-line-1"), l2 = $(".ai-line-2");
+    if (deltaFirst === null && l2) { deltaFirst = { line1: l1 ? l1.textContent : "", line2: l2.textContent }; }
+    window.APRISM_DELTA_SCOPE = floorView;
+    if (!floorView) { if (deltaFirst) { d.line1 = deltaFirst.line1 || " "; d.line2 = deltaFirst.line2; } return d; }
+    var ms = missionsOn(floorView);
+    d.line1 = FNAME[floorView];
+    d.line2 = list.length
+      ? FNAME[floorView] + "에서 알림이 " + list.length + "건(" + sevCount(list) + ") 들어와 있어요. 이 층을 지나는 미션은 " + ms.length + "개예요. 어느 미션부터 들어가 볼까요?"
+      : FNAME[floorView] + "은 지금 조용해요. 이 층을 지나는 미션 " + ms.length + "개가 순회 중이에요. 궁금한 미션이 있으면 골라 주세요.";
+    return d;
   }
 
   renderLeft();
@@ -933,7 +1014,7 @@
       tag.appendChild(txt);
       tag.addEventListener("mouseenter", function () { setHot(f, null, true); });
       tag.addEventListener("mouseleave", function () { setHot(null); });
-      tag.addEventListener("click", function () { enter(f, missionFor(f)); });
+      tag.addEventListener("click", function () { if (V3) { openFloor(f); } else { enter(f, missionFor(f)); } });
       labels.appendChild(tag);
       L["tag" + f] = tag;
     });
@@ -1029,8 +1110,11 @@
     row("알림", list.length ? sevCount(list) : "없음", topSev(list));
     tip.appendChild(rows);
     var go = el("p", "t-caption bld-tip-go");
-    go.appendChild(el("span", null, "누르면 들어가요"));
-    go.appendChild(el("b", "t-label-2", missionFor(f)));
+    if (V3) { go.appendChild(el("span", null, "누르면 이 층만 펼쳐요")); }
+    else {
+      go.appendChild(el("span", null, "누르면 들어가요"));
+      go.appendChild(el("b", "t-label-2", missionFor(f)));
+    }
     tip.appendChild(go);
     tip.hidden = false;
     var hr = hit.getBoundingClientRect();
@@ -1060,7 +1144,7 @@
   hit.addEventListener("click", function (event) {
     if (mode !== "all" || (event.target.closest && event.target.closest("button"))) { return; }
     var f = pickFloor(event);
-    if (f) { enter(f, missionFor(f)); }
+    if (f) { if (V3) { openFloor(f); } else { enter(f, missionFor(f)); } }
   });
 
   // 확대 · 축소 — 휠과 버튼. 판 가운데를 기준으로 한다.
@@ -1085,7 +1169,7 @@
   function enter(f, mission) {
     if (busy) { return; }
     closeMenu();
-    if (!ready) { location.href = mainUrl(mission); return; }
+    if (!ready) { location.href = mainUrl(mission, f); return; }
     setHot(null);
     busy = true;
     mode = "one";
@@ -1098,18 +1182,53 @@
     // 예전엔 이름 줄에 미션을 붙이고 칩은 "통합 순회 현황" 그대로라 두 미션이 함께 보였다.
     if (trigger) { trigger.querySelector(".t-title-2").textContent = mission; }
     $$("[data-bld-floor]").forEach(function (b) { b.classList.toggle("is-on", b.getAttribute("data-bld-floor") === f); });
-    setTimeout(function () { location.href = mainUrl(mission); }, reduce ? 0 : 760);
+    setTimeout(function () { location.href = mainUrl(mission, f); }, reduce ? 0 : 760);
+  }
+
+  /*
+   * v3 — 층 펼치기(10/21 디자이너). 층을 눌러도 미션으로 넘어가지 않는다 — 이 화면 안에서 그 층만 남기고
+   * 왼쪽 알림 · 오른쪽 로봇 · 요약 · Delta 를 그 층으로 좁힌다. 미션 · 로봇 · 알림 줄을 눌러야 미션 관제로 들어간다.
+   * 층 판 [전체] 가 쌓인 건물로 돌아온다 — 미션 관제의 [전체] 와 같은 뜻이다.
+   */
+  function markFloorBtns(f) {
+    $$("[data-bld-floor]").forEach(function (b) {
+      var on = b.getAttribute("data-bld-floor") === f;
+      b.classList.toggle("is-on", on);
+      b.setAttribute("aria-pressed", on ? "true" : "false");
+    });
+  }
+
+  function openFloor(f) {
+    if (busy) { return; }
+    closeMenu();
+    setHot(null);
+    tip.hidden = true;
+    floorView = f;
+    if (ready) { mode = "one"; cur = f; cam.user = 1; layout(false); }
+    body.classList.add("is-floor-view");
+    markFloorBtns(f);
+    renderLeft(); renderRight(); renderSum();
+  }
+
+  function closeFloor() {
+    if (busy || !floorView) { return; }
+    floorView = null;
+    fleetFloor = "all";
+    if (ready) { mode = "all"; cur = null; cam.user = 1; layout(false); }
+    body.classList.remove("is-floor-view");
+    markFloorBtns("all");
+    renderLeft(); renderRight(); renderSum();
   }
 
   // 뒤로 가기로 돌아왔을 때(bfcache) 쌓인 판으로 되돌린다.
   window.addEventListener("pageshow", function (event) {
     if (!event.persisted || !ready) { return; }
     busy = false;
-    mode = "all";
-    cur = null;
+    mode = floorView ? "one" : "all";
+    cur = floorView;
     body.classList.remove("is-entering");
     if (trigger) { trigger.querySelector(".t-title-2").textContent = "통합 순회 현황"; }
-    $$("[data-bld-floor]").forEach(function (b) { b.classList.toggle("is-on", b.getAttribute("data-bld-floor") === "all"); });
+    markFloorBtns(floorView || "all");
     layout(true);
   });
 
@@ -1121,7 +1240,7 @@
   var goCrit = $("[data-bld-go-critical]");
   if (goCrit) {
     goCrit.addEventListener("click", function () {
-      var a = ALERTS.filter(function (x) { return x.sev === "critical"; })[0];
+      var a = (floorView ? alertsOn(floorView) : ALERTS).filter(function (x) { return x.sev === "critical"; })[0];
       if (a) { enter(a.floor, a.mission); }
     });
   }
