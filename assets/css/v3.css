@@ -1203,7 +1203,7 @@ body.ver-3.is-building .ah-item .ah-where::after { top: 50%; width: 7px; height:
 .ver-3 .bld-rc2-vitals .battery:not(.is-warning):not(.is-critical) .signal-bars { color: var(--text-secondary); }
 .ver-3 .bld-rc2-body { position: relative; display: flex; flex-direction: column; gap: var(--space-12); min-width: 0; }
 /* 지금 → 다음 세로 선 — 두 기호 가운데를 잇는다(지금 가운데 10 · 다음 가운데 9). 선 2, 지금 쪽이 진하다. */
-.ver-3 .bld-rc2-body::before {
+.ver-3 .bld-rc2-body.has-next::before {
   content: "";
   position: absolute;
   left: 7px;
@@ -1237,3 +1237,14 @@ body.ver-3.is-building .ah-item .ah-where::after { top: 50%; width: 7px; height:
 .ver-3 .bld-rc2-wp { margin-top: 2px; color: var(--text-tertiary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ver-3 .bld-rc2-next { display: block; color: var(--text-tertiary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ver-3 .bld-rc2-prog { display: flex; align-items: center; gap: var(--space-8); color: var(--text-secondary); }
+
+/* 한 칸짜리 카드 — 수행중이 아닌 로봇(10/21 디자이너). 지금 칸만 남고 한 단 물러난다. 끊김은 위험 색. 완료 진행 막대도 옅게. */
+.ver-3 .bld-rc2-step.is-rest .bld-rc2-mark .i { color: var(--text-tertiary); }
+.ver-3 .bld-rc2-step.is-rest .bld-rc2-now { font-weight: 500; color: var(--text-secondary); }
+.ver-3 .bld-rc2-step.is-off .bld-rc2-mark .i { color: var(--status-critical-icon); }
+.ver-3 .bld-rc2-step.is-off .bld-rc2-now { color: var(--status-critical-text); }
+.ver-3 .bld-rc2:not(.is-run) .bld-rc2-name { color: var(--text-secondary); }
+.ver-3 .bld-rc2.is-off .bld-rc2-name { color: var(--text-tertiary); }
+.ver-3 .bld-rc2:not(.is-run) .bld-rc2-prog { color: var(--text-tertiary); }
+.ver-3 .bld-rc2:not(.is-run) .progress-fill { background-color: var(--text-tertiary); }
+.ver-3 .bld-rc2:not(.is-run) .progress-knob { display: none; }

@@ -574,11 +574,17 @@
     st.appendChild(el("span", null, b.text));
     vit.appendChild(st);
     var bat = el("span", "bld-rc2-cell battery" + (r.bat <= 20 ? " is-critical" : r.bat <= 40 ? " is-warning" : "") + (r.chg ? " is-charging" : ""));
-    bat.title = "배터리 " + r.bat + "%";
+    bat.title = "배터리 " + r.bat + "%" + (r.chg ? " · 충전 중" : "");
     var bb = el("span", "battery-body");
     var bf = el("span", "battery-fill");
     bf.style.width = r.bat + "%";
     bb.appendChild(bf);
+    if (r.chg) {   // 충전 중 — 미션 관제 배터리와 같은 번개(app-shell.css .battery-bolt)
+      var bolt = el("span", "i battery-bolt");
+      bolt.style.setProperty("--i", "var(--ic-bolt)");
+      bolt.setAttribute("aria-hidden", "true");
+      bb.appendChild(bolt);
+    }
     bat.appendChild(bb);
     bat.appendChild(el("span", "battery-tip"));
     bat.appendChild(el("span", "t-caption num", r.bat + "%"));
@@ -594,16 +600,27 @@
     node.appendChild(vit);
 
     // 지금 · 다음 — 왼쪽 줄 칸에 기호(지금 way 원 · 다음 target)를 세로 선으로 잇는다(10/21 디자이너). 진행 막대는 맨 아래.
-    var wp = STEPS[r.n];
-    var bodyEl = el("span", "bld-rc2-body");
+    var wp = r.st === "run" ? STEPS[r.n] : null;
+    var bodyEl = el("span", "bld-rc2-body" + (wp ? " has-next" : ""));
     var nowRow = el("span", "bld-rc2-step is-now");
-    // 표식 — 지금 · 다음 둘 다 target, 색만 다르다(지금 fg/primary · 다음 fg/tertiary, 10/21 디자이너).
+    // 표식 — 수행중은 지금 · 다음 둘 다 target, 색만 다르다(지금 fg/primary · 다음 fg/tertiary, 10/21 디자이너).
+    // 그 밖은 지금 칸 하나 — 완료 check-circle · 충전 bolt · 복귀 way · 대기 clock(fg/tertiary, 글도 한 단 물러난다), 끊김은 위험 색.
+    var ic = "target";
+    if (r.st === "off") { nowRow.classList.add("is-off"); }
+    else if (r.st !== "run") {
+      nowRow.classList.add("is-rest");
+      ic = r.st === "done" ? "check-circle" : /충전/.test(r.now) ? "bolt" : r.moving ? "way" : "clock";
+    }
     var nm = el("span", "bld-rc2-mark");
-    nm.appendChild(icon("target", 16));
+    nm.appendChild(icon(ic, 16));
     nowRow.appendChild(nm);
     var nt = el("span", "bld-rc2-txt");
     nt.appendChild(el("span", "bld-rc2-now", r.now));
     if (wp) { nt.appendChild(el("span", "bld-rc2-wp t-caption", wp[0][1] + " " + wp[0][0])); }
+    else {
+      nt.appendChild(el("span", "bld-rc2-wp t-caption", r.st === "done" ? (r.mission || "") + " 끝"
+        : r.st === "off" ? FNAME[r.floor] + " · 마지막 위치" : FNAME[r.floor] + (r.dock ? " · 도크" : "")));
+    }
     nowRow.appendChild(nt);
     bodyEl.appendChild(nowRow);
     if (wp) {
@@ -636,8 +653,7 @@
   }
 
   function fleetRow(r) {
-    if (V3 && r.n === 1) { return fleetCardSlim(r); }   // 시안 비교 — Robot 01 만 한 칸짜리(10/21)
-    if (V3) { return fleetCard(r); }
+    if (V3) { return fleetCardSlim(r); }   // v3 — 한 칸짜리 카드(10/21 디자이너, Robot 01 시안을 전체로). fleetCard(두 칸)는 이전 안으로 남겨 둔다.
     var node = el("button", "bld-robot" + (r.st === "off" ? " is-offline" : ""));
     node.type = "button";
     node.setAttribute("role", "listitem");
