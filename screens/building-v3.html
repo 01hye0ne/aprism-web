@@ -31,7 +31,7 @@
   <link rel="stylesheet" href="../assets/css/delta-v3.css?v=b1562ee4" />
   <link rel="stylesheet" href="../assets/css/building.css?v=34793c69" />
   <!-- v3 전용 규칙 — v2.2 는 10/21 부로 멈췄다. v3 에서 바꾸는 것은 여기(body.ver-3)에. -->
-  <link rel="stylesheet" href="../assets/css/v3.css?v=41e3b72d" />
+  <link rel="stylesheet" href="../assets/css/v3.css?v=52e37504" />
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
@@ -197,12 +197,17 @@
           </section>
 
           <!-- 오늘 확인 완료 — 머리(Title/2 + 건수 배지) · 목록 -->
-          <section class="ah-sec" aria-labelledby="done-title">
-            <div class="done-head">
+          <!-- v3(10/21) — 접을 수 있다. 머리 줄 어디를 눌러도 접히고, 접으면 위 최신 알림이 그만큼 자란다(v3-panel.js). -->
+          <section class="ah-sec done-sec" aria-labelledby="done-title" data-done-sec>
+            <div class="done-head" data-done-head>
               <h3 class="t-title-2" id="done-title">오늘 확인 완료</h3>
               <span class="badge done-count t-caption"><span class="badge-dot"></span><span class="num" data-done-count>0건</span></span>
+              <button type="button" class="done-fold" data-done-fold
+                      aria-expanded="true" aria-controls="done-box" aria-label="오늘 확인 완료 접기">
+                <span class="i i-16" aria-hidden="true" style="--i:var(--ic-chevron-down)"></span>
+              </button>
             </div>
-            <div class="ah-box">
+            <div class="ah-box" id="done-box">
               <div class="ah-list" data-done-list role="list"></div>
             </div>
           </section>
@@ -404,5 +409,6 @@
 <script src="../assets/js/delta-v3.js?v=6842c15b"></script>
 <script src="../assets/js/delta-resize.js?v=2541bd65"></script>
 <script src="../assets/js/grid-overlay.js?v=164e4f2a"></script>
+<script src="../assets/js/v3-panel.js?v=e9544d8c"></script>
 </body>
 </html>
