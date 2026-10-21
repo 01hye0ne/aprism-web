@@ -639,8 +639,11 @@ body.ver-3.v2-2.v3 .delta3-clue-ics .i:nth-child(3) { animation-delay: 0.8s; }
  * v2.2 는 지도 깎인 모서리 앞에서 "잘린 선"으로 읽혀 12 안쪽에서 시작 · 끝냈다. v3 는 모서리가 둥글어 그 까닭이 없다.
  * 머리줄(관제) 아래 선 · 최신 알림 / 오늘 확인 완료 사이 선 둘 다.
  */
-body.ver-3.v2-2 .panel-head::after,
-.ver-3.v2-2 .ah-sec + .ah-sec::before { left: 0; right: 0; }
+body.ver-3.v2-2 .panel-head::after { left: 0; right: 0; }
+/* 칸 사이 선은 칸 자신의 윗변(1px 자리 그대로)으로 긋는다 — ::before 는 윗변 밖(-1)에 앉아 있어,
+ * 오늘 확인 완료를 접으면(overflow: hidden) 잘려 사라졌다(10/21 디자이너). */
+.ver-3.v2-2 .ah-sec + .ah-sec { border-top-color: var(--border-default); }
+.ver-3.v2-2 .ah-sec + .ah-sec::before { display: none; }
 
 /*
  * 위험 — 접힌 Delta 뒤 모서리 빛도 붉게 (10/21 디자이너).
