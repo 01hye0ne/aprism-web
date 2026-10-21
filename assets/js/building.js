@@ -747,6 +747,7 @@
 
   if (scopeMission && trigger) { trigger.querySelector(".t-title-2").textContent = scopeMission; }
   if (scopeMission) {
+    body.classList.add("is-mission-scope");
     var order = $(".ah-order");
     if (order) { order.textContent = "오래된 순 · 위험 우선"; }
     var hintTxt = $("[data-bld-hint]");
@@ -1133,6 +1134,8 @@
       b.setAttribute("aria-hidden", "true");
       b.appendChild(el("i"));
       b.appendChild(el("span", "bld-bot-name num", (r.n < 10 ? "0" : "") + r.n));
+      // v3 — 로봇 위 미션 이름 말풍선(10/21 디자이너). 층을 펼쳤을 때 · 줄에 손을 얹었을 때만 보인다(v3.css).
+      if (V3 && r.mission) { b.appendChild(el("span", "bld-bot-say t-caption", r.mission)); }
       labels.appendChild(b);
       r.node = b;
     });
