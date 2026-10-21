@@ -25,3 +25,36 @@
   head.addEventListener("click", function () { set(!sec.classList.contains("is-folded")); });
 })();
 
+
+// Delta 위젯 근거 줄(10/21 디자이너) — "Thinking..." 대신 Delta 가 지금 하는 일을 행동으로 적는다("~ 분석 중...").
+// 단계 · 건수가 바뀌거나 답을 기다릴 때(is-thinking) 따라 바꾼다. 건수는 Delta 판단(전체 미션)과 같은 값이다.
+(function () {
+  var win = document.querySelector("[data-delta3]");
+  var out = win && win.querySelector(".delta3-clue-txt");
+  if (!out) { return; }
+  var body = document.body;
+
+  function count(kind) {
+    var c = window.APRISM_DELTA_COUNT;
+    if (c) { return kind === "critical" ? c.crit : kind === "warning" ? c.warn : c.total; }
+    // 전체 층 현황처럼 판단 값이 없는 화면은 최신 알림 거르기 단추의 건수를 쓴다.
+    var el = document.querySelector('[data-ah-count="' + (kind === "total" ? "all" : kind) + '"]');
+    return el ? parseInt(el.textContent, 10) || 0 : 0;
+  }
+
+  function say() {
+    if (win.classList.contains("is-thinking")) { return "답변 정리 중..."; }
+    var level = body.getAttribute("data-level");
+    var total = count("total");
+    if (level === "critical") { return "위험 " + count("critical") + "건 원인 분석 중..."; }
+    if (level === "warning") { return "주의 " + count("warning") + "건 추세 비교 중..."; }
+    if (total) { return "알림 " + total + "건 살펴보는 중..."; }
+    return "순회 경로 지켜보는 중...";
+  }
+
+  function update() { var t = say(); if (out.textContent !== t) { out.textContent = t; } }
+  update();
+  new MutationObserver(update).observe(body, { attributes: true, attributeFilter: ["data-level"] });
+  new MutationObserver(update).observe(win, { attributes: true, attributeFilter: ["class"] });
+  document.addEventListener("aprism:severity", function () { setTimeout(update, 0); });
+})();

@@ -170,7 +170,8 @@ body.ver-3.v2-2.v3 .delta3-clue-txt {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-family: "JetBrains Mono", var(--font-family-mono, monospace);
+  /* Figma 는 Mono 13(영문 "Thinking...")이다. 한글 행동 문구로 바꾸며 SUIT 13 Regular 로 — Mono 는 한글 사이 빈칸이 넓게 벌어진다. */
+  font-family: var(--font-family-sans);
   font-size: var(--font-size-13);
   line-height: var(--font-line-height-18);
   color: var(--text-primary);
