@@ -309,7 +309,6 @@
     var title = el("span", "ah-title t-label-2");
     title.appendChild(icon(a.sev === "critical" ? "error" : "warning"));
     title.appendChild(el("span", null, a.title));
-    title.appendChild(el("span", "ah-time t-caption num", a.time));
 
     var where = el("span", "ah-where t-caption");
     where.appendChild(el("span", "floor-tag num", a.floor));   // 층 꼬리표는 웨이포인트 이름 앞(10/19)
@@ -322,6 +321,8 @@
     scope.appendChild(icon("way"));
     scope.appendChild(el("span", null, a.mission));
 
+    // v3(10/21 디자이너) — 시각은 마지막 줄(미션) 오른쪽, [안전진단] 이 첫 줄 오른쪽(v3.css). v2.2 는 첫 줄 오른쪽 그대로.
+    (V3 ? scope : title).appendChild(el("span", "ah-time t-caption num", a.time));
     node.appendChild(title);
     node.appendChild(where);
     node.appendChild(scope);

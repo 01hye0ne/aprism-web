@@ -326,7 +326,8 @@
     if (scoped) {
       // v2.2 — 무슨 일(위험도 + 알림명)이 첫 줄, 어디서가 둘째 줄(10/19 디자이너). 타임라인 · 오늘 확인 완료처럼 이름이 먼저다.
       // 시각은 첫 줄 오른쪽 — 목록이 "오래된 순" 이라 정렬 기준이 위에 보이게.
-      title.appendChild(el("span", "ah-time t-caption num", a.time));
+      // v3(10/21 디자이너) — 시각은 마지막 줄 오른쪽, [안전진단] 이 첫 줄 오른쪽으로 자리를 바꾼다(v3.css).
+      (document.body.classList.contains("ver-3") ? where : title).appendChild(el("span", "ah-time t-caption num", a.time));
       node.appendChild(title);
       node.appendChild(where);
     } else {
