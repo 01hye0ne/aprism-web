@@ -881,3 +881,21 @@ body.ver-3 .delta3 .delta3-name .ai-delta-mark i { width: 14px; height: 14px; bo
  */
 body.ver-3 .ah-item { border-left-color: var(--status-warning-icon); }
 body.ver-3 .ah-item.is-critical { border-left-color: var(--status-critical-icon); }
+
+/*
+ * Delta 이름 줄 키우기 (10/21 디자이너 — 오브가 잘 보이게). 위젯형 · 가로형 · 펼침 모두.
+ *   오브 칸 28(오브 지름 ≈ 22) · 위아래 -2 로 글줄 24 안에 앉힌다. "Delta" 16/24 ExtraBold.
+ *   머리 줄 높이는 그대로 36 — 위젯 접힘 12 + 20 + 4 → 10 + 24 + 2, 가로형 8 + 20 + 8 → 6 + 24 + 6.
+ *   아래 카드(요약 6 줄 · 근거 줄)는 자리 그대로다.
+ */
+body.ver-3 .delta3 .delta3-name .ai-delta-mark { width: 28px; height: 28px; margin: -2px; }
+body.ver-3 .delta3 .delta3-name .ai-delta-mark i { width: 20px; height: 20px; }
+body.ver-3 .delta3 .delta3-name .delta3-name-in { gap: 6px; }
+body.ver-3.v2-2.v3 .delta3 .delta3-name b {
+  font-size: var(--font-size-16);
+  line-height: var(--font-line-height-24);
+}
+body.ver-3.v2-2.v3 .delta3:not(.is-open) .delta3-name { padding: 10px var(--space-12) 2px; }
+body.ver-3.v2-2.v3 .delta3.is-open .delta3-name { padding: 10px var(--space-8) 2px var(--space-12); }
+:root[data-theme][data-delta][data-glow] body.ver-3.v2-2.v3.d3-bar .delta3 .delta3-name { padding: 6px var(--space-12); }
+:root[data-theme][data-delta][data-glow] body.ver-3.v2-2.v3.d3-bar .delta3.is-open .delta3-name { padding: 6px var(--space-8) 6px var(--space-12); }
