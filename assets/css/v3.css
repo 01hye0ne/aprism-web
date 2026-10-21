@@ -1122,3 +1122,14 @@ body.ver-3.v2-2.v3 .delta3.is-open .delta3-name { padding: 10px var(--space-8) 2
 .ver-3 .bld-rc.is-idle .bld-rc-name { color: var(--text-secondary); }
 .ver-3 .bld-rc:not(.is-run) .bld-rc-pct { color: var(--text-tertiary); }
 .ver-3 .bld-rc:not(.is-run) .bld-rc-track > i { background-color: var(--text-tertiary); }
+
+/*
+ * 통합 순회 현황 · 층 정보는 한 곳에 (10/21 디자이너).
+ *   층 정보   지도 옆 층 이름표(.bld-ftag) — 층 이름 · 로봇 수 · 알림 건수. 눌러도 그 층이 펼쳐진다.
+ *   이동      오른쪽 층 단추(전체 · B3 · B4, 단계 점) — 미션 관제 층 단추와 같은 꼴
+ *   왼쪽 아래 요약(.bld-sum)  전체 보기에서는 뺀다 — 로봇 수는 로봇 현황 머리, 층별 알림은 이름표와 겹쳤다.
+ *            층을 펼쳤을 때(그 층을 지나는 미션 목록) · 미션 범위일 때만 선다.
+ */
+body.ver-3:not(.is-floor-view):not(.is-mission-scope) .bld-sum { display: none; }
+/* 층을 펼친 뒤에는 "층을 누르면 펼쳐 보여요" 가 맞지 않아 걷는다 — 왼쪽 아래 미션 목록이 다음 행동을 말한다. */
+body.ver-3.is-floor-view .bld-hint { display: none; }
