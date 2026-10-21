@@ -323,8 +323,8 @@
     scope.appendChild(el("span", null, a.mission));
 
     node.appendChild(title);
-    node.appendChild(where);
-    node.appendChild(scope);
+    // v3(10/21 디자이너) — 미션(상위)이 장소(하위)보다 먼저: 무슨 일 → 어느 미션 → 어디서. v2.2 는 장소 → 미션.
+    if (V3) { node.appendChild(scope); node.appendChild(where); } else { node.appendChild(where); node.appendChild(scope); }
     node.addEventListener("mouseenter", function () { setHot(a.floor, null, true); });
     node.addEventListener("mouseleave", function () { setHot(null); });
     node.addEventListener("click", function () { enter(a.floor, a.mission); });
