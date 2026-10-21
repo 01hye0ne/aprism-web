@@ -549,8 +549,8 @@
    * 시안 — 한 칸짜리 로봇 카드 (10/21 디자이너, Robot 01 만 먼저 비교용). 레퍼런스처럼 라벨 · 칸 선 없이 위에서 아래로 한 흐름.
    *   머리   이름 · 미션(흐리게) · 오른쪽 끝 배터리 %와 신호 막대(라벨 없음, 신호 글자는 약함 · 끊김일 때만)
    *   지금   작업(14 Bold) / 웨이포인트(12 fg/tertiary)
-   *   진행   막대 하나 + 지나온 수
-   *   다음   "다음 · 이름" 한 줄(fg/tertiary)
+   *   다음   이름 한 줄(fg/tertiary) — 지금 · 다음 앞에 기호(way 원 · target)와 잇는 세로 선
+   *   진행   맨 아래 막대 하나 + 지나온 수
    * 상태 배지(Mission 줄) · 다음 웨이포인트 번호 · 오른쪽 칸은 뺐다.
    */
   function fleetCardSlim(r) {
@@ -585,10 +585,27 @@
     head.appendChild(vit);
     node.appendChild(head);
 
+    // 지금 · 다음 — 왼쪽 줄 칸에 기호(지금 way 원 · 다음 target)를 세로 선으로 잇는다(10/21 디자이너). 진행 막대는 맨 아래.
     var wp = STEPS[r.n];
     var bodyEl = el("span", "bld-rc2-body");
-    bodyEl.appendChild(el("span", "bld-rc2-now", r.now));
-    if (wp) { bodyEl.appendChild(el("span", "bld-rc2-wp t-caption", wp[0][1] + " " + wp[0][0])); }
+    var nowRow = el("span", "bld-rc2-step is-now");
+    var nm = el("span", "bld-rc2-mark");
+    nm.appendChild(icon("way", 12));
+    nowRow.appendChild(nm);
+    var nt = el("span", "bld-rc2-txt");
+    nt.appendChild(el("span", "bld-rc2-now", r.now));
+    if (wp) { nt.appendChild(el("span", "bld-rc2-wp t-caption", wp[0][1] + " " + wp[0][0])); }
+    nowRow.appendChild(nt);
+    bodyEl.appendChild(nowRow);
+    if (wp) {
+      var nextRow = el("span", "bld-rc2-step is-next");
+      var xm = el("span", "bld-rc2-mark");
+      xm.appendChild(icon("target", 16));
+      nextRow.appendChild(xm);
+      nextRow.appendChild(el("span", "bld-rc2-txt bld-rc2-next t-caption", wp[1][0]));
+      bodyEl.appendChild(nextRow);
+    }
+    node.appendChild(bodyEl);
     if (r.total) {
       var prog = el("span", "bld-rc2-prog");
       var bar = el("span", "bld-rc2-bar");
@@ -597,10 +614,8 @@
       bar.appendChild(fill);
       prog.appendChild(bar);
       prog.appendChild(el("span", "t-caption num", r.done + "/" + r.total));
-      bodyEl.appendChild(prog);
+      node.appendChild(prog);
     }
-    if (wp) { bodyEl.appendChild(el("span", "bld-rc2-next t-caption", "다음 · " + wp[1][0])); }
-    node.appendChild(bodyEl);
 
     node.addEventListener("mouseenter", function () { setHot(r.floor, null, true); markRobot(r, true); });
     node.addEventListener("mouseleave", function () { setHot(null); markRobot(r, false); });

@@ -1183,10 +1183,40 @@ body.ver-3.is-building .ah-item .ah-where::after { top: 50%; width: 7px; height:
 .ver-3 .bld-rc2-vitals .battery { gap: var(--space-8); font-size: var(--font-size-12); line-height: var(--font-line-height-18); }
 .ver-3 .bld-rc2-vitals .battery:not(.is-warning):not(.is-critical) .battery-fill { background-color: var(--text-secondary); }
 .ver-3 .bld-rc2-vitals .battery:not(.is-warning):not(.is-critical) .signal-bars { color: var(--text-secondary); }
-.ver-3 .bld-rc2-body { display: flex; flex-direction: column; min-width: 0; }
+.ver-3 .bld-rc2-body { position: relative; display: flex; flex-direction: column; gap: var(--space-12); min-width: 0; }
+/* 지금 → 다음 세로 선 — 두 기호 가운데를 잇는다(지금 기호 가운데 10 · 다음 기호 가운데 9). 선 2 chart/track, 위쪽은 지금 쪽이 진하다. */
+.ver-3 .bld-rc2-body::before {
+  content: "";
+  position: absolute;
+  left: 7px;
+  top: 10px;
+  bottom: 9px;
+  width: 2px;
+  border-radius: var(--radius-pill);
+  background-image: linear-gradient(to bottom, var(--text-secondary), var(--comp-chart-track));
+}
+.ver-3 .bld-rc2-step { position: relative; display: flex; align-items: flex-start; gap: var(--space-8); min-width: 0; }
+.ver-3 .bld-rc2-mark { flex: none; display: grid; place-items: center; width: 16px; height: 20px; }
+.ver-3 .bld-rc2-step.is-next .bld-rc2-mark { height: 18px; }
+/* 기호 밑에 원을 깔아 선을 가린다 — 지금은 bg/inverse 원(12) 위에 way 를 카드 면 색으로, 다음은 카드 면 원(16) 위에 target fg/tertiary. */
+.ver-3 .bld-rc2-mark { position: relative; }
+.ver-3 .bld-rc2-mark::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  border-radius: var(--radius-pill);
+  transform: translate(-50%, -50%);
+}
+.ver-3 .bld-rc2-step.is-now .bld-rc2-mark::before { width: 12px; height: 12px; background-color: var(--bg-inverse); box-shadow: 0 0 0 2px var(--bg-cell); }
+.ver-3 .bld-rc2-step.is-next .bld-rc2-mark::before { width: 16px; height: 16px; background-color: var(--bg-cell); }
+.ver-3 .bld-rc2-mark .i { position: relative; transform: rotate(90deg); background-color: currentColor; }
+.ver-3 .bld-rc2-step.is-now .bld-rc2-mark .i { width: 12px; height: 12px; color: var(--bg-cell); }
+.ver-3 .bld-rc2-step.is-next .bld-rc2-mark .i { color: var(--text-tertiary); }
+.ver-3 .bld-rc2-txt { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; }
 .ver-3 .bld-rc2-now { font-size: var(--font-size-14); line-height: var(--font-line-height-20); font-weight: 700; color: var(--text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ver-3 .bld-rc2-wp { margin-top: 2px; color: var(--text-tertiary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.ver-3 .bld-rc2-prog { display: flex; align-items: center; gap: var(--space-8); margin-top: 10px; color: var(--text-secondary); }
+.ver-3 .bld-rc2-next { display: block; color: var(--text-tertiary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ver-3 .bld-rc2-prog { display: flex; align-items: center; gap: var(--space-8); color: var(--text-secondary); }
 .ver-3 .bld-rc2-bar { flex: 1 1 auto; height: 4px; overflow: hidden; border-radius: var(--radius-pill); background-color: var(--comp-chart-track); }
 .ver-3 .bld-rc2-bar > i { display: block; height: 100%; border-radius: inherit; background-color: var(--text-secondary); }
-.ver-3 .bld-rc2-next { margin-top: 6px; color: var(--text-tertiary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
