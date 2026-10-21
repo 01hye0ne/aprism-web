@@ -18,8 +18,9 @@
   if (!win) { return; }
   var stage = win.parentElement;
 
-  var MIN = 320;      // 오른쪽 패널(col-3) 너비와 같다(10/13 디자이너)
-  var START = 395;    // 처음 펼친 너비 — Figma 펼친 창
+  // 화면이 data-d3-min · data-d3-start 로 바꿀 수 있다 — v3 위젯은 295(Figma 1320:14677, 10/21).
+  var MIN = +win.getAttribute("data-d3-min") || 320;      // 오른쪽 패널(col-3) 너비와 같다(10/13 디자이너)
+  var START = +win.getAttribute("data-d3-start") || 395;  // 처음 펼친 너비 — Figma 펼친 창
   var MAX = 720;
   var STEP = 16;
   var width = START;

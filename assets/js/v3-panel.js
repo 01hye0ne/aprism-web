@@ -24,3 +24,15 @@
 
   head.addEventListener("click", function () { set(!sec.classList.contains("is-folded")); });
 })();
+
+// Delta 위젯형(10/21, Figma DS 1320:14679) — 펼친 창 머리에는 "DELTA" 대신 지금 제목(.ai-line-1)을 적는다.
+// 제목은 monitor.js · delta-chat.js 가 수시로 바꾸므로 따라 적는다.
+(function () {
+  var win = document.querySelector("[data-delta3]");
+  var src = win && win.querySelector(".ai-line-1");
+  var dst = win && win.querySelector(".delta3-name b");
+  if (!src || !dst) { return; }
+  function copy() { if (dst.textContent !== src.textContent) { dst.textContent = src.textContent; } }
+  copy();
+  new MutationObserver(copy).observe(src, { childList: true, characterData: true, subtree: true });
+})();
