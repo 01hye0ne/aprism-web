@@ -1179,8 +1179,26 @@ body.ver-3.is-building .ah-item .ah-where::after { top: 50%; width: 7px; height:
 .ver-3 .bld-rc2-head { display: flex; align-items: center; gap: var(--space-8); min-width: 0; }
 .ver-3 .bld-rc2-name { flex: none; font-size: var(--font-size-14); line-height: var(--font-line-height-20); font-weight: 800; color: var(--text-primary); }
 .ver-3 .bld-rc2-mission { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-tertiary); }
-.ver-3 .bld-rc2-vitals { flex: none; display: flex; align-items: center; gap: var(--space-12); }
-.ver-3 .bld-rc2-vitals .battery { gap: var(--space-8); font-size: var(--font-size-12); line-height: var(--font-line-height-18); }
+/* 상태 세 칸 — 높이 28 · 선 border/divider · radius 4, 칸은 폭을 셋으로 나누고 사이를 선으로 가른다. 라벨 없이 값만(미션 관제와 같은 부품). */
+.ver-3 .bld-rc2-vitals {
+  display: flex;
+  height: 28px;
+  margin-top: calc(var(--space-4) * -1);
+  border: var(--border-width-thin) solid var(--border-divider);
+  border-radius: var(--radius-4);
+}
+.ver-3 .bld-rc2-vitals .bld-rc2-cell {
+  flex: 1 1 0;
+  min-width: 0;
+  justify-content: center;
+  gap: var(--space-8);
+  padding: 0 var(--space-4);
+  font-size: var(--font-size-12);
+  line-height: var(--font-line-height-18);
+  white-space: nowrap;
+}
+.ver-3 .bld-rc2-vitals .bld-rc2-cell + .bld-rc2-cell { border-left: var(--border-width-thin) solid var(--border-divider); }
+.ver-3 .bld-rc2-vitals .bld-rc-badge { padding: 0 var(--space-4); gap: var(--space-4); }
 .ver-3 .bld-rc2-vitals .battery:not(.is-warning):not(.is-critical) .battery-fill { background-color: var(--text-secondary); }
 .ver-3 .bld-rc2-vitals .battery:not(.is-warning):not(.is-critical) .signal-bars { color: var(--text-secondary); }
 .ver-3 .bld-rc2-body { position: relative; display: flex; flex-direction: column; gap: var(--space-12); min-width: 0; }

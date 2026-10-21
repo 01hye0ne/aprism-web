@@ -563,8 +563,17 @@
     var head = el("span", "bld-rc2-head");
     head.appendChild(el("span", "bld-rc2-name", rname(r)));
     if (r.mission) { head.appendChild(el("span", "bld-rc2-mission t-caption", r.mission)); }
+    node.appendChild(head);
+
+    // 상태 세 칸(10/21 디자이너) — 이름 아래 한 줄을 셋으로 나눠 미션 단계 · 배터리 · 신호. 미션 관제 로봇 패널의
+    // Mission · Battery · Signal 과 같은 차례 · 같은 부품이다. 머리 오른쪽에 두면 이름 · 미션명이 길 때 겹쳤다.
     var vit = el("span", "bld-rc2-vitals");
-    var bat = el("span", "battery" + (r.bat <= 20 ? " is-critical" : r.bat <= 40 ? " is-warning" : "") + (r.chg ? " is-charging" : ""));
+    var b = BADGE[r.st];
+    var st = el("span", "bld-rc2-cell bld-rc-badge is-" + ST_TONE[r.st]);
+    st.appendChild(el("i"));
+    st.appendChild(el("span", null, b.text));
+    vit.appendChild(st);
+    var bat = el("span", "bld-rc2-cell battery" + (r.bat <= 20 ? " is-critical" : r.bat <= 40 ? " is-warning" : "") + (r.chg ? " is-charging" : ""));
     bat.title = "배터리 " + r.bat + "%";
     var bb = el("span", "battery-body");
     var bf = el("span", "battery-fill");
@@ -574,16 +583,15 @@
     bat.appendChild(el("span", "battery-tip"));
     bat.appendChild(el("span", "t-caption num", r.bat + "%"));
     vit.appendChild(bat);
-    var sig = el("span", "battery" + (r.sig === 1 ? " is-critical" : r.sig === 2 ? " is-warning" : ""));
+    var sig = el("span", "bld-rc2-cell battery" + (r.sig === 1 ? " is-critical" : r.sig === 2 ? " is-warning" : ""));
     sig.title = "신호 " + SIG[r.sig];
     var bars = el("span", "signal-bars");
     bars.setAttribute("data-level", String(r.sig));
     for (var i = 0; i < 4; i += 1) { bars.appendChild(el("i")); }
     sig.appendChild(bars);
-    if (r.sig <= 2) { sig.appendChild(el("span", "t-caption", SIG[r.sig])); }
+    sig.appendChild(el("span", "t-caption", SIG[r.sig]));
     vit.appendChild(sig);
-    head.appendChild(vit);
-    node.appendChild(head);
+    node.appendChild(vit);
 
     // 지금 · 다음 — 왼쪽 줄 칸에 기호(지금 way 원 · 다음 target)를 세로 선으로 잇는다(10/21 디자이너). 진행 막대는 맨 아래.
     var wp = STEPS[r.n];
