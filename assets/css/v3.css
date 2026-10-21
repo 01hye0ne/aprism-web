@@ -1094,18 +1094,14 @@ body.ver-3.v2-2.v3 .delta3.is-open .delta3-name { padding: 10px var(--space-8) 2
  *   1단  이름 · 지금 작업                      fg/primary · Bold
  *   2단  진행률 숫자 · 상태 값(수행중 등)       fg/secondary — 수는 13 Mono 로 낮추고 막대도 fg/secondary
  *   3단  웨이포인트 · 다음 · 라벨 · 미션 꼬리표  fg/tertiary 이하
- * 오른쪽 칸 줄 사이 선은 걷는다 — 선이 칸마다 서 있어 표처럼 읽히고 눈이 오른쪽으로 끌렸다. 칸 경계 선 하나만 남긴다.
+ * 오른쪽 칸 줄 사이 선(border/divider)은 Figma 대로 둔다 — 한 번 걷었다가 디자이너가 되살렸다(10/21).
  */
 .ver-3 .bld-rc-mission { background-color: transparent; padding: 0; color: var(--text-tertiary); font-weight: 400; }
 .ver-3 .bld-rc-pct { font-size: var(--font-size-13); line-height: var(--font-line-height-18); color: var(--text-secondary); }
 .ver-3 .bld-rc-track > i { background-color: var(--text-secondary); }
-.ver-3 .bld-rc-prog { justify-content: center; gap: var(--space-4); padding: var(--space-8) var(--space-8) var(--space-4); border-bottom: 0; }
-.ver-3 .bld-rc-state + .bld-rc-state { border-top: 0; }
-.ver-3 .bld-rc-state,
-.ver-3 .bld-rc-prog + .bld-rc-state { padding: 2px var(--space-8); }
+.ver-3 .bld-rc-prog { justify-content: center; gap: var(--space-4); }
 .ver-3 .bld-rc-label { font-size: var(--font-size-12); font-weight: 400; color: var(--text-tertiary); }
 .ver-3 .bld-rc-badge { padding: 0; }
 .ver-3 .bld-rc-state .battery:not(.is-warning):not(.is-critical) .battery-fill { background-color: var(--text-secondary); }
 .ver-3 .bld-rc-state .battery:not(.is-warning):not(.is-critical) .signal-bars { color: var(--text-secondary); }
-.ver-3 .bld-rc-side { padding-bottom: var(--space-8); }
 .ver-3 .bld-rc-step:not(.is-now) .bld-rc-step-name { color: var(--text-tertiary); font-weight: 400; }
