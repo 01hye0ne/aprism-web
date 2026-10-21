@@ -615,7 +615,7 @@
           metaRow("위치",
             '<span class="ac-mono-label">' + esc(a.wp) + '</span>' +
             '<span class="t-body-4">' + esc(a.place) + '</span>' +
-            '<a class="t-caption" href="./main-v2-2.html">지도에서 보기</a>') +
+            '<a class="t-caption" href="./' + (document.body.classList.contains("ver-3") ? "main-v3" : "main-v2-2") + '.html">지도에서 보기</a>') +
           metaRow("감지", '<span class="ac-d-chip t-caption">' + esc(a.detect) + '</span>') +
           metaRow("로봇", '<span class="ac-d-robot ac-mono">' + esc(a.robot) + '</span>')) +
         deltaCard(a) +

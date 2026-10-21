@@ -524,7 +524,7 @@
   var allBtn = $("[data-ah-all]");
   if (allBtn) {
     allBtn.addEventListener("click", function () {
-      var url = "./alert-center.html";
+      var url = document.body.classList.contains("ver-3") ? "./alert-center-v3.html" : "./alert-center.html";
       var name = "aprism-alert-center";
       if (!window.screen.isExtended || !window.getScreenDetails) {
         window.open(url, name);
