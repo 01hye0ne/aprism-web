@@ -589,14 +589,9 @@
     var wp = STEPS[r.n];
     var bodyEl = el("span", "bld-rc2-body");
     var nowRow = el("span", "bld-rc2-step is-now");
-    // 표식은 미션 관제 웨이포인트 목록과 같은 그림(rail-dot — 상태색 고리 + 가운데 점, 10/21 디자이너).
-    // 지금 칸은 파랑, 그 칸에 알림이 걸려 있으면 그 단계 색 — 미션 관제 목록 · 지도 점과 같다.
+    // 표식 — 지금 way(bg/inverse 원) · 다음 target. 미션 관제 목록 고리(rail-dot)로 바꿔 봤다가 되돌렸다(10/21 디자이너).
     var nm = el("span", "bld-rc2-mark");
-    nm.appendChild(el("span", "rail-dot"));
-    if (wp) {
-      var hit = ALERTS.filter(function (a) { return a.robot === r.n && a.where.indexOf(wp[0][1]) >= 0; });
-      if (hit.length) { nowRow.setAttribute("data-wp-alert", topSev(hit) === "critical" ? "danger" : "caution"); }
-    }
+    nm.appendChild(icon("way", 12));
     nowRow.appendChild(nm);
     var nt = el("span", "bld-rc2-txt");
     nt.appendChild(el("span", "bld-rc2-now", r.now));
@@ -604,9 +599,10 @@
     nowRow.appendChild(nt);
     bodyEl.appendChild(nowRow);
     if (wp) {
-      // 다음(아직 안 한 칸) — 미션 관제 목록처럼 표식 없이 점선만 지난다.
       var nextRow = el("span", "bld-rc2-step is-next");
-      nextRow.appendChild(el("span", "bld-rc2-mark"));
+      var xm = el("span", "bld-rc2-mark");
+      xm.appendChild(icon("target", 16));
+      nextRow.appendChild(xm);
       nextRow.appendChild(el("span", "bld-rc2-txt bld-rc2-next t-caption", wp[1][0]));
       bodyEl.appendChild(nextRow);
     }
