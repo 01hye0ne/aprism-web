@@ -589,9 +589,9 @@
     var wp = STEPS[r.n];
     var bodyEl = el("span", "bld-rc2-body");
     var nowRow = el("span", "bld-rc2-step is-now");
-    // 표식 — 지금 way(bg/inverse 원) · 다음 target. 미션 관제 목록 고리(rail-dot)로 바꿔 봤다가 되돌렸다(10/21 디자이너).
+    // 표식 — 지금 · 다음 둘 다 target, 색만 다르다(지금 fg/primary · 다음 fg/tertiary, 10/21 디자이너).
     var nm = el("span", "bld-rc2-mark");
-    nm.appendChild(icon("way", 12));
+    nm.appendChild(icon("target", 16));
     nowRow.appendChild(nm);
     var nt = el("span", "bld-rc2-txt");
     nt.appendChild(el("span", "bld-rc2-now", r.now));
