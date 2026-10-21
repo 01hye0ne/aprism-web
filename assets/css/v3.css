@@ -1237,13 +1237,3 @@ body.ver-3.is-building .ah-item .ah-where::after { top: 50%; width: 7px; height:
 .ver-3 .bld-rc2-wp { margin-top: 2px; color: var(--text-tertiary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ver-3 .bld-rc2-next { display: block; color: var(--text-tertiary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ver-3 .bld-rc2-prog { display: flex; align-items: center; gap: var(--space-8); color: var(--text-secondary); }
-/*
- * 상태 세 칸 — 띠 꼴 (10/21 디자이너). 상자 대신 카드 양끝까지 닿는 위 · 아래 선(border/divider)에 칸 사이 선.
- * 카드 안쪽 여백(12)만큼 밖으로 내보내 선이 카드 테두리에 닿는다. 모서리는 각지게.
- */
-.ver-3 .bld-rc2-vitals {
-  margin-left: calc(var(--space-12) * -1);
-  margin-right: calc(var(--space-12) * -1);
-  border-width: var(--border-width-thin) 0;
-  border-radius: 0;
-}
