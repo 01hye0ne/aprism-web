@@ -418,7 +418,116 @@
 
   function chip(cls) { return el("span", "bld-chip" + (cls ? " " + cls : "")); }
 
+  /*
+   * v3 로봇 카드 — Figma DS 1260:15802(10/21 디자이너 3차).
+   *   머리   bg/raised · 위아래 4 · 왼쪽 8 — 이름 14/20 ExtraBold
+   *   왼쪽 134(오른쪽 선 border/default)  로봇 그림(400:200) · 위 선 · Mission(상태 점 + 글) · Battery · Signal 세 줄(사이 선 border/divider)
+   *   오른쪽   웨이포인트 둘 — 지금(way 12 · bg/inverse 원, 줄은 bg/inverse → chart/track) · 다음(target 16 · fg/tertiary)
+   *            이름 14/24 Bold · 번호 Mono 13. 다음 것은 한 단 옅게(fg/tertiary · fg/disabled).
+   * 수행중이 아니면 웨이포인트 자리에 지금 하는 일 하나만(대기 · 충전 · 복귀 · 완료 · 끊김).
+   * 지금 · 다음 웨이포인트는 임시 값이다(STEPS).
+   */
+  var STEPS = {
+    1:  [["N₂ 배관 압력계", "WP-04"], ["FFU-02 토출구", "WP-05"]],
+    5:  [["공기 압축기 C-1", "WP-13"], ["냉각수 펌프 P-3", "WP-14"]],
+    11: [["배전반실 열화상", "WP-04"], ["변압기 TR-2", "WP-05"]]
+  };
+  var ST_TONE = { run: "info", done: "normal", idle: "idle", off: "critical" };
+
+  function rcStep(name, sub, now, ic) {
+    var item = el("span", "bld-rc-step" + (now ? " is-now" : ""));
+    var rail = el("span", "bld-rc-rail");
+    rail.appendChild(el("i", "bld-rc-line"));
+    var mark = el("span", "bld-rc-mark");
+    mark.appendChild(icon(ic, now ? 12 : 16));
+    rail.appendChild(mark);
+    rail.appendChild(el("i", "bld-rc-line is-tail"));
+    item.appendChild(rail);
+    var txt = el("span", "bld-rc-step-txt");
+    txt.appendChild(el("span", "bld-rc-step-name", name));
+    if (sub) { txt.appendChild(el("span", "bld-rc-step-wp", sub)); }
+    item.appendChild(txt);
+    return item;
+  }
+
+  function fleetCard(r) {
+    var node = el("button", "bld-robot bld-rc is-" + r.st);
+    node.type = "button";
+    node.setAttribute("role", "listitem");
+    node.setAttribute("data-floor", r.floor);
+    node.setAttribute("aria-label", rname(r) + " · " + FNAME[r.floor] + " · " + r.now);
+
+    var head = el("span", "bld-rc-head");
+    head.appendChild(el("span", "bld-rc-name", rname(r)));
+    node.appendChild(head);
+
+    var main = el("span", "bld-rc-main");
+    var side = el("span", "bld-rc-side");
+    var pic = el("span", "bld-rc-pic");
+    var img = el("img");
+    img.alt = "";
+    img.src = "../assets/img/" + (r.st === "run" || r.moving ? "robot-dog.svg" : "robot-dog-sit.svg");
+    pic.appendChild(img);
+    side.appendChild(pic);
+
+    var states = el("span", "bld-rc-states");
+    function line(label, value) {
+      var row = el("span", "bld-rc-state");
+      row.appendChild(el("span", "bld-rc-label", label));
+      row.appendChild(value);
+      states.appendChild(row);
+    }
+    var b = BADGE[r.st];
+    var st = el("span", "bld-rc-badge is-" + ST_TONE[r.st]);
+    st.appendChild(el("i"));
+    st.appendChild(el("span", null, b.text));
+    line("Mission", st);
+
+    var bat = el("span", "battery" + (r.bat <= 20 ? " is-critical" : r.bat <= 40 ? " is-warning" : "") + (r.chg ? " is-charging" : ""));
+    var bb = el("span", "battery-body");
+    var bf = el("span", "battery-fill");
+    bf.style.width = r.bat + "%";
+    bb.appendChild(bf);
+    if (r.chg) {
+      var bolt = el("span", "i battery-bolt");
+      bolt.style.setProperty("--i", "var(--ic-bolt)");
+      bolt.setAttribute("aria-hidden", "true");
+      bb.appendChild(bolt);
+    }
+    bat.appendChild(bb);
+    bat.appendChild(el("span", "battery-tip"));
+    bat.appendChild(el("span", "t-caption num", r.bat + "%"));
+    line("Battery", bat);
+
+    var sig = el("span", "battery" + (r.sig === 0 ? " is-critical" : r.sig <= 2 ? " is-warning" : ""));
+    var bars = el("span", "signal-bars");
+    bars.setAttribute("data-level", String(r.sig));
+    for (var i = 0; i < 4; i += 1) { bars.appendChild(el("i")); }
+    sig.appendChild(bars);
+    sig.appendChild(el("span", "t-caption", SIG[r.sig]));
+    line("Signal", sig);
+    side.appendChild(states);
+    main.appendChild(side);
+
+    var steps = el("span", "bld-rc-steps");
+    var wp = STEPS[r.n];
+    if (r.st === "run" && wp) {
+      steps.appendChild(rcStep(wp[0][0], wp[0][1], true, "way"));
+      steps.appendChild(rcStep(wp[1][0], wp[1][1], false, "target"));
+    } else {
+      steps.appendChild(rcStep(r.now, r.total ? r.done + "/" + r.total : FNAME[r.floor], true, "way"));
+    }
+    main.appendChild(steps);
+    node.appendChild(main);
+
+    node.addEventListener("mouseenter", function () { setHot(r.floor, null, true); markRobot(r, true); });
+    node.addEventListener("mouseleave", function () { setHot(null); markRobot(r, false); });
+    node.addEventListener("click", function () { enter(r.floor, r.mission || missionFor(r.floor)); });
+    return node;
+  }
+
   function fleetRow(r) {
+    if (V3) { return fleetCard(r); }
     var node = el("button", "bld-robot" + (r.st === "off" ? " is-offline" : ""));
     node.type = "button";
     node.setAttribute("role", "listitem");
@@ -520,6 +629,7 @@
 
     // 운행 흐름
     var g = $("[data-bld-gantt]");
+    if (g) {   // v3 — 운행 흐름 · 다음 일정 카드는 뺐다(10/21 디자이너). v2.2 화면에만 있다.
     g.textContent = "";
     var span = T1 - T0;
     var ticks = el("div", "bld-g-row is-ticks");
@@ -560,8 +670,10 @@
     now.appendChild(el("b", "t-caption num", "10:11"));
     rows.appendChild(now);
     g.appendChild(rows);
+    }
 
     var sc = $("[data-bld-sched]");
+    if (sc) {
     sc.textContent = "";
     if (!SCHED.length) { sc.appendChild(el("li", "bld-sched-item t-caption", "예정된 일정이 없어요")); }
     SCHED.forEach(function (s) {
@@ -570,6 +682,7 @@
       li.appendChild(el("span", "t-label-2", s.text));
       sc.appendChild(li);
     });
+    }
   }
 
   /* ==================================================================

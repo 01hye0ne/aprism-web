@@ -31,7 +31,7 @@
   <link rel="stylesheet" href="../assets/css/delta-v3.css?v=b1562ee4" />
   <link rel="stylesheet" href="../assets/css/building.css?v=34793c69" />
   <!-- v3 전용 규칙 — v2.2 는 10/21 부로 멈췄다. v3 에서 바꾸는 것은 여기(body.ver-3)에. -->
-  <link rel="stylesheet" href="../assets/css/v3.css?v=dfc6b3cd" />
+  <link rel="stylesheet" href="../assets/css/v3.css?v=0631e54c" />
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
@@ -362,7 +362,8 @@
             </div>
           </section>
 
-          <!-- ---------- 로봇 현황 · 운행 흐름 · 다음 일정 ---------- -->
+          <!-- ---------- 로봇 현황 ---------- -->
+          <!-- v3(10/21 디자이너) — 운행 흐름 · 다음 일정 카드는 뺐다. 로봇 현황이 패널 높이를 다 쓴다. 로봇 카드는 Figma 1260:15802(building.js). -->
           <div class="floating col-3">
             <section class="right-panel bld-panel" aria-label="로봇 현황">
 
@@ -379,26 +380,6 @@
                 <div class="bld-fleet" data-bld-fleet role="list"></div>
               </div>
 
-              <div class="panel-card bld-card">
-                <div class="bld-card-head">
-                  <h3 class="t-title-2">운행 흐름</h3>
-                  <span class="t-caption num bld-meta">06:00 ~ 14:00</span>
-                </div>
-                <div class="bld-gantt" data-bld-gantt></div>
-                <div class="bld-legend t-caption">
-                  <span><i class="is-run"></i>순회</span>
-                  <span><i class="is-move"></i>이동 · 복귀</span>
-                  <span><i class="is-chg"></i>충전</span>
-                  <span><i class="is-plan"></i>예정</span>
-                </div>
-              </div>
-
-              <div class="panel-card bld-card">
-                <div class="bld-card-head">
-                  <h3 class="t-title-2">다음 일정</h3>
-                </div>
-                <ul class="bld-sched" data-bld-sched></ul>
-              </div>
 
             </section>
           </div>
@@ -414,7 +395,7 @@
 <script src="../assets/js/prism-orb.js?v=03386460"></script>
 <script src="../assets/js/screen.js?v=ee5edeb4"></script>
 <script src="../assets/js/map-model.js?v=0f88c871"></script>
-<script src="../assets/js/building.js?v=5066bf21"></script>
+<script src="../assets/js/building.js?v=ef9c9a06"></script>
 <script src="../assets/js/delta-pulse.js?v=2d0afced"></script>
 <script src="../assets/js/delta-v3.js?v=403861c7"></script>
 <script src="../assets/js/delta-resize.js?v=b83bd18b"></script>

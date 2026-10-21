@@ -917,3 +917,123 @@ body.ver-3.v2-2.v3 .delta3:not(.is-open) .delta3-name { padding: 10px var(--spac
 body.ver-3.v2-2.v3 .delta3.is-open .delta3-name { padding: 10px var(--space-8) 2px var(--space-12); }
 :root[data-theme][data-delta][data-glow] body.ver-3.v2-2.v3.d3-bar .delta3 .delta3-name { padding: 6px var(--space-12); }
 :root[data-theme][data-delta][data-glow] body.ver-3.v2-2.v3.d3-bar .delta3.is-open .delta3-name { padding: 6px var(--space-8) 6px var(--space-12); }
+
+/* ==================================================================
+ * 통합 순회 현황 · 로봇 현황 카드 (10/21 디자이너, Figma DS 1260:15802 3차) — building.js fleetCard
+ * 운행 흐름 · 다음 일정 카드는 뺐다 — 로봇 현황이 패널 높이를 다 쓴다.
+ *   카드     bg/cell · 선 border/default 1 · radius 4
+ *   머리     bg/raised · 위아래 4 · 왼쪽 8 · 오른쪽 4 — 이름 14/20 ExtraBold
+ *   왼쪽 134 오른쪽 선 border/default — 로봇 그림(400:200) · 위 선 border/divider · 세 줄(Label/2 13/18 Medium fg/secondary ·
+ *            값은 오른쪽, 줄 사이 border/divider). Mission 줄은 위아래 0(배지 26), 나머지는 위아래 4.
+ *   오른쪽   웨이포인트 — 줄 칸 28(선 4 · 위 18) + 글(위 14 · 아래 8 · 오른쪽 8, 이름 14/24 Bold · 번호 Mono 13/18).
+ *            지금: way 12(bg/inverse 원) · 아래 줄 bg/inverse → chart/track(55%) · 이름 fg/primary · 번호 fg/tertiary
+ *            다음: target 16 · 줄 chart/track · 이름 fg/tertiary · 번호 fg/disabled
+ * ================================================================== */
+.ver-3 .bld-fleet { gap: var(--space-8); }
+.ver-3 .bld-robot.bld-rc {
+  border: var(--border-width-thin) solid var(--border-default);
+  border-radius: var(--radius-4);
+  background-color: var(--bg-cell);
+}
+.ver-3 .bld-robot.bld-rc:hover { background-color: var(--bg-cell); border-color: var(--border-strong); }
+.ver-3 .bld-rc-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  padding: var(--space-4) var(--space-4) var(--space-4) var(--space-8);
+  background-color: var(--bg-raised);
+}
+.ver-3 .bld-rc-name {
+  font-size: var(--font-size-14);
+  line-height: var(--font-line-height-20);
+  font-weight: 800;
+  letter-spacing: -0.15px;
+  color: var(--text-primary);
+}
+.ver-3 .bld-rc.is-off .bld-rc-name { color: var(--text-tertiary); }
+.ver-3 .bld-rc-main { display: flex; align-items: stretch; }
+.ver-3 .bld-rc-side {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  width: 134px;
+  border-right: var(--border-width-thin) solid var(--border-default);
+}
+.ver-3 .bld-rc-pic {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 400 / 200;
+  overflow: hidden;
+  background-color: var(--bg-map-chip);
+}
+.ver-3 .bld-rc-pic img { display: block; width: auto; max-width: 80%; height: 86%; object-fit: contain; }
+.ver-3 .bld-rc.is-off .bld-rc-pic img { opacity: 0.4; }
+.ver-3 .bld-rc-states { display: flex; flex-direction: column; border-top: var(--border-width-thin) solid var(--border-divider); }
+.ver-3 .bld-rc-state {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  padding: var(--space-4) var(--space-8);
+  white-space: nowrap;
+}
+.ver-3 .bld-rc-state + .bld-rc-state { border-top: var(--border-width-thin) solid var(--border-divider); }
+.ver-3 .bld-rc-state:first-child { padding: 0 var(--space-4) 0 var(--space-8); }
+.ver-3 .bld-rc-label {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: var(--font-size-13);
+  line-height: var(--font-line-height-18);
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+/* 상태 — Badge(점 6 + Caption 12/18), 면 없음. 수행중 info · 완료 safe · 대기 fg/tertiary · 끊김 critical. */
+.ver-3 .bld-rc-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  font-size: var(--font-size-12);
+  line-height: var(--font-line-height-18);
+  --tone-dot: var(--text-tertiary);
+  --tone-text: var(--text-tertiary);
+  color: var(--tone-text);
+}
+.ver-3 .bld-rc-badge > i { width: 6px; height: 6px; border-radius: var(--radius-pill); background-color: var(--tone-dot); }
+.ver-3 .bld-rc-badge.is-info { --tone-dot: var(--status-info-icon); --tone-text: var(--status-info-text); }
+.ver-3 .bld-rc-badge.is-normal { --tone-dot: var(--status-safe-icon); --tone-text: var(--status-safe-text); }
+.ver-3 .bld-rc-badge.is-critical { --tone-dot: var(--status-critical-icon); --tone-text: var(--status-critical-text); }
+.ver-3 .bld-rc-state .battery { gap: var(--space-8); font-size: var(--font-size-12); line-height: var(--font-line-height-18); }
+
+/* 웨이포인트 — 지금 · 다음 */
+.ver-3 .bld-rc-steps { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; overflow: hidden; }
+.ver-3 .bld-rc-step { flex: 1 1 0; display: flex; align-items: stretch; min-height: 68px; }
+.ver-3 .bld-rc-rail { flex: none; width: 28px; display: flex; flex-direction: column; align-items: center; }
+.ver-3 .bld-rc-line { display: block; width: 4px; height: 18px; flex: none; background-color: var(--comp-chart-track); }
+.ver-3 .bld-rc-line.is-tail { height: auto; flex: 1 1 auto; }
+.ver-3 .bld-rc-step.is-now .bld-rc-line.is-tail { background-image: linear-gradient(to bottom, var(--bg-inverse), var(--comp-chart-track) 55%); }
+.ver-3 .bld-rc-mark { flex: none; display: grid; place-items: center; width: 16px; height: 16px; }
+.ver-3 .bld-rc-mark .i { transform: rotate(90deg); color: var(--text-tertiary); background-color: currentColor; }
+.ver-3 .bld-rc-step.is-now .bld-rc-mark {
+  width: 12px;
+  height: 12px;
+  border-radius: var(--radius-pill);
+  background-color: var(--bg-inverse);
+}
+.ver-3 .bld-rc-step.is-now .bld-rc-mark .i { width: 12px; height: 12px; color: var(--text-inverse, var(--bg-cell)); }
+.ver-3 .bld-rc-step-txt {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2, 2px);
+  padding: 14px var(--space-8) var(--space-8) 0;
+  white-space: nowrap;
+}
+.ver-3 .bld-rc-step-name,
+.ver-3 .bld-rc-step-wp { overflow: hidden; text-overflow: ellipsis; }
+.ver-3 .bld-rc-step-name { font-size: var(--font-size-14); line-height: var(--font-line-height-24); font-weight: 700; color: var(--text-tertiary); }
+.ver-3 .bld-rc-step-wp { font-family: var(--font-family-mono); font-size: var(--font-size-13); line-height: var(--font-line-height-18); color: var(--text-disabled); }
+.ver-3 .bld-rc-step.is-now .bld-rc-step-name { color: var(--text-primary); }
+.ver-3 .bld-rc-step.is-now .bld-rc-step-wp { color: var(--text-tertiary); }
