@@ -164,20 +164,20 @@ body.ver-3.v2-2.v3 .delta3-clue {
 body.ver-3.v2-2.v3 .delta3-clue-ics { flex: none; display: flex; align-items: center; }
 /*
  * 근거 아이콘(감지 종류) — 24 동그라미 칩 안에 아이콘 16. 칩은 6 씩 겹친다.
- * 불투명 칩 + 카드 쪽 테 2(10/21 디자이너 — 프로젝트 카드 레퍼런스의 겹친 아바타처럼). 반투명일 때는 아이콘이 작고
- * 판 색에 묻혀 잘 안 읽혔다. 테가 칩 사이를 갈라 겹쳐도 하나하나 떨어져 보인다.
- * 다크 — 칩 bg/raised · 테 gnb/bg(gray/900 — 가장 어두운 바탕이라 붉은 판 위에서도 칩 사이가 갈린다).
- * 라이트 — 칩 bg/cell · 테 bg/raised(흰) — 레퍼런스처럼 카드 쪽 흰 테.
+ * 불투명 칩 + 은은한 그림자(10/21 디자이너 — 프로젝트 카드 레퍼런스의 겹친 아바타처럼). 반투명일 때는 아이콘이 작고
+ * 판 색에 묻혀 잘 안 읽혔다. 카드 쪽 테(2)로 갈랐더니 너무 도드라져, 테를 빼고 왼쪽으로 지는 옅은 그림자로 칩 사이를 가른다
+ * (뒤 칩 위에 앞 칩이 살짝 떠 보인다).
+ * 다크 — 칩 bg/raised · 그림자 검정 45%. 라이트 — 칩 bg/cell · 그림자 검정 12%(밝은 판이라 옅게).
  */
 body.ver-3.v2-2.v3 .delta3-clue-ics {
   --clue-bg: var(--bg-raised);
   --clue-bg-on: color-mix(in srgb, var(--bg-raised), var(--text-primary) 14%);
-  --clue-ring: var(--comp-gnb-bg);
+  --clue-shadow: rgb(0 0 0 / 45%);
 }
 :root[data-theme="light"] body.ver-3.v2-2.v3 .delta3-clue-ics {
   --clue-bg: var(--bg-cell);
   --clue-bg-on: var(--bg-raised);
-  --clue-ring: var(--bg-raised);
+  --clue-shadow: rgb(0 0 0 / 12%);
 }
 body.ver-3.v2-2.v3 .delta3-clue-ics .i {
   position: relative;
@@ -187,7 +187,7 @@ body.ver-3.v2-2.v3 .delta3-clue-ics .i {
   border: 0;
   border-radius: var(--radius-pill);
   background-color: var(--clue-bg);
-  box-shadow: 0 0 0 2px var(--clue-ring);
+  box-shadow: -2px 0 4px 0 var(--clue-shadow);
   -webkit-mask: none;
   mask: none;
 }
