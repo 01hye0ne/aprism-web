@@ -372,3 +372,33 @@ body.ver-3.v2-2.v3 .delta3 .delta3-close .i { background-color: currentColor; }
  */
 body.ver-3.v2-2.v3 .delta3.is-chat:not(.is-open) .dc-thread { display: none; }
 body.ver-3.v2-2.v3 .delta3.is-chat:not(.is-open) .delta3-body > .ai-line-2 { display: -webkit-box; }
+
+/* ==================================================================
+ * Delta 위젯 · 위험 (10/21 디자이너, Figma DS 1324:14819 Card Type=Default · expand)
+ *   면     접힘 — 오른쪽 아래(유리) → 왼쪽 위(status/critical/bg)로 번지는 원형 그라데이션(반지름 ≈ 270), 채움 55%
+ *          펼침 — 아래(유리) → 위(status/critical/bg) 세로 그라데이션, 채움 55%
+ *   안쪽 빛 inset 0 0 8 -3 glow-core · inset 0 0 20 glow-halo · 윗변 반사(inset 0 2 3 -1 glass-edge)
+ *   접힘 요약 글은 절반부터 흰 40% 로 옅어지고, 근거 줄은 80% 로 한 단 물러난다.
+ * 주의 · 안전은 아직 디자인 전 — 기본 면 그대로다.
+ * ================================================================== */
+:root[data-theme][data-delta][data-glow] body.ver-3.v2-2.v3 .delta3.is-critical:not(.is-open) .delta3-card {
+  background-image: radial-gradient(circle 270px at 100% 100%,
+    color-mix(in srgb, var(--bg-glass) 55%, transparent),
+    color-mix(in srgb, var(--status-critical-bg) 55%, transparent));
+}
+:root[data-theme][data-delta][data-glow] body.ver-3.v2-2.v3 .delta3.is-critical.is-open {
+  background-image: linear-gradient(to top,
+    color-mix(in srgb, var(--bg-glass) 55%, transparent),
+    color-mix(in srgb, var(--status-critical-bg) 55%, transparent));
+}
+:root[data-theme][data-delta][data-glow] body.ver-3.v2-2.v3 .delta3.is-critical:not(.is-open) .delta3-card,
+:root[data-theme][data-delta][data-glow] body.ver-3.v2-2.v3 .delta3.is-critical.is-open {
+  box-shadow:
+    inset 0 0 8px -3px var(--comp-alert-critical-glow-core),
+    inset 0 0 20px 0 var(--comp-alert-critical-glow-halo),
+    inset 0 2px 3px -1px var(--effect-glass-edge);
+}
+body.ver-3.v2-2.v3 .delta3.is-critical:not(.is-open) .delta3-body > .ai-line-2 {
+  background-image: linear-gradient(to bottom, var(--text-primary) 50%, color-mix(in srgb, var(--text-primary) 40%, transparent));
+}
+body.ver-3.v2-2.v3 .delta3.is-critical .delta3-clue { opacity: 0.8; }
