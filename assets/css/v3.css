@@ -779,6 +779,8 @@ body.ver-3.v2-2.v3.d3-bar .delta3:not(.is-open) .delta3-body > .ai-input { displ
   padding: 0;
   overflow: visible;
   opacity: 1;
+  /* 위험 · 주의에서는 근거 줄이 opacity 0.8 로 쌓임 맥락이 생겨 DOM 뒤쪽인 이 칸을 덮었다 — [+] 가 안 눌렸다(10/21 버그). */
+  z-index: 1;
 }
 
 /* [+] — Icon Button · Ghost 24 pill, plus 16 fg/primary. */
