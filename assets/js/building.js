@@ -419,13 +419,17 @@
   function chip(cls) { return el("span", "bld-chip" + (cls ? " " + cls : "")); }
 
   /*
-   * v3 로봇 카드 — Figma DS 1260:15802(10/21 디자이너 3차).
-   *   머리   bg/raised · 위아래 4 · 왼쪽 8 — 이름 14/20 ExtraBold
-   *   왼쪽 134(오른쪽 선 border/default)  Mission(상태 점 + 글) · Battery · Signal 세 줄(사이 선 border/divider)
-   *   오른쪽   웨이포인트 둘 — 지금(way 12 · bg/inverse 원, 줄은 bg/inverse → chart/track) · 다음(target 16 · fg/tertiary)
-   *            이름 14/24 Bold · 번호 Mono 13. 다음 것은 한 단 옅게(fg/tertiary · fg/disabled).
-   * 수행중이 아니면 웨이포인트 자리에 지금 하는 일 하나만(대기 · 충전 · 복귀 · 완료 · 끊김).
-   * 지금 · 다음 웨이포인트는 임시 값이다(STEPS).
+   * v3 로봇 카드 — Figma DS 1260:15802(10/21 디자이너 4차).
+   *   머리   bg/raised · 위아래 4 · 왼쪽 8 · 오른쪽 4 — 이름 14/20 ExtraBold · 오른쪽 끝 미션 꼬리표(bg/panel · r2 · 12 Medium)
+   *   왼쪽   웨이포인트 둘(높이 136) — 지금(way 12 · bg/inverse 원) 작업 14/24 Bold + 웨이포인트 12 Regular fg/tertiary
+   *                                    다음(target 16) 이름 + 번호 Mono 13 fg/disabled
+   *   오른쪽 133(왼쪽 선 border/divider) — 진행률(숫자 + 막대 4) · Mission(상태 점 + 글) · Battery · Signal
+   * 디자이너와 맞춘 손질(10/21) — Figma 와 다르게 둔 곳:
+   *   · 진행률 숫자 Mono 20 → 16. 20 이면 열두 장에서 숫자가 "무엇을 하는지"보다 먼저 읽혔다.
+   *   · 배터리 · 신호는 정상이면 무채색(DS Battery Gauge · Signal Bars 규칙). Figma 는 정상에도 초록이다.
+   *   · 다음 칸 이름은 13/18 Medium — 지금(14 Bold)보다 한 단 낮춘다. 다음 번호는 지금 다음 것(WP-05).
+   * 수행중이 아니면 왼쪽은 지금 하는 일 한 칸만(대기 · 충전 · 복귀 · 완료 · 끊김) — 그 상태 디자인은 아직이다.
+   * 웨이포인트는 임시 값이다(STEPS).
    */
   var STEPS = {
     1:  [["N₂ 배관 압력계", "WP-04"], ["FFU-02 토출구", "WP-05"]],
@@ -434,7 +438,7 @@
   };
   var ST_TONE = { run: "info", done: "normal", idle: "idle", off: "critical" };
 
-  function rcStep(name, sub, now, ic) {
+  function rcStep(name, sub, now, ic, subCls) {
     var item = el("span", "bld-rc-step" + (now ? " is-now" : ""));
     var rail = el("span", "bld-rc-rail");
     rail.appendChild(el("i", "bld-rc-line"));
@@ -445,7 +449,7 @@
     item.appendChild(rail);
     var txt = el("span", "bld-rc-step-txt");
     txt.appendChild(el("span", "bld-rc-step-name", name));
-    if (sub) { txt.appendChild(el("span", "bld-rc-step-wp", sub)); }
+    if (sub) { txt.appendChild(el("span", "bld-rc-step-wp" + (subCls ? " " + subCls : ""), sub)); }
     item.appendChild(txt);
     return item;
   }
@@ -455,22 +459,46 @@
     node.type = "button";
     node.setAttribute("role", "listitem");
     node.setAttribute("data-floor", r.floor);
-    node.setAttribute("aria-label", rname(r) + " · " + FNAME[r.floor] + " · " + r.now);
+    node.setAttribute("aria-label", rname(r) + " · " + FNAME[r.floor] + " · " + (r.mission ? r.mission + " · " : "") + r.now);
 
     var head = el("span", "bld-rc-head");
     head.appendChild(el("span", "bld-rc-name", rname(r)));
+    if (r.mission) { head.appendChild(el("span", "bld-rc-mission", r.mission)); }
     node.appendChild(head);
 
     var main = el("span", "bld-rc-main");
-    var side = el("span", "bld-rc-side");
-    // 로봇 그림(Figma 400:200 자리)은 뺐다 — 목록마다 반복돼 정보가 과했다(10/21 디자이너).
 
-    var states = el("span", "bld-rc-states");
+    // 왼쪽 — 지금 · 다음
+    var steps = el("span", "bld-rc-steps");
+    var wp = STEPS[r.n];
+    if (r.st === "run" && wp) {
+      steps.appendChild(rcStep(r.now, wp[0][1] + " " + wp[0][0], true, "way"));
+      steps.appendChild(rcStep(wp[1][0], wp[1][1], false, "target", "is-no"));
+    } else {
+      var where = r.st === "done" ? (r.mission || "") + " 끝"
+        : r.st === "off" ? FNAME[r.floor] + " · 마지막 위치"
+        : FNAME[r.floor] + (r.dock ? " · 도크" : "");
+      steps.appendChild(rcStep(r.now, where, true, "way"));
+    }
+    main.appendChild(steps);
+
+    // 오른쪽 — 진행률 · 상태 세 줄
+    var side = el("span", "bld-rc-side");
+    var pct = r.total ? Math.round(r.done / r.total * 100) : null;
+    var prog = el("span", "bld-rc-prog");
+    prog.appendChild(el("span", "bld-rc-pct num", pct == null ? "—" : pct + "%"));
+    var track = el("span", "bld-rc-track");
+    var fill = el("i");
+    fill.style.width = (pct || 0) + "%";
+    track.appendChild(fill);
+    prog.appendChild(track);
+    side.appendChild(prog);
+
     function line(label, value) {
       var row = el("span", "bld-rc-state");
       row.appendChild(el("span", "bld-rc-label", label));
       row.appendChild(value);
-      states.appendChild(row);
+      side.appendChild(row);
     }
     var b = BADGE[r.st];
     var st = el("span", "bld-rc-badge is-" + ST_TONE[r.st]);
@@ -494,25 +522,14 @@
     bat.appendChild(el("span", "t-caption num", r.bat + "%"));
     line("Battery", bat);
 
-    var sig = el("span", "battery" + (r.sig === 0 ? " is-critical" : r.sig <= 2 ? " is-warning" : ""));
+    var sig = el("span", "battery" + (r.sig === 1 ? " is-critical" : r.sig === 2 ? " is-warning" : ""));
     var bars = el("span", "signal-bars");
     bars.setAttribute("data-level", String(r.sig));
     for (var i = 0; i < 4; i += 1) { bars.appendChild(el("i")); }
     sig.appendChild(bars);
     sig.appendChild(el("span", "t-caption", SIG[r.sig]));
     line("Signal", sig);
-    side.appendChild(states);
     main.appendChild(side);
-
-    var steps = el("span", "bld-rc-steps");
-    var wp = STEPS[r.n];
-    if (r.st === "run" && wp) {
-      steps.appendChild(rcStep(wp[0][0], wp[0][1], true, "way"));
-      steps.appendChild(rcStep(wp[1][0], wp[1][1], false, "target"));
-    } else {
-      steps.appendChild(rcStep(r.now, r.total ? r.done + "/" + r.total : FNAME[r.floor], true, "way"));
-    }
-    main.appendChild(steps);
     node.appendChild(main);
 
     node.addEventListener("mouseenter", function () { setHot(r.floor, null, true); markRobot(r, true); });
