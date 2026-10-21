@@ -48,6 +48,24 @@
 .ver-3 .done-sec.is-folded .done-fold .i { transform: rotate(180deg); }
 .ver-3 .done-sec.no-motion .done-fold .i { transition: none; }
 
+/*
+ * 접힌 채 조치 완료 — 착지 (10/21 디자이너). 쪽지가 건수로 빨려 들어간 뒤(monitor.js .is-landed)
+ * 건수가 살짝 튀고(1 → 1.25 → 1) 머리 줄 바탕이 잠깐 밝아졌다 돌아온다. 600ms 한 번. 펼치지는 않는다.
+ * 움직임 줄이기면 쪽지는 그 자리에서 사라지고(monitor.js) 건수만 바뀐다 — .is-landed 가 안 붙는다.
+ */
+.ver-3 .done-sec.is-folded.is-landed .done-head { animation: done-land-flash 600ms ease-out; }
+.ver-3 .done-sec.is-folded.is-landed .done-count { animation: done-land-pop 420ms cubic-bezier(.3, 1.6, .5, 1); }
+@keyframes done-land-flash {
+  0% { background-color: transparent; }
+  20% { background-color: var(--state-hover, rgb(255 255 255 / 8%)); }
+  100% { background-color: transparent; }
+}
+@keyframes done-land-pop {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.25); }
+  100% { transform: scale(1); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .ver-3 .done-sec,
   .ver-3 .done-sec > .ah-box,

@@ -976,6 +976,26 @@
         return;
       }
 
+      // v3 — 오늘 확인 완료가 접혀 있으면(v3-panel.js) 펼치지 않는다. 쪽지는 머리 줄 건수로 빨려 들어가고,
+      // 닿으면 건수가 튀고 머리 줄이 잠깐 밝아진다(10/21 디자이너). 사람이 접어 둔 것을 매번 뒤집지 않고,
+      // 최신 알림 칸 높이도 출렁이지 않는다 — 알림을 연달아 처리할 때 다음 알림 자리가 움직이지 않는다.
+      var doneSec = doneList.closest("[data-done-sec]");
+      if (doneSec && doneSec.classList.contains("is-folded")) {
+        var badge = doneSec.querySelector(".done-count") || doneSec.querySelector("[data-done-head]");
+        flyer.animate(flyTo(from, badge.getBoundingClientRect()),
+          { duration: 480, easing: "cubic-bezier(.55,0,.75,.2)", fill: "forwards" }).finished
+          .catch(function () {})
+          .then(function () {
+            flyer.remove();
+            commit(a, rec);
+            doneSec.classList.remove("is-landed");
+            void doneSec.offsetWidth;          // 연달아 처리해도 다시 돈다
+            doneSec.classList.add("is-landed");
+            setTimeout(function () { doneSec.classList.remove("is-landed"); }, 700);
+          });
+        return;
+      }
+
       var slot = el("div", "done-slot");
       slot.setAttribute("aria-hidden", "true");
       doneList.insertBefore(slot, doneList.firstChild);
