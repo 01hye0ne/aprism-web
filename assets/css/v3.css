@@ -364,3 +364,10 @@ body.ver-3.v2-2.v3 .delta3 .delta3-close .i { background-color: currentColor; }
   mask-composite: exclude;
 }
 
+
+/*
+ * 대화 뒤 접힌 위젯 — 대화 내역은 펼친 창에서만 본다(10/21 디자이너).
+ * v2.2 미니창은 마지막 말 몇 줄을 남겼는데, 위젯에서는 늘 요약(.ai-line-2)으로 돌아간다. 대화는 펼치면 그대로 이어진다.
+ */
+body.ver-3.v2-2.v3 .delta3.is-chat:not(.is-open) .dc-thread { display: none; }
+body.ver-3.v2-2.v3 .delta3.is-chat:not(.is-open) .delta3-body > .ai-line-2 { display: -webkit-box; }
