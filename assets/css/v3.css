@@ -1248,3 +1248,13 @@ body.ver-3.is-building .ah-item .ah-where::after { top: 50%; width: 7px; height:
 .ver-3 .bld-rc2:not(.is-run) .bld-rc2-prog { color: var(--text-tertiary); }
 .ver-3 .bld-rc2:not(.is-run) .progress-fill { background-color: var(--text-tertiary); }
 .ver-3 .bld-rc2:not(.is-run) .progress-knob { display: none; }
+/*
+ * 상태 세 칸과 본문(지금 · 다음) 사이 구분선 — 카드 양끝까지 (10/21 디자이너). 머리(누구 · 상태)와 하는 일을 가른다.
+ * 본문을 카드 안쪽 여백(12)만큼 밖으로 내보내고 위 선을 긋는다. 지금 → 다음 세로 선은 그만큼 옮긴다.
+ */
+.ver-3 .bld-rc2-body {
+  margin: 0 calc(var(--space-12) * -1);
+  padding: var(--space-12) var(--space-12) 0;
+  border-top: var(--border-width-thin) solid var(--border-divider);
+}
+.ver-3 .bld-rc2-body.has-next::before { left: calc(var(--space-12) + 7px); top: calc(var(--space-12) + 10px); }
