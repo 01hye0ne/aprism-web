@@ -479,7 +479,12 @@
       var where = r.st === "done" ? (r.mission || "") + " 끝"
         : r.st === "off" ? FNAME[r.floor] + " · 마지막 위치"
         : FNAME[r.floor] + (r.dock ? " · 도크" : "");
-      steps.appendChild(rcStep(r.now, where, true, "way"));
+      // 완료 · 대기(10/21 디자이너) — 한 단 물러난다. 표식은 상태 아이콘(완료 check-circle · 충전 bolt · 대기 clock ·
+      // 복귀 중 way)을 면 없이 fg/tertiary 로 — 수행중의 bg/inverse 원과 갈린다. 끊김은 위험 색 그대로.
+      var restIc = r.st === "done" ? "check-circle" : /충전/.test(r.now) ? "bolt" : r.moving ? "way" : "clock";   // 충전 여부(chg)가 아니라 지금 하는 일 글을 따른다 — 대기하며 충전 중인 로봇도 "대기 중"
+      var restStep = rcStep(r.now, where, true, r.st === "off" ? "way" : restIc);
+      if (r.st !== "off") { restStep.classList.add("is-rest"); }
+      steps.appendChild(restStep);
     }
     main.appendChild(steps);
 
