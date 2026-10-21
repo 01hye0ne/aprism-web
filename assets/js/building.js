@@ -332,6 +332,14 @@
     var counts = { all: all.length, critical: 0, warning: 0 };
     all.forEach(function (a) { counts[a.sev] += 1; });
     $$("[data-ah-count]").forEach(function (n) { n.textContent = counts[n.getAttribute("data-ah-count")]; });
+
+    // 층별 알림 건수 — v3 지도 층 판이 버튼마다 단다(v3-panel.js, 10/21). 다른 화면은 듣지 않는다.
+    window.APRISM_FLOOR_COUNTS = (function (list) {
+      var c = { all: list.length };
+      list.forEach(function (a) { if (a.floor) { c[a.floor] = (c[a.floor] || 0) + 1; } });
+      return c;
+    })(all);
+    document.dispatchEvent(new CustomEvent("aprism:floor-counts", { detail: window.APRISM_FLOOR_COUNTS }));
     // 테두리 · Delta 판 단계 = 남은 알림 중 가장 높은 단계(메인 v2.2 monitor.js 와 같은 신호, 10/19)
     var top = counts.critical ? "critical" : counts.warning ? "warning" : null;
     document.dispatchEvent(new CustomEvent("aprism:severity", { detail: { level: top, glow: top } }));

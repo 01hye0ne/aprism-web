@@ -30,7 +30,7 @@
   <link rel="stylesheet" href="../assets/css/palette-neutral.css?v=0c969aea" />
   <link rel="stylesheet" href="../assets/css/delta-v3.css?v=b1562ee4" />
   <!-- v3 전용 규칙 — v2.2 는 10/21 부로 멈췄다. v3 에서 바꾸는 것은 여기(body.ver-3)에. -->
-  <link rel="stylesheet" href="../assets/css/v3.css?v=fa24b4ee" />
+  <link rel="stylesheet" href="../assets/css/v3.css?v=dbb58677" />
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
@@ -121,11 +121,10 @@
       <span class="status-bar-logo">
         <span class="i" style="--i:var(--ic-brand-mark)" role="img" aria-label="APRISM"></span>
       </span>
-      <!-- v3(10/21 디자이너) — 상단은 미션만 고른다: 미션(라벨) | [미션 ▾] | 전층(알림 건수).
-           "전체 건물 ›" 링크는 지도 층 판의 [전체]와 역할이 겹쳐 헷갈렸다 — 층(전체 · B3 · B4)은 지도 안에서만 고른다.
-           오른쪽 "전층 N" 은 누르지 않는 표시다 — 고른 미션의 알림이 층과 상관없이 모두 몇 건인지(v3-panel.js). -->
+      <!-- v3(10/21 디자이너) — 상단은 미션만: 미션(라벨) [미션 ▾].
+           "전체 건물 ›" 링크는 지도 층 판의 [전체]와 역할이 겹쳐 헷갈렸다 — 층(전체 · B3 · B4)은 지도 안에서만 고르고,
+           층별 알림 건수도 그 층 버튼에 단다(v3-panel.js). -->
       <span class="sb-label t-title-2">미션</span>
-      <span class="sb-div" aria-hidden="true"></span>
       <!-- v2.2 — 미션 고르기. 화면 전체(최신 알림 · 로봇 패널 · 지도 층)가 이 미션을 본다(mission-scope.js).
            메뉴는 표(수행 · 미션 · 층 · 로봇)다. 미션 이름 뒤 기호는 그 미션의 가장 높은 알림 단계다(ⓧ 위험 · △ 주의). -->
       <div class="scope-menu-box" data-scope-menu-box>
@@ -136,11 +135,6 @@
         </button>
         <div class="dropdown-menu scope-menu" data-scope-menu role="menu" aria-label="미션" hidden></div>
       </div>
-      <span class="sb-div" aria-hidden="true"></span>
-      <span class="sb-floors" aria-label="전층 알림">
-        <span class="t-label-1">전층</span>
-        <span class="sb-count t-label-2 num" data-sb-count>0</span>
-      </span>
     </div>
 
     <div class="status-bar-right">
@@ -1767,13 +1761,13 @@
 <script src="../assets/js/map-model.js?v=0f88c871"></script>
 <script src="../assets/js/map.js?v=df2c61e6"></script>
 <script src="../assets/js/robot-stage.js?v=f154b57d"></script>
-<script src="../assets/js/monitor.js?v=b28078bc"></script>
+<script src="../assets/js/monitor.js?v=b16d6282"></script>
 <script src="../assets/js/mission-scope.js?v=d7ec3bd0"></script>
 <script src="../assets/js/delta-pulse.js?v=2d0afced"></script>
 <script src="../assets/js/delta-chat.js?v=a243a46e"></script>
 <script src="../assets/js/delta-v3.js?v=403861c7"></script>
 <script src="../assets/js/delta-resize.js?v=b83bd18b"></script>
 <script src="../assets/js/grid-overlay.js?v=164e4f2a"></script>
-<script src="../assets/js/v3-panel.js?v=09f8d86e"></script>
+<script src="../assets/js/v3-panel.js?v=d1a55650"></script>
 </body>
 </html>

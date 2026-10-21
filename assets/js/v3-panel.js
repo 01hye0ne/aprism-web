@@ -59,12 +59,26 @@
   document.addEventListener("aprism:severity", function () { setTimeout(update, 0); });
 })();
 
-// 상태바 "전층 N"(10/21) — 고른 미션의 알림 건수. 최신 알림 거르기 [전체] 단추의 수를 그대로 따른다(층과 상관없는 그 미션 전체).
+// 지도 층 판 — 층마다 알림 건수(10/21). monitor.js · building.js 가 aprism:floor-counts 로 알린다.
 (function () {
-  var out = document.querySelector("[data-sb-count]");
-  var src = document.querySelector('[data-ah-count="all"]');
-  if (!out || !src) { return; }
-  function copy() { out.textContent = (parseInt(src.textContent, 10) || 0) + ""; }
-  copy();
-  new MutationObserver(copy).observe(src, { childList: true, characterData: true, subtree: true });
+  var btns = Array.prototype.slice.call(document.querySelectorAll("[data-map-floor], .map-floor.is-all, [data-bld-floor]"));
+  if (!btns.length) { return; }
+  function key(b) {
+    return b.getAttribute("data-map-floor") || b.getAttribute("data-bld-floor") || "all";
+  }
+  function paint(c) {
+    if (!c) { return; }
+    btns.forEach(function (b) {
+      var n = c[key(b)] || 0;
+      var tag = b.querySelector(".floor-count");
+      if (!tag) { tag = document.createElement("span"); tag.className = "floor-count"; b.appendChild(tag); }
+      tag.textContent = n;
+      tag.hidden = !n;
+      b.setAttribute("aria-label", b.getAttribute("data-floor-name") + (n ? " · 알림 " + n + "건" : ""));
+    });
+  }
+  // 원래 이름(aria-label 이 있으면 그것, 없으면 글자)을 둔다 — 건수를 덧붙일 때 바탕이다.
+  btns.forEach(function (b) { b.setAttribute("data-floor-name", b.getAttribute("aria-label") || b.firstChild.textContent.trim()); });
+  paint(window.APRISM_FLOOR_COUNTS);
+  document.addEventListener("aprism:floor-counts", function (e) { paint(e.detail); });
 })();

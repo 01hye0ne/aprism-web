@@ -444,6 +444,14 @@
     $("[data-ah-count='critical']").textContent = crit;
     $("[data-ah-count='warning']").textContent = warn;
 
+    // 층별 알림 건수 — v3 지도 층 판이 버튼마다 단다(v3-panel.js, 10/21). 다른 화면은 듣지 않는다.
+    window.APRISM_FLOOR_COUNTS = (function (list) {
+      var c = { all: list.length };
+      list.forEach(function (a) { if (a.floor) { c[a.floor] = (c[a.floor] || 0) + 1; } });
+      return c;
+    })(mine);
+    document.dispatchEvent(new CustomEvent("aprism:floor-counts", { detail: window.APRISM_FLOOR_COUNTS }));
+
     doneList.textContent = "";
     DONE.forEach(function (d) {
       doneList.appendChild(doneItem(d));
