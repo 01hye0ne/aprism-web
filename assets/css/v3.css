@@ -402,3 +402,13 @@ body.ver-3.v2-2.v3 .delta3.is-critical:not(.is-open) .delta3-body > .ai-line-2 {
   background-image: linear-gradient(to bottom, var(--text-primary) 50%, color-mix(in srgb, var(--text-primary) 40%, transparent));
 }
 body.ver-3.v2-2.v3 .delta3.is-critical .delta3-clue { opacity: 0.8; }
+
+/*
+ * 대화 중 — 대화 칸이 남는 높이를 다 갖고 묻기 칸은 맨 아래에 붙는다(10/21 디자이너).
+ * v2.2 는 대화 칸이 60vh 안팎에서 멈추고 묻기 칸이 그 바로 밑을 따라 올라왔다. 창이 지도 높이 가득이라 바닥에 고정한다.
+ */
+body.ver-3.v2-2.v3 .delta3.is-open.is-chat .dc-thread {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: none;
+}
