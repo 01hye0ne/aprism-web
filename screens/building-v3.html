@@ -31,7 +31,7 @@
   <link rel="stylesheet" href="../assets/css/delta-v3.css?v=b1562ee4" />
   <link rel="stylesheet" href="../assets/css/building.css?v=34793c69" />
   <!-- v3 전용 규칙 — v2.2 는 10/21 부로 멈췄다. v3 에서 바꾸는 것은 여기(body.ver-3)에. -->
-  <link rel="stylesheet" href="../assets/css/v3.css?v=3206be29" />
+  <link rel="stylesheet" href="../assets/css/v3.css?v=8a69cb59" />
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
@@ -58,16 +58,16 @@
       <span class="status-bar-logo">
         <span class="i" style="--i:var(--ic-brand-mark)" role="img" aria-label="APRISM"></span>
       </span>
-      <!-- v3(10/21 디자이너) — 상단은 미션만: 미션(라벨) [미션 ▾].
-           "전체 건물 ›" 링크는 지도 층 판의 [전체]와 역할이 겹쳐 헷갈렸다 — 층(전체 · B3 · B4)은 지도 안에서만 고르고,
-           층별 알림 건수도 그 층 버튼에 단다(v3-panel.js). -->
-      <span class="sb-label t-title-2">미션</span>
+      <!-- v3(10/21 디자이너) — 상단은 보는 범위만: [통합 순회 현황] [미션 ▾].
+           "미션" 라벨 자리에 통합 순회 현황(전체 미션)을 두고, 오른쪽 드롭다운은 미션 하나를 고른다. 지금 보는 쪽이 면(bg/cell) · 흰 글자다.
+           층은 지도 층 판에서만 고른다. -->
+      <span class="sb-overview t-title-2 is-on" aria-current="page">통합 순회 현황</span>
       <!-- 미션 고르기 — 고르면 그 층으로 들어가 메인 v2.2 가 그 미션으로 열린다.
            메뉴 모양은 메인과 같은 표(수행 · 미션 · 층 · 로봇)다. -->
       <div class="scope-menu-box" data-bld-menu-box>
         <button type="button" class="scope-trigger" data-bld-trigger
                 aria-haspopup="true" aria-expanded="false" aria-label="미션 고르기">
-          <span class="t-title-2">통합 순회 현황</span>
+          <span class="t-title-2">미션 선택</span>
           <span class="i i-16" style="--i:var(--ic-chevron-down)" aria-hidden="true"></span>
         </button>
         <div class="dropdown-menu scope-menu bld-menu" data-bld-menu role="menu" aria-label="미션" hidden></div>
@@ -419,7 +419,7 @@
 <script src="../assets/js/prism-orb.js?v=03386460"></script>
 <script src="../assets/js/screen.js?v=ee5edeb4"></script>
 <script src="../assets/js/map-model.js?v=0f88c871"></script>
-<script src="../assets/js/building.js?v=198ee0cd"></script>
+<script src="../assets/js/building.js?v=5066bf21"></script>
 <script src="../assets/js/delta-pulse.js?v=2d0afced"></script>
 <script src="../assets/js/delta-v3.js?v=403861c7"></script>
 <script src="../assets/js/delta-resize.js?v=b83bd18b"></script>

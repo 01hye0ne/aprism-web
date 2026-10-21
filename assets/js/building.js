@@ -242,21 +242,6 @@
     head.setAttribute("aria-hidden", "true");
     ["수행", "미션", "층", "로봇"].forEach(function (t) { head.appendChild(el("span", null, t)); });
     menu.appendChild(head);
-    // v3 — 맨 위는 전체 미션(통합 순회 현황). 상단은 "보는 범위" 하나만 고른다(10/21).
-    if (V3) {
-      var whole = el("button", "menu-item scope-item scope-all");
-      whole.type = "button";
-      whole.setAttribute("role", "menuitemradio");
-      whole.setAttribute("aria-checked", scopeMission ? "false" : "true");
-      whole.appendChild(el("span", "scope-run"));
-      var wn = el("span", "scope-name");
-      wn.appendChild(el("span", "t-label-2", "통합 순회 현황"));
-      whole.appendChild(wn);
-      whole.appendChild(el("span", "scope-floors t-caption", "전체 미션"));
-      whole.appendChild(el("span", "scope-robots"));
-      whole.addEventListener("click", function () { closeMenu(); if (scopeMission) { location.href = allUrl(); } });
-      menu.appendChild(whole);
-    }
     [["run", "수행중"], ["idle", "대기"], ["done", "완료"]].forEach(function (g) {
       MISSION_LIST.filter(function (m) { return stateOf(m) === g[0]; }).forEach(function (m) {
         var item = el("button", "menu-item scope-item is-" + g[0]);
@@ -750,6 +735,8 @@
   if (scopeMission && trigger) { trigger.querySelector(".t-title-2").textContent = scopeMission; }
   if (scopeMission) {
     body.classList.add("is-mission-scope");
+    var ov = $(".sb-overview");
+    if (ov) { ov.classList.remove("is-on"); ov.removeAttribute("aria-current"); }
     var order = $(".ah-order");
     if (order) { order.textContent = "오래된 순 · 위험 우선"; }
     var hintTxt = $("[data-bld-hint]");
@@ -1343,7 +1330,7 @@
     mode = floorView ? "one" : "all";
     cur = floorView;
     body.classList.remove("is-entering");
-    if (trigger) { trigger.querySelector(".t-title-2").textContent = scopeMission || "통합 순회 현황"; }
+    if (trigger) { trigger.querySelector(".t-title-2").textContent = scopeMission || (V3 ? "미션 선택" : "통합 순회 현황"); }
     markFloorBtns(floorView || "all");
     layout(true);
   });
