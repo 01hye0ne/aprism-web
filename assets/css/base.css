@@ -277,6 +277,23 @@ body {
   list-style: none;
 }
 
+/* 버전 묶음 — 큰 번호(v1 · v2 · v3)마다 한 열. 열 안은 카드가 위에서 아래로 쌓인다(통합 관제 메인, 10/21). */
+.ver-groups {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-16) var(--space-12);
+  align-items: start;
+}
+
+.ver-group-label {
+  margin: 0 0 var(--space-8);
+  color: var(--text-tertiary);
+  font-size: var(--font-size-12);
+  font-weight: 600;
+}
+
+.ver-list.is-stack { grid-template-columns: 1fr; }
+
 /* 카드 전체가 링크다 — .ver-link 의 ::after 가 카드를 덮고, 안쪽 보조 링크(.ver-extra)만 그 위로 올린다. */
 .ver-card {
   position: relative;

@@ -6,7 +6,7 @@
   <title>APRISM — 화면 퍼블리싱</title>
   <meta name="description" content="APRISM 공장 환경점검 로봇 관제 대시보드 화면 퍼블리싱" />
   <link rel="stylesheet" href="./assets/css/tokens.css?v=b64812bd" />
-  <link rel="stylesheet" href="./assets/css/base.css?v=45f95d13" />
+  <link rel="stylesheet" href="./assets/css/base.css?v=c723efd4" />
 </head>
 <body>
   <header class="site-header">
@@ -109,52 +109,68 @@
           <span class="screen-code">Screen 04.1</span>
           <a class="screen-title" href="./screens/main-v3.html">통합 관제 메인</a>
         </header>
-        <ol class="ver-list">
-          <li class="ver-card">
-            <a class="ver-link" href="./screens/sian-1.html"><span class="ver-name">v1-A</span><span class="ver-tag">좌측 패널형</span></a>
-            <span class="ver-date">2026.09.17</span>
-          </li>
-          <li class="ver-card">
-            <a class="ver-link" href="./screens/sian-2.html"><span class="ver-name">v1-B</span><span class="ver-tag">모달형</span></a>
-            <span class="ver-date">2026.09.17</span>
-          </li>
-          <li class="ver-card">
-            <a class="ver-link" href="./screens/dashboard-home.html"><span class="ver-name">v2</span><span class="ver-tag">통합판</span></a>
-            <span class="ver-date">2026.09.21</span>
-            <span class="ver-extra"><a href="./screens/dashboard-home-notes.html">퍼블리싱 노트</a></span>
-          </li>
-          <li class="ver-card">
-            <a class="ver-link" href="./screens/sian-3.html"><span class="ver-name">v2.1</span><span class="ver-tag">Delta 창형</span></a>
-            <span class="ver-date">2026.09.28</span>
-          </li>
-          <li class="ver-card">
-            <a class="ver-link" href="./screens/main-v2-2.html"><span class="ver-name">v2.2</span><span class="ver-tag">미션 기준 화면</span></a>
-            <span class="ver-date">2026.10.12</span>
-            <a class="ver-ask" href="#ask">확인 2</a>
-            <!-- v2.2 는 화면이 여럿이라 카드 안에 목록으로 둔다(10/20 디자이너). 번호는 쓰는 차례 — 준비(1 · 2) → 건물 전체(3) → 미션(4),
-                 4-n 은 미션 관제에서 여는 화면(상단 바 "전체 건물 › 미션" 과 같은 차례). -->
-            <ul class="ver-pages">
-              <li><a href="./screens/mission-setup.html"><span class="ver-no">1</span>미션 설정</a></li>
-              <li><a href="./screens/mission-precheck.html"><span class="ver-no">2</span>사전 점검</a></li>
-              <li><a href="./screens/building-v2-2.html"><span class="ver-no">3</span>통합 순회 현황</a></li>
-              <li><a href="./screens/main-v2-2.html"><span class="ver-no">4</span>미션 관제</a></li>
-              <li class="is-sub"><a href="./screens/alert-center.html"><span class="ver-no">4-1</span>알림 센터</a></li>
-            </ul>
-          </li>
-          <!-- v3 — 10/21 부터 작업 화면(디자이너). v2.2 다섯 장을 복제해 시작했고 v2.2 는 멈췄다. -->
-          <li class="ver-card is-latest">
-            <a class="ver-link" href="./screens/main-v3.html"><span class="ver-name">v3</span><span class="ver-tag">작업 중</span></a>
-            <span class="ver-date">2026.10.21</span>
-            <span class="ver-badge">최신</span>
-            <ul class="ver-pages">
-              <li><a href="./screens/mission-setup-v3.html"><span class="ver-no">1</span>미션 설정</a></li>
-              <li><a href="./screens/mission-precheck-v3.html"><span class="ver-no">2</span>사전 점검</a></li>
-              <li><a href="./screens/building-v3.html"><span class="ver-no">3</span>통합 순회 현황</a></li>
-              <li><a href="./screens/main-v3.html"><span class="ver-no">4</span>미션 관제</a></li>
-              <li class="is-sub"><a href="./screens/alert-center-v3.html"><span class="ver-no">4-1</span>알림 센터</a></li>
-            </ul>
-          </li>
-        </ol>
+        <!-- 버전 묶음(10/21 디자이너) — 큰 번호마다 한 열, 그 안은 위에서 아래로 나온 차례. -->
+        <div class="ver-groups">
+          <section class="ver-group" aria-label="v1">
+            <p class="ver-group-label">v1</p>
+            <ol class="ver-list is-stack">
+              <li class="ver-card">
+                <a class="ver-link" href="./screens/sian-1.html"><span class="ver-name">v1-A</span><span class="ver-tag">좌측 패널형</span></a>
+                <span class="ver-date">2026.09.17</span>
+              </li>
+              <li class="ver-card">
+                <a class="ver-link" href="./screens/sian-2.html"><span class="ver-name">v1-B</span><span class="ver-tag">모달형</span></a>
+                <span class="ver-date">2026.09.17</span>
+              </li>
+            </ol>
+          </section>
+          <section class="ver-group" aria-label="v2">
+            <p class="ver-group-label">v2</p>
+            <ol class="ver-list is-stack">
+              <li class="ver-card">
+                <a class="ver-link" href="./screens/dashboard-home.html"><span class="ver-name">v2</span><span class="ver-tag">통합판</span></a>
+                <span class="ver-date">2026.09.21</span>
+                <span class="ver-extra"><a href="./screens/dashboard-home-notes.html">퍼블리싱 노트</a></span>
+              </li>
+              <li class="ver-card">
+                <a class="ver-link" href="./screens/sian-3.html"><span class="ver-name">v2.1</span><span class="ver-tag">Delta 창형</span></a>
+                <span class="ver-date">2026.09.28</span>
+              </li>
+              <li class="ver-card">
+                <a class="ver-link" href="./screens/main-v2-2.html"><span class="ver-name">v2.2</span><span class="ver-tag">미션 기준 화면</span></a>
+                <span class="ver-date">2026.10.12</span>
+                <a class="ver-ask" href="#ask">확인 2</a>
+                <!-- v2.2 는 화면이 여럿이라 카드 안에 목록으로 둔다(10/20 디자이너). 번호는 쓰는 차례 — 준비(1 · 2) → 건물 전체(3) → 미션(4),
+                     4-n 은 미션 관제에서 여는 화면(상단 바 "전체 건물 › 미션" 과 같은 차례). -->
+                <ul class="ver-pages">
+                  <li><a href="./screens/mission-setup.html"><span class="ver-no">1</span>미션 설정</a></li>
+                  <li><a href="./screens/mission-precheck.html"><span class="ver-no">2</span>사전 점검</a></li>
+                  <li><a href="./screens/building-v2-2.html"><span class="ver-no">3</span>통합 순회 현황</a></li>
+                  <li><a href="./screens/main-v2-2.html"><span class="ver-no">4</span>미션 관제</a></li>
+                  <li class="is-sub"><a href="./screens/alert-center.html"><span class="ver-no">4-1</span>알림 센터</a></li>
+                </ul>
+              </li>
+            </ol>
+          </section>
+          <section class="ver-group" aria-label="v3">
+            <p class="ver-group-label">v3</p>
+            <ol class="ver-list is-stack">
+              <!-- v3 — 10/21 부터 작업 화면(디자이너). v2.2 다섯 장을 복제해 시작했고 v2.2 는 멈췄다. -->
+              <li class="ver-card is-latest">
+                <a class="ver-link" href="./screens/main-v3.html"><span class="ver-name">v3</span><span class="ver-tag">작업 중</span></a>
+                <span class="ver-date">2026.10.21</span>
+                <span class="ver-badge">최신</span>
+                <ul class="ver-pages">
+                  <li><a href="./screens/mission-setup-v3.html"><span class="ver-no">1</span>미션 설정</a></li>
+                  <li><a href="./screens/mission-precheck-v3.html"><span class="ver-no">2</span>사전 점검</a></li>
+                  <li><a href="./screens/building-v3.html"><span class="ver-no">3</span>통합 순회 현황</a></li>
+                  <li><a href="./screens/main-v3.html"><span class="ver-no">4</span>미션 관제</a></li>
+                  <li class="is-sub"><a href="./screens/alert-center-v3.html"><span class="ver-no">4-1</span>알림 센터</a></li>
+                </ul>
+              </li>
+            </ol>
+          </section>
+        </div>
       </article>
     </section>
 
