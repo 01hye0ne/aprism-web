@@ -419,31 +419,22 @@
   function chip(cls) { return el("span", "bld-chip" + (cls ? " " + cls : "")); }
 
   /*
-   * v3 로봇 카드 — "지금 뭘 하고, 다음엔 뭘 하나" (10/21 디자이너, Figma DS 1260:15802 을 바탕으로 다시 짰다).
-   *   머리   bg/raised — 층 꼬리표 · 이름(14/20 ExtraBold) · 미션 이름(fg/secondary, 남는 폭) · 오른쪽 끝 배터리 · 신호(작게).
-   *          배터리 · 신호는 정상이면 무채색, 임계를 넘을 때만 주의 · 위험 색(DS Battery Gauge · Signal Bars 규칙).
-   *   본문   폭 가득 웨이포인트 둘 — 왼쪽 줄 칸(지금 way · 다음 target)
-   *          지금  작업(14/20 Bold) / 웨이포인트(Mono 13) / 진행 막대 + "3/20 · 15:15 종료 예상"
-   *          다음  "다음" + 다음 웨이포인트. 미션이 없는 로봇은 다음 예정(SCHED — 예전 "다음 일정" 카드)을 시각과 함께.
-   * 상태 배지(수행중)는 뺐다 — 줄 칸 모양(지금 · 다음)이 이미 말한다. 대기 · 완료 · 끊김은 지금 칸 글이 말한다(끊김은 위험 색).
-   * 지금 · 다음 웨이포인트 · 종료 예상은 임시 값이다(STEPS · ETA).
+   * v3 로봇 카드 — Figma DS 1260:15802(10/21 디자이너 3차).
+   *   머리   bg/raised · 위아래 4 · 왼쪽 8 — 이름 14/20 ExtraBold
+   *   왼쪽 134(오른쪽 선 border/default)  Mission(상태 점 + 글) · Battery · Signal 세 줄(사이 선 border/divider)
+   *   오른쪽   웨이포인트 둘 — 지금(way 12 · bg/inverse 원, 줄은 bg/inverse → chart/track) · 다음(target 16 · fg/tertiary)
+   *            이름 14/24 Bold · 번호 Mono 13. 다음 것은 한 단 옅게(fg/tertiary · fg/disabled).
+   * 수행중이 아니면 웨이포인트 자리에 지금 하는 일 하나만(대기 · 충전 · 복귀 · 완료 · 끊김).
+   * 지금 · 다음 웨이포인트는 임시 값이다(STEPS).
    */
   var STEPS = {
     1:  [["N₂ 배관 압력계", "WP-04"], ["FFU-02 토출구", "WP-05"]],
     5:  [["공기 압축기 C-1", "WP-13"], ["냉각수 펌프 P-3", "WP-14"]],
     11: [["배전반실 열화상", "WP-04"], ["변압기 TR-2", "WP-05"]]
   };
-  var ETA = { 1: "15:15", 5: "13:40", 11: "12:10" };   // 메인 v3 Robot 01 "15:15 종료 예상" · 다음 일정 "12:10 Robot 11 … 끝" 과 같다
+  var ST_TONE = { run: "info", done: "normal", idle: "idle", off: "critical" };
 
-  function nextPlan(r) {
-    var p = rname(r) + " · ";
-    for (var i = 0; i < SCHED.length; i += 1) {
-      if (SCHED[i].text.indexOf(p) === 0) { return { time: SCHED[i].time, text: SCHED[i].text.slice(p.length) }; }
-    }
-    return null;
-  }
-
-  function rcStep(now, ic) {
+  function rcStep(name, sub, now, ic) {
     var item = el("span", "bld-rc-step" + (now ? " is-now" : ""));
     var rail = el("span", "bld-rc-rail");
     rail.appendChild(el("i", "bld-rc-line"));
@@ -453,8 +444,10 @@
     rail.appendChild(el("i", "bld-rc-line is-tail"));
     item.appendChild(rail);
     var txt = el("span", "bld-rc-step-txt");
+    txt.appendChild(el("span", "bld-rc-step-name", name));
+    if (sub) { txt.appendChild(el("span", "bld-rc-step-wp", sub)); }
     item.appendChild(txt);
-    return { item: item, txt: txt };
+    return item;
   }
 
   function fleetCard(r) {
@@ -462,17 +455,30 @@
     node.type = "button";
     node.setAttribute("role", "listitem");
     node.setAttribute("data-floor", r.floor);
-    node.setAttribute("aria-label", rname(r) + " · " + FNAME[r.floor] + " · " + (r.mission ? r.mission + " · " : "") + r.now);
+    node.setAttribute("aria-label", rname(r) + " · " + FNAME[r.floor] + " · " + r.now);
 
-    // 머리 — 어느 층 · 누구 · 어느 미션 / 배터리 · 신호
     var head = el("span", "bld-rc-head");
-    head.appendChild(el("span", "bld-floor-tag num", r.floor));
     head.appendChild(el("span", "bld-rc-name", rname(r)));
-    head.appendChild(el("span", "bld-rc-mission t-caption", r.mission || "배정된 미션 없음"));
+    node.appendChild(head);
 
-    var vit = el("span", "bld-rc-vitals");
+    var main = el("span", "bld-rc-main");
+    var side = el("span", "bld-rc-side");
+    // 로봇 그림(Figma 400:200 자리)은 뺐다 — 목록마다 반복돼 정보가 과했다(10/21 디자이너).
+
+    var states = el("span", "bld-rc-states");
+    function line(label, value) {
+      var row = el("span", "bld-rc-state");
+      row.appendChild(el("span", "bld-rc-label", label));
+      row.appendChild(value);
+      states.appendChild(row);
+    }
+    var b = BADGE[r.st];
+    var st = el("span", "bld-rc-badge is-" + ST_TONE[r.st]);
+    st.appendChild(el("i"));
+    st.appendChild(el("span", null, b.text));
+    line("Mission", st);
+
     var bat = el("span", "battery" + (r.bat <= 20 ? " is-critical" : r.bat <= 40 ? " is-warning" : "") + (r.chg ? " is-charging" : ""));
-    bat.title = "배터리 " + r.bat + "%" + (r.chg ? " · 충전 중" : "");
     var bb = el("span", "battery-body");
     var bf = el("span", "battery-fill");
     bf.style.width = r.bat + "%";
@@ -486,60 +492,28 @@
     bat.appendChild(bb);
     bat.appendChild(el("span", "battery-tip"));
     bat.appendChild(el("span", "t-caption num", r.bat + "%"));
-    vit.appendChild(bat);
-    var sig = el("span", "battery bld-rc-sig" + (r.sig === 0 ? " is-critical" : r.sig <= 2 ? " is-warning" : ""));
-    sig.title = "신호 " + SIG[r.sig];
+    line("Battery", bat);
+
+    var sig = el("span", "battery" + (r.sig === 0 ? " is-critical" : r.sig <= 2 ? " is-warning" : ""));
     var bars = el("span", "signal-bars");
     bars.setAttribute("data-level", String(r.sig));
     for (var i = 0; i < 4; i += 1) { bars.appendChild(el("i")); }
     sig.appendChild(bars);
-    vit.appendChild(sig);
-    head.appendChild(vit);
-    node.appendChild(head);
+    sig.appendChild(el("span", "t-caption", SIG[r.sig]));
+    line("Signal", sig);
+    side.appendChild(states);
+    main.appendChild(side);
 
-    // 본문 — 지금 · 다음
     var steps = el("span", "bld-rc-steps");
     var wp = STEPS[r.n];
-    var now = rcStep(true, "way");
-    now.txt.appendChild(el("span", "bld-rc-step-name", r.now));
-    if (r.st === "run") {
-      if (wp) {
-        var w0 = el("span", "bld-rc-step-wp");
-        w0.appendChild(el("span", "bld-rc-wpno", wp[0][1]));
-        w0.appendChild(document.createTextNode(" " + wp[0][0]));
-        now.txt.appendChild(w0);
-      }
-      var prog = el("span", "bld-rc-prog");
-      var bar = el("span", "bld-bar");
-      var fill = el("i");
-      fill.style.width = (r.total ? Math.round(r.done / r.total * 100) : 0) + "%";
-      bar.appendChild(fill);
-      prog.appendChild(bar);
-      prog.appendChild(el("span", "t-caption num", r.done + "/" + r.total + (ETA[r.n] ? " · " + ETA[r.n] + " 종료 예상" : "")));
-      now.txt.appendChild(prog);
-    } else {
-      var why = r.st === "done" ? r.mission + " " + r.done + "/" + r.total
-        : r.st === "off" ? FNAME[r.floor] + " · 마지막 위치"
-        : r.dock ? FNAME[r.floor] + " · 도크" : FNAME[r.floor];
-      now.txt.appendChild(el("span", "bld-rc-step-wp", why));
-    }
-    steps.appendChild(now.item);
-
-    var next = rcStep(false, "target");
-    next.txt.appendChild(el("span", "bld-rc-next t-caption", "다음"));
-    var plan = nextPlan(r);
     if (r.st === "run" && wp) {
-      next.txt.appendChild(el("span", "bld-rc-step-name", wp[1][0]));
-      next.txt.appendChild(el("span", "bld-rc-step-wp bld-rc-wpno", wp[1][1]));
-    } else if (plan) {
-      next.txt.appendChild(el("span", "bld-rc-step-name", plan.text));
-      next.txt.appendChild(el("span", "bld-rc-step-wp num", plan.time));
+      steps.appendChild(rcStep(wp[0][0], wp[0][1], true, "way"));
+      steps.appendChild(rcStep(wp[1][0], wp[1][1], false, "target"));
     } else {
-      next.item.classList.add("is-empty");
-      next.txt.appendChild(el("span", "bld-rc-step-name", "예정된 일 없음"));
+      steps.appendChild(rcStep(r.now, r.total ? r.done + "/" + r.total : FNAME[r.floor], true, "way"));
     }
-    steps.appendChild(next.item);
-    node.appendChild(steps);
+    main.appendChild(steps);
+    node.appendChild(main);
 
     node.addEventListener("mouseenter", function () { setHot(r.floor, null, true); markRobot(r, true); });
     node.addEventListener("mouseleave", function () { setHot(null); markRobot(r, false); });
