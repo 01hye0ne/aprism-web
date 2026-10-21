@@ -23,25 +23,26 @@
   } else {
     try { form = localStorage.getItem(KEY); } catch (e) { form = null; }
   }
-  if (form !== "bar") { return; }
-
-  document.body.classList.add("d3-bar");
   var win = document.querySelector("[data-delta3]");
-  if (win) {
-    win.setAttribute("data-d3-start", "526");   // Figma 펼침 526 × 296
-    win.setAttribute("data-d3-min", "420");
+  if (form === "bar") {
+    document.body.classList.add("d3-bar");
+    if (win) {
+      win.setAttribute("data-d3-start", "526");   // Figma 펼침 526 × 296
+      win.setAttribute("data-d3-min", "420");
+    }
   }
 
   /*
-   * [+] 를 누르면 묻기 칸이 바로 선다(10/21 디자이너, Figma expand 1335:21705) — 펼친 창 맨 아래에 늘 있고 초점이 간다.
-   * 묻기 칸은 화면에 따라 hidden 으로 시작해 [돋보기]로 열게 돼 있어(통합 순회 현황), 가로형은 펼칠 때 직접 연다.
+   * 펼치면 묻기 칸이 바로 선다(10/21 디자이너, Figma expand 1335:21705 · 1320:14677) — 펼친 창 맨 아래에 늘 있고 초점이 간다.
+   * 묻기 칸은 화면에 따라 hidden 으로 시작해 [돋보기]로 열게 돼 있어(통합 순회 현황), 펼칠 때 직접 연다.
+   * 가로형 · 위젯형 둘 다 — 처음엔 가로형에만 걸어 통합 순회 현황 위젯형은 펼쳐도 묻기 칸이 없었다(10/21 버그).
    */
   var box = document.getElementById("ai-ask");
   if (!win || !box) { return; }
   var input = box.querySelector("[data-ai-ask]");
 
   // 조치 버튼 · 묻기 칸은 요약 칸(.delta3-body) 안 맨 끝이 제자리다 — 미션 관제는 delta-chat.js 가 그렇게 옮기는데
-  // 통합 순회 현황에는 대화가 없어 카드 바깥(조치 줄)에 남는다. 가로형은 두 화면이 같은 짜임이어야 해서 여기서 옮긴다.
+  // 통합 순회 현황에는 대화가 없어 카드 바깥(조치 줄)에 남는다. 두 화면이 같은 짜임이어야 해서 여기서 옮긴다.
   var body = win.querySelector(".delta3-body");
   var acts = win.querySelector("[data-ai-actions]");
   if (body) {
