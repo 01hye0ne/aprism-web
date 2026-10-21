@@ -88,3 +88,25 @@
   paint(window.APRISM_FLOOR_COUNTS);
   document.addEventListener("aprism:floor-counts", function (e) { paint(e.detail); });
 })();
+
+// 미션 관제의 층 판 [전체](10/21) — 미션을 벗어나지 않고 그 미션이 지나는 층을 모아 본다(building-v3.html?mission=).
+// 한 층만 도는 미션은 모아 볼 층이 없어 끈다 — 미션이 지나지 않는 층을 끄는 규칙과 같다.
+(function () {
+  var link = document.querySelector(".map-floor.is-all[data-building-link]");
+  var nameSlot = document.querySelector("[data-scope-name]");
+  if (!link || !nameSlot) { return; }
+  var keep = (location.search.match(/[?&](theme|palette|delta|glow)=[\w-]+/g) || []).map(function (q) { return q.slice(1); });
+  function set(m) {
+    var floors = (window.APRISM_MISSION_FLOORS || {})[m] || [];
+    link.setAttribute("href", "building-v3.html?" + keep.concat(["mission=" + encodeURIComponent(m)]).join("&"));
+    var off = floors.length < 2;
+    link.classList.toggle("is-out", off);
+    link.setAttribute("aria-disabled", off ? "true" : "false");
+    link.setAttribute("tabindex", off ? "-1" : "0");
+    link.setAttribute("data-floor-name", off ? "전체 · 이 미션은 한 층만 지나요" : "전체 · " + m + " 이 지나는 층 모아 보기");
+    link.setAttribute("aria-label", link.getAttribute("data-floor-name"));
+  }
+  link.addEventListener("click", function (e) { if (link.getAttribute("aria-disabled") === "true") { e.preventDefault(); } });
+  set(nameSlot.textContent.trim());
+  document.addEventListener("aprism:scope", function (e) { if (e.detail && e.detail.mission) { set(e.detail.mission); } });
+})();

@@ -120,6 +120,25 @@
   function buildMenu() {
     menu.textContent = "";
     menu.appendChild(menuHead());
+    // v3 — 맨 위는 전체 미션(통합 순회 현황)으로 가는 줄. 상단은 "보는 범위" 하나만 고른다(10/21 디자이너).
+    if (document.body.classList.contains("ver-3")) {
+      var whole = document.createElement("button");
+      whole.type = "button";
+      whole.className = "menu-item scope-item scope-all";
+      whole.setAttribute("role", "menuitemradio");
+      whole.setAttribute("aria-checked", "false");
+      whole.appendChild(span("scope-run"));
+      var wn = span("scope-name");
+      wn.appendChild(span("t-label-2", "통합 순회 현황"));
+      whole.appendChild(wn);
+      whole.appendChild(span("scope-floors t-caption", "전체 미션"));
+      whole.appendChild(span("scope-robots"));
+      whole.addEventListener("click", function () {
+        closeMenu();
+        location.href = "building-v3.html" + (keep ? "?" + keep : "");
+      });
+      menu.appendChild(whole);
+    }
     GROUPS.forEach(function (g) {
       names().filter(function (m) { return stateOf(m) === g[0]; }).forEach(function (m) {
         var item = document.createElement("button");

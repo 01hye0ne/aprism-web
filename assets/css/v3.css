@@ -476,3 +476,9 @@ body.ver-3.v2-2.v3 .delta3.is-open.is-chat .dc-thread {
 .ver-3 .bld-sum-go-name { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ver-3 .bld-sum-go .bld-sev { flex: none; color: var(--text-secondary); }
 .ver-3 .bld-fleet-filter[hidden] { display: none; }
+
+/* 미션 범위 요약 줄의 층 이름표 · 메뉴 맨 위 전체 미션 줄 (10/21) */
+.ver-3 .bld-sum-go-floor { flex: none; color: var(--text-secondary); font-family: var(--font-family-mono); font-size: var(--font-size-12); }
+.ver-3 .scope-menu .scope-all { border-bottom: var(--border-width-thin) solid var(--border-divider); }
+.ver-3 .scope-menu .scope-all .scope-floors { color: var(--text-tertiary); }
+.ver-3 a.map-floor.is-out { pointer-events: auto; cursor: default; }
