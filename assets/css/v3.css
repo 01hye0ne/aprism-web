@@ -1105,3 +1105,6 @@ body.ver-3.v2-2.v3 .delta3.is-open .delta3-name { padding: 10px var(--space-8) 2
 .ver-3 .bld-rc-state .battery:not(.is-warning):not(.is-critical) .battery-fill { background-color: var(--text-secondary); }
 .ver-3 .bld-rc-state .battery:not(.is-warning):not(.is-critical) .signal-bars { color: var(--text-secondary); }
 .ver-3 .bld-rc-step:not(.is-now) .bld-rc-step-name { color: var(--text-tertiary); font-weight: 400; }
+/* 상태 세 줄 높이 하나로 — 26(Figma 아래 두 줄). Mission 줄만 배지 여백에 기대 위아래 0 이라, 배지 여백을 걷은 뒤 18 로 줄었다(10/21). */
+.ver-3 .bld-rc-state,
+.ver-3 .bld-rc-prog + .bld-rc-state { height: 26px; padding: 0 var(--space-8); }
