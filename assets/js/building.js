@@ -408,6 +408,7 @@
    * 오른쪽 — 로봇 현황 · 운행 흐름 · 다음 일정
    * ================================================================== */
   var fleetFloor = "all";
+  var fleetSt = "all";   // v3 — 미션 단계 거르기(10/21)
 
   /*
    * 로봇 줄 — Figma "Building / 로봇 현황" 의 로봇 줄(1260:15802, 10/19 디자이너 수정).
@@ -635,9 +636,30 @@
     list.textContent = "";
     // 수행중 → 끊김 → 완료 → 대기. 관제사가 먼저 볼 것이 위다.
     var ORDER = { run: 0, off: 1, done: 2, idle: 3 };
-    ROBOTS.filter(function (r) { return fleetFloor === "all" || r.floor === fleetFloor; })
-      .slice().sort(function (a, b) { return (ORDER[a.st] - ORDER[b.st]) || (a.n - b.n); })
+    var onFloor = ROBOTS.filter(function (r) { return fleetFloor === "all" || r.floor === fleetFloor; });
+
+    // v3 — 미션 단계로 거르기(10/21 디자이너). 단추 차례 = 목록 차례. 수는 지금 보는 층 안에서 센다.
+    // 0 인 단계도 단추는 남긴다(최신 알림 "위험 0" 과 같다) — 고른 단계가 비면 목록에 한 줄로 알린다.
+    var sf = $("[data-bld-st-filter]");
+    if (sf) {
+      sf.textContent = "";
+      [["all", "전체"], ["run", "수행중"], ["off", "끊김"], ["done", "완료"], ["idle", "대기"]].forEach(function (x) {
+        var n = x[0] === "all" ? onFloor.length : onFloor.filter(function (r) { return r.st === x[0]; }).length;
+        var b = el("button", "btn is-xs");
+        b.type = "button";
+        b.setAttribute("aria-pressed", fleetSt === x[0] ? "true" : "false");
+        b.appendChild(document.createTextNode(x[1] + " "));
+        b.appendChild(el("span", "num", String(n)));
+        b.addEventListener("click", function () { fleetSt = x[0]; renderRight(); });
+        sf.appendChild(b);
+      });
+    }
+    var shown = onFloor.filter(function (r) { return fleetSt === "all" || r.st === fleetSt; });
+    shown.slice().sort(function (a, b) { return (ORDER[a.st] - ORDER[b.st]) || (a.n - b.n); })
       .forEach(function (r) { list.appendChild(fleetRow(r)); });
+    if (!shown.length) {
+      list.appendChild(el("p", "bld-fleet-empty t-caption", (BADGE[fleetSt] ? BADGE[fleetSt].text : "") + " 로봇이 없어요"));
+    }
 
     // 운행 흐름
     var g = $("[data-bld-gantt]");

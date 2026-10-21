@@ -1083,3 +1083,7 @@ body.ver-3.v2-2.v3 .delta3.is-open .delta3-name { padding: 10px var(--space-8) 2
 .ver-3 .battery:not(.is-warning):not(.is-critical) .signal-bars { background-color: transparent; }
 .ver-3 .battery:not(.is-warning):not(.is-critical) .battery-fill { background-color: var(--text-primary); }
 .ver-3 .battery:not(.is-warning):not(.is-critical) .signal-bars { color: var(--text-primary); }
+
+/* 로봇 현황 · 미션 단계 거르기 (10/21 디자이너) — 최신 알림 거르기(.ah-caps)와 같은 단추. 머리 줄 아래 · 목록 위. */
+.ver-3 .bld-st-filter { flex: none; gap: var(--space-4); }   /* 다섯 개가 한 줄에 들도록 사이 4(최신 알림은 셋이라 8) */
+.ver-3 .bld-fleet-empty { margin: 0; padding: var(--space-16) var(--space-8); color: var(--text-tertiary); text-align: center; }
