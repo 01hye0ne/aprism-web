@@ -30,7 +30,7 @@
   <link rel="stylesheet" href="../assets/css/palette-neutral.css?v=0c969aea" />
   <link rel="stylesheet" href="../assets/css/delta-v3.css?v=b1562ee4" />
   <!-- v3 전용 규칙 — v2.2 는 10/21 부로 멈췄다. v3 에서 바꾸는 것은 여기(body.ver-3)에. -->
-  <link rel="stylesheet" href="../assets/css/v3.css?v=74199eed" />
+  <link rel="stylesheet" href="../assets/css/v3.css?v=809a8c1a" />
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
@@ -360,18 +360,10 @@
                  펼침에서는 이 줄이 창 머리가 되고, 여기를 잡아 창을 옮긴다. -->
             <div class="delta3-name" data-delta3-drag>
               <span class="delta3-name-in">
-                <!-- Delta 표식 — 세 상태 도트(디자이너 핸드오프 "세 상태 도트 모션 그래픽").
-                     정상이면 흰 점 셋이 가만히 있고, 주의면 1-2-3 으로 번갈아 켜지고,
-                     위험이면 셋이 한꺼번에 깜빡인다. 단계는 body[data-level] 이 정한다. -->
-                <span class="delta-dots" data-delta-dots aria-hidden="true">
-                  <svg viewBox="0 0 20 20" fill="none">
-                    <!-- v3 — Figma Icon/Delta(1001:19631) 비례 그대로: 16 칸 안 2~14 에 5.33 점 셋 · 틈 1.33 · 모서리 0.67
-                         (20 칸으로 1.25 배). v2.2 는 20 칸을 꽉 채운 8 점이라 글줄보다 커 보였다(10/21 디자이너). -->
-                    <g><rect class="dd-1" x="2.5" y="10.833" width="6.667" height="6.667" rx="0.833" /></g>
-                    <g><rect class="dd-2" x="2.5" y="2.5" width="6.667" height="6.667" rx="0.833" /></g>
-                    <g><rect class="dd-3" x="10.833" y="2.5" width="6.667" height="6.667" rx="0.833" /></g>
-                  </svg>
-                </span>
+                <!-- Delta 표식 — 1-B 시안(sian-2)의 Prism Orb(10/21 디자이너, 세 상태 도트에서 바꿈).
+                     screen.js 가 이 자리에 오브 캔버스를 붙이고 단계(위험 · 주의 · 안전 · 정보)에 맞춰 팔레트를 갈아 낀다.
+                     <i> 원은 WebGL2 를 못 쓸 때 남는 자리표시자다. -->
+                <span class="ai-delta-mark delta3-orb" aria-hidden="true"><i></i></span>
                 <b>Delta</b>
               </span>
               <button type="button" class="delta3-close" data-delta3-close aria-label="Delta 창 닫기">

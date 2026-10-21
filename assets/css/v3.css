@@ -863,3 +863,10 @@ body.ver-3.v2-2.v3.d3-bar .delta3.is-open .delta3-body::before { display: none; 
 :root[data-theme][data-delta][data-glow] body.ver-3.v2-2.v3.d3-bar .delta3.is-open.is-chat .dc-thread { padding: var(--space-8) var(--space-12); }
 /* 가로형은 [돋보기] 조치 줄을 쓰지 않는다 — 묻기 칸은 펼치면 늘 있고 [+] 가 그 입구다. */
 body.ver-3.v2-2.v3.d3-bar .delta3 .delta3-suggest { display: none; }
+
+/*
+ * Delta 표식 — Prism Orb (10/21 디자이너, 1-B 시안 sian-2 의 오브). 이름 줄 20 칸에 오브 지름 16(ORB_FILL 0.8)으로
+ * 앉아 아이콘 16 자리와 글줄이 그대로 맞는다. 위젯형 · 가로형 · 펼침 모두 같은 크기.
+ */
+body.ver-3 .delta3 .delta3-name .ai-delta-mark { width: 20px; height: 20px; margin: 0 -2px; }
+body.ver-3 .delta3 .delta3-name .ai-delta-mark i { width: 14px; height: 14px; border-width: var(--border-width-thin); }
