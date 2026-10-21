@@ -499,10 +499,17 @@ body.ver-3.v2-2.v3 .delta3.is-open.is-chat .dc-thread {
   -webkit-backdrop-filter: var(--map-glass-blur);
   backdrop-filter: var(--map-glass-blur);
   box-shadow: var(--map-glass-edge), var(--map-glass-shadow);
+  border: 0;
+  margin: 0;
+  font-family: var(--font-family-sans);
   color: var(--text-primary);
   white-space: nowrap;
-  pointer-events: none;
+  pointer-events: auto;
+  cursor: pointer;
 }
+.ver-3 .bld-bot-say:hover { background-color: var(--bg-raised); }
+.ver-3 .bld-bot-say:hover::after { border-top-color: var(--bg-raised); }
+.ver-3 .bld-bot-say:focus-visible { outline: var(--border-width-strong) solid var(--border-focus); outline-offset: 2px; }
 .ver-3 .bld-bot-say::after {
   content: "";
   position: absolute;
@@ -516,3 +523,4 @@ body.ver-3.v2-2.v3 .delta3.is-open.is-chat .dc-thread {
 .ver-3.is-mission-scope .bld-bot-say,
 .ver-3 .bld-bot.is-marked .bld-bot-say { display: block; }
 .ver-3 .bld-bot.is-marked { z-index: 2; }
+.ver-3 .bld-bot.is-gone .bld-bot-say { display: none; }

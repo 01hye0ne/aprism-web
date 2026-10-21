@@ -1135,7 +1135,15 @@
       b.appendChild(el("i"));
       b.appendChild(el("span", "bld-bot-name num", (r.n < 10 ? "0" : "") + r.n));
       // v3 — 로봇 위 미션 이름 말풍선(10/21 디자이너). 층을 펼쳤을 때 · 줄에 손을 얹었을 때만 보인다(v3.css).
-      if (V3 && r.mission) { b.appendChild(el("span", "bld-bot-say t-caption", r.mission)); }
+      // 말풍선을 누르면 그 미션으로, 로봇이 선 층 그대로 들어간다(10/21).
+      if (V3 && r.mission) {
+        var say = el("button", "bld-bot-say t-caption", r.mission);
+        say.type = "button";
+        say.setAttribute("aria-label", rname(r) + " · " + r.mission + " 으로 들어가기");
+        say.addEventListener("click", function (event) { event.stopPropagation(); enter(r.floor, r.mission); });
+        b.removeAttribute("aria-hidden");
+        b.appendChild(say);
+      }
       labels.appendChild(b);
       r.node = b;
     });
@@ -1154,6 +1162,7 @@
     node.style.transform = "translate(" + snap(xy[0]) + "px," + snap(xy[1]) + "px)";
     node.style.opacity = op;
     node.style.pointerEvents = op > 0.5 ? "" : "none";
+    node.classList.toggle("is-gone", op <= 0.5);   // 비켜 사라진 층의 표식 — 안의 누를 것(말풍선)도 같이 끈다
   }
 
   function placeLabels() {
