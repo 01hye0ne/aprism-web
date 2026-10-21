@@ -58,8 +58,17 @@
     light();
   }
 
+  /*
+   * 처음 펼칠 자리 — 기본은 지도 한가운데. 화면이 data-d3-open-at="left,top" 을 주면 그 자리에서 아래로 펼친다
+   * (v3 위젯형: 접힌 카드 자리 20,20 그대로 아래로 자란다 — 10/21 디자이너).
+   */
+  var openAt = (win.getAttribute("data-d3-open-at") || "").split(",").map(Number);
+  function start() {
+    return openAt.length === 2 && !isNaN(openAt[0]) && !isNaN(openAt[1]) ? clamp(openAt[0], openAt[1]) : middle();
+  }
+
   function opened() {
-    place(moved ? clamp(moved.left, moved.top) : middle());
+    place(moved ? clamp(moved.left, moved.top) : start());
   }
 
   function closed() {

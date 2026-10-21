@@ -196,7 +196,7 @@ body.ver-3.v2-2.v3 .delta3.is-open .delta3-plus-label { display: none; }
   width: var(--d3-w, 295px);
   height: 637px;
   min-height: 0;
-  max-height: calc(100% - var(--space-16));
+  max-height: calc(100% - var(--space-20) * 2);   /* 접힌 카드 자리(위 20)에서 아래로 펼치고 아래도 20 남긴다. */
   padding: 0;
 }
 /* 제목 줄은 Figma 에서 빠졌다 — 머리(Delta)와 요약만 남는다. */
