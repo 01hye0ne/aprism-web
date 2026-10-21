@@ -871,3 +871,11 @@ body.ver-3.v2-2.v3.d3-bar .delta3 .delta3-suggest { display: none; }
  */
 body.ver-3 .delta3 .delta3-name .ai-delta-mark { width: 20px; height: 20px; margin: 0 -2px; }
 body.ver-3 .delta3 .delta3-name .ai-delta-mark i { width: 14px; height: 14px; border-width: var(--border-width-thin); }
+
+/*
+ * 알림 목록 왼쪽 줄 = 위험도 아이콘 색 (10/21 클라이언트 의견 — 줄과 아이콘 색이 달라 하나로).
+ * 줄은 comp/alert/*-edge(다크 red · yellow 300, 라이트 500)라 아이콘(status/*-icon — 다크 500, 라이트 주의 yellow 600)보다 옅었다.
+ * 단계 기호는 아이콘이 기준이라 줄이 아이콘을 따른다. 토큰 값은 그대로 두고 v3 에서만 바꿔 쓴다(v2.2 는 멈춤).
+ */
+body.ver-3 .ah-item { border-left-color: var(--status-warning-icon); }
+body.ver-3 .ah-item.is-critical { border-left-color: var(--status-critical-icon); }
