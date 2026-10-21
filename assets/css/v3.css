@@ -672,3 +672,189 @@ body.ver-3.v2-2 .panel-head::after,
     color-mix(in srgb, var(--comp-alert-warning-glow-halo) 12%, transparent) 50%,
     transparent 100%);
 }
+
+/* ==================================================================
+ * Delta 가로형 (10/21 디자이너, Figma DS 1335:21707 Delta-horizon) — body.d3-bar(delta-form.js, ?form=bar)
+ *   Default 1335:21706  526×140 — 머리 줄(위아래 8 · 좌우 12 · 표식 16 + "Delta" 14/20 ExtraBold)이 카드 밖 위에 선다.
+ *                                  카드 bg/glass · radius/container — 요약(위아래 8 · 좌우 12 · Body/2 16/24 두 줄, 넘치면 …)
+ *                                  + 아래 40 줄(근거 아이콘 · 하는 일 글 · 오른쪽 끝 [+] Ghost 24 pill — 누르면 펼친다)
+ *   expand  1335:21705  526×296 — 같은 자리에서 아래로 자란다. 카드에 선(border/divider)이 서고, 요약이 남는 높이를 갖고,
+ *                                  맨 아래 묻기 칸(위 선 · 위아래 8 · 좌우 12). 머리 줄 오른쪽 끝에 닫기.
+ * 위젯형에서 만든 것은 그대로 쓴다 — 근거 아이콘 · 행동 글 · 모션, 보내기(네모 · 쓸 때만), 대화 중 묻기 칸 바닥 고정,
+ * 위험 면(오른쪽 아래 유리 → 위험 빛) · 안쪽 빛. Figma 가로형은 기본 면만 그려져 있다.
+ * 위젯 판 뒤 모서리 빛(회색 · 위험 빨강 · 주의 노랑)은 뺀다 — 머리 줄이 지도 위에 바로 앉아 빛이 글 뒤로 번진다.
+ * ================================================================== */
+:root[data-theme][data-delta][data-glow] body.ver-3.v2-2.v3.d3-bar .delta3 {
+  background: none;
+  box-shadow: none;
+  border-radius: 0;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+:root[data-theme][data-delta][data-glow] body.ver-3.v2-2.v3.d3-bar .delta3:not(.is-open) {
+  left: var(--space-20);
+  top: var(--space-20);
+  width: 526px;
+  height: auto;
+  padding: 0;
+  pointer-events: auto;
+}
+body.ver-3.v2-2.v3.d3-bar .delta3 .delta3-light { display: none; }
+
+/* 머리 줄 — 카드 밖 위 36(8 + 20 + 8). 펼침에서는 닫기 24 가 오른쪽 끝에 서서 위아래 6 · 오른쪽 8. */
+:root[data-theme][data-delta][data-glow] body.ver-3.v2-2.v3.d3-bar .delta3 .delta3-name {
+  position: relative;
+  left: auto;
+  top: auto;
+  order: -1;
+  width: 100%;
+  height: 36px;
+  padding: var(--space-8) var(--space-12);
+  align-items: center;
+}
+:root[data-theme][data-delta][data-glow] body.ver-3.v2-2.v3.d3-bar .delta3.is-open .delta3-name {
+  padding: 6px var(--space-8) 6px var(--space-12);
+}
+
+/* 카드 — bg/glass. 지도 위라 뒤를 흐린다(위젯과 같은 10). */
+:root[data-theme][data-delta][data-glow] body.ver-3.v2-2.v3.d3-bar .delta3 .delta3-card {
+  width: 100%;
+  height: auto;
+  padding: 0;
+  overflow: hidden;
+  border-radius: var(--radius-container);
+  background-color: var(--bg-glass);
+  background-image: none;
+  box-shadow: none;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+:root[data-theme][data-delta][data-glow] body.ver-3.v2-2.v3.d3-bar .delta3.is-open .delta3-card {
+  flex: 1 1 auto;
+  min-height: 0;
+  border: var(--border-width-thin) solid var(--border-divider);
+}
+body.ver-3.v2-2.v3.d3-bar .delta3.is-dragging .delta3-card { -webkit-backdrop-filter: none; backdrop-filter: none; }
+
+/* 요약 — 두 줄(48). 글은 한 색으로 또렷하게(위젯형의 아래로 옅어지기는 두 줄이라 뺀다). */
+:root[data-theme][data-delta][data-glow] body.ver-3.v2-2.v3.d3-bar .delta3 .delta3-body {
+  order: 1;
+  flex: none;
+  min-height: 0;
+  padding: var(--space-8) var(--space-12);
+}
+:root[data-theme][data-delta][data-glow] body.ver-3.v2-2.v3.d3-bar .delta3 .delta3-body > .ai-line-2 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  margin: 0;
+  font-size: var(--font-size-16);
+  line-height: var(--font-line-height-24);
+  background-image: none;
+  color: var(--text-primary);
+}
+/* 기본형은 요약 두 줄만 — 조치 버튼 · 묻기 칸은 펼쳐서 본다. */
+body.ver-3.v2-2.v3.d3-bar .delta3:not(.is-open) .delta3-body > .ai-actions,
+body.ver-3.v2-2.v3.d3-bar .delta3:not(.is-open) .delta3-body > .ai-input { display: none; }
+
+/* 아래 40 줄 — 근거 줄 오른쪽 끝에 [+] 자리(8 + 24 + 8)를 비운다. 올려도 단추 줄로 바뀌지 않는다(가로형은 [+] 가 늘 있다). */
+:root[data-theme][data-delta][data-glow] body.ver-3.v2-2.v3.d3-bar .delta3:not(.is-open) .delta3-clue,
+:root[data-theme][data-delta][data-glow] body.ver-3.v2-2.v3.d3-bar .delta3:not(.is-open):is(:hover, :focus-within) .delta3-clue {
+  display: flex;
+  height: 40px;
+  padding: var(--space-8) calc(var(--space-8) * 2 + 24px) var(--space-8) var(--space-8);
+}
+:root[data-theme][data-delta][data-glow] body.ver-3.v2-2.v3.d3-bar .delta3:not(.is-open) .delta3-head,
+:root[data-theme][data-delta][data-glow] body.ver-3.v2-2.v3.d3-bar .delta3:not(.is-open):is(:hover, :focus-within) .delta3-head {
+  position: absolute;
+  right: var(--space-8);
+  bottom: var(--space-8);
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  overflow: visible;
+  opacity: 1;
+}
+
+/* [+] — Icon Button · Ghost 24 pill, plus 16 fg/primary. */
+:root[data-theme][data-delta][data-glow] body.ver-3.v2-2.v3.d3-bar .delta3 .delta3-plus {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background-color: transparent;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+:root[data-theme][data-delta][data-glow] body.ver-3.v2-2.v3.d3-bar .delta3 .delta3-plus:hover { background-color: var(--state-hover); }
+body.ver-3.v2-2.v3.d3-bar .delta3 .delta3-plus .i { display: block; width: 16px; height: 16px; background-color: var(--text-primary); }
+body.ver-3.v2-2.v3.d3-bar .delta3 .delta3-plus-label { display: none; }
+
+/* ---------- 펼침 526 × 296 ---------- */
+:root[data-theme][data-delta][data-glow] body.ver-3.v2-2.v3.d3-bar .delta3.is-open {
+  width: var(--d3-w, 526px);
+  height: 296px;
+  min-height: 0;
+  padding: 0;
+}
+:root[data-theme][data-delta][data-glow] body.ver-3.v2-2.v3.d3-bar .delta3.is-open .delta3-body {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  overflow: hidden;
+}
+body.ver-3.v2-2.v3.d3-bar .delta3.is-open .delta3-body::before { display: none; }
+:root[data-theme][data-delta][data-glow] body.ver-3.v2-2.v3.d3-bar .delta3.is-open .delta3-body > .ai-line-2 {
+  display: block;
+  flex: 1 1 auto;
+  min-height: 0;
+  margin: 0;
+  padding: var(--space-8) var(--space-12);
+  overflow-y: auto;
+}
+:root[data-theme][data-delta][data-glow] body.ver-3.v2-2.v3.d3-bar .delta3.is-open .delta3-body > .ai-actions {
+  margin: 0 var(--space-12) var(--space-8);
+}
+/* 묻기 칸 — 카드 맨 아래, 위 선 border/divider. 면은 따로 깔지 않는다(카드 유리 그대로). */
+:root[data-theme][data-delta][data-glow] body.ver-3.v2-2.v3.d3-bar .delta3.is-open .delta3-body .ai-input,
+:root[data-theme][data-delta][data-glow] body.ver-3.v2-2.v3.d3-bar .delta3.is-open .delta3-body .ai-input:focus-within,
+:root[data-theme][data-delta][data-glow] body.ver-3.v2-2.v3.d3-bar .delta3.is-open .delta3-body > .ai-actions[hidden] + .ai-input {
+  flex: none;
+  margin: 0;
+  padding: var(--space-8) var(--space-12);
+  border: 0;
+  border-top: var(--border-width-thin) solid var(--border-divider);
+  border-radius: 0;
+  background-color: transparent;
+}
+
+/* ---------- 위험 — 위젯형 면을 카드에(창 · 판은 비운다) ---------- */
+:root[data-theme][data-delta][data-glow] body.ver-3.v2-2.v3.d3-bar .delta3.is-critical:not(.is-open),
+:root[data-theme][data-delta][data-glow] body.ver-3.v2-2.v3.d3-bar .delta3.is-warning:not(.is-open),
+:root[data-theme][data-delta][data-glow] body.ver-3.v2-2.v3.d3-bar .delta3.is-critical.is-open {
+  background-image: none;
+  box-shadow: none;
+}
+/* 가로로 길어 원을 키운다 — 220 위젯의 270 으로는 526 카드의 왼쪽만 붉다. */
+:root[data-theme][data-delta][data-glow] body.ver-3.v2-2.v3.d3-bar .delta3.is-critical:not(.is-open) .delta3-card {
+  background-image: radial-gradient(circle 560px at 100% 100%,
+    var(--bg-glass),
+    var(--status-critical-bg));
+}
+:root[data-theme][data-delta][data-glow] body.ver-3.v2-2.v3.d3-bar .delta3.is-critical.is-open .delta3-card {
+  background-image: linear-gradient(to top,
+    var(--bg-glass),
+    var(--status-critical-bg));
+}
+:root[data-theme][data-delta][data-glow] body.ver-3.v2-2.v3.d3-bar .delta3.is-critical .delta3-card {
+  box-shadow:
+    inset 0 0 8px -3px var(--comp-alert-critical-glow-core),
+    inset 0 0 20px 0 var(--comp-alert-critical-glow-halo),
+    inset 0 2px 3px -1px var(--effect-glass-edge);
+}
+/* 대화 중 — 요약은 대화 첫 말로 들어가 있어 글 칸을 걷고, 대화 칸이 남는 높이를 갖는다(위젯형과 같다). */
+:root[data-theme][data-delta][data-glow] body.ver-3.v2-2.v3.d3-bar .delta3.is-open.is-chat .delta3-body > .ai-line-2 { display: none; }
+:root[data-theme][data-delta][data-glow] body.ver-3.v2-2.v3.d3-bar .delta3.is-open.is-chat .dc-thread { padding: var(--space-8) var(--space-12); }
