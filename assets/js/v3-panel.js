@@ -65,30 +65,6 @@
   document.addEventListener("aprism:severity", function () { setTimeout(update, 0); });
 })();
 
-// 지도 층 판 — 층마다 알림 건수(10/21). monitor.js · building.js 가 aprism:floor-counts 로 알린다.
-(function () {
-  var btns = Array.prototype.slice.call(document.querySelectorAll("[data-map-floor], .map-floor.is-all, [data-bld-floor]"));
-  if (!btns.length) { return; }
-  function key(b) {
-    return b.getAttribute("data-map-floor") || b.getAttribute("data-bld-floor") || "all";
-  }
-  function paint(c) {
-    if (!c) { return; }
-    btns.forEach(function (b) {
-      var n = c[key(b)] || 0;
-      var tag = b.querySelector(".floor-count");
-      if (!tag) { tag = document.createElement("span"); tag.className = "floor-count"; b.appendChild(tag); }
-      tag.textContent = n;
-      tag.hidden = !n;
-      b.setAttribute("aria-label", b.getAttribute("data-floor-name") + (n ? " · 알림 " + n + "건" : ""));
-    });
-  }
-  // 원래 이름(aria-label 이 있으면 그것, 없으면 글자)을 둔다 — 건수를 덧붙일 때 바탕이다.
-  btns.forEach(function (b) { b.setAttribute("data-floor-name", b.getAttribute("aria-label") || b.firstChild.textContent.trim()); });
-  paint(window.APRISM_FLOOR_COUNTS);
-  document.addEventListener("aprism:floor-counts", function (e) { paint(e.detail); });
-})();
-
 // 미션 관제의 층 판 [전체](10/21) — 미션을 벗어나지 않고 그 미션이 지나는 층을 모아 본다(building-v3.html?mission=).
 // 한 층만 도는 미션은 모아 볼 층이 없어 끈다 — 미션이 지나지 않는 층을 끄는 규칙과 같다.
 (function () {
@@ -105,6 +81,8 @@
     link.setAttribute("tabindex", off ? "-1" : "0");
     link.setAttribute("data-floor-name", off ? "전체 · 이 미션은 한 층만 지나요" : "전체 · " + m + " 이 지나는 층 모아 보기");
     link.setAttribute("aria-label", link.getAttribute("data-floor-name"));
+    // 꺼진 이유를 올렸을 때 띄운다 — 고장으로 보이지 않게(10/21).
+    if (off) { link.title = "이 미션은 한 층만 지나요 — 모아 볼 층이 없어요"; } else { link.title = m + " 이 지나는 층 모아 보기"; }
   }
   link.addEventListener("click", function (e) { if (link.getAttribute("aria-disabled") === "true") { e.preventDefault(); } });
   set(nameSlot.textContent.trim());

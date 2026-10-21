@@ -421,36 +421,6 @@ body.ver-3.v2-2.v3 .delta3.is-open.is-chat .dc-thread {
 .ver-3 .sb-label { color: var(--text-tertiary); white-space: nowrap; }
 .ver-3 .sb-label + .scope-menu-box { margin-left: var(--space-8); }
 
-/* ==================================================================
- * 지도 층 판 — 층마다 알림 건수 (10/21 디자이너)
- * 미션 관제는 고른 미션의 알림, 통합 순회 현황은 모든 미션의 알림을 층별로 센다([전체]는 합계).
- * 건수는 층 이름 오른쪽 작은 숫자 — 무채색(fg/secondary)이다. 단계 색은 알림 목록 · 테두리가 맡는다.
- * 0 건이면 숫자를 감춘다. 로봇 점(오른쪽 위 파랑)은 그대로 둔다.
- * 통합 순회 현황의 층 버튼 단계 점(.bld-floor-dot)은 숫자와 겹쳐 v3 에서 뺀다.
- * ================================================================== */
-.ver-3 .map-floor {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  gap: var(--space-4);
-  width: 52px;
-  padding: 0 var(--space-8);
-}
-.ver-3 .map-floor .floor-count {
-  margin-left: auto;
-  color: var(--text-secondary);
-  font-family: var(--font-family-mono);
-  font-size: 11px;
-  line-height: 1;
-}
-.ver-3 .map-floor .floor-count[hidden] { display: none; }
-.ver-3 .map-floor.is-on .floor-count { color: var(--text-primary); }
-.ver-3 .map-floor.is-out .floor-count { color: var(--text-disabled); }
-.ver-3 .bld-floor-dot { display: none; }
-/* 로봇 점은 모서리로 한 단 더 붙인다 — 오른쪽 건수 숫자와 닿지 않게. */
-.ver-3 .map-floor.has-robot::after { top: 3px; right: 3px; width: 5px; height: 5px; }
-.ver-3 .map-floor.has-robot .floor-count { margin-right: 2px; }
 
 /* ==================================================================
  * 통합 순회 현황 · 층 펼치기 (10/21 디자이너) — building.js openFloor
@@ -482,3 +452,8 @@ body.ver-3.v2-2.v3 .delta3.is-open.is-chat .dc-thread {
 .ver-3 .scope-menu .scope-all { border-bottom: var(--border-width-thin) solid var(--border-divider); }
 .ver-3 .scope-menu .scope-all .scope-floors { color: var(--text-tertiary); }
 .ver-3 a.map-floor.is-out { pointer-events: auto; cursor: default; }
+
+/* 로봇 현황 층 거르기 단추 — v3 에서는 뺀다. 층은 지도 층 판에서만 고른다(10/21 디자이너). */
+.ver-3 .bld-fleet-filter { display: none; }
+
+/* 꺼진 [전체] 도움말은 title 로 띄운다 — 층 판(.map-floors)이 overflow 로 잘라 CSS 말풍선은 밖으로 못 나온다. */
