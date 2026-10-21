@@ -58,7 +58,7 @@
  * Delta 위젯형 · 기본 (10/21 디자이너, Figma DS 1320:14679 Card — 2차 구조)
  *   Default 1320:14678  220×220 — 머리 40(표식 16 + "Delta" Mono 13) · 아래 요약(글이 아래로 옅어진다)
  *   Hover   1322:14692  220×220 — 맨 아래 40 줄에 "Delta와 대화" 둥근 단추(폭 가득 · 높이 24) — 누르면 펼친다
- *   expand  1320:14677  295×637 — 머리 40 · 안쪽 4 · 상자(bg/map-chip · radius/container)
+ *   expand  1320:14677  295×637 — 화면에서는 지도 높이 가득(위 · 아래 20). 머리 40 · 안쪽 4 · 상자(bg/map-chip · radius/container)
  *                                  [요약 · 조치 버튼(여백 8 · 사이 8)] [묻기 칸 — 위 선 border/default · 왼쪽 16 · 사방 8]
  *   면은 셋 다 bg/cell → bg/glass 세로 그라데이션(채움 55%) + 안쪽 윗변 반사(inset 0 2 3 -1 effect/glass-edge) · radius 12.
  * 판 색은 Figma 그대로 단계와 상관없이 하나다 — 위험 · 주의의 판 색 표현은 나중에(10/21 디자이너). 표식 모션 · 프레임 엣지 글로우는 그대로.
@@ -187,12 +187,12 @@ body.ver-3.v2-2.v3 .delta3 .delta3-plus-label {
 }
 body.ver-3.v2-2.v3 .delta3.is-open .delta3-plus-label { display: none; }
 
-/* ---------- 펼침 295 × 637 ---------- */
+/* ---------- 펼침 295 × 지도 높이 ---------- */
 :root[data-theme] body.ver-3.v2-2.v3 .delta3.is-open {
   width: var(--d3-w, 295px);
-  height: 637px;
+  /* 지도 높이 가득 — 접힌 카드 자리(위 20)에서 아래로 펼쳐 아래도 20 남긴다(10/21 디자이너, Figma 637 보다 길게). */
+  height: calc(100% - var(--space-20) * 2);
   min-height: 0;
-  max-height: calc(100% - var(--space-20) * 2);   /* 접힌 카드 자리(위 20)에서 아래로 펼치고 아래도 20 남긴다. */
   padding: 0;
 }
 /* 제목 줄은 Figma 에서 빠졌다 — 머리(Delta)와 요약만 남는다. */
