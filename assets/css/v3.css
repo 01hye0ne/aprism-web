@@ -858,3 +858,5 @@ body.ver-3.v2-2.v3.d3-bar .delta3.is-open .delta3-body::before { display: none; 
 /* 대화 중 — 요약은 대화 첫 말로 들어가 있어 글 칸을 걷고, 대화 칸이 남는 높이를 갖는다(위젯형과 같다). */
 :root[data-theme][data-delta][data-glow] body.ver-3.v2-2.v3.d3-bar .delta3.is-open.is-chat .delta3-body > .ai-line-2 { display: none; }
 :root[data-theme][data-delta][data-glow] body.ver-3.v2-2.v3.d3-bar .delta3.is-open.is-chat .dc-thread { padding: var(--space-8) var(--space-12); }
+/* 가로형은 [돋보기] 조치 줄을 쓰지 않는다 — 묻기 칸은 펼치면 늘 있고 [+] 가 그 입구다. */
+body.ver-3.v2-2.v3.d3-bar .delta3 .delta3-suggest { display: none; }
