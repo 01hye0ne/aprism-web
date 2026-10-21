@@ -61,7 +61,7 @@
  *   expand  1320:14677  295×637 — 머리 40 · 안쪽 4 · 상자(bg/map-chip · radius/container)
  *                                  [요약 · 조치 버튼(여백 8 · 사이 8)] [묻기 칸 — 위 선 border/default · 왼쪽 16 · 사방 8]
  *   면은 셋 다 bg/cell → bg/glass 세로 그라데이션(채움 55%) + 안쪽 윗변 반사(inset 0 2 3 -1 effect/glass-edge) · radius 12.
- * 색은 Figma 그대로 단계와 상관없이 하나다 — 위험 · 주의의 색 표현은 나중에(10/21 디자이너). 프레임 엣지 글로우는 그대로.
+ * 판 색은 Figma 그대로 단계와 상관없이 하나다 — 위험 · 주의의 판 색 표현은 나중에(10/21 디자이너). 표식 모션 · 프레임 엣지 글로우는 그대로.
  *
  * v2.2 규칙이 :root[data-delta][data-glow] … 로 무겁게 걸려 있어 같은 무게 이상으로 덮는다.
  * ================================================================== */
@@ -84,12 +84,8 @@
 }
 :root[data-theme][data-delta][data-glow] body.ver-3.v2-2.v3 .delta3.is-open::after { display: none; }
 
-/* 표식 — Icon/Delta 16, 흰 점 셋 그대로(단계 색 · 깜빡임은 나중에). 답을 기다릴 때 도는 모션(is-thinking)은 남긴다. */
+/* 표식 — Icon/Delta 16. 단계 모션(주의 1-2-3 · 위험 깜빡임 · 답 기다림)은 v2.2 그대로 둔다(10/21 디자이너). */
 body.ver-3.v2-2.v3 .delta3 .delta3-name .delta-dots { width: 16px; height: 16px; }
-body.ver-3.v2-2.v3[data-level] .delta3 .delta-dots rect {
-  fill: var(--text-primary);
-  animation: none;
-}
 
 /* 머리 — 40 · 사방 8 · 표식과 이름 사이 4. "Delta" 는 Mono/Data/2 13/18 fg/primary. */
 body.ver-3.v2-2.v3 .delta3 .delta3-name {
