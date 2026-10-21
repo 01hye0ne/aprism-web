@@ -486,8 +486,7 @@ body.ver-3.v2-2.v3 .delta3.is-open.is-chat .dc-thread {
 .ver-3 a.sb-overview:hover { background-color: var(--bg-cell); color: var(--text-primary); }
 .ver-3 a.sb-overview:focus-visible { outline: var(--border-width-strong) solid var(--border-focus); outline-offset: 2px; }
 .ver-3 .sb-overview.is-on { background-color: var(--bg-cell); color: var(--text-primary); }
-.ver-3 .sb-overview + .scope-menu-box { margin-left: var(--space-4); }
-.ver-3 .sb-overview.is-on + .scope-menu-box .scope-trigger:not([aria-expanded="true"]):not(:hover) {
+.ver-3 .sb-overview.is-on ~ .scope-menu-box .scope-trigger:not([aria-expanded="true"]):not(:hover) {
   background-color: transparent;
   color: var(--text-secondary);
 }
