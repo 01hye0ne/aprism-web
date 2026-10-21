@@ -640,3 +640,16 @@ body.ver-3.v2-2 .panel-head::after,
     color-mix(in srgb, var(--comp-alert-critical-glow-halo) 12%, transparent) 50%,
     transparent 100%);
 }
+/* 주의 — 같은 자리에 노란 빛(glow-halo warning). 위험보다 한 단 옅게 둔다 — 강약(10/06 회의 "주의는 덜어내기"). */
+:root[data-theme][data-delta][data-glow] body.ver-3.v2-2.v3 .delta3.is-warning:not(.is-open) {
+  background-image: radial-gradient(circle 226px at 0 0,
+    color-mix(in srgb, var(--comp-alert-warning-glow-halo) 45%, transparent) 0%,
+    color-mix(in srgb, var(--comp-alert-warning-glow-halo) 15%, transparent) 50%,
+    transparent 100%);
+}
+:root[data-theme="light"][data-delta][data-glow] body.ver-3.v2-2.v3 .delta3.is-warning:not(.is-open) {
+  background-image: radial-gradient(circle 226px at 0 0,
+    color-mix(in srgb, var(--comp-alert-warning-glow-halo) 35%, transparent) 0%,
+    color-mix(in srgb, var(--comp-alert-warning-glow-halo) 12%, transparent) 50%,
+    transparent 100%);
+}
