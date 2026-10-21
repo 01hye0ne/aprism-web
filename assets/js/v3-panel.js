@@ -64,3 +64,37 @@
   new MutationObserver(update).observe(win, { attributes: true, attributeFilter: ["class"] });
   document.addEventListener("aprism:severity", function () { setTimeout(update, 0); });
 })();
+
+// 미션이 지나지 않는 층 안내(10/21) — 층 판이 미션과 상관없이 옮겨지므로, 그 미션이 없는 층에서는 지도 위에 이유를 띄운다.
+// 안내 오른쪽 단추는 그 미션이 지나는 층(로봇이 선 층 먼저)으로 돌려보낸다.
+(function () {
+  var note = document.querySelector("[data-floor-note]");
+  var nameSlot = document.querySelector("[data-scope-name]");
+  if (!note || !nameSlot) { return; }
+  var text = note.querySelector("[data-floor-note-text]");
+  var go = note.querySelector("[data-floor-note-go]");
+  var floor = null;
+  function now() {
+    var on = document.querySelector("[data-map-floor][aria-pressed='true']");
+    return floor || (on && on.getAttribute("data-map-floor"));
+  }
+  function update() {
+    var m = nameSlot.textContent.trim();
+    var fl = (window.APRISM_MISSION_FLOORS || {})[m] || [];
+    var f = now();
+    var off = !!f && fl.length > 0 && fl.indexOf(f) < 0;
+    note.hidden = !off;
+    if (!off) { return; }
+    var robotBtn = document.querySelector("[data-map-floor].has-robot");
+    var back = (robotBtn && fl.indexOf(robotBtn.getAttribute("data-map-floor")) >= 0) ? robotBtn.getAttribute("data-map-floor") : fl[0];
+    text.textContent = m + "은 " + f + "을 지나지 않아요";
+    go.textContent = back + "로 돌아가기";
+    go.onclick = function () {
+      var b = document.querySelector("[data-map-floor='" + back + "']");
+      if (b) { b.click(); }
+    };
+  }
+  document.addEventListener("aprism:floor", function (e) { floor = e.detail && e.detail.floor; update(); });
+  document.addEventListener("aprism:scope", function () { setTimeout(update, 0); });
+  update();
+})();

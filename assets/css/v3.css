@@ -455,3 +455,29 @@ body.ver-3.v2-2.v3 .delta3.is-open.is-chat .dc-thread {
 /* 로봇 현황 층 거르기 단추 — v3 에서는 뺀다. 층은 지도 층 판에서만 고른다(10/21 디자이너). */
 .ver-3 .bld-fleet-filter { display: none; }
 
+
+/*
+ * 미션이 지나지 않는 층 안내 (10/21 디자이너) — 지도 위 가운데 위, 지도 유리면과 같은 판.
+ * 상태가 아니라 안내라 무채색이다(info 아이콘도 fg/secondary). 단추는 Secondary — 지금 할 단 하나의 행동은 아니다.
+ */
+.ver-3 .floor-note {
+  position: absolute;
+  top: var(--space-20);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  padding: var(--space-8) var(--space-8) var(--space-8) var(--space-12);
+  border-radius: var(--radius-container);
+  background-color: var(--map-glass-bg);
+  -webkit-backdrop-filter: var(--map-glass-blur);
+  backdrop-filter: var(--map-glass-blur);
+  box-shadow: var(--map-glass-edge), var(--map-glass-shadow);
+  color: var(--text-primary);
+  white-space: nowrap;
+  cursor: default;
+}
+.ver-3 .floor-note[hidden] { display: none; }
+.ver-3 .floor-note > .i { color: var(--text-secondary); }

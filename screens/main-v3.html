@@ -30,7 +30,7 @@
   <link rel="stylesheet" href="../assets/css/palette-neutral.css?v=0c969aea" />
   <link rel="stylesheet" href="../assets/css/delta-v3.css?v=b1562ee4" />
   <!-- v3 전용 규칙 — v2.2 는 10/21 부로 멈췄다. v3 에서 바꾸는 것은 여기(body.ver-3)에. -->
-  <link rel="stylesheet" href="../assets/css/v3.css?v=f0abc7cf" />
+  <link rel="stylesheet" href="../assets/css/v3.css?v=49a74269" />
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
@@ -397,6 +397,12 @@
           <!-- ---------- Map Panel ---------- -->
           <section class="map-panel col-9" aria-label="설비 배치도">
             <div class="map-canvas">
+              <!-- v3(10/21) — 미션이 지나지 않는 층을 보고 있을 때만 뜨는 안내. 빈 지도를 오류로 읽지 않게(v3-panel.js). -->
+              <div class="floor-note" data-floor-note role="status" hidden>
+                <span class="i i-16" style="--i:var(--ic-info)" aria-hidden="true"></span>
+                <span class="t-label-2" data-floor-note-text></span>
+                <button type="button" class="btn btn-secondary is-xs" data-floor-note-go></button>
+              </div>
               <div class="map-tools">
                 <!-- 10/19 — 조작 버튼 판과 층 판을 둘로 나눴다. 층 판은 조작 버튼 아래에 따로 선다. -->
                 <div class="map-tools-box">
@@ -1768,6 +1774,6 @@
 <script src="../assets/js/delta-v3.js?v=403861c7"></script>
 <script src="../assets/js/delta-resize.js?v=b83bd18b"></script>
 <script src="../assets/js/grid-overlay.js?v=164e4f2a"></script>
-<script src="../assets/js/v3-panel.js?v=157dfe6a"></script>
+<script src="../assets/js/v3-panel.js?v=134bb801"></script>
 </body>
 </html>
