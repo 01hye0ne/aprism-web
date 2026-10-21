@@ -58,3 +58,13 @@
   new MutationObserver(update).observe(win, { attributes: true, attributeFilter: ["class"] });
   document.addEventListener("aprism:severity", function () { setTimeout(update, 0); });
 })();
+
+// 상태바 "전층 N"(10/21) — 고른 미션의 알림 건수. 최신 알림 거르기 [전체] 단추의 수를 그대로 따른다(층과 상관없는 그 미션 전체).
+(function () {
+  var out = document.querySelector("[data-sb-count]");
+  var src = document.querySelector('[data-ah-count="all"]');
+  if (!out || !src) { return; }
+  function copy() { out.textContent = (parseInt(src.textContent, 10) || 0) + ""; }
+  copy();
+  new MutationObserver(copy).observe(src, { childList: true, characterData: true, subtree: true });
+})();

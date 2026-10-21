@@ -412,3 +412,34 @@ body.ver-3.v2-2.v3 .delta3.is-open.is-chat .dc-thread {
   min-height: 0;
   max-height: none;
 }
+
+/* ==================================================================
+ * 상태바 — 미션(라벨) | [미션 ▾] | 전층 N (10/21 디자이너)
+ * 상단은 미션만 고른다. 층은 지도 층 판에서만 — "전체 건물 ›" 링크가 층 판 [전체]와 겹쳤다.
+ * 라벨은 한 단 물러난 글색(fg/tertiary), 칸 사이는 border/default 1 × 16 세로 선.
+ * "전층 N" 은 누르지 않는 표시 — 고른 미션의 알림이 층과 상관없이 모두 몇 건인지. 색은 무채색(상태색은 알림 목록이 맡는다).
+ * ================================================================== */
+.ver-3 .sb-label { color: var(--text-tertiary); white-space: nowrap; }
+.ver-3 .sb-div {
+  flex: none;
+  width: var(--border-width-thin);
+  height: 16px;
+  margin: 0 var(--space-12);
+  background-color: var(--border-default);
+}
+.ver-3 .sb-div + .scope-menu-box { margin-left: 0; }
+.ver-3 .sb-floors {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+.ver-3 .sb-count {
+  min-width: 20px;
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-pill);
+  background-color: var(--bg-raised);
+  color: var(--text-primary);
+  text-align: center;
+}
