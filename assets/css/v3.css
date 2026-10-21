@@ -1133,3 +1133,27 @@ body.ver-3.v2-2.v3 .delta3.is-open .delta3-name { padding: 10px var(--space-8) 2
 body.ver-3:not(.is-floor-view):not(.is-mission-scope) .bld-sum { display: none; }
 /* 층을 펼친 뒤에는 "층을 누르면 펼쳐 보여요" 가 맞지 않아 걷는다 — 왼쪽 아래 미션 목록이 다음 행동을 말한다. */
 body.ver-3.is-floor-view .bld-hint { display: none; }
+
+/*
+ * 통합 순회 현황 최신 알림 — 위험도 아이콘에서 미션 · 장소로 이어지는 가지 선 (10/21 디자이너).
+ * 무슨 일(알림명) 아래로 어느 미션 · 어디서가 딸려 있음을 선으로 보인다. 둘째 · 셋째 줄은 알림명 글자 자리(20)로 들인다.
+ *   세로 선  아이콘 아래 끝(줄 위 9)에서 시작 — 미션 줄은 다음 줄까지 내려가고, 장소 줄에서 멈춘다(└)
+ *   꺾임     각 줄 가운데에서 오른쪽으로 7
+ * 선은 border/default 1 — 글보다 한참 옅게. 줄 사이는 8(.ah-item gap).
+ */
+body.ver-3.is-building .ah-item .ah-scope,
+body.ver-3.is-building .ah-item .ah-where { position: relative; padding-left: 20px; }
+body.ver-3.is-building .ah-item .ah-scope::before,
+body.ver-3.is-building .ah-item .ah-where::before,
+body.ver-3.is-building .ah-item .ah-scope::after,
+body.ver-3.is-building .ah-item .ah-where::after {
+  content: "";
+  position: absolute;
+  left: 7px;
+  background-color: var(--border-default);
+  pointer-events: none;
+}
+body.ver-3.is-building .ah-item .ah-scope::before { top: -9px; bottom: -8px; width: 1px; }
+body.ver-3.is-building .ah-item .ah-where::before { top: -8px; height: calc(8px + 50%); width: 1px; }
+body.ver-3.is-building .ah-item .ah-scope::after,
+body.ver-3.is-building .ah-item .ah-where::after { top: 50%; width: 7px; height: 1px; }
