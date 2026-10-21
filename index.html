@@ -156,18 +156,28 @@
             <p class="ver-group-label">v3</p>
             <ol class="ver-list is-stack">
               <!-- v3 — 10/21 부터 작업 화면(디자이너). v2.2 다섯 장을 복제해 시작했고 v2.2 는 멈췄다. -->
+              <!-- Delta 꼴(10/21 디자이너) — 같은 v3 화면을 Delta 꼴만 바꿔 연다(delta-form.js). 고른 꼴은 기억해 화면을 오가도 그대로라,
+                   카드의 모든 링크에 ?form= 을 달아 어느 카드로 들어와도 그 꼴로 시작한다. -->
               <li class="ver-card is-latest">
-                <a class="ver-link" href="./screens/main-v3.html"><span class="ver-name">v3</span><span class="ver-tag">작업 중</span></a>
+                <a class="ver-link" href="./screens/main-v3.html?form=widget"><span class="ver-name">v3</span><span class="ver-tag">Delta 위젯형</span></a>
                 <span class="ver-date">2026.10.21</span>
                 <span class="ver-badge">최신</span>
                 <ul class="ver-pages">
                   <li><a href="./screens/mission-setup-v3.html"><span class="ver-no">1</span>미션 설정</a></li>
                   <li><a href="./screens/mission-precheck-v3.html"><span class="ver-no">2</span>사전 점검</a></li>
-                  <li><a href="./screens/building-v3.html"><span class="ver-no">3</span>통합 순회 현황</a></li>
-                  <li><a href="./screens/main-v3.html?form=widget"><span class="ver-no">4</span>미션 관제 · Delta 위젯형</a></li>
-                  <!-- Delta 가로형(10/21, Figma 1335:21707) — 같은 화면을 ?form=bar 로 연다. 고른 꼴은 기억해 화면을 오가도 그대로다. -->
-                  <li><a href="./screens/main-v3.html?form=bar"><span class="ver-no">4</span>미션 관제 · Delta 가로형</a></li>
+                  <li><a href="./screens/building-v3.html?form=widget"><span class="ver-no">3</span>통합 순회 현황</a></li>
+                  <li><a href="./screens/main-v3.html?form=widget"><span class="ver-no">4</span>미션 관제</a></li>
                   <li class="is-sub"><a href="./screens/alert-center-v3.html"><span class="ver-no">4-1</span>알림 센터</a></li>
+                </ul>
+              </li>
+              <!-- Delta 가로형 — Figma DS 1335:21707. Delta 가 있는 두 화면만. -->
+              <li class="ver-card is-latest">
+                <a class="ver-link" href="./screens/main-v3.html?form=bar"><span class="ver-name">v3</span><span class="ver-tag">Delta 가로형</span></a>
+                <span class="ver-date">2026.10.21</span>
+                <span class="ver-badge">최신</span>
+                <ul class="ver-pages">
+                  <li><a href="./screens/building-v3.html?form=bar"><span class="ver-no">3</span>통합 순회 현황</a></li>
+                  <li><a href="./screens/main-v3.html?form=bar"><span class="ver-no">4</span>미션 관제</a></li>
                 </ul>
               </li>
             </ol>
