@@ -562,3 +562,41 @@ body.ver-3.v2-2.v3 .delta3.is-open.is-chat .dc-thread {
 .ver-3 .bld-bot.is-marked .bld-bot-say { display: block; }
 .ver-3 .bld-bot.is-marked { z-index: 2; }
 .ver-3 .bld-bot.is-gone .bld-bot-say { display: none; }
+
+/* ==================================================================
+ * 근거 줄 — "지금 하고 있다" 모션 (10/21 디자이너)
+ *   글   빛이 왼쪽에서 오른쪽으로 훑고 지나간다(shimmer). 바탕은 fg/secondary, 지나가는 빛만 fg/primary.
+ *   아이콘 감지 칩이 하나씩 차례로 살짝 떠올랐다 가라앉는다 — 근거를 하나씩 들여다보는 셈이다.
+ * 한 바퀴 2.4초로 둘이 같은 박자다(위험 표식의 느린 숨과 같은 길이). 흔들림 없이 크기 · 밝기만 바뀐다.
+ * 움직임 줄이기 설정이면 멈춘다 — 글은 fg/primary, 칩은 제자리.
+ * ================================================================== */
+body.ver-3.v2-2.v3 .delta3-clue-txt {
+  background-image: linear-gradient(90deg,
+    var(--text-secondary) 0%, var(--text-secondary) 35%,
+    var(--text-primary) 50%,
+    var(--text-secondary) 65%, var(--text-secondary) 100%);
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: clue-shimmer 2.4s linear infinite;
+}
+@keyframes clue-shimmer {
+  from { background-position: 100% 0; }
+  to { background-position: 0% 0; }
+}
+
+body.ver-3.v2-2.v3 .delta3-clue-ics .i {
+  animation: clue-look 2.4s cubic-bezier(.3, 0, .2, 1) infinite;
+}
+body.ver-3.v2-2.v3 .delta3-clue-ics .i:nth-child(2) { animation-delay: 0.4s; }
+body.ver-3.v2-2.v3 .delta3-clue-ics .i:nth-child(3) { animation-delay: 0.8s; }
+@keyframes clue-look {
+  0%, 40%, 100% { transform: scale(1); background-color: var(--bg-raised); }
+  15% { transform: scale(1.18); background-color: color-mix(in srgb, var(--bg-raised) 70%, var(--text-primary)); z-index: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.ver-3.v2-2.v3 .delta3-clue-txt { animation: none; background-image: none; color: var(--text-primary); }
+  body.ver-3.v2-2.v3 .delta3-clue-ics .i { animation: none; }
+}
