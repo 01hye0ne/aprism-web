@@ -1070,8 +1070,16 @@ body.ver-3.v2-2.v3 .delta3.is-open .delta3-name { padding: 10px var(--space-8) 2
 .ver-3 .bld-rc-badge.is-info { --tone-dot: var(--status-info-icon); --tone-text: var(--status-info-text); }
 .ver-3 .bld-rc-badge.is-normal { --tone-dot: var(--status-safe-icon); --tone-text: var(--status-safe-text); }
 .ver-3 .bld-rc-badge.is-critical { --tone-dot: var(--status-critical-icon); --tone-text: var(--status-critical-text); }
-/* 배터리 · 신호 — 정상은 무채색(fg/primary · 글 fg/secondary), 임계를 넘을 때만 주의 · 위험 색(DS 규칙, Figma 는 정상에도 초록). */
-.ver-3 .bld-rc-state .battery { gap: var(--space-8); font-size: var(--font-size-12); line-height: var(--font-line-height-18); color: var(--text-secondary); }
-.ver-3 .bld-rc-state .battery:not(.is-warning):not(.is-critical) .battery-fill { background-color: var(--text-primary); }
-.ver-3 .bld-rc-state .battery.is-warning { color: var(--status-warning-text); }
-.ver-3 .bld-rc-state .battery.is-critical { color: var(--status-critical-text); }
+.ver-3 .bld-rc-state .battery { gap: var(--space-8); font-size: var(--font-size-12); line-height: var(--font-line-height-18); }
+
+/*
+ * 로봇 배터리 · 신호 — 정상은 무채색, 임계를 넘을 때만 주의 · 위험 색 (10/21 디자이너, v3 모든 화면).
+ * DS Battery Gauge · Signal Bars 규칙("정상 구간에 Safe 녹색을 쓰지 않는다")대로. 같은 로봇 값이 미션 관제(초록)와
+ * 통합 순회 현황(무채색)에서 달라 보였다 — 하나로 맞춘다. 게이지 · 막대는 fg/primary, 글은 fg/secondary.
+ * 주의 · 위험(.is-warning · .is-critical)은 app-shell.css 그대로. Figma 화면은 아직 정상에도 초록이다.
+ */
+.ver-3 .battery:not(.is-warning):not(.is-critical) { color: var(--text-secondary); }
+.ver-3 .battery:not(.is-warning):not(.is-critical) .battery-fill,
+.ver-3 .battery:not(.is-warning):not(.is-critical) .signal-bars { background-color: transparent; }
+.ver-3 .battery:not(.is-warning):not(.is-critical) .battery-fill { background-color: var(--text-primary); }
+.ver-3 .battery:not(.is-warning):not(.is-critical) .signal-bars { color: var(--text-primary); }
