@@ -451,9 +451,7 @@ body.ver-3.v2-2.v3 .delta3.is-open.is-chat .dc-thread {
 .ver-3 .bld-sum-go-floor { flex: none; color: var(--text-secondary); font-family: var(--font-family-mono); font-size: var(--font-size-12); }
 .ver-3 .scope-menu .scope-all { border-bottom: var(--border-width-thin) solid var(--border-divider); }
 .ver-3 .scope-menu .scope-all .scope-floors { color: var(--text-tertiary); }
-.ver-3 a.map-floor.is-out { pointer-events: auto; cursor: default; }
 
 /* 로봇 현황 층 거르기 단추 — v3 에서는 뺀다. 층은 지도 층 판에서만 고른다(10/21 디자이너). */
 .ver-3 .bld-fleet-filter { display: none; }
 
-/* 꺼진 [전체] 도움말은 title 로 띄운다 — 층 판(.map-floors)이 overflow 로 잘라 CSS 말풍선은 밖으로 못 나온다. */

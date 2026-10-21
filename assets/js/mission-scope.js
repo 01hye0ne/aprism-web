@@ -185,7 +185,8 @@
     var on = floorsOf(m);
     Array.prototype.forEach.call(document.querySelectorAll("[data-map-floor]"), function (btn) {
       var id = btn.getAttribute("data-map-floor");
-      var out = on.length > 0 && on.indexOf(id) < 0;
+      // v3 — 층은 미션과 상관없이 옮겨 볼 수 있다(10/21 디자이너). 미션이 지나지 않는 층도 끄지 않는다.
+      var out = !document.body.classList.contains("ver-3") && on.length > 0 && on.indexOf(id) < 0;
       btn.disabled = out;
       btn.classList.toggle("is-out", out);
       btn.title = out ? "이 미션이 지나지 않는 층" : "";
