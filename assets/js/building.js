@@ -433,7 +433,7 @@
    * 웨이포인트는 임시 값이다(STEPS).
    */
   var STEPS = {
-    1:  [["N₂ 배관 압력계", "WP-04"], ["FFU-02 토출구", "WP-05"]],
+    1:  [["N₂ 배관 압력계", "WP-04"], ["waypoint name", "WP-05"]],   // 미션 관제 Robot 01 목록(screen.js) 4 · 5번과 같다
     5:  [["공기 압축기 C-1", "WP-13"], ["냉각수 펌프 P-3", "WP-14"]],
     11: [["배전반실 열화상", "WP-04"], ["변압기 TR-2", "WP-05"]]
   };
@@ -549,7 +549,7 @@
    * 시안 — 한 칸짜리 로봇 카드 (10/21 디자이너, Robot 01 만 먼저 비교용). 레퍼런스처럼 라벨 · 칸 선 없이 위에서 아래로 한 흐름.
    *   머리   이름 · 미션(흐리게) · 오른쪽 끝 배터리 %와 신호 막대(라벨 없음, 신호 글자는 약함 · 끊김일 때만)
    *   지금   작업(14 Bold) / 웨이포인트(12 fg/tertiary)
-   *   다음   이름 한 줄(fg/tertiary) — 지금 · 다음 앞에 기호(way 원 · target)와 잇는 세로 선
+   *   다음   이름 한 줄(fg/tertiary) — 표식 · 선 · 진행 막대는 미션 관제 로봇 패널과 같은 부품(10/21 디자이너 — 인지 줄이기)
    *   진행   맨 아래 막대 하나 + 지나온 수
    * 상태 배지(Mission 줄) · 다음 웨이포인트 번호 · 오른쪽 칸은 뺐다.
    */
@@ -589,8 +589,14 @@
     var wp = STEPS[r.n];
     var bodyEl = el("span", "bld-rc2-body");
     var nowRow = el("span", "bld-rc2-step is-now");
+    // 표식은 미션 관제 웨이포인트 목록과 같은 그림(rail-dot — 상태색 고리 + 가운데 점, 10/21 디자이너).
+    // 지금 칸은 파랑, 그 칸에 알림이 걸려 있으면 그 단계 색 — 미션 관제 목록 · 지도 점과 같다.
     var nm = el("span", "bld-rc2-mark");
-    nm.appendChild(icon("way", 12));
+    nm.appendChild(el("span", "rail-dot"));
+    if (wp) {
+      var hit = ALERTS.filter(function (a) { return a.robot === r.n && a.where.indexOf(wp[0][1]) >= 0; });
+      if (hit.length) { nowRow.setAttribute("data-wp-alert", topSev(hit) === "critical" ? "danger" : "caution"); }
+    }
     nowRow.appendChild(nm);
     var nt = el("span", "bld-rc2-txt");
     nt.appendChild(el("span", "bld-rc2-now", r.now));
@@ -598,20 +604,22 @@
     nowRow.appendChild(nt);
     bodyEl.appendChild(nowRow);
     if (wp) {
+      // 다음(아직 안 한 칸) — 미션 관제 목록처럼 표식 없이 점선만 지난다.
       var nextRow = el("span", "bld-rc2-step is-next");
-      var xm = el("span", "bld-rc2-mark");
-      xm.appendChild(icon("target", 16));
-      nextRow.appendChild(xm);
+      nextRow.appendChild(el("span", "bld-rc2-mark"));
       nextRow.appendChild(el("span", "bld-rc2-txt bld-rc2-next t-caption", wp[1][0]));
       bodyEl.appendChild(nextRow);
     }
     node.appendChild(bodyEl);
     if (r.total) {
+      // 진행 막대 — 미션 관제 진행 막대와 같은 부품(Figma Progress Bar 1054:20548 · 채움 bg/inverse · way 표식).
       var prog = el("span", "bld-rc2-prog");
-      var bar = el("span", "bld-rc2-bar");
-      var fill = el("i");
-      fill.style.width = Math.round(r.done / r.total * 100) + "%";
-      bar.appendChild(fill);
+      var bar = el("span", "progress-track");
+      bar.style.setProperty("--progress", Math.round(r.done / r.total * 100) + "%");
+      bar.appendChild(el("span", "progress-fill"));
+      var knob = el("span", "progress-knob");
+      knob.appendChild(icon("way", 16));
+      bar.appendChild(knob);
       prog.appendChild(bar);
       prog.appendChild(el("span", "t-caption num", r.done + "/" + r.total));
       node.appendChild(prog);
