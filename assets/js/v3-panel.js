@@ -98,3 +98,51 @@
   document.addEventListener("aprism:scope", function () { setTimeout(update, 0); });
   update();
 })();
+
+// Delta 근거 아이콘(10/21 디자이너 — 감지 종류) — X 위젯의 출처 얼굴 자리에 "무엇을 보고 판단했는지"를 단다.
+// 판단에 들어간 알림의 감지 종류를 겹치지 않게 최대 3 개, 더 있으면 +n. 알림이 없으면 순회 중인 로봇 하나.
+// 진동 아이콘은 세트에 아직 없어 게이지로 대신한다(Figma 아이콘 세트에 추가 요청).
+(function () {
+  var box = document.querySelector("[data-clue-ics]");
+  if (!box) { return; }
+  var KINDS = [
+    { re: /계기|압력|NG|게이지/, icon: "gauge", name: "계기 판독" },
+    { re: /온도|과열|열화상/, icon: "thermometer", name: "온도" },
+    { re: /방전/, icon: "bolt", name: "부분방전" },
+    { re: /누출|누수/, icon: "eye", name: "누출" },
+    { re: /진동/, icon: "gauge", name: "진동" }
+  ];
+  function kindOf(t) {
+    for (var i = 0; i < KINDS.length; i += 1) { if (KINDS[i].re.test(t)) { return KINDS[i]; } }
+    return { icon: "info", name: "기타" };
+  }
+  function paint() {
+    var list = window.APRISM_DELTA_DETECTS || [];
+    var seen = [], names = [];
+    // 같은 아이콘은 한 번만 — 진동은 아직 게이지를 빌려 써서 계기 판독과 겹친다. 이름(title)에는 둘 다 남긴다.
+    var icons = [];
+    list.forEach(function (t) {
+      var k = kindOf(t);
+      if (names.indexOf(k.name) < 0) { names.push(k.name); }
+      if (icons.indexOf(k.icon) < 0) { icons.push(k.icon); seen.push(k); }
+    });
+    if (!seen.length) { seen = [{ icon: "bot", name: "순회" }]; names = ["순회"]; }
+    box.textContent = "";
+    seen.slice(0, 3).forEach(function (k) {
+      var i = document.createElement("span");
+      i.className = "i";
+      i.style.setProperty("--i", "var(--ic-" + k.icon + ")");
+      i.title = k.name;
+      box.appendChild(i);
+    });
+    if (seen.length > 3) {
+      var more = document.createElement("span");
+      more.className = "delta3-clue-more num";
+      more.textContent = "+" + (seen.length - 3);
+      box.appendChild(more);
+    }
+    box.setAttribute("title", "근거 — " + names.join(" · "));
+  }
+  paint();
+  document.addEventListener("aprism:severity", function () { setTimeout(paint, 0); });
+})();

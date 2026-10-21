@@ -471,6 +471,9 @@
     // 화면 테두리(엣지 글로우)는 목록에서 가장 높은 단계를 따른다.
     var top = highest(all);
     body.setAttribute("data-level", top);
+    // v3 Delta 근거 줄 — 판단에 들어간 알림의 감지 종류(위험 먼저). v3-panel.js 가 아이콘으로 단다(10/21).
+    window.APRISM_DELTA_DETECTS = all.slice().sort(function (a, b) { return (a.sev === "critical" ? 0 : 1) - (b.sev === "critical" ? 0 : 1); })
+      .map(function (a) { return a.detect || a.title || ""; });
     tellAi(judge(all), top);
     markWaypoints();
   }

@@ -397,6 +397,8 @@
     document.dispatchEvent(new CustomEvent("aprism:floor-counts", { detail: window.APRISM_FLOOR_COUNTS }));
     // 테두리 · Delta 판 단계 = 남은 알림 중 가장 높은 단계(메인 v2.2 monitor.js 와 같은 신호, 10/19)
     var top = counts.critical ? "critical" : counts.warning ? "warning" : null;
+    // v3 Delta 근거 줄 — 지금 범위 알림의 감지 종류(이 화면 알림엔 감지 칸이 없어 알림명으로 가린다, v3-panel.js).
+    window.APRISM_DELTA_DETECTS = all.map(function (a) { return a.detect || a.title || ""; });
     // v3 — 단계(body[data-level])도 지금 보는 범위를 따른다. Delta 표식 모션 · 근거 줄이 이 값을 읽는다.
     if (V3) { body.setAttribute("data-level", top || "normal"); }
     document.dispatchEvent(new CustomEvent("aprism:severity", { detail: deltaSay(top, all) }));
