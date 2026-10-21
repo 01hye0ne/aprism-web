@@ -1157,3 +1157,36 @@ body.ver-3.is-building .ah-item .ah-scope::before { top: -9px; bottom: -8px; wid
 body.ver-3.is-building .ah-item .ah-where::before { top: -8px; height: calc(8px + 50%); width: 1px; }
 body.ver-3.is-building .ah-item .ah-scope::after,
 body.ver-3.is-building .ah-item .ah-where::after { top: 50%; width: 7px; height: 1px; }
+
+/*
+ * 시안 — 한 칸짜리 로봇 카드 (10/21 디자이너, Robot 01 만 · building.js fleetCardSlim). 라벨 · 칸 선 없이 여백으로 가른다.
+ *   카드   bg/cell · 선 border/default · radius 4 · 안쪽 12
+ *   머리   이름 14/20 ExtraBold · 미션 Caption fg/tertiary · 배터리 · 신호(무채색, 임계만 색)
+ *   지금   14/20 Bold fg/primary · 웨이포인트 Caption fg/tertiary — 머리와 사이 12
+ *   진행   막대 4(fg/secondary) + 수 Caption fg/secondary — 사이 10
+ *   다음   Caption fg/tertiary — 사이 6
+ */
+.ver-3 .bld-robot.bld-rc2 {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  padding: var(--space-12);
+  border: var(--border-width-thin) solid var(--border-default);
+  border-radius: var(--radius-4);
+  background-color: var(--bg-cell);
+}
+.ver-3 .bld-robot.bld-rc2:hover { background-color: var(--bg-cell); border-color: var(--border-strong); }
+.ver-3 .bld-rc2-head { display: flex; align-items: center; gap: var(--space-8); min-width: 0; }
+.ver-3 .bld-rc2-name { flex: none; font-size: var(--font-size-14); line-height: var(--font-line-height-20); font-weight: 800; color: var(--text-primary); }
+.ver-3 .bld-rc2-mission { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-tertiary); }
+.ver-3 .bld-rc2-vitals { flex: none; display: flex; align-items: center; gap: var(--space-12); }
+.ver-3 .bld-rc2-vitals .battery { gap: var(--space-8); font-size: var(--font-size-12); line-height: var(--font-line-height-18); }
+.ver-3 .bld-rc2-vitals .battery:not(.is-warning):not(.is-critical) .battery-fill { background-color: var(--text-secondary); }
+.ver-3 .bld-rc2-vitals .battery:not(.is-warning):not(.is-critical) .signal-bars { color: var(--text-secondary); }
+.ver-3 .bld-rc2-body { display: flex; flex-direction: column; min-width: 0; }
+.ver-3 .bld-rc2-now { font-size: var(--font-size-14); line-height: var(--font-line-height-20); font-weight: 700; color: var(--text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ver-3 .bld-rc2-wp { margin-top: 2px; color: var(--text-tertiary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ver-3 .bld-rc2-prog { display: flex; align-items: center; gap: var(--space-8); margin-top: 10px; color: var(--text-secondary); }
+.ver-3 .bld-rc2-bar { flex: 1 1 auto; height: 4px; overflow: hidden; border-radius: var(--radius-pill); background-color: var(--comp-chart-track); }
+.ver-3 .bld-rc2-bar > i { display: block; height: 100%; border-radius: inherit; background-color: var(--text-secondary); }
+.ver-3 .bld-rc2-next { margin-top: 6px; color: var(--text-tertiary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

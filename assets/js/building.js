@@ -545,7 +545,71 @@
     return node;
   }
 
+  /*
+   * 시안 — 한 칸짜리 로봇 카드 (10/21 디자이너, Robot 01 만 먼저 비교용). 레퍼런스처럼 라벨 · 칸 선 없이 위에서 아래로 한 흐름.
+   *   머리   이름 · 미션(흐리게) · 오른쪽 끝 배터리 %와 신호 막대(라벨 없음, 신호 글자는 약함 · 끊김일 때만)
+   *   지금   작업(14 Bold) / 웨이포인트(12 fg/tertiary)
+   *   진행   막대 하나 + 지나온 수
+   *   다음   "다음 · 이름" 한 줄(fg/tertiary)
+   * 상태 배지(Mission 줄) · 다음 웨이포인트 번호 · 오른쪽 칸은 뺐다.
+   */
+  function fleetCardSlim(r) {
+    var node = el("button", "bld-robot bld-rc2 is-" + r.st);
+    node.type = "button";
+    node.setAttribute("role", "listitem");
+    node.setAttribute("data-floor", r.floor);
+    node.setAttribute("aria-label", rname(r) + " · " + FNAME[r.floor] + " · " + (r.mission ? r.mission + " · " : "") + r.now);
+
+    var head = el("span", "bld-rc2-head");
+    head.appendChild(el("span", "bld-rc2-name", rname(r)));
+    if (r.mission) { head.appendChild(el("span", "bld-rc2-mission t-caption", r.mission)); }
+    var vit = el("span", "bld-rc2-vitals");
+    var bat = el("span", "battery" + (r.bat <= 20 ? " is-critical" : r.bat <= 40 ? " is-warning" : "") + (r.chg ? " is-charging" : ""));
+    bat.title = "배터리 " + r.bat + "%";
+    var bb = el("span", "battery-body");
+    var bf = el("span", "battery-fill");
+    bf.style.width = r.bat + "%";
+    bb.appendChild(bf);
+    bat.appendChild(bb);
+    bat.appendChild(el("span", "battery-tip"));
+    bat.appendChild(el("span", "t-caption num", r.bat + "%"));
+    vit.appendChild(bat);
+    var sig = el("span", "battery" + (r.sig === 1 ? " is-critical" : r.sig === 2 ? " is-warning" : ""));
+    sig.title = "신호 " + SIG[r.sig];
+    var bars = el("span", "signal-bars");
+    bars.setAttribute("data-level", String(r.sig));
+    for (var i = 0; i < 4; i += 1) { bars.appendChild(el("i")); }
+    sig.appendChild(bars);
+    if (r.sig <= 2) { sig.appendChild(el("span", "t-caption", SIG[r.sig])); }
+    vit.appendChild(sig);
+    head.appendChild(vit);
+    node.appendChild(head);
+
+    var wp = STEPS[r.n];
+    var bodyEl = el("span", "bld-rc2-body");
+    bodyEl.appendChild(el("span", "bld-rc2-now", r.now));
+    if (wp) { bodyEl.appendChild(el("span", "bld-rc2-wp t-caption", wp[0][1] + " " + wp[0][0])); }
+    if (r.total) {
+      var prog = el("span", "bld-rc2-prog");
+      var bar = el("span", "bld-rc2-bar");
+      var fill = el("i");
+      fill.style.width = Math.round(r.done / r.total * 100) + "%";
+      bar.appendChild(fill);
+      prog.appendChild(bar);
+      prog.appendChild(el("span", "t-caption num", r.done + "/" + r.total));
+      bodyEl.appendChild(prog);
+    }
+    if (wp) { bodyEl.appendChild(el("span", "bld-rc2-next t-caption", "다음 · " + wp[1][0])); }
+    node.appendChild(bodyEl);
+
+    node.addEventListener("mouseenter", function () { setHot(r.floor, null, true); markRobot(r, true); });
+    node.addEventListener("mouseleave", function () { setHot(null); markRobot(r, false); });
+    node.addEventListener("click", function () { enter(r.floor, r.mission || missionFor(r.floor)); });
+    return node;
+  }
+
   function fleetRow(r) {
+    if (V3 && r.n === 1) { return fleetCardSlim(r); }   // 시안 비교 — Robot 01 만 한 칸짜리(10/21)
     if (V3) { return fleetCard(r); }
     var node = el("button", "bld-robot" + (r.st === "off" ? " is-offline" : ""));
     node.type = "button";
