@@ -421,7 +421,7 @@
   /*
    * v3 로봇 카드 — Figma DS 1260:15802(10/21 디자이너 3차).
    *   머리   bg/raised · 위아래 4 · 왼쪽 8 — 이름 14/20 ExtraBold
-   *   왼쪽 134(오른쪽 선 border/default)  로봇 그림(400:200) · 위 선 · Mission(상태 점 + 글) · Battery · Signal 세 줄(사이 선 border/divider)
+   *   왼쪽 134(오른쪽 선 border/default)  Mission(상태 점 + 글) · Battery · Signal 세 줄(사이 선 border/divider)
    *   오른쪽   웨이포인트 둘 — 지금(way 12 · bg/inverse 원, 줄은 bg/inverse → chart/track) · 다음(target 16 · fg/tertiary)
    *            이름 14/24 Bold · 번호 Mono 13. 다음 것은 한 단 옅게(fg/tertiary · fg/disabled).
    * 수행중이 아니면 웨이포인트 자리에 지금 하는 일 하나만(대기 · 충전 · 복귀 · 완료 · 끊김).
@@ -463,12 +463,7 @@
 
     var main = el("span", "bld-rc-main");
     var side = el("span", "bld-rc-side");
-    var pic = el("span", "bld-rc-pic");
-    var img = el("img");
-    img.alt = "";
-    img.src = "../assets/img/" + (r.st === "run" || r.moving ? "robot-dog.svg" : "robot-dog-sit.svg");
-    pic.appendChild(img);
-    side.appendChild(pic);
+    // 로봇 그림(Figma 400:200 자리)은 뺐다 — 목록마다 반복돼 정보가 과했다(10/21 디자이너).
 
     var states = el("span", "bld-rc-states");
     function line(label, value) {
