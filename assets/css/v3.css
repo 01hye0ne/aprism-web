@@ -672,9 +672,10 @@ body.ver-3.v2-2 .panel-head::after,
 
 /*
  * 화살표 양옆 간격을 눈에 보이는 대로 같게(10/21 디자이너) — 면이 있는 칩은 면 가장자리, 면이 없는 쪽은 글자가 기준이다.
- * 면 없는 쪽은 안쪽 여백 12 가 더해져 20 으로 벌어졌다. 화살표 쪽 여백을 4 로 줄이고 화살표 바깥 4 를 더해 8 로 맞춘다.
+ * 면 없는 쪽은 안쪽 여백(12)이 더해져 20 으로 벌어졌다. 안쪽 여백은 좌우 같게 8 로 두고(올렸을 때 면이 한쪽으로 쏠리지 않게),
+ * 그쪽 화살표 바깥 간격을 0 으로 — 글자까지 8 이 된다. 면이 있는 쪽은 면에서 화살표까지 8 그대로.
  */
-.ver-3 a.sb-overview { padding-right: var(--space-4); }
-.ver-3 a.sb-overview + .status-bar-sep { margin-left: var(--space-4); }
-.ver-3 .sb-overview.is-on + .status-bar-sep { margin-right: var(--space-4); }
-.ver-3 .sb-overview.is-on ~ .scope-menu-box .scope-trigger { padding-left: var(--space-4); }
+.ver-3 .sb-overview { padding: var(--space-4) var(--space-8); }
+.ver-3 a.sb-overview + .status-bar-sep { margin-left: 0; }
+.ver-3 .sb-overview.is-on + .status-bar-sep { margin-right: 0; }
+.ver-3 .sb-overview.is-on ~ .scope-menu-box .scope-trigger { padding-left: var(--space-8); }
