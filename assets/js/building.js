@@ -487,7 +487,8 @@
     var side = el("span", "bld-rc-side");
     var pct = r.total ? Math.round(r.done / r.total * 100) : null;
     var prog = el("span", "bld-rc-prog");
-    prog.appendChild(el("span", "bld-rc-pct num", pct == null ? "—" : pct + "%"));
+    // 진행은 지나온 웨이포인트 수 / 전체(10/21 디자이너) — 퍼센트는 미션 크기를 지운다. 막대는 그대로 비율.
+    prog.appendChild(el("span", "bld-rc-pct num", pct == null ? "—" : r.done + "/" + r.total));
     var track = el("span", "bld-rc-track");
     var fill = el("i");
     fill.style.width = (pct || 0) + "%";
