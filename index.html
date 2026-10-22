@@ -34,20 +34,20 @@
       <h2 class="ask-title" id="ask-title">확인이 필요한 것 <span class="ask-count">2</span></h2>
       <ul class="ask-list">
         <li class="ask-item">
-          <a class="ask-tag" href="./screens/main-v2-2.html">04.1 · v2.2</a>
+          <a class="ask-tag" href="./screens/main-v2-2.html">04.1 · v3</a>
           <span class="ask-q">미션 화면에서 Delta의 문구와 알림 건수를 '현재 미션' 기준으로 할까요, '전체 미션' 기준으로 할까요? 지금은 전체 미션 기준이라 목록(현재 미션)과 숫자가 다를 수 있습니다. 전체 미션은 통합 순회 현황에서 한눈에 봅니다.</span>
         </li>
         <li class="ask-item">
-          <a class="ask-tag" href="./screens/main-v2-2.html">04.1 · v2.2</a>
+          <a class="ask-tag" href="./screens/main-v2-2.html">04.1 · v3</a>
           <span class="ask-q">한 미션에 로봇이 여러 대(다기종) 붙으면 E-STOP 은 '보고 있는 로봇'만 멈출까요, '미션의 로봇 전체'를 멈출까요? 지금은 미션 하나에 로봇 한 대라 둘이 같습니다.</span>
         </li>
       </ul>
       <details class="ask-done">
         <summary>결정된 것 <span class="ask-count">1</span></summary>
         <ul class="ask-list">
-          <!-- 예) <li class="ask-item"><a class="ask-tag" href="…">04.1 · v2.2</a><span class="ask-q">질문</span><span class="ask-answer">2026.10.20 · 답</span></li> -->
+          <!-- 예) <li class="ask-item"><a class="ask-tag" href="…">04.1 · v3</a><span class="ask-q">질문</span><span class="ask-answer">2026.10.20 · 답</span></li> -->
           <li class="ask-item">
-            <a class="ask-tag" href="./screens/alert-center.html">04.1 · v2.2</a>
+            <a class="ask-tag" href="./screens/alert-center.html">04.1 · v3</a>
             <span class="ask-q">알림 전체보기(알림 센터)와 알림별 보고서 화면에 꼭 들어가야 할 내용이 있을까요?</span>
             <span class="ask-answer">2026.10.20 · 알림 센터 설계 완료(10/16) · 보고서는 실제 보고서 예시(ARPS 순시 점검 보고서) 기준으로 설계 예정</span>
           </li>
@@ -136,11 +136,17 @@
                 <a class="ver-link" href="./screens/sian-3.html"><span class="ver-name">v2.1</span><span class="ver-tag">Delta 창형</span></a>
                 <span class="ver-date">2026.09.28</span>
               </li>
+            </ol>
+          </section>
+          <!-- 버전 이름 정리(10/22 디자이너) — v2.2 → v3, v3 → v4. 화면 파일 이름(*-v2-2.html · *-v3.html)은 그대로 두고 인덱스 표기만 바꿨다. -->
+          <section class="ver-group" aria-label="v3">
+            <p class="ver-group-label">v3</p>
+            <ol class="ver-list is-stack">
               <li class="ver-card">
-                <a class="ver-link" href="./screens/main-v2-2.html"><span class="ver-name">v2.2</span><span class="ver-tag">미션 기준 화면</span></a>
+                <a class="ver-link" href="./screens/main-v2-2.html"><span class="ver-name">v3</span><span class="ver-tag">미션 기준 화면</span></a>
                 <span class="ver-date">2026.10.12</span>
                 <a class="ver-ask" href="#ask">확인 2</a>
-                <!-- v2.2 는 화면이 여럿이라 카드 안에 목록으로 둔다(10/20 디자이너). 번호는 쓰는 차례 — 준비(1 · 2) → 건물 전체(3) → 미션(4),
+                <!-- v3(예전 이름 v2.2 · 파일은 *-v2-2.html 그대로) 는 화면이 여럿이라 카드 안에 목록으로 둔다(10/20 디자이너). 번호는 쓰는 차례 — 준비(1 · 2) → 건물 전체(3) → 미션(4),
                      4-n 은 미션 관제에서 여는 화면(상단 바 "전체 건물 › 미션" 과 같은 차례). -->
                 <ul class="ver-pages">
                   <li><a href="./screens/mission-setup.html"><span class="ver-no">1</span>미션 설정</a></li>
@@ -152,14 +158,14 @@
               </li>
             </ol>
           </section>
-          <section class="ver-group" aria-label="v3">
-            <p class="ver-group-label">v3</p>
+          <section class="ver-group" aria-label="v4">
+            <p class="ver-group-label">v4</p>
             <ol class="ver-list is-stack">
-              <!-- v3 — 10/21 부터 작업 화면(디자이너). v2.2 다섯 장을 복제해 시작했고 v2.2 는 멈췄다. -->
-              <!-- Delta 꼴(10/21 디자이너) — 같은 v3 화면을 Delta 꼴만 바꿔 연다(delta-form.js). 고른 꼴은 기억해 화면을 오가도 그대로라,
+              <!-- v4(예전 이름 v3 · 파일 *-v3.html) — 10/21 부터 작업 화면(디자이너). v3(예전 v2.2) 다섯 장을 복제해 시작했고 v3 은 멈췄다. -->
+              <!-- Delta 꼴(10/21 디자이너) — 같은 v4 화면을 Delta 꼴만 바꿔 연다(delta-form.js). 고른 꼴은 기억해 화면을 오가도 그대로라,
                    카드의 모든 링크에 ?form= 을 달아 어느 카드로 들어와도 그 꼴로 시작한다. -->
               <li class="ver-card is-latest">
-                <a class="ver-link" href="./screens/main-v3.html?form=widget"><span class="ver-name">v3</span><span class="ver-tag">Delta 위젯형</span></a>
+                <a class="ver-link" href="./screens/main-v3.html?form=widget"><span class="ver-name">v4</span><span class="ver-tag">Delta 위젯형</span></a>
                 <span class="ver-date">2026.10.21</span>
                 <span class="ver-badge">최신</span>
                 <ul class="ver-pages">
@@ -172,7 +178,7 @@
               </li>
               <!-- Delta 가로형 — Figma DS 1335:21707. Delta 가 있는 두 화면만. -->
               <li class="ver-card is-latest">
-                <a class="ver-link" href="./screens/main-v3.html?form=bar"><span class="ver-name">v3</span><span class="ver-tag">Delta 가로형</span></a>
+                <a class="ver-link" href="./screens/main-v3.html?form=bar"><span class="ver-name">v4</span><span class="ver-tag">Delta 가로형</span></a>
                 <span class="ver-date">2026.10.21</span>
                 <span class="ver-badge">최신</span>
                 <ul class="ver-pages">
