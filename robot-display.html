@@ -173,6 +173,15 @@
     .seg { display: inline-flex; padding: 2px; border: var(--border-width-thin) solid var(--border-default); border-radius: var(--radius-pill); }
     .seg button { padding: var(--space-4) var(--space-12); border: 0; border-radius: var(--radius-pill); background: transparent; color: var(--text-tertiary); font: inherit; font-size: var(--font-size-12); cursor: pointer; }
     .seg button[aria-pressed="true"] { background-color: var(--bg-inverse); color: var(--text-on-inverse); font-weight: 700; }
+    .segs { display: flex; gap: var(--space-8); flex-wrap: wrap; }
+    .only-1 { display: none; }
+    body.size-1 .only-1 { display: inline; }
+    /* 실제 크기 — SVG 를 기기 픽셀 800×480(세로 480×800) 그대로. --dpr 로 OS 화면 배율을 되돌린다. 한 줄에 한 장, 넘치면 가로 스크롤 */
+    .mocks[data-size="1"] { grid-template-columns: minmax(0, 1fr) !important; }
+    .mocks[data-size="1"] figure { overflow-x: auto; }
+    .mocks[data-size="1"] .mk { box-sizing: content-box; max-width: none; border-width: calc(6px / var(--dpr, 1)); }
+    .mocks[data-size="1"] .mk-l { width: calc(800px / var(--dpr, 1)); height: calc(480px / var(--dpr, 1)); }
+    .mocks[data-size="1"] .mk-p { width: calc(480px / var(--dpr, 1)); height: calc(800px / var(--dpr, 1)); }
     .mk-p, .only-p { display: none; }
     .mocks[data-orient="p"] { grid-template-columns: repeat(4, minmax(0, 1fr)); }
     .mocks[data-orient="p"] .mk-l { display: none; }
@@ -474,13 +483,19 @@
 
       <div class="mk-head">
         <h3>틀별 화면 예시</h3>
+        <div class="segs">
         <div class="seg" role="group" aria-label="화면 방향">
           <button type="button" data-orient="l" aria-pressed="true">가로 800×480</button>
           <button type="button" data-orient="p" aria-pressed="false">세로 480×800</button>
         </div>
+        <div class="seg" role="group" aria-label="보기 크기">
+          <button type="button" data-size="fit" aria-pressed="true">맞춤</button>
+          <button type="button" data-size="1" aria-pressed="false">실제 크기 1:1</button>
+        </div>
+        </div>
       </div>
-      <p class="note"><span class="only-p">세로는 너비 86mm — 3m 에서 한 줄 약 3자라 문구가 두 줄로 쌓인다 · </span>도형과 글자만 · 주 문구 70~120px · 보조 26~36px · 위쪽 상태 줄 24px · 아래 띠 = 몸체 상태등 색</p>
-      <div class="mocks" data-orient="l">
+      <p class="note"><span class="only-1">실제 크기 — 모니터 픽셀 1:1(화면 배율 <span class="dpr">100</span>% 보정). 실물 패널은 가로 155mm 라 모니터에 따라 실물보다 크거나 작게 보인다 · </span><span class="only-p">세로는 너비 86mm — 3m 에서 한 줄 약 3자라 문구가 두 줄로 쌓인다 · </span>도형과 글자만 · 주 문구 70~120px · 보조 26~36px · 위쪽 상태 줄 24px · 아래 띠 = 몸체 상태등 색</p>
+      <div class="mocks" data-orient="l" data-size="fit">
           <figure>
             <svg class="mk mk-l" viewBox="0 0 800 480" role="img" aria-label="T1 상태 화면 예시: 왼쪽 캐릭터 자리 정육면체, 오른쪽 순회 중"><rect class="bg" x="0" y="0" width="800" height="480"/><rect class="sf" x="0" y="0" width="800" height="52"/><text class="tx b" x="28" y="35" font-size="26">로봇 05</text><circle class="dg" cx="514" cy="26" r="7"/><text class="sub" x="530" y="35" font-size="24">촬영 중</text><text class="sub" x="700" y="35" font-size="24" text-anchor="end">86%</text><rect class="ln-s" x="712" y="15" width="48" height="22" rx="5"/><rect class="sub-f" x="716" y="19" width="34" height="14" rx="2"/><rect class="sub-f" x="762" y="21" width="4" height="10" rx="1"/><g class="cube"><polygon class="c1" points="180,170 260,215 180,260 100,215"/><polygon class="c2" points="100,215 180,260 180,350 100,305"/><polygon class="c3" points="180,260 260,215 260,305 180,350"/></g><text class="tx b" x="330" y="245" font-size="88">순회 중</text><text class="sub" x="332" y="310" font-size="36">B4 · 압력계 판독</text><text class="mu" x="332" y="360" font-size="36">다음 WP-04</text><rect class="sf-ok" x="0" y="466" width="800" height="14"/></svg>
             <svg class="mk mk-p" viewBox="0 0 480 800" role="img" aria-label="T1 상태 화면 예시 (세로)"><rect class="bg" x="0" y="0" width="480" height="800"/><rect class="sf" x="0" y="0" width="480" height="52"/><text class="tx b" x="24" y="35" font-size="24">로봇 05</text><circle class="dg" cx="232" cy="26" r="6"/><text class="sub" x="246" y="34" font-size="22">촬영 중</text><text class="sub" x="390" y="34" font-size="22" text-anchor="end">86%</text><rect class="ln-s" x="402" y="16" width="44" height="20" rx="5"/><rect class="sub-f" x="406" y="20" width="30" height="12" rx="2"/><rect class="sub-f" x="448" y="22" width="4" height="8" rx="1"/><g class="cube"><polygon class="c1" points="240,160 320,205 240,250 160,205"/><polygon class="c2" points="160,205 240,250 240,340 160,295"/><polygon class="c3" points="240,250 320,205 320,295 240,340"/></g><text class="tx b" x="240" y="480" font-size="88" text-anchor="middle">순회 중</text><text class="sub" x="240" y="545" font-size="36" text-anchor="middle">B4 · 압력계 판독</text><text class="mu" x="240" y="600" font-size="36" text-anchor="middle">다음 WP-04</text><rect class="sf-ok" x="0" y="786" width="480" height="14"/></svg>
@@ -695,18 +710,29 @@
   </footer>
 
   <script>
-    // 틀별 화면 예시 — 가로 · 세로 전환
+    // 틀별 화면 예시 — 가로 · 세로, 맞춤 · 실제 크기(기기 픽셀 1:1) 전환
     (function () {
       var grid = document.querySelector('.mocks');
-      var btns = document.querySelectorAll('.seg button');
-      btns.forEach(function (b) {
-        b.addEventListener('click', function () {
-          var o = b.getAttribute('data-orient');
-          grid.setAttribute('data-orient', o);
-          document.body.classList.toggle('orient-p', o === 'p');
-          btns.forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+      function setDpr() {
+        var d = window.devicePixelRatio || 1;
+        grid.style.setProperty('--dpr', d);
+        var el = document.querySelector('.dpr'); if (el) el.textContent = Math.round(d * 100);
+      }
+      setDpr();
+      window.addEventListener('resize', setDpr);
+      function wire(attr, onPick) {
+        var btns = document.querySelectorAll('.seg button[data-' + attr + ']');
+        btns.forEach(function (b) {
+          b.addEventListener('click', function () {
+            var v = b.getAttribute('data-' + attr);
+            grid.setAttribute('data-' + attr, v);
+            onPick(v);
+            btns.forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+          });
         });
-      });
+      }
+      wire('orient', function (v) { document.body.classList.toggle('orient-p', v === 'p'); });
+      wire('size', function (v) { document.body.classList.toggle('size-1', v === '1'); });
     })();
   </script>
   <script src="./assets/js/theme.js?v=c86093d9"></script>
