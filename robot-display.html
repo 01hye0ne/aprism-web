@@ -43,11 +43,39 @@
     .tbl.grp td:first-child { color: var(--text-secondary); font-weight: 400; white-space: normal; }
     .tbl.grp td[rowspan] { color: var(--text-primary); font-weight: 600; white-space: nowrap; border-right: var(--border-width-thin) solid var(--border-divider); }
     .dot { display: inline-block; width: 8px; height: 8px; margin-right: 6px; border-radius: 50%; vertical-align: 1px; }
-    .open {
-      margin-top: var(--space-16); padding: var(--space-12) var(--space-16);
+    /* memo — 넓은 화면에서 오른쪽 고정 패널. 본문은 남은 폭의 가운데로 옮긴다. 좁으면 본문 끝에 그대로 놓인다. */
+    .memo {
+      margin-top: var(--space-48); padding: var(--space-16) var(--space-20);
       border: var(--border-width-thin) solid var(--status-warning-border); border-radius: var(--radius-card);
+      background-color: var(--bg-panel);
     }
-    .open h3 { margin-top: 0; color: var(--status-warning-text); }
+    .memo h2 { margin: 0; color: var(--status-warning-text); font-size: var(--font-size-16); line-height: var(--font-line-height-24); }
+    .memo .memo-sub { margin: 0 0 var(--space-12); color: var(--text-tertiary); font-size: var(--font-size-12); }
+    .memo ul { margin: 0; padding-left: var(--space-16); }
+    .memo li { color: var(--text-secondary); font-size: var(--font-size-13); line-height: var(--font-line-height-20); word-break: keep-all; }
+    .memo li + li { margin-top: var(--space-8); }
+    .memo b { color: var(--text-primary); }
+    .toc-memo { display: none; }
+    @media (max-width: 1399px) { .toc-memo { display: list-item; list-style: none; } }
+    @media (min-width: 1400px) {
+      .site-main { margin-left: max(var(--space-24), calc((100vw - 960px - 344px) / 2)); margin-right: auto; }
+      .memo {
+        position: fixed; top: 80px; right: var(--space-24); z-index: 2;
+        width: 320px; max-height: calc(100vh - 104px); overflow-y: auto;
+        margin-top: 0; box-sizing: border-box;
+      }
+    }
+    .review {
+      margin: var(--space-24) 0 var(--space-8); padding: var(--space-16) var(--space-20);
+      border: var(--border-width-thin) dashed var(--border-strong); border-radius: var(--radius-card);
+    }
+    .review-tag { margin: 0 0 var(--space-4); color: var(--text-tertiary); font-size: var(--font-size-12); font-weight: 600; }
+    .review h4 { margin: 0 0 var(--space-12); color: var(--text-primary); font-size: var(--font-size-14); }
+    .review-body { display: grid; grid-template-columns: 140px minmax(0, 1fr); gap: var(--space-16); align-items: start; }
+    .review-fig { margin: 0; }
+    .review-fig img { display: block; width: 100%; height: auto; border-radius: var(--radius-card); }
+    .review-fig figcaption { margin-top: var(--space-4); color: var(--text-tertiary); font-size: var(--font-size-12); }
+    @media (max-width: 640px) { .review-body { grid-template-columns: minmax(0, 1fr); } .review-fig { max-width: 160px; } }
     .done {
       margin: 0 0 var(--space-16); padding: var(--space-12) var(--space-16);
       border: var(--border-width-thin) solid var(--border-divider); border-radius: var(--radius-card);
@@ -102,16 +130,16 @@
       <h1>로봇 디스플레이</h1>
       <p class="lead">로봇개 등에 올라가는 디스플레이의 리서치와 방향성을 정리한 문서입니다.
         시나리오는 Figma <a href="https://www.figma.com/design/6jlcnuP9HDFNNHwaAhX5vz/KISTA-2026?node-id=479-1448">KISTA-2026 · 06 시나리오</a>(8개 장면)를 기준으로 했습니다. 2026-10-23 작성.
-        아직 정하지 않은 것은 마지막 "정할 것"에 모았습니다.</p>
+        아직 정하지 않은 것은 memo 에 모았습니다.</p>
       <ul class="toc">
         <li><a href="#role">1. 역할과 대상</a></li>
         <li><a href="#hw">2. 하드웨어 조건</a></li>
-        <li><a href="#cases">3. 사례와 논문</a></li>
-        <li><a href="#scenario">4. 시나리오에서 짚을 점</a></li>
-        <li><a href="#factors">5. 고려 요소</a></li>
-        <li><a href="#direction">6. 방향성</a></li>
-        <li><a href="#screens">7. 만들 화면</a></li>
-        <li><a href="#open">8. 정할 것</a></li>
+        <li><a href="#scenario">3. 시나리오에서 짚을 점</a></li>
+        <li><a href="#factors">4. 고려 요소</a></li>
+        <li><a href="#direction">5. 방향성</a></li>
+        <li><a href="#screens">6. 만들 화면</a></li>
+        <li><a href="#cases">7. 사례와 논문</a></li>
+        <li class="toc-memo"><a href="#memo">memo</a></li>
       </ul>
     </section>
 
@@ -247,76 +275,23 @@
     </section>
 
     <!-- ============================================================ 3 -->
-    <section class="pol" id="cases">
-      <h2>3. 사례와 논문</h2>
-      <p class="meta">2026-10-23 조사 · 출처는 문서 끝</p>
-
-      <p class="rule">산업 현장의 4족 로봇에 작업자를 향한 화면을 단 사례는 거의 없다. 산업용은 빛과 소리로 말하고, 화면은 반려 · 연구용에만 있다. 참고할 선례가 적다는 뜻이자 차별점이 될 자리다.</p>
-
-      <h3>제품과 현장 사례</h3>
-      <div class="scroll"><table class="tbl">
-        <thead><tr><th>사례</th><th>화면 · 신호</th><th>우리에게 주는 점</th></tr></thead>
-        <tbody>
-          <tr><td>Boston Dynamics Spot<br />(2023 하드웨어)</td><td>화면 없음. 몸체 둘레 안전등 · 부저 · 스피커. 기본 패턴은 <b>초록 점멸 = 정상, 흰색 번쩍임 = 점검 중, 호박색 점멸 = 주의</b></td><td>산업용 4족 로봇에 이미 있는 색 관례다. 시나리오가 이상 지점에 흰빛을 쓰는 것과 겹친다. 상태 문법을 이 관례와 어긋나지 않게 맞춘다(6. 방향성 ①)</td></tr>
-          <tr><td>Dr. Spot<br />(MIT × Brigham, 2020)</td><td>등에 iPad 를 달아 원격 의료진의 얼굴을 보여줌. COVID 환자 문진용, 환자 다수가 만족</td><td>4족 로봇 등에 화면을 단 대표 사례. 다만 화면이 로봇이 아니라 <i>사람의</i> 얼굴이었다. 시나리오 4-2 관제 음성 연결 때 관제사의 존재를 보여주는 방식에 참고</td></tr>
-          <tr><td>Sony aibo ERS-1000<br />(2018)</td><td>눈 두 개가 OLED. 깜빡이고 움직이며 몸짓 · 기분에 맞춰 바뀜</td><td>4족 로봇 화면 표정의 기준점. 핵심은 <b>눈과 몸짓을 함께 움직이는 것</b></td></tr>
-          <tr><td>Mini Pupper<br />(MangDang, Stanford Pupper 기반)</td><td>앞쪽 320×240 LCD 얼굴, 표정 애니메이션을 직접 만듦. <b>Raspberry Pi 기반</b></td><td>우리와 같은 Raspberry Pi 구성의 오픈소스 표정 사례. 성능 기준점</td></tr>
-          <tr><td>Xiaomi CyberDog 2<br />(2023)</td><td>얼굴 화면 대신 몸통 외장에 E Ink Prism — 움직임에 맞춰 색이 바뀜</td><td>화면이 꼭 안내판일 필요는 없다. <b>몸 자체를 브랜드 표면으로</b> 쓴다. 꺼져도 남는 e-paper 아이디어와 이어진다</td></tr>
-          <tr><td>현대차그룹 공장 안전 서비스 로봇<br />(Spot 기반, 2021)</td><td>열화상 · 라이다 · 관제 연동. 작업자용 화면은 확인되지 않음</td><td>국내 공장 순회 사례도 감지 · 관제 중심이고 현장 소통은 비어 있다</td></tr>
-        </tbody>
-      </table></div>
-
-      <h3>논문 — 화면 얼굴</h3>
-      <ul>
-        <li><b>Kalegina et al., HRI 2018</b> — 화면 얼굴 로봇 157종을 76개 속성으로 분석. 상황마다 선호하는 사실감이 다르고, <b>산업용은 엔터테인먼트용보다 단순한 얼굴</b>이 맞는다. 얼굴 설계의 출발점.</li>
-        <li><b>Broadbent et al., PLoS ONE 2013</b> — 얼굴이 사람에 가까울수록 마음과 좋은 성격이 있다고 느낀다. 그만큼 기대치도 오른다.</li>
-        <li><b>평면 화면 얼굴의 시선 (Sensors 2022)</b> — 화면의 아이콘 얼굴로 "나를 보고 있다"는 느낌을 높이는 방법. "당신을 봤어요" 신호에 바로 쓸 수 있다.</li>
-        <li><b>실물 vs 화면 얼굴</b> — 시선과 일부 표정은 2D 화면보다 실물에서 더 정확히 읽힌다. 화면의 눈만으로는 한계가 있으니 몸 방향과 빛을 함께 쓴다.</li>
-        <li><b>Kim, Lee, Mutlu, HRI 2026 "Speaking with Screens"</b> — 정보 전달용 로봇 화면의 설계 공간과 지침. 주제가 가장 가까우나 원문을 아직 읽지 못했다. <span class="tag">읽을 것</span></li>
-      </ul>
-
-      <h3>논문 — 4족 로봇과 사람</h3>
-      <ul>
-        <li><b>Unitree Go2 + 작은 모니터의 표정 · 음성 (arXiv 2512.13981, 2025)</b> — 4족 로봇에 화면 표정을 단 실험 중 가장 가깝다. 실패 뒤 신뢰 회복을 다뤄서, 배터리 부족 · 회수 대기 같은 "로봇이 실패한 순간"의 표현에 참고가 된다.</li>
-        <li><b>4족 로봇 근접 거리 (N=32)</b> — 로봇이 향한 방향과 시선이 사람이 원하는 거리에 유의미한 영향을 준다. 화면이 누구를 향하는지도 신호다.</li>
-        <li><b>Safe Spot (arXiv 2403.05400)</b> — 정면 · 교차 상황에서 순한(submissive) 몸짓의 Spot 이 더 안전하게 느껴졌다. 시나리오 2의 "멈추고 양보"를 뒷받침한다.</li>
-        <li><b>개 같은 몸짓 (HICSS 2024, 222명)</b> — 기본 움직임보다 인상 평가가 전 항목에서 좋았다.</li>
-        <li><b>MIT Media Lab 2026 "Do Robots Need Body Language?"</b> — Spot 의 몸짓 · 빛 · 텍스트 · 소리를 비교하고 신호가 어긋나는 조건도 시험했다.</li>
-        <li><b>Shin et al. 2024 (Unitree Go1)</b> — 사람들은 말보다 손 · 몸 제스처로 소통하길 선호했다. 터치 없이 사람의 답을 받는 방향(손을 들면 양보)을 뒷받침한다.</li>
-      </ul>
-
-      <h3>논문 — 신호 채널</h3>
-      <ul>
-        <li><b>Kannan, Lee, Min — 배달 로봇 외부 표시 (152명)</b> — 진행 의도를 알리는 데 화면이 빛보다 선호됐고, 빛은 같은 정보를 반복하는 보조 신호일 때 가장 좋았다.</li>
-        <li><b>바닥 투사 (Chadalavada 등, 바퀴 로봇)</b> — 경로를 바닥에 비추면 예측 가능하다고 느낀다. 4족 로봇에서 시험한 연구는 찾지 못했다.</li>
-      </ul>
-
-      <h3>정리</h3>
-      <ol>
-        <li>산업용 4족 로봇 + 작업자용 화면은 선례가 거의 없다.</li>
-        <li>화면 표정의 선례는 aibo 와 Mini Pupper 다. 연구들은 <b>산업 현장에서는 단순한 얼굴, 눈과 몸짓이 함께 움직이기</b>를 말한다.</li>
-        <li>색 문법은 Spot 의 기존 관례(초록 정상 · 흰색 점검 · 호박색 주의)와 맞춘다.</li>
-      </ol>
-    </section>
-
-    <!-- ============================================================ 4 -->
     <section class="pol" id="scenario">
-      <h2>4. 시나리오에서 짚을 점</h2>
+      <h2>3. 시나리오에서 짚을 점</h2>
       <p class="meta">Figma KISTA-2026 · 06 시나리오 — 1 출발, 2 근로자 만남, 3 위험, 4 주의 1(안전모), 5 주의 2(이상 음향), 6 배터리 부족, 7 자율복귀 불가, 8 계단</p>
 
       <ol>
         <li><b>색의 뜻이 장면마다 다르다.</b> 평상시 색이 "파랑 or 초록(선택 가능)"으로 남아 있다. 계단을 오를 때 빨강(8)을 써서 위험(3)의 빨강과 겹친다. 이상 지점은 흰색(3, 5), 확인이 끝나면 하늘색(4, 5)이다. 관제 화면의 위험도 4단계와 맞춰져 있지 않다.</li>
-        <li><b>디스플레이 문구와 음성이 거의 같은 문장이다.</b> 채널마다 맡을 역할이 나뉘어 있지 않다(5-B).</li>
-        <li><b>사람 쪽에서 로봇에게 답할 방법이 없다.</b> 로봇이 "먼저 지나가세요"라고 해도 사람이 "너 먼저 가"라고 할 수 없다. 터치를 쓰지 않으므로 답하는 수단은 몸짓이나 관제를 거치는 방법뿐이다(5-C).</li>
+        <li><b>디스플레이 문구와 음성이 거의 같은 문장이다.</b> 채널마다 맡을 역할이 나뉘어 있지 않다(4-B).</li>
+        <li><b>사람 쪽에서 로봇에게 답할 방법이 없다.</b> 로봇이 "먼저 지나가세요"라고 해도 사람이 "너 먼저 가"라고 할 수 없다. 터치를 쓰지 않으므로 답하는 수단은 몸짓이나 관제를 거치는 방법뿐이다(4-C).</li>
         <li><b>꺼진 로봇은 아무것도 말하지 않는다.</b> 7-5에서 off 된 뒤에 지나가는 사람은 이 로봇이 왜 여기 있는지 알 수 없다.</li>
         <li><b>시나리오 7 회수 화면은 터치 UI다.</b> 터치를 쓰지 않기로 했으므로 담당자 단말로 옮긴다. 로봇 화면에는 "회수 대기 · 만지지 마세요"만 남긴다.</li>
         <li><b>메시지가 겹치는 장면이 없다.</b> 장면이 하나씩 따로 쓰여 있어서, 배터리 부족 중에 사람을 만나거나 관제 통화 중에 안내음이 나는 경우(4-2의 "대화 중엔 안내음 겹치지 않도록")의 규칙이 없다.</li>
       </ol>
     </section>
 
-    <!-- ============================================================ 5 -->
+    <!-- ============================================================ 4 -->
     <section class="pol" id="factors">
-      <h2>5. 고려 요소</h2>
+      <h2>4. 고려 요소</h2>
       <p class="meta">처음 목록(아이콘 · UX 라이팅 · 화면 트랜지션 · 모핑 · 시선에 따른 크기) 밖에서 찾은 것</p>
 
       <h3>A. 물리 조건</h3>
@@ -355,7 +330,7 @@
 
       <h3>D. 브랜딩</h3>
       <ul>
-        <li><b>의인화 수위</b> — 귀여운 표정은 친근함을 높이지만, 지나치면 기대치가 높아지고 경고를 가볍게 받아들이게 된다. <b>위험할수록 캐릭터를 줄인다</b>(6. 방향성). 특히 Spot 은 앞쪽 PTZ 카메라가 이미 머리로 읽혀서, 화면에 얼굴을 넣으면 머리가 둘로 보인다(6. 방향성 ③).</li>
+        <li><b>의인화 수위</b> — 귀여운 표정은 친근함을 높이지만, 지나치면 기대치가 높아지고 경고를 가볍게 받아들이게 된다. <b>위험할수록 캐릭터를 줄인다</b>(5. 방향성). 특히 Spot 은 앞쪽 PTZ 카메라가 이미 머리로 읽혀서, 화면에 얼굴을 넣으면 머리가 둘로 보인다(5. 방향성 ③).</li>
         <li><b>시그니처 요소</b> — 대기 중 숨 쉬듯 반복되는 모션, 기립·부팅 시퀀스, 완료 제스처, 고유 효과음(earcon), 바닥 투사 패턴. 소리도 브랜드다.</li>
         <li><b>이름</b> — "05번 로봇"처럼 현장에서 부를 이름을 화면에 둔다. 관제에 알릴 때도 쓰인다.</li>
         <li><b>관제와 같은 언어</b> — 로봇 화면의 색, 아이콘, 문구가 APRISM 관제 화면과 같은 체계면 그 자체로 브랜드 일관성이 생긴다.</li>
@@ -370,9 +345,9 @@
       </ul>
     </section>
 
-    <!-- ============================================================ 6 -->
+    <!-- ============================================================ 5 -->
     <section class="pol" id="direction">
-      <h2>6. 방향성</h2>
+      <h2>5. 방향성</h2>
       <p class="meta">제안 · 확정 전</p>
 
       <h3>① 상태 문법을 하나로 만들어 관제와 나눠 쓴다</h3>
@@ -389,7 +364,7 @@
       <ul>
         <li>계단을 오를 때의 빨강(8)은 <b>안전 · 정보 또는 주의</b>로 옮긴다.</li>
         <li>이상 지점을 비추는 흰빛(3, 5)은 신호가 아니라 <b>작업등</b>으로 따로 둔다. 상태를 말하는 빛과 섞지 않는다.</li>
-        <li>평상시의 "파랑 or 초록(선택 가능)"은 하나로 정한다. <b>Spot 기본 안전등이 이미 초록 점멸 = 정상</b>이고(장착 안 사진의 바닥에 비친 초록빛), 흰색은 점검, 호박색은 주의다. 로봇 몸의 빛과 화면이 다른 말을 하지 않도록 <b>초록 쪽을 추천</b>한다(3. 사례와 논문).</li>
+        <li>평상시의 "파랑 or 초록(선택 가능)"은 하나로 정한다. <b>Spot 기본 안전등이 이미 초록 점멸 = 정상</b>이고(장착 안 사진의 바닥에 비친 초록빛), 흰색은 점검, 호박색은 주의다. 로봇 몸의 빛과 화면이 다른 말을 하지 않도록 <b>초록 쪽을 추천</b>한다(7. 사례와 논문).</li>
         <li>흰빛을 작업등으로 따로 두는 것도 Spot 의 "흰색 = 점검 중" 관례와 맞는다.</li>
       </ul>
 
@@ -406,13 +381,54 @@
         <li><b>성능</b> — 지금 오브는 관제 화면용이다. 블러 · 글로우가 많으면 Raspberry Pi 에서 버벅이므로 로봇용 단순 버전이 필요할 수 있다.</li>
       </ul>
 
+      <div class="review">
+        <p class="review-tag">검토 중인 안 · 2026-10-23 · 확정 전</p>
+        <h4>정육면체 슬라임 — 지도 아이콘 · Delta · 로봇 디스플레이를 한 꼴로</h4>
+        <div class="review-body">
+          <figure class="review-fig">
+            <img src="./assets/img/robot-icon-cube-draft.webp" alt="지도 위 로봇 아이콘 초안 — 3면이 보이는 둥근 정육면체를 말랑한 막이 한 겹 감싸고, 앞면에 세로로 긴 눈 두 개" width="185" height="184" loading="lazy" />
+            <figcaption>지도 로봇 아이콘 초안</figcaption>
+          </figure>
+          <div>
+            <p>지도의 로봇 아이콘을 <b>정육면체를 말랑한 막이 한 겹 감싼 꼴</b>(슬라임 느낌)로 바꾸자는 의견이 나왔다. 확정되면 Delta 도 3면이 보이는 정육면체로 바꾸고(눈 없이 색만 바뀜), 이것을 발전시켜 로봇 디스플레이에 넣는다. 그때는 위의 프리즘 오브 자리를 정육면체가 대신한다.</p>
+            <div class="scroll"><table class="tbl">
+              <thead><tr><th>쓰임</th><th>꼴</th><th>상태를 말하는 것</th></tr></thead>
+              <tbody>
+                <tr><td>지도 로봇 아이콘</td><td>정육면체 + 눈</td><td>바깥 고리, 또는 몸 색(아래 4)</td></tr>
+                <tr><td>Delta</td><td>정육면체, 눈 없음</td><td>색 — 위험도</td></tr>
+                <tr><td>로봇 디스플레이</td><td>정육면체, 눈 없음</td><td>움직임과 모핑</td></tr>
+              </tbody>
+            </table></div>
+          </div>
+        </div>
+
+        <p><b>좋은 점</b></p>
+        <ul>
+          <li><b>머리 두 개 문제를 피한다</b> — 개도 얼굴도 아니다. 단, 로봇 디스플레이에서는 눈을 뺀다.</li>
+          <li><b>모핑 이야기가 자연스럽다</b> — 정육면체의 앞면이 펴지며 표지 모양(△ 주의 · ○ 금지)이 된다. <b>정육면체 → 면 → 표지</b>.</li>
+          <li><b>말랑함이 움직임의 언어가 된다</b> — 평상시 숨 쉬듯 출렁임, "봤어요" 사람 쪽으로 통통, 주의 굳으며 출렁임이 줄어듦, 위험 멈추고 표지로. 색 말고 움직임으로도 단계를 말해서 색각 이상에도 도움이 된다.</li>
+          <li><b>그리기 쉽다</b> — 단색 면 3개와 외곽 한 겹, 블러가 필요 없다. 오브보다 Raspberry Pi 부담이 적다.</li>
+          <li><b>이름과 맞는다</b> — APRISM 의 프리즘(다면체)과 이어진다.</li>
+        </ul>
+
+        <p><b>정할 것</b></p>
+        <ol>
+          <li><b>눈의 규칙</b> — "눈 있음 = 개별 로봇, 없음 = 시스템(Delta)"이면 로봇 디스플레이에도 눈이 붙어야 하는데, 그러면 머리 두 개가 다시 생긴다. 제안: 로봇 디스플레이는 눈 없이. 실제 몸이 거기 있으니 화면 속 정육면체는 얼굴이 아니라 "로봇의 속(코어)"이다.</li>
+          <li><b>지도에서 방향</b> — 로봇이 돌 때 정육면체도 같이 돌지(눈이 다른 면으로 옮겨 감), 고정하고 바깥 고리 화살표로 방향을 줄지.</li>
+          <li><b>작은 크기</b> — 로봇이 여럿이거나 지도를 줄이면 면 3개 · 눈 · 고리가 뭉개진다. 작은 크기용 단순 버전.</li>
+          <li><b>색의 역할</b> — Delta 정육면체가 색으로 위험도를 말하면, 지도 로봇의 파란 몸이 "수행 중"인지 "정상 Delta"인지 헷갈린다. 상태는 고리가 맡고 몸은 고정색일지, 몸 색이 곧 상태일지.</li>
+          <li><b>위험할 때의 귀여움</b> — 위험 단계에서는 출렁임을 멈추고 표준 표지로 넘어간다(위 원칙 그대로).</li>
+          <li><b>A형이면 좌우 대칭</b> — 양옆 화면에서 정육면체를 거울로 그려 둘 다 로봇 앞쪽을 향하게.</li>
+        </ol>
+      </div>
+
       <h3>④ 짧은 대화 리듬</h3>
       <p>"봤어요 → 기다릴게요 → 고마워요". 터치 없이 몸짓과 감지만으로 닫히는 이 세 박자를 로봇의 시그니처 경험으로 만든다.</p>
     </section>
 
-    <!-- ============================================================ 7 -->
+    <!-- ============================================================ 6 -->
     <section class="pol" id="screens">
-      <h2>7. 만들 화면</h2>
+      <h2>6. 만들 화면</h2>
       <p class="meta">시나리오 8개의 "디스플레이" 행을 모아 유형별로 묶은 것 · 2026-10-23 · 숫자는 시나리오-장면 (예: 2-3 = 시나리오 2의 3번 장면)</p>
 
       <p class="rule">시나리오 문구는 40개 가까이 되지만, 같은 꼴끼리 묶으면 틀 8개로 줄어든다. 화면은 틀을 먼저 만들고 문구 · 아이콘만 바꿔 끼운다.</p>
@@ -485,7 +501,7 @@
         <li><b>오류 · 비상정지</b> — E-STOP 이 눌렸을 때. 시나리오 3 위험과는 다른 등급(관제 정책: 일시정지 = 안전/정보, E-STOP = 위험)</li>
         <li><b>종료 중</b> — 7-5처럼 전원이 꺼지기 직전. 꺼진 뒤에 남길 정보가 있다면 마지막 화면</li>
         <li><b>절전</b> — 주변에 사람이 없을 때 어둡게</li>
-        <li><b>"고마워요"</b> — 사람이 지나간 뒤 대화를 닫는 짧은 화면(6. 방향성 ④). 지금 시나리오 2에는 없다</li>
+        <li><b>"고마워요"</b> — 사람이 지나간 뒤 대화를 닫는 짧은 화면(5. 방향성 ④). 지금 시나리오 2에는 없다</li>
       </ul>
 
       <h3>터치를 쓰지 않아서 로봇 화면에서 빠지는 것</h3>
@@ -496,29 +512,81 @@
       </ul>
     </section>
 
-    <!-- ============================================================ 8 -->
-    <section class="pol" id="open">
-      <h2>8. 정할 것</h2>
-      <div class="open">
-        <h3>정할 것</h3>
-        <ul>
-          <li>장착 안 — 세로형(화면 1개) / A형(화면 2개). 제안은 A형(2. 장착 안)</li>
-          <li>라이다 · PTZ 카메라 가림 — 화면 꼭대기 높이 상한을 로봇 개발 쪽과 확인</li>
-          <li>A형이면 기울기(수직에서 30~40° 출발)와 Raspberry Pi 5 한 대로 두 화면 구동 여부</li>
-          <li>Spot 기본 안전등(초록 · 흰색 · 호박색)을 그대로 쓸지, 우리 색으로 바꿀 수 있는지</li>
-          <li>화면 위쪽 공통 상태 줄(로봇 이름 · 배터리 · 통신 · 촬영 중)을 둘지 (7. 만들 화면)</li>
-          <li>패널 밝기와 시야각 실측 — 공장 조명 아래, 3m · 옆 45°에서</li>
-          <li>렌더링 방식(웹 키오스크 / 네이티브)과 애니메이션 런타임 — 실기기 프레임 측정</li>
-          <li>평상시 색 — 파랑과 초록 중 하나로. 브랜드 파랑과 ISO 지시 파랑의 관계</li>
-          <li>프리즘 오브를 로봇 화면 캐릭터로 쓸지 — 쓴다면 로봇용 단순 버전, 어느 단계까지 보일지</li>
-          <li>PTZ 카메라를 사람 쪽으로 돌려 "봤어요" 신호로 쓸 수 있는지 — 점검 중 제약, 찍히는 느낌</li>
-          <li>다국어 범위 — 한국어만 / 영어 병기 / 언어 순환</li>
-          <li>"촬영 중" 표시 의무 여부 — 법무 확인</li>
-          <li>사람의 답을 무엇으로 받을지 — 몸짓 인식, 지나감 감지, 받지 않음</li>
-          <li>방폭구역 여부 최종 확인</li>
-        </ul>
-      </div>
+    <!-- ============================================================ 7 -->
+    <section class="pol" id="cases">
+      <h2>7. 사례와 논문</h2>
+      <p class="meta">2026-10-23 조사 · 출처는 문서 끝</p>
+
+      <p class="rule">산업 현장의 4족 로봇에 작업자를 향한 화면을 단 사례는 거의 없다. 산업용은 빛과 소리로 말하고, 화면은 반려 · 연구용에만 있다. 참고할 선례가 적다는 뜻이자 차별점이 될 자리다.</p>
+
+      <h3>제품과 현장 사례</h3>
+      <div class="scroll"><table class="tbl">
+        <thead><tr><th>사례</th><th>화면 · 신호</th><th>우리에게 주는 점</th></tr></thead>
+        <tbody>
+          <tr><td>Boston Dynamics Spot<br />(2023 하드웨어)</td><td>화면 없음. 몸체 둘레 안전등 · 부저 · 스피커. 기본 패턴은 <b>초록 점멸 = 정상, 흰색 번쩍임 = 점검 중, 호박색 점멸 = 주의</b></td><td>산업용 4족 로봇에 이미 있는 색 관례다. 시나리오가 이상 지점에 흰빛을 쓰는 것과 겹친다. 상태 문법을 이 관례와 어긋나지 않게 맞춘다(5. 방향성 ①)</td></tr>
+          <tr><td>Dr. Spot<br />(MIT × Brigham, 2020)</td><td>등에 iPad 를 달아 원격 의료진의 얼굴을 보여줌. COVID 환자 문진용, 환자 다수가 만족</td><td>4족 로봇 등에 화면을 단 대표 사례. 다만 화면이 로봇이 아니라 <i>사람의</i> 얼굴이었다. 시나리오 4-2 관제 음성 연결 때 관제사의 존재를 보여주는 방식에 참고</td></tr>
+          <tr><td>Sony aibo ERS-1000<br />(2018)</td><td>눈 두 개가 OLED. 깜빡이고 움직이며 몸짓 · 기분에 맞춰 바뀜</td><td>4족 로봇 화면 표정의 기준점. 핵심은 <b>눈과 몸짓을 함께 움직이는 것</b></td></tr>
+          <tr><td>Mini Pupper<br />(MangDang, Stanford Pupper 기반)</td><td>앞쪽 320×240 LCD 얼굴, 표정 애니메이션을 직접 만듦. <b>Raspberry Pi 기반</b></td><td>우리와 같은 Raspberry Pi 구성의 오픈소스 표정 사례. 성능 기준점</td></tr>
+          <tr><td>Xiaomi CyberDog 2<br />(2023)</td><td>얼굴 화면 대신 몸통 외장에 E Ink Prism — 움직임에 맞춰 색이 바뀜</td><td>화면이 꼭 안내판일 필요는 없다. <b>몸 자체를 브랜드 표면으로</b> 쓴다. 꺼져도 남는 e-paper 아이디어와 이어진다</td></tr>
+          <tr><td>현대차그룹 공장 안전 서비스 로봇<br />(Spot 기반, 2021)</td><td>열화상 · 라이다 · 관제 연동. 작업자용 화면은 확인되지 않음</td><td>국내 공장 순회 사례도 감지 · 관제 중심이고 현장 소통은 비어 있다</td></tr>
+        </tbody>
+      </table></div>
+
+      <h3>논문 — 화면 얼굴</h3>
+      <ul>
+        <li><b>Kalegina et al., HRI 2018</b> — 화면 얼굴 로봇 157종을 76개 속성으로 분석. 상황마다 선호하는 사실감이 다르고, <b>산업용은 엔터테인먼트용보다 단순한 얼굴</b>이 맞는다. 얼굴 설계의 출발점.</li>
+        <li><b>Broadbent et al., PLoS ONE 2013</b> — 얼굴이 사람에 가까울수록 마음과 좋은 성격이 있다고 느낀다. 그만큼 기대치도 오른다.</li>
+        <li><b>평면 화면 얼굴의 시선 (Sensors 2022)</b> — 화면의 아이콘 얼굴로 "나를 보고 있다"는 느낌을 높이는 방법. "당신을 봤어요" 신호에 바로 쓸 수 있다.</li>
+        <li><b>실물 vs 화면 얼굴</b> — 시선과 일부 표정은 2D 화면보다 실물에서 더 정확히 읽힌다. 화면의 눈만으로는 한계가 있으니 몸 방향과 빛을 함께 쓴다.</li>
+        <li><b>Kim, Lee, Mutlu, HRI 2026 "Speaking with Screens"</b> — 정보 전달용 로봇 화면의 설계 공간과 지침. 주제가 가장 가까우나 원문을 아직 읽지 못했다. <span class="tag">읽을 것</span></li>
+      </ul>
+
+      <h3>논문 — 4족 로봇과 사람</h3>
+      <ul>
+        <li><b>Unitree Go2 + 작은 모니터의 표정 · 음성 (arXiv 2512.13981, 2025)</b> — 4족 로봇에 화면 표정을 단 실험 중 가장 가깝다. 실패 뒤 신뢰 회복을 다뤄서, 배터리 부족 · 회수 대기 같은 "로봇이 실패한 순간"의 표현에 참고가 된다.</li>
+        <li><b>4족 로봇 근접 거리 (N=32)</b> — 로봇이 향한 방향과 시선이 사람이 원하는 거리에 유의미한 영향을 준다. 화면이 누구를 향하는지도 신호다.</li>
+        <li><b>Safe Spot (arXiv 2403.05400)</b> — 정면 · 교차 상황에서 순한(submissive) 몸짓의 Spot 이 더 안전하게 느껴졌다. 시나리오 2의 "멈추고 양보"를 뒷받침한다.</li>
+        <li><b>개 같은 몸짓 (HICSS 2024, 222명)</b> — 기본 움직임보다 인상 평가가 전 항목에서 좋았다.</li>
+        <li><b>MIT Media Lab 2026 "Do Robots Need Body Language?"</b> — Spot 의 몸짓 · 빛 · 텍스트 · 소리를 비교하고 신호가 어긋나는 조건도 시험했다.</li>
+        <li><b>Shin et al. 2024 (Unitree Go1)</b> — 사람들은 말보다 손 · 몸 제스처로 소통하길 선호했다. 터치 없이 사람의 답을 받는 방향(손을 들면 양보)을 뒷받침한다.</li>
+      </ul>
+
+      <h3>논문 — 신호 채널</h3>
+      <ul>
+        <li><b>Kannan, Lee, Min — 배달 로봇 외부 표시 (152명)</b> — 진행 의도를 알리는 데 화면이 빛보다 선호됐고, 빛은 같은 정보를 반복하는 보조 신호일 때 가장 좋았다.</li>
+        <li><b>바닥 투사 (Chadalavada 등, 바퀴 로봇)</b> — 경로를 바닥에 비추면 예측 가능하다고 느낀다. 4족 로봇에서 시험한 연구는 찾지 못했다.</li>
+      </ul>
+
+      <h3>정리</h3>
+      <ol>
+        <li>산업용 4족 로봇 + 작업자용 화면은 선례가 거의 없다.</li>
+        <li>화면 표정의 선례는 aibo 와 Mini Pupper 다. 연구들은 <b>산업 현장에서는 단순한 얼굴, 눈과 몸짓이 함께 움직이기</b>를 말한다.</li>
+        <li>색 문법은 Spot 의 기존 관례(초록 정상 · 흰색 점검 · 호박색 주의)와 맞춘다.</li>
+      </ol>
     </section>
+
+    <!-- memo — 넓은 화면에서는 오른쪽에 고정, 좁으면 본문 끝에 놓인다 -->
+    <aside class="memo" id="memo" aria-labelledby="memo-title">
+      <h2 id="memo-title">memo</h2>
+      <p class="memo-sub">정할 것 · 확인할 것</p>
+      <ul>
+        <li>장착 안 — 세로형(화면 1개) / A형(화면 2개). 제안은 A형(2. 장착 안)</li>
+        <li>라이다 · PTZ 카메라 가림 — 화면 꼭대기 높이 상한을 로봇 개발 쪽과 확인</li>
+        <li>A형이면 기울기(수직에서 30~40° 출발)와 Raspberry Pi 5 한 대로 두 화면 구동 여부</li>
+        <li>Spot 기본 안전등(초록 · 흰색 · 호박색)을 그대로 쓸지, 우리 색으로 바꿀 수 있는지</li>
+        <li>화면 위쪽 공통 상태 줄(로봇 이름 · 배터리 · 통신 · 촬영 중)을 둘지 (6. 만들 화면)</li>
+        <li>패널 밝기와 시야각 실측 — 공장 조명 아래, 3m · 옆 45°에서</li>
+        <li>렌더링 방식(웹 키오스크 / 네이티브)과 애니메이션 런타임 — 실기기 프레임 측정</li>
+        <li>평상시 색 — 파랑과 초록 중 하나로. 브랜드 파랑과 ISO 지시 파랑의 관계</li>
+        <li><b>정육면체 슬라임 안 확정 여부</b> — 지도 아이콘 · Delta · 로봇 디스플레이를 한 꼴로. 확정되면 아래 오브 항목을 대신하고, 눈 · 방향 · 작은 크기 · 색 역할을 정한다(5. 방향성 ③ 검토 중)</li>
+        <li>프리즘 오브를 로봇 화면 캐릭터로 쓸지 — 쓴다면 로봇용 단순 버전, 어느 단계까지 보일지</li>
+        <li>PTZ 카메라를 사람 쪽으로 돌려 "봤어요" 신호로 쓸 수 있는지 — 점검 중 제약, 찍히는 느낌</li>
+        <li>다국어 범위 — 한국어만 / 영어 병기 / 언어 순환</li>
+        <li>"촬영 중" 표시 의무 여부 — 법무 확인</li>
+        <li>사람의 답을 무엇으로 받을지 — 몸짓 인식, 지나감 감지, 받지 않음</li>
+        <li>방폭구역 여부 최종 확인</li>
+      </ul>
+    </aside>
 
     <section class="pol" id="sources">
       <h2>출처</h2>
@@ -537,7 +605,7 @@
         <li><a href="https://www.dailian.co.kr/news/view/1556187/">정부, 외국인노동자 위한 다국어 안전표지 제작 (2025)</a></li>
         <li><a href="https://faytech.us/monitors/high-brightness/sunlight-readable/viewable">Sunlight readable displays (Faytech)</a> — 밝기 기준</li>
       </ul>
-      <h3>3. 사례와 논문</h3>
+      <h3>7. 사례와 논문</h3>
       <ul class="src">
         <li><a href="https://www.equipmentjournal.com/tech-news/boston-dynamics-teaches-spot-new-tricks/">Spot 안전등 · 소리 패턴 (Equipment Journal)</a> · <a href="https://www.techeblog.com/boston-dynamics-spot-robot-dog-open-closed-doors/">Techeblog</a></li>
         <li><a href="https://www.npr.org/sections/coronavirus-live-updates/2020/04/24/844770815/meet-spot-the-robot-that-could-help-doctors-remotely-treat-covid-19-patients">Dr. Spot (NPR)</a> · <a href="https://spectrum.ieee.org/automaton/robotics/medical-robots/boston-dynamics-legged-robots-hospitals">IEEE Spectrum</a> · <a href="https://develop.freethink.com/health/robot-doctor">Freethink</a></li>
