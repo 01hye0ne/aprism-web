@@ -223,6 +223,9 @@
       <a class="sum-card" href="#face"><span class="k">캐릭터</span><b>얼굴 없음</b><span>머리는 PTZ 하나. 오브 · 정육면체 검토 중</span></a>
       <a class="sum-card" href="#face"><span class="k">표현</span><b>캐릭터 → 아이콘 → 표지</b><span>위험할수록 표준 표지로 모핑</span></a>
       <a class="sum-card" href="#screens"><span class="k">화면</span><b>틀 8개 · 화면 31개</b><span>틀을 먼저, 문구는 바꿔 끼운다</span></a>
+      <a class="sum-card" href="#motion"><span class="k">트랜지션</span><b>몸의 동작을 따른다</b><span>일어나면 위로 · 엎드리면 아래로 · 완료는 꼬리처럼</span></a>
+      <a class="sum-card" href="#proportion"><span class="k">비례</span><b>낮게 · 한 덮개 · 어둡게</b><span>등에 얹은 TV 가 아니라 몸의 일부로</span></a>
+      <a class="sum-card" href="#motion"><span class="k">계단</span><b>글자는 수평 유지</b><span>IMU 로 기울기만큼 반대로 돌린다</span></a>
     </section>
 
     <!-- ============================================================ 1 -->
@@ -414,6 +417,40 @@
 
       <h3>④ 짧은 대화 리듬</h3>
       <p><b>봤어요 → 기다릴게요 → 고마워요</b> — 터치 없이 몸짓과 감지만으로 닫히는 세 박자를 시그니처 경험으로.</p>
+
+      <h3 id="motion">⑤ 로봇개다운 트랜지션</h3>
+      <p class="rule">화면 트랜지션은 몸의 동작을 따른다. 몸이 일어나면 화면도 일어나고, 엎드리면 화면도 가라앉는다.</p>
+      <div class="scroll"><table class="tbl">
+        <thead><tr><th>로봇 동작</th><th>화면 트랜지션</th><th>근거</th></tr></thead>
+        <tbody>
+          <tr><td>기립 (1)</td><td>내용이 아래에서 위로 떠오르며 켜짐</td><td>몸과 같은 방향</td></tr>
+          <tr><td>엎드림 · 회수 대기 (6 · 7)</td><td>아래로 가라앉으며 어두워짐</td><td>몸과 같은 방향</td></tr>
+          <tr><td>멈춤</td><td>발이 닿는 순간 바뀜 · 살짝 눌렸다 튐</td><td>화면이 먼저 말하면 몸과 어긋남(MIT 2026)</td></tr>
+          <tr><td>회전 · 출발 직전</td><td>0.5~1초 <b>먼저</b> 가려는 쪽으로 기울어짐</td><td>개는 고개가 먼저 돈다 · 의도를 미리 보이면 예측이 쉬움(Szafir)</td></tr>
+          <tr><td>양보 (2-3)</td><td>앞을 낮추는 인사 자세와 함께 꾸벅</td><td>순한 몸짓이 더 안전(Safe Spot)</td></tr>
+          <tr><td>"봤어요"</td><td>귀를 세우듯 위로 톡</td><td>개의 주목 신호</td></tr>
+          <tr><td>확인 중 (5)</td><td>고개를 갸웃하듯 살짝 기울어짐</td><td>개의 "뭐지?"</td></tr>
+          <tr><td>완료 (T7)</td><td>좌우로 짧게 흔들림</td><td><b>등 뒤 화면 = 꼬리</b></td></tr>
+          <tr><td>걷는 중</td><td>미끄러지는 전환 금지 · 사라짐 · 크기만</td><td>보행 진동과 겹치면 어지러움</td></tr>
+        </tbody>
+      </table></div>
+      <p class="alert"><b>계단 수평 유지</b> A형은 화면이 옆을 봐서, 계단에서 몸이 30~40° 기울면 글자도 그만큼 돌아간다. 기울기 센서(IMU) 값으로 내용을 반대로 돌리면 글자가 수평으로 남는다 — 몸은 기울어도 화면은 균형을 잡는 장면. IMU 값을 화면에서 받을 수 있는지는 개발 확인.</p>
+
+      <h3 id="proportion">⑥ 비례 · 무게감</h3>
+      <p class="rule">무게(적재 한도 14kg)보다 "보이는 무게"가 문제다. 덧붙인 물건이 아니라 몸의 일부로 보이게 한다.</p>
+      <div class="scroll"><table class="tbl">
+        <thead><tr><th>위험</th><th>해결</th></tr></thead>
+        <tbody>
+          <tr><td>높이 솟은 판 — 위가 무거워 보임</td><td><b>낮게</b> — 라이다 · PTZ 보다 아래(센서 가림과 같은 답). A형은 등줄기처럼</td></tr>
+          <tr><td>등 위가 복잡 — 짐을 잔뜩 멘 듯</td><td><b>한 덮개(하우징)</b> — 컴퓨터 상자 · 케이블까지 감싸고 화면을 박는다. Spot 의 모서리 선 · 노랑 · 검정을 따른다</td></tr>
+          <tr><td>노란 몸 위 빛나는 사각형 — 등에 TV</td><td><b>어두운 화면</b> — 검은 부품과 한 덩어리로. 흰 바탕 전체 화면 피하기</td></tr>
+          <tr><td>한쪽으로 쏠림</td><td><b>가운데</b> — 앞다리와 뒷다리 사이 중앙</td></tr>
+          <tr><td>걸을 때 덜렁 — 허술해 보임</td><td><b>단단한 고정</b> — 진동 받침 · 덜컹 소리 차단</td></tr>
+        </tbody>
+      </table></div>
+      <ul class="kv">
+        <li><b>검증</b><span>실물 크기 목업(종이 · 3D 프린트)을 얹고 걸려 1.5m · 3m 눈높이로 찍어 본다 · 그 전에 사진 위 실제 비율 겹쳐 보기</span></li>
+      </ul>
     </section>
 
     <!-- ============================================================ 6 -->
@@ -591,6 +628,9 @@
         <li>밝기 · 시야각 실측(3m · 옆 45°)</li>
         <li>렌더링 방식 · 애니메이션 런타임</li>
         <li>방폭구역 최종 확인</li>
+        <li>IMU 기울기 값을 화면에서 받기(계단 수평)</li>
+        <li>하우징(덮개) 디자인 — 누가 · 언제</li>
+        <li>실물 크기 목업 테스트</li>
       </ul>
       <p class="memo-k">표현</p>
       <ul>
