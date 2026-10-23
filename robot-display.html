@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>APRISM — 로봇 디스플레이</title>
+  <meta name="description" content="로봇개 등에 올라가는 7인치 디스플레이 — 하드웨어 조건, 거리별 글자 크기, 시나리오에서 짚을 점, 고려 요소, 방향성" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/static/woff2/SUIT.css" />
+  <link rel="stylesheet" href="./assets/css/tokens.css?v=b64812bd" />
+  <link rel="stylesheet" href="./assets/css/base.css?v=c723efd4" />
+  <style>
+    /* 리서치 문서 한 장 — 화면 정책(policy.html)과 같은 꼴. 값은 토큰만 쓴다. */
+    .site-main { max-width: 960px; }
+    .toc { display: flex; flex-wrap: wrap; gap: var(--space-8); margin: var(--space-24) 0 0; padding: 0; list-style: none; }
+    .toc a {
+      display: inline-block; padding: var(--space-4) var(--space-12);
+      border: var(--border-width-thin) solid var(--border-default); border-radius: var(--radius-pill);
+      color: var(--text-secondary); font-size: var(--font-size-13); text-decoration: none;
+    }
+    .toc a:hover { color: var(--text-primary); border-color: var(--border-strong); }
+    .pol { margin-top: var(--space-48); scroll-margin-top: var(--space-16); }
+    .pol h2 { margin: 0 0 var(--space-4); font-size: var(--font-size-20); line-height: var(--font-line-height-28); }
+    .pol .meta { margin: 0 0 var(--space-16); color: var(--text-tertiary); font-size: var(--font-size-12); }
+    .pol h3 { margin: var(--space-24) 0 var(--space-8); font-size: var(--font-size-14); color: var(--text-secondary); }
+    .pol p, .pol li { color: var(--text-secondary); font-size: var(--font-size-14); line-height: var(--font-line-height-22); word-break: keep-all; }
+    .pol p { margin: 0 0 var(--space-8); }
+    .pol ul, .pol ol { margin: 0 0 var(--space-8); padding-left: var(--space-20); }
+    .pol li + li { margin-top: var(--space-4); }
+    .pol b { color: var(--text-primary); }
+    .rule {
+      margin: 0 0 var(--space-16); padding: var(--space-12) var(--space-16);
+      border-left: 3px solid var(--border-brand); background-color: var(--bg-panel);
+      border-radius: 0 var(--radius-card) var(--radius-card) 0;
+      color: var(--text-primary); font-weight: 600;
+    }
+    .tbl { width: 100%; border-collapse: collapse; font-size: var(--font-size-13); margin-bottom: var(--space-8); }
+    .tbl th, .tbl td { padding: var(--space-8) var(--space-12); border-bottom: var(--border-width-thin) solid var(--border-divider); text-align: left; vertical-align: top; word-break: keep-all; }
+    .tbl th { color: var(--text-tertiary); font-weight: 600; font-size: var(--font-size-12); }
+    .tbl td { color: var(--text-secondary); }
+    .tbl td:first-child { color: var(--text-primary); font-weight: 600; white-space: nowrap; }
+    .num { font-variant-numeric: tabular-nums; }
+    .dot { display: inline-block; width: 8px; height: 8px; margin-right: 6px; border-radius: 50%; vertical-align: 1px; }
+    .open {
+      margin-top: var(--space-16); padding: var(--space-12) var(--space-16);
+      border: var(--border-width-thin) solid var(--status-warning-border); border-radius: var(--radius-card);
+    }
+    .open h3 { margin-top: 0; color: var(--status-warning-text); }
+    .done {
+      margin: 0 0 var(--space-16); padding: var(--space-12) var(--space-16);
+      border: var(--border-width-thin) solid var(--border-divider); border-radius: var(--radius-card);
+    }
+    .done h3 { margin-top: 0; }
+    .scroll { overflow-x: auto; }
+    .tag { display: inline-block; margin-right: var(--space-4); padding: 0 var(--space-8); border-radius: var(--radius-pill); background-color: var(--bg-cell); color: var(--text-tertiary); font-size: var(--font-size-12); font-weight: 600; }
+    .src li { font-size: var(--font-size-13); }
+    .src a { color: var(--text-secondary); }
+
+    /* 거리별 화면 — 800×480 화면 비율 그대로. 글자 크기는 화면 너비(800px) 대비 cqw 로 둬서 칸 너비가 바뀌어도 비율이 맞는다. */
+    .dist { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-16); margin: var(--space-16) 0 var(--space-8); }
+    .dist figure { margin: 0; }
+    .scr {
+      container-type: inline-size;
+      aspect-ratio: 800 / 480;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3cqw;
+      border: 6px solid var(--bg-cell); border-radius: var(--radius-card);
+      background-color: var(--bg-panel); color: var(--text-primary);
+      overflow: hidden; text-align: center; font-weight: 700; line-height: 1.25; letter-spacing: -0.02em;
+    }
+    .scr .t5 { font-size: 28cqw; line-height: 1; }  /* 5m — 약 230px: 기호 하나 */
+    .scr .t3 { font-size: 17cqw; }                  /* 3m — 약 140px: 한 줄 6자 */
+    .scr .t3i { font-size: 15cqw; line-height: 1; }
+    .scr .t15 { font-size: 8.6cqw; }                /* 1.5m — 약 70px: 한 줄 11자 */
+    .scr .warn { color: var(--status-warning-icon); }
+    .dist figcaption { margin-top: var(--space-8); color: var(--text-tertiary); font-size: var(--font-size-12); line-height: var(--font-line-height-18, 18px); word-break: keep-all; }
+    .dist figcaption b { color: var(--text-primary); }
+    @media (max-width: 640px) { .dist { grid-template-columns: minmax(0, 1fr); } }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span class="brand-name">APRISM</span>
+    </div>
+    <a href="./index.html" class="theme-toggle" style="text-decoration:none">목록으로</a>
+  </header>
+
+  <main class="site-main">
+    <section class="intro">
+      <p class="eyebrow">Research · Robot Display</p>
+      <h1>로봇 디스플레이</h1>
+      <p class="lead">로봇개 등에 올라가는 디스플레이의 리서치와 방향성을 정리한 문서입니다.
+        시나리오는 Figma <a href="https://www.figma.com/design/6jlcnuP9HDFNNHwaAhX5vz/KISTA-2026?node-id=479-1448">KISTA-2026 · 06 시나리오</a>(8개 장면)를 기준으로 했습니다. 2026-10-23 작성.
+        아직 정하지 않은 것은 마지막 "정할 것"에 모았습니다.</p>
+      <ul class="toc">
+        <li><a href="#role">1. 역할과 대상</a></li>
+        <li><a href="#hw">2. 하드웨어 조건</a></li>
+        <li><a href="#scenario">3. 시나리오에서 짚을 점</a></li>
+        <li><a href="#factors">4. 고려 요소</a></li>
+        <li><a href="#direction">5. 방향성</a></li>
+        <li><a href="#open">6. 정할 것</a></li>
+      </ul>
+    </section>
+
+    <!-- ============================================================ 1 -->
+    <section class="pol" id="role">
+      <h2>1. 역할과 대상</h2>
+      <p class="meta">디자이너 정리 · 2026-10-23</p>
+
+      <p class="rule">로봇이 사람과 마주쳤을 때 안내하고, 로봇의 상태를 알린다. 안내판에 그치지 않고 브랜딩과 인터랙션까지 설계한다.</p>
+
+      <ul>
+        <li><b>최종 목표는 근로자가 없는 현장이다.</b> 그래서 디스플레이를 보는 사람은 매일 로봇을 보는 숙련자가 아니라 <b>가끔 마주치는 낯선 사람</b>이다(점검 인원, 회수 담당자, 협력업체, 방문자). 설명 없이 바로 알아볼 수 있어야 하고, 교육받았다는 전제를 두지 않는다.</li>
+        <li>마주침이 드물어서 한 번 한 번의 인상이 크다. 데모와 방문 때 보이는 모습이 곧 제품의 얼굴이므로 브랜딩도 이 장면에서 일어난다.</li>
+        <li>디스플레이는 혼자 말하지 않는다. 상태등, 바닥 투사, 소리, 음성, 그리고 <b>로봇의 몸짓</b>과 함께 하나의 신호 체계로 설계한다.</li>
+      </ul>
+    </section>
+
+    <!-- ============================================================ 2 -->
+    <section class="pol" id="hw">
+      <h2>2. 하드웨어 조건</h2>
+      <p class="meta">디스플레이 사양은 디자이너가 공유한 제품 정보 · 계산은 사인 업계 경험칙 기준 근사치</p>
+
+      <div class="scroll"><table class="tbl">
+        <thead><tr><th>항목</th><th>값</th><th>디자인에 주는 뜻</th></tr></thead>
+        <tbody>
+          <tr><td>패널</td><td>7인치 정전식 터치(10점), Raspberry Pi DSI 연결</td><td>터치는 쓰지 않는다(아래). 화면 그리기는 Raspberry Pi 가 맡는다</td></tr>
+          <tr><td>보이는 화면</td><td class="num">155 × 86 mm</td><td>세로 86mm 가 글자 줄 수를 정한다</td></tr>
+          <tr><td>해상도</td><td class="num">800 × 480 px (1mm ≈ 5.2~5.6px, 약 130ppi)</td><td>가는 선, 작은 아이콘은 계단 현상이 생긴다. 굵은 획 위주로 그린다</td></tr>
+          <tr><td>외형</td><td class="num">194 × 110 × 20 mm (받침 포함)</td><td>로봇 등 위 장착 위치, 각도, 하우징은 아직 정해지지 않았다</td></tr>
+        </tbody>
+      </table></div>
+
+      <div class="done">
+        <h3>정해진 것 (2026-10-23)</h3>
+        <ul>
+          <li><b>방폭 인증은 필요 없는 것으로 본다.</b> 확실하지는 않다. 대상 현장이 방폭구역으로 밝혀지면 패널 선택부터 다시 본다(참고: ANYmal X 는 Zone 1 인증).</li>
+          <li><b>터치 인터랙션은 넣지 않는다.</b> 근로자가 없는 현장이 목표라서 화면은 보여주기만 한다. 정전식 터치는 물방울, 장갑, 벽에 스치는 것으로도 눌릴 수 있으므로 소프트웨어에서 끈다. 시나리오 7의 회수 담당자 화면은 담당자 단말이나 관제 앱으로 옮긴다.</li>
+        </ul>
+      </div>
+
+      <h3>거리별 글자 크기 — 3m 에서 한 줄 6자</h3>
+      <p>사인 업계 경험칙 "3m 에 글자 높이 약 2.5cm"(1m 당 약 8mm)를 이 화면에 대면 아래와 같다. 한글은 글자 폭이 높이와 거의 같아서, 화면 너비 155mm 에 들어가는 글자 수도 함께 정해진다.</p>
+      <div class="scroll"><table class="tbl">
+        <thead><tr><th>보는 거리</th><th>글자 높이</th><th>화면에서</th><th>한 줄 글자 수</th><th>한 화면에 담을 것</th></tr></thead>
+        <tbody>
+          <tr><td>5m 이상</td><td class="num">약 42mm</td><td class="num">약 230px</td><td class="num">3~4자</td><td>기호 하나, 또는 한 단어. 실제로는 빛과 바닥 투사가 맡는다</td></tr>
+          <tr><td>약 3m</td><td class="num">약 25mm</td><td class="num">약 140px</td><td class="num">약 6자</td><td>아이콘 + 짧은 한 줄(최대 두 줄)</td></tr>
+          <tr><td>약 1.5m</td><td class="num">약 12mm</td><td class="num">약 70px</td><td class="num">약 11자</td><td>"이유 + 요청" 두 줄, 많아야 네 줄</td></tr>
+        </tbody>
+      </table></div>
+
+      <div class="dist" aria-label="800×480 화면에 거리별 글자 크기를 그대로 넣은 예">
+        <figure>
+          <div class="scr"><span class="t5 warn" aria-hidden="true">▲</span></div>
+          <figcaption><b>5m</b> · 기호 하나가 전부다</figcaption>
+        </figure>
+        <figure>
+          <div class="scr"><span class="t3i warn" aria-hidden="true">↗</span><span class="t3">계단 이동 중</span></div>
+          <figcaption><b>3m</b> · 아이콘과 한 줄</figcaption>
+        </figure>
+        <figure>
+          <div class="scr"><span class="t15">로봇이 계단을 오릅니다<br />잠시 기다려 주세요</span></div>
+          <figcaption><b>1.5m</b> · 두 줄 문장</figcaption>
+        </figure>
+      </div>
+      <p>지금 시나리오 문구 "N₂ 배관 압력계 판독 중 · 이상 징후를 확인하고 있습니다"(26자 안팎)는 1m 안쪽에서나 읽힌다. 문구 길이는 이 표에서 거꾸로 정한다.</p>
+
+      <h3>장착 각도와 시야</h3>
+      <ul>
+        <li>로봇 등은 작업자 눈높이(약 1.6m)보다 1m 가까이 낮다. 3m 떨어진 사람이 내려다보는 각도는 약 18°뿐이라, <b>등에 눕혀 달면 거의 옆면만 보인다.</b> 앞쪽으로 세우거나 기울여야 한다.</li>
+        <li>계단에서는 몸체가 30~40° 기운다. 계단 위 사람은 로봇 앞을, 아래 사람은 뒤를 본다. 시나리오 8에서 화면이 누구를 향하는지 정해야 한다.</li>
+        <li>시나리오 7처럼 로봇이 주저앉으면 화면이 더 낮아진다. 그때도 읽혀야 하는 정보가 무엇인지 따로 정한다.</li>
+        <li>이 패널은 데스크톱용 밝기 수준으로 보인다(직사광 대응 패널은 보통 1,000nit 이상). 공장 조명 반사와 옆에서 보는 시야각은 <b>실물로 확인한다.</b></li>
+      </ul>
+
+      <h3>Raspberry Pi 에서 그리기</h3>
+      <ul>
+        <li>트랜지션과 모핑은 기기 성능 안에서 설계한다. 흐림(blur), 큰 면적의 글로우, 겹친 반투명은 프레임이 떨어지기 쉽다. 단색 벡터 움직임 위주로 잡고, Lottie·Rive 같은 런타임은 실기기에서 프레임을 재본 뒤 정한다.</li>
+        <li>렌더링 방식(웹 키오스크인지 Qt 같은 네이티브 UI인지)에 따라 쓸 수 있는 효과가 달라진다. 개발 쪽과 먼저 맞춘다.</li>
+      </ul>
+    </section>
+
+    <!-- ============================================================ 3 -->
+    <section class="pol" id="scenario">
+      <h2>3. 시나리오에서 짚을 점</h2>
+      <p class="meta">Figma KISTA-2026 · 06 시나리오 — 1 출발, 2 근로자 만남, 3 위험, 4 주의 1(안전모), 5 주의 2(이상 음향), 6 배터리 부족, 7 자율복귀 불가, 8 계단</p>
+
+      <ol>
+        <li><b>색의 뜻이 장면마다 다르다.</b> 평상시 색이 "파랑 or 초록(선택 가능)"으로 남아 있다. 계단을 오를 때 빨강(8)을 써서 위험(3)의 빨강과 겹친다. 이상 지점은 흰색(3, 5), 확인이 끝나면 하늘색(4, 5)이다. 관제 화면의 위험도 4단계와 맞춰져 있지 않다.</li>
+        <li><b>디스플레이 문구와 음성이 거의 같은 문장이다.</b> 채널마다 맡을 역할이 나뉘어 있지 않다(4-B).</li>
+        <li><b>사람 쪽에서 로봇에게 답할 방법이 없다.</b> 로봇이 "먼저 지나가세요"라고 해도 사람이 "너 먼저 가"라고 할 수 없다. 터치를 쓰지 않으므로 답하는 수단은 몸짓이나 관제를 거치는 방법뿐이다(4-C).</li>
+        <li><b>꺼진 로봇은 아무것도 말하지 않는다.</b> 7-5에서 off 된 뒤에 지나가는 사람은 이 로봇이 왜 여기 있는지 알 수 없다.</li>
+        <li><b>시나리오 7 회수 화면은 터치 UI다.</b> 터치를 쓰지 않기로 했으므로 담당자 단말로 옮긴다. 로봇 화면에는 "회수 대기 · 만지지 마세요"만 남긴다.</li>
+        <li><b>메시지가 겹치는 장면이 없다.</b> 장면이 하나씩 따로 쓰여 있어서, 배터리 부족 중에 사람을 만나거나 관제 통화 중에 안내음이 나는 경우(4-2의 "대화 중엔 안내음 겹치지 않도록")의 규칙이 없다.</li>
+      </ol>
+    </section>
+
+    <!-- ============================================================ 4 -->
+    <section class="pol" id="factors">
+      <h2>4. 고려 요소</h2>
+      <p class="meta">처음 목록(아이콘 · UX 라이팅 · 화면 트랜지션 · 모핑 · 시선에 따른 크기) 밖에서 찾은 것</p>
+
+      <h3>A. 물리 조건</h3>
+      <ul>
+        <li><b>보행 진동</b> — 4족 보행 중에는 화면이 계속 흔들린다. 걷는 동안에는 작은 글씨와 흐르는 텍스트를 쓰지 않고, 문장은 멈춘 상태에서 보여준다.</li>
+        <li><b>어디가 앞인지</b> — 4족 로봇은 앞뒤가 애매하다. 화면과 빛이 "내 앞은 여기"를 알려줄 수 있다. 옆과 뒤에서 다가오는 사람에게는 화면 대신 빛이 보인다.</li>
+        <li><b>환경</b> — 분진, 물기(IP 등급), 공장 조명 반사, 야외 구간의 직사광.</li>
+      </ul>
+
+      <h3>B. 정보 설계</h3>
+      <div class="scroll"><table class="tbl">
+        <thead><tr><th>채널</th><th>맡는 것</th><th>보이는 거리</th></tr></thead>
+        <tbody>
+          <tr><td>바닥 투사</td><td>어디로, 어디까지 — 공간</td><td>멀리</td></tr>
+          <tr><td>상태등</td><td>지금 어떤 상태 — 색과 점멸</td><td>멀리 · 360°</td></tr>
+          <tr><td>디스플레이</td><td>왜, 무엇을 해 달라 — 이유와 요청</td><td>가까이 · 앞에서만</td></tr>
+          <tr><td>소리 · 음성</td><td>주의를 끈다. 문장은 짧게</td><td>소음이 크면 들리지 않는다고 본다</td></tr>
+          <tr><td>몸짓</td><td>멈춤, 양보, 출발 의사</td><td>멀리</td></tr>
+        </tbody>
+      </table></div>
+      <ul>
+        <li><b>한 화면 = 한 상태 + 한 요청.</b> 걸어가는 사람이 읽는 시간은 1~2초다.</li>
+        <li><b>우선순위와 끼어들기 규칙</b> — 위험 &gt; 사람 안내 &gt; 로봇 상태 &gt; 평상시. 높은 쪽이 들어오면 낮은 쪽은 멈췄다가, 끝나면 이어서 보여준다.</li>
+        <li><b>픽토그램 먼저, 문장은 보조</b> — 2024년 건설현장 외국인 근로자 비율은 14.7%이고, 정부가 2025년 10월부터 다국어 안전표지를 보급하고 있다. 언어를 바꿔 가며 보여줄지도 정한다.</li>
+        <li><b>안전색 표준(ISO 3864 · KS)</b> — 빨강 금지·위험, 노랑 주의, 초록 안전, <b>파랑 지시(해야 할 것)</b>. 4-1의 "안전모를 착용해 주세요"는 표준상 파란 원형 지시 표지다. 브랜드 파랑과 지시 파랑이 부딪히지 않게 한다.</li>
+        <li><b>색각 이상</b> — 빨강과 초록 구분에만 기대지 않는다. 관제 화면과 같은 기호(위험 ⓧ · 주의 △ · 완료 ✓)와 점멸 패턴을 함께 쓴다.</li>
+      </ul>
+
+      <h3>C. 인터랙션 (터치 없이)</h3>
+      <ul>
+        <li><b>"당신을 봤어요" 신호</b> — 감지한 사람 쪽으로 시선(눈 그래픽)이나 빛이 향한다. 지금은 사람 아이콘뿐인데, 사람이 가장 안심하는 순간은 로봇이 <i>나를</i> 알아봤다고 느낄 때다.</li>
+        <li><b>몸짓과 화면의 일치</b> — MIT 연구(2026)는 Spot 의 몸짓 · 빛 · 텍스트 · 소리를 비교하면서 신호끼리 어긋나는 조건도 따로 시험했다. 화면은 "정지"인데 몸이 움찔거리면 믿지 않는다. 개 같은 몸짓을 더한 4족 로봇이 인상 평가 전 항목에서 더 좋게 나온 연구(222명)도 있다. 모션도 인터페이스로 함께 설계한다.</li>
+        <li><b>사람의 답</b> — 터치를 쓰지 않으므로 몸짓(손을 들면 양보, 멈춰 서면 대기)을 카메라로 읽는 방법, 또는 사람이 지나간 것을 감지해 "고마워요"로 닫는 방법을 검토한다. 답을 받지 못해도 대화가 끝나도록 시간 제한을 둔다.</li>
+        <li><b>박자 맞추기</b> — 시나리오 1의 3-2-1 카운트다운처럼 화면 숫자, 투사 원, 소리가 한 박자로 맞아야 한다. 트랜지션은 이 박자 위에 설계한다.</li>
+      </ul>
+
+      <h3>D. 브랜딩</h3>
+      <ul>
+        <li><b>의인화 수위</b> — 귀여운 표정은 친근함을 높이지만, 지나치면 기대치가 높아지고 경고를 가볍게 받아들이게 된다. <b>위험할수록 캐릭터를 줄인다</b>(5. 방향성).</li>
+        <li><b>시그니처 요소</b> — 대기 중 숨 쉬듯 반복되는 모션, 기립·부팅 시퀀스, 완료 제스처, 고유 효과음(earcon), 바닥 투사 패턴. 소리도 브랜드다.</li>
+        <li><b>이름</b> — "05번 로봇"처럼 현장에서 부를 이름을 화면에 둔다. 관제에 알릴 때도 쓰인다.</li>
+        <li><b>관제와 같은 언어</b> — 로봇 화면의 색, 아이콘, 문구가 APRISM 관제 화면과 같은 체계면 그 자체로 브랜드 일관성이 생긴다.</li>
+      </ul>
+
+      <h3>E. 운영과 규정</h3>
+      <ul>
+        <li><b>촬영 사실 표시</b> — 개인정보보호법(제25조의2, 이동형 영상정보처리기기)은 촬영 사실을 불빛, 소리, 안내판 등으로 알리도록 정하고 있다. 화면에 "촬영 중" 표식이 늘 필요할 수 있다. 적용 범위는 법무 확인이 필요하다.</li>
+        <li><b>경보 피로</b> — 마주칠 때마다 소리가 나면 금방 무시된다. 같은 사람과 반복해서 마주치면 소리를 줄인다(관제 정책의 "반복 마주침 = 주의"와 연결).</li>
+        <li><b>꺼진 상태</b> — 전원이 꺼진 로봇에도 남는 정보가 있어야 한다. 하우징의 물리 라벨이나 전원 없이 남는 e-paper 를 검토한다.</li>
+        <li><b>절전 · 야간 · 연결 끊김</b> — 사람이 없을 때 화면을 어둡게 할지, 통신이 끊겼을 때 무엇을 띄울지 정한다.</li>
+      </ul>
+    </section>
+
+    <!-- ============================================================ 5 -->
+    <section class="pol" id="direction">
+      <h2>5. 방향성</h2>
+      <p class="meta">제안 · 확정 전</p>
+
+      <h3>① 상태 문법을 하나로 만들어 관제와 나눠 쓴다</h3>
+      <p class="rule">색은 위험도 4단계를 따른다. 빨강은 위험에만 쓴다. 점멸 속도도 뜻을 갖는다.</p>
+      <div class="scroll"><table class="tbl">
+        <thead><tr><th>단계</th><th>색</th><th>빛의 움직임</th><th>화면</th><th>시나리오 예</th></tr></thead>
+        <tbody>
+          <tr><td>default</td><td>브랜드 색, 낮은 밝기</td><td>켜져 있음</td><td>이름, 지금 할 일, 브랜드 표정</td><td>출발, 순회, 충전</td></tr>
+          <tr><td><span class="dot" style="background:var(--status-info-icon)"></span>안전 · 정보</td><td>파랑(정보) · 초록(안전 확보, 짧게)</td><td>느리게 숨 쉬기</td><td>아이콘 + 짧은 요청</td><td>사람 마주침, 양보, 계단 이동, 확인 완료</td></tr>
+          <tr><td><span class="dot" style="background:var(--status-warning-icon)"></span>주의</td><td>노랑</td><td>느린 점멸</td><td>△ + 이유 + 요청, 표정 없음</td><td>안전모 미착용, 이상 음향, 배터리 부족</td></tr>
+          <tr><td><span class="dot" style="background:var(--status-critical-icon)"></span>위험</td><td>빨강</td><td>빠른 점멸(1초 3번 미만)</td><td>표준 금지·경고 표지 하나</td><td>배관 이상, 자율복귀 불가, 접근 금지</td></tr>
+        </tbody>
+      </table></div>
+      <ul>
+        <li>계단을 오를 때의 빨강(8)은 <b>안전 · 정보 또는 주의</b>로 옮긴다.</li>
+        <li>이상 지점을 비추는 흰빛(3, 5)은 신호가 아니라 <b>작업등</b>으로 따로 둔다. 상태를 말하는 빛과 섞지 않는다.</li>
+        <li>평상시의 "파랑 or 초록(선택 가능)"은 하나로 정한다.</li>
+      </ul>
+
+      <h3>② 거리 3단계 × 채널 역할 분담</h3>
+      <p>멀리는 빛과 투사, 3m 는 아이콘과 한 줄(6자), 1.5m 는 이유와 요청 두 줄(11자). 화면 문구는 이 표에서 거꾸로 길이를 정한다.</p>
+
+      <h3>③ 브랜드는 평상시에, 안전은 위험할 때</h3>
+      <p>위험도가 오를수록 표현이 표준 표지 쪽으로 옮겨 간다 — <b>표정 → 아이콘 → 표준 표지</b>. 모핑은 이 단계 전환을 보여주는 장치로 쓸 때 의미가 생긴다. 표정이 아이콘으로, 아이콘이 표지로 바뀌는 움직임 자체가 "상황이 심각해졌다"를 말한다.</p>
+
+      <h3>④ 짧은 대화 리듬</h3>
+      <p>"봤어요 → 기다릴게요 → 고마워요". 터치 없이 몸짓과 감지만으로 닫히는 이 세 박자를 로봇의 시그니처 경험으로 만든다.</p>
+    </section>
+
+    <!-- ============================================================ 6 -->
+    <section class="pol" id="open">
+      <h2>6. 정할 것</h2>
+      <div class="open">
+        <h3>정할 것</h3>
+        <ul>
+          <li>디스플레이 장착 위치와 각도 — 등 위 어디에, 몇 도로. 계단에서 화면이 누구를 향하는지</li>
+          <li>패널 밝기와 시야각 실측 — 공장 조명 아래, 3m · 옆 45°에서</li>
+          <li>렌더링 방식(웹 키오스크 / 네이티브)과 애니메이션 런타임 — 실기기 프레임 측정</li>
+          <li>평상시 색 — 파랑과 초록 중 하나로. 브랜드 파랑과 ISO 지시 파랑의 관계</li>
+          <li>표정(캐릭터)을 쓸지, 쓴다면 어느 단계까지</li>
+          <li>다국어 범위 — 한국어만 / 영어 병기 / 언어 순환</li>
+          <li>"촬영 중" 표시 의무 여부 — 법무 확인</li>
+          <li>사람의 답을 무엇으로 받을지 — 몸짓 인식, 지나감 감지, 받지 않음</li>
+          <li>방폭구역 여부 최종 확인</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="pol" id="sources">
+      <h2>출처</h2>
+      <ul class="src">
+        <li><a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8122490/">eHMI: Review and Guidelines for Deployment on Autonomous Vehicles (Carmona et al., 2021)</a></li>
+        <li><a href="https://mdpi.com/2439100">Principles for External Human–Machine Interfaces — 17 heuristics (2023)</a></li>
+        <li><a href="https://arxiv.org/pdf/2108.03045">External HMI on Delivery Robots: Expression of Navigation Intent (Kannan, Lee, Min)</a> — 디스플레이 선호, 빛은 보조 신호</li>
+        <li><a href="https://arxiv.org/pdf/2404.09844">Facial Features Integration in Last Mile Delivery Robots</a></li>
+        <li><a href="https://www.media.mit.edu/publications/do-robots-need-body-language-comparing-communication-modalities-for-legible-motion-intent-in-human-shared-spaces/">Do Robots Need Body Language? (MIT Media Lab, 2026)</a></li>
+        <li><a href="https://arxiv.org/abs/2311.04454v1">Expressive movement improves pedestrians' impressions of a quadruped service robot</a></li>
+        <li><a href="https://peopleandrobots.wisc.edu/publications/communicating-directionality-in-flying-robots-inproceedings/">Communicating Directionality in Flying Robots (Szafir, Mutlu, Fong, 2015)</a></li>
+        <li><a href="https://www.dezeen.com/2019/01/25/new-deal-design-postmates-delivery-robot-serve/amp/">Serve delivery robot — New Deal Design × Postmates (Dezeen)</a></li>
+        <li><a href="https://s3files.core77.com/files/pdfs/2026/140966/1797773_fJ06BmcGB.pdf">Delivery robot design report (Core77)</a> — 과한 의인화의 위험</li>
+        <li><a href="https://www.anybotics.com/anymal-x-the-worlds-first-ex-proof-legged-robot/">ANYmal X — Ex-proof legged robot (ANYbotics)</a></li>
+        <li><a href="https://www.newsseoul.co.kr/news/view/1065584419714074">건설근로자공제회 '건설현장 리포트' — 외국인 근로자 14.7%</a></li>
+        <li><a href="https://www.dailian.co.kr/news/view/1556187/">정부, 외국인노동자 위한 다국어 안전표지 제작 (2025)</a></li>
+        <li><a href="https://faytech.us/monitors/high-brightness/sunlight-readable/viewable">Sunlight readable displays (Faytech)</a> — 밝기 기준</li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <span>APRISM · 공장 환경점검 로봇 관제 대시보드</span>
+  </footer>
+
+  <script src="./assets/js/theme.js?v=c86093d9"></script>
+</body>
+</html>
