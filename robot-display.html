@@ -182,6 +182,20 @@
     .mocks[data-size="1"] .mk { box-sizing: content-box; max-width: none; border-width: calc(6px / var(--dpr, 1)); }
     .mocks[data-size="1"] .mk-l { width: calc(800px / var(--dpr, 1)); height: calc(480px / var(--dpr, 1)); }
     .mocks[data-size="1"] .mk-p { width: calc(480px / var(--dpr, 1)); height: calc(800px / var(--dpr, 1)); }
+    /* 실물 크기 — --mmpx(CSS px / mm)를 모니터 인치 · 해상도로 계산. 패널 155 × 86mm(세로 86 × 155) */
+    .only-mm, .only-mm-b { display: none; }
+    body.size-mm .only-mm { display: inline; }
+    body.size-mm .only-mm-b { display: flex; }
+    .calib { align-items: center; gap: var(--space-16); flex-wrap: wrap; margin: 0 0 var(--space-8); padding: var(--space-8) var(--space-12); border: var(--border-width-thin) solid var(--border-divider); border-radius: var(--radius-card); color: var(--text-secondary); font-size: var(--font-size-12); }
+    .calib input { width: 64px; margin: 0 var(--space-4); padding: 2px var(--space-8); border: var(--border-width-thin) solid var(--border-default); border-radius: var(--radius-control); background: var(--bg-cell); color: var(--text-primary); font: inherit; }
+    .calib b { color: var(--text-primary); }
+    .ruler-wrap { display: inline-flex; align-items: center; gap: var(--space-8); }
+    .ruler { display: inline-block; width: calc(50px * var(--mmpx, 3.6)); height: 10px; border: 2px solid var(--text-primary); border-top: 0; box-sizing: border-box; }
+    .mocks[data-size="mm"] { grid-template-columns: repeat(auto-fill, calc(155px * var(--mmpx, 3.6) + 4px)) !important; }
+    .mocks[data-size="mm"] .mk { box-sizing: content-box; max-width: none; border-width: 2px; }
+    .mocks[data-size="mm"] .mk-l { width: calc(155px * var(--mmpx, 3.6)); height: calc(86px * var(--mmpx, 3.6)); }
+    .mocks[data-size="mm"] .mk-p { width: calc(86px * var(--mmpx, 3.6)); height: calc(155px * var(--mmpx, 3.6)); }
+    .mocks[data-size="mm"][data-orient="p"] { grid-template-columns: repeat(auto-fill, calc(86px * var(--mmpx, 3.6) + 4px)) !important; }
     .mk-p, .only-p { display: none; }
     .mocks[data-orient="p"] { grid-template-columns: repeat(4, minmax(0, 1fr)); }
     .mocks[data-orient="p"] .mk-l { display: none; }
@@ -490,11 +504,17 @@
         </div>
         <div class="seg" role="group" aria-label="보기 크기">
           <button type="button" data-size="fit" aria-pressed="true">맞춤</button>
-          <button type="button" data-size="1" aria-pressed="false">실제 크기 1:1</button>
+          <button type="button" data-size="1" aria-pressed="false">픽셀 1:1</button>
+          <button type="button" data-size="mm" aria-pressed="false">실물 크기</button>
         </div>
         </div>
       </div>
-      <p class="note"><span class="only-1">실제 크기 — 모니터 픽셀 1:1(화면 배율 <span class="dpr">100</span>% 보정). 실물 패널은 가로 155mm 라 모니터에 따라 실물보다 크거나 작게 보인다 · </span><span class="only-p">세로는 너비 86mm — 3m 에서 한 줄 약 3자라 문구가 두 줄로 쌓인다 · </span>도형과 글자만 · 주 문구 70~120px · 보조 26~36px · 위쪽 상태 줄 24px · 아래 띠 = 몸체 상태등 색</p>
+      <div class="calib only-mm-b">
+        <label>모니터 <input type="number" id="diag" value="24" min="10" max="60" step="0.1" inputmode="decimal" /> 인치</label>
+        <span class="calib-res">해상도 <b id="res">1920×1080</b> · <b id="ppi">92</b> ppi</span>
+        <span class="ruler-wrap">자로 재어 확인 <span class="ruler" aria-hidden="true"></span> = 50mm</span>
+      </div>
+      <p class="note"><span class="only-mm">실물 크기 — 보이는 화면 155 × 86mm. 이 패널은 픽셀이 정사각형이 아니라(가로 0.194 · 세로 0.179mm) 실물에서는 그림이 <b>가로로 약 8% 퍼진다</b> — 원이 살짝 납작한 타원이 된다 · </span><span class="only-1">픽셀 1:1 — 모니터 픽셀 1:1(화면 배율 <span class="dpr">100</span>% 보정). 실물 패널은 가로 155mm 라 모니터에 따라 실물보다 크거나 작게 보인다 · </span><span class="only-p">세로는 너비 86mm — 3m 에서 한 줄 약 3자라 문구가 두 줄로 쌓인다 · </span>도형과 글자만 · 주 문구 70~120px · 보조 26~36px · 위쪽 상태 줄 24px · 아래 띠 = 몸체 상태등 색</p>
       <div class="mocks" data-orient="l" data-size="fit">
           <figure>
             <svg class="mk mk-l" viewBox="0 0 800 480" role="img" aria-label="T1 상태 화면 예시: 왼쪽 캐릭터 자리 정육면체, 오른쪽 순회 중"><rect class="bg" x="0" y="0" width="800" height="480"/><rect class="sf" x="0" y="0" width="800" height="52"/><text class="tx b" x="28" y="35" font-size="26">로봇 05</text><circle class="dg" cx="514" cy="26" r="7"/><text class="sub" x="530" y="35" font-size="24">촬영 중</text><text class="sub" x="700" y="35" font-size="24" text-anchor="end">86%</text><rect class="ln-s" x="712" y="15" width="48" height="22" rx="5"/><rect class="sub-f" x="716" y="19" width="34" height="14" rx="2"/><rect class="sub-f" x="762" y="21" width="4" height="10" rx="1"/><g class="cube"><polygon class="c1" points="180,170 260,215 180,260 100,215"/><polygon class="c2" points="100,215 180,260 180,350 100,305"/><polygon class="c3" points="180,260 260,215 260,305 180,350"/></g><text class="tx b" x="330" y="245" font-size="88">순회 중</text><text class="sub" x="332" y="310" font-size="36">B4 · 압력계 판독</text><text class="mu" x="332" y="360" font-size="36">다음 WP-04</text><rect class="sf-ok" x="0" y="466" width="800" height="14"/></svg>
@@ -710,16 +730,28 @@
   </footer>
 
   <script>
-    // 틀별 화면 예시 — 가로 · 세로, 맞춤 · 실제 크기(기기 픽셀 1:1) 전환
+    // 틀별 화면 예시 — 가로 · 세로 / 맞춤 · 픽셀 1:1 · 실물 크기(모니터 인치로 계산)
     (function () {
       var grid = document.querySelector('.mocks');
-      function setDpr() {
+      var diag = document.getElementById('diag');
+      try { var saved = localStorage.getItem('rd-diag'); if (saved) diag.value = saved; } catch (e) {}
+      function calc() {
         var d = window.devicePixelRatio || 1;
+        var rw = Math.round(screen.width * d), rh = Math.round(screen.height * d);
+        var inch = parseFloat(diag.value) || 24;
+        var ppi = Math.sqrt(rw * rw + rh * rh) / inch;
         grid.style.setProperty('--dpr', d);
+        document.documentElement.style.setProperty('--mmpx', (ppi / 25.4 / d).toFixed(4));
+        document.getElementById('res').textContent = rw + '×' + rh;
+        document.getElementById('ppi').textContent = Math.round(ppi);
         var el = document.querySelector('.dpr'); if (el) el.textContent = Math.round(d * 100);
       }
-      setDpr();
-      window.addEventListener('resize', setDpr);
+      calc();
+      window.addEventListener('resize', calc);
+      diag.addEventListener('input', function () {
+        calc();
+        try { localStorage.setItem('rd-diag', diag.value); } catch (e) {}
+      });
       function wire(attr, onPick) {
         var btns = document.querySelectorAll('.seg button[data-' + attr + ']');
         btns.forEach(function (b) {
@@ -732,7 +764,14 @@
         });
       }
       wire('orient', function (v) { document.body.classList.toggle('orient-p', v === 'p'); });
-      wire('size', function (v) { document.body.classList.toggle('size-1', v === '1'); });
+      wire('size', function (v) {
+        document.body.classList.toggle('size-1', v === '1');
+        document.body.classList.toggle('size-mm', v === 'mm');
+        // 실물은 픽셀이 정사각형이 아니므로 155 × 86mm 에 늘려 맞춘다
+        grid.querySelectorAll('svg.mk').forEach(function (g) {
+          g.setAttribute('preserveAspectRatio', v === 'mm' ? 'none' : 'xMidYMid meet');
+        });
+      });
     })();
   </script>
   <script src="./assets/js/theme.js?v=c86093d9"></script>
