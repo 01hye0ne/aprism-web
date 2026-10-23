@@ -146,3 +146,51 @@
   paint();
   document.addEventListener("aprism:severity", function () { setTimeout(paint, 0); });
 })();
+
+// Delta 위젯형 · 작은 창 요약 — 넘치면 스크롤(10/23 디자이너, 레퍼런스 "subtle text scale effect").
+// 위로 빠져나가는 줄은 살짝 작아지고 흐려진다. 낱말마다 감싸 각자의 높이로 잰다 — 한 줄의 낱말은 같은 값을 받아 줄째로 움직인다.
+// 문구는 monitor.js 가 갈아 끼우므로 글이 바뀌면 다시 감싸고 맨 위로 돌린다. 가로형 · 펼친 창은 손대지 않는다.
+(function () {
+  if (!document.body.classList.contains("ver-3")) { return; }
+  var win = document.querySelector("[data-delta3]");
+  var box = win && win.querySelector(".delta3-body");
+  var p = box && box.querySelector(".ai-line-2");
+  if (!p) { return; }
+  var words = [];
+  var last = null;
+  var LINE = 24;   // 한 줄 높이(16/24) — 위 끝에 걸치기 시작해 한 줄만큼 빠져나가는 동안 줄어든다. 쉬는 자리의 첫 줄은 그대로다.
+  function off() { return win.classList.contains("is-open") || document.body.classList.contains("d3-bar"); }
+  function paint() {
+    var top = box.getBoundingClientRect().top;
+    box.classList.toggle("is-scrolled", box.scrollTop > 0);   // 내려 읽는 동안만 위 끝도 흐린다(v3.css)
+    words.forEach(function (w) {
+      if (off()) { w.style.transform = ""; w.style.opacity = ""; return; }
+      var r = w.getBoundingClientRect();
+      var k = Math.max(0, Math.min(1, 1 + (r.top - top) / LINE));
+      w.style.transform = k < 1 ? "scale(" + (0.86 + 0.14 * k).toFixed(3) + ")" : "";
+      w.style.opacity = k < 1 ? (0.2 + 0.8 * k).toFixed(2) : "";
+    });
+  }
+  function split() {
+    var t = p.textContent;
+    if (t === last) { return; }
+    last = t;
+    p.textContent = "";
+    words = [];
+    t.split(/(\s+)/).forEach(function (w) {
+      if (!w) { return; }
+      if (/^\s+$/.test(w)) { p.appendChild(document.createTextNode(w)); return; }
+      var s = document.createElement("span");
+      s.className = "d3-w";
+      s.textContent = w;
+      p.appendChild(s);
+      words.push(s);
+    });
+    box.scrollTop = 0;
+    paint();
+  }
+  new MutationObserver(split).observe(p, { childList: true, characterData: true, subtree: true });
+  new MutationObserver(function () { requestAnimationFrame(paint); }).observe(win, { attributes: true, attributeFilter: ["class"] });
+  box.addEventListener("scroll", function () { requestAnimationFrame(paint); }, { passive: true });
+  split();
+})();

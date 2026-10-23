@@ -1267,3 +1267,36 @@ body.ver-3.is-building .ah-item .ah-where::after { top: 50%; width: 7px; height:
   border-color: var(--text-secondary);
   box-shadow: inset 0 0 0 1px var(--text-secondary);
 }
+
+/*
+ * Delta 위젯형 · 작은 창 요약 — 넘치면 스크롤 (10/23 디자이너, 레퍼런스 subtle text scale effect).
+ * 6 줄에서 자르던(…) 것을 칸 안 스크롤로 바꾼다. 스크롤 막대는 숨긴다(작은 카드라 막대가 글보다 시끄럽다).
+ * 아래 끝은 가림 그라데이션(20)으로 "더 있다"를 알리고, 위로 빠지는 줄은 v3-panel.js 가 줄이고(0.86) 흐린다.
+ * 글은 한 색(fg/primary) — 예전 "절반부터 옅어지기"는 스크롤하면 자리가 안 맞아 뺐다.
+ */
+body.ver-3.v2-2.v3:not(.d3-bar) .delta3:not(.is-open) .delta3-body {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+  padding-bottom: var(--space-8);
+  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 20px), transparent);
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 20px), transparent);
+}
+body.ver-3.v2-2.v3:not(.d3-bar) .delta3:not(.is-open) .delta3-body::-webkit-scrollbar { display: none; }
+body.ver-3.v2-2.v3:not(.d3-bar) .delta3:not(.is-open) .delta3-body > .ai-line-2 {
+  display: block;
+  -webkit-line-clamp: unset;
+  overflow: visible;
+  background-image: none;
+  color: var(--text-primary);
+}
+.ver-3 .delta3 .ai-line-2 .d3-w { display: inline-block; transform-origin: 50% 100%; }
+@media (prefers-reduced-motion: reduce) {
+  .ver-3 .delta3 .ai-line-2 .d3-w { transform: none !important; }
+}
+/* 내려 읽는 동안(.is-scrolled)은 위 끝 16 도 흐려, 빠져나가는 줄이 칼로 자른 듯 끊기지 않는다. 쉬는 자리의 첫 줄은 또렷하다. */
+body.ver-3.v2-2.v3:not(.d3-bar) .delta3:not(.is-open) .delta3-body.is-scrolled {
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 16px, #000 calc(100% - 20px), transparent);
+  mask-image: linear-gradient(to bottom, transparent, #000 16px, #000 calc(100% - 20px), transparent);
+}
