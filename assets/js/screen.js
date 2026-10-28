@@ -600,6 +600,8 @@ window.APRISM_TEXT = (function () {
   // 문구는 Figma 와 같은 자리표시자(waypoint name)를 그대로 쓴다.
   // 진행률은 steps 에서 계산한다 — Figma 의 "3 / 5"·"00%" 는 서로 맞지 않는 값이었다.
   // ------------------------------------------------------------------
+  // v4 지도 경로 표현(body[data-route-rules] — main-v3.html 만) — Robot 11 의 웨이포인트 20칸 더미 데이터를 쓴다
+  var V4_RR = document.body.hasAttribute("data-route-rules");
   var ROBOTS = [
     {
       // State=Running · 78% · Strong
@@ -773,8 +775,30 @@ window.APRISM_TEXT = (function () {
       // 11 · 수행중 · 71% · Strong — 막바지에 가까워졌다
       // 10/20 디자이너 — 걸어가는 로봇 예시. WP-03 을 마치고 WP-04 로 이동 중이라 붙든 칸이 없다(로봇 3D 는 걷기).
       mission: "지하 3층 전기실 열화상 점검",
-      current: "WP-04 로 이동 중",
-      steps: [
+      // v4 — 지도 경로 표현(10/22 전달서) 더미: 09:12 출발, 14:15 도킹 스테이션 복귀. 1~7 완료, 8 진행중, 9~20 진행전.
+      current: V4_RR ? "WP-08 케미컬 공급 캐비닛 CDS-02 판독" : "WP-04 로 이동 중",
+      steps: V4_RR ? [
+        { title: "FFU-01 토출구", state: "done", time: "09:12 – 09:31", duration: "19분", desc: "토출 풍속과 필터 표면 오염 여부를 확인한다." },
+        { title: "HEPA Filter 차압계", state: "done", time: "09:31 – 09:52", duration: "21분", desc: "차압계 표시값을 자동으로 판독하고, 교체 기준 대비 차압 상승을 확인한다." },
+        { title: "냉각수 배관 밸브", state: "done", time: "09:52 – 10:08", duration: "16분", desc: "밸브 개폐 상태와 연결부 누수 흔적을 확인한다." },
+        { title: "N₂ 배관 압력계", state: "done", time: "10:08 – 10:24", duration: "16분", desc: "압력계 표시값을 자동으로 판독하고, 정상 운전범위 대비 압력 편차와 변화 추이를 확인한다." },
+        { title: "CDA 메인 레귤레이터", state: "done", time: "10:24 – 10:37", duration: "13분", desc: "2차 압력 설정값과 실제 출력값의 차이를 확인한다." },
+        { title: "배기 덕트 댐퍼", state: "done", time: "10:37 – 10:55", duration: "18분", desc: "댐퍼 개도 위치와 덕트 연결부 이격 여부를 확인한다." },
+        { title: "PCW 공급 유량계", state: "done", time: "10:55 – 11:09", duration: "14분", desc: "유량계 표시값을 판독하고, 설정 유량 대비 편차를 확인한다." },
+        { title: "케미컬 공급 캐비닛 CDS-02", state: "running", time: "11:09 – 11:26", duration: "17분", desc: "누액 센서 상태와 배관 연결부 온도를 열화상으로 확인하고, 캐비닛 내부 온도 편차를 점검한다." },
+        { title: "FFU-02 토출구", state: "pending", time: "11:26 – 11:40", duration: "14분", desc: "토출 풍속과 필터 표면 오염 여부를 확인한다." },
+        { title: "클린룸 파티클 카운터", state: "pending", time: "11:40 – 11:55", duration: "15분", desc: "구역별 파티클 농도를 측정하고, 청정도 등급 기준 초과 여부를 확인한다." },
+        { title: "UPW 공급 밸브", state: "pending", time: "11:55 – 12:08", duration: "13분", desc: "밸브 개폐 상태와 비저항 표시값을 확인한다." },
+        { title: "스크러버 배기 압력계", state: "pending", time: "12:08 – 12:24", duration: "16분", desc: "배기 압력을 판독하고, 정상 범위 대비 음압 유지 여부를 확인한다." },
+        { title: "가스 캐비닛 GC-03", state: "pending", time: "12:24 – 12:41", duration: "17분", desc: "가스 누출 감지기 상태와 실린더 압력 잔량을 확인한다." },
+        { title: "항온항습기 AHU-01", state: "pending", time: "12:41 – 12:59", duration: "18분", desc: "공급 온도와 습도가 설정값을 유지하는지 확인한다." },
+        { title: "진공 펌프 VP-04", state: "pending", time: "12:59 – 13:13", duration: "14분", desc: "펌프 표면 온도와 이상 진동 여부를 확인한다." },
+        { title: "분전반 MCC-02", state: "pending", time: "13:13 – 13:30", duration: "17분", desc: "차단기 단자부 발열을 열화상으로 확인한다." },
+        { title: "비상 샤워기", state: "pending", time: "13:30 – 13:39", duration: "9분", desc: "주변 적치물과 접근 동선 확보 상태를 확인한다." },
+        { title: "소화 설비 감지기", state: "pending", time: "13:39 – 13:52", duration: "13분", desc: "감지기 표시등 상태와 외관 손상 여부를 확인한다." },
+        { title: "FFU-03 토출구", state: "pending", time: "13:52 – 14:06", duration: "14분", desc: "토출 풍속과 필터 표면 오염 여부를 확인한다." },
+        { title: "도킹 스테이션 복귀", state: "pending", time: "14:06 – 14:15", duration: "9분", desc: "충전 위치로 복귀하고 점검 결과를 업로드한다." }
+      ] : [
         { title: "waypoint name", state: "done", time: "09:40 – 09:58", duration: "18분" },
         { title: "waypoint name", state: "done", time: "09:58 – 10:12", duration: "14분" },
         { title: "waypoint name", state: "done", time: "10:12 – 10:29", duration: "17분" },
@@ -837,6 +861,8 @@ window.APRISM_TEXT = (function () {
    * 완료 칸의 시각은 앞 칸이 끝난 시각에서 이어 붙인다.
    */
   var WP_TOTAL = 20;
+  // v4 — 상태 시뮬레이션 막대(route-sim.js)의 [지점 60개] 시험
+  if (V4_RR) { try { if (localStorage.getItem("rr-wp-total") === "60") { WP_TOTAL = 60; } } catch (e) { } }
   var WP_SPANS = [17, 14, 21, 16, 19, 15, 18, 22, 13, 20];
 
   function clockAt(mins) {
@@ -872,7 +898,7 @@ window.APRISM_TEXT = (function () {
   }
 
   ROBOTS.forEach(function (robot) {
-    robot.steps = padSteps(robot.steps, WP_TOTAL);
+    robot.steps = padSteps(robot.steps, WP_TOTAL).slice(0, WP_TOTAL);
   });
 
   /*

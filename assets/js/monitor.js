@@ -378,6 +378,7 @@
   }
 
   var TONE = { normal: 0, warning: 1, critical: 2 };
+  var V4_WP_FIXED = document.body.hasAttribute("data-route-rules") ? { "WP-02": "critical", "WP-04": "warning" } : {};
 
   /*
    * 관제사 교대 — 사람이 바뀌어도 로봇은 돈다(UI_99 1319:89664).
@@ -496,6 +497,9 @@
     });
     $$("[data-waypoint]", rail).forEach(function (node) {
       var sev = hits[node.getAttribute("data-waypoint")];
+      // v4 지도 경로 표현(10/22 전달서) — 2번 위험 · 4번 주의 판정으로 고정해 세모 표식을 보인다
+      var fixed = V4_WP_FIXED[node.getAttribute("data-waypoint")];
+      if (fixed && (!sev || TONE[fixed] > TONE[sev])) { sev = fixed; }
       if (sev) { node.setAttribute("data-wp-alert", WP_ALERT[sev]); } else { node.removeAttribute("data-wp-alert"); }
       var done = node.getAttribute("data-wp-state") === "completed";
       if (done) { node.setAttribute("data-wp-result", sev ? WP_ALERT[sev] : "safe"); }

@@ -1,0 +1,400 @@
+/*
+ * route-rules 시안 반영(10/21) — 지도와 패널이 같은 박자로 움직인다.
+ * 지도에서 지금 가는 길에 흐름이 지나가면, 우측 미션 타임라인에서도
+ * 지난 칸에서 지금 칸으로 내려오는 레일에 같은 흐름이 지나간다.
+ */
+@keyframes rr-railflow {
+  from { background-position: 0 -36px; }
+  to { background-position: 0 calc(100% + 36px); }
+}
+.timeline-item.is-done:has(+ .timeline-item.is-running) .rail-line,
+.timeline-item.is-running .rail-stub {
+  background-color: var(--color-blue-400);
+}
+/* 흐름은 이동 중에만(측정 · 멈춤에선 멈춘다 — 시안) */
+[data-timeline]:not(.rr-flow) .timeline-item.is-done:has(+ .timeline-item.is-running) .rail-line,
+[data-timeline]:not(.rr-flow) .timeline-item.is-running .rail-stub { background-image: none !important; animation: none !important; }
+.rr-flow .timeline-item.is-done:has(+ .timeline-item.is-running) .rail-line,
+.rr-flow .timeline-item.is-running .rail-stub {
+  background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0, rgba(255, 255, 255, .95) 70%, rgba(255, 255, 255, 0) 100%);
+  background-size: 100% 36px;
+  background-repeat: no-repeat;
+  animation: rr-railflow 1.6s linear infinite;
+}
+.timeline-item.is-running .rail-stub { animation-delay: .9s; }
+@media (prefers-reduced-motion: reduce) {
+  .timeline-item.is-done:has(+ .timeline-item.is-running) .rail-line,
+  .timeline-item.is-running .rail-stub { animation: none; background-image: none; }
+}
+
+/*
+ * 로봇 표식 — 웨이포인트(원)와 헷갈리지 않게 캡슐(route-rules B안).
+ * 가는 쪽으로 돌고(--bot-ang, map.js placeBot), 앞쪽 꺾쇠가 방향이다.
+ * 지도 위에는 설비실 이름 말고 글자를 두지 않는다 — 로봇 이름표는 숨긴다(이름은 툴팁과 우측 패널).
+ */
+.map-bot-dot {
+  width: calc(26px * var(--bot-zoom, 1));
+  height: calc(15px * var(--bot-zoom, 1));
+  border-width: calc(2px * var(--bot-zoom, 1));
+  border-radius: calc(8px * var(--bot-zoom, 1));
+  transform: translate(-50%, -50%) rotate(var(--bot-ang, 0deg));
+  background-color: var(--bot-route, var(--color-blue-400));
+  box-shadow: 0 2px 8px var(--color-alpha-gray-900-50, rgba(0, 0, 0, 0.5));
+}
+.map-bot-dot::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: calc(4px * var(--bot-zoom, 1));
+  width: calc(4px * var(--bot-zoom, 1));
+  height: calc(4px * var(--bot-zoom, 1));
+  border-top: calc(2px * var(--bot-zoom, 1)) solid var(--bg-page);
+  border-right: calc(2px * var(--bot-zoom, 1)) solid var(--bg-page);
+  transform: translateY(-50%) rotate(45deg);
+}
+.map-bot-halo { background-color: var(--bot-route, var(--color-blue-400)); border-radius: 999px; height: calc(36px * var(--bot-zoom, 1)); transform: translate(-50%, -50%) rotate(var(--bot-ang, 0deg)); }
+.map-bot-name { display: none; }
+
+/* ---------- 움직임 시뮬레이션 패널 ---------- */
+.rsim { position: fixed; left: 50%; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 9998;
+  width: min(760px, calc(100% - 32px)); display: grid; gap: 8px; padding: 10px 12px;
+  background: rgba(12, 16, 23, .94); color: #e4e8ef; border: 1px solid #2a3343; border-radius: 12px; box-shadow: 0 12px 40px rgba(0, 0, 0, .45);
+  font: 13px/1.4 "SUIT", "Malgun Gothic", system-ui, sans-serif; color-scheme: dark; }
+.rsim-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.rsim-chips button { font: inherit; border: 1px solid #2f3a4c; background: transparent; color: #c5ccd8; border-radius: 999px; padding: 5px 12px; cursor: pointer; }
+.rsim-chips button[aria-pressed="true"] { background: #e4e8ef; color: #0a0e15; border-color: #e4e8ef; font-weight: 700; }
+.rsim-bar { display: flex; align-items: center; gap: 12px; }
+.rsim-play { font: inherit; border: 1px solid #2f3a4c; background: #1b2230; color: #e4e8ef; border-radius: 7px; padding: 5px 14px; cursor: pointer; }
+.rsim-bar input { flex: 1; accent-color: #4990e0; min-width: 0; }
+.rsim-pct { width: 40px; text-align: right; color: #8b95a7; font: 12px "JetBrains Mono", Consolas, monospace; }
+.rsim-wait { margin: 0; color: #e2b45a; font-size: 12px; }
+.rsim:not(.is-ready) .rsim-chips, .rsim:not(.is-ready) .rsim-bar { opacity: .35; pointer-events: none; }
+.rsim button:focus-visible, .rsim input:focus-visible { outline: 2px solid #4990e0; outline-offset: 2px; }
+
+/* ---------- 로봇 표식 — 상태에 따라(시뮬레이션이 data-rr 을 단다) ---------- */
+.map-bot[data-rr="pause"] .map-bot-dot { background-color: var(--color-gray-450, #9ea8bb); }
+.map-bot[data-rr="pause"] .map-bot-dot::after,
+.map-bot[data-rr="estop"] .map-bot-dot::after { right: 50%; transform: translate(50%, -50%); border: 0; }
+.map-bot[data-rr="pause"] .map-bot-dot::after { width: calc(6px * var(--bot-zoom, 1)); height: calc(7px * var(--bot-zoom, 1));
+  border-left: calc(2px * var(--bot-zoom, 1)) solid var(--bg-page); border-right: calc(2px * var(--bot-zoom, 1)) solid var(--bg-page); }
+.map-bot[data-rr="estop"] .map-bot-dot { background-color: #ff383c; }
+.map-bot[data-rr="estop"] .map-bot-dot::after { width: calc(5px * var(--bot-zoom, 1)); height: calc(5px * var(--bot-zoom, 1)); background: var(--bg-page); }
+.map-bot[data-rr="return"] .map-bot-dot { background-color: #e4e8ef; }
+.map-bot[data-rr="done"] .map-bot-dot { background-color: var(--color-gray-450, #9ea8bb); }
+.map-bot[data-rr="done"] .map-bot-dot::after { display: none; }
+.map-bot[data-rr="lost"] .map-bot-dot { background-color: var(--bg-page); border-style: dashed; border-color: var(--color-gray-450, #9ea8bb); }
+.map-bot[data-rr="lost"] .map-bot-dot::after { border-color: var(--color-gray-450, #9ea8bb); }
+.map-bot[data-rr="lost"] .map-bot-halo { opacity: 1; background: none; border: 1.5px dashed var(--color-gray-450, #9ea8bb); animation: rr-lost 3s ease-out infinite; }
+.map-bot[data-rr="inspect"] .map-bot-halo { animation: rr-pulse 1.6s ease-out infinite; }
+@keyframes rr-pulse { 0% { opacity: .45; transform: translate(-50%, -50%) rotate(var(--bot-ang, 0deg)) scale(.7); } 100% { opacity: 0; transform: translate(-50%, -50%) rotate(var(--bot-ang, 0deg)) scale(1.6); } }
+@keyframes rr-lost { 0% { opacity: .9; transform: translate(-50%, -50%) scale(.6); } 100% { opacity: 0; transform: translate(-50%, -50%) scale(1.8); } }
+@media (prefers-reduced-motion: reduce) { .map-bot[data-rr] .map-bot-halo { animation: none; } }
+
+/* ---------- [route-rules 10/21] 기존 지도 표식 — 시안 결정에 없어 끈다 ----------
+ * 다른 로봇 이름 알약(.tr-pill), 층 이동 배지 · 칩, 계단 입구 칩, 기존 도커(글자 포함)는 지도 위 글자 금지 원칙에 따라 숨긴다.
+ * 만드는 코드는 map.js 에 그대로 두었다(도커 · 계단 칩 호출은 frame() 에서 주석 처리).
+ */
+.tr-pill, .tr-badge, .tr-chip, .stair-tag, .map-dock { display: none !important; }
+
+/* ---------- 충전 스테이션(시안) ---------- */
+.rr-dock { position: absolute; z-index: 3; transform: translate(-50%, -50%); pointer-events: none; width: 22px; height: 22px; }
+.rr-dock svg { display: block; overflow: visible; }
+.rr-dock .rr-dock-box { fill: var(--bg-page, #070a10); stroke: #8894aa; stroke-width: 1.5; stroke-opacity: .8; }
+.rr-dock .rr-dock-bolt { fill: #8894aa; fill-opacity: .8; }
+.rr-dock .rr-dock-pulse { fill: none; stroke-width: 2; opacity: 0; transform-box: fill-box; transform-origin: center; }
+.rr-dock[data-rr="return"] .rr-dock-box { stroke: #e4e8ef; stroke-opacity: 1; }
+.rr-dock[data-rr="return"] .rr-dock-bolt { fill: #e4e8ef; fill-opacity: 1; }
+.rr-dock[data-rr="return"] .rr-dock-pulse { stroke: #e4e8ef; animation: rr-dock 2.4s ease-out infinite; }
+.rr-dock[data-rr="done"] .rr-dock-box { fill: #34c759; stroke: var(--bg-page, #070a10); stroke-opacity: 1; }
+.rr-dock[data-rr="done"] .rr-dock-bolt { fill: var(--bg-page, #070a10); fill-opacity: 1; }
+.rr-dock[data-rr="done"] .rr-dock-pulse { stroke: #34c759; animation: rr-dock 2.4s ease-out infinite; }
+@keyframes rr-dock { 0% { opacity: .6; transform: scale(.8); } 100% { opacity: 0; transform: scale(1.8); } }
+
+/* ---------- 측정 눈금 6칸(로봇 둘레) ---------- */
+.rr-ring { position: absolute; top: 50%; left: 50%; width: calc(60px * var(--bot-zoom, 1)); height: calc(60px * var(--bot-zoom, 1));
+  transform: translate(-50%, -50%); pointer-events: none; overflow: visible; display: none; }
+.rr-ring path { fill: none; stroke: #9ea8bb; stroke-opacity: .45; stroke-width: 4; stroke-linecap: round; }
+.rr-ring path.on { stroke: var(--color-blue-400, #89b9ed); stroke-opacity: 1; }
+
+/* ---------- 우측 지금 카드 — 상태 줄 ---------- */
+.rr-notes { display: grid; gap: 4px; margin-top: 4px; }
+.rr-note { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 12px; font-weight: 600; color: inherit; }
+.rr-note.is-measure { justify-content: flex-start; }
+.rr-note.is-measure .num { margin-left: auto; }
+.rr-note .trk { fill: none; stroke: rgba(127, 127, 127, .3); stroke-width: 3; }
+.rr-note .val { fill: none; stroke: #0d8df9; stroke-width: 3; stroke-linecap: round; transition: stroke-dashoffset .3s; }
+.rr-note b { font-weight: 700; }
+.rr-resume { font: inherit; font-size: 12px; font-weight: 700; border: 0; border-radius: 6px; padding: 3px 10px; background: #0d8df9; color: #ffffff; cursor: pointer; }
+.rr-band { display: grid; gap: 2px; background: #ff383c; color: #ffffff; border-radius: 6px; padding: 6px 8px; font-size: 12px; }
+
+/* 지금 카드 글자색 — 카드 제목과 같은 색 */
+.v2 .is-running .rr-note { color: var(--step-now-fg); }
+
+/* ---------- 자동복귀(시안) ---------- */
+.rr-chev { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none; overflow: visible; }
+.rr-chev path { fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.map-bot[data-rr="return"] .map-bot-dot { background-color: #e4e8ef; }
+:root[data-theme="light"] .map-bot[data-rr="return"] .map-bot-dot { background-color: #2b3445; }
+:root[data-theme="light"] .rr-dock[data-rr="return"] .rr-dock-box,
+:root[data-theme="light"] .rr-dock[data-rr="return"] .rr-dock-pulse { stroke: #2b3445; }
+:root[data-theme="light"] .rr-dock[data-rr="return"] .rr-dock-bolt { fill: #2b3445; }
+.rr-hide { display: none !important; }
+.rr-skip .step-card { background: transparent !important; border: 1px dashed var(--border-default, #4e576a); }
+.rr-skip .step-title, .rr-skip .step-desc { color: var(--text-secondary, #afb7c8) !important; }
+.rr-skip .rail-dot { border-style: dashed; color: var(--color-gray-500, #667085); }
+.rr-skip .rail-dot::after { display: none; }
+.rr-home .rail-dot { border-radius: 4px; color: #e4e8ef; }
+.rr-home .rail-dot::after { display: none; }
+.rr-homebar { height: 6px; border-radius: 3px; margin-top: 4px; background: repeating-linear-gradient(90deg, currentColor 0 8px, transparent 8px 14px); background-size: 28px 100%; opacity: .7; animation: rr-march .9s linear infinite; }
+@keyframes rr-march { to { background-position: 28px 0; } }
+.rr-home .rr-note { margin-top: 2px; }
+.rc-actions .btn.rr-on { box-shadow: 0 0 0 2px currentColor inset; }
+@media (prefers-reduced-motion: reduce) { .rr-homebar { animation: none; } }
+
+/* ---------- [route-rules 10/21] 제품 지도 표현 중 시안에 없는 것 — 숨김 ----------
+ * 미션 설정의 들르는 차례 번호 · 화살촉(.map-plan). 만드는 코드는 map.js 에 그대로 둔다.
+ */
+.map-plan { display: none !important; }
+
+/* ---------- 위험 감지(시안) ---------- */
+.rr-alert-pulse { position: absolute; z-index: 2; width: 34px; height: 34px; margin: -17px 0 0 -17px; border-radius: 50%;
+  background: rgba(255, 56, 60, .5); pointer-events: none; animation: rr-alert 1.6s ease-out infinite; }
+@keyframes rr-alert { 0% { opacity: .7; transform: scale(.5); } 100% { opacity: 0; transform: scale(1.7); } }
+.rr-alert-line { display: flex; justify-content: space-between; gap: 8px; margin: 4px 0 0; font-size: 12px; font-weight: 600; color: var(--status-critical-text, #ff8a8d); }
+@media (prefers-reduced-motion: reduce) { .rr-alert-pulse { animation: none; opacity: .5; } }
+
+/* ---------- [10/21] 일시정지 — 시안 C안: ‖ 는 세워 두고, 둘레 고리 + 재개 버튼 ---------- */
+.map-bot[data-rr="pause"] .map-bot-dot::after,
+.map-bot[data-rr="estop"] .map-bot-dot::after { transform: translate(50%, -50%) rotate(calc(-1 * var(--bot-ang, 0deg))); }
+.rr-pause { position: absolute; top: 50%; left: 50%; width: calc(60px * var(--bot-zoom, 1)); height: calc(60px * var(--bot-zoom, 1));
+  transform: translate(-50%, -50%); display: none; pointer-events: none; }
+.rr-pause > svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.rr-pause .trk { fill: none; stroke: #9ea8bb; stroke-opacity: .35; stroke-width: 3; }
+.rr-pause .val { fill: none; stroke: var(--bot-route, #4990e0); stroke-width: 3; stroke-linecap: round; transition: stroke-dashoffset .3s; }
+.rr-pause-go { position: absolute; left: calc(50% + 35px * var(--bot-zoom, 1)); top: calc(50% - 32px * var(--bot-zoom, 1));
+  width: calc(26px * var(--bot-zoom, 1)); height: calc(26px * var(--bot-zoom, 1)); transform: translate(-50%, -50%);
+  border: 2px solid var(--bg-page, #070a10); border-radius: 50%; background: var(--bot-route, #4990e0); padding: 0; cursor: pointer; pointer-events: auto; display: grid; place-items: center; }
+.rr-pause-go svg { width: 55%; height: 55%; display: block; }
+.rr-pause-go path { fill: #ffffff; }
+.rr-pause-go:focus-visible { outline: 2px solid #ffffff; outline-offset: 2px; }
+
+/* ---------- 미션 완료 — 로봇은 충전 스테이션에 들어가 보이지 않는다(초록 스테이션이 대신) ---------- */
+.map-bot[data-rr="done"] { visibility: hidden; }
+
+/* ---------- [10/21] 우측 타임라인 표식 — 지도의 웨이포인트 그림과 같게 ----------
+ * 지나온 정상 = 길색 작은 점, 주의 = 노랑 세모, 위험 = 빨강 세모, 지금 = 길색 빈 고리, 예정 = 회색 작은 고리, 건너뜀 = 회색 점선 고리.
+ */
+.v2-2 [data-timeline] .timeline-item.is-done:not([data-wp-alert]) .rail-dot { width: 8px; height: 8px; border: 0; background-color: var(--color-blue-400, #89b9ed); }
+.v2-2 [data-timeline] .timeline-item[data-wp-alert] .rail-dot { width: 16px; height: 14px; border: 0; border-radius: 0; background-color: currentColor;
+  clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+.v2-2 [data-timeline] .timeline-item.is-running:not([data-wp-alert]) .rail-mark { color: var(--color-blue-400, #89b9ed); }
+.v2-2 [data-timeline] .timeline-item.is-pending:not(.rr-home) .rail-dot { width: 12px; height: 12px; color: var(--color-gray-450, #9ea8bb); }
+.v2-2 [data-timeline] .timeline-item.is-pending:not(.rr-home) .rail-mark { color: var(--color-gray-450, #9ea8bb); }
+.v2-2 [data-timeline] .timeline-item.is-done .rail-dot::after,
+.v2-2 [data-timeline] .timeline-item[data-wp-alert] .rail-dot::after,
+.v2-2 [data-timeline] .timeline-item.is-running .rail-dot::after,
+.v2-2 [data-timeline] .timeline-item.is-pending .rail-dot::after { display: none; }
+
+/* [10/21] 위험 지점 맥동 — 둥근 빛 대신 시안처럼 세모가 커지며 옅어진다(로봇이 빛을 내뿜는 것처럼 보이지 않게) */
+.rr-alert-pulse { width: 22px; height: 20px; margin: -13px 0 0 -11px; border-radius: 0; clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+
+/* [10/21] 통신 끊김 — 방향을 모르니 꺾쇠를 숨긴다(점선 캡슐만) */
+.map-bot[data-rr="lost"] .map-bot-dot::after { display: none; }
+.map-bot[data-rr="lost"] .map-bot-dot { opacity: .8; }
+
+/* ---------- [10/21] 통신 끊김 파장 — 로봇 캡슐과 같은 모양, 같은 방향으로 퍼진다 ---------- */
+.map-bot[data-rr="lost"] .map-bot-halo { width: calc(26px * var(--bot-zoom, 1)); height: calc(15px * var(--bot-zoom, 1)); border-radius: 999px; animation: rr-lost-cap 3s ease-out infinite; }
+@keyframes rr-lost-cap {
+  0% { opacity: .9; transform: translate(-50%, -50%) rotate(var(--bot-ang, 0deg)) scale(1.2); }
+  100% { opacity: 0; transform: translate(-50%, -50%) rotate(var(--bot-ang, 0deg)) scale(3.4); }
+}
+
+/* ---------- [10/21] 충전 스테이션에 든 로봇 — 칸 하나로 합친다 ----------
+ * 출발 전: 회색 칸 안에 로봇색 캡슐. 미션 완료(충전 중): 칸 테두리 초록, 오른쪽 위 초록 번개 배지가 맥동.
+ */
+.rr-dock .rr-dock-with { display: none; }
+.rr-dock.is-docked .rr-dock-solo { display: none; }
+.rr-dock.is-docked .rr-dock-with { display: inline; }
+.rr-dock .rr-dock-slot { fill: var(--bg-page, #070a10); stroke: #8894aa; stroke-width: 1.5; }
+.rr-dock .rr-dock-bot { fill: var(--color-blue-400, #89b9ed); stroke: var(--bg-page, #070a10); stroke-width: 1.2; }
+.rr-dock .rr-dock-badge { fill: #8894aa; stroke: var(--bg-page, #070a10); stroke-width: 1.5; }
+.rr-dock .rr-dock-badge-bolt { fill: var(--bg-page, #070a10); }
+.rr-dock.is-docked[data-rr="done"] .rr-dock-slot { stroke: #34c759; }
+.rr-dock.is-docked[data-rr="done"] .rr-dock-bot { fill: #9ea8bb; }
+.rr-dock.is-docked[data-rr="done"] .rr-dock-badge { fill: #34c759; transform-box: fill-box; transform-origin: center; animation: rr-badge 2.4s ease-in-out infinite; }
+.rr-dock.is-docked .rr-dock-pulse { display: none; }
+@keyframes rr-badge { 0%, 100% { opacity: 1; } 50% { opacity: .55; } }
+.map-bot[data-rr-docked] { visibility: hidden; }
+@media (prefers-reduced-motion: reduce) { .rr-dock.is-docked .rr-dock-badge { animation: none; } }
+
+/* ---------- [10/21] 우측 목록 — 이동 → 측정 전환을 매끄럽게 ----------
+ * 상태 줄은 바뀔 때 살짝 내려오며 나타나고, 카드 바탕 · 글자색 · 표식은 0.3초에 걸쳐 바뀐다.
+ * 지금 카드는 목록 가운데로 부드럽게 따라간다(map.js scrollIntoView center).
+ */
+.rr-notes, .rr-alert-line { animation: rr-note-in .32s ease-out both; }
+@keyframes rr-note-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+.v2-2 [data-timeline] .step-card { transition: background-color .3s ease, color .3s ease, box-shadow .3s ease; }
+.v2-2 [data-timeline] .rail-mark { transition: color .3s ease; }
+.v2-2 [data-timeline] .rail-dot { transition: width .25s ease, height .25s ease, background-color .3s ease, border-color .3s ease; }
+.v2-2 [data-timeline] .rail-line { transition: background-color .3s ease; }
+@media (prefers-reduced-motion: reduce) {
+  .rr-notes, .rr-alert-line { animation: none; }
+  .v2-2 [data-timeline] .step-card, .v2-2 [data-timeline] .rail-mark, .v2-2 [data-timeline] .rail-dot, .v2-2 [data-timeline] .rail-line { transition: none; }
+}
+
+/* ---------- [10/21] 로봇 표식 F 시야 빔 ----------
+ * 몸은 진행 방향으로 긴 둥근 네모(25 x 15, 모서리 5), 방향은 지도 바닥에 눕힌 부채꼴 빔(map.js fan)이 맡는다.
+ * 몸 안 꺾쇠는 없다. 일시정지 ‖ · 긴급정지 ■ 만 몸 안에 남긴다.
+ */
+.map-bot-dot { width: calc(25px * var(--bot-zoom, 1)); height: calc(15px * var(--bot-zoom, 1)); border-radius: calc(5px * var(--bot-zoom, 1)); border-width: calc(2.5px * var(--bot-zoom, 1)); }
+.map-bot:not([data-rr="pause"]):not([data-rr="estop"]) .map-bot-dot::after { display: none; }
+.map-bot[data-rr="lost"] .map-bot-halo { width: calc(25px * var(--bot-zoom, 1)); height: calc(15px * var(--bot-zoom, 1)); border-radius: calc(5px * var(--bot-zoom, 1)); }
+.map-bot-halo { border-radius: calc(6px * var(--bot-zoom, 1)); }
+
+/* ---------- [10/21] 웨이포인트 번호 — 우측 목록 번호와 같다 ----------
+ * 지도 위 글자는 설비실 이름만 두던 원칙의 예외. 숫자만, 표식 안에 넣는다.
+ */
+.rr-wpnums { position: absolute; inset: 0; pointer-events: none; z-index: 2; }
+.rr-wpnum { position: absolute; transform: translate(-50%, -50%); font: 700 9px/1 "JetBrains Mono", Consolas, monospace; letter-spacing: -.3px;
+  color: #9ea8bb; white-space: nowrap; }
+.rr-wpnum[data-tone="safe"] { color: var(--bg-page, #070a10); }
+.rr-wpnum[data-tone="caution"] { color: #1a1300; transform: translate(-50%, -30%); font-size: 8.5px; }
+.rr-wpnum[data-tone="danger"] { color: #ffffff; transform: translate(-50%, -30%); font-size: 8.5px; }
+.rr-wpnum[data-tone="current"], .rr-wpnum[data-tone="next"], .rr-wpnum[data-tone="active"] { color: var(--color-blue-400, #89b9ed); }
+.rr-wpnum[data-occ] { opacity: .6; }
+:root[data-theme="light"] .rr-wpnum { color: #667085; }
+:root[data-theme="light"] .rr-wpnum[data-tone="safe"] { color: #ffffff; }
+
+/* [10/21] 번호가 잘 보이게 — 가려진 지점도 흐리게 하지 않고, 예정 번호는 밝은 회색 10px */
+.rr-wpnum { font-size: 10px; color: #c5ccd8; text-shadow: 0 0 2px var(--bg-page, #070a10), 0 0 2px var(--bg-page, #070a10); }
+.rr-wpnum[data-occ] { opacity: 1; }
+.rr-wpnum[data-tone="current"] { color: var(--color-blue-400, #89b9ed); }
+:root[data-theme="light"] .rr-wpnum { color: #4e576a; text-shadow: 0 0 2px #ffffff, 0 0 2px #ffffff; }
+/* 번호 글꼴 — 고정폭 글꼴은 0 안에 점이 있어 9~10px에서 8로 읽혔다(10 → 18). 화면 본문 글꼴로 */
+.rr-wpnum { font-family: "SUIT", "Pretendard", "Malgun Gothic", system-ui, sans-serif; font-weight: 800; letter-spacing: -.2px; }
+
+/* [10/21] 지도 끌기 막음 — 잡는 손 커서도 쓰지 않는다 */
+.map-canvas, .map-canvas.is-turning, .map-canvas.is-panning { cursor: default; }
+.map-canvas.is-picking { cursor: pointer; }
+
+/* [10/21] 마지막 지점 뒤에서는 자동복귀를 끈다 */
+.rc-actions [data-recall-button]:disabled { opacity: .4; cursor: not-allowed; }
+.rsim-chips button:disabled { opacity: .35; cursor: not-allowed; }
+
+/* [10/21] 지도 위 번호 · 표식은 글자 선택 · 끌기가 되지 않게 */
+.rr-wpnums, .rr-wpnum, .rr-dock, .rr-alert-pulse, .rr-chev, .map-bot { user-select: none; -webkit-user-select: none; -webkit-user-drag: none; }
+.rr-wpnums, .rr-wpnum { pointer-events: none; }
+.rr-wpnums { display: none !important; }   /* [10/21] 번호 일단 뺌 */
+
+/* [10/21] 겹치는 길 — 겹치기 / 나란히 전환 */
+.rsim-lanes { display: inline-flex; align-items: center; gap: 4px; margin-left: 8px; font-size: 12px; color: #8b95a7; white-space: nowrap; }
+.rsim-lanes span { margin-right: 2px; }
+.rsim-lanes button { font: inherit; border: 1px solid #2f3a4c; background: transparent; color: #c5ccd8; border-radius: 6px; padding: 3px 9px; cursor: pointer; }
+.rsim-lanes button[aria-pressed="true"] { background: #e4e8ef; color: #0a0e15; border-color: #e4e8ef; font-weight: 700; }
+.rsim-lanes button:focus-visible { outline: 2px solid #4990e0; outline-offset: 2px; }
+@media (max-width: 640px) { .rsim-bar { flex-wrap: wrap; } }
+
+/* ---------- [10/22] 웨이포인트 번호 핀 — 시안의 핀 형태 ----------
+ * 바닥 지점에서 가는 막대(1.5px)를 세우고 끝에 번호 머리(이미지). 설비에 가려진 지점은 고리를 숨기고 막대를 높여 설비 위로 올린다.
+ */
+.rr-pins { position: absolute; inset: 0; pointer-events: none; z-index: 2; user-select: none; -webkit-user-select: none; }
+.rr-pin { position: absolute; width: 0; height: 0; --stem: 20px; }
+.rr-pin::before { content: ""; position: absolute; left: -0.75px; bottom: 0; width: 1.5px; height: var(--stem); background: var(--pin); opacity: .85; }
+.rr-pin img { position: absolute; left: -9px; bottom: calc(var(--stem) - 1px); width: 18px; height: 18px; display: block; -webkit-user-drag: none; user-select: none; }
+.rr-pin.is-past { opacity: .8; }
+.rr-pin.is-buried { --stem: 44px; }
+.rr-pin.is-buried::after { content: ""; position: absolute; left: -3px; top: -3px; width: 6px; height: 6px; border-radius: 50%; background: var(--pin); opacity: .55; }
+
+/* [10/22] 핀 — 막대 1.5배(2.25px), 머리는 CSS 동그라미(이미지가 막혀 안 보이던 것), 번호는 가상 요소라 선택 · 끌기 불가 */
+.rr-pin::before { width: 2.25px; left: -1.12px; }
+.rr-pin img { display: none; }
+.rr-pin-head { position: absolute; left: -10px; bottom: calc(var(--stem) - 2px); width: 20px; height: 20px; box-sizing: border-box; border-radius: 50%; border: 2px solid; display: grid; place-items: center; }
+.rr-pin-head::after { content: attr(data-n); font: 800 10px/1 "SUIT", "Pretendard", "Malgun Gothic", system-ui, sans-serif; letter-spacing: -0.2px; }
+
+/* ---------- [10/22] 설비 이름 — 축소 상태에서는 숨기고, 일정 배율 이상 다가가면 늘 보인다 ---------- */
+.rr-labels { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 1; opacity: 0; transition: opacity .25s ease; user-select: none; -webkit-user-select: none; }
+.rr-labels.is-on { opacity: 1; }
+.rr-label { position: absolute; transform: translate(-50%, -50%); white-space: nowrap; font: 600 11px/1.2 "SUIT", "Pretendard", "Malgun Gothic", system-ui, sans-serif;
+  color: #c5ccd8; text-shadow: 0 0 3px #0a0f18, 0 0 3px #0a0f18; letter-spacing: -0.1px; }
+:root[data-theme="light"] .rr-label { color: #4e576a; text-shadow: 0 0 3px #ffffff, 0 0 3px #ffffff; }
+@media (prefers-reduced-motion: reduce) { .rr-labels { transition: none; } }
+
+/* [10/22] 핀 크기 — 지도 확대에 따라(--pz, map.js rrPins) 막대 · 머리 · 숫자가 함께 커진다 */
+.rr-pin { --stem: calc(20px * var(--pz, 1)); }
+.rr-pin.is-buried { --stem: calc(44px * var(--pz, 1)); }
+.rr-pin::before { width: calc(2.25px * var(--pz, 1)); left: calc(-1.12px * var(--pz, 1)); }
+.rr-pin-head { width: calc(20px * var(--pz, 1)); height: calc(20px * var(--pz, 1)); left: calc(-10px * var(--pz, 1)); border-width: calc(2px * var(--pz, 1)); }
+.rr-pin-head::after { font-size: calc(10px * var(--pz, 1)); }
+.rr-pin.is-buried::after { width: calc(6px * var(--pz, 1)); height: calc(6px * var(--pz, 1)); left: calc(-3px * var(--pz, 1)); top: calc(-3px * var(--pz, 1)); }
+.rr-pins { overflow: hidden; }   /* [10/22] 지도 영역 밖으로 넘치지 않게 */
+
+/* [10/22] 설비에 가려진 지점 — 바닥 점은 그리지 않는다(키 큰 핀이 대신 말한다) */
+.rr-pin.is-buried::after { display: none; }
+
+/* [10/22] 설명은 진행중 칸에서만 펼친다 */
+.v2-2 [data-timeline] .timeline-item:not(.is-running) .step-desc { display: none; }
+
+/* ---------- [10/22] 시안의 상태별 패널 ---------- */
+.rr-banner { display: grid; gap: 2px; margin: 0 0 8px; padding: 8px 12px; border-radius: 8px; font-size: 12px; line-height: 1.45; }
+.rr-banner b { font-size: 13px; }
+.rr-banner.is-lost { background: var(--bg-card, #1b2230); border-left: 3px solid #9ea8bb; color: #c5ccd8; }
+.rr-banner.is-done { background: rgba(52, 199, 89, .14); border-left: 3px solid #34c759; color: #c8f0d4; }
+:root[data-theme="light"] .rr-banner.is-lost { background: #f2f4f7; color: #2a2f38; }
+:root[data-theme="light"] .rr-banner.is-done { background: #e8f8ee; color: #155c2c; }
+[data-timeline].rr-frozen .step-card { filter: grayscale(.9); opacity: .65; }
+[data-timeline].rr-estop .timeline-item.is-pending .step-card { opacity: .45; }
+.rr-sig-lost { color: #ff8a8d !important; }
+/* 긴급정지 — 로봇 둘레 바닥에 빨강 빗금 복구 구역(시안 C안) */
+.map-bot[data-rr="estop"] .map-bot-halo { opacity: 1; width: calc(64px * var(--bot-zoom, 1)); height: calc(40px * var(--bot-zoom, 1)); border-radius: 50%;
+  background: repeating-linear-gradient(45deg, rgba(255, 56, 60, .35) 0 2px, rgba(255, 56, 60, .06) 2px 6px); border: 1.5px dashed #ff383c; transform: translate(-50%, -50%); animation: none; }
+
+/* ---------- [10/22] 로봇 아이콘 — 스팟 머리 큐브(F 몸 대신). 방향은 바닥 빔이 같이 말한다 ---------- */
+/* [10/22] 다시 시안의 F 시야 빔으로 — 큐브는 숨김 */
+.rr-spot { display: none !important; }
+.rr-spot { position: absolute; left: 50%; top: 50%; width: calc(48px * var(--bot-zoom, 1)); height: calc(48px * var(--bot-zoom, 1)); transform: translate(-50%, -62%); overflow: visible; pointer-events: none; }
+
+/* [10/22] 시안 F 시야 빔 몸 — 테두리는 몸 색과 같은 계열의 밝은 색(몸 55% + 흰색). 검은 굵은 외곽선이 아니다 */
+.map-bot .map-bot-dot { border-width: calc(1.8px * var(--bot-zoom, 1)); border-color: color-mix(in srgb, var(--bot-route, #89B9ED) 55%, #FFFFFF); box-shadow: none; }
+.map-bot[data-rr="pause"] .map-bot-dot { border-color: color-mix(in srgb, #9EA8BB 55%, #FFFFFF); }
+.map-bot[data-rr="estop"] .map-bot-dot { border-color: color-mix(in srgb, #FF383C 55%, #FFFFFF); }
+.map-bot[data-rr="return"] .map-bot-dot { border-color: #FFFFFF; }
+
+/* [10/22] 로봇 = 시안 K 스팟 머리. 원래 몸(.map-bot-dot)은 숨기고 바닥 빔은 그대로 */
+.map-bot .map-bot-dot { opacity: 0 !important; }
+.rr-khead { position: absolute; left: 50%; top: 50%; width: calc(48px * var(--bot-zoom, 1)); height: calc(34px * var(--bot-zoom, 1)); transform: translate(-50%, -50%); overflow: visible; pointer-events: none; }
+
+/* [10/22] 로봇 = 진행 방향으로 몸통이 긴 스팟 머리 상자(높이 · 앞면은 그대로) */
+.rr-khead { display: none !important; }
+.rr-spot { display: block !important; width: calc(52px * var(--bot-zoom, 1)) !important; height: calc(52px * var(--bot-zoom, 1)) !important; transform: translate(-50%, -50%) !important; }
+
+/* [10/22] 로봇 = 시안 K 스팟 머리 그대로 — 큐브(.rr-spot)는 숨기고 평면 육각 머리를 보인다 */
+.rr-spot { display: none !important; }
+.rr-khead { display: block !important; width: calc(38px * var(--bot-zoom, 1)) !important; height: calc(38px * var(--bot-zoom, 1)) !important; }
+
+/* [10/22] 핀 구분 — 다음 지점은 크게(1.2배) 맨 앞, 지난 정상은 옅게 */
+.rr-pin.is-next { z-index: 2; }
+.rr-pin.is-next .rr-pin-head { transform: scale(1.2); transform-origin: 50% 100%; box-shadow: 0 0 0 2px rgba(137, 185, 237, .35); }
+.rr-pin.is-past { opacity: .6; }
+
+/* [10/22] 우측 목록 번호도 지도 핀 머리와 같은 원형 */
+.v2-2 [data-timeline] .step-no { border-radius: 50% !important; width: 22px; height: 22px; padding: 0 !important; }
+
+/* [10/22 실험] 번호 표현 — P1 바닥 번호: 막대 없이 지점 자리에 번호 원. P2: 같은 원을 바닥에 눕힌 만큼(--tilt) 납작하게 */
+.rr-pins[data-pv="P1"] .rr-pin:not(.is-buried), .rr-pins[data-pv="P2"] .rr-pin:not(.is-buried) { --stem: 0px; }
+.rr-pins[data-pv="P1"] .rr-pin:not(.is-buried)::before, .rr-pins[data-pv="P2"] .rr-pin:not(.is-buried)::before { display: none; }
+.rr-pins[data-pv="P1"] .rr-pin:not(.is-buried) .rr-pin-head, .rr-pins[data-pv="P2"] .rr-pin:not(.is-buried) .rr-pin-head { bottom: calc(-10px * var(--pz, 1)); transform-origin: 50% 50%; }
+.rr-pins[data-pv="P1"] .rr-pin.is-next:not(.is-buried) .rr-pin-head { transform: scale(1.2); }
+.rr-pins[data-pv="P2"] .rr-pin:not(.is-buried) .rr-pin-head { transform: scale(1, var(--tilt, .6)); }
+.rr-pins[data-pv="P2"] .rr-pin.is-next:not(.is-buried) .rr-pin-head { transform: scale(1.2, calc(1.2 * var(--tilt, .6))); }
+.rsim .rsim-x { margin-left: 8px; }
+
+/* [10/22 실험] 지나온 지점 번호 숨김 — 바닥의 길색 점만 남는다 */
+.rr-pins[data-past="off"] .rr-pin.is-past { display: none; }
+.rsim .rsim-bar { flex-wrap: wrap; row-gap: 6px; }
+/* [10/22 실험] 번호 솎기 — 겹쳐서 밀린 번호는 숨긴다 */
+.rr-pin.is-thin { display: none; }
+/* [10/22 실험] 바닥만 — 설비에 가려진 지점도 막대 없이 바닥 번호 */
+.rr-pins[data-pv="PF"] .rr-pin { --stem: 0px; }
+.rr-pins[data-pv="PF"] .rr-pin::before { display: none; }
+.rr-pins[data-pv="PF"] .rr-pin .rr-pin-head { bottom: calc(-10px * var(--pz, 1)); transform-origin: 50% 50%; }
+.rr-pins[data-pv="PF"] .rr-pin.is-next .rr-pin-head { transform: scale(1.2); }
