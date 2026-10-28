@@ -95,12 +95,27 @@
   // v2.2 — 제목의 층(B3)이 층 꼬리표(B4)와 어긋나 뺐다(10/19 디자이너). 예전 판(v2 · v2.1)은 그대로다.
   if (body.classList.contains("v2-2")) { CRITICAL.title = "지하발전소 터빈 2 NG 1건 발견"; }
 
+  // v4 지도 경로 표현(10/28 디자이너) — 전기실 열화상 점검(Robot 11 · B3)에 실제 알림 두 건. 지도 · 우측 목록의 세모(WP-02 위험 · WP-04 주의)와 1:1 이다.
+  //   예전에는 세모만 고정으로 그려 최신 알림이 비어 있었다. body[data-route-rules](main-v3.html)에서만 쓴다 — 통합 순회 현황(building.js v3)에도 같은 두 건이 있다.
+  var ROUTE_ALERTS = body.hasAttribute("data-route-rules") ? [
+    { sev: "critical", robot: 10, floor: "B3", wp: "WP-02", live: "ppe", where: "Robot 11 · WP-02 HEPA Filter 차압계", time: "09:44:18",
+      title: "차압 NG · HEPA Filter 차압계", detect: "계기인식",
+      sum: "차압 312 Pa 로 교체 기준 250 Pa 를 넘었습니다. 최근 3회 측정이 잇달아 올라 NG 로 판정했습니다.",
+      lead: "필터 교체와 현장 점검을 요청하세요.", fp: 9, fpLabel: "낮음",
+      acts: [{ t: "필터 교체 요청", ai: true }, { t: "현장 점검 요청", ai: true }, { t: "재측정 후 판단" }] },
+    { sev: "warning", robot: 10, floor: "B3", wp: "WP-04", live: "discharge", where: "Robot 11 · WP-04 N₂ 배관 압력계", time: "10:15:52",
+      title: "압력 편차 · N₂ 배관 압력계", detect: "계기인식",
+      sum: "압력 0.62 MPa 로 정상 범위(0.65~0.75) 아래입니다. 최근 2회 측정에서 조금씩 내려가고 있습니다.",
+      lead: "배관 연결부 누설 점검을 요청하세요.", fp: 20, fpLabel: "낮음",
+      acts: [{ t: "누설 점검 요청", ai: true }, { t: "다음 순회 재측정" }, { t: "추이 관찰" }] }
+  ] : [];
+
   // 검토용 단계 — 주소 끝 #… 로 고른다. few 는 알림은 있지만 Delta 종합 기준에 못 미친 판이다.
   var SETS = {
     normal: function () { return []; },
     few: function () { return [CRITICAL, WARNINGS[0], WARNINGS[1]]; },
-    warning: function () { return WARNINGS.slice(); },
-    critical: function () { return [CRITICAL].concat(WARNINGS); }
+    warning: function () { return WARNINGS.concat(ROUTE_ALERTS.filter(function (a) { return a.sev === "warning"; })); },
+    critical: function () { return [CRITICAL].concat(WARNINGS, ROUTE_ALERTS); }
   };
 
   // ==================================================================
@@ -378,7 +393,6 @@
   }
 
   var TONE = { normal: 0, warning: 1, critical: 2 };
-  var V4_WP_FIXED = document.body.hasAttribute("data-route-rules") ? { "WP-02": "critical", "WP-04": "warning" } : {};
 
   /*
    * 관제사 교대 — 사람이 바뀌어도 로봇은 돈다(UI_99 1319:89664).
@@ -497,9 +511,6 @@
     });
     $$("[data-waypoint]", rail).forEach(function (node) {
       var sev = hits[node.getAttribute("data-waypoint")];
-      // v4 지도 경로 표현(10/22 전달서) — 2번 위험 · 4번 주의 판정으로 고정해 세모 표식을 보인다
-      var fixed = V4_WP_FIXED[node.getAttribute("data-waypoint")];
-      if (fixed && (!sev || TONE[fixed] > TONE[sev])) { sev = fixed; }
       if (sev) { node.setAttribute("data-wp-alert", WP_ALERT[sev]); } else { node.removeAttribute("data-wp-alert"); }
       var done = node.getAttribute("data-wp-state") === "completed";
       if (done) { node.setAttribute("data-wp-result", sev ? WP_ALERT[sev] : "safe"); }

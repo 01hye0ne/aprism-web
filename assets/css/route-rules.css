@@ -398,3 +398,15 @@
 .rr-pins[data-pv="PF"] .rr-pin::before { display: none; }
 .rr-pins[data-pv="PF"] .rr-pin .rr-pin-head { bottom: calc(-10px * var(--pz, 1)); transform-origin: 50% 50%; }
 .rr-pins[data-pv="PF"] .rr-pin.is-next .rr-pin-head { transform: scale(1.2); }
+
+/*
+ * [10/28] 알림이 난 지점 — 바닥 세모(위험 빨강 · 주의 노랑)는 지점 자리에, 번호는 오른쪽 위로 비켜 짧은 선으로 잇는다
+ * (지도 경로 표현 전달서 1022 "지점 표식"). 번호가 지점 자리에 그대로 앉으면 세모를 덮었다.
+ */
+.rr-pins[data-pv="PF"] .rr-pin.is-alert { z-index: 1; }
+.rr-pins[data-pv="PF"] .rr-pin.is-alert .rr-pin-head { left: calc(2px * var(--pz, 1)); bottom: calc(4px * var(--pz, 1)); width: calc(17px * var(--pz, 1)); height: calc(17px * var(--pz, 1)); border-width: calc(1.5px * var(--pz, 1)); }
+.rr-pins[data-pv="PF"] .rr-pin.is-alert .rr-pin-head::after { font-size: calc(9px * var(--pz, 1)); }
+.rr-pins[data-pv="PF"] .rr-pin.is-alert::before {
+  display: block; left: 0; bottom: 0; width: calc(15px * var(--pz, 1)); height: calc(1.5px * var(--pz, 1));
+  background: var(--pin); opacity: .8; transform-origin: 0 50%; transform: rotate(-48deg);
+}

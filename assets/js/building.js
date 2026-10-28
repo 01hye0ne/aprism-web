@@ -83,6 +83,8 @@
     { n: 11, floor: "B3", st: "run",  mission: "전기실 열화상 점검", now: "배전반실 열화상 점검",  done: 3,  total: 20, bat: 71, sig: 4, uv: [0.66, 0.58] },
     { n: 12, floor: "B3", st: "idle", mission: null,                          now: "충전 중",               bat: 55, chg: true, sig: 3, uv: [0.10, 0.80], dock: true }
   ];
+  // v4(10/28) — Robot 11 은 미션 관제의 웨이포인트 20칸 더미와 같게 7칸 마치고 8번 진행 중
+  if (V3) { ROBOTS.forEach(function (r) { if (r.n === 11) { r.now = "케미컬 공급 캐비닛 CDS-02 판독"; r.done = 7; } }); }
   var BADGE = {
     run:  { cls: "badge-info",   text: "수행중" },
     done: { cls: "badge-normal", text: "완료" },
@@ -103,6 +105,13 @@
     { sev: "warning",  robot: 5, floor: "B3", where: "Robot 05 · WP-02 발전기 베어링",         time: "10:03:27", title: "과열 · 발전기 베어링 68.4℃", uv: [0.56, 0.24] },
     { sev: "warning",  robot: 5, floor: "B4", where: "Robot 05 · WP-13 공기 압축기 C-1",       time: "10:01:12", title: "압력 편차 · 공기 압축기 C-1", uv: [0.50, 0.74] }
   ];
+  // v4(10/28) — 미션 관제의 지도 경로 표현 더미와 같게: 전기실 열화상 점검(Robot 11 · B3) 위험 · 주의 한 건씩(monitor.js ROUTE_ALERTS 와 같다)
+  if (V3) {
+    ALERTS.push(
+      { sev: "critical", robot: 11, floor: "B3", where: "Robot 11 · WP-02 HEPA Filter 차압계", time: "09:44:18", title: "차압 NG · HEPA Filter 차압계", uv: [0.60, 0.50] },
+      { sev: "warning",  robot: 11, floor: "B3", where: "Robot 11 · WP-04 N₂ 배관 압력계",     time: "10:15:52", title: "압력 편차 · N₂ 배관 압력계", uv: [0.70, 0.64] }
+    );
+  }
   ALERTS.forEach(function (a) {
     // 층은 알림이 난 웨이포인트의 층이다(로봇이 지금 선 층이 아니다 — 메인 v2.2 monitor.js 와 같다).
     a.mission = robotNo(a.robot).mission;
@@ -437,6 +446,8 @@
     5:  [["공기 압축기 C-1", "WP-13"], ["냉각수 펌프 P-3", "WP-14"]],
     11: [["배전반실 열화상", "WP-04"], ["변압기 TR-2", "WP-05"]]
   };
+  // v4(10/28) — 미션 관제 Robot 11 목록(screen.js 웨이포인트 20칸 더미) 8 · 9번과 같다
+  if (V3) { STEPS[11] = [["케미컬 공급 캐비닛 CDS-02", "WP-08"], ["FFU-02 토출구", "WP-09"]]; }
   var ST_TONE = { run: "info", done: "normal", idle: "idle", off: "critical" };
 
   function rcStep(name, sub, now, ic, subCls) {
@@ -983,7 +994,15 @@
         (list.length ? "알림이 " + list.length + "건(" + sevCount(list) + ") 들어와 있어요. 어느 층부터 볼까요?" : "지금은 들어온 알림이 없어요. 보고 싶은 층을 골라 주세요.");
       return d;
     }
-    if (!floorView) { if (deltaFirst) { d.line1 = deltaFirst.line1 || " "; d.line2 = deltaFirst.line2; } return d; }
+    if (!floorView) {
+      if (deltaFirst) {
+        d.line1 = deltaFirst.line1 || " ";
+        // 건수는 목록에서 센다 — HTML 문장의 숫자가 알림 데이터와 어긋나지 않게(10/28, Robot 11 알림 두 건 추가)
+        var nc = list.filter(function (a) { return a.sev === "critical"; }).length;
+        d.line2 = deltaFirst.line2.replace(/위험 알림 \d+건, 주의 알림 \d+건/, "위험 알림 " + nc + "건, 주의 알림 " + (list.length - nc) + "건");
+      }
+      return d;
+    }
     var ms = missionsOn(floorView);
     d.line1 = FNAME[floorView];
     d.line2 = list.length
