@@ -2842,9 +2842,16 @@
   var RRS = { mode: "run", s: null, lane: null, at: 0 };
   function rrNeutral() { return isLight() ? 0x2b3445 : 0xe4e8ef; }   // 복귀 도로색(시안 --rt-return)
   var RR_GRAY = 0x9ea8bb, RR_NEUTRAL = 0xe4e8ef;
-  function rrStyle(part, color, op, lw) {
+  /*
+   * [10/28] 반투명 선을 불투명하게 — 굵은 선(Line2)은 짧은 토막을 이어 그려서, 반투명이면 토막이 맞닿는 자리마다
+   * 두 번 칠해져 그 자리만 진해졌다(구슬처럼 끊겨 보이는 선, 디자이너 지적). 바탕색과 미리 섞은 색을 불투명으로 칠한다.
+   * 바탕은 화면에 찍힌 바닥색. 앞길은 그 밑의 바닥 홈 색과 섞는다(rrAhead).
+   */
+  function rrUnder() { return isLight() ? 0xb8c0cd : 0x181d28; }   // 화면에 찍힌 바닥 화소색(조명 받은 뒤) — 라이트 · 다크
+  function rrMix(color, op, under) { return new THREE.Color(color).lerp(new THREE.Color(under == null ? rrUnder() : under), 1 - op).getHex(); }
+  function rrStyle(part, color, op, lw, under) {
     if (!part || !part.material) { return; }
-    part.material.color.setHex(color); part.material.opacity = op;
+    part.material.color.setHex(op < 1 ? rrMix(color, op, under) : color); part.material.opacity = 1;
     if (lw) { lw *= RR.k; part.material.linewidth = lw; }
     part.children.forEach(function (ch) { if (!ch.userData.rrKeep && ch.material && ch.material.color) { ch.material.color.setHex(color); ch.material.opacity = op * 0.3; if (lw) { ch.material.linewidth = lw; } } });
   }
@@ -2853,7 +2860,8 @@
     var left = ln.parts[1]; if (!left || !left.material || !Fat) { return; }
     var c4 = RR.ahead === "C4", light = isLight(), run = m !== "pause" && m !== "estop" && m !== "lost" && m !== "return" && m !== "done";
     if (left.material.dashed === c4) { left.material.dashed = !c4; left.material.needsUpdate = true; }
-    if (c4 && run) { rrStyle(left, RR_GRAY, 0.6); }
+    var grooveHex = light ? rrMix(0x8a93a1, 0.9) : rrMix(0x05080d, 0.9);   // 바닥 홈도 불투명 — 바닥색과 미리 섞는다(rrMix)
+    if (c4 && run) { rrStyle(left, RR_GRAY, 0.6, null, grooveHex); }
     if (c4 && !ln.groove) {
       var gm = new Fat.LineMaterial({ color: 0x05080d, linewidth: 2 * RR.k + 2.5, transparent: true, opacity: 0.9, depthWrite: false });
       gm.resolution.copy(left.material.resolution); fatMats.push(gm);
@@ -2865,7 +2873,7 @@
     }
     if (ln.groove) {
       ln.groove.visible = c4; ln.chev.visible = false;   // [10/22] C3 — 바닥 꺾쇠는 쓰지 않는다
-      ln.groove.material.color.setHex(light ? 0x8a93a1 : 0x05080d);
+      ln.groove.material.color.setHex(grooveHex); ln.groove.material.opacity = 1;
       ln.chev.material.color.setHex(light ? 0xffffff : 0x0a0f18);
     }
   }
