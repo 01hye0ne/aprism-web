@@ -2073,6 +2073,7 @@
     dotMats.forEach(function (mat) { mat.dashSize = DOT.on * pp * kk; mat.gapSize = DOT.off * pp * kk; });
   }
 
+  function rrLift(m) { m.polygonOffset = true; m.polygonOffsetFactor = -10; m.polygonOffsetUnits = -10; return m; }
   function strand(points, color, dashed) {
     var flat = [];
     points.forEach(function (p) { flat.push(p.x, p.y, p.z); });
@@ -2090,6 +2091,9 @@
       gapSize: span * 0.01,
       depthWrite: false
     });
+    // [10/28] 굵은 선은 화면에 평평하게 편 띠라, 기울어진 바닥 위에서 띠 가장자리가 옆 바닥보다 "뒤"로 판정돼 바닥에 먹혔다
+    // (확대하면 선 바깥이 톱니처럼 삐죽삐죽, 디자이너 지적). 깊이를 카메라 쪽으로 당겨 바닥에는 안 먹히고 설비 · 벽에는 그대로 가려지게 한다.
+    rrLift(mat);
     mat.resolution.set(view.clientWidth || 1, view.clientHeight || 1);
     fatMats.push(mat);
     if (THEMED && dashed) { dotMats.push(mat); rrRoundDots(mat); }
@@ -2741,6 +2745,7 @@
       for (var k = 0; k < RR_N; k += 1) { pos.push(0, 0, 0); col.push(1, 1, 1); }
       g.setPositions(pos); g.setColors(col);
       var m = new Fat.LineMaterial({ color: 0xffffff, linewidth: 4 * RR.k, vertexColors: true, transparent: true, opacity: 1, depthWrite: false });
+      rrLift(m);
       m.resolution.set(view.clientWidth || 1, view.clientHeight || 1);
       fatMats.push(m);
       ln.comet = new Fat.Line2(g, m);
@@ -2864,7 +2869,7 @@
     if (c4 && run) { rrStyle(left, RR_GRAY, 0.6, null, grooveHex); }
     if (c4 && !ln.groove) {
       var gm = new Fat.LineMaterial({ color: 0x05080d, linewidth: 2 * RR.k + 2.5, transparent: true, opacity: 0.9, depthWrite: false });
-      gm.resolution.copy(left.material.resolution); fatMats.push(gm);
+      rrLift(gm); gm.resolution.copy(left.material.resolution); fatMats.push(gm);
       ln.groove = new Fat.Line2(left.geometry, gm); ln.groove.renderOrder = 1; ln.groove.userData.rrKeep = true; left.add(ln.groove);
       var cm = new Fat.LineMaterial({ color: 0x141b27, linewidth: 2 * RR.k, transparent: true, opacity: 1, dashed: true, dashSize: 1, gapSize: 0, depthWrite: false });
       cm.resolution.copy(left.material.resolution); fatMats.push(cm); rrChev(cm); chevMats.push(cm);
