@@ -2872,9 +2872,10 @@
       syncDots();
     }
     if (ln.groove) {
-      ln.groove.visible = c4; ln.chev.visible = false;   // [10/22] C3 — 바닥 꺾쇠는 쓰지 않는다
+      // [10/28] 꺾쇠 선이 없을 때도 멈추지 않게 — 여기서 오류가 나면 상태 시뮬레이션 초기화(route-sim.js)가 끊겨 로봇 머리(K)가 그려지지 않았다
+      ln.groove.visible = c4; if (ln.chev) { ln.chev.visible = false; }   // [10/22] C3 — 바닥 꺾쇠는 쓰지 않는다
       ln.groove.material.color.setHex(grooveHex); ln.groove.material.opacity = 1;
-      ln.chev.material.color.setHex(light ? 0xffffff : 0x0a0f18);
+      if (ln.chev) { ln.chev.material.color.setHex(light ? 0xffffff : 0x0a0f18); }
     }
   }
   function rrApply(ln) {

@@ -503,13 +503,19 @@
     show();
   }
 
+  var tries = 0;
   (function wait() {
     var a = window.APRISM_RR;
     if (!a || !a.ready()) { setTimeout(wait, 300); return; }
+    // [10/28] 지점이 다 깔리기 전(8개 미만)에 시작하면 시작 자리를 못 잡고 touched 가 꺼진 채 남아
+    // 상태 칩을 누르기 전까지 로봇 머리(K)가 그려지지 않았다 — 지점이 깔릴 때까지 잠깐(최대 6초) 기다린다
+    var n0 = 0; try { n0 = a.stops().length; } catch (e) { n0 = 0; }
+    if (n0 < 8 && tries < 20) { tries += 1; setTimeout(wait, 300); return; }
     api = a;
     box.querySelector(".rsim-wait").hidden = true;
     box.classList.add("is-ready");
-    try { var st0 = api.stops(); if (st0.length > 7) { api.mode("run"); api.set(st0[6] + (st0[7] - st0[6]) * 0.55); touched = true; } } catch (e) { /* 지점이 적으면 그대로 */ }
+    try { var st0 = api.stops(); if (st0.length > 7) { api.mode("run"); api.set(st0[6] + (st0[7] - st0[6]) * 0.55); } } catch (e) { /* 지점이 적으면 그대로 */ }
+    touched = true;   // 지점이 적어도 로봇 머리는 그린다
     show();
     window.requestAnimationFrame(loop);
   })();
