@@ -296,7 +296,7 @@
       const multi = !!(m.fls && m.fls.length > 1);
       return `<div class="sf-mon ${w}"><div class="sf-monh"><button type="button" class="sf-mrow on" data-sc="${i}" aria-current="true">${t1}</button><a class="btn btn-ghost is-xs m2go" href="${mainUrl(i, cur)}" title="관제 3D 지도에서 이 미션과 층을 연다">관제에서 보기<span class="i i-16" style="--i:var(--ic-chevron-right)" aria-hidden="true"></span></a></div>
         <div class="sf-monb">${meta}<div class="m2">${multi ? `<div class="m2b">${floorBar(i)}</div>` : ''}${svg2(i, cur, false, 316, sel, lk)}</div></div></div>`; }).join('');
-    return `<div class="sf-mlist"><div class="sf-mwell">${top}${rows}</div></div>${LEG}`;
+    return `${LEG}<div class="sf-mlist"><div class="sf-mwell">${top}${rows}</div></div>`;   // 범례는 목록 위(10/30) — 기호를 먼저 읽고 목록으로
   }
   const MAINV3 = "./main-v5.html";   // [v5] 같은 판의 관제로
   function mainUrl(i, ab){ const m = M[i], q = new URLSearchParams({mission:m.mis, floor:PLANOF[ab] || ab}); const nw = nowOf(i); if(nw) q.set("wp", nw); return MAINV3 + "?" + q.toString(); }
