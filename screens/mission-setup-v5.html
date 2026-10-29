@@ -30,6 +30,8 @@
   <link rel="stylesheet" href="../assets/css/v3.css?v=7fce80d4" />
   <!-- v5 전용 규칙 — v4 는 10/29 부로 멈췄다. v5 에서 바꾸는 것은 여기(body.ver-5)에. -->
   <link rel="stylesheet" href="../assets/css/v5.css?v=8ccdfeab" />
+  <!-- [10/29] v5 지도(map-v5.js)가 그리는 설비 이름표 · 충전 스테이션 · 번호 핀 꼴 — 메인과 같다 -->
+  <link rel="stylesheet" href="../assets/css/route-rules.css?v=4eeed062" />
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
@@ -1623,7 +1625,9 @@
 <script src="../assets/js/prism-orb.js?v=03386460"></script>
 <script src="../assets/js/screen.js?v=51665b3f"></script>
 <script src="../assets/js/map-model.js?v=0f88c871"></script>
-<script src="../assets/js/map.js?v=df2c61e6"></script>
+<!-- [10/29] v5 지도(map-v5.js) — 라이트 단계 톤 지도 · 바닥 표식 · 바닥 띠 경로를 메인과 같게. map.js 는 v3 · v4 가 쓴다 -->
+<script src="../assets/js/map-v5.js?v=3c045cf2"></script>
+<script src="../assets/js/robot-spot.js?v=2a3061e4"></script>
 <script src="../assets/js/sian.js?v=8caef8ce"></script>
 <!-- 미션 설정 — 점검항목 · 순서 · 로봇이 소요시간과 배터리를 움직인다. screen.js 뒤에 온다. -->
 <script src="../assets/js/mission-setup.js?v=d4fe220d"></script>
