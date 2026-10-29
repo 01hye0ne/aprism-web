@@ -379,8 +379,8 @@
   /*
    * 월 보고서 자리 — 목록 맨 위 한 줄(10/29 디자이너: 따로 있던 [월 보고서 생성] 단추를 목록 안으로).
    * 만들기 전과 뒤가 같은 자리다 — 상태가 한 곳에만 있다.
-   *   none  빈 자리: 흐린 문서 아이콘 · "N월 월 보고서" · 기간 + [만들기](xSmall). 문서 줄로 읽히지 않게 줄 자체는 누를 수 없다
-   *   busy  [만들기] 자리에 돌림표 + 만드는 중
+   *   none  빈 자리: 흐린 문서 아이콘 · "N월 월 보고서" · 기간 + [생성](xSmall). 문서 줄로 읽히지 않게 줄 자체는 누를 수 없다
+   *   busy  [생성] 자리에 돌림표 + 만드는 중
    *   made  그 자리가 바로 월 보고서 줄(누르면 연다). 날짜가 더 쌓이면 실제 서비스에선 오른쪽에 [다시 만들기]가 뜬다
    */
   function moSlot() {
@@ -389,7 +389,7 @@
     var busy = vm === 10 && moState === "busy";
     return '<div class="rp-moslot"><span class="rp-a t-label-1">' + ic("document") + "<b>" + name + '</b></span><span class="rp-tm t-caption num">' + range + "</span>" +
       (busy ? '<span class="rp-mobusy t-caption"><span class="rp-spin" aria-hidden="true"></span>만드는 중</span>'
-            : '<button type="button" class="btn btn-secondary is-xs" data-mo-go aria-label="' + name + ' 만들기">만들기</button>') + "</div>";
+            : '<button type="button" class="btn btn-secondary is-xs" data-mo-go aria-label="' + name + ' 생성">생성</button>') + "</div>";
   }
   function makeMonth() {
     if (vm !== 10) { plainToast("시안에서는 10월만 연결돼요"); return; }
