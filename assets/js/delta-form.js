@@ -17,7 +17,10 @@
   var asked = new URLSearchParams(location.search).get("form");
   var form = null;
 
-  if (asked === "bar" || asked === "widget") {
+  // v5(10/29 디자이너) — 위젯형만 쓴다. 주소 · 기억한 꼴과 상관없이 위젯형이고, v4 에서 고른 꼴(기억)은 건드리지 않는다.
+  if (document.body.classList.contains("ver-5")) {
+    form = "widget";
+  } else if (asked === "bar" || asked === "widget") {
     form = asked;
     try { localStorage.setItem(KEY, form); } catch (e) { /* 저장 못 해도 이번 화면은 그 꼴 */ }
   } else {

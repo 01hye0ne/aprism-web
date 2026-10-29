@@ -107,7 +107,7 @@
       <article class="screen-row">
         <header class="screen-head">
           <span class="screen-code">Screen 04.1</span>
-          <a class="screen-title" href="./screens/main-v3.html">통합 관제 메인</a>
+          <a class="screen-title" href="./screens/main-v5.html">통합 관제 메인</a>
         </header>
         <!-- 버전 묶음(10/21 디자이너) — 큰 번호마다 한 열, 그 안은 위에서 아래로 나온 차례. -->
         <div class="ver-groups">
@@ -164,10 +164,9 @@
               <!-- v4(예전 이름 v3 · 파일 *-v3.html) — 10/21 부터 작업 화면(디자이너). v3(예전 v2.2) 다섯 장을 복제해 시작했고 v3 은 멈췄다. -->
               <!-- Delta 꼴(10/21 디자이너) — 같은 v4 화면을 Delta 꼴만 바꿔 연다(delta-form.js). 고른 꼴은 기억해 화면을 오가도 그대로라,
                    카드의 모든 링크에 ?form= 을 달아 어느 카드로 들어와도 그 꼴로 시작한다. -->
-              <li class="ver-card is-latest">
+              <li class="ver-card">
                 <a class="ver-link" href="./screens/main-v3.html?form=widget"><span class="ver-name">v4</span><span class="ver-tag">Delta 위젯형</span></a>
                 <span class="ver-date">2026.10.21</span>
-                <span class="ver-badge">최신</span>
                 <ul class="ver-pages">
                   <li><a href="./screens/mission-setup-v3.html"><span class="ver-no">1</span>미션 설정</a></li>
                   <li><a href="./screens/mission-precheck-v3.html"><span class="ver-no">2</span>사전 점검</a></li>
@@ -177,13 +176,31 @@
                 </ul>
               </li>
               <!-- Delta 가로형 — Figma DS 1335:21707. Delta 가 있는 두 화면만. -->
-              <li class="ver-card is-latest">
+              <li class="ver-card">
                 <a class="ver-link" href="./screens/main-v3.html?form=bar"><span class="ver-name">v4</span><span class="ver-tag">Delta 가로형</span></a>
                 <span class="ver-date">2026.10.21</span>
-                <span class="ver-badge">최신</span>
                 <ul class="ver-pages">
                   <li><a href="./screens/building-v3.html?form=bar"><span class="ver-no">3</span>통합 순회 현황</a></li>
                   <li><a href="./screens/main-v3.html?form=bar"><span class="ver-no">4</span>미션 관제</a></li>
+                </ul>
+              </li>
+            </ol>
+          </section>
+          <section class="ver-group" aria-label="v5">
+            <p class="ver-group-label">v5</p>
+            <ol class="ver-list is-stack">
+              <!-- v5(파일 *-v5.html) — 10/29 부터 작업 화면(디자이너). v4(*-v3.html) 다섯 장을 Delta 위젯형 기준으로 복제했고 v4 는 멈췄다.
+                   Delta 는 위젯형만 쓴다(가로형 카드 없음). -->
+              <li class="ver-card is-latest">
+                <a class="ver-link" href="./screens/main-v5.html"><span class="ver-name">v5</span><span class="ver-tag">Delta 위젯형</span></a>
+                <span class="ver-date">2026.10.29</span>
+                <span class="ver-badge">최신</span>
+                <ul class="ver-pages">
+                  <li><a href="./screens/mission-setup-v5.html"><span class="ver-no">1</span>미션 설정</a></li>
+                  <li><a href="./screens/mission-precheck-v5.html"><span class="ver-no">2</span>사전 점검</a></li>
+                  <li><a href="./screens/building-v5.html"><span class="ver-no">3</span>통합 순회 현황</a></li>
+                  <li><a href="./screens/main-v5.html"><span class="ver-no">4</span>미션 관제</a></li>
+                  <li class="is-sub"><a href="./screens/alert-center-v5.html"><span class="ver-no">4-1</span>알림 센터</a></li>
                 </ul>
               </li>
             </ol>

@@ -173,7 +173,7 @@
   // 전체 미션 보기 주소 — 테마 같은 보기 설정은 들고 간다.
   function allUrl() {
     var keep = (location.search.match(/[?&](theme|palette|delta|glow)=[\w-]+/g) || []).map(function (s) { return s.slice(1); });
-    return "building-v3.html" + (keep.length ? "?" + keep.join("&") : "");
+    return (document.body.classList.contains("ver-5") ? "building-v5.html" : "building-v3.html") + (keep.length ? "?" + keep.join("&") : "");
   }
 
   function robotNo(n) { return ROBOTS.filter(function (r) { return r.n === n; })[0]; }
@@ -220,7 +220,7 @@
     keep.push("mission=" + encodeURIComponent(mission));
     // v3 — 층을 펼쳐 본 뒤 들어가면 그 층으로 연다(mission-scope.js 가 받는다).
     if (V3 && floor && MISSION_FLOORS[mission] && MISSION_FLOORS[mission].indexOf(floor) >= 0) { keep.push("floor=" + floor); }
-    return (document.body.classList.contains("ver-3") ? "main-v3.html?" : "main-v2-2.html?") + keep.join("&");
+    return (document.body.classList.contains("ver-5") ? "main-v5.html?" : document.body.classList.contains("ver-3") ? "main-v3.html?" : "main-v2-2.html?") + keep.join("&");
   }
 
   /* ==================================================================
@@ -411,7 +411,7 @@
     b.addEventListener("click", function () { filter = b.getAttribute("data-ah-filter"); renderLeft(); });
   });
   var allBtn = $("[data-ah-all]");
-  if (allBtn) { allBtn.addEventListener("click", function () { location.href = document.body.classList.contains("ver-3") ? "alert-center-v3.html" : "alert-center.html"; }); }
+  if (allBtn) { allBtn.addEventListener("click", function () { location.href = document.body.classList.contains("ver-5") ? "alert-center-v5.html" : document.body.classList.contains("ver-3") ? "alert-center-v3.html" : "alert-center.html"; }); }
 
   /* ==================================================================
    * 오른쪽 — 로봇 현황 · 운행 흐름 · 다음 일정
