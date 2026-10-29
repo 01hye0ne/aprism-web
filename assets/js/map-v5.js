@@ -2815,10 +2815,12 @@
    * 지나온 길 38% · 지금 가는 길(로봇 → 다음 웨이포인트) 진한 실선 + 진행 방향 흐름 · 앞으로 갈 길 점선.
    * 흐름은 머리가 흰 혜성이고, 지금 가는 길에만 지나간다(지도에서 움직이는 선은 하나).
    */
-  var RR = { doneAlpha: 0.38, wpExcept: true, k: 2.85, lanes: "side", occl: false, prune: false, ahead: "A", pins: "P0", pastNo: "on", flow: "floor", thin: "on", floorMarks: true };   // floorMarks — [10/29] 웨이포인트 표식을 바닥에 눕힌다(floorStops)   // thin — 번호가 화면에서 겹치면 중요한 번호만 남긴다(지점이 많을 때)   // flow — 흐름 빛 round 화면 선(둥근 머리) / floor 바닥에 깐 띠(머리를 길과 직각으로 자름, 원근을 받음)   // pastNo — 지나온 지점 번호 off 숨김 / on 옅게   // [10/22 실험] ahead — 앞으로 갈 길 A 점선 / C4 바닥에 칠한 실선. pins — P0 핀 / P1 바닥 번호 / P2 바닥에 눕힌 번호   // [10/22] k 1.9→2.85 — 경로 선을 자동복귀 도로 굵기 정도로   // occl — 가려짐 F(가려진 길·빔 점선, 가려진 지점 점선 고리). 10/22 보류   // lanes — 겹치는 길: side 나란히(기본, 10/22) / stack 겹치기   // k — 시안(SVG)은 선이 지도 크기만큼 커진다. 같은 굵기로 보이게 곱한다
+  var RR = { doneAlpha: 0.38, wpExcept: true, k: 2.85, lanes: "stack", occl: false, prune: false, ahead: "A", pins: "P0", pastNo: "on", flow: "floor", thin: "on", floorMarks: true };   // floorMarks — [10/29] 웨이포인트 표식을 바닥에 눕힌다(floorStops)   // thin — 번호가 화면에서 겹치면 중요한 번호만 남긴다(지점이 많을 때)   // flow — 흐름 빛 round 화면 선(둥근 머리) / floor 바닥에 깐 띠(머리를 길과 직각으로 자름, 원근을 받음)   // pastNo — 지나온 지점 번호 off 숨김 / on 옅게   // [10/22 실험] ahead — 앞으로 갈 길 A 점선 / C4 바닥에 칠한 실선. pins — P0 핀 / P1 바닥 번호 / P2 바닥에 눕힌 번호   // [10/22] k 1.9→2.85 — 경로 선을 자동복귀 도로 굵기 정도로   // occl — 가려짐 F(가려진 길·빔 점선, 가려진 지점 점선 고리). 10/22 보류   // lanes — 겹치는 길: side 나란히(기본, 10/22) / stack 겹치기   // k — 시안(SVG)은 선이 지도 크기만큼 커진다. 같은 굵기로 보이게 곱한다
   var RR_N = 14, rrReduce = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
   var rrOn = false, rrLast = 0, rrPh = 0, rrPrev = 0;   // rrPh — 흐름이 지나온 시간(초), 프레임마다 쌓는다
   function rrFlat(pts) { var f = []; pts.forEach(function (q) { f.push(q.x, q.y, q.z); }); return f; }
+  /* [10/29 v5] lanes 를 stack(겹치기)으로 — 디자이너: "핀이 경로 위에 없다 · 점선과 띠가 어긋난다". 지나온 길이 넓은 바닥 띠(리본)가 된 뒤로
+   * 비킨 폭(span*0.011)이 띠 굵기보다 좁아 두 줄로 안 읽히고, 되짚는 점선이 지나온 실선 가장자리에 걸쳐 어긋나 보였다. 이제 점선은 실선 한가운데를 탄다.
   /* [10/21] 겹치는 길 — 이미 지나온 길을 되짚는 구간은 진행 방향 오른쪽으로 비켜 그린다(나란히 띄우기).
    * 되짚는지는 길을 촘촘히 나눠 한 번만 재 두고(rtMask), 들어가고 나올 때는 몇 칸에 걸쳐 서서히 비킨다. */
   function rrMask(ln) {
@@ -4921,8 +4923,7 @@
     safety: 0.2,      // 안전거리(m)
     height: 1.5,      // 이 높이 안에 걸치는 것만 장애물(m)
     lift: 0.02,       // 경로선을 바닥에서 띄우는 높이(m) — 그릴 때만
-    turn45: 0.6, turn90: 1.4, turn135: 4,  // 꺾는 값(m 로 친다)
-    reuse: 0.5        // [10/29] 앞 구간이 지난 마디는 반값 — 같은 통로를 오갈 때 옆 한 칸(0.5 m)에 따로 길을 내지 않고 지난 길을 다시 탄다
+    turn45: 0.6, turn90: 1.4, turn135: 4   // 꺾는 값(m 로 친다)
   };
   var navByFloor = {};
   var routeLog = [];    // 좌표 보정 · 여유 부족 구간 기록 — APRISM_ROUTE.report()
@@ -5035,7 +5036,7 @@
 
   var DIRS = [[1, 0], [1, 1], [0, 1], [-1, 1], [-1, 0], [-1, -1], [0, -1], [1, -1]];
 
-  function astar(nav, s, g, need, used) {
+  function astar(nav, s, g, need) {
     var ni = nav.ni, nj = nav.nj, N = ni * nj;
     var cost = new Float32Array(N * 9).fill(Infinity);
     var from = new Int32Array(N * 9).fill(-1);
@@ -5092,7 +5093,7 @@
         if (!free(ii, jj)) { continue; }
         if ((k & 1) && (!free(i + DIRS[k][0], j) || !free(i, j + DIRS[k][1]))) { continue; }
         var nst = (jj * ni + ii) * 9 + k;
-        var nc = base + NAV.cell * ((k & 1) ? Math.SQRT2 : 1) * (used && used[jj * ni + ii] ? NAV.reuse : 1) + turn;
+        var nc = base + NAV.cell * ((k & 1) ? Math.SQRT2 : 1) + turn;
         if (nc < cost[nst]) { cost[nst] = nc; from[nst] = st; push(nc + h(ii, jj), nst); }
       }
     }
@@ -5123,7 +5124,7 @@
    * 점들을 차례로 잇는 길(도면 좌표). closed 면 마지막 점에서 처음 점으로 돌아온다.
    * 돌려주는 것: { path:[{X,Y,Z}], stops:[{X,Y,Z}](보정된 웨이포인트), reduced:[구간 번호] }
    */
-  function planChain(fid, pts, closed, names, merge) {
+  function planChain(fid, pts, closed, names) {
     var nav = navOf(fid);
     var need = NAV.radius + NAV.safety;
     var stops = pts.map(function (P, k) {
@@ -5137,37 +5138,18 @@
     });
     var order = closed ? stops.concat([stops[0]]) : stops;
     var nodes = [], reduced = [];
-    /*
-     * [10/29 v5] 같은 통로를 오가는 길은 한 줄로 — 디자이너: "핀이 경로 위에 없다 · 점선과 띠가 어긋난다".
-     * 갈 때(지나온 실선)와 올 때(남은 점선)가 마디 한 칸(0.5 m) 옆에 따로 나서, 점선이 실선 띠 가장자리를 타고
-     * 그 줄의 핀도 실선 밖에 꽂힌 것처럼 보였다. 지난 마디는 싸게 쳐서 다시 타게 하고(NAV.reuse),
-     * 지난 길에서 한 칸 옆에 찍힌 웨이포인트는 그 길 위로 옮긴다(장애물 여유는 지킨다).
-     */
-    // 씨앗 길(웨이포인트를 뿌리는 바탕)에는 쓰지 않는다 — 웨이포인트 자리가 통째로 바뀐다
-    var used = merge ? new Uint8Array(nav.ni * nav.nj) : null;
     for (var k = 0; k < order.length - 1; k += 1) {
       var a = [Math.round(order[k].X / NAV.cell), Math.round(order[k].Y / NAV.cell)];
       var b = [Math.round(order[k + 1].X / NAV.cell), Math.round(order[k + 1].Y / NAV.cell)];
-      if (used && k + 1 < stops.length && !used[b[1] * nav.ni + b[0]]) {
-        for (var dj = -1; dj <= 1; dj += 1) {
-          for (var di = -1; di <= 1; di += 1) {
-            var bi = b[0] + di, bj = b[1] + dj;
-            if ((di || dj) && bi >= 0 && bj >= 0 && bi < nav.ni && bj < nav.nj && used[bj * nav.ni + bi] && clearAt(nav, bi, bj) >= need) {
-              b = [bi, bj]; stops[k + 1] = order[k + 1] = { X: bi * NAV.cell, Y: bj * NAV.cell, Z: 0 }; di = dj = 2;
-            }
-          }
-        }
-      }
-      var leg = astar(nav, a, b, need, used);
+      var leg = astar(nav, a, b, need);
       if (!leg) {
-        leg = astar(nav, a, b, NAV.radius, used) || astar(nav, a, b, 0, used);
+        leg = astar(nav, a, b, NAV.radius) || astar(nav, a, b, 0);
         reduced.push(k);
         routeLog.push((names ? names[k] + " → " + (names[k + 1] || names[0]) : "구간 " + k) +
           (leg ? " : 안전거리 미확보(반경만 지킴)" : " : 길 없음 — 직선으로 둠"));
       }
       leg = leg || [a, b];
       nodes = nodes.concat(nodes.length ? leg.slice(1) : leg);
-      if (used) { leg.forEach(function (n) { used[n[1] * nav.ni + n[0]] = 1; }); }
     }
     var path = straighten(nodes).map(function (n) { return { X: n[0] * NAV.cell, Y: n[1] * NAV.cell, Z: 0 }; });
     return { path: path, stops: stops, reduced: reduced };
@@ -5210,7 +5192,7 @@
       routeLog.push(bot.name + " 웨이포인트 " + count + "개는 씨앗 좌표(ROBOT_WPS 비어 있음)");
     }
     var pts = [dock].concat(wps.map(function (w) { return { X: w[0], Y: w[1] }; }));
-    var res = planChain(fid, pts, true, names, true);
+    var res = planChain(fid, pts, true, names);
     var lift = NAV.lift;
     return {
       fid: fid, names: names, dockPlan: res.stops[0], wpPlan: res.stops.slice(1), pathPlan: res.path,
