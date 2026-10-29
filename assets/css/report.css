@@ -189,7 +189,8 @@
   justify-content: space-between;
   align-items: flex-end;
   gap: var(--space-24);
-  padding: var(--space-24) var(--space-20) var(--space-20);
+  /* 위 14 · 아래 12(예전 24 · 20) — 머리 아래 선이 왼쪽 목록 상자 위 끝과 한 줄이 되게(10/29 디자이너). 14 는 토큰이 없다 — 맞추려고 둔 값 */
+  padding: 14px var(--space-20) var(--space-12);
   border-bottom: var(--border-width-thin) solid var(--border-divider);
   background-color: var(--bg-glass);
 }
