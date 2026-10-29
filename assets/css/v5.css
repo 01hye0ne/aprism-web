@@ -17,12 +17,43 @@ body.ver-5 .map-bot .map-bot-halo { display: none !important; }
 /* 앉으면 접힌 다리 끝이 칸 오른쪽으로 11 쯤 나온다 — 칸 옆 여백(16) 안이라 자르지 않는다. */
 body.ver-5 .robot-strip.is-carousel .robot-thumb { overflow: visible; }
 
+/*
+ * 크기 · 자리는 Figma Mission-in progress-2(828:15313)의 Robot-grahpics 인스턴스(원본의 202/164 배)를 따른다.
+ * Figma 판은 352 폭(안쪽 336)인데 여기 판은 화면 폭 따라 좁아진다(1910 에서 312). 그대로 키우면 앉은 다리 끝이
+ * 오른쪽 정보 줄 밑으로 15 들어가서, 판 안쪽 폭에 비례해 줄인다(100cqw = 판 안쪽 폭, Figma 에선 336).
+ * 몸통 왼쪽 = 판 왼쪽 20(Figma 기준), 발바닥 = 판 바닥 9 위 — 바닥 띠(25) 가운데쯤에 선다.
+ * 그래픽 칸은 판 왼쪽 24(판 패딩 8 + 칸 여백 16)에서 시작하므로 그만큼 당긴다.
+ */
+body.ver-5 .robot-strip.is-carousel { container-type: inline-size; }
+body.ver-5 .robot-strip.is-carousel .robot-thumb { justify-content: flex-start; }
+
 body.ver-5 .robot-strip.is-carousel .robot-2d {
   display: block;
-  width: 116px;
-  height: 102px;
+  flex: none;
+  width: calc(116 * 202 / 164 * 100cqw / 336);
+  height: calc(102 * 202 / 164 * 100cqw / 336);
+  margin-left: calc(15.07 * 100cqw / 336 - 24px);
   overflow: visible;
 }
+
+/*
+ * 바닥 — Figma 828:15313 의 Rectangle 222: 판 맨 아래 전체 폭 · 높이 25 · bg/selected.
+ * 판(.robot-strip)이 overflow:hidden · radius 4 라 아래 두 모서리는 판을 따라 둥글게 잘린다. 카드 내용은 그 위에 뜬다.
+ * 라이트의 bg/selected 는 blue/100 이라 파랑이 상태 말고 바닥에 쓰이게 된다 — 라이트는 무채색 gray/300(라이트 판 위에서 gray/200 은 거의 안 보였다), 다크만 bg/selected.
+ */
+body.ver-5 .robot-strip.is-carousel { position: relative; }
+body.ver-5 .robot-strip.is-carousel::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 25px;
+  background-color: var(--color-gray-300);
+  pointer-events: none;
+}
+:root[data-theme="dark"] body.ver-5 .robot-strip.is-carousel::before { background-color: var(--bg-selected); }
+body.ver-5 .robot-strip.is-carousel .robot-card { position: relative; z-index: 1; }
 
 body.ver-5 .robot-2d .r2-hip-l { transform-origin: 44.5px 54.5px; }
 body.ver-5 .robot-2d .r2-hip-r { transform-origin: 110.5px 54.5px; }
