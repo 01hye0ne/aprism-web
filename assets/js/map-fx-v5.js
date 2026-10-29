@@ -35,6 +35,7 @@
   };
   var TONES = { "없음": "none", "AgX": "AgX", "ACES": "ACES" };
   var LAB = document.documentElement.hasAttribute("data-fx-lab");
+  var FPS = LAB || /[?&]fps/.test(window.location.search);   // ?fps — 운영 화면에서도 지도 fps 를 띄운다(버벅임 확인용)
   if (/[?&]fx=off/.test(window.location.search)) { S.on = false; }   // ?fx=off — 효과 없이 연다(전후 비교 · 느린 PC)
   // ?fxset=tone:ACES,envAmt:0.2 — 값을 주소로 넘긴다. 마음에 드는 조합을 링크 하나로 나눌 수 있다.
   ((window.location.search.match(/[?&]fxset=([^&]+)/) || [])[1] || "").split(",").forEach(function (kv) {
@@ -230,7 +231,7 @@
     P.vig.enabled = S.vignette > 0 && !light;   // 라이트는 밝은 바탕 가장자리가 회색으로 때 묻어 보인다 — 다크만
     P.vig.uniforms.amount.value = S.vignette;
 
-    if (LAB) { badge(); }
+    if (FPS) { badge(); }
     ctx.redraw();
   }
 
@@ -288,7 +289,7 @@
     var t = performance.now();
     if (!fps.t0) { fps.t0 = t; }
     fps.n += 1;
-    if (t - fps.t0 >= 1000) { fps.v = Math.round(fps.n * 1000 / (t - fps.t0)); fps.n = 0; fps.t0 = t; if (LAB) { badge(); } }
+    if (t - fps.t0 >= 1000) { fps.v = Math.round(fps.n * 1000 / (t - fps.t0)); fps.n = 0; fps.t0 = t; if (FPS) { badge(); } }
   }
 
   var tag = null;
@@ -296,9 +297,14 @@
     if (!tag) {
       tag = document.createElement("div");
       tag.className = "lab-fx-tag";
+      // 운영 화면에는 실험 페이지의 .lab-fx-tag 규칙이 없다 — 같은 꼴을 직접 입힌다.
+      if (!LAB) { tag.style.cssText = "position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:9999;padding:6px 12px;border-radius:999px;font:600 12px/1.4 SUIT,sans-serif;background:rgba(60,66,80,.9);color:#fff;pointer-events:none;white-space:pre"; }
       document.body.appendChild(tag);
     }
-    tag.textContent = (S.on ? "효과 켜짐" + (fps.v ? " · " + fps.v + " fps" : "") : "효과 꺼짐 · 운영 화면과 같음") + "  ·  B 로 전환";
+    var c = ctx.renderer.domElement;
+    tag.textContent = LAB
+      ? (S.on ? "효과 켜짐" + (fps.v ? " · " + fps.v + " fps" : "") : "효과 꺼짐 · 운영 화면과 같음") + "  ·  B 로 전환"
+      : "지도 " + (fps.v || "–") + " fps · 화면 배율 " + window.devicePixelRatio + " · 캔버스 " + c.width + "×" + c.height + (S.on ? "" : " · 효과 꺼짐");
     tag.classList.toggle("is-off", !S.on);
   }
 

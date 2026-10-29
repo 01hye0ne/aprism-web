@@ -398,12 +398,13 @@
   /*
    * 걸음(walkTick) · 로봇개(rrDog) · 경로 흐름(rrTick)이 각자 박자로 frame() 을 부른다 — 셋이 겹치면
    * 화면 한 번 바뀔 동안 지도를 두세 번 그렸다(10/29 효과를 얹고 버벅임으로 드러남). 애니메이션은 이것으로 부른다:
-   * 같은 화면 갱신(rAF) 안에서는 한 번만 그리고, 고주사율 모니터에서도 초당 60번을 넘지 않는다.
-   * 건너뛴 변경은 다음 갱신에 같이 그려진다 — 마지막 것이 빠지지 않게 꼬리 한 번을 걸어 둔다.
+   * 같은 화면 갱신(rAF)의 콜백은 모두 같은 t 를 받는다 — 같은 t 면 한 번만 그린다.
+   * 초당 횟수로 자르지 않는다. "15ms 안이면 건너뜀"으로 60fps 상한을 뒀더니 75 · 144Hz 모니터에서
+   * 하나 걸러 · 두셋 걸러 들쭉날쭉 그려 미세하게 끊겼다(10/29). 늦게 온 콜백의 변경은 다음 갱신에 같이 그려진다.
    */
   var tickAt = -1, tickTail = 0;
   function frameTick(t) {
-    if (t - tickAt < 15) {
+    if (t === tickAt) {
       if (!tickTail) { tickTail = window.requestAnimationFrame(function (t2) { tickTail = 0; frameTick(t2); }); }
       return;
     }
