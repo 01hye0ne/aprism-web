@@ -286,13 +286,15 @@
     const sumD = M.reduce((a, m) => a + m.done, 0), sumT = M.reduce((a, m) => a + m.total, 0);
     const top = `<button type="button" class="sf-mrow sf-all ${scope==='all' ? 'on' : ''}" data-sc="all" aria-current="${scope==='all'}"><span class="sf-mmap sf-allsum" aria-hidden="true"><span class="sf-cnt all">미션<b>${M.length}</b></span>${cnt('crit', nc, '위험')}${cnt('warn', nw0, '주의')}${cnt('ok', M.length - nc - nw0, '정상')}</span><span class="sf-mtx"><span class="sf-mt1"><b>미션 전체</b></span><span class="sf-meta">${kv('측정', sumD + '/' + sumT + '곳')}${kv('요청 전', allN + '건')}</span></span></button>`;
     const rows = M.map((m, i) => { const w = worst(i), h = hits(i), nw = i===1 && !newSeen, on = scope===i;
-      const tx = `<span class="sf-mtx"><span class="sf-mt1"><i class="ixd ${w} ${nw ? 'blink' : ''}"></i><b>${m.mis}</b>${nw ? '<em class="nwm">새로</em>' : ''}</span><span class="sf-meta">${kv('위치', flN(m))}${kv('측정', `${m.done}/${m.total}곳${m.done===m.total ? ', 순회 끝' : ''}`)}${kv('로봇', m.robot)}${kv('요청 전', h + '건')}</span></span>`;
-      if(!on) return `<button type="button" class="sf-mrow ${w}" data-sc="${i}"><span class="sf-mmap">${svg2(i, viewF(i).robotF, false, 96)}</span>${tx}</button>`;
+      const t1 = `<span class="sf-mt1"><i class="ixd ${w} ${nw ? 'blink' : ''}"></i><b>${m.mis}</b>${nw ? '<em class="nwm">새로</em>' : ''}</span>`;
+      const meta = `<span class="sf-meta">${kv('위치', flN(m))}${kv('측정', `${m.done}/${m.total}곳${m.done===m.total ? ', 순회 끝' : ''}`)}${kv('로봇', m.robot)}${kv('요청 전', h + '건')}</span>`;
+      if(!on) return `<button type="button" class="sf-mrow ${w}" data-sc="${i}"><span class="sf-mmap">${svg2(i, viewF(i).robotF, false, 96)}</span><span class="sf-mtx">${t1}${meta}</span></button>`;
       const cur = dt && dt.wp ? flOf(m, dt.wp) : viewF(i).cur, sel = dt ? dt.wp : undefined, lk = dt ? dt.lk : undefined;
-      // [10/30] 고른 미션은 테 하나 안에 정보 + 지도 — [관제에서 보기]는 머리 줄 오른쪽 위, 층 표시는 층이 여럿일 때만(고르는 단추) 지도 위에 남긴다
+      // [10/30] 고른 미션 — 제목 줄(+ [관제에서 보기])은 테 밖, 테(border/default) 하나 안에 정보 + 지도. 면은 깔지 않는다.
+      // 층 표시는 층이 여럿일 때만(고르는 단추) 지도 위에 남긴다
       const multi = !!(m.fls && m.fls.length > 1);
-      return `<div class="sf-mon ${w}"><button type="button" class="sf-mrow on" data-sc="${i}" aria-current="true">${tx}</button><a class="btn btn-ghost is-xs m2go" href="${mainUrl(i, cur)}" title="관제 3D 지도에서 이 미션과 층을 연다">관제에서 보기<span class="i i-16" style="--i:var(--ic-chevron-right)" aria-hidden="true"></span></a>
-        <div class="m2">${multi ? `<div class="m2b">${floorBar(i)}</div>` : ''}${svg2(i, cur, false, 316, sel, lk)}</div></div>`; }).join('');
+      return `<div class="sf-mon ${w}"><div class="sf-monh"><button type="button" class="sf-mrow on" data-sc="${i}" aria-current="true"><span class="sf-mtx">${t1}</span></button><a class="btn btn-ghost is-xs m2go" href="${mainUrl(i, cur)}" title="관제 3D 지도에서 이 미션과 층을 연다">관제에서 보기<span class="i i-16" style="--i:var(--ic-chevron-right)" aria-hidden="true"></span></a></div>
+        <div class="sf-monb">${meta}<div class="m2">${multi ? `<div class="m2b">${floorBar(i)}</div>` : ''}${svg2(i, cur, false, 316, sel, lk)}</div></div></div>`; }).join('');
     return `<div class="sf-mlist"><div class="sf-mwell">${top}${rows}</div></div>${LEG}`;
   }
   const MAINV3 = "./main-v5.html";   // [v5] 같은 판의 관제로
