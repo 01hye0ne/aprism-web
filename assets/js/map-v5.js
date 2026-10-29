@@ -5731,7 +5731,7 @@
 
     if (window.APRISM_MAP_FX) {
       fx = window.APRISM_MAP_FX;
-      fx.init({ THREE: THREE, renderer: renderer, scene: scene, camera: camera, view: view, key: key, meshes: meshes, span: span, isLight: isLight, redraw: frame });
+      fx.init({ THREE: THREE, renderer: renderer, scene: scene, camera: camera, view: view, key: key, meshes: meshes, span: span, box: box, isLight: isLight, redraw: frame });
     }
 
     plan();

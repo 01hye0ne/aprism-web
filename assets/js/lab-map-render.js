@@ -11,17 +11,23 @@
 //   그림자       해상도 · 번짐을 올린다.
 //
 // 키보드 B — 효과 켜기 · 끄기(전후 비교).
+//
+// 무게 — 로봇이 걷는 동안 지도는 매 프레임(초당 60번) 다시 그려진다. 그래서
+//   · 후처리 판은 배율 1 + MSAA 로 그린다(운영 화면은 배율 2 로 그려 줄인다 — 픽셀이 4배).
+//   · AO 는 반 해상도로 계산하고, 카메라 · 비치는 벽이 그대로면 지난 결과를 다시 쓴다 — 건물은 안 움직인다.
+//   · 끌어 돌리는 동안에는 AO 를 쉬고, 멈추면 한 번 계산한다.
 (function () {
   "use strict";
 
   var S = {
     on: true,
-    tone: "AgX", exposure: 1.0,
-    env: true, envAmt: 0.35, rough: 0.8,
-    ao: true, aoRadius: 1.2, aoAmt: 1.0,
-    bloom: true, bloomAmt: 0.45, bloomRadius: 0.5, bloomTh: 0.7,
-    vignette: 0.45,
-    shadow: 2048, shadowSoft: 4
+    tone: "none", exposure: 1.0,   // AgX 는 경로 · 상태색의 채도를 크게 뺀다(10/29 캡처) — 기본은 끔
+    env: true, envAmt: 0.12, rough: 0.8,   // 0.35 는 덩이가 뿌옇게 바랬다
+    ao: true, aoRadius: 8, aoAmt: 1.2, aoDeep: 2, aoRest: true, aoView: 0,   // aoView 0 합친 화면 · 5 AO 만 · 3 노멀 판
+    bloom: true, bloomAmt: 0.45, bloomRadius: 0.5, bloomTh: 0.6,
+    vignette: 0.5,
+    shadow: 2048, shadowSoft: 4,
+    res: 1   // 후처리 판 배율 — 1 이면 운영 화면(2)의 ¼ 픽셀
   };
   var TONES = { "없음": "none", "AgX": "AgX", "ACES": "ACES" };
   if (/[?&]fx=off/.test(window.location.search)) { S.on = false; }   // ?fx=off — 꺼진 채로 연다(전후 캡처용)
@@ -36,6 +42,8 @@
   var P = {};          // 패스 — render · ao · bloom · out · vig
   var envTex = null, ready = false, size = { w: 0, h: 0, pr: 0 };
   var bgNow = null;    // 지금 바탕색(CSS) — 투명 캔버스를 메우는 데 쓴다
+  var aoSig = "", aoPrev = "", aoMoved = 0, aoTimer = 0;   // AO 다시 쓰기 — 지난 계산 때 · 직전 프레임의 카메라 · 벽 상태, 마지막으로 바뀐 때
+  var fps = { n: 0, t0: 0, v: 0 };
 
   window.APRISM_MAP_FX = { init: init, render: render, S: S };
 
@@ -82,6 +90,34 @@
         if ((o.isMesh || o.isLine || o.isPoints || o.isSprite) && !keep.has(o)) { o.visible = false; }
       });
     };
+    // 반 해상도 — 그늘은 부드러운 것이라 반으로 계산해 늘려도 티가 안 난다. 계산량은 ¼.
+    var aoSize = P.ao.setSize;
+    P.ao.setSize = function (w, h) { aoSize.call(this, Math.max(1, Math.round(w / 2)), Math.max(1, Math.round(h / 2))); aoSig = ""; };
+    /*
+     * 같은 장면이면 AO 계산(노멀 판 · GTAO · 잡티 지우기)을 건너뛰고 지난 결과만 덧입힌다.
+     * 로봇이 걷기만 할 때가 그렇다 — 로봇 · 길은 AO 판에 안 들어가니 바뀐 것이 없다.
+     * 끌어 돌리는 동안(aoRest)은 AO 를 아예 쉬고, 멈춘 뒤 한 번 다시 그린다.
+     */
+    var aoRender = P.ao.render;
+    P.ao.render = function (r, wb, rb) {
+      var sig = sceneSig(), out = this.renderToScreen ? null : wb;
+      var now = performance.now();
+      if (sig !== aoPrev) { aoMoved = now; aoPrev = sig; }   // 직전 프레임과 견준다 — 지난 계산과 견주면 한 번 움직인 뒤 영영 "움직이는 중"이다
+      var moving = S.aoRest && now - aoMoved < 180;
+      if (moving) {
+        window.clearTimeout(aoTimer);
+        aoTimer = window.setTimeout(ctx.redraw, 200);
+      }
+      if (this.output !== 0) { aoSig = ""; return aoRender.call(this, r, wb, rb); }   // 진단 보기는 늘 새로
+      if (!moving && sig !== aoSig) { aoSig = sig; return aoRender.call(this, r, wb, rb); }
+      this.copyMaterial.uniforms.tDiffuse.value = rb.texture;
+      this.copyMaterial.blending = T.NoBlending;
+      this.renderPass(r, this.copyMaterial, out);
+      if (moving || !aoSig) { return; }
+      this.blendMaterial.uniforms.intensity.value = this.blendIntensity;
+      this.blendMaterial.uniforms.tDiffuse.value = this.pdRenderTarget.texture;
+      this.renderPass(r, this.blendMaterial, out);
+    };
     composer.addPass(P.ao);
 
     P.bloom = new m[3].UnrealBloomPass(new T.Vector2(1, 1), S.bloomAmt, S.bloomRadius, S.bloomTh);
@@ -121,6 +157,15 @@
     sync();
   }
 
+  // AO 판을 다시 계산해야 하나 — 카메라 자리 · 렌즈, 덩이마다 보이는지 · 비치는지.
+  function sceneSig() {
+    var e = ctx.camera.matrixWorld.elements, p = ctx.camera.projectionMatrix.elements, s = "";
+    for (var i = 12; i < 15; i++) { s += e[i].toFixed(3) + ","; }
+    s += e[8].toFixed(4) + "," + e[10].toFixed(4) + "," + p[0].toFixed(5) + "," + p[5].toFixed(5) + "|";
+    ctx.meshes.forEach(function (it) { s += it.mesh.visible ? (it.now > 0.9 ? "1" : "0") : "-"; });
+    return s;
+  }
+
   // 투명 캔버스 뒤로 비치던 바탕색 — 지도 칸에서 위로 올라가며 처음 칠해진 배경을 찾는다.
   function backdrop() {
     var el = ctx.view;
@@ -156,8 +201,13 @@
     ctx.key.shadow.radius = on ? S.shadowSoft : 3;
 
     P.ao.enabled = S.ao;
+    P.ao.output = S.aoView;
+    P.ao.updatePdMaterial({ samples: 8 });
+    aoSig = "";
     // 반지름은 모델 크기에 맞춘다 — 모델 반지름(span)의 몇 % 인가.
-    P.ao.updateGtaoMaterial({ radius: ctx.span * S.aoRadius / 100, distanceExponent: 1, thickness: ctx.span * 0.01, scale: 1, samples: 16 });
+    // 두께는 반경보다 커야 한다 — 작으면 표본이 다 "너무 멀다"로 버려져 그늘이 하나도 안 생긴다(10/29 AO 판이 온통 흰색).
+    var aoR = ctx.span * S.aoRadius / 100;
+    P.ao.updateGtaoMaterial({ radius: aoR, distanceExponent: 1, thickness: aoR * 3, scale: S.aoDeep, samples: 8 });   // scale = 그늘을 몇 제곱하나 — 클수록 진하다
     P.ao.blendIntensity = S.aoAmt;
     P.bloom.enabled = S.bloom && !light;
     P.bloom.strength = S.bloomAmt;
@@ -172,18 +222,51 @@
 
   function render(w, h) {
     if (!ready || !S.on) { return false; }
-    var pr = ctx.renderer.getPixelRatio();
+    var pr = Math.min(ctx.renderer.getPixelRatio(), S.res);
     if (w !== size.w || h !== size.h || pr !== size.pr) {
       size = { w: w, h: h, pr: pr };
       composer.setPixelRatio(pr);
       composer.setSize(w, h);
       P.vig.uniforms.aspect.value = w / h;
     }
+    /*
+     * 깊이 판을 모델 둘레로 좁힌다. 지도 카메라는 멀리 서서(EYE 9) near 1 · far 반지름 ×40 이라
+     * 모델이 깊이 판의 아주 얇은 띠에만 앉는다 — 그 정밀도로는 AO 가 모서리를 못 찾는다.
+     */
+    var cam = ctx.camera, n0 = cam.near, f0 = cam.far, z = depthSpan();
+    if (z) { cam.near = Math.max(n0, z[0]); cam.far = Math.min(f0, z[1]); cam.updateProjectionMatrix(); }
     composer.render();
+    if (z) { cam.near = n0; cam.far = f0; cam.updateProjectionMatrix(); }
+    tick();
     return true;
   }
 
   /* ---------- 조절판 ---------- */
+
+  // 모델 상자의 여덟 꼭짓점을 카메라 앞 방향으로 재서 가장 가까운 · 먼 깊이(여유 10%)를 낸다.
+  var _fw = null, _pt = null;
+  function depthSpan() {
+    var b = ctx.box;
+    if (!b) { return null; }
+    _fw = _fw || new T.Vector3(); _pt = _pt || new T.Vector3();
+    ctx.camera.getWorldDirection(_fw);
+    var lo = Infinity, hi = -Infinity;
+    for (var i = 0; i < 8; i++) {
+      _pt.set(i & 1 ? b.max.x : b.min.x, i & 2 ? b.max.y : b.min.y, i & 4 ? b.max.z : b.min.z).sub(ctx.camera.position);
+      var d = _pt.dot(_fw);
+      lo = Math.min(lo, d); hi = Math.max(hi, d);
+    }
+    var pad = (hi - lo) * 0.1;
+    return hi > 0 ? [Math.max(0.01, lo - pad), hi + pad] : null;
+  }
+
+  // 초당 그린 횟수 — 로봇이 걷는 동안(계속 그릴 때) 의미가 있다.
+  function tick() {
+    var t = performance.now();
+    if (!fps.t0) { fps.t0 = t; }
+    fps.n += 1;
+    if (t - fps.t0 >= 1000) { fps.v = Math.round(fps.n * 1000 / (t - fps.t0)); fps.n = 0; fps.t0 = t; badge(); }
+  }
 
   var tag = null;
   function badge() {
@@ -192,7 +275,7 @@
       tag.className = "lab-fx-tag";
       document.body.appendChild(tag);
     }
-    tag.textContent = (S.on ? "효과 켜짐" : "효과 꺼짐 · 운영 화면과 같음") + "  ·  B 로 전환";
+    tag.textContent = (S.on ? "효과 켜짐" + (fps.v ? " · " + fps.v + " fps" : "") : "효과 꺼짐 · 운영 화면과 같음") + "  ·  B 로 전환";
     tag.classList.toggle("is-off", !S.on);
   }
 
@@ -210,8 +293,11 @@
 
     f = gui.addFolder("AO (모서리 그늘)");
     f.add(S, "ao").name("켜기").onChange(sync);
-    f.add(S, "aoRadius", 0.2, 5, 0.1).name("반경 (모델 %)").onChange(sync);
-    f.add(S, "aoAmt", 0, 1.5, 0.05).name("세기").onChange(sync);
+    f.add(S, "aoRadius", 1, 20, 0.5).name("반경 (모델 %)").onChange(sync);
+    f.add(S, "aoDeep", 1, 4, 0.1).name("진하기").onChange(sync);
+    f.add(S, "aoAmt", 0, 2, 0.05).name("세기").onChange(sync);
+    f.add(S, "aoRest").name("돌리는 동안 쉬기").onChange(sync);
+    f.add(S, "aoView", { "합친 화면": 0, "AO 만 보기": 5, "AO 날것": 4, "노멀 판": 3, "깊이 판": 2 }).name("보기").onChange(function (v) { S.aoView = +v; sync(); });
 
     f = gui.addFolder("블룸 (다크만)");
     f.add(S, "bloom").name("켜기").onChange(sync);
@@ -221,6 +307,7 @@
 
     f = gui.addFolder("화면 · 그림자");
     f.add(S, "vignette", 0, 0.9, 0.05).name("비네트").onChange(sync);
+    f.add(S, "res", { "1 (가벼움)": 1, "1.5": 1.5, "2 (운영 화면과 같음)": 2 }).name("해상도 배율").onChange(function (v) { S.res = +v; ctx.redraw(); });
     f.add(S, "shadow", { "1024 (원래)": 1024, "2048": 2048, "4096": 4096 }).name("그림자 해상도").onChange(function (v) { S.shadow = +v; sync(); });
     f.add(S, "shadowSoft", 1, 10, 0.5).name("그림자 번짐").onChange(sync);
 

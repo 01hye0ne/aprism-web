@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>APRISM — 지도 조명 굽기 안내서</title>
+  <meta name="description" content="지도 3D 모델에 AO(모서리 그늘)를 블렌더에서 구워 넣는 단계 — 준비 · UV · 굽기 · 내보내기 · 넘기기 · 점검" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/static/woff2/SUIT.css" />
+  <link rel="stylesheet" href="./assets/css/tokens.css?v=b64812bd" />
+  <link rel="stylesheet" href="./assets/css/base.css?v=c723efd4" />
+  <style>
+    /* 안내서 한 장 — 로봇 디스플레이(robot-display.html)와 같은 꼴. 값은 토큰만 쓴다. */
+    .site-main { max-width: 860px; }
+    .toc { display: flex; flex-wrap: wrap; gap: var(--space-8); margin: var(--space-24) 0 0; padding: 0; list-style: none; }
+    .toc a {
+      display: inline-block; padding: var(--space-4) var(--space-12);
+      border: var(--border-width-thin) solid var(--border-default); border-radius: var(--radius-pill);
+      color: var(--text-secondary); font-size: var(--font-size-13); text-decoration: none;
+    }
+    .toc a:hover { color: var(--text-primary); border-color: var(--border-strong); }
+    .pol { margin-top: var(--space-48); scroll-margin-top: var(--space-16); }
+    .pol h2 { margin: 0 0 var(--space-4); font-size: var(--font-size-20); line-height: var(--font-line-height-28); }
+    .pol .meta { margin: 0 0 var(--space-16); color: var(--text-tertiary); font-size: var(--font-size-12); }
+    .pol h3 { margin: var(--space-24) 0 var(--space-8); font-size: var(--font-size-14); color: var(--text-secondary); }
+    .pol p, .pol li { color: var(--text-secondary); font-size: var(--font-size-14); line-height: var(--font-line-height-22); word-break: keep-all; }
+    .pol p { margin: 0 0 var(--space-8); }
+    .pol ul, .pol ol { margin: 0 0 var(--space-8); padding-left: var(--space-20); }
+    .pol li + li { margin-top: var(--space-4); }
+    .pol b { color: var(--text-primary); }
+    .pol code, .path {
+      padding: 1px var(--space-4); border-radius: var(--radius-4);
+      background-color: var(--bg-panel); color: var(--text-primary);
+      font-family: "JetBrains Mono", ui-monospace, monospace; font-size: var(--font-size-12);
+    }
+    .menu { color: var(--text-primary); font-weight: 600; }
+    .rule {
+      margin: 0 0 var(--space-16); padding: var(--space-12) var(--space-16);
+      border-left: 3px solid var(--border-brand); background-color: var(--bg-panel);
+      border-radius: 0 var(--radius-card) var(--radius-card) 0;
+      color: var(--text-primary); font-weight: 600;
+    }
+    .warn { border-left-color: var(--status-warning-border); }
+    .tbl { width: 100%; border-collapse: collapse; font-size: var(--font-size-13); margin-bottom: var(--space-8); }
+    .tbl th, .tbl td { padding: var(--space-8) var(--space-12); border-bottom: var(--border-width-thin) solid var(--border-divider); text-align: left; vertical-align: top; word-break: keep-all; }
+    .tbl th { color: var(--text-tertiary); font-weight: 600; font-size: var(--font-size-12); }
+    .tbl td { color: var(--text-secondary); }
+    .tbl td:first-child { color: var(--text-primary); font-weight: 600; white-space: nowrap; }
+    .scroll { overflow-x: auto; }
+    .flow { display: flex; flex-wrap: wrap; gap: var(--space-8); align-items: center; margin: var(--space-16) 0 0; padding: 0; list-style: none; }
+    .flow li {
+      padding: var(--space-8) var(--space-12); border-radius: var(--radius-card);
+      background-color: var(--bg-panel); color: var(--text-primary); font-size: var(--font-size-13); font-weight: 600;
+    }
+    .flow li.arrow { padding: 0; background: none; color: var(--text-tertiary); }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span class="brand-name">APRISM</span>
+    </div>
+    <a href="./index.html" class="theme-toggle" style="text-decoration:none">목록으로</a>
+  </header>
+
+  <main class="site-main">
+    <section class="intro">
+      <p class="eyebrow">Guide · Map Bake</p>
+      <h1>지도 조명 굽기 안내서</h1>
+      <p class="lead">지도 3D 모델에 AO(모서리 · 벽 밑동 · 틈에 지는 그늘)를 블렌더에서 미리 구워 넣는 2단계 작업 순서예요. 1단계(코드 효과)는 <a href="./screens/lab-map-render-v5.html">지도 렌더 실험</a>에서 볼 수 있어요. · 2026-10-29</p>
+      <ul class="flow" aria-label="작업 흐름">
+        <li>지금 GLB 불러오기</li><li class="arrow">→</li>
+        <li>AO 전용 UV 펴기</li><li class="arrow">→</li>
+        <li>Cycles로 AO 굽기</li><li class="arrow">→</li>
+        <li>GLB · PNG 내보내기</li><li class="arrow">→</li>
+        <li>assets/ 에 넣기</li>
+      </ul>
+      <ul class="toc">
+        <li><a href="#why">왜 굽나</a></li>
+        <li><a href="#prep">0. 준비</a></li>
+        <li><a href="#import">1. 불러오기</a></li>
+        <li><a href="#uv">2. UV</a></li>
+        <li><a href="#bake">3. 굽기</a></li>
+        <li><a href="#export">4. 내보내기</a></li>
+        <li><a href="#handoff">5. 넘기기</a></li>
+        <li><a href="#check">점검</a></li>
+        <li><a href="#trouble">문제 해결</a></li>
+      </ul>
+    </section>
+
+    <section class="pol" id="why">
+      <h2>왜 굽나</h2>
+      <p class="rule">레퍼런스의 무게감은 대부분 AO에서 나와요. 건물은 움직이지 않으니 한 번 구워 두면 실행 비용 없이 늘 그 품질이에요.</p>
+      <div class="scroll"><table class="tbl">
+        <thead><tr><th></th><th>실시간 AO (1단계 GTAO)</th><th>구운 AO (2단계)</th></tr></thead>
+        <tbody>
+          <tr><td>품질</td><td>화면 공간 계산이라 얕고, 화면 가장자리에서 끊겨요</td><td>광선 추적이라 깊고 부드러워요 (레퍼런스 ③ 수준)</td></tr>
+          <tr><td>속도</td><td>프레임마다 계산 — 4K · 저사양 PC에서 부담</td><td>텍스처 한 장 읽기 — 거의 0</td></tr>
+          <tr><td>비치는 벽</td><td>Focus Point로 벽이 비칠 때 판단이 흔들려요</td><td>벽과 함께 옅어져 자연스러워요</td></tr>
+          <tr><td>경로 선</td><td>벽 가까이 지나는 경로 선까지 어두워져요</td><td>건물 면에만 붙어 경로 색이 그대로예요</td></tr>
+          <tr><td>테마</td><td colspan="2">둘 다 "어둡게 곱하기"라 다크 · 라이트, 덩이 색을 바꿔도 그대로 맞아요</td></tr>
+        </tbody>
+      </table></div>
+      <p><b>AO만 구워요.</b> 빛과 색까지 굽는 라이트맵은 레퍼런스 ③에 더 가깝지만, 색이 텍스처에 박혀서 테마 전환 · 선택 강조 · Focus Point 투명도와 부딪혀요.</p>
+    </section>
+
+    <section class="pol" id="prep">
+      <h2>0. 준비</h2>
+      <p class="meta">10분</p>
+      <ul>
+        <li><b>Blender 4.2 LTS 이상</b> (무료, blender.org). 메뉴 이름은 4.2 영문 기준이에요.</li>
+        <li>GPU가 있으면 <span class="menu">Edit › Preferences › System › Cycles Render Devices</span>에서 CUDA · OptiX(엔비디아)나 HIP(AMD)를 켜 주세요. 굽는 시간이 몇 분에서 수십 초로 줄어요.</li>
+        <li>원본 파일: <span class="path">aprism-web/assets/model/apro-b3-b4.glb</span> — 지금 지도가 쓰는 모델이에요. 라이노에서 새로 내보내도 되지만, <b>이 파일에서 시작하면 이름 · 위치가 지금과 똑같아서</b> 코드가 그대로 읽어요.</li>
+      </ul>
+    </section>
+
+    <section class="pol" id="import">
+      <h2>1. 불러오기</h2>
+      <ol>
+        <li>새 파일을 열고 기본 큐브 · 카메라 · 라이트를 지워요 (<span class="menu">A</span> → <span class="menu">X</span>).</li>
+        <li><span class="menu">File › Import › glTF 2.0</span> → <span class="path">apro-b3-b4.glb</span>.</li>
+        <li>Outliner에서 구조를 확인해요. <b>맨 위가 층(지하 4층 · 지하 3층), 그 안이 레이어(floor · wall · equipment · stairs)</b>예요. 코드가 이 이름으로 층과 색을 정하니 <b>이름 · 묶음 · 위치 · 크기는 절대 바꾸지 않아요.</b></li>
+        <li>선(Curve)으로 들어온 것이 있으면 그대로 두세요. 코드가 알아서 빼요.</li>
+      </ol>
+    </section>
+
+    <section class="pol" id="uv">
+      <h2>2. AO 전용 UV 펴기</h2>
+      <p class="meta">모든 덩이가 텍스처 한 장(아틀라스)을 나눠 쓰게 펼쳐요.</p>
+      <ol>
+        <li>Outliner에서 메시만 전부 고르고 (<span class="menu">Select › Select All by Type › Mesh</span>), 3D 뷰에서 <span class="menu">Tab</span>으로 편집 모드에 들어가요. 여러 덩이를 한꺼번에 편집하는 상태예요.</li>
+        <li><span class="menu">A</span>로 면을 전부 고르고 <span class="menu">UV › Lightmap Pack</span>을 실행해요.
+          <ul>
+            <li>Selection: <b>All Faces</b></li>
+            <li>Share Texture Space: <b>켬</b> ← 한 장에 다 모으는 옵션이에요</li>
+            <li>Pack Quality: <b>48</b> · Margin: <b>0.2</b> 안팎</li>
+          </ul>
+          모서리가 많은 건물은 Lightmap Pack이 잘 맞아요. 결과가 지저분하면 <span class="menu">UV › Smart UV Project</span>(Island Margin 0.005)를 쓴 뒤 <span class="menu">UV › Pack Islands</span>로 다시 모아도 돼요.</li>
+        <li><span class="menu">Tab</span>으로 나와요. UV Editing 탭에서 섬들이 0~1 칸 안에 겹치지 않고 펼쳐졌는지 봐요.</li>
+      </ol>
+      <p class="rule warn">바닥판처럼 아주 큰 면은 칸을 많이 차지해야 그늘이 뭉개지지 않아요. 바닥이 너무 작게 잡혔으면 바닥 섬만 골라 키운(S) 뒤 Pack Islands를 다시 돌려요.</p>
+    </section>
+
+    <section class="pol" id="bake">
+      <h2>3. Cycles로 AO 굽기</h2>
+      <h3>3-1. 담을 이미지 만들기</h3>
+      <ol>
+        <li>Image Editor에서 <span class="menu">Image › New</span> → 이름 <code>apro-ao</code>, <b>4096 × 4096</b>, Color 흰색, Alpha 끔, <b>32-bit Float 켬</b> (굽는 동안 계조가 깨지지 않게).</li>
+        <li>각 재질에 이 이미지를 걸어요. Shader Editor에서 재질마다 <span class="menu">Add › Texture › Image Texture</span> → <code>apro-ao</code>를 고르고, <b>그 노드를 클릭해 활성(흰 테)으로</b> 둬요. 아무 데도 연결하지 않아요 — 굽는 대상이라는 표시일 뿐이에요.
+          <ul><li>재질이 여러 개면 전부 해야 해요. 하나라도 빠지면 그 덩이는 안 구워지고 오류가 나요.</li></ul></li>
+      </ol>
+      <h3>3-2. 굽기 설정</h3>
+      <div class="scroll"><table class="tbl">
+        <thead><tr><th>위치</th><th>값</th><th>이유</th></tr></thead>
+        <tbody>
+          <tr><td>Render › Render Engine</td><td>Cycles · Device GPU</td><td>굽기는 Cycles만 돼요</td></tr>
+          <tr><td>Render › Sampling › Render</td><td>Max Samples 256 · Denoise 켬</td><td>128이면 거칠고 512는 차이가 거의 없어요</td></tr>
+          <tr><td>World › Settings › Ambient Occlusion › Distance</td><td><b>층 높이의 ⅓ 쯤</b> (모델 단위로 1.0~1.5 부근부터)</td><td>너무 크면 위층 바닥판이 아래층 전체를 덮어 다 까매져요</td></tr>
+          <tr><td>Render › Bake › Bake Type</td><td>Ambient Occlusion</td><td></td></tr>
+          <tr><td>Bake › Output › Margin</td><td>16 px · Extend</td><td>섬 경계의 검은 줄(이음매)을 막아요</td></tr>
+          <tr><td>Bake › Selected to Active</td><td>끔</td><td></td></tr>
+        </tbody>
+      </table></div>
+      <h3>3-3. 굽기</h3>
+      <ol>
+        <li>Object 모드에서 메시를 전부 고르고 <span class="menu">Render › Bake › Bake</span>.</li>
+        <li><b>위층 바닥판이 아래층을 덮는 문제:</b> Distance를 낮춰도 아래층이 전반적으로 어두우면, 층을 하나씩 구워요 — 지하 3층을 숨기고(눈 아이콘이 아니라 <span class="menu">Disable in Renders</span> 카메라 아이콘) 지하 4층만 고르고 굽기 → 반대로 한 번 더. 같은 이미지에 이어서 구워져요.</li>
+        <li>Image Editor에서 결과를 봐요. 벽 밑동 · 설비 아래 · 구석이 부드럽게 어둡고 나머지는 흰색이면 정상이에요.</li>
+        <li><span class="menu">Image › Save As</span> → <b>PNG · BW · 8-bit</b>, 이름 <code>apro-b3-b4-ao.png</code>.</li>
+      </ol>
+    </section>
+
+    <section class="pol" id="export">
+      <h2>4. 내보내기</h2>
+      <ol>
+        <li><span class="menu">File › Export › glTF 2.0</span> → Format <b>glTF Binary (.glb)</b>, 이름 <code>apro-b3-b4-ao.glb</code>.</li>
+        <li>Include: <b>Selected Objects 끔</b> (전부 내보내기). Data › Mesh: <b>UVs 켬</b> · Normals 켬. Material: <b>No export</b> 또는 Placeholder — 재질은 코드가 입혀요.</li>
+        <li>Compression(Draco)은 <b>끔</b>. 지금 코드가 Draco를 풀지 않아요.</li>
+        <li>Transform › +Y Up <b>켬</b>(기본값). 바꾸면 지도가 누워요.</li>
+      </ol>
+      <p>AO는 GLB에 넣지 않고 PNG를 따로 넘겨요. glTF Occlusion 소켓 연결이 번거롭고, 따로 두면 PNG만 다시 구워 바꿔 끼우기 쉬워요.</p>
+    </section>
+
+    <section class="pol" id="handoff">
+      <h2>5. 넘기기</h2>
+      <ul>
+        <li>두 파일을 <span class="path">aprism-web/assets/</span> 바로 아래에 넣고 알려 주세요: <code>apro-b3-b4-ao.glb</code> · <code>apro-b3-b4-ao.png</code>. 하위 폴더 정리와 연결은 제가 해요.</li>
+        <li>제가 할 일
+          <ul>
+            <li>지도 코드가 지금 UV를 지우는데(재질에 텍스처가 없어서), AO를 붙이려고 UV를 남기게 바꿔요.</li>
+            <li>PNG를 <code>aoMap</code>으로 붙이고, 세기를 다크 · 라이트 따로 맞출 수 있게 렌더 실험 조절판에 넣어요.</li>
+            <li>1단계 GTAO와 나란히 비교한 뒤 하나로 정해요. 구운 AO가 낫다면 GTAO는 빼서 부하를 줄여요.</li>
+            <li>PNG는 화질을 보고 2048 · WebP로 줄여요 (base64로 들고 있어 용량이 ⅓ 더 늘어나요). 지금 모델이 4MB예요.</li>
+          </ul></li>
+      </ul>
+    </section>
+
+    <section class="pol" id="check">
+      <h2>점검</h2>
+      <ul>
+        <li>☐ Outliner의 층 · 레이어 이름이 원본과 같다 (지하 4층 › floor · wall · equipment · stairs)</li>
+        <li>☐ UV 섬이 0~1 칸 안에 있고 서로 겹치지 않는다</li>
+        <li>☐ AO 이미지에 섬 경계를 따라 검은 줄이 없다</li>
+        <li>☐ 아래층이 통째로 어둡지 않다 (위층 바닥판 문제)</li>
+        <li>☐ GLB를 다시 불러왔을 때 위치 · 크기 · 방향이 원본과 같다</li>
+      </ul>
+    </section>
+
+    <section class="pol" id="trouble">
+      <h2>문제 해결</h2>
+      <div class="scroll"><table class="tbl">
+        <thead><tr><th>증상</th><th>원인 · 해결</th></tr></thead>
+        <tbody>
+          <tr><td>"No active image found"</td><td>그 덩이의 재질에 <code>apro-ao</code> 이미지 노드가 없거나 활성이 아니에요. 3-1의 2번을 그 재질에 다시 해요.</td></tr>
+          <tr><td>얼룩덜룩 · 자글자글</td><td>Samples를 올리거나 Denoise를 켜요. 그래도 남으면 이미지를 4096으로, 섬을 키워요.</td></tr>
+          <tr><td>전체가 회색 · 검정</td><td>AO Distance가 너무 커요. 아니면 면 방향(노멀)이 뒤집혔어요 — 편집 모드에서 <span class="menu">Mesh › Normals › Recalculate Outside</span>.</td></tr>
+          <tr><td>섬 경계에 검은 선</td><td>Margin을 24 px로 올려요. UV 섬 간격(Margin)도 넓혀요.</td></tr>
+          <tr><td>굽기가 너무 오래 걸림</td><td>GPU가 켜졌는지 보세요. 시험은 1024 · 64 Samples로 먼저 돌리고, 마지막에만 4096 · 256으로.</td></tr>
+          <tr><td>계단실 구멍 둘레가 어색함</td><td>위층 바닥의 계단 구멍은 코드가 셰이더로 뚫어요. 모델에는 구멍이 없어서, 구멍 자리에도 그늘이 생겨요. 보이면 알려 주세요 — 그 자리만 코드에서 걷을게요.</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <span>APRISM · 공장 환경점검 로봇 관제 대시보드</span>
+  </footer>
+
+  <script src="./assets/js/theme.js?v=c86093d9"></script>
+</body>
+</html>
