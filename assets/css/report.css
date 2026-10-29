@@ -20,7 +20,8 @@
   flex: 1 1 auto;
   min-width: 0;
   display: grid;
-  grid-template-columns: 420px minmax(0, 1fr);
+  /* 목록 폭 = 관제 패널 폭(monitor.css --lp-w 340, Figma 420 에서 줄인 값 — 10/29 디자이너: 탭끼리 열 너비 통일) */
+  grid-template-columns: 340px minmax(0, 1fr);
   gap: 0;
   padding: 0;
   border-radius: var(--radius-container) var(--radius-container) 0 0;
@@ -47,7 +48,7 @@
 .rp-ib:hover:not(:disabled) { border-color: var(--border-strong) !important; }
 .rp-ib:disabled { opacity: 0.4; cursor: default !important; }
 
-/* ---------- 왼쪽 — 보고서 목록(Figma Sidebar 420) ---------- */
+/* ---------- 왼쪽 — 보고서 목록(Figma Sidebar 420 → 관제 패널과 같은 340) ---------- */
 .rp-side {
   position: relative;
   min-height: 0;
