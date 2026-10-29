@@ -3039,6 +3039,8 @@
     if (part.userData[key]) { return part.userData[key]; }
     var mt = new Fat.LineMaterial({ color: 0xffffff, linewidth: 1, transparent: true, opacity: 1, depthWrite: false });
     rrLift(mt); mt.resolution.copy(part.material.resolution); fatMats.push(mt);
+    // 본선보다 넓은 띠라 화면 아래쪽(카메라에 가까운 쪽) 가장자리가 기울어진 바닥 깊이에 먹혀 한쪽 테만 남았다(디자이너 지적) — 깊이를 더 당긴다
+    mt.polygonOffsetFactor = -40; mt.polygonOffsetUnits = -40;
     var l = new Fat.Line2(part.geometry, mt);
     l.renderOrder = order; l.userData.rrKeep = true; l.raycast = function () {};
     l.onBeforeRender = function () { if (l.geometry !== part.geometry) { l.geometry = part.geometry; } };
@@ -3050,6 +3052,8 @@
     [ln.parts[0], ln.cur].forEach(function (p) {   // 흰 테
       var e = rrUnder2(p, "rrEdge", 1.9); if (!e) { return; }
       e.visible = !gray;
+      // 본선도 같은 만큼 당긴다 — 본선 아래쪽만 바닥에 먹히면 그 자리에 흰 테가 두껍게 드러나 양쪽 테 굵기가 달라 보였다
+      if (p.material.polygonOffsetFactor !== -40) { p.material.polygonOffsetFactor = -40; p.material.polygonOffsetUnits = -40; }
       e.material.linewidth = p.material.linewidth + 2;
       e.material.color.setHex(rrMix(0xffffff, p === ln.cur ? 0.9 : 0.55, under));   // 지나온 길(옅은 파랑)은 테도 한 단 옅게
     });
@@ -3057,7 +3061,7 @@
       var b = rrUnder2(p, "rrBand", 1.8); if (!b) { return; }
       b.visible = !!p.material.dashed;
       b.material.linewidth = p.material.linewidth;
-      b.material.color.copy(p.material.color).lerp(new THREE.Color(under), isLight() ? 0.82 : 0.55);   // 점 색을 바닥에 다크 45% · 라이트 18% 남긴다 — 점보다 한참 옅지만 한 줄로 읽히게(라이트는 바닥이 밝아 같은 값이면 실선이 된다)
+      b.material.color.copy(p.material.color).lerp(new THREE.Color(under), isLight() ? 0.88 : 0.75);   // 점 색을 바닥에 다크 25% · 라이트 12% 남긴다(10/29 더 연하게) — 점보다 한참 옅지만 한 줄로 읽히게
     });
   }
   function rrApply(ln) {
