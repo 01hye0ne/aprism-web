@@ -146,10 +146,9 @@
 .sf-cnt .ixd.crit, .sf-cnt .ixd.warn { width: 12px; height: 12px; }
 /* 미션 칸 — bg/map-chip 50%, 위에서 떨어지는 안쪽 그림자(Delta 요약 칸과 같은 꺼짐) */
 .sf-mwell { flex: 1 0 auto; display: flex; flex-direction: column; background-color: color-mix(in srgb, var(--bg-map-chip) 50%, transparent); box-shadow: inset 0 10px 8px 0 rgb(0 0 0 / 25%); }
-/* 미션 줄 왼쪽 4 — 단계 테(comp/alert/위험·주의/edge). 정상은 선 자리만 남긴다 */
-.sf-side .sf-mwell > .sf-mrow, .sf-side .sf-mon { border: 0; border-left: 4px solid transparent; }
-.sf-side .sf-mwell > .sf-mrow.crit, .sf-side .sf-mon.crit { border-left-color: var(--comp-alert-critical-edge); }
-.sf-side .sf-mwell > .sf-mrow.warn, .sf-side .sf-mon.warn { border-left-color: var(--comp-alert-warning-edge); }
+/* 미션 줄 왼쪽 단계 선은 뺐다(10/30) — 이름 앞 ⓧ/△ 와 같은 말을 두 번 해 빨강이 겹쳤다. 비운 4 는 왼쪽 여백(8 → 12)으로 돌려 글 자리를 지킨다 */
+.sf-side .sf-mwell .sf-mrow { border: 0; padding-left: var(--space-12); }
+.sf-side .sf-mon .m2 { padding-left: var(--space-8); }
 .sf-mon { display: flex; flex-direction: column; gap: var(--space-8); padding-bottom: var(--space-8); background-color: var(--bg-selected); }
 .sf-mon .m2 { padding: 0 var(--space-4); }
 .sf-mon .m2v { width: auto; max-width: 100%; height: 420px; margin: 0 auto; }
