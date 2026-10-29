@@ -219,9 +219,9 @@
 
   /* ---------- 뷰어 ---------- */
   var VIEWER = '<div class="rp-viewer"><nav class="rp-toc" data-v="toc" aria-label="문서 목차"></nav><div class="rp-pages" data-v="pages"></div><div class="rp-pgno t-caption num" data-v="pgno" aria-live="polite"></div></div>';
-  var DL = '<button type="button" class="btn btn-ghost is-md" data-v="cfg" aria-haspopup="dialog">' + ic("settings") + '문서 구성</button>' +
-    '<button type="button" class="btn btn-secondary is-md" data-v="docx">DOCX 내려받기</button>' +
-    '<button type="button" class="btn btn-accent is-md" data-v="pdf">PDF 내려받기</button>';
+  var DL = '<button type="button" class="btn btn-ghost" data-v="cfg" aria-haspopup="dialog">' + ic("settings") + '문서 구성</button>' +
+    '<button type="button" class="btn btn-secondary" data-v="docx">DOCX 내려받기</button>' +
+    '<button type="button" class="btn btn-accent" data-v="pdf">PDF 내려받기</button>';
   function initViewer(rootEl, actsEl, popUp, id) {
     var doc = DOCS[id], count = 0, busy = false;
     function q(s) { return rootEl.querySelector('[data-v="' + s + '"]'); }
@@ -266,7 +266,7 @@
     function closePops() { Array.prototype.forEach.call(actsEl.querySelectorAll(".rp-pop"), function (p) { p.remove(); }); }
     // 특이 사항 입력(일일 · 월간)
     if (doc.kind !== "m" && !qa("note")) {
-      qa("cfg").insertAdjacentHTML("beforebegin", '<button type="button" class="btn btn-ghost is-md" data-v="note" aria-haspopup="dialog">' + ic("message") + "특이 사항 입력</button>");
+      qa("cfg").insertAdjacentHTML("beforebegin", '<button type="button" class="btn btn-ghost" data-v="note" aria-haspopup="dialog">' + ic("message") + "특이 사항 입력</button>");
     }
     function openNote() {
       var ex = actsEl.querySelector("[data-pop=note]");
@@ -278,7 +278,7 @@
       box.setAttribute("role", "dialog");
       box.setAttribute("aria-label", "특이 사항 입력");
       box.innerHTML = '<h4 class="t-title-2">특이 사항</h4><p class="rp-fx t-caption">입력한 내용이 문서의 특이 사항 칸에 들어가요. 비워 두면 빈칸으로 나가요.</p>' +
-        '<textarea class="t-body-3" rows="6" maxlength="500" placeholder="예: 10:36 WP-10 고온은 다음 근무자가 현장 확인 예정"></textarea>' +
+        '<textarea class="t-body-4" rows="6" maxlength="500" placeholder="예: 10:36 WP-10 고온은 다음 근무자가 현장 확인 예정"></textarea>' +
         '<div class="rp-sum t-caption"><span data-note-cnt></span><span class="rp-nb"><button type="button" class="btn btn-secondary" data-note-cancel>취소</button><button type="button" class="btn btn-accent" data-note-save>저장</button></span></div>';
       actsEl.appendChild(box);
       var tx = box.querySelector("textarea"), cnt = box.querySelector("[data-note-cnt]");
@@ -305,7 +305,7 @@
       box.setAttribute("role", "dialog");
       box.setAttribute("aria-label", "문서 구성");
       box.innerHTML = '<h4 class="t-title-2">내려받을 문서 구성</h4><p class="rp-fx t-caption">1쪽(기본 정보, 요약, 유형별 현황)은 항상 들어가요</p><div>' +
-        doc.flow.map(function (f) { return '<label class="rp-ck t-body-3"><input type="checkbox" value="' + f[0] + '"' + (opt[id].has(f[0]) ? " checked" : "") + ">" + f[1] + "</label>"; }).join("") +
+        doc.flow.map(function (f) { return '<label class="rp-ck t-body-4"><input type="checkbox" value="' + f[0] + '"' + (opt[id].has(f[0]) ? " checked" : "") + ">" + f[1] + "</label>"; }).join("") +
         '</div><div class="rp-sep"></div><div class="rp-sum t-caption" data-cfg-sum></div>';
       actsEl.appendChild(box);
       Array.prototype.forEach.call(box.querySelectorAll("input[value]"), function (c) {
@@ -342,8 +342,8 @@
   function partTag(d) { return d.part ? '<span class="badge badge-idle t-caption">중간 집계</span>' : ""; }
   function detailHead(id) {
     var d = DOCS[id];
-    return '<div><p class="rp-eb t-body-4">' + d.title + '</p><h2 class="t-heading-2">' + d.head + partTag(d) + "</h2>" +
-      '<p class="rp-meta t-body-3">' + metaHtml(d) + "</p></div>" +
+    return '<div><p class="rp-eb t-caption">' + d.title + '</p><h2 class="t-title-2">' + d.head + partTag(d) + "</h2>" +
+      '<p class="rp-meta t-body-4">' + metaHtml(d) + "</p></div>" +
       '<div class="rp-acts" data-rp-acts>' + DL + "</div>";
   }
   function openDetail() {
@@ -363,11 +363,11 @@
    */
   function dayRow(id, name, meta, isOn, live) {
     return '<button type="button" class="rp-item is-day' + (live ? " is-live" : "") + '" data-id="' + (id || "") + '"' + (isOn ? ' aria-current="true"' : "") + (live ? " disabled" : "") + ">" +
-      '<span class="rp-a t-title-2">' + ic("document") + "<b>" + name + '</b></span><span class="rp-tm t-body-4 num">' + meta + "</span></button>";
+      '<span class="rp-a t-label-1">' + ic("document") + "<b>" + name + '</b></span><span class="rp-tm t-caption num">' + meta + "</span></button>";
   }
   function missionRow(id, time, isOn) {
     return '<button type="button" class="rp-item is-mission" data-id="' + (id || "") + '"' + (isOn ? ' aria-current="true"' : "") + ">" +
-      '<span class="rp-a t-body-3"><span class="rp-br" aria-hidden="true"></span><b>' + NAME + '</b></span><span class="rp-tm t-body-4 num">' + time + "</span></button>";
+      '<span class="rp-a t-body-4"><span class="rp-br" aria-hidden="true"></span><b>' + NAME + '</b></span><span class="rp-tm t-caption num">' + time + "</span></button>";
   }
 
   /*
@@ -434,7 +434,7 @@
     var d = DOCS[id];
     modal = document.createElement("div");
     modal.innerHTML = '<div class="rp-modal-scrim" data-m-close></div><section class="rp-modal" role="dialog" aria-modal="true" aria-labelledby="rp-mt">' +
-      '<div class="rp-mhd"><div><h2 class="t-heading-2" id="rp-mt">' + d.title + partTag(d) + '</h2><p class="rp-meta t-body-3">' + metaHtml(d) + "</p></div>" +
+      '<div class="rp-mhd"><div><h2 class="t-title-2" id="rp-mt">' + d.title + partTag(d) + '</h2><p class="rp-meta t-body-4">' + metaHtml(d) + "</p></div>" +
       '<button type="button" class="icon-button modal-close" data-m-close aria-label="닫기"><span class="i i-20" style="--i:var(--ic-close)"></span></button></div>' +
       '<div style="display:flex;min-height:0">' + VIEWER + "</div>" +
       '<div class="rp-mft"><button type="button" class="rp-link t-label-2" data-m-menu>보고서 메뉴에서 보기' + ic("chevron-right") + '</button><div class="rp-acts" data-m-acts>' + DL + "</div></div></section>";

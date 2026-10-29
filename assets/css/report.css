@@ -92,6 +92,8 @@
   text-align: left;
 }
 .rp-item.is-day { min-height: 40px; }
+/* 날짜 줄 글자 — 관제 웨이포인트 제목(.step-title)과 같은 14/500. 미션 줄은 13/400(Body/4) 이라 한 단 아래로 읽힌다 */
+.rp-item.is-day .rp-a { font-weight: 500; }
 .rp-item.is-mission { min-height: 46px; }
 .rp-item:hover:not(:disabled) { background-color: var(--bg-glass) !important; }
 .rp-item[aria-current="true"] { background-color: var(--bg-selected) !important; }
@@ -137,10 +139,9 @@
 .rp-meta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4) var(--space-24); margin-top: var(--space-4); color: var(--text-primary); }
 .rp-meta > span { display: inline-flex; gap: var(--space-8); }
 .rp-meta .rp-mlb { color: var(--text-tertiary); }
+/* 머리 단추 — 관제 탭과 같은 Small(32 · 13/500). Figma 는 Large 40 이었다(10/29 디자이너: 글자 크기를 관제 탭 기준으로) */
 .rp-acts { position: relative; display: flex; align-items: center; gap: var(--space-8); }
 .rp-acts .btn .i { width: 16px; height: 16px; }
-/* 머리 단추는 Figma Size=Large — 40 · 좌우 20 */
-.rp-dh .rp-acts .btn.is-md { height: var(--size-control-lg); padding: 0 var(--space-20); gap: var(--space-8); }
 .rp-spin { width: 14px; height: 14px; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: rp-spin 0.8s linear infinite; }
 @keyframes rp-spin { to { transform: rotate(360deg); } }
 
