@@ -392,10 +392,10 @@
  * 머리는 관제 패널과 같은 유리면(bg/glass + 배경 블러 20)이라 위로 올라간 문서가 머리 뒤로 흐리게 비쳐 보인다.
  * 처음 자리는 머리 높이(--rp-dh-h, report.js 가 잰다) + 20 만큼 띄워 예전과 같다. 관제에서 여는 모달(.rp-modal)은 그대로다.
  */
-/* 흰 종이가 지나가면 유리면만으로는 머리가 밝아져 회색 글자(문서 구성 · 라벨)가 안 읽힌다 — 유리면 아래 bg/page 60% 를 한 겹 깔아 비침은 남기고 대비를 지킨다 */
+/* 흰 종이가 지나가면 유리면만으로는 머리가 밝아져 회색 글자(문서 구성 · 라벨)가 안 읽힌다 — 유리면 아래 bg/page 85% 를 한 겹 깔아 비침은 흐리게만 남기고 대비를 지킨다(60% 는 너무 밝게 비쳤다 — 10/29 디자이너) */
 .rp-detail .rp-dh {
   position: absolute; top: 0; left: 0; right: 0; z-index: 3;
-  background: linear-gradient(var(--bg-glass), var(--bg-glass)), color-mix(in srgb, var(--bg-page) 60%, transparent);
+  background: linear-gradient(var(--bg-glass), var(--bg-glass)), color-mix(in srgb, var(--bg-page) 85%, transparent);
   -webkit-backdrop-filter: blur(20px);
   backdrop-filter: blur(20px);
 }
@@ -403,3 +403,29 @@
 .rp-detail .rp-toc,
 .rp-detail .rp-pages { padding-top: calc(var(--rp-dh-h, 112px) + var(--space-20)); }
 .rp-detail .rp-pgno { top: calc(var(--rp-dh-h, 112px) + var(--space-20)); }
+
+/*
+ * 스크롤 막대 — 다른 화면(웨이포인트 목록 · 알림 목록 등, app-shell .timeline/.ah-list)과 같은 꼴:
+ * 트랙 12 · 비움, 막대 4(투명 테두리 4) · border/default, 손이 닿으면 border/strong. 보고서 목록 · 목차 · 종이 칸에 쓴다.
+ * 종이 칸 · 목차는 머리 뒤까지 스크롤되지만 막대는 머리 아래에서 시작한다(트랙 위 여백 = 머리 높이).
+ */
+.rp-list::-webkit-scrollbar,
+.rp-toc::-webkit-scrollbar,
+.rp-pages::-webkit-scrollbar { width: 12px; height: 12px; }
+.rp-list::-webkit-scrollbar-track,
+.rp-toc::-webkit-scrollbar-track,
+.rp-pages::-webkit-scrollbar-track,
+.rp-pages::-webkit-scrollbar-corner { background: transparent; }
+.rp-detail .rp-toc::-webkit-scrollbar-track,
+.rp-detail .rp-pages::-webkit-scrollbar-track { margin-top: var(--rp-dh-h, 112px); }
+.rp-list::-webkit-scrollbar-thumb,
+.rp-toc::-webkit-scrollbar-thumb,
+.rp-pages::-webkit-scrollbar-thumb { border: 4px solid transparent; border-radius: var(--radius-pill); background-color: var(--border-default); background-clip: content-box; }
+.rp-list::-webkit-scrollbar-thumb:hover,
+.rp-toc::-webkit-scrollbar-thumb:hover,
+.rp-pages::-webkit-scrollbar-thumb:hover { background-color: var(--border-strong); }
+@supports not selector(::-webkit-scrollbar) {
+  .rp-list, .rp-toc, .rp-pages { scrollbar-width: thin; scrollbar-color: var(--border-default) transparent; }
+}
+/* 쪽 표시는 막대(12) 바로 안쪽 — 예전 기본 막대(16) 자리에서 옮긴다 */
+.rp-detail .rp-pgno { right: calc(var(--space-20) + 12px); }
