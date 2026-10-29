@@ -114,7 +114,7 @@
  * 월 보고서 자리(만들기 전) — 날짜 줄과 같은 높이 · 여백이지만 "빈 자리 + 행동"으로 읽히게:
  * 문서 아이콘 · 이름은 흐리게(text/tertiary · secondary), 오른쪽 기간 옆에 [만들기](Secondary xSmall). 줄 자체는 누를 수 없다.
  */
-.rp-moslot { display: flex; align-items: center; gap: var(--space-8); min-height: 32px; padding: var(--space-4) var(--space-12) var(--space-4) var(--space-16); }
+.rp-moslot { display: flex; align-items: center; gap: var(--space-8); min-height: 40px; padding: var(--space-8) var(--space-12) var(--space-8) var(--space-16); }
 .rp-moslot .rp-a { flex: 1; min-width: 0; display: flex; align-items: center; gap: var(--space-4); color: var(--text-secondary); font-weight: 500; }
 .rp-moslot .rp-a .i { flex: none; color: var(--text-tertiary); }
 .rp-moslot .rp-a b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: inherit; }
@@ -129,19 +129,19 @@
 .rp-grp { border-bottom: var(--border-width-thin) solid var(--border-divider); }
 .rp-empty { padding: var(--space-24) var(--space-16); color: var(--text-tertiary); text-align: center; }
 
-/* 줄 — 날짜(=일일 보고서) 32 · 미션 34(10/29 디자이너: Figma 40 · 46 의 위아래 여백을 반으로). 고른 줄은 bg/selected 면만(막대 없음 — 글자가 밀리지 않는다) */
+/* 줄 — 날짜(=일일 보고서) 40 · 미션 42 · 위아래 여백 8(10/29 디자이너: 4 는 빡빡했다, 좌우 16 그대로). 고른 줄은 bg/selected 면만(막대 없음 — 글자가 밀리지 않는다) */
 .rp-item {
   width: 100%;
   display: flex;
   align-items: center;
   gap: var(--space-8);
-  padding: var(--space-4) var(--space-16);
+  padding: var(--space-8) var(--space-16);
   text-align: left;
 }
-.rp-item.is-day { min-height: 32px; }
+.rp-item.is-day { min-height: 40px; }
 /* 날짜 줄 글자 — 관제 웨이포인트 제목(.step-title)과 같은 14/500. 미션 줄은 13/400(Body/4) 이라 한 단 아래로 읽힌다 */
 .rp-item.is-day .rp-a { font-weight: 500; }
-.rp-item.is-mission { min-height: 34px; }
+.rp-item.is-mission { min-height: 42px; }
 .rp-item:hover:not(:disabled) { background-color: var(--bg-glass) !important; }
 .rp-item[aria-current="true"] { background-color: var(--bg-selected) !important; }
 .rp-item:disabled { cursor: default !important; }
@@ -155,7 +155,7 @@
 .rp-item.is-live .rp-a .i { color: var(--text-tertiary); }
 /*
  * 가지 — 관제 탭 최신 알림의 가지 선(v3.css .ah-scope · .ah-where)과 같은 꼴.
- *   세로 선  날짜 줄 문서 아이콘 가운데(x 24) 아래로 — 첫 미션 줄은 아이콘 아래 끝(위 8)에서 시작하고,
+ *   세로 선  날짜 줄 문서 아이콘 가운데(x 24) 아래로 — 첫 미션 줄은 아이콘 아래 끝(위 12)에서 시작하고,
  *            다음 미션이 있으면 줄 끝까지(├), 마지막 미션은 줄 가운데에서 멈춘다(└)
  *   꺾임     줄 가운데에서 오른쪽으로 7
  *   선은 border/default 1 — 글보다 한참 옅게. 미션 이름은 날짜 글자 자리(36)로 들인다(.rp-br 20 칸).
@@ -166,7 +166,7 @@
 .rp-item.is-mission::before,
 .rp-item.is-mission::after { content: ""; position: absolute; left: 23px; background-color: var(--border-default); pointer-events: none; }
 .rp-item.is-mission::before { top: 0; bottom: 0; width: 1px; }
-.rp-item.is-day + .rp-item.is-mission::before { top: -8px; }
+.rp-item.is-day + .rp-item.is-mission::before { top: -12px; }
 .rp-item.is-mission:last-child::before { bottom: 50%; }
 .rp-item.is-mission::after { top: 50%; width: 7px; height: 1px; }
 
