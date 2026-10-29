@@ -57,13 +57,20 @@
   border-right: var(--border-width-thin) solid var(--border-divider);
   overflow: hidden;
 }
-/* 패널 머리 — 관제 패널과 같은 모양(접기 아이콘 · 라벨, 아래 border/default) */
-.rp-phead { flex: none; display: flex; align-items: center; gap: var(--space-8); padding: var(--space-8); border-bottom: var(--border-width-thin) solid var(--border-default); }
+/* 패널 머리 — 관제 패널(.panel-head · app-shell v2.2 머리줄)과 같다: 안쪽 12 · 사이 8 · 45 높이,
+   구분선은 좌우 12 안쪽에서만 border/default(양끝까지 그으면 잘린 선으로 읽힌다) */
+.rp-phead { position: relative; flex: none; display: flex; align-items: center; gap: var(--space-8); padding: var(--space-12); border-bottom: var(--border-width-thin) solid transparent; }
+.rp-phead::after { content: ""; position: absolute; left: var(--space-12); right: var(--space-12); bottom: calc(var(--border-width-thin) * -1); height: var(--border-width-thin); background-color: var(--border-default); }
+.rp-body.is-fold .rp-phead { gap: 0; }
+.rp-body.is-fold .rp-phead::after { opacity: 0; }
 .rp-ptog { display: grid; place-items: center; width: 20px; height: 20px; color: var(--text-primary) !important; }
 .rp-plabel { color: var(--text-tertiary); white-space: nowrap; }
-.rp-sbody { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: var(--space-12); padding: var(--space-12) var(--space-8) var(--space-8); }
+/* 본문 — 관제 패널(.ah-body)과 같다: 위 16 · 글줄(달 이동 · 단추)은 좌우 12 · 목록 상자는 좌우 8 · 묶음 사이 12 */
+.rp-sbody { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: var(--space-12); padding: var(--space-16) var(--space-8) var(--space-8); }
+.rp-sbody > .rp-mrow,
+.rp-sbody > .rp-mobtn { margin: 0 var(--space-4); }
 /* 접으면 머리 아이콘만 남는다 */
-.rp-body.is-fold { grid-template-columns: 37px minmax(0, 1fr); }
+.rp-body.is-fold { grid-template-columns: calc(var(--size-icon-20) + var(--space-12) * 2) minmax(0, 1fr); }
 .rp-body.is-fold .rp-plabel,
 .rp-body.is-fold .rp-sbody { display: none; }
 .rp-body.is-fold .rp-ptog { transform: scaleX(-1); }
@@ -73,7 +80,7 @@
 .rp-mnav .rp-mt { color: var(--text-primary); white-space: nowrap; }
 .rp-cnt { display: flex; align-items: center; gap: var(--space-8); color: var(--text-tertiary); white-space: nowrap; }
 .rp-cnt .rp-cn { color: var(--text-secondary); }
-.rp-mobtn { flex: none; width: 100%; justify-content: center; }
+.rp-mobtn { flex: none; justify-content: center; }
 .rp-mobtn .rp-spin { margin-right: var(--space-4); }
 
 /* 목록 상자 — bg/map-chip · radius 8. 날짜 묶음마다 아래 구분선 */
@@ -106,10 +113,22 @@
 /* 작성 중(근무가 안 끝난 날) — 아직 문서가 없어 못 누른다 */
 .rp-item.is-live .rp-a { color: var(--text-secondary); }
 .rp-item.is-live .rp-a .i { color: var(--text-tertiary); }
-/* └ 가지 — 20 칸 가운데에서 11 × 11 */
-.rp-br { flex: none; position: relative; width: 20px; height: 20px; }
-.rp-br::before { content: ""; position: absolute; left: 10px; top: 0; width: 11px; height: 11px; border-left: var(--border-width-thin) solid var(--text-tertiary); border-bottom: var(--border-width-thin) solid var(--text-tertiary); }
-.rp-item.is-mission .rp-a { gap: var(--space-8); }
+/*
+ * 가지 — 관제 탭 최신 알림의 가지 선(v3.css .ah-scope · .ah-where)과 같은 꼴.
+ *   세로 선  날짜 줄 문서 아이콘 가운데(x 24) 아래로 — 첫 미션 줄은 아이콘 아래 끝(위 12)에서 시작하고,
+ *            다음 미션이 있으면 줄 끝까지(├), 마지막 미션은 줄 가운데에서 멈춘다(└)
+ *   꺾임     줄 가운데에서 오른쪽으로 7
+ *   선은 border/default 1 — 글보다 한참 옅게. 미션 이름은 날짜 글자 자리(36)로 들인다(.rp-br 20 칸).
+ */
+.rp-br { flex: none; width: 20px; height: 20px; }
+.rp-item.is-mission { position: relative; }
+.rp-item.is-mission .rp-a { gap: 0; }
+.rp-item.is-mission::before,
+.rp-item.is-mission::after { content: ""; position: absolute; left: 23px; background-color: var(--border-default); pointer-events: none; }
+.rp-item.is-mission::before { top: 0; bottom: 0; width: 1px; }
+.rp-item.is-day + .rp-item.is-mission::before { top: -12px; }
+.rp-item.is-mission:last-child::before { bottom: 50%; }
+.rp-item.is-mission::after { top: 50%; width: 7px; height: 1px; }
 
 /* ---------- 오른쪽 — 보고서(위 · 오른쪽 · 아래 8 띄운 bg/page 판) ---------- */
 .rp-detail {
