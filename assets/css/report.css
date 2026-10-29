@@ -116,8 +116,8 @@
 
 /* 목록 상자 — bg/map-chip · radius 8. 날짜 묶음마다 아래 구분선 */
 .rp-list { flex: 1; min-height: 0; overflow: auto; border-radius: var(--radius-8); background-color: var(--bg-map-chip); }
-.rp-grp { padding-top: var(--space-4); border-bottom: var(--border-width-thin) solid var(--border-divider); }
-.rp-grp.is-month { padding-bottom: var(--space-4); }
+/* 묶음 위아래 여백 없음 — 고른 줄 · 올린 줄의 면이 구분선에 바로 닿는다(10/29 디자이너, Figma 위 4 를 뺐다) */
+.rp-grp { border-bottom: var(--border-width-thin) solid var(--border-divider); }
 .rp-empty { padding: var(--space-24) var(--space-16); color: var(--text-tertiary); text-align: center; }
 
 /* 줄 — 날짜(=일일 보고서) 32 · 미션 34(10/29 디자이너: Figma 40 · 46 의 위아래 여백을 반으로). 고른 줄은 bg/selected 면만(막대 없음 — 글자가 밀리지 않는다) */
