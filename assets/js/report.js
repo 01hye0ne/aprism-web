@@ -392,13 +392,15 @@
 
   function renderList() {
     var html = "", n = 0;
-    body.querySelector("[data-rp-mt]").textContent = "2026년 " + vm + "월";
+    var mt = body.querySelector("[data-rp-mt]");
+    mt.textContent = "2026년 " + vm + "월";
+    mt.setAttribute("aria-label", "2026년 " + vm + "월, 날짜로 찾기");
     body.querySelector("[data-rp-next]").disabled = vm >= MAXM;
     if (vm === 10) {
       if (moState === "made") { n++; html += '<div class="rp-grp is-month">' + dayRow("mo10", "10월 월 보고서", rangeOf(vm), cur === "mo10") + "</div>"; }
       DAYS.forEach(function (d) {
         if (!d.live) { n++; }
-        html += '<div class="rp-grp" role="listitem">' + dayRow(d.dayRpt.id, d.d, d.live ? "작성 중" : "미션 " + d.dayRpt.n, d.dayRpt.id && d.dayRpt.id === cur, d.live);
+        html += '<div class="rp-grp" role="listitem" data-day="' + d.day + '">' + dayRow(d.dayRpt.id, d.d, d.live ? "작성 중" : "미션 " + d.dayRpt.n, d.dayRpt.id && d.dayRpt.id === cur, d.live);
         d.missions.forEach(function (m) { n++; html += missionRow(m.id, m.t, m.id && m.id === cur); });
         html += "</div>";
       });
@@ -416,8 +418,66 @@
       };
     });
   }
-  body.querySelector("[data-rp-prev]").onclick = function () { vm--; renderList(); };
-  body.querySelector("[data-rp-next]").onclick = function () { if (vm < MAXM) { vm++; renderList(); } };
+  body.querySelector("[data-rp-prev]").onclick = function () { vm--; closeCal(); renderList(); };
+  body.querySelector("[data-rp-next]").onclick = function () { if (vm < MAXM) { vm++; closeCal(); renderList(); } };
+
+  /*
+   * 달력 — 날짜로 찾기(10/29 디자이너: 달 제목을 누르면 뜬다). 달 이동 줄 바로 아래, 목록 위에 뜨는 판.
+   * 보고서가 있는 날만 누를 수 있다(점). 누르면 그달로 옮겨 그날 일일 보고서를 열고 목록에서 그 날짜로 내려간다.
+   * 오늘처럼 근무가 안 끝난 날은 일일 보고서가 없어 목록만 그 날짜로 옮긴다.
+   */
+  var mtBtn = body.querySelector("[data-rp-mt]");
+  function closeCal() {
+    var c = side.querySelector(".rp-cal");
+    if (c) { c.remove(); }
+    mtBtn.setAttribute("aria-expanded", "false");
+  }
+  function toggleCal() {
+    if (side.querySelector(".rp-cal")) { closeCal(); return; }
+    var p = document.createElement("div");
+    p.className = "rp-cal";
+    p.setAttribute("role", "dialog");
+    p.setAttribute("aria-label", "날짜로 찾기");
+    var row = side.querySelector(".rp-mrow");
+    p.style.top = (row.getBoundingClientRect().bottom - side.getBoundingClientRect().top + 8) + "px";
+    side.appendChild(p);
+    mtBtn.setAttribute("aria-expanded", "true");
+    drawCal(p, vm);
+  }
+  function reportDays(m) { return m === 10 ? DAYS.map(function (d) { return d.day; }) : []; }
+  function drawCal(p, m) {
+    var first = new Date(2026, m - 1, 1).getDay(), n = daysIn(m), has = reportDays(m), cells = "";
+    for (var i = 0; i < first; i++) { cells += "<span></span>"; }
+    for (var d = 1; d <= n; d++) {
+      var fut = m === MAXM && d > TODAY, on = has.indexOf(d) >= 0;
+      cells += '<button type="button" class="rp-cd t-body-4 num' + (on ? " has" : "") + (m === MAXM && d === TODAY ? " is-today" : "") + '" data-d="' + d + '"' + (on ? "" : " disabled") +
+        ' aria-label="' + m + "월 " + d + "일" + (on ? ", 보고서 있음" : fut ? ", 아직 없음" : ", 보고서 없음") + '">' + d + "</button>";
+    }
+    p.innerHTML = '<div class="rp-cal-h"><button type="button" class="rp-ib" data-cm="-1" aria-label="이전 달">' + ic("chevron-left") + '</button><b class="t-title-2">2026년 ' + m + '월</b><button type="button" class="rp-ib" data-cm="1" aria-label="다음 달"' + (m >= MAXM ? " disabled" : "") + ">" + ic("chevron-right") + "</button></div>" +
+      '<div class="rp-cg">' + ["일", "월", "화", "수", "목", "금", "토"].map(function (w) { return '<span class="rp-w t-caption">' + w + "</span>"; }).join("") + cells + "</div>" +
+      '<div class="rp-cf t-caption"><span><i></i>보고서 있는 날</span>' + (m === 10 ? "" : "<span>시안 예시는 10월만</span>") + "</div>";
+    Array.prototype.forEach.call(p.querySelectorAll("[data-cm]"), function (b) { b.onclick = function () { var nm = m + (+b.getAttribute("data-cm")); if (nm <= MAXM) { drawCal(p, nm); } }; });
+    Array.prototype.forEach.call(p.querySelectorAll(".rp-cd.has"), function (b) {
+      b.onclick = function () {
+        var day = +b.getAttribute("data-d"), dd = DAYS.filter(function (x) { return x.day === day; })[0];
+        vm = m; closeCal();
+        if (dd && dd.dayRpt.id) { selectDoc(dd.dayRpt.id); } else { renderList(); }
+        var g = list.querySelector('.rp-grp[data-day="' + day + '"]');
+        if (g) {
+          g.scrollIntoView({ block: "start", behavior: "smooth" });
+          g.classList.add("is-flash");
+          setTimeout(function () { g.classList.remove("is-flash"); }, 1200);
+        }
+      };
+    });
+  }
+  mtBtn.onclick = function (e) { e.stopPropagation(); toggleCal(); };
+  // 바깥을 누르면 닫는다
+  document.addEventListener("click", function (e) {
+    var c = side.querySelector(".rp-cal");
+    // composedPath — 달 넘김 단추는 누르는 순간 달력이 새로 그려져 떨어져 나가므로 contains 로는 못 잡는다
+    if (c && e.composedPath().indexOf(c) < 0 && e.target !== mtBtn) { closeCal(); }
+  });
   // 목록 접기 — 머리 아이콘만 남기고 보고서를 넓게 본다
   var fold = body.querySelector("[data-rp-fold]");
   fold.onclick = function () {
@@ -497,7 +557,7 @@
     }
     if (e.key === "Escape") {
       var pops = document.querySelectorAll(".rp-pop");
-      if (pops.length) { Array.prototype.forEach.call(pops, function (p) { p.remove(); }); } else if (modal) { closeModal(); }
+      if (pops.length) { Array.prototype.forEach.call(pops, function (p) { p.remove(); }); } else if (modal) { closeModal(); } else { closeCal(); }
     }
   });
 

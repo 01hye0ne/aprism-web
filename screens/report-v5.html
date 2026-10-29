@@ -14,7 +14,7 @@
   <link rel="stylesheet" href="../assets/css/app-shell.css?v=01264297" />
   <link rel="stylesheet" href="../assets/css/icons-outline.css?v=13527115" />
   <link rel="stylesheet" href="../assets/css/text-parts.css?v=e38e19ea" />
-  <link rel="stylesheet" href="../assets/css/report.css?v=2e230832" />
+  <link rel="stylesheet" href="../assets/css/report.css?v=2eb86a46" />
   <!-- v3 전용 규칙 — v2.2 는 10/21 부로 멈췄다. v3 에서 바꾸는 것은 여기(body.ver-3)에. -->
   <link rel="stylesheet" href="../assets/css/v3.css?v=7fce80d4" />
   <!-- v5 전용 규칙 — v4 는 10/29 부로 멈췄다. v5 에서 바꾸는 것은 여기(body.ver-5)에. -->
@@ -139,7 +139,8 @@
           <div class="rp-mrow">
             <div class="rp-mnav">
               <button type="button" class="rp-ib" data-rp-prev aria-label="이전 달"><span class="i i-16" style="--i:var(--ic-chevron-left)" aria-hidden="true"></span></button>
-              <span class="rp-mt t-title-2" data-rp-mt>2026년 10월</span>
+              <!-- 달 제목 = 달력 단추(10/29 디자이너) — 올리면 단추 면, 누르면 날짜로 찾기 달력 -->
+              <button type="button" class="rp-mt t-title-2" data-rp-mt aria-haspopup="dialog" aria-expanded="false" aria-label="2026년 10월, 날짜로 찾기">2026년 10월</button>
               <button type="button" class="rp-ib" data-rp-next aria-label="다음 달"><span class="i i-16" style="--i:var(--ic-chevron-right)" aria-hidden="true"></span></button>
             </div>
             <p class="rp-cnt t-caption"><span>최신순 정렬</span><span class="rp-cn" data-rp-cnt></span></p>
@@ -160,6 +161,6 @@
 </div>
 
 <script src="../assets/js/theme.js?v=c86093d9"></script>
-<script src="../assets/js/report.js?v=153be6db"></script>
+<script src="../assets/js/report.js?v=3ebaf533"></script>
 </body>
 </html>
