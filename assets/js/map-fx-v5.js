@@ -17,6 +17,8 @@
 //   · 후처리 판은 배율 1 + MSAA 로 그린다(운영 화면은 배율 2 로 그려 줄인다 — 픽셀이 4배).
 //   · AO 는 반 해상도로 계산하고, 카메라 · 비치는 벽이 그대로면 지난 결과를 다시 쓴다 — 건물은 안 움직인다.
 //   · 끌어 돌리는 동안에는 AO 를 쉬고, 멈추면 한 번 계산한다.
+//   · 캔버스도 배율 res 로 그린다 — 효과 판이 이미 res 라 캔버스만 2배로 두면 마지막 칠만 4배로 든다.
+//   · 그림자 맵은 덩이가 보이고 · 숨고 · 비칠 때만 다시 굽는다 — 건물 · 키 라이트가 안 움직이니 매 프레임 구울 까닭이 없다.
 (function () {
   "use strict";
 
@@ -47,12 +49,14 @@
   var bgNow = null;    // 지금 바탕색(CSS) — 투명 캔버스를 메우는 데 쓴다
   var aoSig = "", aoPrev = "", aoMoved = 0, aoTimer = 0;   // AO 다시 쓰기 — 지난 계산 때 · 직전 프레임의 카메라 · 벽 상태, 마지막으로 바뀐 때
   var fps = { n: 0, t0: 0, v: 0 };
+  var pr0 = 0, shSig = "";   // 효과 없던 때의 캔버스 배율 · 그림자를 마지막으로 구운 때의 덩이 상태
 
   window.APRISM_MAP_FX = { init: init, render: render, S: S };
 
   function init(c) {
     ctx = c;
     T = c.THREE;
+    pr0 = c.renderer.getPixelRatio();
     Promise.all([
       import("three/addons/postprocessing/EffectComposer.js"),
       import("three/addons/postprocessing/RenderPass.js"),
@@ -189,6 +193,10 @@
   function sync() {
     if (!ready) { return; }
     var r = ctx.renderer, on = S.on, light = ctx.isLight();
+    r.setPixelRatio(on ? Math.min(pr0, S.res) : pr0);
+    r.shadowMap.autoUpdate = !on;   // 켜져 있으면 render 가 덩이 상태를 보고 필요할 때만 굽는다
+    r.shadowMap.needsUpdate = true;
+    shSig = "";
     r.toneMapping = !on || S.tone === "none" ? T.NoToneMapping : (S.tone === "ACES" ? T.ACESFilmicToneMapping : T.AgXToneMapping);
     r.toneMappingExposure = on ? S.exposure : 1;
     ctx.scene.environment = on && S.env ? envTex : null;
@@ -204,6 +212,7 @@
       if (ctx.key.shadow.map) { ctx.key.shadow.map.dispose(); ctx.key.shadow.map = null; }
     }
     ctx.key.shadow.radius = on ? S.shadowSoft : 3;
+    if (on) { r.shadowMap.needsUpdate = true; }
 
     P.ao.enabled = S.ao;
     P.ao.output = S.aoView;
@@ -238,6 +247,8 @@
      * 깊이 판을 모델 둘레로 좁힌다. 지도 카메라는 멀리 서서(EYE 9) near 1 · far 반지름 ×40 이라
      * 모델이 깊이 판의 아주 얇은 띠에만 앉는다 — 그 정밀도로는 AO 가 모서리를 못 찾는다.
      */
+    var sh = shadowSig();
+    if (sh !== shSig) { shSig = sh; ctx.renderer.shadowMap.needsUpdate = true; }
     var cam = ctx.camera, n0 = cam.near, f0 = cam.far, z = depthSpan();
     if (z) { cam.near = Math.max(n0, z[0]); cam.far = Math.min(f0, z[1]); cam.updateProjectionMatrix(); }
     composer.render();
@@ -247,6 +258,13 @@
   }
 
   /* ---------- 조절판 ---------- */
+
+  // 그림자를 다시 구워야 하나 — 덩이마다 보이는지 · 그림자를 드리우는지(map-v5 가 비칠 때 castShadow 를 끈다).
+  function shadowSig() {
+    var s = "";
+    ctx.meshes.forEach(function (it) { s += it.mesh.visible ? (it.mesh.castShadow ? "1" : "0") : "-"; });
+    return s;
+  }
 
   // 모델 상자의 여덟 꼭짓점을 카메라 앞 방향으로 재서 가장 가까운 · 먼 깊이(여유 10%)를 낸다.
   var _fw = null, _pt = null;

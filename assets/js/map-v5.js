@@ -395,11 +395,32 @@
   // [10/29] 지도 효과 고리 — map-fx-v5.js(v5 화면 모두 읽는다)가 단다. 그 파일이 없거나 ?fx=off 면 예전처럼 직접 그린다.
   var fx = null;
 
+  /*
+   * 걸음(walkTick) · 로봇개(rrDog) · 경로 흐름(rrTick)이 각자 박자로 frame() 을 부른다 — 셋이 겹치면
+   * 화면 한 번 바뀔 동안 지도를 두세 번 그렸다(10/29 효과를 얹고 버벅임으로 드러남). 애니메이션은 이것으로 부른다:
+   * 같은 화면 갱신(rAF) 안에서는 한 번만 그리고, 고주사율 모니터에서도 초당 60번을 넘지 않는다.
+   * 건너뛴 변경은 다음 갱신에 같이 그려진다 — 마지막 것이 빠지지 않게 꼬리 한 번을 걸어 둔다.
+   */
+  var tickAt = -1, tickTail = 0;
+  function frameTick(t) {
+    if (t - tickAt < 15) {
+      if (!tickTail) { tickTail = window.requestAnimationFrame(function (t2) { tickTail = 0; frameTick(t2); }); }
+      return;
+    }
+    tickAt = t;
+    frame();
+  }
+
+  var sizeW = 0, sizeH = 0, sizePr = 0;
   function frame() {
     if (!renderer) { return; }
     var w = view.clientWidth, h = view.clientHeight;
     if (!w || !h) { return; }
-    renderer.setSize(w, h, false);
+    // 크기가 그대로면 건너뛴다 — setSize 는 캔버스 width 를 다시 써서, 같은 값이어도 그리기 판을 매번 새로 잡는다.
+    if (w !== sizeW || h !== sizeH || renderer.getPixelRatio() !== sizePr) {
+      renderer.setSize(w, h, false);
+      sizeW = w; sizeH = h; sizePr = renderer.getPixelRatio();
+    }
     aim();
     // 굵은 선은 제 굵기를 재려면 화면 크기를 알아야 한다.
     fatMats.forEach(function (mat) { mat.resolution.set(w, h); });
@@ -2358,7 +2379,7 @@
         var dt = dog3.last ? Math.min(0.1, (t - dog3.last) / 1000) : 0;
         dog3.last = t;
         dog3.cur.update(dt, dog3.motion);
-        frame();
+        frameTick(t);
       });
     }
   }
@@ -2957,10 +2978,10 @@
     var ln = onLane;
     if (ln && ln.ribbon && ln.ribbon.visible && (!ln.comet || !ln.comet.visible || RR.flow !== "floor")) { ln.ribbon.visible = false; frame(); }   // 흐름이 꺼지면 바닥 띠도 끈다
     if (ln && ln.fan && ln.fanBase !== undefined && ln.fan.visible && RRS.mode === "inspect" && renderer && !document.hidden) {   // F — 측정 중 빔이 좌우로 둘러본다
-      ln.fan.rotation.y = ln.fanBase + Math.sin(t / 650) * (rrReduce ? 0 : 0.42); frame();
+      ln.fan.rotation.y = ln.fanBase + Math.sin(t / 650) * (rrReduce ? 0 : 0.42); frameTick(t);
     }
     if (ln && ln.rr && RRS.mode === "return" && RRS.lane === ln.id && ln.parts[0] && ln.parts[0].visible && renderer && !document.hidden) {
-      rrReturnTick(ln, t); frame(); return;
+      rrReturnTick(ln, t); frameTick(t); return;
     }
     if (ln && ln.rr && ln.comet && RRS.mode === "done" && RRS.lane === ln.id && renderer && !document.hidden) {   // 미션 완료 훑기(시안 1.4초)
       var on0 = !!(ln.parts[0] && ln.parts[0].visible), e0 = (t - RRS.at) / 3200, Cs = span * 0.07, Ds = ln.total;
@@ -2975,7 +2996,7 @@
         rrRibbon(ln, ps, cs);
       }
       if (!ln.comet.visible) { rrRibbon(ln, [], []); }
-      if (e0 < 1.2) { frame(); }
+      if (e0 < 1.2) { frameTick(t); }
       return;
     }
     if (!ln || !ln.comet || !ln.rr || !ln.comet.visible || !renderer || document.hidden) { return; }
@@ -2996,7 +3017,7 @@
     ln.comet.geometry.setPositions(pos);
     ln.comet.geometry.setColors(col);
     rrRibbon(ln, pos, col);
-    frame();
+    frameTick(t);
   }
 
   /* ---------- 움직임 시뮬레이션(route-sim.js 가 부른다) ----------
@@ -3632,7 +3653,7 @@
       if (w.s >= w.to) { w.s = w.to; w.rest = 2.5; }
     }
     walkPlace(ln);
-    frame();
+    frameTick(t);
     window.requestAnimationFrame(walkTick);
   }
   function walkStart() {
