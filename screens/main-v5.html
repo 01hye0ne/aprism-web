@@ -784,7 +784,7 @@
                       </span>
                     </button>
 
-                    <!-- Robot 05 = 모베드(바퀴형, 10/29 디자이너) — 패널 그래픽만 바뀐다(robot-2d.js). -->
+                    <!-- Robot 05 = 모베드(바퀴형, 10/29 디자이너) — 패널은 2D 모베드(robot-2d.js), 지도는 3D 휠 로봇(robot-spot.js). -->
                     <button type="button" class="robot-card" data-robot="4" data-type="mobed" aria-pressed="false">
                       <span class="label">
                         <span class="t-label-1 robot-id">Robot 05</span>
@@ -1763,8 +1763,9 @@
 <script src="../assets/js/screen.js?v=51665b3f"></script>
 <script src="../assets/js/map-model.js?v=0f88c871"></script>
 <!-- v5 전용 지도(map-v3.js 를 10/29 에 복제) -->
-<script src="../assets/js/map-v5.js?v=0f8b9b20"></script>
-<script src="../assets/js/robot-stage.js?v=f154b57d"></script>
+<script src="../assets/js/map-v5.js?v=f10da398"></script>
+<!-- 지도 위 3D 로봇(SPOT · 휠 로봇) — 10/29 디자이너 "SPOT 로봇 360 시안". 예전 로봇개(robot-stage.js)는 v5 에서 안 쓴다. -->
+<script src="../assets/js/robot-spot.js?v=c525b68e"></script>
 <script src="../assets/js/robot-2d.js?v=8011b14e"></script>
 <script src="../assets/js/monitor.js?v=babca6fa"></script>
 <script src="../assets/js/mission-scope.js?v=475687bd"></script>

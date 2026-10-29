@@ -413,7 +413,7 @@
     rrLabels();        // [10/22] 설비 이름 — 다가가면 상시 노출
     travelSync();   // 층 이동 — 층마다 선을 켜고 끄고 표식을 놓는다
     renderer.render(scene, camera);
-    rrDog();           // [10/29 v5] 로봇 = 우측 패널의 3D 로봇개 — 깊이를 지우고 맨 위에 한 번 더 그린다
+    rrDog();           // [10/29 v5] 로봇 = 3D SPOT(robot-spot.js) — 깊이를 지우고 맨 위에 한 번 더 그린다
     placeCard();
     placeBot();
     placeWp();
@@ -2216,57 +2216,62 @@
    * CSS 는 위쪽을 0도로 치므로 atan2(가로, -세로) 로 옮긴다.
    */
   /*
-   * [10/29 v5] 지도 위 로봇 = 우측 패널의 3D 로봇개(robot-stage.js 가 여는 APRISM_ROBOT_DOG — 같은 모델 · 같은 동작 클립).
-   * 로봇 자리(onLane.here)에 세우고 가는 쪽(ahead)을 본다. 크기는 화면에서 약 46px(배율 1) — 확대하면 함께 커진다.
+   * [10/29 v5] 지도 위 로봇 = 3D SPOT(assets/js/robot-spot.js — 디자이너 "SPOT 로봇 360 시안"). 우측 패널은 2D 다.
+   * 카드가 data-type="mobed" 면(Robot 05) 휠 로봇을 세운다.
+   * 로봇 자리(onLane.here)에 세우고 가는 쪽(ahead)을 본다(모델의 코는 로컬 -z). 크기는 화면에서 약 46px(배율 1) — 확대하면 함께 커진다.
    * 로봇은 설비에 가려지지 않는다(시안 "로봇은 늘 맨 위") — 지도를 그린 뒤 깊이만 지우고 따로 한 번 더 그린다.
-   * 동작은 상태(.map-bot[data-rr])를 따른다 — 이동 · 위험 감지 · 자동복귀 걷기, 측정 검사, 일시정지 · 끊김 대기, 긴급정지 · 완료 앉기.
+   * 동작은 상태(.map-bot[data-rr])를 따른다 — 이동 · 위험 감지 · 자동복귀 걷기, 측정 · 일시정지 · 끊김 서기, 긴급정지 · 완료 앉기.
    * 평면 로봇 머리(.rr-khead) · 둘레 빛은 v5.css 가 숨긴다. 바닥 시야 빔은 그대로 둔다.
    */
   var dog3 = null;
   var DOG_PX = 46;
-  var DOG_MOTION = { run: "walk", alert: "walk", "return": "walk", inspect: "inspect", pause: "idle", lost: "idle", estop: "sit", done: "sit" };
+  var DOG_MOTION = { run: "walk", alert: "walk", "return": "walk", inspect: "idle", pause: "idle", lost: "idle", estop: "sit", done: "sit" };
+  function robotKind(id) {
+    var card = document.querySelector(".robot-strip .robot-card[data-robot='" + id + "']");
+    return card && card.getAttribute("data-type") === "mobed" ? "wheel" : "spot";
+  }
   function rrDog() {
-    if (!THREE || !renderer || !camera || !window.APRISM_ROBOT_DOG) { return; }
+    if (!THREE || !renderer || !camera || !window.APRISM_SPOT) { return; }
     var show = !!(onLane && botBox && !botBox.hidden && botBox.style.visibility !== "hidden" && !botBox.hasAttribute("data-rr-docked"));
     if (!show) { if (dog3) { dog3.turn.visible = false; } return; }
     if (!dog3) {
-      var d = window.APRISM_ROBOT_DOG(THREE);
       var sc = new THREE.Scene();
-      sc.add(new THREE.HemisphereLight(0xffffff, 0x3a4250, 1.6));
-      var key = new THREE.DirectionalLight(0xffffff, 1.6); key.position.set(-2, 4, 3); sc.add(key);
-      var turn = new THREE.Group(); turn.add(d.group); sc.add(turn);
-      var mixer = new THREE.AnimationMixer(d.group), acts = {};
-      d.clips.forEach(function (c) { acts[c.name] = mixer.clipAction(c); });
-      if (acts.sit) { acts.sit.setLoop(THREE.LoopOnce); acts.sit.clampWhenFinished = true; }
-      dog3 = { scene: sc, turn: turn, mixer: mixer, acts: acts, playing: null, last: 0, raf: 0 };
+      sc.add(new THREE.HemisphereLight(0xffffff, 0x50586a, 1.6));
+      var key = new THREE.DirectionalLight(0xffffff, 1.5); key.position.set(-1.5, 4, 1.2); sc.add(key);
+      var rim = new THREE.DirectionalLight(0xffffff, 0.5); rim.position.set(2, 1.5, -2); sc.add(rim);
+      var turn = new THREE.Group(); sc.add(turn);
+      dog3 = { scene: sc, turn: turn, models: {}, cur: null, last: 0, raf: 0 };
+    }
+    // 로봇 종류가 바뀌면(미션을 바꿔 다른 로봇을 보면) 모델을 갈아 끼운다 — 한 번 만든 것은 둔다
+    var kind = robotKind(onLane.id);
+    if (!dog3.models[kind]) { dog3.models[kind] = window.APRISM_SPOT(THREE, kind); }
+    if (dog3.cur !== dog3.models[kind]) {
+      if (dog3.cur) { dog3.turn.remove(dog3.cur.group); }
+      dog3.cur = dog3.models[kind];
+      dog3.turn.add(dog3.cur.group);
     }
     var g = dog3.turn;
     g.visible = true;
     g.position.copy(onLane.here);
     var dx = onLane.ahead.x - onLane.here.x, dz = onLane.ahead.z - onLane.here.z;
-    if (dx * dx + dz * dz > 1e-10) { g.rotation.y = Math.atan2(dx, dz) - Math.PI / 2; }   // 패널과 같은 코 방향(NOSE -90도)
+    if (dx * dx + dz * dz > 1e-10) { g.rotation.y = Math.atan2(dx, dz) + Math.PI; }   // 코(로컬 -z)가 가는 쪽을 본다
     var sz = DOG_PX * baseSize / (view.clientHeight || 1);   // 배율 1 에서 화면 약 46px — 월드 크기로 붙박아 확대하면 커진다
     g.scale.setScalar(sz);
     var st = (botBox && botBox.getAttribute("data-rr")) || "run";
-    var next = dog3.acts[DOG_MOTION[st] || "idle"] || dog3.acts.idle;
-    if (next && dog3.playing !== next) {
-      next.reset().setEffectiveWeight(1).play();
-      if (dog3.playing) { dog3.playing.crossFadeTo(next, 0.35, false); }
-      dog3.playing = next;
-    }
+    dog3.motion = DOG_MOTION[st] || "idle";
     var ac = renderer.autoClear;
     renderer.autoClear = false;
     renderer.clearDepth();
     renderer.render(dog3.scene, camera);
     renderer.autoClear = ac;
-    // 동작 클립을 돌린다 — 지도는 필요할 때만 다시 그리므로, 로봇이 보이는 동안 따로 박자를 낸다
+    // 걸음 · 앉기를 돌린다 — 지도는 필요할 때만 다시 그리므로, 로봇이 보이는 동안 따로 박자를 낸다
     if (!dog3.raf) {
       dog3.raf = window.requestAnimationFrame(function tick(t) {
         dog3.raf = 0;
-        if (!dog3.turn.visible || document.hidden) { return; }
+        if (!dog3.turn.visible || document.hidden) { dog3.last = 0; return; }
         var dt = dog3.last ? Math.min(0.1, (t - dog3.last) / 1000) : 0;
         dog3.last = t;
-        dog3.mixer.update(dt);
+        dog3.cur.update(dt, dog3.motion);
         frame();
       });
     }
