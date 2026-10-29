@@ -184,9 +184,9 @@
 
   function tableAll(){
     // 행 = 층(미션), 열 = 감지 6종. 카드 전체 보기와 같은 축
-    const head = `<tr><th class="tn">층, 미션</th>${K.map(k => `<th class="tw"><b>${k}</b><span>${STD[k]}</span></th>`).join('')}</tr>`;
+    const head = `<tr><th class="tn">미션, 층</th>${K.map(k => `<th class="tw"><b>${k}</b><span>${STD[k]}</span></th>`).join('')}</tr>`;
     const body = M.map((m, i) => { const w = worst(i);
-      return `<tr class="${w}"><td class="tn"><span class="bar"></span><div class="tnw"><button type="button" class="tmap" data-sc="${i}" aria-label="${m.mis} 지도, 이 미션 6종 보기">${svg2(i, viewF(i).robotF, false, 112)}</button><div class="tnt"><b class="fl2">${m.fl}</b><small>${m.mis}</small><span class="trb"><i></i>${m.robot}${nowOf(i) ? ', ' + nowOf(i) + ' 지나 이동 중' : ', 순회 끝'}</span><small>측정 ${m.done}/${m.total}곳</small>${i===1 && !newSeen ? '<em class="nwm">새로</em>' : ''}</div></div></td>
+      return `<tr class="${w}"><td class="tn"><span class="bar"></span><div class="tnw"><div class="tnt"><b class="fl2">${m.mis}</b><small>${flN(m)}</small><span class="trb"><i></i>${m.robot}${nowOf(i) ? ', ' + nowOf(i) + ' 지나 이동 중' : ', 순회 끝'}</span><small>측정 ${m.done}/${m.total}곳</small>${i===1 && !newSeen ? '<em class="nwm">새로</em>' : ''}</div></div></td>
         ${K.map(k => { const x = m.r[k]; if(!x) return '<td class="tc"><span class="nat">' + NAW[naOf(i, k)] + '</span></td>';
           if(x[0]==='ok') return `<td class="tc"><span class="cv ok" data-dk="${k}" data-dm="${i}"><i></i>정상 범위</span></td>`;
           return `<td class="tc"><span class="cv ${x[0]}" data-dk="${k}" data-dm="${i}"><i></i>${SHORT[x[1]] || x[1]}</span><small class="twp">${x[2].split(' ')[0]}${moreTxt(i, k)}, ${x[3]}</small></td>`; }).join('')}</tr>`; }).join('');
@@ -197,6 +197,8 @@
   // 한 감지의 결과 목록. 넘은 것 먼저(위험 > 주의 > 요청됨), 같으면 최근 것 먼저. 맨 앞이 대표
   const isOpen = it => (it[0]==='crit' || it[0]==='warn') && !it[4];
   const wpOf = it => it[2].split(' ')[0];
+  // [10/29] 전체 목록은 미션이 제목, 층은 보조 — 한 미션이 여러 층을 지나고 한 층에 미션이 여럿일 수 있어 층은 열쇠가 못 된다. 여러 층은 지나는 순서로
+  const flN = m => m.fls ? m.fls.map(f => f[1]).join(' → ') : m.fl;
   function itemsOf(i, k){ const m = M[i]; if(m.rs && m.rs[k]) return m.rs[k].slice().sort((a, b) => (RANK[b[0]] - RANK[a[0]]) || (b[3] > a[3] ? 1 : -1)); return m.r[k] ? [m.r[k]] : []; }
   function sync(m, i){ if(!m.rs) return; Object.keys(m.rs).forEach(k => { m.r[k] = itemsOf(i, k)[0].slice(); }); }
   const moreTxt = (i, k) => { const n = itemsOf(i, k).length - 1; return n > 0 ? ' 외 ' + n + '곳' : ''; };
@@ -272,7 +274,7 @@
   // [v5 점검] 왼쪽 패널(관제 · 보고서와 같은 340) 본문 — 미션 하나: 요약 + 2D 지도(자세히 보기에서는 그 지점 · 연관 지점 표시), 전체: 미션별 작은 지도 목록
   function sideHtml(){
     if(scope==='all') return `<div class="sf-mlist">${M.map((m, i) => { const w = worst(i), h = hits(i), nw = i===1 && !newSeen;
-      return `<button type="button" class="sf-mrow" data-sc="${i}"><span class="sf-mmap">${svg2(i, viewF(i).robotF, false, 96)}</span><span class="sf-mtx"><span class="sf-mt1"><i class="ixd ${w} ${nw ? 'blink' : ''}"></i><b>${m.fl}</b>${nw ? '<em class="nwm">새로</em>' : ''}</span><span class="t-body-4">${m.mis}, ${m.robot}</span><span class="t-caption">측정 ${m.done}/${m.total}곳${m.done===m.total ? ', 순회 끝' : ''}${h ? ', 요청 전 ' + h + '건' : ''}</span></span></button>`; }).join('')}</div>${LEG}`;
+      return `<button type="button" class="sf-mrow" data-sc="${i}"><span class="sf-mmap">${svg2(i, viewF(i).robotF, false, 96)}</span><span class="sf-mtx"><span class="sf-mt1"><i class="ixd ${w} ${nw ? 'blink' : ''}"></i><b>${m.mis}</b>${nw ? '<em class="nwm">새로</em>' : ''}</span><span class="t-body-4">${flN(m)}, ${m.robot}</span><span class="t-caption">측정 ${m.done}/${m.total}곳${m.done===m.total ? ', 순회 끝' : ''}${h ? ', 요청 전 ' + h + '건' : ''}</span></span></button>`; }).join('')}</div>${LEG}`;
     const i = scope, m = M[i], {fls} = viewF(i), multi = fls.length > 1;
     const cur = dt && dt.wp ? flOf(m, dt.wp) : viewF(i).cur;
     const sel = dt ? dt.wp : undefined, lk = dt ? dt.lk : undefined;
@@ -325,7 +327,7 @@
   }
   function crumb(){
     const isAll = scope==='all';
-    const items = [['all','통합 순회 현황','전체 미션 ' + M.length + '개']].concat(M.map((m, i) => [i, m.mis, m.fl + ', ' + m.robot])).map(([id, a, b]) => { const w = id==='all' ? '' : worst(id), on = String(scope)===String(id);
+    const items = [['all','통합 순회 현황','전체 미션 ' + M.length + '개']].concat(M.map((m, i) => [i, m.mis, flN(m) + ', ' + m.robot])).map(([id, a, b]) => { const w = id==='all' ? '' : worst(id), on = String(scope)===String(id);
       return `<button type="button" class="menu-item sf-mi" role="menuitemradio" aria-checked="${on}" data-sc="${id}"><i class="wd ${w}"></i><span class="t-label-2">${a}${id===1 && !newSeen ? ' <em class="nwm">새 위험</em>' : ''}</span><span class="t-caption">${b}</span></button>`; }).join('');
     return `<button type="button" class="sb-overview t-title-2 ${isAll ? 'is-on' : ''}" data-sc="all">통합 순회 현황</button><span class="status-bar-sep t-title-2" aria-hidden="true">›</span>
       <div class="scope-menu-box"><button type="button" class="scope-trigger" data-menu="1" aria-haspopup="true" aria-expanded="${menu}"><span class="t-title-2">${isAll ? '미션 고르기' : M[scope].mis}</span><span class="i i-16" style="--i:var(--ic-chevron-down)" aria-hidden="true"></span></button><div class="dropdown-menu scope-menu sf-scope" role="menu" aria-label="미션"${menu ? '' : ' hidden'}>${items}</div></div>${dt ? `<span class="status-bar-sep t-title-2" aria-hidden="true">›</span><span class="t-title-2 sf-crumb-k">${dt.k}</span>` : ''}`;
@@ -334,7 +336,7 @@
   function secsAll(){
     return '<div class="msecs">' + M.map((m, i) => { const rk = k => m.r[k] ? RANK[m.r[k][0]] : -1, fl = K.slice().sort((a, b) => rk(b) - rk(a));
       const okn = K.filter(k => m.r[k] && m.r[k][0]==='ok').length, nsc = K.filter(k => !m.r[k] && naOf(i, k)==='scope').length, nse = K.filter(k => !m.r[k] && naOf(i, k)==='sensor').length, w = worst(i);
-      return `<section class="msec ${w}" data-mi="${i}"><div class="msh2"><i class="ixd ${w}"></i><b>${m.fl}</b><span class="mn2">${m.mis}, ${m.robot}</span><span class="mt2">측정 ${m.done}/${m.total}곳${m.done===m.total ? ', 순회 끝' : ''}</span>${i===1 && !newSeen ? '<em class="nwm">새로</em>' : ''}<span class="sp"></span><span class="mok">정상 범위 ${okn}종${nsc ? ', 대상 아님 ' + nsc + '종' : ''}${nse ? ', 센서 없음 ' + nse + '종' : ''}</span></div>
+      return `<section class="msec ${w}" data-mi="${i}"><div class="msh2"><i class="ixd ${w}"></i><b>${m.mis}</b><span class="mn2">${flN(m)}, ${m.robot}</span><span class="mt2">측정 ${m.done}/${m.total}곳${m.done===m.total ? ', 순회 끝' : ''}</span>${i===1 && !newSeen ? '<em class="nwm">새로</em>' : ''}<span class="sp"></span><span class="mok">정상 범위 ${okn}종${nsc ? ', 대상 아님 ' + nsc + '종' : ''}${nse ? ', 센서 없음 ' + nse + '종' : ''}</span></div>
         <div class="mrow vC">${fl.length ? fl.map(k => cardM(M.indexOf(m), k)).join('') : '<p class="mnone2">넘은 결과 없음</p>'}</div></section>`; }).join('') + '</div>';
   }
   function cardsAll(){
