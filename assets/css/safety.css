@@ -1,0 +1,475 @@
+/*
+ * 안전진단(GNB [안전진단]) — v5 · 10/29 디자이너 와이어프레임 "UI_전주기 안전진단 탭"(artifact 56NnnFUgW1c1Wn2Nm2ZxPE)을 옮겼다.
+ *
+ * 시안은 1920×1080 판에 다크 원시값과 라이트 덮어쓰기(.lt)를 따로 들고 있었다. 여기서는 디자인 시스템으로 바꿨다.
+ *   · 색      — 회색 · 상태 원시값(#202838 · #373f4e · #ffa69a · #421a13 …) → bg/* · border/* · text/* · status/* 토큰.
+ *              라이트는 따로 적지 않는다 — 같은 토큰이 v5 라이트 단계 톤으로 바뀐다(.lt 덮어쓰기 270줄을 걷었다)
+ *   · 글자    — 거의 모든 글자가 14 였다 → 단계(12 caption · 13 label-2/body-4 · 14 label-1 · 16 title-2 · 18 title-1 · 20 heading-3 · 24 heading-2)
+ *   · 간격    — 6 · 10 · 14 · 18 → space 4 · 8 · 12 · 16
+ *   · 둥글기  — 3 · 6 · 10 · 12 → radius/chart · card · control · container
+ *   · 부품    — 돌아가기 · 현장 조치 요청 · 6종 보기는 .btn(Secondary · Accent), 라이브 · AI 추천은 .badge, 상단 경로는 관제 상태바(.sb-overview › .scope-trigger)
+ *   · 파랑    — 상태(지금 지점 · 로봇 · DELTA)와 주요 행동(현장 조치 요청)에만. 고른 탭 · 레일 · 단계 번호의 파란 테 · 파란 원은 무채색(bg/selected)으로
+ * 사진 위에 뜨는 칩(자세히 보기 · 원본 · 히트맵 크게)은 사진이 늘 어두운 면이라 테마와 상관없이 어두운 유리다.
+ */
+
+/* ---------- 본문 판 — GNB 오른쪽 전체 면(보고서 .rp-body 와 같은 규칙) ---------- */
+.sf {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-16) var(--space-20) var(--space-20);
+  border-radius: var(--radius-container) var(--radius-container) 0 0;
+  background-color: var(--bg-frame);
+  overflow: hidden;
+}
+/* 단추 초기화는 상세도 0(:where) — .btn 같은 디자인 시스템 단추가 늘 이긴다 */
+:where(.sf) :where(button) { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+:where(.sf) :where(button):focus-visible { outline: var(--border-width-strong) solid var(--border-focus); outline-offset: 1px; }
+:where(.sf) :where(h1, h4, h5, p) { margin: 0; }
+.sf b { font-weight: inherit; }
+
+#sfv { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: var(--space-12); overflow: auto; transition: opacity .14s; }
+#sfv.xfade, #sfv.xin { opacity: 0; }
+
+/* 글자 단계 — 시안 클래스에 그대로 건다(값은 app-shell .t-* 와 같다) */
+.sf .mph b, .sf .kd .nm, .sf .sth b, .sf .dl .ti, .sf .donec b, .sf .pvh b, .sf .mx td.c-n b { font-size: var(--font-size-14); line-height: var(--font-line-height-20); font-weight: 800; }
+.sf .msh2 b, .sf .mtb td.tn .fl2, .sf .pvf b, .sf .mrow .kd .big { font-size: var(--font-size-16); line-height: var(--font-line-height-24); font-weight: 700; }
+.sf .kd .big, .sf .lvA .sm2, .sf .locb .lw { font-size: var(--font-size-20); line-height: var(--font-line-height-28); font-weight: 800; letter-spacing: -0.01em; }
+.sf .lvA .tt h5 { font-size: var(--font-size-24); line-height: var(--font-line-height-32); font-weight: 600; letter-spacing: -0.01em; }
+
+/* ---------- 머리 — 제목 · 라이브 · 요청 전 건수 · 카드/표 ---------- */
+.sf .hd { flex: none; display: flex; align-items: center; gap: var(--space-8); }
+.sf .hd h1 { margin-right: var(--space-4); }
+.sf .hd .lvh { align-self: center; }
+.sf .hd .lvh .badge-dot { animation: sf-blink 1.6s ease-in-out infinite; }
+.sf .hd .sp { flex: 1; }
+.sf .todo { color: var(--text-secondary); }
+.sf .todo b { margin-right: var(--space-2); color: var(--text-primary); }
+
+/* 카드 · 표 — 두 칸 고르개. Secondary 단추 면에 고른 쪽만 bg/selected */
+.sf .lyseg { display: inline-flex; margin-left: var(--space-12); border: var(--border-width-thin) solid var(--comp-button-secondary-border-default); border-radius: var(--radius-control); overflow: hidden; }
+.sf .lyseg button { height: 28px; padding: 0 var(--space-12); font-size: var(--font-size-13); line-height: var(--font-line-height-18); font-weight: 500; color: var(--text-secondary); background-color: var(--comp-button-secondary-bg-default); }
+.sf .lyseg button + button { border-left: var(--border-width-thin) solid var(--comp-button-secondary-border-default); }
+.sf .lyseg button:hover { color: var(--text-primary); }
+.sf .lyseg button.on { background-color: var(--bg-selected); color: var(--text-primary); }
+
+/* ---------- 미션 레일(접힘) — 층 점 띠, 올리면 카드 위로 이름까지 펼쳐진다. ≫ 는 고정해서 펼치기 ---------- */
+.sf .ixc { flex: 1; min-height: 0; display: grid; grid-template-columns: 52px minmax(0, 1fr); align-items: start; }
+.sf .rail { position: relative; z-index: 12; display: flex; flex-direction: column; align-items: center; gap: var(--space-4); padding: var(--space-8) 0 0; }
+.sf .rex { width: 32px; height: 26px; display: grid; place-items: center; border: var(--border-width-thin) solid var(--comp-button-secondary-border-default); border-radius: var(--radius-control); background-color: var(--comp-button-secondary-bg-default); color: var(--text-secondary); font-size: var(--font-size-13); }
+.sf .rex:hover { color: var(--text-primary); }
+.sf .railin { position: absolute; left: -1px; top: 42px; width: 52px; display: flex; flex-direction: column; gap: var(--space-4); padding: 0 var(--space-4) var(--space-8) var(--space-8); background-color: var(--bg-raised); border: var(--border-width-thin) solid var(--border-default); border-top: 0; border-radius: 0 0 var(--radius-card) var(--radius-card); overflow: hidden; transition: width .16s ease .25s, box-shadow .16s ease .25s; }
+.sf .rail:not(:hover) .railin { background-color: transparent; border-color: transparent; border-right-color: var(--border-divider); box-shadow: none; }
+.sf .rail:hover .railin { width: 210px; box-shadow: 12px 0 28px rgb(0 0 0 / 35%); transition-delay: .18s; }
+.sf .rsep { align-self: flex-start; width: 24px; height: 1px; margin-left: var(--space-4); background-color: var(--border-divider); }
+.sf .rd { position: relative; display: flex; align-items: center; gap: var(--space-8); min-width: 36px; padding: var(--space-4); border-radius: var(--radius-card); color: var(--text-tertiary); text-align: left; }
+.sf .rd:hover { background-color: var(--state-hover); }
+.sf .rd.on { background-color: var(--bg-selected); color: var(--text-primary); }
+.sf .rdi { position: relative; flex: none; width: 28px; display: flex; flex-direction: column; align-items: center; gap: var(--space-2); }
+.sf .rdi > span { font-size: var(--font-size-12); line-height: 1.25; font-weight: 700; text-align: center; }
+.sf .rfull { display: flex; flex-direction: column; white-space: nowrap; opacity: 0; transition: opacity .1s; }
+.sf .rail:hover .rfull { opacity: 1; transition: opacity .15s ease .3s; }
+.sf .rfull b { font-size: var(--font-size-13); line-height: var(--font-line-height-18); font-weight: 700; color: var(--text-primary); }
+.sf .rfull small { font-size: var(--font-size-12); line-height: var(--font-line-height-18); color: var(--text-tertiary); }
+.sf .rd .rfn { margin-left: auto; opacity: 0; }
+.sf .rail:hover .rd .rfn { opacity: 1; }
+.sf .rnew { position: absolute; right: 2px; top: 0; width: 7px; height: 7px; border-radius: var(--radius-pill); background-color: var(--status-critical-icon); box-shadow: 0 0 0 2px var(--bg-frame); }
+.sf .ixp2 { min-width: 0; display: flex; flex-direction: column; }
+.sf .ixc > .ixp2 { align-self: stretch; }
+.sf .ixp2 > .mapw { flex: 1; min-height: 0; }
+
+/* 상태 점 — 위험 · 주의 · 그 밖 */
+.sf .ixd { flex: none; width: 8px; height: 8px; border-radius: var(--radius-pill); background-color: var(--text-disabled); }
+.sf .ixd.crit { background-color: var(--status-critical-icon); }
+.sf .ixd.warn { background-color: var(--status-warning-icon); }
+.sf .ixd.blink { animation: sf-blink 1s infinite; }
+
+/* 미션 레일(고정해서 펼침) — 왼쪽 탭 + 오른쪽 판 */
+.sf .ixw { flex: 1; min-height: 0; display: grid; grid-template-columns: 160px minmax(0, 1fr); }
+.sf .ixl { display: flex; flex-direction: column; gap: var(--space-4); padding-top: var(--space-8); }
+.sf .ixt { position: relative; display: flex; align-items: center; gap: var(--space-8); margin-right: -1px; padding: var(--space-8) var(--space-8) var(--space-8) var(--space-12); border: var(--border-width-thin) solid var(--border-divider); border-right: 0; border-radius: var(--radius-container) 0 0 var(--radius-container); background-color: var(--bg-inset); color: var(--text-secondary); text-align: left; }
+.sf .ixt:hover { background-color: var(--state-hover); }
+.sf .ixt b { display: block; font-size: var(--font-size-13); line-height: var(--font-line-height-18); font-weight: 700; color: var(--text-secondary); }
+.sf .ixt small { font-size: var(--font-size-12); line-height: var(--font-line-height-18); color: var(--text-tertiary); }
+.sf .ixt.on { z-index: 2; background-color: var(--bg-panel); border-color: var(--border-default); }
+.sf .ixt.on b { color: var(--text-primary); }
+.sf .ixt .nwm { position: absolute; right: var(--space-4); top: var(--space-4); }
+.sf .ixsep { height: 1px; margin: var(--space-2) var(--space-8) var(--space-2) var(--space-4); background-color: var(--border-divider); }
+.sf .ixfold { margin-top: var(--space-4); padding: var(--space-4) var(--space-8); border: var(--border-width-thin) dashed var(--border-default); border-right: 0; border-radius: var(--radius-card) 0 0 var(--radius-card); font-size: var(--font-size-12); font-weight: 600; color: var(--text-tertiary); text-align: left; }
+.sf .ixfold:hover { color: var(--text-primary); }
+.sf .ixp { min-width: 0; display: flex; flex-direction: column; padding: var(--space-12); border: var(--border-width-thin) solid var(--border-default); border-radius: var(--radius-container); background-color: var(--bg-panel); }
+.sf .ixp > .mapw { flex: 1; }
+
+/* ---------- 미션 2D 지도(왼쪽) + 본문 ---------- */
+.sf .mapw { display: grid; grid-template-columns: 244px minmax(0, 1fr); align-items: stretch; }
+.sf .mapw > div { min-width: 0; display: flex; flex-direction: column; padding-left: var(--space-16); }
+.sf .mapw > .mapp { align-self: start; display: flex; flex-direction: column; gap: var(--space-8); padding: var(--space-4) var(--space-12) var(--space-12); border-right: var(--border-width-thin) solid var(--border-divider); }
+.sf .mph { display: flex; flex-direction: column; gap: var(--space-2); }
+.sf .mph b { color: var(--text-primary); }
+.sf .mph span { font-size: var(--font-size-12); line-height: var(--font-line-height-18); color: var(--text-tertiary); }
+.sf .m2 { display: flex; flex-direction: column; gap: var(--space-4); }
+.sf .m2b { display: flex; align-items: center; gap: var(--space-4); font-size: var(--font-size-12); color: var(--text-tertiary); }
+.sf .m2b .sp { flex: 1; }
+.sf .m2f { display: flex; gap: var(--space-2); }
+.sf .m2f button, .sf .m2f span { position: relative; padding: var(--space-2) var(--space-8); border-radius: var(--radius-control); font-size: var(--font-size-13); line-height: var(--font-line-height-18); font-weight: 700; color: var(--text-tertiary); }
+.sf .m2f span { color: var(--text-secondary); background-color: var(--bg-cell); }
+.sf .m2f button.on { color: var(--text-primary); background-color: var(--bg-cell); }
+.sf .m2f button i { position: absolute; right: 1px; top: 1px; width: 5px; height: 5px; border-radius: var(--radius-pill); background-color: var(--status-info-icon); }
+.sf .m2go { gap: var(--space-2); padding-right: var(--space-4); text-decoration: none; }
+.sf .mlg { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4) var(--space-8); font-size: var(--font-size-12); line-height: var(--font-line-height-18); color: var(--text-tertiary); }
+.sf .mlg i { display: inline-block; width: 8px; height: 8px; margin-right: -4px; border-radius: var(--radius-pill); }
+.sf .mlg i.c { background-color: var(--status-critical-icon); }
+.sf .mlg i.w { background-color: var(--status-warning-icon); }
+.sf .mlg i.o { background-color: var(--text-tertiary); }
+.sf .mlg i.p { border: 1px dashed var(--text-tertiary); }
+.sf .mlg svg { margin-right: -4px; }
+
+/* 2D 평면 — 면 · 설비 · 길 · 지점 색은 여기서 칠한다(지도 스크립트는 자리만) */
+.sf .m2v { display: block; width: 100%; height: auto; border: var(--border-width-thin) solid var(--border-default); border-radius: var(--radius-card); }
+.sf .m2v .bg { fill: var(--bg-inset); }
+.sf .m2v .eq, .sf .m2v .eqb { fill: var(--border-default); }
+.sf .m2v .wl { fill: var(--text-tertiary); }
+.sf .m2v .stz { fill: none; stroke: var(--text-disabled); }
+.sf .m2v .rd { fill: none; stroke: var(--status-info-icon); stroke-linecap: round; stroke-linejoin: round; }
+.sf .m2v .ra { fill: none; stroke: var(--text-secondary); stroke-linecap: round; stroke-linejoin: round; }
+.sf .m2v .wpm { transition: opacity .15s; }
+.sf .m2v.dimk .wpm:not(.hit) { opacity: .25; }
+.sf .m2v .wpn { font-weight: 700; fill: var(--text-primary); paint-order: stroke; stroke: var(--bg-frame); }
+.sf .m2v .mk-p { fill: var(--bg-frame); stroke: var(--text-tertiary); stroke-opacity: .7; }
+.sf .m2v .mk-p.nx { stroke: var(--status-info-icon); stroke-opacity: 1; }
+.sf .m2v .mk-c { fill: var(--status-critical-icon); stroke: var(--bg-frame); }
+.sf .m2v .mk-w { fill: var(--status-warning-icon); stroke: var(--bg-frame); }
+.sf .m2v .mk-d { stroke: var(--text-secondary); }
+.sf .m2v .mk-o { fill: var(--text-tertiary); fill-opacity: .7; }
+.sf .m2v .mk-sel { stroke: var(--text-primary); }
+.sf .m2v .hlr { stroke: var(--status-warning-icon); opacity: 0; }
+.sf .m2v text.hlr { fill: var(--status-warning-icon); stroke: var(--bg-frame); }
+.sf .m2v .wpm.hl .hlr { opacity: 1; }
+.sf .m2v .lkl, .sf .m2v .lkc { stroke: var(--status-warning-icon); }
+.sf .rbt { fill: var(--status-info-icon); stroke: var(--color-gray-0); }
+
+/* ---------- 감지 6종 카드 ---------- */
+.sf .g6 { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(280px, 1fr)); gap: var(--space-12); }
+.sf .kd { position: relative; min-width: 0; display: flex; flex-direction: column; gap: var(--space-8); padding: var(--space-16); border: var(--border-width-thin) solid var(--border-default); border-radius: var(--radius-card); background-color: var(--bg-panel); overflow: hidden; cursor: pointer; transition: border-color .15s, box-shadow .15s; }
+.sf .kd[role="button"]:hover { border-color: var(--border-strong); }
+.sf .kd:focus-visible { outline: var(--border-width-strong) solid var(--border-focus); outline-offset: 2px; }
+.sf .kd .rw { display: flex; justify-content: space-between; align-items: center; gap: var(--space-8); }
+.sf .kd .nm { color: var(--text-primary); }
+.sf .kd .big { color: var(--text-primary); }
+.sf .kd.crit .big { color: var(--status-critical-text); }
+.sf .kd.warn .big { color: var(--status-warning-text); }
+.sf .kd.ok .big { color: var(--text-secondary); }
+.sf .kd .sm, .sf .req { font-size: var(--font-size-13); line-height: var(--font-line-height-20); color: var(--text-tertiary); }
+.sf .kd .md { position: relative; flex: 1; min-height: 0; border-radius: var(--radius-card); overflow: hidden; background-color: var(--bg-page); }
+.sf .kd .more { position: absolute; right: var(--space-12); bottom: var(--space-12); z-index: 3; padding: var(--space-4) var(--space-8); border-radius: var(--radius-pill); background-color: rgb(7 10 16 / 82%); color: #fff; font-size: var(--font-size-12); line-height: var(--font-line-height-18); font-weight: 600; opacity: 0; transition: opacity .15s; }
+.sf .kd:hover .more, .sf .kd:focus-visible .more { opacity: 1; }
+.sf .kd.dim { filter: grayscale(1); opacity: .55; }
+.sf .kd.ok .md { filter: grayscale(1); }
+.sf .kd.ring { box-shadow: 0 0 0 3px var(--border-brand); }
+/* 판정하지 않는 감지(대상 아님 · 센서 없음) */
+.sf .kd.na { cursor: default; opacity: .5; border-style: dashed; }
+.sf .kd.na .nm { color: var(--text-secondary); }
+.sf .kd.na .big { color: var(--text-disabled); }
+.sf .md.nadim img { filter: grayscale(1) brightness(.45) !important; }
+.sf .md.naempty { display: grid; place-items: center; padding: var(--space-8); text-align: center; color: var(--text-disabled); font-size: var(--font-size-12); line-height: var(--font-line-height-18); background: repeating-linear-gradient(135deg, var(--bg-inset) 0 8px, transparent 8px 16px); }
+.sf .md.naempty b { display: block; color: var(--text-tertiary); font-weight: 600; }
+
+/* 사진 · 열화상 · 계기 · PRPD — 시안 그대로(사진 처리라 색 토큰과 무관) */
+.sf .md img, .sf .md canvas { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+.sf .md .bx { position: absolute; border: 2px solid var(--status-warning-icon); }
+.sf .md.ir img { filter: grayscale(1) contrast(1.2); }
+.sf .md.ir::after { content: ""; position: absolute; inset: 0; mix-blend-mode: color; background: linear-gradient(180deg, #4b1db0, #a01fb8 40%, #e0329a 70%, #ff8a3d); }
+.sf .md.zoom img { transform: scale(2.2); transform-origin: 52% 88%; object-position: 52% 88%; }
+.sf .md.pd img { inset: auto; left: 0; top: -116.7%; height: 233.4%; object-fit: fill; filter: invert(1) hue-rotate(180deg) brightness(.9) saturate(1.3); }
+.sf .md.hm img { filter: grayscale(1) brightness(.6); }
+.sf .heat { position: absolute; inset: 0; mix-blend-mode: screen; background: radial-gradient(ellipse 24% 20% at 32% 50%, rgba(255, 64, 40, .95), rgba(255, 140, 0, .6) 45%, rgba(255, 214, 0, .2) 75%, transparent); }
+
+/* 판정 배지 — Mode Badge 꼴(면 · 테 · 점) + status 토큰. 정상 범위는 일부러 무채색(넘은 것만 색이 산다) */
+.sf .pl { display: inline-flex; align-items: center; gap: var(--space-4); padding: var(--space-2) var(--space-8) var(--space-2) var(--space-4); border: var(--border-width-thin) solid var(--border-default); border-radius: var(--radius-pill); background-color: var(--bg-cell); color: var(--text-secondary); font-size: var(--font-size-12); line-height: var(--font-line-height-18); white-space: nowrap; }
+.sf .pl::before { content: ""; flex: none; width: 6px; height: 6px; border-radius: var(--radius-pill); background-color: var(--text-tertiary); }
+.sf .pl.crit { color: var(--status-critical-text); background-color: var(--status-critical-bg); border-color: var(--status-critical-border); }
+.sf .pl.crit::before { background-color: var(--status-critical-icon); }
+.sf .pl.warn { color: var(--status-warning-text); background-color: var(--status-warning-bg); border-color: var(--status-warning-border); }
+.sf .pl.warn::before { background-color: var(--status-warning-icon); }
+.sf .pl.plan, .sf .pl.na { background-color: transparent; border-style: dashed; color: var(--text-tertiary); }
+.sf .pl.na::before { display: none; }
+
+/* ---------- 표 — 미션 하나(행 감지 × 열 지점) ---------- */
+.sf .ewrap, .sf .mtbw { flex: none; border: var(--border-width-thin) solid var(--border-default); border-radius: var(--radius-card); overflow: hidden; }
+.sf table { width: 100%; border-collapse: collapse; color: var(--text-primary); font-variant-numeric: tabular-nums; }
+.sf .mx { table-layout: fixed; }
+.sf .mx th, .sf .mtb th { padding: var(--space-8) var(--space-8) var(--space-8); border-bottom: var(--border-width-thin) solid var(--border-default); text-align: left; vertical-align: bottom; white-space: nowrap; font-size: var(--font-size-13); line-height: var(--font-line-height-18); font-weight: 500; color: var(--text-tertiary); }
+.sf .mx td { height: 84px; padding: 0 var(--space-8); border-bottom: var(--border-width-thin) solid var(--border-divider); vertical-align: middle; white-space: nowrap; overflow: hidden; }
+.sf .mx tr:last-child td, .sf .mtb tr:last-child td { border-bottom: 0; }
+.sf .mx tr:first-child > th:nth-child(1) { width: 150px; }
+.sf .mx tr:first-child > th:nth-child(2) { width: 84px; }
+.sf .mx tr:first-child > th:nth-child(3) { width: 108px; }
+.sf .mx .c-n { position: relative; padding-left: var(--space-16); }
+.sf .mx td.c-n b { display: block; color: var(--text-primary); }
+.sf .mx td.c-n .src { font-size: var(--font-size-12); line-height: var(--font-line-height-18); color: var(--text-tertiary); }
+.sf .bar { position: absolute; left: 0; top: 22%; bottom: 22%; width: 3px; border-radius: var(--radius-chart); background-color: transparent; }
+.sf .r-crit .bar, .sf tr.crit .bar { background-color: var(--status-critical-icon); }
+.sf .r-warn .bar, .sf tr.warn .bar { background-color: var(--status-warning-icon); }
+.sf .mx .c-std, .sf .mtb td.std { font-size: var(--font-size-13); line-height: var(--font-line-height-20); color: var(--text-secondary); }
+.sf .mx .c-wp { text-align: center; }
+.sf .mx th.c-wp b { display: block; font-size: var(--font-size-13); line-height: var(--font-line-height-18); font-weight: 700; color: var(--text-primary); }
+.sf .mx th.c-wp span { display: block; font-size: var(--font-size-12); line-height: var(--font-line-height-18); }
+.sf .mx th.c-wp .rb { color: var(--text-disabled); }
+.sf .mx th.c-wp.plan b { color: var(--text-tertiary); }
+/* 지금 지점 열 — 상태(로봇이 있는 곳)라 정보 파랑 */
+.sf .mx .now { background-color: color-mix(in srgb, var(--status-info-icon) 12%, transparent); }
+.sf .mx th.now b { color: var(--status-info-text); }
+.sf .mx .nil { display: inline-block; width: 3px; height: 3px; border-radius: var(--radius-pill); background-color: var(--border-default); }
+.sf .mx tr.r-na td { opacity: .5; }
+.sf .mx tbody tr, .sf .mx tr:not(:first-child) { cursor: pointer; }
+.sf .mx tr:not(:first-child):hover td { background-color: color-mix(in srgb, var(--status-info-icon) 6%, transparent); }
+.sf .mx .colhi, .sf .mx tr:not(:first-child):hover td.colhi { background-color: color-mix(in srgb, var(--status-info-icon) 16%, transparent); }
+/* DELTA 메모 열 — AI 가 말해 준 칸: 옅은 정보 면 · 정보 글자 · DELTA 점 로고 */
+.sf .mx .c-m { width: 230px; white-space: normal; font-size: var(--font-size-13); line-height: var(--font-line-height-20); color: var(--text-secondary); background-color: color-mix(in srgb, var(--status-info-icon) 8%, transparent); }
+.sf .mx th.dmh { color: var(--status-info-text); font-weight: 700; }
+.sf .mx th.dmh .dlogo { margin-right: var(--space-4); vertical-align: -1px; }
+.sf .dlogo { display: inline-grid; grid-template-columns: 5px 5px; gap: 2px; width: 12px; height: 12px; }
+.sf .dlogo i { display: block; width: 5px; height: 5px; border-radius: 1px; background-color: var(--status-info-icon); }
+.sf .dlogo i:nth-child(3) { grid-column: 1; }
+.sf .mx .dmm { display: flex; gap: var(--space-8); align-items: flex-start; color: var(--status-info-text); }
+.sf .mx .dmm .dlogo { flex: none; margin-top: 4px; }
+
+/* 값 칩 — 정상 · 주의 · 위험 모두 점 + 값, 같은 테 두께 */
+.sf .cv { display: inline-flex; align-items: center; gap: var(--space-4); padding: var(--space-4) var(--space-8); border: var(--border-width-thin) solid var(--border-default); border-radius: var(--radius-control); background-color: var(--bg-cell); color: var(--text-secondary); font-size: var(--font-size-13); line-height: var(--font-line-height-18); font-weight: 500; }
+.sf .cv i { width: 6px; height: 6px; border-radius: var(--radius-pill); background-color: var(--status-safe-icon); }
+.sf .cv.crit { color: var(--status-critical-text); background-color: var(--status-critical-bg); border-color: var(--status-critical-border); font-weight: 700; }
+.sf .cv.crit i { background-color: var(--status-critical-icon); }
+.sf .cv.warn { color: var(--status-warning-text); background-color: var(--status-warning-bg); border-color: var(--status-warning-border); font-weight: 700; }
+.sf .cv.warn i { background-color: var(--status-warning-icon); }
+.sf .cv.done { color: var(--text-secondary); }
+.sf .cv.done i { background-color: var(--text-tertiary); }
+.sf .cv.plan { color: var(--text-tertiary); background-color: transparent; border-style: dashed; }
+.sf .cv[data-dk] { cursor: pointer; }
+.sf .cv[data-dk]:hover { outline: var(--border-width-strong) solid var(--border-focus); outline-offset: 2px; }
+.sf td.ring { box-shadow: inset 0 0 0 3px var(--border-brand); }
+
+/* ---------- 표 — 전체(행 미션 × 열 감지) ---------- */
+.sf .mtb th.tw { text-align: center; }
+.sf .mtb th.tw b { display: block; font-weight: 700; color: var(--text-primary); }
+.sf .mtb th.tw span { font-size: var(--font-size-12); }
+.sf .mtb td { height: 96px; padding: var(--space-12); border-bottom: var(--border-width-thin) solid var(--border-divider); vertical-align: middle; }
+.sf .mtb td.tn { position: relative; width: 370px; padding-left: var(--space-16); }
+.sf .mtb td.tc { text-align: center; }
+.sf .mtb td.tn small { display: block; font-size: var(--font-size-12); line-height: var(--font-line-height-18); color: var(--text-tertiary); }
+.sf .mtb td.tn .nwm { margin: var(--space-4) 0 0; }
+.sf .tnw { display: flex; gap: var(--space-12); align-items: center; }
+.sf .tmap { flex: none; width: 112px; border-radius: var(--radius-card); }
+.sf .tmap .m2v { width: 112px; }
+.sf .tmap:hover .m2v, .sf .tmap:focus-visible .m2v { outline: var(--border-width-strong) solid var(--border-focus); outline-offset: 1px; }
+.sf .tnt { min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-2); }
+.sf .trb { display: inline-flex; align-items: center; gap: var(--space-4); font-size: var(--font-size-12); line-height: var(--font-line-height-18); font-weight: 600; color: var(--status-info-text); }
+.sf .trb i { width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-bottom: 9px solid var(--status-info-icon); transform: rotate(90deg); }
+.sf .twp { display: block; margin-top: var(--space-4); font-size: var(--font-size-12); line-height: var(--font-line-height-18); color: var(--text-tertiary); }
+.sf .nat { font-size: var(--font-size-12); color: var(--text-disabled); }
+
+/* 6종 보기 — 이동 단추라 무채색(Secondary · xSmall) */
+.sf .mgo { display: inline-flex; align-items: center; height: 24px; padding: 0 var(--space-8); border: var(--border-width-thin) solid var(--comp-button-secondary-border-default); border-radius: var(--radius-control); background-color: var(--comp-button-secondary-bg-default); color: var(--comp-button-secondary-text-default); font-size: var(--font-size-13); line-height: var(--font-line-height-18); font-weight: 500; white-space: nowrap; }
+.sf .mgo:hover { background-color: var(--comp-button-secondary-bg-hover); }
+.sf .mgo.sm { margin-top: var(--space-4); }
+
+/* ---------- 전체 카드 — 미션마다 한 줄, 넘은 결과만 ---------- */
+.sf .msecs { display: flex; flex-direction: column; gap: var(--space-8); }
+.sf .msec { padding: var(--space-12); border: var(--border-width-thin) solid var(--border-default); border-radius: var(--radius-card); background-color: var(--bg-panel); }
+.sf .msec.crit { box-shadow: inset 3px 0 0 var(--status-critical-icon); }
+.sf .msec.warn { box-shadow: inset 3px 0 0 var(--status-warning-icon); }
+.sf .msh2 { display: flex; align-items: center; gap: var(--space-8); margin-bottom: var(--space-8); }
+.sf .msh2 b { color: var(--text-primary); }
+.sf .msh2 .mn2 { font-size: var(--font-size-13); line-height: var(--font-line-height-20); color: var(--text-secondary); }
+.sf .msh2 .mt2, .sf .msh2 .mok { font-size: var(--font-size-12); line-height: var(--font-line-height-18); color: var(--text-tertiary); }
+.sf .msh2 .sp { flex: 1; }
+.sf .mrow { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: var(--space-8); }
+.sf .mrow .kd { min-height: 0; padding: var(--space-8) var(--space-12) var(--space-12); }
+.sf .mrow .kd .md { flex: none; height: 96px; }
+.sf .mchip { font-size: var(--font-size-12); line-height: var(--font-line-height-18); color: var(--text-secondary); }
+.sf .mchip b { margin-right: var(--space-4); padding: 1px var(--space-4); border: var(--border-width-thin) solid var(--border-default); border-radius: var(--radius-chart); background-color: var(--bg-cell); color: var(--text-primary); font-weight: 600; }
+.sf .mnone2 { margin: 0; font-size: var(--font-size-12); color: var(--text-disabled); }
+
+/* 새로(다른 미션에 새 위험) — 알림 위험 면 */
+.nwm { font-style: normal; margin-left: var(--space-4); padding: 0 var(--space-4); border-radius: var(--radius-chart); background-color: var(--comp-alert-critical-bg); color: var(--comp-alert-critical-text); font-size: var(--font-size-12); line-height: var(--font-line-height-18); font-weight: 800; }
+
+/* ---------- 자세히 보기 — 감지 탭 · ① 판정 ② 영상 ③ 재발 ④ 연관 ⑤ 위치 ⑥ 조치 ---------- */
+.sf .dtop { flex: none; display: flex; align-items: center; gap: var(--space-12); }
+.sf .bkx { flex: none; padding-left: var(--space-8); }
+.sf .tbs { flex: 1; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: var(--space-8); }
+.sf .tb { display: flex; justify-content: space-between; align-items: center; gap: var(--space-8); height: var(--size-control-sm); padding: 0 var(--space-12); border: var(--border-width-thin) solid var(--comp-button-secondary-border-default); border-radius: var(--radius-control); background-color: var(--comp-button-secondary-bg-default); color: var(--text-secondary); font-size: var(--font-size-13); line-height: var(--font-line-height-18); font-weight: 500; }
+.sf .tb:hover { color: var(--text-primary); }
+.sf .tb.on { background-color: var(--bg-selected); border-color: var(--border-strong); color: var(--text-primary); font-weight: 700; }
+.sf .tb.na { opacity: .5; border-style: dashed; cursor: default; }
+.sf .tb .d { width: 8px; height: 8px; border-radius: var(--radius-pill); }
+.sf .d.crit { background-color: var(--status-critical-icon); }
+.sf .d.warn { background-color: var(--status-warning-icon); }
+.sf .d.done { background-color: var(--text-tertiary); }
+
+.sf .dB { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: var(--space-12); align-items: start; min-height: 0; }
+.sf .dBm, .sf .dBc { min-width: 0; display: flex; flex-direction: column; gap: var(--space-12); }
+.sf .dBr2 { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: var(--space-12); align-items: stretch; }
+
+/* 단계 머리 — 번호는 순서일 뿐이라 무채색 원(파랑은 상태 · 주요 행동에만) */
+.sf .sth { display: flex; align-items: center; gap: var(--space-8); margin-bottom: var(--space-8); }
+.sf .sth b { color: var(--text-primary); }
+.sf .sn { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: var(--radius-pill); background-color: var(--bg-selected); color: var(--text-primary); font-size: var(--font-size-12); font-weight: 800; }
+
+/* 위계 — ① ② 가장 밝은 판 · ③ ④ 보통 판 · ⑤ 선만(참고) */
+.sf .lvA { padding: var(--space-12) var(--space-16); border: var(--border-width-thin) solid var(--border-default); border-radius: var(--radius-card); background-color: var(--bg-raised); }
+.sf .lvA.s1.crit { box-shadow: inset 4px 0 0 var(--status-critical-icon); }
+.sf .lvA.s1.warn { box-shadow: inset 4px 0 0 var(--status-warning-icon); }
+.sf .lvA .tt { display: flex; align-items: center; gap: var(--space-8); flex-wrap: wrap; margin-bottom: var(--space-4); }
+.sf .lvA .tt h5 { color: var(--text-primary); }
+.sf .lvA .sm2 { display: block; }
+.sf .sm2.crit { color: var(--status-critical-text); }
+.sf .sm2.warn { color: var(--status-warning-text); }
+.sf .why1 { font-size: var(--font-size-13); line-height: var(--font-line-height-20); color: var(--text-secondary); }
+/* 기준 막대 — 값 · 주의 · 위험 표시 */
+.sf .trk { position: relative; height: 10px; margin: 22px 44px var(--space-4) 0; border-radius: var(--radius-pill); background-color: var(--comp-chart-track); }
+.sf .trk .f { position: absolute; left: 0; top: 0; bottom: 0; border-radius: var(--radius-pill); }
+.sf .trk .f.crit { background-color: var(--status-critical-icon); }
+.sf .trk .f.warn { background-color: var(--status-warning-icon); }
+.sf .trk .m { position: absolute; top: -6px; bottom: -6px; border-left: 1px dashed; }
+.sf .trk .m span { position: absolute; bottom: 100%; left: 0; margin-bottom: 2px; font-size: var(--font-size-12); line-height: var(--font-line-height-18); white-space: nowrap; }
+.sf .trk .m.w { border-color: var(--status-warning-icon); color: var(--status-warning-text); }
+.sf .trk .m.c { border-color: var(--status-critical-icon); color: var(--status-critical-text); }
+.sf .trk .m.w span { transform: translateX(calc(-100% + 2px)); }
+.sf .trk .m.c span { transform: translateX(4px); }
+
+/* ② 영상 */
+.sf .lvA.s2 { display: flex; flex-direction: column; }
+.sf .dmw { position: relative; }
+.sf .lvA.s2 .dmw:not(.two) { flex: 1; display: flex; flex-direction: column; }
+.sf .dmw .md { position: relative; min-height: 280px; flex: 1; border-radius: var(--radius-card); overflow: hidden; background-color: var(--bg-page); }
+.sf .dmw.two { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-8); }
+.sf .dmw.two .md { aspect-ratio: 4 / 3; min-height: 0; }
+.sf .dlab, .sf .bigb { position: absolute; z-index: 3; padding: var(--space-2) var(--space-8); border-radius: var(--radius-control); background-color: rgb(7 10 16 / 82%); color: #fff; font-size: var(--font-size-12); line-height: var(--font-line-height-18); font-weight: 700; }
+.sf .dlab { left: var(--space-8); top: var(--space-8); }
+.sf .bigb { right: var(--space-8); bottom: var(--space-8); padding: var(--space-4) var(--space-8); border: var(--border-width-thin) solid rgb(255 255 255 / 24%); }
+.sf .bigb:hover, .sf .bigb.on { border-color: rgb(255 255 255 / 60%); }
+
+/* ③ 재발 · ④ 연관 */
+.sf .lvB { flex: 1; padding: var(--space-8) var(--space-12); border: var(--border-width-thin) solid var(--border-divider); border-radius: var(--radius-card); background-color: var(--bg-panel); }
+.sf .hist { display: flex; flex-direction: column; gap: var(--space-4); }
+.sf .hi { display: grid; grid-template-columns: 92px 56px auto 1fr; gap: var(--space-8); align-items: center; padding: var(--space-4) var(--space-8); border-radius: var(--radius-chart); background-color: var(--bg-inset); font-size: var(--font-size-13); line-height: var(--font-line-height-20); color: var(--text-primary); }
+.sf .hi .t { color: var(--text-tertiary); }
+.sf .hi.now { box-shadow: inset 0 0 0 1px var(--border-brand); }
+.sf .hia { justify-self: end; font-size: var(--font-size-12); color: var(--text-disabled); white-space: nowrap; }
+.sf .hia.on { color: var(--text-secondary); font-weight: 600; }
+.sf .lvB .rl.b { display: flex; flex-direction: column; gap: var(--space-4); }
+.sf .rlx { display: flex; flex-direction: column; align-items: stretch; gap: var(--space-2); padding: var(--space-4) var(--space-8); border: var(--border-width-thin) solid var(--border-default); border-radius: var(--radius-card); background-color: var(--bg-inset); color: var(--text-primary); font-size: var(--font-size-13); line-height: var(--font-line-height-20); text-align: left; }
+.sf .rlx:not(.lk) { flex-direction: row; align-items: center; gap: var(--space-8); }
+.sf .lvB.ref .rlx:hover, .sf .lvB.ref .rlx:focus-visible { border-color: var(--status-warning-icon); }
+.sf .rlx .rlt { display: flex; align-items: center; gap: var(--space-8); }
+.sf .rlx .t { margin-left: auto; color: var(--text-tertiary); }
+.sf .rlx em.rr { font-style: normal; padding: 0 var(--space-4); border-radius: var(--radius-chart); background-color: var(--status-info-bg); color: var(--status-info-text); font-size: var(--font-size-12); font-weight: 600; }
+.sf .rlx .lp { font-size: var(--font-size-12); color: var(--text-tertiary); }
+.sf .rlx .rwhy { display: flex; gap: var(--space-8); align-items: baseline; padding-left: 2px; font-size: var(--font-size-12); line-height: var(--font-line-height-18); color: var(--text-secondary); }
+/* 연관 감지 설명 — ? 를 올리면 뜨는 말풍선(드롭다운 판과 같은 면) */
+.sf .qt { position: relative; display: inline-grid; place-items: center; width: 20px; height: 20px; margin-left: 2px; border: var(--border-width-thin) solid var(--border-strong); border-radius: var(--radius-pill); color: var(--text-secondary); font-size: var(--font-size-12); font-weight: 700; cursor: help; }
+.sf .qt:focus-visible { outline: var(--border-width-strong) solid var(--border-focus); outline-offset: 2px; }
+.sf .qt .tip { position: absolute; left: 50%; bottom: calc(100% + 8px); z-index: 30; width: 320px; padding: var(--space-8) var(--space-12); border: var(--border-width-thin) solid var(--border-strong); border-radius: var(--radius-card); background-color: var(--bg-raised); box-shadow: 0 4px 16px rgb(0 0 0 / 35%); color: var(--text-primary); font-size: var(--font-size-12); line-height: var(--font-line-height-18); font-weight: 400; text-align: left; transform: translateX(-50%); visibility: hidden; opacity: 0; }
+.sf .qt:hover .tip, .sf .qt:focus .tip { visibility: visible; opacity: 1; }
+
+/* ⑤ 위치 — 참고라 선만 */
+.sf .lvC { padding: var(--space-8) var(--space-12) var(--space-12); border: var(--border-width-thin) dashed var(--border-default); border-radius: var(--radius-card); }
+.sf .lvC .sth b { font-weight: 700; color: var(--text-secondary); }
+.sf .locb { display: flex; align-items: baseline; gap: var(--space-12); margin: 0 0 var(--space-8); padding: var(--space-4) var(--space-12); border: var(--border-width-thin) solid var(--border-default); border-radius: var(--radius-card); background-color: var(--bg-inset); }
+.sf .locb .lw { color: var(--text-primary); }
+.sf .locb .ln { font-size: var(--font-size-14); line-height: var(--font-line-height-22); font-weight: 600; color: var(--text-secondary); }
+.sf .locb .lm { margin-left: auto; font-size: var(--font-size-12); color: var(--text-tertiary); }
+.sf .lvCb { display: grid; grid-template-columns: 132px minmax(0, 1fr); gap: var(--space-16); align-items: start; }
+.sf .lvCb .dmap2 { width: 132px; border: var(--border-width-thin) solid var(--border-default); border-radius: var(--radius-card); overflow: hidden; }
+.sf .lvCb .dmap2 svg { display: block; width: 100%; height: auto; border: 0; border-radius: 0; }
+.sf .dgw .dgcap { padding-left: 52px; margin-bottom: 2px; font-size: var(--font-size-12); color: var(--text-tertiary); }
+.sf .dgr { display: grid; align-items: center; height: 19px; border-radius: var(--radius-chart); }
+.sf .dgr span { display: flex; justify-content: center; align-items: center; height: 100%; font-size: var(--font-size-12); color: var(--text-disabled); }
+.sf .dgr span.on { background-color: color-mix(in srgb, var(--status-info-icon) 8%, transparent); }
+.sf .dgr .w { justify-content: flex-start; color: var(--text-secondary); font-weight: 700; }
+.sf .dgr.sel { background-color: color-mix(in srgb, var(--status-info-icon) 10%, transparent); }
+.sf .dgr.sel .w { color: var(--text-primary); }
+.sf .dgh span { white-space: nowrap; }
+.sf .dgh span.on { background: none; color: var(--status-info-text); font-weight: 700; }
+.sf .dgr [data-dk] { cursor: pointer; }
+.sf .dgr [data-dk]:hover { background-color: var(--state-hover); }
+.sf .dg i { display: inline-block; width: 8px; height: 8px; border-radius: var(--radius-pill); }
+.sf .dg i.crit { background-color: var(--status-critical-icon); }
+.sf .dg i.warn { background-color: var(--status-warning-icon); }
+.sf .dg i.done { background-color: var(--text-tertiary); border-radius: 2px; }
+.sf .dg i.o { width: 4px; height: 4px; background-color: var(--text-disabled); }
+.sf .dg i.p { border: 1px dashed var(--text-tertiary); }
+.sf .dgl { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-8); margin-top: var(--space-8); font-size: var(--font-size-12); color: var(--text-tertiary); }
+/* 연관 감지에 올리면 그 칸 · 행 · 지점이 노랗게 */
+.sf .dgr.hl { background-color: color-mix(in srgb, var(--status-warning-icon) 16%, transparent); }
+.sf .dgr span.hl { box-shadow: inset 0 0 0 2px var(--status-warning-icon); border-radius: 3px; }
+.sf .dgh span.hl { color: var(--status-warning-text); font-weight: 700; }
+
+/* ⑥ 조치 — DELTA 제안 판 + 현장 조치 요청(이 화면의 단 하나 Accent) */
+.sf .dl { display: flex; flex-direction: column; gap: var(--space-8); padding: var(--space-12); border: var(--border-width-thin) solid var(--border-default); border-radius: var(--radius-card); background-color: var(--bg-panel); color: var(--text-primary); }
+.sf .dl .hh { display: flex; justify-content: space-between; font-size: var(--font-size-12); line-height: var(--font-line-height-18); }
+.sf .dl .hh span:first-child { color: var(--status-info-text); font-weight: 700; }
+.sf .dl .hh span:last-child { color: var(--text-tertiary); }
+.sf .dl .hh b { color: var(--status-safe-text); font-weight: 600; }
+.sf .dl .ti { line-height: var(--font-line-height-22); }
+.sf .dl .cks { display: flex; flex-direction: column; border: var(--border-width-thin) solid var(--border-default); border-radius: var(--radius-card); background-color: var(--bg-inset); }
+.sf .c1x { display: grid; grid-template-columns: 18px 1fr auto; gap: var(--space-8); align-items: center; padding: var(--space-8) var(--space-12); border-bottom: var(--border-width-thin) solid var(--border-divider); cursor: pointer; }
+.sf .c1x:last-child { border-bottom: 0; }
+.sf .c1x input { width: 16px; height: 16px; margin: 0; accent-color: var(--comp-button-accent-bg-default); }
+.sf .c1x b { display: block; font-size: var(--font-size-13); line-height: var(--font-line-height-18); font-weight: 700; }
+.sf .c1x small { font-size: var(--font-size-12); line-height: var(--font-line-height-18); color: var(--text-tertiary); }
+.sf .c1x .badge { height: auto; align-self: center; font-style: normal; }
+.sf .dl .mm { font-size: var(--font-size-12); line-height: var(--font-line-height-18); color: var(--text-tertiary); }
+.sf .dl .fd { width: 100%; min-height: 56px; padding: var(--space-8) var(--space-12); border: var(--border-width-thin) solid var(--comp-input-border); border-radius: var(--radius-control); background-color: var(--bg-panel); color: var(--text-primary); font: inherit; font-size: var(--font-size-13); line-height: var(--font-line-height-20); resize: vertical; }
+.sf .dl .fd::placeholder { color: var(--text-tertiary); }
+.sf .dl .fd:hover { border-color: var(--comp-input-border-hover); }
+.sf .dl .fd:focus { outline: none; border-color: var(--border-focus); }
+.sf .rqx { width: 100%; height: var(--size-control-lg); margin-top: var(--space-8); font-size: var(--font-size-14); font-weight: 700; }
+.sf .donec { display: flex; flex-direction: column; gap: var(--space-4); padding: var(--space-12) var(--space-16); border: var(--border-width-thin) solid var(--border-default); border-radius: var(--radius-card); background-color: var(--bg-inset); }
+.sf .donec span { font-size: var(--font-size-13); line-height: var(--font-line-height-20); color: var(--text-secondary); }
+
+/* 동시 발생에서 넘어왔을 때 돌아가기 — 토스트와 같은 반전 알약 */
+.sf .rtbar { position: absolute; left: 50%; bottom: var(--space-24); z-index: 20; display: flex; align-items: center; gap: var(--space-8); padding: var(--space-8) var(--space-8) var(--space-8) var(--space-16); border-radius: var(--radius-pill); background-color: var(--bg-inverse); color: var(--text-on-inverse); box-shadow: 0 8px 24px rgb(0 0 0 / 35%); transform: translateX(-50%); }
+.sf .rtbar .ri { font-size: var(--font-size-16); }
+.sf .rtb { height: 28px; padding: 0 var(--space-12) !important; border: var(--border-width-thin) solid color-mix(in srgb, var(--text-on-inverse) 30%, transparent) !important; border-radius: var(--radius-pill); font-size: var(--font-size-13); font-weight: 600; }
+.sf .rtb:hover { border-color: var(--text-on-inverse) !important; }
+.sf .rtx { width: 28px; height: 28px; border-radius: var(--radius-pill); font-size: var(--font-size-13); opacity: .7; }
+.sf .rtx:hover { opacity: 1; }
+
+/* 카드 ↔ 자세히 보기 옮겨 가는 틀 · 표 칸 미리 보기 */
+.sf .gx { position: absolute; z-index: 18; border: var(--border-width-strong) solid var(--border-brand); border-radius: var(--radius-card); background-color: var(--bg-panel); pointer-events: none; }
+.sf .pvx { position: absolute; z-index: 20; width: 300px; display: flex; flex-direction: column; gap: var(--space-8); padding: var(--space-12); border: var(--border-width-thin) solid var(--border-strong); border-radius: var(--radius-card); background-color: var(--bg-raised); box-shadow: 0 4px 16px rgb(0 0 0 / 35%); pointer-events: none; }
+.sf .pvx[hidden] { display: none; }
+.sf .pvh { display: flex; flex-direction: column; gap: var(--space-2); }
+.sf .pvh span, .sf .pvn { font-size: var(--font-size-12); line-height: var(--font-line-height-18); color: var(--text-tertiary); }
+.sf .pvm { position: relative; height: 150px; border-radius: var(--radius-card); overflow: hidden; background-color: var(--bg-page); }
+.sf .pvf { display: flex; align-items: center; gap: var(--space-8); font-size: var(--font-size-12); color: var(--text-tertiary); }
+.sf .pvf b { color: var(--text-primary); }
+
+/* ---------- 상단 경로 메뉴(상태바) — 줄 앞 점은 그 미션의 가장 높은 판정 ---------- */
+/* 경로 틀은 관제(monitor.css)와 같다 — 그 파일 전체를 읽지 않고 쓰는 몇 줄만 옮겼다(값을 고치면 monitor.css 와 같이) */
+.status-bar-left { display: flex; align-items: center; }
+.status-bar-sep { margin: 0 var(--space-8); color: var(--text-tertiary); }
+.scope-menu-box { position: relative; display: flex; }
+.scope-trigger { display: inline-flex; align-items: center; gap: var(--space-4); padding: var(--space-4) var(--space-8) var(--space-4) var(--space-12); border: 0; border-radius: var(--radius-control); background-color: var(--bg-cell); color: var(--text-primary); font: inherit; white-space: nowrap; cursor: pointer; }
+.scope-trigger .i { color: var(--text-secondary); }
+.scope-trigger:hover, .scope-trigger[aria-expanded="true"] { background-color: var(--bg-raised); }
+.scope-trigger:focus-visible { outline: var(--border-width-strong) solid var(--border-focus); outline-offset: 1px; }
+.scope-menu { left: 0; min-width: 100%; white-space: nowrap; }
+.sf-scope { min-width: 280px; }
+.sf-scope .sf-mi { display: grid; grid-template-columns: 14px 1fr; align-items: center; gap: 0 var(--space-8); height: auto; padding: var(--space-8) var(--space-12) var(--space-8) var(--space-8); }
+.sf-scope .sf-mi:first-child { grid-template-columns: 1fr; margin-bottom: var(--space-4); border-radius: var(--radius-chart) var(--radius-chart) 0 0; box-shadow: 0 1px 0 var(--border-divider); }
+.sf-scope .sf-mi:first-child .wd { display: none; }
+.sf-scope .sf-mi .t-caption { grid-column: 2; color: var(--text-tertiary); }
+.sf-scope .sf-mi:first-child .t-caption { grid-column: 1; }
+.sf-scope .sf-mi[aria-checked="true"] { background-color: var(--bg-selected); }
+.sf-scope .wd { width: 8px; height: 8px; border-radius: var(--radius-pill); }
+button.sb-overview { border: 0; font-family: inherit; cursor: pointer; }
+button.sb-overview:not(.is-on):hover { background-color: var(--bg-cell); color: var(--text-primary); }
+
+@keyframes sf-blink { 50% { opacity: .3; } }
+@media (prefers-reduced-motion: reduce) {
+  #sfv, .sf .kd, .sf .railin, .sf .rfull, .sf .kd .more { transition: none; }
+  .sf .ixd.blink, .sf .hd .lvh .badge-dot { animation: none; }
+}
