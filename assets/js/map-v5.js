@@ -1802,7 +1802,7 @@
     var pz = Math.min(2.2, Math.max(0.8, Math.pow(zoom, 0.75)));   // 핀(rrPins)과 같은 확대 배율
     spots.forEach(function (s, i) {
       var w = sizePx * pz * floorPx(s);
-      _fsP.copy(s); _fsP.y += span * 0.0006;   // 길 띠 바로 위
+      _fsP.copy(s);   // [10/29] 띄우지 않는다 — 깊이 검사를 안 해 묻힐 일이 없고, 띄우면 아이소 화면에서 위로 밀려 길에서 비켜 보였다
       _fsM.compose(_fsP, _fsQ, _fsS.set(w, 1, w));
       m.setMatrixAt(i, _fsM);
     });
@@ -2186,7 +2186,7 @@
 
     var line = new Fat.Line2(geo, mat);
     line.computeLineDistances();
-    line.renderOrder = 2;
+    line.renderOrder = dashed ? 2.5 : 2;   // [10/29] 점선은 실선 리본(2) 뒤에 — 같은 순서면 거리 정렬에 따라 되짚는 구간의 점이 실선 밑에 묻혔다
 
     /*
      * 벽 뒤로 들어간 토막 — 같은 선을 깊이 검사 없이 옅게 한 벌 더 깐다.
@@ -3073,8 +3073,18 @@
       var mx = a[0] + b[0], mz = a[1] + b[1], ml = Math.sqrt(mx * mx + mz * mz), s = half;
       if (ml > 1e-6) { mx /= ml; mz /= ml; var d = mx * a[0] + mz * a[1]; s = half / Math.max(0.5, d); } else { mx = a[0]; mz = a[1]; }
       var p = pts[k];
-      pos.set([p.x + mx * s, p.y + lift, p.z + mz * s, p.x - mx * s, p.y + lift, p.z - mz * s], k * 6);
+      pos.set([p.x + mx * s, p.y, p.z + mz * s, p.x - mx * s, p.y, p.z - mz * s], k * 6);
       if (k < n - 1) { var i0 = k * 2; idx.push(i0, i0 + 1, i0 + 2, i0 + 1, i0 + 3, i0 + 2); }
+    }
+    /*
+     * [10/29] 바닥에 묻히지 않게 띄우는 것은 위가 아니라 카메라 쪽으로 — 디자이너: "대각선 점선만 띠 위에 맞고 다른 선은 어긋난다".
+     * 위로 띄우면(y + lift) 아이소 화면에서는 띠가 통째로 화면 위로 밀린다. 화면에서 세로로 선 토막은 제 길이 방향이라 티가 안 나고,
+     * 누운 토막만 점선(제 높이 그대로)과 옆으로 어긋나 보였다. 시선을 따라 당기면 화면 자리는 그대로 두고 깊이만 앞선다.
+     */
+    var c = camera.position;
+    for (k = 0; k < n * 2; k++) {
+      var vx = c.x - pos[k * 3], vy = c.y - pos[k * 3 + 1], vz = c.z - pos[k * 3 + 2], vl = Math.sqrt(vx * vx + vy * vy + vz * vz) || 1;
+      pos[k * 3] += vx / vl * lift; pos[k * 3 + 1] += vy / vl * lift; pos[k * 3 + 2] += vz / vl * lift;
     }
     var g = new THREE.BufferGeometry();
     g.setAttribute("position", new THREE.BufferAttribute(pos, 3));
@@ -3110,10 +3120,10 @@
       r.main.visible = on; if (r.edge) { r.edge.visible = on && p.userData.ribEdge !== false; }
       if (!on) { return true; }
       var st = p.geometry.attributes.instanceStart, lw = p.material.linewidth || 2;
-      var key = (st ? st.data.array.length + ":" + st.data.array[0] + ":" + st.data.array[st.data.array.length - 1] + ":" + st.data.version : "") + "|" + pp.toPrecision(5) + "|" + lw;
+      var key = (st ? st.data.array.length + ":" + st.data.array[0] + ":" + st.data.array[st.data.array.length - 1] + ":" + st.data.version : "") + "|" + pp.toPrecision(5) + "|" + lw + "|" + camera.position.x.toFixed(2) + "," + camera.position.y.toFixed(2) + "," + camera.position.z.toFixed(2);   // 시선 쪽으로 당기므로 시점이 바뀌어도 다시 짠다
       if (key !== r.key) {
         r.key = key;
-        var pts = ribPoints(p), lift = span * 0.0025;   // 바닥 판 위로 살짝 — 선 자리는 바닥 면과 거의 같은 높이라 띄우지 않으면 바닥에 묻힌다
+        var pts = ribPoints(p), lift = span * 0.0025;   // 바닥 판에서 살짝 — 선 자리는 바닥 면과 거의 같은 높이라 띄우지 않으면 바닥에 묻힌다(카메라 쪽으로, ribGeo)
         if (pts.length >= 2) {
           // 같은 높이에 깐다 — 본선을 더 띄우면 화면에서 위로 밀려 위쪽 흰 테를 덮었다. 겹침 순서는 renderOrder(테 1.9 → 본선 2)가 정한다.
           // 바닥에 누우면 화면에서 기울기만큼 얇아진다 — 굵은 선 시절과 비슷한 두께로 읽히게 RIB_K 배로 깐다
