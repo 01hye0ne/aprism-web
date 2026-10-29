@@ -136,19 +136,16 @@
 .sf-mbody { display: flex; align-items: flex-start; gap: var(--space-12); }   /* 썸네일 | 키-값 */
 .sf-mrow:hover { background-color: var(--state-hover); }
 .sf-mrow.on { background-color: var(--bg-selected); cursor: default; }
-/* [미션 전체] 블록 — 가로형(10/30). 썸네일과 같은 120 자리를 세 칸(위험 · 주의 · 정상)으로 나누고 칸 사이 선 1. 칸마다 기호는 왼쪽 위, 숫자는 오른쪽 아래. 높이는 옆 키-값만큼 */
+/* [미션 전체] 블록 — 가로형(10/30). 썸네일과 같은 120 자리를 세 칸(위험 · 주의 · 정상)으로 나누고 칸 사이 선 1. 칸마다 단계 이름은 왼쪽 위(글, 기호 없이), 숫자는 오른쪽 아래. 높이는 옆 키-값만큼 */
 .sf-allsum { align-self: stretch; display: grid; grid-template-columns: repeat(3, 1fr); padding: 0; background-color: var(--bg-cell); }
 .sf-cnt { position: relative; display: block; min-width: 0; padding: var(--space-4) var(--space-4) 0; color: var(--text-secondary); }
 .sf-cnt + .sf-cnt { border-left: var(--border-width-thin) solid var(--border-default); }
-.sf-cnt .ixd { display: block; }
+.sf-cnt .l { display: block; font-size: var(--font-size-12); line-height: var(--font-line-height-18); }
 .sf-cnt b { position: absolute; right: var(--space-4); bottom: var(--space-2); font-size: var(--font-size-16); line-height: var(--font-line-height-24); font-weight: 700; }
 .sf-cnt.crit { color: var(--status-critical-text); }
 .sf-cnt.warn { color: var(--status-warning-text); }
 .sf-cnt.zero { color: var(--text-disabled); }
 .sf-cnt.zero b { font-weight: 400; }
-.sf-cnt.zero .ixd { opacity: .4; }
-.sf-cnt .ixd.crit, .sf-cnt .ixd.warn { width: 14px; height: 14px; }
-.sf-cnt .ixd.ok { width: 8px; height: 8px; margin: 3px; background-color: var(--text-tertiary); }
 /* 미션 칸 — bg/map-chip 50%, 위에서 떨어지는 안쪽 그림자(Delta 요약 칸과 같은 꺼짐) */
 .sf-mwell { flex: 1 0 auto; display: flex; flex-direction: column; background-color: color-mix(in srgb, var(--bg-map-chip) 50%, transparent); box-shadow: inset 0 10px 8px 0 rgb(0 0 0 / 25%); }
 /* 미션 줄 왼쪽 단계 선은 뺐다(10/30) — 이름 앞 ⓧ/△ 와 같은 말을 두 번 해 빨강이 겹쳤다. 비운 4 는 왼쪽 여백(8 → 12)으로 돌려 글 자리를 지킨다 */
