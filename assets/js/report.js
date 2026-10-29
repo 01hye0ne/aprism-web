@@ -228,8 +228,10 @@
     function qa(s) { return actsEl.querySelector('[data-v="' + s + '"]'); }
     var pagesEl = q("pages"), tocEl = q("toc"), pgnoEl = q("pgno");
     function topOf(el) { return el.getBoundingClientRect().top - pagesEl.getBoundingClientRect().top + pagesEl.scrollTop; }
+    // 머리가 종이 위에 겹쳐 있으면(보고서 메뉴) 종이 칸 위 여백 = 머리 높이 + 20 — 그만큼 아래를 "보이는 맨 위"로 친다
+    function over() { return Math.max(0, (parseFloat(getComputedStyle(pagesEl).paddingTop) || 0) - 20); }
     function sync() {
-      var y = pagesEl.scrollTop + 140, pg = 1, c = null;
+      var y = pagesEl.scrollTop + over() + 140, pg = 1, c = null;
       Array.prototype.forEach.call(pagesEl.children, function (p, i) { if (topOf(p) <= pagesEl.scrollTop + pagesEl.clientHeight / 2) { pg = i + 1; } });
       if (pgnoEl) { pgnoEl.textContent = pg + " / " + count + " 쪽"; }
       Array.prototype.forEach.call(pagesEl.querySelectorAll("[data-sec]"), function (el) { if (topOf(el) <= y) { c = el.getAttribute("data-sec"); } });
@@ -250,7 +252,7 @@
       // 목차 — 머리(목차 · 총 N쪽) · 항목 · 아래 생성 시각(Figma 목차 209)
       tocEl.innerHTML = '<h4 class="rp-th t-caption"><span>목차</span><span>총 ' + count + "쪽</span></h4>" + items + '<div class="rp-pn t-caption">' + (doc.kind === "m" ? "자동 생성 2026.10.13 10:46" : doc.kind === "d" ? "자동 생성 2026.10.13 18:00" : "생성 2026.10.22 14:12") + "</div>";
       Array.prototype.forEach.call(tocEl.querySelectorAll("button"), function (b) {
-        b.onclick = function () { var el = pagesEl.querySelector('[data-sec="' + b.getAttribute("data-k") + '"]'); if (el) { pagesEl.scrollTo({ top: topOf(el) - 60, behavior: "smooth" }); } };
+        b.onclick = function () { var el = pagesEl.querySelector('[data-sec="' + b.getAttribute("data-k") + '"]'); if (el) { pagesEl.scrollTo({ top: topOf(el) - over() - 60, behavior: "smooth" }); } };
       });
       sync();
       var s = actsEl.querySelector("[data-cfg-sum]");
@@ -289,7 +291,7 @@
       box.querySelector("[data-note-save]").onclick = function () {
         NOTE[id] = tx.value.trim(); box.remove(); render();
         var el = pagesEl.querySelector('[data-sec="n"]');
-        if (el) { pagesEl.scrollTo({ top: topOf(el) - 60, behavior: "smooth" }); }
+        if (el) { pagesEl.scrollTo({ top: topOf(el) - over() - 60, behavior: "smooth" }); }
         plainToast(NOTE[id] ? "특이 사항을 저장했어요" : "특이 사항을 비웠어요");
       };
     }
@@ -346,8 +348,12 @@
       '<p class="rp-meta t-body-4">' + metaHtml(d) + "</p></div>" +
       '<div class="rp-acts" data-rp-acts>' + DL + "</div>";
   }
+  // 머리 높이 — 종이 · 목차가 머리 뒤에서 시작하는 자리(CSS --rp-dh-h). 단추 줄이 접히면 높이가 바뀌어 늘 다시 잰다
+  function measureHead() { detail.style.setProperty("--rp-dh-h", dh.offsetHeight + "px"); }
+  if (window.ResizeObserver) { new ResizeObserver(measureHead).observe(dh); }
   function openDetail() {
     dh.innerHTML = detailHead(cur);
+    measureHead();
     var old = detail.querySelector(".rp-viewer");
     if (old) { old.remove(); }
     detail.insertAdjacentHTML("beforeend", VIEWER);
