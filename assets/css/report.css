@@ -1,0 +1,353 @@
+/*
+ * 보고서(GNB [보고서]) — v5 · 10/29 디자이너 시안 "UI_전주기 보고서 탭"(artifact D5JzW7J7fsimgHCjnCRHQ5)을 옮겼다.
+ *
+ * 시안은 1920×1080 판을 따로 그린 것이라 색 · 간격 · 글자를 제 값으로 들고 있었다. 여기서는 디자인 시스템으로 바꿨다.
+ *   · 색      — 회색 원시값(#f6f7f8 · #1f2023 …) → bg/frame · bg/panel · bg/cell · bg/selected · border/* · text/* 토큰
+ *   · 간격    — 6 · 10 · 14 · 15 · 18 · 22 · 26 · 36 → space 4 · 8 · 12 · 16 · 20 · 24 단계로
+ *   · 글자    — 20/600 · 16/700 · 13/20 … → t-title-1 · t-title-2 · t-body-3/4 · t-caption · t-heading-2(HTML 클래스)
+ *   · 둥글기  — 6 · 8 · 10 · 12 · 16 → radius/control · radius/card · radius/container
+ *   · 버튼    — 44 높이 자체 버튼 → .btn(Size Medium 36) · Accent 는 영역에 하나(PDF 내려받기), DOCX 는 Secondary, 문서 구성 · 특이 사항은 Ghost
+ *   · 고른 줄 — 왼쪽 3px 흰 막대 + 회색 면 → bg/selected 면 + 왼쪽 2px border/strong 막대(파랑은 상태 · 주요 행동에만 쓴다)
+ *   · 토스트  — 자체 검은 상자 → .toast(app-shell, Figma UI_99 1605:38529 · bg/inverse 알약)
+ * 문서 종이(.rp-page)는 테마와 상관없이 인쇄 색이다 — 그 안의 색은 그대로 두고 글자 크기만 토큰 단계에 맞췄다.
+ */
+
+/* ---------- 본문 판 — GNB 오른쪽 전체 면(알림 센터 .ac-body 와 같은 규칙) ---------- */
+.rp-body {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 360px minmax(0, 1fr);
+  gap: var(--space-12);
+  padding: var(--space-20);
+  border-radius: var(--radius-container) var(--radius-container) 0 0;
+  background-color: var(--bg-frame);
+  overflow: hidden;
+}
+/* 단추 초기화는 상세도 0(:where) — .btn · .btn-accent 같은 디자인 시스템 단추가 늘 이긴다. 모달 · 사진 보기는 body 에 붙어 함께 적는다. */
+:where(.rp-body, .rp-modal, .rp-lb) :where(button) { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+:where(.rp-body, .rp-modal, .rp-lb) :where(button):focus-visible { outline: var(--border-width-strong) solid var(--border-focus); outline-offset: 1px; }
+:where(.rp-body, .rp-modal) :where(h1, h2, h3, h4, p) { margin: 0; }
+
+/* 작은 칸 버튼(이전 · 다음 달, 달력) — 32 · border/default · radius/control */
+.rp-ib {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: var(--size-control-sm);
+  height: var(--size-control-sm);
+  border: var(--border-width-thin) solid var(--border-default) !important;
+  border-radius: var(--radius-control);
+  background-color: var(--bg-cell) !important;
+  color: var(--text-secondary) !important;
+}
+.rp-ib:hover:not(:disabled) { color: var(--text-primary) !important; border-color: var(--border-strong) !important; }
+.rp-ib:disabled { opacity: 0.4; cursor: default !important; }
+
+/* ---------- 왼쪽 — 보고서 목록 ---------- */
+.rp-side {
+  position: relative;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius-card);
+  background-color: var(--bg-panel);
+  overflow: hidden;
+}
+.rp-side-head { display: flex; flex-direction: column; gap: var(--space-16); padding: var(--space-20) var(--space-16) var(--space-12); }
+.rp-side-head p { margin-top: var(--space-4); color: var(--text-secondary); }
+.rp-mnav { display: flex; align-items: center; gap: var(--space-8); }
+.rp-mnav .rp-mt { flex: 1; text-align: center; }
+
+/* 월 보고서 줄 — 만들기 전에는 점선 칸(행동), 만든 뒤에는 목록 줄 */
+.rp-morow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-8);
+  margin: 0 var(--space-16) var(--space-8);
+  padding: var(--space-12) var(--space-16);
+  border: var(--border-width-thin) dashed var(--border-default);
+  border-radius: var(--radius-card);
+  color: var(--text-secondary);
+}
+.rp-morow > span { display: flex; align-items: center; gap: var(--space-8); }
+.rp-morow .rp-mk { color: var(--fg-link); }
+.rp-morow .rp-mk:hover { text-decoration: underline; }
+
+.rp-cnt { display: flex; justify-content: space-between; padding: 0 var(--space-16) var(--space-4); color: var(--text-tertiary); }
+.rp-list { flex: 1; min-height: 0; overflow: auto; padding-bottom: var(--space-16); }
+.rp-dg { padding: var(--space-16) var(--space-16) var(--space-4); color: var(--text-tertiary); }
+.rp-dg.is-flash { color: var(--text-primary); font-weight: 600; }
+
+.rp-item {
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-8);
+  padding: var(--space-12) var(--space-16);
+  border-bottom: var(--border-width-thin) solid var(--border-divider) !important;
+  text-align: left;
+}
+.rp-item:hover { background-color: var(--bg-cell) !important; }
+.rp-item[aria-current="true"] { background-color: var(--bg-selected) !important; box-shadow: inset 2px 0 0 var(--border-strong); }
+.rp-item .rp-a { display: flex; align-items: center; gap: var(--space-8); min-width: 0; color: var(--text-primary); }
+.rp-item .rp-a .i { flex: none; color: var(--text-tertiary); }
+.rp-item .rp-a b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: inherit; }
+.rp-item.is-mission { padding-left: calc(var(--space-16) + var(--space-24)); }
+.rp-item.is-mission .rp-a { color: var(--text-secondary); }
+.rp-item[aria-current="true"].is-mission .rp-a { color: var(--text-primary); }
+.rp-item .rp-tm { color: var(--text-tertiary); white-space: nowrap; }
+.rp-side-foot { padding: var(--space-8) var(--space-16); border-top: var(--border-width-thin) solid var(--border-divider); color: var(--text-tertiary); }
+
+/* 달력 — 날짜로 찾기 */
+.rp-cal {
+  position: absolute;
+  left: var(--space-16);
+  right: var(--space-16);
+  top: 156px;
+  z-index: 16;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  padding: var(--space-16);
+  border: var(--border-width-thin) solid var(--border-strong);
+  border-radius: var(--radius-card);
+  background-color: var(--bg-raised);
+  box-shadow: 0 4px 16px rgb(0 0 0 / 35%);
+}
+.rp-cal-h { display: flex; align-items: center; justify-content: space-between; }
+.rp-cg { display: grid; grid-template-columns: repeat(7, 1fr); gap: var(--space-4); text-align: center; }
+.rp-cg .rp-w { padding: var(--space-4) 0; color: var(--text-tertiary); }
+.rp-cd { position: relative; height: var(--size-control-md); border-radius: var(--radius-control); color: var(--text-tertiary) !important; }
+.rp-cd:disabled { opacity: 0.45; cursor: default !important; }
+.rp-cd.has { color: var(--text-primary) !important; font-weight: 600; }
+.rp-cd.has::after { content: ""; position: absolute; left: 50%; bottom: var(--space-4); width: 4px; height: 4px; margin-left: -2px; border-radius: 50%; background-color: var(--text-secondary); }
+.rp-cd.has:hover { background-color: var(--bg-cell) !important; }
+.rp-cd.is-sel { background-color: var(--bg-inverse) !important; color: var(--text-on-inverse) !important; }
+.rp-cd.is-sel::after { background-color: var(--text-on-inverse); }
+.rp-cf { display: flex; justify-content: space-between; color: var(--text-tertiary); }
+.rp-cf i { display: inline-block; width: 4px; height: 4px; margin-right: var(--space-4); border-radius: 50%; background-color: var(--text-secondary); vertical-align: middle; }
+
+/* ---------- 오른쪽 — 보고서 ---------- */
+.rp-detail {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius-card);
+  background-color: var(--bg-panel);
+  overflow: hidden;
+}
+.rp-dh {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: var(--space-24);
+  padding: var(--space-20) var(--space-24) var(--space-16);
+  border-bottom: var(--border-width-thin) solid var(--border-divider);
+}
+.rp-dh .rp-eb { color: var(--text-tertiary); }
+.rp-dh h2 { display: flex; align-items: baseline; gap: var(--space-12); margin-top: var(--space-4); color: var(--text-primary); }
+.rp-dh h2 .rp-sub { color: var(--text-secondary); font-weight: 500; }
+.rp-meta { display: flex; align-items: center; gap: var(--space-16); margin-top: var(--space-8); color: var(--text-secondary); }
+.rp-meta .rp-mlb { margin-right: var(--space-4); color: var(--text-tertiary); }
+.rp-acts { position: relative; display: flex; align-items: center; gap: var(--space-8); }
+.rp-acts .btn .i { width: 16px; height: 16px; }
+.rp-spin { width: 14px; height: 14px; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: rp-spin 0.8s linear infinite; }
+@keyframes rp-spin { to { transform: rotate(360deg); } }
+
+/* 뷰어 — 목차 | 종이. 종이는 한 단 꺼진 면(bg/inset) 위에 놓인다 */
+.rp-viewer { position: relative; flex: 1; min-height: 0; display: grid; grid-template-columns: 232px minmax(0, 1fr); background-color: var(--bg-inset); }
+.rp-toc { display: flex; flex-direction: column; gap: var(--space-2); padding: var(--space-24) 0 var(--space-24) var(--space-16); overflow: auto; }
+.rp-toc h4 { margin-bottom: var(--space-8); color: var(--text-tertiary); }
+.rp-toc button { display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-8); padding: var(--space-8) var(--space-12) !important; border-radius: 0 var(--radius-control) var(--radius-control) 0; color: var(--text-secondary) !important; text-align: left; box-shadow: inset 2px 0 0 transparent; }
+.rp-toc button span { flex: none; color: var(--text-tertiary); }
+.rp-toc button:hover { color: var(--text-primary) !important; background-color: var(--bg-cell) !important; }
+.rp-toc button.is-on { color: var(--text-primary) !important; font-weight: 600; box-shadow: inset 2px 0 0 var(--text-primary); }
+.rp-toc .rp-pn { margin-top: var(--space-12); padding: var(--space-12) var(--space-12) 0; border-top: var(--border-width-thin) solid var(--border-divider); color: var(--text-tertiary); }
+.rp-pages { min-width: 0; display: flex; flex-direction: column; align-items: center; gap: var(--space-24); padding: var(--space-24) var(--space-24) var(--space-40) 0; overflow: auto; }
+.rp-pgno { position: absolute; top: var(--space-24); right: var(--space-32); color: var(--text-tertiary); pointer-events: none; }
+
+/* 팝오버 — 문서 구성 · 특이 사항(드롭다운과 같은 면 · 테 · 그림자) */
+.rp-pop {
+  position: absolute;
+  right: 0;
+  top: calc(100% + var(--space-8));
+  z-index: 15;
+  width: 360px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  padding: var(--space-16);
+  border: var(--border-width-thin) solid var(--border-strong);
+  border-radius: var(--radius-card);
+  background-color: var(--bg-raised);
+  box-shadow: 0 4px 16px rgb(0 0 0 / 35%);
+}
+.rp-pop.is-up { top: auto; bottom: calc(100% + var(--space-8)); }
+.rp-pop .rp-fx { color: var(--text-tertiary); }
+.rp-pop .rp-sep { height: 1px; background-color: var(--border-divider); }
+.rp-pop .rp-sum { display: flex; justify-content: space-between; align-items: center; color: var(--text-secondary); }
+.rp-pop .rp-nb { display: flex; gap: var(--space-8); }
+.rp-pop textarea {
+  width: 100%;
+  min-height: 120px;
+  resize: vertical;
+  padding: var(--space-8) var(--space-12);
+  border: var(--border-width-thin) solid var(--border-default);
+  border-radius: var(--radius-control);
+  background-color: var(--bg-inset);
+  color: var(--text-primary);
+  font: inherit;
+}
+.rp-pop textarea:focus { outline: var(--border-width-strong) solid var(--border-focus); outline-offset: -1px; }
+.rp-ck { display: flex; align-items: center; gap: var(--space-8); padding: var(--space-4) 0; color: var(--text-primary); cursor: pointer; }
+.rp-ck input, .rp-only input { width: 16px; height: 16px; margin: 0; accent-color: var(--comp-button-accent-bg-default); }
+
+/* 토스트 — .toast(app-shell) 를 쓴다. 이 화면은 위쪽 알림(위치)만 더한다 */
+.rp-body .toast { position: absolute; }
+.rp-body .toast.is-top { top: var(--space-20); bottom: auto; }
+.rp-body .toast .toast-undo { padding: 0 var(--space-12); }
+
+/* 사진 크게 보기 */
+.rp-lb { position: fixed; inset: 0; z-index: 200; display: flex; align-items: center; justify-content: center; background-color: var(--color-alpha-gray-950-85, rgb(7 10 16 / 88%)); }
+.rp-lb figure { margin: 0; display: flex; flex-direction: column; align-items: center; gap: var(--space-12); }
+.rp-lb img { width: min(900px, 70vw); aspect-ratio: 5 / 4; object-fit: cover; border-radius: var(--radius-card); }
+.rp-lb figcaption { display: flex; gap: var(--space-12); color: #f7f8fa; }
+.rp-lb figcaption .rp-v { color: var(--status-critical-text); }
+.rp-lb .rp-nv, .rp-lb .rp-x { position: absolute; display: grid; place-items: center; border: var(--border-width-thin) solid rgb(255 255 255 / 18%); border-radius: var(--radius-pill); background-color: rgb(255 255 255 / 8%); color: #f7f8fa; cursor: pointer; }
+.rp-lb .rp-nv { top: 50%; width: 48px; height: 48px; transform: translateY(-50%); }
+.rp-lb .rp-nv:disabled { opacity: 0.3; cursor: default; }
+.rp-lb .rp-x { top: var(--space-24); right: var(--space-24); width: 40px; height: 40px; }
+
+/* 다른 화면(관제)에서 여는 보고서 — 같은 뷰어를 모달로 */
+.rp-modal-scrim { position: fixed; inset: 0; z-index: 100; background-color: var(--color-alpha-gray-950-60); }
+.rp-modal {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  z-index: 101;
+  width: min(1200px, calc(100vw - 40px));
+  height: min(980px, calc(100vh - 40px));
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  border: var(--border-width-thin) solid var(--border-divider);
+  border-radius: var(--radius-container);
+  background-color: var(--bg-panel);
+  transform: translate(-50%, -50%);
+  overflow: hidden;
+}
+.rp-modal .rp-mhd { display: flex; justify-content: space-between; align-items: flex-start; padding: var(--space-20) var(--space-24) var(--space-16); border-bottom: var(--border-width-thin) solid var(--border-divider); }
+.rp-modal .rp-mft { display: flex; justify-content: space-between; align-items: center; padding: var(--space-12) var(--space-24); border-top: var(--border-width-thin) solid var(--border-divider); }
+.rp-modal .rp-link { display: inline-flex; align-items: center; gap: var(--space-4); color: var(--fg-link); }
+.rp-modal .rp-link:hover { text-decoration: underline; }
+
+/* ---------- A4 문서(관제 양식) — 인쇄 색, 테마와 상관없다 ---------- */
+.rp-page {
+  --paper: #ffffff; --ink: #151617; --ink-2: #5b6270; --ink-3: #80868f; --p-line: #d5d9de; --p-cell: #f1f2f4; --p-crit: #b92b18; --p-warn: #c27c0e;
+  flex: none;
+  width: 794px;
+  height: 1123px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+  padding: var(--space-40) 56px var(--space-48);
+  background-color: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-13);
+  line-height: var(--font-line-height-20);
+  font-variant-numeric: tabular-nums;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 12%), 0 6px 18px rgb(0 0 0 / 8%);
+}
+.rp-page button { font: inherit; }
+.rp-page .p-hd { display: flex; justify-content: space-between; align-items: center; }
+.rp-page .p-hd .lg { display: flex; flex-direction: column; align-items: center; gap: 1px; color: var(--ink); }
+.rp-page .p-hd .lg small { font-size: 5px; line-height: 6px; letter-spacing: 2px; }
+.rp-page .p-hd .no { font-size: var(--font-size-12); color: var(--ink-3); }
+.rp-page .f-title { padding: var(--space-8) 0; text-align: center; font-size: var(--font-size-24); line-height: var(--font-line-height-32); font-weight: 600; }
+.rp-page .f-sec { display: flex; flex-direction: column; gap: var(--space-8); }
+.rp-page .f-h { display: flex; align-items: center; gap: var(--space-4); font-size: var(--font-size-14); line-height: var(--font-line-height-20); font-weight: 600; }
+.rp-page .ft { border: 1px solid var(--ink); }
+.rp-page .ft + .ft { margin-top: var(--space-12); }
+.rp-page .fr { display: grid; border-bottom: 1px solid var(--p-line); }
+.rp-page .fr:last-child { border-bottom: 0; }
+.rp-page .fr > span { display: flex; align-items: center; min-width: 0; min-height: 34px; padding: 7px var(--space-8); border-right: 1px solid var(--p-line); }
+.rp-page .fr > span:last-child { border-right: 0; }
+.rp-page .fr .l { justify-content: center; text-align: center; background-color: var(--p-cell); font-weight: 500; }
+.rp-page .fr .c { justify-content: center; text-align: center; }
+.rp-page .fr.hd > span { justify-content: center; text-align: center; background-color: var(--p-cell); font-weight: 500; }
+.rp-page .fr.sum > span { background-color: var(--p-cell); font-weight: 500; }
+.rp-page .f2 { grid-template-columns: 96px 1fr 96px 1fr; }
+.rp-page .f1, .rp-page .fl { grid-template-columns: 96px 1fr; }
+.rp-page .fl > span { min-height: 80px; }
+.rp-page .fl > span:last-child { align-items: flex-start; }
+.rp-page .cnt6 { grid-template-columns: 182px repeat(5, 1fr); }
+.rp-page .alr { grid-template-columns: 80px 52px 76px 1fr 150px 92px; }
+.rp-page .alr.wph { grid-template-columns: 72px 44px 72px 1fr 136px 100px 40px; }
+.rp-page .mst { grid-template-columns: 58px 1fr 48px 56px 74px 52px 56px 176px; }
+.rp-page .dyt { grid-template-columns: 96px repeat(5, 1fr) 176px; }
+.rp-page .lk { padding: 0; border: 0; background: none; color: var(--ink); white-space: nowrap; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.rp-page .gau { grid-template-columns: 40px 1fr 66px 110px 130px 72px; }
+.rp-page .red { color: var(--p-crit); }
+.rp-page .q { color: var(--ink-3); }
+.rp-page .ev0 { grid-template-columns: 1fr; }
+.rp-page .ev0 > span { justify-content: center; min-height: 56px; color: var(--ink-2); }
+.rp-page .evp { display: grid; grid-template-columns: 1fr 1fr; border-bottom: 1px solid var(--p-line); }
+.rp-page .evp:last-child { border-bottom: 0; }
+.rp-page .evc { min-width: 0; display: flex; flex-direction: column; border-right: 1px solid var(--p-line); }
+.rp-page .evc:last-child { border-right: 0; }
+.rp-page .evc .ph { flex: none; display: block; width: 100%; aspect-ratio: 2 / 1; padding: 0; border: 0; border-bottom: 1px solid var(--p-line); background: #20134a; overflow: hidden; cursor: zoom-in; }
+.rp-page .evc .ph.none { background: none; cursor: default; }
+.rp-page .evc .ph img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.rp-page .evf { flex: 1; display: flex; flex-direction: column; }
+.rp-page .evf .fr { flex: 1; grid-template-columns: 84px 1fr; }
+.rp-page .evf .ev-h { gap: var(--space-12); }
+.rp-page .evf .ev-h b { font-weight: 600; }
+.rp-page .evf .ev-h i { font-style: normal; }
+.rp-page .note-add { padding: var(--space-4) var(--space-8); border: 1px dashed var(--p-line); border-radius: var(--radius-4); background: none; color: var(--ink-3); font-size: var(--font-size-12); cursor: pointer; }
+.rp-page .note-add:hover { border-color: var(--ink-3); color: var(--ink); }
+/* 월간 추이 그래프 — 인쇄 문서용: 먹색 + 빨강/주황만 */
+.rp-page .chs { padding: var(--space-4) 0; }
+.rp-page .ch { padding: var(--space-8) var(--space-12); border-bottom: 1px solid var(--p-line); }
+.rp-page .ch:last-child { border-bottom: 0; }
+.rp-page .cht { display: flex; align-items: baseline; gap: var(--space-8); margin-bottom: var(--space-2); }
+.rp-page .cht b { font-weight: 600; }
+.rp-page .cht span { color: var(--ink-3); font-size: var(--font-size-12); }
+.rp-page .cht .lg { margin-left: auto; display: flex; align-items: center; gap: var(--space-4); color: var(--ink-2); }
+.rp-page .cht .lg i { display: inline-block; width: 10px; height: 10px; margin-left: var(--space-8); border-radius: 2px; }
+.rp-page .cht .lg i.cr { background: var(--p-crit); }
+.rp-page .cht .lg i.ca { background: var(--p-warn); }
+.rp-page .ch svg { display: block; overflow: visible; }
+.rp-page .ch .gl { stroke: var(--p-line); stroke-width: 1; }
+.rp-page .ch .ax { font-size: 10px; fill: var(--ink-3); }
+.rp-page .ch .ax.on { fill: var(--ink); font-weight: 600; }
+.rp-page .ch .thr { stroke: var(--ink-2); stroke-width: 1; stroke-dasharray: 4 3; }
+.rp-page .ch .thl { font-size: 11px; fill: var(--ink-2); }
+.rp-page .ch .ln { fill: none; stroke: var(--ink); stroke-width: 2; stroke-linejoin: round; }
+.rp-page .ch .pt { fill: var(--ink); stroke: var(--paper); stroke-width: 2; }
+.rp-page .ch .pt.bad { fill: var(--p-crit); }
+.rp-page .ch .vl { font-size: 11px; font-weight: 600; fill: var(--p-crit); }
+.rp-page .ch .vl.n { fill: var(--ink); }
+.rp-page .ch .br.cr { fill: var(--p-crit); }
+.rp-page .ch .br.ca { fill: var(--p-warn); }
+.rp-page .chn { margin-top: var(--space-2); font-size: 11px; color: var(--ink-3); }
+.rp-measure { position: absolute; left: -5000px; top: 0; visibility: hidden; }
+
+@media (prefers-reduced-motion: reduce) { .rp-spin { animation: none; } }
+
+/*
+ * 색 위계(10/12 확정) — 파랑은 상태이거나 영역에 하나뿐인 주요 행동(PDF 내려받기)에만.
+ * 보조 단추(문서 구성 · 특이 사항 입력)와 이동 링크(보고서 메뉴에서 보기 · 월 보고서 만들기)는 무채색이다.
+ * Ghost 단추의 기본 글자색(button/ghost/text)이 파랑이라 이 화면에서는 text/secondary 로 내린다.
+ */
+.rp-acts .btn-ghost { color: var(--text-secondary); }
+.rp-acts .btn-ghost:hover { color: var(--text-primary); }
+.rp-morow .rp-mk,
+.rp-modal .rp-link { color: var(--text-primary); text-decoration: underline; text-underline-offset: 3px; }
+.rp-morow .rp-mk:hover,
+.rp-modal .rp-link:hover { color: var(--text-secondary); }
