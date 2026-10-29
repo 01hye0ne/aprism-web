@@ -98,6 +98,30 @@ body.ver-5 [data-r2="sit"] .r2-knee { animation: r2-sit-knee 0.9s 0.15s ease-in-
 @keyframes r2-sit-hip { to { transform: rotate(-40.94deg); } }
 @keyframes r2-sit-knee { to { transform: rotate(58.25deg); } }
 
+/*
+ * 모베드(robot-2d.js MOBED · Figma 1412:16371 / 1412:16401) — 바퀴형이라 관절 대신 바퀴가 움직인다.
+ *   운행중  바퀴가 왼쪽으로 구른다(반시계, 한 바퀴 1.6s) · 몸통이 0.6 떤다.
+ *   충전중  바퀴가 몸통 안쪽으로 모이며 구르고(왼 +19 · 오른 -17 = 반지름 20 기준 +54° · -49°), 몸통이 6 내려앉는다.
+ * 바퀴는 제 가운데에서 돈다(fill-box) — 바퀴 그림이 원이라 상자 가운데 = 바퀴 축이다.
+ */
+body.ver-5 .robot-2d .mb-spin { transform-box: fill-box; transform-origin: center; }
+body.ver-5 .robot-2d .mb-body { transform-box: view-box; }
+body.ver-5 [data-r2="walk"] .mb-spin { animation: mb-roll 1.6s linear infinite; }
+body.ver-5 [data-r2="walk"] .mb-body { animation: mb-hum 0.4s ease-in-out infinite; }
+@keyframes mb-roll { to { transform: rotate(-360deg); } }
+@keyframes mb-hum { 50% { transform: translateY(-0.6px); } }
+
+body.ver-5 [data-r2="sit"] .mb-body { animation: mb-sit-body 0.9s 0.15s ease-in-out both; }
+body.ver-5 [data-r2="sit"] .mb-slide-l { animation: mb-sit-l 0.9s 0.15s ease-in-out both; }
+body.ver-5 [data-r2="sit"] .mb-slide-r { animation: mb-sit-r 0.9s 0.15s ease-in-out both; }
+body.ver-5 [data-r2="sit"] .mb-spin-l { animation: mb-sit-spin-l 0.9s 0.15s ease-in-out both; }
+body.ver-5 [data-r2="sit"] .mb-spin-r { animation: mb-sit-spin-r 0.9s 0.15s ease-in-out both; }
+@keyframes mb-sit-body { to { transform: translateY(6px); } }
+@keyframes mb-sit-l { to { transform: translateX(19px); } }
+@keyframes mb-sit-r { to { transform: translateX(-17px); } }
+@keyframes mb-sit-spin-l { to { transform: rotate(54deg); } }
+@keyframes mb-sit-spin-r { to { transform: rotate(-49deg); } }
+
 @media (prefers-reduced-motion: reduce) {
   body.ver-5 .robot-2d * { animation-duration: 0s !important; animation-delay: 0s !important; animation-iteration-count: 1 !important; }
 }
