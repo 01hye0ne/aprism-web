@@ -911,7 +911,7 @@
 
     function showToast(a) {
       if (!toast) { return; }
-      toastMsg.textContent = "조치 완료 · " + a.title;
+      toastMsg.textContent = a.title + " 조치를 완료했어요";   // 가운뎃점 구분 대신 문장으로(10/29 피드백)
       toast.hidden = false;
       clearTimeout(toastTimer);
       toastTimer = setTimeout(hideToast, 5000);
