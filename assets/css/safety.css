@@ -35,7 +35,8 @@
 .sf-ptog { display: grid; place-items: center; width: 20px; height: 20px; color: var(--text-primary) !important; }
 .sf-plabel { color: var(--text-tertiary); white-space: nowrap; }
 .sf-sbody { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: var(--space-12); padding: var(--space-12) var(--space-8) var(--space-8); overflow: auto; }
-.sf-main { position: relative; min-width: 0; min-height: 0; display: flex; flex-direction: column; padding: var(--space-16) var(--space-20) var(--space-20); background-color: var(--bg-page); }   /* [10/30 GUI] 본문은 bg/page, 카드(bg/cell)가 떠 보인다 */
+/* [10/30 GUI] 본문은 보고서 .rp-detail 과 같은 판 — 위 · 오른쪽 · 아래 8 띄운 bg/page(모서리 8), 카드(bg/cell)가 떠 보인다 */
+.sf-main { position: relative; min-width: 0; min-height: 0; display: flex; flex-direction: column; margin: var(--space-8) var(--space-8) var(--space-8) 0; border-radius: var(--radius-8); background-color: var(--bg-page); overflow: hidden; }
 /* 접으면 머리 아이콘만 남는다(보고서와 같다) */
 .sf.is-fold { grid-template-columns: calc(var(--size-icon-20) + var(--space-12) * 2) minmax(0, 1fr); }
 .sf.is-fold .sf-plabel, .sf.is-fold .sf-sbody { display: none; }
@@ -47,7 +48,7 @@
 :where(.sf) :where(h1, h4, h5, p) { margin: 0; }
 .sf b { font-weight: inherit; }
 
-#sfv { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: var(--space-12); overflow: auto; transition: opacity .14s; }
+#sfv { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: var(--space-12); padding: 0 var(--space-20) var(--space-20); overflow: auto; transition: opacity .14s; }
 #sfv.xfade, #sfv.xin { opacity: 0; }
 
 /* 글자 단계 — 시안 클래스에 그대로 건다(값은 app-shell .t-* 와 같다) */
@@ -57,7 +58,15 @@
 .sf .lvA .tt h5 { font-size: var(--font-size-24); line-height: var(--font-line-height-32); font-weight: 600; letter-spacing: -0.01em; }
 
 /* ---------- 머리 — 제목 · 라이브 · 요청 전 건수 · 카드/표 ---------- */
-.sf .hd { flex: none; display: flex; align-items: center; gap: var(--space-8); }
+/*
+ * 머리 — 보고서 머리(.rp-dh)와 같은 유리 띠: bg/glass 아래 bg/page 85% 한 겹 + 배경 블러 20, 아래 border/divider, 위 14 · 좌우 20 · 아래 12.
+ * 판 양끝까지 닿고(#sfv 좌우 20 을 음수로 되돌린다) 위에 붙어 있어 카드가 머리 뒤로 흐리게 지나간다.
+ * 전체 카드 화면은 감지 머리 줄(.mhead)이 바로 아래 이어 붙어 한 띠가 되고, 선은 감지 머리 줄 아래에만 있다.
+ */
+.sf .hd { --sf-hd-h: 56px; position: sticky; top: 0; z-index: 6; flex: none; display: flex; align-items: center; gap: var(--space-8); height: var(--sf-hd-h); margin: 0 calc(var(--space-20) * -1); padding: 14px var(--space-20) var(--space-12); border-bottom: var(--border-width-thin) solid var(--border-divider); }
+.sf .hd, .sf .mhead { background: linear-gradient(var(--bg-glass), var(--bg-glass)), color-mix(in srgb, var(--bg-page) 85%, transparent); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); }
+#sfv > :first-child:not(.hd) { margin-top: var(--space-16); }   /* 머리 없는 깊이(자세히 보기)는 판 위에서 16 띄운다 */
+#sfv > .hd:has(+ .msecs) { margin-bottom: calc(var(--space-12) * -1); border-bottom-color: transparent; }
 .sf .hd .lvh { align-self: center; }
 .sf .hd .lvh .badge-dot { animation: sf-blink 1.6s ease-in-out infinite; }
 .sf .hd .sp { flex: 1; }
@@ -278,7 +287,7 @@
 /* ---------- 전체 카드 — 미션마다 한 줄, 넘은 결과만 ---------- */
 .sf .msecs { display: flex; flex-direction: column; gap: 0; }
 /* 감지 열 머리 — 표 머리와 같은 이름 · 기준. 본문을 스크롤해도 위에 붙는다. 열은 묶음 안 카드 격자와 같다(묶음 안쪽 12 + 테 1) */
-.sf .mhead { position: sticky; top: 0; z-index: 5; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: var(--space-8); margin-bottom: calc(var(--space-8) * -1 + var(--space-4)); padding: var(--space-4) calc(var(--space-12) + 1px) var(--space-8); background-color: var(--bg-page); border-bottom: var(--border-width-thin) solid var(--border-divider); }
+.sf .mhead { position: sticky; top: 56px; z-index: 5; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: var(--space-8); margin: 0 calc(var(--space-20) * -1) var(--space-4); padding: var(--space-4) calc(var(--space-20) + var(--space-12)) var(--space-8); border-bottom: var(--border-width-thin) solid var(--border-divider); }   /* top = 머리 높이(.hd --sf-hd-h) */
 .sf .mhead span { display: flex; flex-direction: column; }
 .sf .mhead b { font-size: var(--font-size-13); line-height: var(--font-line-height-18); font-weight: 700; color: var(--text-primary); }
 .sf .mhead small { font-size: var(--font-size-12); line-height: var(--font-line-height-18); color: var(--text-tertiary); }
