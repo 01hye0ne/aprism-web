@@ -136,19 +136,17 @@
 .sf-mbody { display: flex; align-items: flex-start; gap: var(--space-12); }   /* 썸네일 | 키-값 */
 .sf-mrow:hover { background-color: var(--state-hover); }
 .sf-mrow.on { background-color: var(--bg-selected); cursor: default; }
-/* [미션 전체] 블록 — 가로형(10/30). 썸네일과 같은 120 자리에 위험 · 주의 · 정상 세 칸(숫자 위, 기호 + 단계 아래), 높이는 옆 키-값만큼 */
+/* [미션 전체] 블록 — 가로형(10/30). 썸네일과 같은 120 자리에 위험 · 주의 · 정상 세 칸(기호 + 숫자, 이름은 기호와 아래 범례가 말한다), 높이는 옆 키-값만큼 */
 .sf-allsum { align-self: stretch; display: flex; align-items: center; justify-content: space-evenly; padding: var(--space-4) 0; background-color: var(--bg-cell); }
-.sf-cnt { display: flex; flex-direction: column; align-items: center; gap: var(--space-2); color: var(--text-secondary); white-space: nowrap; }
+.sf-cnt { display: flex; align-items: center; gap: var(--space-4); color: var(--text-secondary); white-space: nowrap; }
 .sf-cnt b { font-size: var(--font-size-16); line-height: var(--font-line-height-24); font-weight: 700; }
-.sf-cnt .l { display: inline-flex; align-items: center; gap: 1px; font-size: var(--font-size-12); line-height: var(--font-line-height-18); }
 .sf-cnt.crit { color: var(--status-critical-text); }
 .sf-cnt.warn { color: var(--status-warning-text); }
 .sf-cnt.zero { color: var(--text-disabled); }
 .sf-cnt.zero b { font-weight: 400; }
 .sf-cnt.zero .ixd { opacity: .4; }
-.sf-cnt .ixd.crit, .sf-cnt .ixd.warn { width: 12px; height: 12px; }
-.sf-cnt .ixd.ok { width: 6px; height: 6px; margin: 0 2px; background-color: var(--text-tertiary); }
-.sf-cnt .ixd.crit, .sf-cnt .ixd.warn { width: 12px; height: 12px; }
+.sf-cnt .ixd.crit, .sf-cnt .ixd.warn { width: 14px; height: 14px; }
+.sf-cnt .ixd.ok { width: 8px; height: 8px; margin: 0 3px; background-color: var(--text-tertiary); }
 /* 미션 칸 — bg/map-chip 50%, 위에서 떨어지는 안쪽 그림자(Delta 요약 칸과 같은 꺼짐) */
 .sf-mwell { flex: 1 0 auto; display: flex; flex-direction: column; background-color: color-mix(in srgb, var(--bg-map-chip) 50%, transparent); box-shadow: inset 0 10px 8px 0 rgb(0 0 0 / 25%); }
 /* 미션 줄 왼쪽 단계 선은 뺐다(10/30) — 이름 앞 ⓧ/△ 와 같은 말을 두 번 해 빨강이 겹쳤다. 비운 4 는 왼쪽 여백(8 → 12)으로 돌려 글 자리를 지킨다 */
