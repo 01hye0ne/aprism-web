@@ -3,7 +3,7 @@
  *
  *   spot   SPOT 실물 비율 4족. 형광 연두 덮개 · 검은 정강이 · 무릎은 뒤로, 앞쪽 위 회색 탑재 카메라.
  *          옆면 ΔPRISM 로고 · 기체 번호, 뒤쪽 위 빨간 비상정지.
- *   wheel  휠 로봇(모베드) — 회색 직사각 몸통, 네 모서리 큰 바퀴와 은색 휠캡.
+ *   wheel  휠 로봇(모베드) — 회색 직사각 몸통, 네 모서리 큰 바퀴와 은색 휠캡. 앉으면(충전중) 2D 모베드처럼 바퀴를 모으고 내려앉는다.
  *
  * 시안은 제자리에서 도는 걸음이었다. 지도에서는 길을 따라 앞으로 걸으므로 발을 앞뒤로 내딛게 바꿨다
  * (대각선 두 쌍이 번갈아 들고, 든 발은 앞으로 · 디딘 발은 뒤로). 앉기는 시안 그대로 — 몸이 300mm 내려앉고 무릎이 접힌다.
@@ -271,9 +271,10 @@
       var dashGeo = new THREE.BoxGeometry(0.006, 0.022, 0.004);
       var colGeo = new THREE.BoxGeometry(0.06, 0.11, 0.05);
       var axleGeo = new THREE.CylinderGeometry(0.025, 0.025, 0.05, 16); axleGeo.rotateX(Math.PI / 2);
-      var spins = [];
+      var spins = [], mods = [];
       [-1, 1].forEach(function (sx) { [-1, 1].forEach(function (sz) {
         var g = new THREE.Group(); g.position.set(sx * 0.36, WRAD, sz * 0.24); wheel.add(g);
+        mods.push({ g: g, sx: sx });
         var spin = new THREE.Group(); g.add(spin);
         spin.add(new THREE.Mesh(tireGeo, tireMat), new THREE.Mesh(hubGeo, WM.under));
         var cap = new THREE.Mesh(capGeo, WM.cap); cap.position.z = sz * 0.048; spin.add(cap);
@@ -288,13 +289,36 @@
       var wShadow = new THREE.Mesh(new THREE.PlaneGeometry(0.95, 0.68), shadowMat); wShadow.rotation.x = -Math.PI / 2; wShadow.position.y = 0.004; wheel.add(wShadow);
       wheel.rotation.y = Math.PI / 2;   // 긴 축을 진행 방향에 맞춤: +x 끝이 앞(-z)
 
-      var speed = 0;
+      // 몸(바퀴 모듈 · 그림자를 뺀 전부)을 한 묶음으로 — 앉을 때 몸만 내려앉힌다
+      var hull = new THREE.Group();
+      wheel.children.slice().forEach(function (c) {
+        if (c !== wShadow && !mods.some(function (m) { return m.g === c; })) { hull.add(c); }
+      });
+      wheel.add(hull);
+
+      /*
+       * 앉기(충전중) — 2D 모베드(Figma 1412:16401)와 같은 움직임: 앞뒤 바퀴가 몸 가운데 쪽으로 모이며 구르고, 몸이 내려앉는다.
+       * 2D 에서 바퀴 사이가 84 → 48(0.57 배), 몸이 바퀴 반지름의 0.3 만큼 내려간 것을 그대로 옮겼다 — 바퀴 x 0.36 → 0.205, 몸 -0.045.
+       * 바퀴는 몸 바깥(z ±0.24)에 붙어 있어 모여도 몸과 겹치지 않는다. 모이는 동안 미끄러지지 않게 간 거리만큼 구른다.
+       */
+      var MOVE_X = 0.155, DROP = 0.045;
+      var speed = 0, sit = 0, shown = 0;
+      var ease = function (t) { return t * t * (3 - 2 * t); };
       return {
         group: root,
-        // 걸을 때(이동)만 바퀴가 앞으로 구른다 — 서면 천천히 멈춘다. 휠 로봇은 앉기가 없다
+        // 걸을 때(이동)만 바퀴가 앞으로 구른다 — 서면 천천히 멈춘다
         update: function (dt, motion) {
           speed += ((motion === "walk" ? 1 : 0) - speed) * Math.min(1, dt * 4);
           spins.forEach(function (s) { s.rotation.z -= speed * dt * 0.5 / WRAD; });
+          sit += Math.max(-dt * 1.1, Math.min(dt * 1.1, (motion === "sit" ? 1 : 0) - sit));
+          var e = ease(sit), de = e - shown;
+          shown = e;
+          mods.forEach(function (m, i) {
+            m.g.position.x = m.sx * (0.36 - MOVE_X * e);
+            spins[i].rotation.z += m.sx * MOVE_X * de / WRAD;   // 안쪽으로 간 만큼 구른다
+          });
+          hull.position.y = -DROP * e;
+          wShadow.scale.x = 1 - 0.35 * e;
         }
       };
     }
