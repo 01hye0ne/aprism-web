@@ -1776,6 +1776,60 @@
     return dots;
   }
 
+  /*
+   * [10/29 v5] 바닥에 눕힌 웨이포인트 표식 — 고리 · 점 · 점선 고리 · 고른 고리를 화면을 보는 점(stopDots) 대신 바닥 판으로 깐다.
+   * 아이소 구도에서 바닥에 꽂힌 자리가 정면을 보면 바닥 위에 뜬 UI 로 읽힌다(디자이너, 레퍼런스: 바닥 표식은 눕고 라벨은 선다).
+   * 그림(stopTexture)은 그대로 쓰고 판만 눕힌다 — 원이라 지도를 돌려도 늘 가로로 긴 타원이 되고, 납작한 정도는 카메라 기울기를 따른다.
+   * 크기는 지금 시점에서 화면 size px(× 핀과 같은 확대 배율 pz)가 되게 월드 크기로 잰다. 시점이 바뀌면 rrCamWatch 가 다시 깐다.
+   * 세모(주의 · 위험)는 서 있는 경고 표지라 눕히지 않는다(stopDots 그대로). 설비에 가려지지 않는 것(depthTest 끔)은 예전과 같다.
+   */
+  var _fsQ = null, _fsM = null, _fsP = null, _fsS = null;
+  function floorPx(spot) {   // 그 자리에서 화면 1px 의 월드 길이
+    var d = camera.position.distanceTo(spot);
+    return 2 * d * Math.tan(camera.fov * Math.PI / 360) / (camera.zoom || 1) / (view.clientHeight || 1);
+  }
+  function floorPlate(spots, color, tex, sizePx, order, opacity) {
+    var geo = new THREE.PlaneGeometry(1, 1); geo.rotateX(-Math.PI / 2);
+    var mat = new THREE.MeshBasicMaterial({ color: color, map: tex, transparent: true, opacity: opacity == null ? 0.95 : opacity, depthWrite: false, depthTest: false });
+    var m = new THREE.InstancedMesh(geo, mat, spots.length);
+    _fsQ = _fsQ || new THREE.Quaternion(); _fsM = _fsM || new THREE.Matrix4(); _fsP = _fsP || new THREE.Vector3(); _fsS = _fsS || new THREE.Vector3();
+    var pz = Math.min(2.2, Math.max(0.8, Math.pow(zoom, 0.75)));   // 핀(rrPins)과 같은 확대 배율
+    spots.forEach(function (s, i) {
+      var w = sizePx * pz * floorPx(s);
+      _fsP.copy(s); _fsP.y += span * 0.0006;   // 길 띠 바로 위
+      _fsM.compose(_fsP, _fsQ, _fsS.set(w, 1, w));
+      m.setMatrixAt(i, _fsM);
+    });
+    m.instanceMatrix.needsUpdate = true;
+    m.renderOrder = order;
+    m.frustumCulled = false;
+    m.raycast = function () {};
+    return m;
+  }
+  function floorStops(spots, color, kind, size) {
+    if (!camera) { return stopDots(spots, color, kind, size); }   // 카메라 전에는 크기를 못 잰다 — 점으로 깔고, 시점이 서면 rrCamWatch 가 다시 깐다
+    var mark = floorPlate(spots, color, stopTexture(kind), size || 15, 3);
+    if (kind === "ring" || kind === "full") {   // 속 판 — 바탕색 원(stopDots 와 같다)
+      var back = floorPlate(spots, new THREE.Color(stopFill()), stopTexture("disc"), size || 15, 2.9);
+      stopBacks.push(back);
+      mark.add(back);
+    }
+    return mark;
+  }
+  // 바닥 빛 — 다음 지점 · 주의 · 위험 지점에만(레퍼런스의 발광 판). 나머지까지 빛나면 지도가 시끄럽다
+  var floorGlowTex = null;
+  function floorGlow(spots, color, size) {
+    if (!camera) { return new THREE.Group(); }
+    if (!floorGlowTex) {
+      var c = document.createElement("canvas"); c.width = c.height = 128;
+      var g = c.getContext("2d"), r = g.createRadialGradient(64, 64, 0, 64, 64, 64);
+      r.addColorStop(0, "rgba(255,255,255,0.9)"); r.addColorStop(0.35, "rgba(255,255,255,0.45)"); r.addColorStop(1, "rgba(255,255,255,0)");
+      g.fillStyle = r; g.fillRect(0, 0, 128, 128);
+      floorGlowTex = new THREE.CanvasTexture(c);
+    }
+    return floorPlate(spots, color, floorGlowTex, size, 2.8, isLight() ? 0.45 : 0.6);
+  }
+
   /* ---------- 웨이포인트 ----------
    *
    * 지도의 웨이포인트와 우측 미션 목록은 같은 것을 가리킨다. 이름(waypointId)도 같다.
@@ -1864,8 +1918,8 @@
   function clearWaypoints() {
     wpMarks.forEach(function (mark) {
       scene.remove(mark);
-      mark.geometry.dispose();
-      mark.material.dispose();
+      if (mark.geometry) { mark.geometry.dispose(); }   // 바닥 빛 자리를 비워 둔 빈 묶음(Group)은 없다
+      if (mark.material) { mark.material.dispose(); }
     });
     wpMarks = [];
     wpSpots = [];
@@ -1977,11 +2031,19 @@
       // if (wk === "ring" || (wk === "dash" && tone !== "safe" && tone !== "skipped")) { ws = 19; }   // 번호는 앞으로 갈 지점에만 — 지나온 점 · 세모는 원래 크기
       var wc = (RR.wpExcept && tone === "safe" && onLane.bot) ? (RRS.mode === "done" ? RR_GRAY : onLane.bot.left) : wpTint(tone);   // 지나온 정상 — 길과 같은 색
       if (RR.ahead === "C4" && tone === "upcoming") { wc = isLight() ? 0xf2f4f7 : 0x141b27; }
-      var mark = stopDots(bucket[key], wc, wk, ws);
+      var mark = (RR.floorMarks && wk !== "tri") ? floorStops(bucket[key], wc, wk, ws) : stopDots(bucket[key], wc, wk, ws);
       mark.userData.floor = key.split("|")[0];
       mark.userData.tone = wk === "disc" ? null : tone;   // 테마가 바뀌면 applyTheme 이 이 이름으로 다시 칠한다(길색 점은 길을 다시 깔 때 칠한다)
       scene.add(mark);
       wpMarks.push(mark);
+      // [10/29] 다음 지점 · 주의 · 위험 — 표식 아래 바닥에 은은한 빛
+      if (RR.floorMarks && key.split("|")[2] !== "o" && /current|next|active|caution|danger/.test(tone)) {
+        var glow = floorGlow(bucket[key], wpTint(tone), tone === "caution" || tone === "danger" ? 46 : 52);
+        glow.userData.floor = mark.userData.floor;
+        glow.userData.tone = glow.material ? tone : null;   // 카메라 전 빈 묶음은 칠할 재질이 없다
+        scene.add(glow);
+        wpMarks.push(glow);
+      }
     });
     wpFloorSync();
 
@@ -2003,7 +2065,7 @@
     }
     var found = wpSpots.filter(function (w) { return w.id === chosenWp; });
     if (!found.length || !scene) { return; }
-    wpHalo = stopDots(found.map(function (w) { return w.spot; }), WP_HALO, "halo", 28);
+    wpHalo = (RR.floorMarks ? floorStops : stopDots)(found.map(function (w) { return w.spot; }), WP_HALO, "halo", 28);   // 고른 고리도 바닥에 눕는다(안의 표식과 같은 타원)
     wpHalo.renderOrder = 4;
     wpHalo.userData.floor = found[0].floor || "";
     if (wpHalo.userData.floor) { wpHalo.visible = wpHalo.userData.floor === floorNow; }
@@ -2732,7 +2794,7 @@
    * 지나온 길 38% · 지금 가는 길(로봇 → 다음 웨이포인트) 진한 실선 + 진행 방향 흐름 · 앞으로 갈 길 점선.
    * 흐름은 머리가 흰 혜성이고, 지금 가는 길에만 지나간다(지도에서 움직이는 선은 하나).
    */
-  var RR = { doneAlpha: 0.38, wpExcept: true, k: 2.85, lanes: "side", occl: false, prune: false, ahead: "A", pins: "P0", pastNo: "on", flow: "floor", thin: "on" };   // thin — 번호가 화면에서 겹치면 중요한 번호만 남긴다(지점이 많을 때)   // flow — 흐름 빛 round 화면 선(둥근 머리) / floor 바닥에 깐 띠(머리를 길과 직각으로 자름, 원근을 받음)   // pastNo — 지나온 지점 번호 off 숨김 / on 옅게   // [10/22 실험] ahead — 앞으로 갈 길 A 점선 / C4 바닥에 칠한 실선. pins — P0 핀 / P1 바닥 번호 / P2 바닥에 눕힌 번호   // [10/22] k 1.9→2.85 — 경로 선을 자동복귀 도로 굵기 정도로   // occl — 가려짐 F(가려진 길·빔 점선, 가려진 지점 점선 고리). 10/22 보류   // lanes — 겹치는 길: side 나란히(기본, 10/22) / stack 겹치기   // k — 시안(SVG)은 선이 지도 크기만큼 커진다. 같은 굵기로 보이게 곱한다
+  var RR = { doneAlpha: 0.38, wpExcept: true, k: 2.85, lanes: "side", occl: false, prune: false, ahead: "A", pins: "P0", pastNo: "on", flow: "floor", thin: "on", floorMarks: true };   // floorMarks — [10/29] 웨이포인트 표식을 바닥에 눕힌다(floorStops)   // thin — 번호가 화면에서 겹치면 중요한 번호만 남긴다(지점이 많을 때)   // flow — 흐름 빛 round 화면 선(둥근 머리) / floor 바닥에 깐 띠(머리를 길과 직각으로 자름, 원근을 받음)   // pastNo — 지나온 지점 번호 off 숨김 / on 옅게   // [10/22 실험] ahead — 앞으로 갈 길 A 점선 / C4 바닥에 칠한 실선. pins — P0 핀 / P1 바닥 번호 / P2 바닥에 눕힌 번호   // [10/22] k 1.9→2.85 — 경로 선을 자동복귀 도로 굵기 정도로   // occl — 가려짐 F(가려진 길·빔 점선, 가려진 지점 점선 고리). 10/22 보류   // lanes — 겹치는 길: side 나란히(기본, 10/22) / stack 겹치기   // k — 시안(SVG)은 선이 지도 크기만큼 커진다. 같은 굵기로 보이게 곱한다
   var RR_N = 14, rrReduce = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
   var rrOn = false, rrLast = 0, rrPh = 0, rrPrev = 0;   // rrPh — 흐름이 지나온 시간(초), 프레임마다 쌓는다
   function rrFlat(pts) { var f = []; pts.forEach(function (q) { f.push(q.x, q.y, q.z); }); return f; }
