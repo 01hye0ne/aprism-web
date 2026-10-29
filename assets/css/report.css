@@ -398,6 +398,8 @@
   background: linear-gradient(var(--bg-glass), var(--bg-glass)), color-mix(in srgb, var(--bg-page) 85%, transparent);
   -webkit-backdrop-filter: blur(20px);
   backdrop-filter: blur(20px);
+  /* 배경 블러가 걸린 칸은 부모(.rp-detail)의 둥근 모서리 자르기를 벗어난다(Chrome) — 위 두 모서리를 판과 같이 직접 둥글린다 */
+  border-radius: var(--radius-8) var(--radius-8) 0 0;
 }
 .rp-detail .rp-viewer { padding-top: 0; }
 .rp-detail .rp-toc,
