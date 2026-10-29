@@ -166,7 +166,12 @@
 .sf-monb > .sf-meta { padding: 0 var(--space-12); }
 .sf-side .sf-mon .m2 { gap: var(--space-8); padding: 0; }
 .sf-mon .m2b { padding: 0 var(--space-12); }
-.sf-mon .m2v { width: 100%; height: auto; max-height: 400px; margin: 0; border: 0; border-radius: 0; }   /* 테는 바깥(.sf-monb)이 맡는다 */
+.sf-mon .m2v { width: 100%; height: auto; max-height: 400px; margin: 0; border: 0; border-radius: 0; }
+/* 고른 미션 지도도 가로형(10/30) — 접힌 줄 썸네일과 같은 방향(-90°). 칸 너비 = 돌린 지도의 높이(100cqw), 칸 높이는 평면 비율(888:1418)로 정한다.
+   지점 이름(.wpn)은 글자가 눕지 않게 제자리에서 되돌린다 */
+.sf-mon .m2rot { position: relative; container-type: inline-size; aspect-ratio: 1418 / 888; overflow: hidden; }
+.sf-mon .m2rot .m2v { position: absolute; left: 50%; top: 50%; width: auto; height: 100cqw; max-height: none; transform: translate(-50%, -50%) rotate(-90deg); }
+.sf-mon .m2rot .wpn { transform-box: fill-box; transform-origin: center; transform: rotate(90deg); }   /* 테는 바깥(.sf-monb)이 맡는다 */
 .sf-mmap { flex: none; width: 72px; border: var(--border-width-thin) solid var(--border-default); border-radius: var(--radius-4); overflow: hidden; }
 /* 가로형 썸네일(10/30) — 120 × 키-값 높이. 평면도는 세로로 길어 -90° 돌려 넣는다(가로 칸에 그대로 넣으면 가운데 작게 남는다) */
 .sf-mbody > .sf-mmap { position: relative; align-self: stretch; width: 120px; min-height: 62px; }
