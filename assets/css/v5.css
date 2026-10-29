@@ -163,3 +163,14 @@ body.ver-5 [data-r2="sit"] .mb-spin-r { animation: mb-sit-spin-r 0.9s 0.15s ease
 @media (prefers-reduced-motion: reduce) {
   body.ver-5 .robot-2d * { animation-duration: 0s !important; animation-delay: 0s !important; animation-iteration-count: 1 !important; }
 }
+
+/*
+ * [10/29] 관제 왼쪽 목록 상자(최신 알림 · 오늘 확인 완료) 면 = 보고서 왼쪽 목록과 같은 bg/map-chip(다크 #0A0E15 50% · 라이트 gray/300 40%).
+ * 예전: 다크 bg/inset(#070A10 18%) · 라이트 흰 면(bg/raised). 라이트는 흰 면에 맞춰 위아래 끝을 흰색으로 녹이던(10/20) 것을 걷고,
+ * 면 색과 상관없는 옅은 그림자(위 inset 8% · 아래 6%)로 되돌린다 — 회색 면에 흰 띠가 끼지 않게.
+ */
+body.ver-5 .ah-box,
+:root[data-theme="light"] body.ver-5 .ah-box { background-color: var(--bg-map-chip); }
+:root[data-theme="light"] body.ver-5 .ah-box::before { content: none; }
+:root[data-theme="light"] body.ver-5 .ah-box.is-scrolled { box-shadow: inset 0 10px 8px rgb(0 0 0 / 8%); }
+:root[data-theme="light"] body.ver-5 .ah-box.has-fade::after { background: linear-gradient(rgb(0 0 0 / 0%), rgb(0 0 0 / 6%)); }
