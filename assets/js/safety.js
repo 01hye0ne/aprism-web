@@ -406,6 +406,13 @@
   function render(){
     pv.hidden = true;
     v.innerHTML = view();   // 자세히 보기가 dt.wp · dt.lk 를 정하므로 본문을 먼저 그린다
+    // [10/30] 스크롤은 머리 아래만 — 머리(.hd)와 감지 머리 줄(.mhead)은 .sftop 에 남기고 나머지를 .sfsc 로 감싼다
+    const top = document.createElement('div'), sc = document.createElement('div'), hd = v.querySelector(':scope > .hd'), mh = v.querySelector('.mhead');
+    top.className = 'sftop'; sc.className = 'sfsc';
+    if(hd){ top.appendChild(hd); if(mh) top.appendChild(mh); }
+    while(v.firstChild) sc.appendChild(v.firstChild);
+    if(hd) v.appendChild(top);
+    v.appendChild(sc);
     bc.innerHTML = crumb();
     side.innerHTML = sideHtml();
     requestAnimationFrame(() => v.querySelectorAll('canvas[data-spec3]').forEach(spec3));

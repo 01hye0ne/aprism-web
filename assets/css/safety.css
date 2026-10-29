@@ -29,7 +29,7 @@
   background-color: var(--bg-frame);
   overflow: hidden;
 }
-.sf-side { position: relative; min-height: 0; display: flex; flex-direction: column; border-right: var(--border-width-thin) solid var(--border-divider); overflow: hidden; }
+.sf-side { position: relative; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }   /* 오른쪽 선 없음 — 본문 판이 8 띄워 떠 있어 경계가 된다(10/30) */
 /* 패널 머리 — 보고서 .rp-phead 와 같다: 안쪽 12 · 사이 8 · 아래 구분선 양끝까지 */
 .sf-phead { flex: none; display: flex; align-items: center; gap: var(--space-8); padding: var(--space-12); border-bottom: var(--border-width-thin) solid var(--border-default); }
 .sf-ptog { display: grid; place-items: center; width: 20px; height: 20px; color: var(--text-primary) !important; }
@@ -48,7 +48,11 @@
 :where(.sf) :where(h1, h4, h5, p) { margin: 0; }
 .sf b { font-weight: inherit; }
 
-#sfv { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: var(--space-12); padding: 0 var(--space-20) var(--space-20); overflow: auto; transition: opacity .14s; }
+#sfv { flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: hidden; transition: opacity .14s; }
+/* [10/30] 스크롤은 머리 아래만 — safety.js render() 가 머리(.hd + 감지 머리 줄)를 .sftop 으로, 나머지를 .sfsc 로 나눈다. 막대 자리는 늘 비워 둬(12) 머리 열과 카드 열이 어긋나지 않는다 */
+.sf .sftop { flex: none; border-bottom: var(--border-width-thin) solid var(--border-divider); border-radius: var(--radius-8) var(--radius-8) 0 0; background: linear-gradient(var(--bg-glass), var(--bg-glass)), var(--bg-page); }
+.sf .sfsc { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: var(--space-12); padding: var(--space-12) var(--space-8) var(--space-20) var(--space-20); overflow: auto; scrollbar-gutter: stable; }
+.sf .sfsc:only-child { padding-top: var(--space-16); }   /* 머리 없는 깊이(자세히 보기) */
 #sfv.xfade, #sfv.xin { opacity: 0; }
 
 /* 글자 단계 — 시안 클래스에 그대로 건다(값은 app-shell .t-* 와 같다) */
@@ -58,15 +62,8 @@
 .sf .lvA .tt h5 { font-size: var(--font-size-24); line-height: var(--font-line-height-32); font-weight: 600; letter-spacing: -0.01em; }
 
 /* ---------- 머리 — 제목 · 라이브 · 요청 전 건수 · 카드/표 ---------- */
-/*
- * 머리 — 보고서 머리(.rp-dh)와 같은 유리 띠: bg/glass 아래 bg/page 85% 한 겹 + 배경 블러 20, 아래 border/divider, 위 14 · 좌우 20 · 아래 12.
- * 판 양끝까지 닿고(#sfv 좌우 20 을 음수로 되돌린다) 위에 붙어 있어 카드가 머리 뒤로 흐리게 지나간다.
- * 전체 카드 화면은 감지 머리 줄(.mhead)이 바로 아래 이어 붙어 한 띠가 되고, 선은 감지 머리 줄 아래에만 있다.
- */
-.sf .hd { --sf-hd-h: 56px; position: sticky; top: 0; z-index: 6; flex: none; display: flex; align-items: center; gap: var(--space-8); height: var(--sf-hd-h); margin: 0 calc(var(--space-20) * -1); padding: 14px var(--space-20) var(--space-12); border-bottom: var(--border-width-thin) solid var(--border-divider); }
-.sf .hd, .sf .mhead { background: linear-gradient(var(--bg-glass), var(--bg-glass)), color-mix(in srgb, var(--bg-page) 85%, transparent); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); }
-#sfv > :first-child:not(.hd) { margin-top: var(--space-16); }   /* 머리 없는 깊이(자세히 보기)는 판 위에서 16 띄운다 */
-#sfv > .hd:has(+ .msecs) { margin-bottom: calc(var(--space-12) * -1); border-bottom-color: transparent; }
+/* 머리 — 보고서 머리(.rp-dh)와 같은 유리 띠(.sftop) 안. 위 14 · 좌우 20 · 아래 12. 전체 카드 화면은 감지 머리 줄이 바로 아래 이어 붙는다 */
+.sf .hd { flex: none; display: flex; align-items: center; gap: var(--space-8); padding: 14px var(--space-20) var(--space-12); }
 .sf .hd .lvh { align-self: center; }
 .sf .hd .lvh .badge-dot { animation: sf-blink 1.6s ease-in-out infinite; }
 .sf .hd .sp { flex: 1; }
@@ -287,7 +284,7 @@
 /* ---------- 전체 카드 — 미션마다 한 줄, 넘은 결과만 ---------- */
 .sf .msecs { display: flex; flex-direction: column; gap: 0; }
 /* 감지 열 머리 — 표 머리와 같은 이름 · 기준. 본문을 스크롤해도 위에 붙는다. 열은 묶음 안 카드 격자와 같다(묶음 안쪽 12 + 테 1) */
-.sf .mhead { position: sticky; top: 56px; z-index: 5; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: var(--space-8); margin: 0 calc(var(--space-20) * -1) var(--space-4); padding: var(--space-4) calc(var(--space-20) + var(--space-12)) var(--space-8); border-bottom: var(--border-width-thin) solid var(--border-divider); }   /* top = 머리 높이(.hd --sf-hd-h) */
+.sf .mhead { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: var(--space-8); padding: 0 calc(var(--space-8) + 12px + var(--space-12)) var(--space-8) calc(var(--space-20) + var(--space-12)); }   /* 열 = 아래 카드 열(본문 왼 20 + 묶음 12, 오른 8 + 막대 12 + 묶음 12) */
 .sf .mhead span { display: flex; flex-direction: column; }
 .sf .mhead b { font-size: var(--font-size-13); line-height: var(--font-line-height-18); font-weight: 700; color: var(--text-primary); }
 .sf .mhead small { font-size: var(--font-size-12); line-height: var(--font-line-height-18); color: var(--text-tertiary); }
