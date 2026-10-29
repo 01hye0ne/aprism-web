@@ -158,15 +158,17 @@
 /* 미션 줄 왼쪽 단계 선은 뺐다(10/30) — 이름 앞 ⓧ/△ 와 같은 말을 두 번 해 빨강이 겹쳤다. 비운 4 는 왼쪽 여백(8 → 12)으로 돌려 글 자리를 지킨다 */
 .sf-side .sf-mwell .sf-mrow { border: 0; padding-left: var(--space-12); }
 /*
- * 고른 미션(10/30) — 제목 줄과 [관제에서 보기]는 테 밖 한 줄, 그 아래 테(border/default · 모서리 8) 하나에 정보(키-값) + 지도. 면(bg/selected)은 깔지 않는다 —
- * 펼쳐진 테가 "고른 미션"을 말한다.
+ * 고른 미션(10/30) — 제목 줄과 [관제에서 보기]는 테 밖 한 줄, 그 아래 테(border/default · 모서리 8) 하나에 정보(키-값) + 지도.
+ * 고른 묶음 전체(제목 줄 ~ 테 아래 12)에 면(bg/selected)을 칸 끝에서 끝까지 깔고, 테 안은 지도 바탕(bg/inset)으로 채워 지도와 한 판이 된다.
  */
-.sf-mon { display: flex; flex-direction: column; gap: var(--space-8); padding: 0 var(--space-12) var(--space-12); }
+.sf-mon { display: flex; flex-direction: column; gap: var(--space-8); padding: 0 var(--space-12) var(--space-12); background-color: var(--bg-selected); }
 .sf-monh { display: flex; align-items: center; gap: var(--space-8); }
 .sf-side .sf-mwell .sf-mon .sf-mrow { flex: 1; min-width: 0; padding: var(--space-12) 0 0; }
 .sf-side .sf-mwell .sf-mon .sf-mrow.on, .sf-side .sf-mwell .sf-mon .sf-mrow:hover { background: none; }
 .sf-mon .m2go { margin-top: var(--space-12); }
-.sf-monb { display: flex; flex-direction: column; gap: var(--space-12); padding-top: var(--space-12); border: var(--border-width-thin) solid var(--border-default); border-radius: var(--radius-8); overflow: hidden; }
+.sf-monb { display: flex; flex-direction: column; gap: var(--space-12); padding-top: var(--space-12); border: var(--border-width-thin) solid var(--border-default); border-radius: var(--radius-8); background-color: var(--bg-cell); overflow: hidden; }   /* 지도 바탕 — bg/inset 은 밝은 선택 면 위에서 설비 칸(border/default)과 같은 색이 돼 bg/cell 로 한 단 내린다 */
+.sf-monb .m2v .bg { fill: transparent; }
+.sf-monb .m2f button.on { background-color: var(--bg-selected); }   /* 고른 층 — 테 안 바탕(bg/cell)과 같아지지 않게 */   /* 지도 바탕은 테(.sf-monb)가 깐다 — 두 겹으로 어두워지지 않게 */
 .sf-monb > .sf-meta { padding: 0 var(--space-12); }
 .sf-side .sf-mon .m2 { gap: var(--space-8); padding: 0; }
 .sf-mon .m2b { padding: 0 var(--space-12); }
