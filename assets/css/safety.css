@@ -135,14 +135,18 @@
 .sf-mrow { display: flex; align-items: flex-start; gap: var(--space-8); width: 100%; padding: var(--space-12) var(--space-8); text-align: left; }
 .sf-mrow:hover { background-color: var(--state-hover); }
 .sf-mrow.on { background-color: var(--bg-selected); cursor: default; }
-/* [미션 전체] 줄 — 미션 줄과 같은 꼴. 썸네일 자리(72)는 단계별 미션 수 블록(위험 · 주의 · 정상) */
-.sf-allsum { align-self: stretch; display: flex; flex-direction: column; justify-content: center; gap: var(--space-8); padding: var(--space-8) var(--space-12); background-color: var(--bg-cell); }
-.sf-cnt { display: inline-flex; align-items: center; gap: var(--space-8); font-size: var(--font-size-14); line-height: var(--font-line-height-20); font-weight: 700; color: var(--text-secondary); }
+/* [미션 전체] 줄 — 미션 줄과 같은 꼴. 썸네일 자리(72)는 단계별 미션 수 블록(위험 · 주의 · 정상).
+   블록 세 줄은 옆 키-값 세 줄(미션 · 측정 · 요청 전)과 같은 높이(18 + 사이 4)로 아래에 붙여 한 줄 맞춤으로 읽힌다 */
+.sf-allsum { align-self: stretch; display: flex; flex-direction: column; justify-content: flex-end; gap: var(--space-4); padding: 0 var(--space-8) var(--space-4); background-color: var(--bg-cell); }
+.sf-all .sf-mtx { padding-bottom: 5px; }   /* 블록 아래 여백 4 + 테 1 만큼 글 칸도 내려 세 줄 높이를 맞춘다 */
+.sf-cnt { display: flex; align-items: center; gap: var(--space-4); font-size: var(--font-size-13); line-height: var(--font-line-height-18); color: var(--text-secondary); white-space: nowrap; }
+.sf-cnt b { margin-left: auto; font-weight: 700; }
 .sf-cnt.crit { color: var(--status-critical-text); }
 .sf-cnt.warn { color: var(--status-warning-text); }
-.sf-cnt.zero { color: var(--text-disabled); font-weight: 400; }
+.sf-cnt.zero { color: var(--text-disabled); }
+.sf-cnt.zero b { font-weight: 400; }
 .sf-cnt.zero .ixd { opacity: .4; }
-.sf-cnt .ixd.ok { width: 8px; height: 8px; margin: 0 3px; background-color: var(--text-tertiary); }
+.sf-cnt .ixd.ok { width: 8px; height: 8px; margin: 0 2px; background-color: var(--text-tertiary); }
 .sf-cnt .ixd.crit, .sf-cnt .ixd.warn { width: 12px; height: 12px; }
 /* 미션 칸 — bg/map-chip 50%, 위에서 떨어지는 안쪽 그림자(Delta 요약 칸과 같은 꺼짐) */
 .sf-mwell { flex: 1 0 auto; display: flex; flex-direction: column; background-color: color-mix(in srgb, var(--bg-map-chip) 50%, transparent); box-shadow: inset 0 10px 8px 0 rgb(0 0 0 / 25%); }
@@ -160,7 +164,7 @@
 .sf-mtx .t-caption { color: var(--text-tertiary); }
 /* 키-값 — 키 12 tertiary, 값 13 secondary(Figma 값 글자가 12/13 · primary/secondary 로 섞여 있어 많은 쪽으로 맞췄다) */
 .sf-meta { display: flex; flex-direction: column; gap: var(--space-4); }
-.sf-kv { display: flex; align-items: baseline; gap: var(--space-12); }
+.sf-kv { display: flex; align-items: center; gap: var(--space-12); height: 18px; }
 .sf-kv .k { flex: none; min-width: 35px; font-size: var(--font-size-12); line-height: var(--font-line-height-18); color: var(--text-tertiary); }
 .sf-kv .v { min-width: 0; font-size: var(--font-size-13); line-height: var(--font-line-height-18); color: var(--text-secondary); }
 
