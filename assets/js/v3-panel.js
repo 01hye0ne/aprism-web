@@ -152,6 +152,7 @@
 // 문구는 monitor.js 가 갈아 끼우므로 글이 바뀌면 다시 감싸고 맨 위로 돌린다. 가로형 · 펼친 창은 손대지 않는다.
 (function () {
   if (!document.body.classList.contains("ver-3")) { return; }
+  if (document.body.getAttribute("data-delta-copy") === "brief") { return; }   // 두 줄 요약(v5 · 10/29)은 넘치지 않아 스크롤이 없다
   var win = document.querySelector("[data-delta3]");
   var box = win && win.querySelector(".delta3-body");
   var p = box && box.querySelector(".ai-line-2");

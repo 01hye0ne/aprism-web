@@ -89,7 +89,7 @@
   var CRITICAL = { sev: "critical", robot: 0, floor: "B4", wp: "WP-04", live: "ppe", where: "터빈 2 / Unit 03 · WP-04 N₂ 배관 압력계", time: "10:12:40",
     title: "지하발전소 B3 터빈 2 NG 1건 발견", detect: "계기인식",
     sum: "Spiral Casing Pr. 측정값 90 이 기준값 87 을 넘었습니다. 최근 3회 측정이 잇달아 올라 NG 로 판정했습니다.",
-    lead: "현장에 무전으로 작업 중지를 요청하세요.", fp: 8, fpLabel: "낮음",
+    lead: "현장에 무전으로 작업 중지를 요청하세요.", fp: 8, fpLabel: "낮음", brief: ["WP-04 압력계가 NG예요.", "작업 중지부터 요청하세요."],
     acts: [{ t: "현장 무전 연락 · 작업 중지 요청", ai: true }, { t: "로봇 정지 · 현장 점검 요청", ai: true }, { t: "재측정 후 판단" }] };
 
   // v2.2 — 제목의 층(B3)이 층 꼬리표(B4)와 어긋나 뺐다(10/19 디자이너). 예전 판(v2 · v2.1)은 그대로다.
@@ -101,7 +101,7 @@
     { sev: "critical", robot: 10, floor: "B3", wp: "WP-02", live: "ppe", where: "Robot 11 · WP-02 HEPA Filter 차압계", time: "09:44:18",
       title: "차압 NG · HEPA Filter 차압계", detect: "계기인식",
       sum: "차압 312 Pa 로 교체 기준 250 Pa 를 넘었습니다. 최근 3회 측정이 잇달아 올라 NG 로 판정했습니다.",
-      lead: "필터 교체와 현장 점검을 요청하세요.", fp: 9, fpLabel: "낮음",
+      lead: "필터 교체와 현장 점검을 요청하세요.", fp: 9, fpLabel: "낮음", brief: ["WP-02 차압계가 NG예요.", "필터 교체부터 요청하세요."],
       acts: [{ t: "필터 교체 요청", ai: true }, { t: "현장 점검 요청", ai: true }, { t: "재측정 후 판단" }] },
     { sev: "warning", robot: 10, floor: "B3", wp: "WP-04", live: "discharge", where: "Robot 11 · WP-04 N₂ 배관 압력계", time: "10:15:52",
       title: "압력 편차 · N₂ 배관 압력계", detect: "계기인식",
@@ -147,7 +147,7 @@
     var crit = all.filter(function (a) { return a.sev === "critical"; }).length;
     var warn = all.length - crit;
     var level = all.length < DELTA_MIN ? "normal" : (crit ? "critical" : "warning");
-    return { level: level, total: all.length, crit: crit, warn: warn };
+    return { level: level, total: all.length, crit: crit, warn: warn, all: all };
   }
 
   /*
@@ -212,6 +212,48 @@
       return copy;
     }
   };
+
+  /*
+   * 두 줄(v5 · 10/29 디자이너 시안 "Delta 두 줄 알림", B 대화체).
+   * 접힘 요약 칸에 두 줄만 둔다 — 1줄(굵게)은 가장 급한 알림의 지점과 판정, 2줄은 그 알림의 AI 추천 조치.
+   * 새 말을 짓지 않고 알림 데이터(brief)에서 가져온다. 2줄은 펼침 첫 버튼 · 알림 상세 AI 추천과 같은 일이다.
+   * 나머지 알림은 근거 줄 아이콘(+N)과 왼쪽 목록이 맡는다. 질문 · 인사 · "~게 좋겠어요" 같은 완충 문구는 없다.
+   * 두 줄은 줄바꿈(\n)으로 잇고, 굵기 · 한 줄 말줄임은 CSS(v5.css)가 맡는다.
+   */
+  function topWarnFloor(all) {
+    var by = {};
+    all.forEach(function (a) {
+      if (a.sev !== "warning" || !a.floor) { return; }
+      (by[a.floor] = by[a.floor] || {})[a.wp] = 1;
+    });
+    var best = null, n = 0;
+    Object.keys(by).forEach(function (f) { var c = Object.keys(by[f]).length; if (c > n) { best = f; n = c; } });
+    return best ? { floor: best, n: n } : null;
+  }
+  COPY.brief = function (j) {
+    var copy = COPY.keyword(j), two;
+    var top = j.all && j.all[0];   // items() 순서 — 위험 먼저, 그다음 오래된 순. [위험 n건부터 조치]가 여는 알림과 같다
+    if (!j.total) {
+      two = ["Robot 01 이상 없어요.", "궁금한 건 물어보세요."];
+    } else if (j.level === "normal") {
+      two = ["확인할 알림이 " + j.total + "건이에요.", "목록에서 하나씩 보세요."];
+    } else if (j.level === "warning") {
+      var f = topWarnFloor(j.all);
+      two = f && f.n > 1 ? [f.floor + " 설비 " + f.n + "곳에서 겹쳐요.", "추세를 묶어서 보세요."]
+                         : ["주의 알림이 " + j.total + "건이에요.", "추세를 묶어서 보세요."];
+    } else {
+      two = top && top.brief ? top.brief : ["위험 알림이 " + j.crit + "건이에요.", "위험 알림부터 보세요."];
+    }
+    copy.line2 = two.join("\n");
+    return copy;
+  };
+
+  // 받침 따라 이/가 — "Robot 01이", "Robot 05가"
+  function josa(word) {
+    var c = word.charCodeAt(word.length - 1);
+    if (c >= 0xac00 && c <= 0xd7a3) { return (c - 0xac00) % 28 ? "이" : "가"; }
+    return /[013678LMNR]$/i.test(word) ? "이" : "가";
+  }
 
   function deltaCopy(j) {
     var mode = body.getAttribute("data-delta-copy");
@@ -412,7 +454,9 @@
     var copy = handover === null ? deltaCopy(j) : {
       tag: "관제사 교대 · 인계",
       line1: "안녕하세요. " + handover + " 님",
-      line2: "인계된 알림 " + j.total + "건과 진행 예정인 미션 1건이 있어요. 먼저 살펴볼까요?"
+      line2: body.getAttribute("data-delta-copy") === "brief"
+        ? "인계 알림이 " + j.total + "건이에요.\n" + (j.crit ? "위험 " + j.crit + "건부터 보세요." : "목록에서 하나씩 보세요.")
+        : "인계된 알림 " + j.total + "건과 진행 예정인 미션 1건이 있어요. 먼저 살펴볼까요?"
     };
     // 테두리와 Delta 가 같은 색을 입는다 — 목록 최고 단계와 종합 판단 중 높은 쪽.
     var tone = TONE[j.level] > TONE[top] ? j.level : top;
@@ -594,7 +638,8 @@
       title: "비상정지 발동 · 로봇 구동 차단",
       robot: activeRobot(), wp: currentWp(),
       sum: "모터 전원이 차단되었습니다. 현장 안전을 확인한 뒤 해제 절차를 진행하세요.",
-      acts: ["현장 무전 연락 · 안전 확인", "해제 절차 진행", "로봇 회수 요청"] };
+      acts: ["현장 무전 연락 · 안전 확인", "해제 절차 진행", "로봇 회수 요청"],
+      brief: [name + josa(name) + " 멈췄어요.", "현장 안전부터 확인하세요."] };
     extra.unshift(a);
     render();
   });
