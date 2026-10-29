@@ -18,8 +18,13 @@
 (function () {
   "use strict";
 
-  // 실물 사진 기준: 형광 연두 덮개와 허벅지, 검은 정강이, 회색 카메라 탑재(시안 "실물 형광")
-  var S = { shell: 0xD3E40A, leg: 0x23282A, joint: 0x1B1E22, foot: 0x111214, rail: 0x15171A, metal: 0x8C929B, cam: 0xC6C9CE, camDark: 0x1A1D22, light: 0x3DFF6E, ink: "#1B2238", seam: "#15171A" };
+  /*
+   * 색 — 우측 패널 2D 일러스트(Figma 566:19167 Robot-grahpics)에 맞췄다(10/29 디자이너). 시안의 "실물 형광" 값에서:
+   *   덮개 · 허벅지  #D3E40A → #E4F400(2D 몸 · 허벅지)        검은 부품(정강이 · 관절 · 발 · 레일 · 카메라 받침) → #070A10
+   *   카메라 상자   #C6C9CE → #D1D5DE(2D 페이로드 위쪽)      비상정지 #E5322D → #FF383C
+   * 검은 부품을 한 색으로만 두면 덩어리가 뭉개져서, 관절 · 발은 #070A10 에서 한 단 밝힌 #1A1F29 로 결만 남긴다.
+   */
+  var S = { shell: 0xE4F400, leg: 0x070A10, joint: 0x1A1F29, foot: 0x1A1F29, rail: 0x070A10, metal: 0x9EA8BB, cam: 0xD1D5DE, camDark: 0x070A10, light: 0x3DFF6E, ink: "#070A10", seam: "#070A10" };
   var FONT = '"SUIT Variable", "SUIT", "Pretendard", "Malgun Gothic", sans-serif';
 
   function build(THREE, kind) {
@@ -84,7 +89,7 @@
         var p = roundedBox(0.15, 0.008, len, 0.003, M.shell); p.position.set(0, TOP + 0.003, z); body.add(p);
         [-1, 1].forEach(function (sx) { [-1, 1].forEach(function (sz) { var b = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, 0.004, 12), M.rail); b.position.set(sx * 0.04, TOP + 0.008, z + sz * (len / 2 - 0.025)); body.add(b); }); });
       });
-      var estop = new THREE.Mesh(new THREE.CylinderGeometry(0.016, 0.018, 0.02, 20), new THREE.MeshStandardMaterial({ color: 0xE5322D, roughness: 0.4 }));
+      var estop = new THREE.Mesh(new THREE.CylinderGeometry(0.016, 0.018, 0.02, 20), new THREE.MeshStandardMaterial({ color: 0xFF383C, roughness: 0.4 }));
       estop.position.set(0.05, TOP + 0.016, 0.39); body.add(estop);
 
       // 앞뒤 얼굴: 가운데 세로 격자, 양옆 카메라창 세 칸, 바깥 세로 홈
@@ -222,14 +227,18 @@
     /* ---------- 휠 로봇(모베드) — 바퀴 지름 300mm 기준 사진 비율 추정 ---------- */
     function wheelBot() {
       var wheel = new THREE.Group(); root.add(wheel);
+      /*
+       * 색 — 2D 모베드(Figma 1412:16371)에 맞췄다: 윗판 #9EA8BB · 하부 #070A10 · 부품 #2C3443 · 휠캡 #9EA8BB · 비상정지 · 표시등 #FF383C.
+       * 시안은 금속감(metalness)이 있어 환경 반사 없이는 색이 어둡게 죽었다 — 2D 색이 그대로 읽히게 거의 뺐다.
+       */
       var WM = {
-        shell: new THREE.MeshStandardMaterial({ color: 0x5F6267, roughness: 0.35, metalness: 0.45 }),
-        under: new THREE.MeshStandardMaterial({ color: 0x15171A, roughness: 0.7 }),
-        dark: new THREE.MeshStandardMaterial({ color: 0x0C0D10, roughness: 0.8 }),
-        box: new THREE.MeshStandardMaterial({ color: 0x2A2D31, roughness: 0.6 }),
-        cap: new THREE.MeshStandardMaterial({ color: 0xC4C7CC, roughness: 0.3, metalness: 0.6 }),
+        shell: new THREE.MeshStandardMaterial({ color: 0x9EA8BB, roughness: 0.45, metalness: 0.1 }),
+        under: new THREE.MeshStandardMaterial({ color: 0x070A10, roughness: 0.7 }),
+        dark: new THREE.MeshStandardMaterial({ color: 0x070A10, roughness: 0.8 }),
+        box: new THREE.MeshStandardMaterial({ color: 0x2C3443, roughness: 0.6 }),
+        cap: new THREE.MeshStandardMaterial({ color: 0x9EA8BB, roughness: 0.35, metalness: 0.15 }),
         lens: new THREE.MeshStandardMaterial({ color: 0x2B3A55, roughness: 0.15, metalness: 0.4 }),
-        red: new THREE.MeshStandardMaterial({ color: 0xE5322D, roughness: 0.4 })
+        red: new THREE.MeshStandardMaterial({ color: 0xFF383C, roughness: 0.4 })
       };
       var shell = roundedBox(0.68, 0.075, 0.31, 0.012, WM.shell); shell.position.y = 0.245; wheel.add(shell);
       var under = roundedBox(0.56, 0.09, 0.27, 0.02, WM.under); under.position.y = 0.165; wheel.add(under);
@@ -250,7 +259,7 @@
       // 앞 끝(+x) 빨간 비상정지 · 은색 손잡이 · 분홍 표시등 · 견인 고리 · 카메라 막대
       var ws = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.022, 0.022, 20), WM.red); ws.rotation.z = Math.PI / 2; ws.position.set(0.352, 0.24, -0.04); wheel.add(ws);
       var knob = new THREE.Mesh(new THREE.CylinderGeometry(0.011, 0.011, 0.03, 16), WM.cap); knob.rotation.z = Math.PI / 2; knob.position.set(0.355, 0.255, 0.01); wheel.add(knob);
-      var led = new THREE.Mesh(new THREE.BoxGeometry(0.004, 0.05, 0.012), new THREE.MeshBasicMaterial({ color: 0xFF4D6D })); led.position.set(0.3425, 0.24, -0.12); wheel.add(led);
+      var led = new THREE.Mesh(new THREE.BoxGeometry(0.004, 0.05, 0.012), new THREE.MeshBasicMaterial({ color: 0xFF383C })); led.position.set(0.3425, 0.24, -0.12); wheel.add(led);
       var hook = roundedBox(0.012, 0.045, 0.05, 0.004, WM.cap); hook.position.set(0.29, 0.125, -0.1); hook.rotation.z = -0.5; wheel.add(hook);
       var camBar = roundedBox(0.02, 0.024, 0.13, 0.006, WM.dark); camBar.position.set(0.288, 0.19, 0); wheel.add(camBar);
       [-0.03, 0.03].forEach(function (z) { var l = new THREE.Mesh(new THREE.CylinderGeometry(0.006, 0.006, 0.004, 12), WM.lens); l.rotation.z = Math.PI / 2; l.position.set(0.299, 0.19, z); wheel.add(l); });
@@ -259,7 +268,7 @@
       // 바퀴 모듈: 검은 조향 기둥 + 바퀴(타이어 홈, 은색 휠캡과 눈금 8개). 바퀴 축은 z
       var WRAD = 0.15, WWID = 0.1;
       var treadTex = canvasTex(512, 64, function (g, w) {
-        g.fillStyle = "#121314"; g.fillRect(0, 0, w, 64); g.fillStyle = "#262729";
+        g.fillStyle = "#2C3443"; g.fillRect(0, 0, w, 64); g.fillStyle = "#070A10";   // 2D 타이어 #2C3443, 홈은 #070A10
         for (var i = 0; i < 48; i++) { var x = i * (w / 48); g.fillRect(x + 2, 6 + (i % 2) * 6, w / 48 - 5, 20); g.fillRect(x + 2, 38 - (i % 2) * 6, w / 48 - 5, 20); }
       });
       treadTex.wrapS = THREE.RepeatWrapping;
