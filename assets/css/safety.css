@@ -34,7 +34,8 @@
 .sf-phead { flex: none; display: flex; align-items: center; gap: var(--space-8); padding: var(--space-12); border-bottom: var(--border-width-thin) solid var(--border-default); }
 .sf-ptog { display: grid; place-items: center; width: 20px; height: 20px; color: var(--text-primary) !important; }
 .sf-plabel { color: var(--text-tertiary); white-space: nowrap; }
-.sf-sbody { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: var(--space-12); padding: var(--space-12) var(--space-8) var(--space-8); overflow: hidden; }   /* 스크롤은 목록(.sf-mlist) 안에서 — 범례는 아래 고정 */
+.sf-sbody { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: var(--space-12); padding: var(--space-12) 0 var(--space-8) var(--space-8); overflow: hidden; }   /* 스크롤은 목록(.sf-mlist) 안에서. 오른쪽 여백 0 — 목록이 본문 판에 닿아 감싸는 느낌(10/30) */
+.sf-sbody > .mlg { padding-right: var(--space-8); }
 /* [10/30 GUI] 본문은 보고서 .rp-detail 과 같은 판 — 위 · 오른쪽 · 아래 8 띄운 bg/page(모서리 8), 카드(bg/cell)가 떠 보인다 */
 .sf-main { position: relative; min-width: 0; min-height: 0; display: flex; flex-direction: column; margin: var(--space-8) var(--space-8) var(--space-8) 0; border-radius: var(--radius-8); background-color: var(--bg-page); overflow: hidden; }
 /* 접으면 머리 아이콘만 남는다(보고서와 같다) */
@@ -129,7 +130,7 @@
 .sf .rbt { fill: var(--status-info-icon); stroke: var(--color-gray-0); }
 /* 미션 목록 — [전체] + 미션 줄(작은 지도 + 미션 · 층 · 측정). 고른 줄은 bg/selected 면, 그 아래 지도가 펼쳐진다 */
 /* [10/30 GUI · Figma 1467:8482] 목록 한 덩이 — 모서리 8. 위 [미션 전체] 줄, 아래 안으로 꺼진 칸에 미션 줄. 범례는 패널 맨 아래로 밀린다 */
-.sf-mlist { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; border-radius: var(--radius-8); overflow: hidden auto; overscroll-behavior: contain; }   /* 막대가 둥근 목록 안쪽에 선다(10/30) */
+.sf-mlist { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; border-radius: var(--radius-8) 0 0 var(--radius-8); overflow: hidden auto; overscroll-behavior: contain; }   /* 막대가 둥근 목록 안쪽에 선다(10/30) */
 .sf-mrow { display: flex; flex-direction: column; gap: var(--space-8); width: 100%; padding: var(--space-12) var(--space-8); text-align: left; }
 .sf-mbody { display: flex; align-items: flex-start; gap: var(--space-12); }   /* 썸네일 | 키-값 */
 .sf-mrow:hover { background-color: var(--state-hover); }
