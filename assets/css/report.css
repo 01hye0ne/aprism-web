@@ -351,3 +351,11 @@
 .rp-modal .rp-link { color: var(--text-primary); text-decoration: underline; text-underline-offset: 3px; }
 .rp-morow .rp-mk:hover,
 .rp-modal .rp-link:hover { color: var(--text-secondary); }
+
+/*
+ * [10/29 디자이너] 좌측 목록은 패딩 · 배경 없이 본문 판(bg/frame)에 바로 — 판 위 · 왼쪽 · 아래 끝까지 붙고,
+ * 오른쪽에 구분선(border/divider) 한 줄로 보고서와 나뉜다. 오른쪽 보고서 카드는 판 안쪽 20 을 그대로 둔다.
+ */
+.rp-body { gap: 0; padding: 0; }
+.rp-side { border-radius: 0; background-color: transparent; border-right: var(--border-width-thin) solid var(--border-divider); }
+.rp-detail { margin: var(--space-20); }
