@@ -165,7 +165,7 @@
 .sf-monb { display: flex; flex-direction: column; gap: var(--space-12); padding-top: var(--space-12); border: var(--border-width-thin) solid var(--border-default); border-radius: var(--radius-8); background-color: var(--bg-cell); overflow: hidden; }   /* 지도 바탕 — bg/inset 은 밝은 선택 면 위에서 설비 칸(border/default)과 같은 색이 돼 bg/cell 로 한 단 내린다 */
 .sf-monb .m2v .bg { fill: transparent; }
 .sf-monb .m2f button.on { background-color: var(--bg-selected); }   /* 고른 층 — 테 안 바탕(bg/cell)과 같아지지 않게 */   /* 지도 바탕은 테(.sf-monb)가 깐다 — 두 겹으로 어두워지지 않게 */
-.sf-monb > .sf-meta { padding: 0 var(--space-12); }
+.sf-monb > .sf-meta { padding: 0 var(--space-12) var(--space-12); border-bottom: var(--border-width-thin) solid var(--border-default); }   /* 정보와 지도 사이 가로 구분선(10/30) */
 .sf-side .sf-mon .m2 { gap: var(--space-8); padding: 0; }
 .sf-mon .m2b { padding: 0 var(--space-12); }
 .sf-mon .m2v { width: 100%; height: auto; max-height: 400px; margin: 0; border: 0; border-radius: 0; }
