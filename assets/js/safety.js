@@ -296,7 +296,7 @@
       const multi = !!(m.fls && m.fls.length > 1);
       return `<div class="sf-mon ${w}"><div class="sf-monh"><button type="button" class="sf-mrow on" data-sc="${i}" aria-current="true">${t1}</button><a class="btn btn-ghost is-xs m2go" href="${mainUrl(i, cur)}" title="관제 3D 지도에서 이 미션과 층을 연다">관제에서 보기<span class="i i-16" style="--i:var(--ic-chevron-right)" aria-hidden="true"></span></a></div>
         <div class="sf-monb">${meta}<div class="m2">${multi ? `<div class="m2b">${floorBar(i)}</div>` : ''}<div class="m2rot">${svg2(i, cur, false, 316, sel, lk)}</div></div></div></div>`; }).join('');
-    return `${LEG}<div class="sf-mlist"><div class="sf-mwell">${top}${rows}</div></div>`;   // 범례는 목록 위(10/30) — 기호를 먼저 읽고 목록으로
+    return `${LEG}<div class="sf-mwrap"><div class="sf-mlist"><div class="sf-mwell">${top}${rows}</div></div><span class="sf-mthumb" aria-hidden="true"></span></div>`;   // 범례는 목록 위(10/30) — 기호를 먼저 읽고 목록으로
   }
   const MAINV3 = "./main-v5.html";   // [v5] 같은 판의 관제로
   function mainUrl(i, ab){ const m = M[i], q = new URLSearchParams({mission:m.mis, floor:PLANOF[ab] || ab}); const nw = nowOf(i); if(nw) q.set("wp", nw); return MAINV3 + "?" + q.toString(); }
@@ -425,8 +425,27 @@
     v.appendChild(sc);
     bc.innerHTML = crumb();
     side.innerHTML = sideHtml();
+    bindThumb();
     requestAnimationFrame(() => v.querySelectorAll('canvas[data-spec3]').forEach(spec3));
   }
+  /*
+   * [10/30] 왼쪽 목록 스크롤 막대 — 목록이 본문 판에 닿아 감싸는 꼴이라 막대 자리(12)를 비우면 고른 줄과 판 사이가 끊긴다.
+   * 그래서 브라우저 막대는 숨기고, 공통 스크롤바와 같은 꼴(막대 4 · border/default · pill)의 얇은 막대를 목록 위에 띄운다.
+   * 막대는 목록에 마우스를 올렸을 때만 보이고, 아래에 더 있으면 목록 아래 끝을 흐린다. 휠 · 키보드 스크롤은 그대로, 막대를 끌어 내릴 수도 있다.
+   */
+  function bindThumb(){
+    const wrap = side.querySelector('.sf-mwrap'), l = wrap && wrap.querySelector('.sf-mlist'), t = wrap && wrap.querySelector('.sf-mthumb');
+    if(!l || !t) return;
+    const upd = () => { const h = l.clientHeight, sh = l.scrollHeight, over = sh > h + 1;
+      wrap.classList.toggle('can', over); wrap.classList.toggle('more', over && l.scrollTop + h < sh - 1);
+      if(!over) return; const th = Math.max(24, h * h / sh); t.style.height = th + 'px'; t.style.transform = `translateY(${(h - th) * l.scrollTop / (sh - h)}px)`; };
+    l.addEventListener('scroll', upd, {passive:true});
+    t.addEventListener('pointerdown', e => { e.preventDefault(); const y0 = e.clientY, s0 = l.scrollTop, k = l.scrollHeight / l.clientHeight; t.setPointerCapture(e.pointerId); wrap.classList.add('drag');
+      const mv = ev => { l.scrollTop = s0 + (ev.clientY - y0) * k; }, up = () => { t.removeEventListener('pointermove', mv); t.removeEventListener('pointerup', up); wrap.classList.remove('drag'); };
+      t.addEventListener('pointermove', mv); t.addEventListener('pointerup', up); });
+    upd(); requestAnimationFrame(upd);
+  }
+  window.addEventListener('resize', () => bindThumb && side.querySelector('.sf-mlist') && side.querySelector('.sf-mlist').dispatchEvent(new Event('scroll')));
   function go(id){
     const to = id==='all' ? 'all' : +id, from = scope, wasDt = !!dt;
     const apply = () => { mapF = {}; dt = null; menu = false; drawer = null; scope = to; if(scope===1){ newSeen = true; toasts = toasts.filter(t => t.mi !== 1); } render(); };
