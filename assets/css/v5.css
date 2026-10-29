@@ -53,6 +53,19 @@ body.ver-5 .robot-strip.is-carousel::before {
   pointer-events: none;
 }
 :root[data-theme="dark"] body.ver-5 .robot-strip.is-carousel::before { background-color: var(--bg-selected); }
+/*
+ * 판 안쪽 그림자(monitor.css 의 inset 0 10 8 / 25%)는 판 배경에 그려져서 바닥 띠가 그 위를 덮어 버렸다(10/29 디자이너).
+ * 그림자를 ::after 로 옮겨 바닥 위에 얹는다 — 판 전체(바닥 포함)를 감싸고, 카드 내용(z 1)보다는 아래다.
+ */
+body.ver-5 .robot-strip.is-carousel { box-shadow: none; }
+body.ver-5 .robot-strip.is-carousel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 10px 8px 0 rgb(0 0 0 / 25%);
+  pointer-events: none;
+}
 body.ver-5 .robot-strip.is-carousel .robot-card { position: relative; z-index: 1; }
 
 body.ver-5 .robot-2d .r2-hip-l { transform-origin: 44.5px 54.5px; }
