@@ -67,8 +67,6 @@
 .sf .hd .lvh { align-self: center; }
 .sf .hd .lvh .badge-dot { animation: sf-blink 1.6s ease-in-out infinite; }
 .sf .hd .sp { flex: 1; }
-.sf .todo { margin-left: var(--space-4); color: var(--text-secondary); }
-.sf .todo b { margin-right: var(--space-2); color: var(--text-primary); }
 
 /* 카드 · 표 — 두 칸 고르개. Secondary 단추 면에 고른 쪽만 bg/selected */
 .sf .lyseg { display: inline-grid; grid-template-columns: 1fr 1fr;   /* 두 칸 1:1 — 넓은 쪽 글자에 맞춘다 */ margin-left: var(--space-12); border: var(--border-width-thin) solid var(--comp-button-secondary-border-default); border-radius: var(--radius-control); overflow: hidden; }

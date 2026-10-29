@@ -340,7 +340,8 @@
       <div class="big">${sent}</div><span class="sm">${loc}, ${t}</span>${rq ? `<span class="req">${rq} 현장 조치 요청됨</span>` : ''}${extra || ''}<div class="md ${md[0]}">${md[1]}</div><span class="more">자세히 보기 →</span></div>`;
   }
   function head(title, done, total, n){
-    return `<div class="hd"><span class="badge badge-mode badge-info t-caption lvh" title="6종 영상과 센서를 실시간으로 받는 중"><span class="badge-dot"></span>라이브</span><span class="todo t-body-4"><b class="t-label-1">${n}</b>건 현장 조치 요청 전</span><span class="sp"></span>${LAYB()}</div>`;
+    // [10/30] 'n건 현장 조치 요청 전'은 뺐다 — 왼쪽 목록의 '요청 전'(전체 · 고른 미션)과 같은 숫자다. 요청을 보내면 목록 값이 줄어 피드백이 된다
+    return `<div class="hd"><span class="badge badge-mode badge-info t-caption lvh" title="6종 영상과 센서를 실시간으로 받는 중"><span class="badge-dot"></span>라이브</span><span class="sp"></span>${LAYB()}</div>`;
   }
   function crumb(){
     const isAll = scope==='all';
