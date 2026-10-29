@@ -2117,12 +2117,24 @@
     };
     mat.customProgramCacheKey = function () { return "rr-chev"; };
   }
+  /*
+   * [10/29 v5] 점을 바닥에 눕힌다 — 레퍼런스처럼 점선도 원근을 받아 바닥에 붙어 보이게(디자이너).
+   * 바닥의 동그란 점은 화면에서 세로로 납작한 타원이다(납작한 정도 = 카메라가 내려다보는 기울기 rrTilt).
+   * 점의 길이 방향은 이미 월드 길이라 원근을 받는다. 남는 굵기 방향만, 선이 화면에서 누운 만큼 tilt 로 눌러 준다:
+   *   굵기 방향 반지름 비율 = √(dirY² + tilt² · dirX²) — 가로로 가는 선은 tilt 만큼 납작, 세로로 가는 선은 그대로.
+   * 화면에서의 선 방향(dir)은 LineMaterial 정점 셰이더가 이미 구한다 — 그대로 넘겨받는다(vRrDir).
+   */
   function rrRoundDots(mat) {
+    mat.userData.rrTilt = mat.userData.rrTilt || { value: 0.6 };
     mat.onBeforeCompile = function (sh) {
-      sh.fragmentShader = sh.fragmentShader.replace(/if \( mod\( (vLineDistance[^,]*), dashSize \+ gapSize \) > dashSize \) discard;/,
-        "float rrP = mod( $1, dashSize + gapSize ); if ( rrP > dashSize ) discard; float rrA = rrP / dashSize * 2.0 - 1.0; if ( rrA * rrA + vUv.x * vUv.x > 1.0 ) discard;");
+      sh.uniforms.rrTilt = mat.userData.rrTilt;
+      sh.vertexShader = sh.vertexShader.replace("#include <common>", "#include <common>\nvarying vec2 vRrDir;")
+        .replace("dir = normalize( dir );", "dir = normalize( dir ); vRrDir = dir;");
+      sh.fragmentShader = sh.fragmentShader.replace("#include <common>", "#include <common>\nvarying vec2 vRrDir;\nuniform float rrTilt;")
+        .replace(/if \( mod\( (vLineDistance[^,]*), dashSize \+ gapSize \) > dashSize \) discard;/,
+        "float rrP = mod( $1, dashSize + gapSize ); if ( rrP > dashSize ) discard; float rrA = rrP / dashSize * 2.0 - 1.0; float rrS = max( 0.35, sqrt( vRrDir.y * vRrDir.y + rrTilt * rrTilt * vRrDir.x * vRrDir.x ) ); float rrX = vUv.x / rrS; if ( rrA * rrA + rrX * rrX > 1.0 ) discard;");
     };
-    mat.customProgramCacheKey = function () { return "rr-round-dots"; };
+    mat.customProgramCacheKey = function () { return "rr-round-dots-floor"; };
   }
   function syncDots() {
     if (chevMats.length) { var cpp = perPixel(), ck = (typeof RR !== "undefined" && RR && RR.k) || 1; chevMats.forEach(function (m) { m.dashSize = 12 * cpp * ck; m.gapSize = 0; }); }
@@ -2135,7 +2147,10 @@
     if (!dotMats.length) { return; }
     var pp = perPixel();
     var kk = (typeof RR !== "undefined" && RR && RR.k) || 1;   // [route-rules] 선 굵기와 같은 배율
-    dotMats.forEach(function (mat) { mat.dashSize = DOT.on * pp * kk; mat.gapSize = DOT.off * pp * kk; });
+    // [10/29] 점을 바닥에 눕히는 기울기 — 카메라가 바닥을 내려다보는 정도(위에서 곧장 보면 1, 눕힐수록 작다)
+    var tilt = 0.6;
+    if (camera) { var cdv = new THREE.Vector3(); camera.getWorldDirection(cdv); tilt = Math.max(0.3, Math.abs(cdv.y)); }
+    dotMats.forEach(function (mat) { mat.dashSize = DOT.on * pp * kk; mat.gapSize = DOT.off * pp * kk; if (mat.userData.rrTilt) { mat.userData.rrTilt.value = tilt; } });
   }
 
   function rrLift(m) { m.polygonOffset = true; m.polygonOffsetFactor = -10; m.polygonOffsetUnits = -10; return m; }
@@ -3011,6 +3026,40 @@
       if (ln.chev) { ln.chev.material.color.setHex(light ? 0xffffff : 0x0a0f18); }
     }
   }
+  /*
+   * [10/29 v5] 경로 다듬기 — 디자이너 레퍼런스(어두운 지도 위 내비 경로)에서 가져온 두 가지.
+   *   흰 테   파란 실선(지나온 길 · 지금 가는 토막) 양옆에 1px 흰 선 — 선 아래에 2px 더 굵은 흰 선을 한 벌 깐다.
+   *           선이 어두운 바닥 · 설비 위에서도 또렷하게 떨어진다. 길이 회색으로 굳는 상태(완료 · 자동복귀)에는 걷는다.
+   *   바탕 띠 점선(앞으로 갈 길 · 돌아가는 길) 밑에 같은 굵기의 은은한 실선 — 점이 흩어진 점이 아니라 한 줄로 읽힌다.
+   * 둘 다 본선의 기하를 같이 쓴다(길이 줄어들면 함께 줄어든다). 반투명 선을 겹치면 토막 이음매가 구슬처럼 진해지므로
+   * 바닥색과 미리 섞은 불투명 색으로 칠한다(rrMix · rrStyle 과 같은 이유).
+   */
+  function rrUnder2(part, key, order) {
+    if (!part || !part.material || !Fat) { return null; }
+    if (part.userData[key]) { return part.userData[key]; }
+    var mt = new Fat.LineMaterial({ color: 0xffffff, linewidth: 1, transparent: true, opacity: 1, depthWrite: false });
+    rrLift(mt); mt.resolution.copy(part.material.resolution); fatMats.push(mt);
+    var l = new Fat.Line2(part.geometry, mt);
+    l.renderOrder = order; l.userData.rrKeep = true; l.raycast = function () {};
+    l.onBeforeRender = function () { if (l.geometry !== part.geometry) { l.geometry = part.geometry; } };
+    part.add(l); part.userData[key] = l;
+    return l;
+  }
+  function rrPolish(ln, m) {
+    var gray = m === "done" || m === "return", under = rrUnder();
+    [ln.parts[0], ln.cur].forEach(function (p) {   // 흰 테
+      var e = rrUnder2(p, "rrEdge", 1.9); if (!e) { return; }
+      e.visible = !gray;
+      e.material.linewidth = p.material.linewidth + 2;
+      e.material.color.setHex(rrMix(0xffffff, p === ln.cur ? 0.9 : 0.55, under));   // 지나온 길(옅은 파랑)은 테도 한 단 옅게
+    });
+    [ln.parts[1], ln.home].forEach(function (p) {   // 점선 바탕 띠
+      var b = rrUnder2(p, "rrBand", 1.8); if (!b) { return; }
+      b.visible = !!p.material.dashed;
+      b.material.linewidth = p.material.linewidth;
+      b.material.color.copy(p.material.color).lerp(new THREE.Color(under), isLight() ? 0.82 : 0.55);   // 점 색을 바닥에 다크 45% · 라이트 18% 남긴다 — 점보다 한참 옅지만 한 줄로 읽히게(라이트는 바닥이 밝아 같은 값이면 실선이 된다)
+    });
+  }
   function rrApply(ln) {
     if (!ln || !ln.rr) { return; }
     var on = !!(ln.parts[0] && ln.parts[0].visible), m = RRS.mode, blue = ln.bot.left;
@@ -3036,6 +3085,7 @@
       hm.color.copy(am.color); hm.opacity = am.opacity; hm.linewidth = am.linewidth;
       if (hm.dashed !== am.dashed) { hm.dashed = am.dashed; hm.needsUpdate = true; }
     }
+    rrPolish(ln, m);
     if (ln.fan && !ln.fanEdge && Fat && ln.fan.geometry && ln.fan.geometry.attributes.position) {   // [가려짐 F] 빔 테두리 — 가려진 곳에서만 점선
       var fp = ln.fan.geometry.attributes.position.array, fe = [];
       for (var fi = 0; fi < fp.length; fi += 3) { fe.push(fp[fi], fp[fi + 1], fp[fi + 2]); }
@@ -3791,6 +3841,7 @@
 
     stopBacks.forEach(function (b) { b.material.color.set(stopFill()); });
     wpMarks.forEach(function (m) { if (m.userData.tone) { m.material.color.setHex(wpTint(m.userData.tone)); } });
+    if (onLane && onLane.rr) { rrApply(onLane); }   // [10/29] 경로 색(바닥과 미리 섞은 불투명 색 · 흰 테 · 점선 바탕 띠)을 새 바닥색으로 다시 섞는다
     // 웨이포인트 · 도킹 그림은 같은 캔버스에 다시 그린다 — 쓰는 재질이 모두 따라온다.
     Object.keys(stopArt).forEach(function (kind) {
       drawStop(kind, stopArt[kind].image);
