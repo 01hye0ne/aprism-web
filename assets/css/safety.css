@@ -298,8 +298,11 @@
 /* 미션 → 전체로 나올 때 돌아온 묶음 — 테 대신 면(bg/selected)이 잠깐 깔렸다 천천히 빠진다(10/30, 묶음 테를 걷어 면 모핑이 자연스럽다) */
 .sf .msec.ring { background-color: var(--bg-selected); transition: none; }
 .sf .msec { transition: background-color .9s ease-out; }
-/* [10/30 GUI] 미션 묶음은 테 · 면 없이 여백 12 만 — 카드(bg/cell)가 덩이를 만든다 */
-.sf .msec { padding: var(--space-12); border-radius: var(--radius-card); }
+/* [10/30 GUI] 미션 묶음은 테 · 면 없이 여백만 — 카드(bg/cell)가 덩이를 만든다.
+   묶음은 스크롤 칸 가로를 꽉 채운다(바깥 여백 0) — 돌아올 때 깔리는 면(.ring)이 판 끝에서 끝까지 닿는다. 카드 자리는 예전과 같게 묶음 안 여백으로 옮겼다(왼 20+12, 오른 8+12) */
+.sf .sfsc:has(> .msecs) { padding: 0 0 var(--space-20); }
+.sf .msec { padding: var(--space-12) var(--space-20) var(--space-12) calc(var(--space-20) + var(--space-12)); }
+.sf .msecs > .msec:first-child { padding-top: var(--space-24); }
 .sf .msh2 { display: flex; align-items: center; gap: var(--space-8); margin-bottom: var(--space-12); }
 .sf .msh2 b { color: var(--text-primary); }
 .sf .msh2 .mn2 { font-size: var(--font-size-13); line-height: var(--font-line-height-20); color: var(--text-secondary); }
