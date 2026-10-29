@@ -443,6 +443,7 @@
     rrLabels();        // [10/22] 설비 이름 — 다가가면 상시 노출
     travelSync();   // 층 이동 — 층마다 선을 켜고 끄고 표식을 놓는다
     rrRibbons();    // [10/29] 경로 실선 · 흰 테 · 점선 바탕 띠 = 바닥에 깐 띠 — 선의 자리 · 색 · 보이기를 따라간다
+    rrHalo();       // [10/29] 로봇 둘레 바닥 투사(라이팅 A · 4방위 아크형) — 지도 장면 바닥에 깔아 벽에 가려지고 블룸을 받는다
     if (!(fx && fx.render(w, h))) { renderer.render(scene, camera); }   // 효과가 아직 안 섰거나 꺼져 있으면 그냥 그린다
     rrDog();           // [10/29 v5] 로봇 = 3D SPOT(robot-spot.js) — 깊이를 지우고 맨 위에 한 번 더 그린다
     placeCard();
@@ -2338,6 +2339,82 @@
     var card = document.querySelector(".robot-strip .robot-card[data-robot='" + id + "']");
     return card && card.getAttribute("data-type") === "mobed" ? "wheel" : "spot";
   }
+  /*
+   * [10/29] 로봇 둘레 바닥 투사 — 디자이너 시안 "도킹 기립 라이팅"의 라이팅 A(4방위 아크형).
+   *   https://claude.ai/artifact/7if9hac6XnvmEGHNKwtBaY · 시안 좌표 R=120 이 1m, 몸체 132 × 60 이 1.1 × 0.5m.
+   *   모델 몸길이(0.85)가 1.1m 라 1m = 0.77 모델 단위 — 로봇개와 같은 배율(sz)로 키운다.
+   *   설비에 가려지지 않게 깊이를 안 보고 그린다(로봇과 같은 규칙) — 처음엔 바닥에 묻었더니 옆 설비가 앞 호를 덮었다.
+   *   그림은 시안의 05 기립완료: 빗금 원판 + 겹친 원 넷(보조선) + 옅은 3방위 호(30%) + 갈 방향(앞) 호만 그린 점멸(2.4초 · 35↔100%).
+   *   상태 — 걷기(이동 · 위험 감지 · 자동복귀)는 앞 호 점멸, 서기(측정 · 일시정지)는 앞 호를 켠 채 멈춤, 완료는 01 대기(링 12%),
+   *   긴급정지 · 끊김은 끈다 — 초록 빛이 "괜찮다"로 읽히면 안 된다. 휠 로봇(Robot 05)은 시안 밖이라 뺀다.
+   */
+  var HALO_R = 0.77, HALO_G = "#3BE07A";
+  var halo = null;
+  function haloArt(light) {
+    // 시안 SVG 를 캔버스에 그대로 옮긴다. 한 칸 = 시안 1단위 × k. 둘레 여유는 겹친 원(1.03R)과 빛 번짐 몫.
+    var R = 120, half = R * 1.22, k = 2, n = Math.round(half * 2 * k);
+    function pad() { var c = document.createElement("canvas"); c.width = c.height = n; var g = c.getContext("2d"); g.setTransform(k, 0, 0, k, half * k, half * k); return { c: c, g: g }; }
+    var line = light ? "rgba(70,80,96,.45)" : "#3A4652", hatch = light ? "rgba(70,80,96,.28)" : "#2E3842";
+    function arcPath(g, a, halfDeg, r) { g.beginPath(); g.arc(0, 0, r, (a - halfDeg) * Math.PI / 180, (a + halfDeg) * Math.PI / 180); }
+
+    var base = pad(), g = base.g;
+    g.save(); g.beginPath(); g.arc(0, 0, R, 0, Math.PI * 2); g.clip();   // 빗금 원판(시안 패턴 hD — 8단위 · 45도)
+    g.strokeStyle = hatch; g.lineWidth = 2;
+    for (var x = -R * 2; x <= R * 2; x += 8 * Math.SQRT2) { g.beginPath(); g.moveTo(x - R, -R); g.lineTo(x + R, R); g.stroke(); }
+    g.restore();
+    g.strokeStyle = line; g.lineWidth = 1.5;
+    g.beginPath(); g.arc(0, 0, R, 0, Math.PI * 2); g.stroke();
+    g.globalAlpha = 0.5;   // 겹친 원 넷 — 시안은 바닥색으로 칠해 빗금을 덮는다. 바닥이 투명하니 선만 남긴다
+    [-90, 0, 90, 180].forEach(function (a) { var t = a * Math.PI / 180; g.beginPath(); g.arc(Math.cos(t) * R * 0.53, Math.sin(t) * R * 0.53, R * 0.5, 0, Math.PI * 2); g.stroke(); });
+    g.globalAlpha = 0.3; g.strokeStyle = HALO_G; g.lineWidth = 12; g.lineCap = "round";   // 옅은 3방위 호(좌 · 우 · 뒤)
+    [-90, 90, 180].forEach(function (a) { arcPath(g, a, 32, R - 10); g.stroke(); });
+
+    var ring = pad(); g = ring.g;   // 01 대기 — 어두운 트랙 위에 링 12%
+    g.lineWidth = 12; g.strokeStyle = light ? "rgba(23,128,74,.25)" : "#1F3328"; g.beginPath(); g.arc(0, 0, R, 0, Math.PI * 2); g.stroke();
+    g.globalAlpha = 0.12; g.strokeStyle = HALO_G; g.beginPath(); g.arc(0, 0, R, 0, Math.PI * 2); g.stroke();
+
+    var front = pad(); g = front.g;   // 갈 방향(앞 = +x) 호 — 굵기 14 · 반각 44도 · 번짐 8
+    g.strokeStyle = HALO_G; g.lineWidth = 14; g.lineCap = "round"; g.shadowColor = HALO_G; g.shadowBlur = 8 * k;
+    arcPath(g, 0, 44, R - 10); g.stroke();
+
+    return { base: base.c, ring: ring.c, front: front.c, size: half / R };
+  }
+  function haloLayer(cv, order) {
+    var tex = new THREE.CanvasTexture(cv); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 4;
+    var geo = new THREE.PlaneGeometry(1, 1); geo.rotateX(-Math.PI / 2);   // 캔버스 → 바닥: 오른쪽 = +x, 위 = -z
+    // 로봇처럼 설비에 가려지지 않는다(시안 "로봇은 늘 맨 위") — 깊이를 안 보고 길 · 표식 위에 그린다. 지도 장면 안이라 블룸은 받는다.
+    var m = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, depthTest: false }));
+    m.renderOrder = 900 + order;
+    return m;
+  }
+  function rrHalo() {
+    if (!THREE || !scene) { return; }
+    var light = isLight();
+    if (!halo || halo.light !== light) {
+      if (halo) { scene.remove(halo.g); halo.g.traverse(function (o) { if (o.material) { o.material.map.dispose(); o.material.dispose(); o.geometry.dispose(); } }); }
+      var art = haloArt(light);
+      halo = { light: light, size: art.size, g: new THREE.Group(), base: haloLayer(art.base, 1), ring: haloLayer(art.ring, 1), front: haloLayer(art.front, 2) };
+      halo.g.add(halo.base, halo.ring, halo.front);
+      halo.g.visible = false;
+      scene.add(halo.g);
+    }
+    var st = (botBox && botBox.getAttribute("data-rr")) || "run";
+    var show = !!(onLane && botBox && !botBox.hidden && botBox.style.visibility !== "hidden" && !botBox.hasAttribute("data-rr-docked"))
+      && robotKind(onLane.id) === "spot" && st !== "estop" && st !== "lost";
+    halo.g.visible = show;
+    if (!show) { return; }
+    var wait = st === "done";
+    halo.base.visible = halo.front.visible = !wait;
+    halo.ring.visible = wait;
+    var walk = DOG_MOTION[st] === "walk";
+    halo.front.material.opacity = walk ? 0.35 + 0.65 * (0.5 - 0.5 * Math.cos(performance.now() / 2400 * Math.PI * 2)) : 1;
+    var sz = DOG_PX * baseSize / (view.clientHeight || 1);   // rrDog 와 같은 배율
+    halo.g.position.set(onLane.here.x, onLane.here.y + span * 0.0006, onLane.here.z);
+    halo.g.scale.setScalar(sz * HALO_R * halo.size * 2);
+    var dx = onLane.ahead.x - onLane.here.x, dz = onLane.ahead.z - onLane.here.z;
+    if (dx * dx + dz * dz > 1e-10) { halo.g.rotation.y = Math.atan2(-dz, dx); }   // 캔버스 +x(앞 호)를 가는 쪽으로
+  }
+
   function rrDog() {
     if (!THREE || !renderer || !camera || !window.APRISM_SPOT) { return; }
     var show = !!(onLane && botBox && !botBox.hidden && botBox.style.visibility !== "hidden" && !botBox.hasAttribute("data-rr-docked"));
