@@ -1,4 +1,6 @@
-// v4(파일 *-v3.html) 전용 지도 — map.js 를 10/28 에 복제해 지도 경로 표현 규칙(route-rules · 10/22 전달서)을 얹었다.
+// v5(파일 *-v5.html) 전용 지도 — map-v3.js(v4)를 10/29 에 복제했다. v4 는 멈췄다.
+// 10/29 디자이너 — 경로 표현은 "로봇 경로 표현 시안 1022"(앞길 로봇색 점선 · 번호 핀) 기준, 돌아가는 길은 앞길과 같게, 로봇은 우측 패널의 3D 로봇개.
+// (아래는 v4 머리말 그대로) v4 전용 지도 — map.js 를 10/28 에 복제해 지도 경로 표현 규칙(route-rules · 10/22 전달서)을 얹었다.
 // main-v3.html 만 읽는다. v3(멈춘 화면) · 미션 설정 · 사전 점검은 그대로 map.js 다. 끌어 돌리기는 막혔다(시점 고정).
 //
 // 지도 — 전주기 맵 3D 모델(assets/model/apro-4f.glb). 자유롭게 돌려 보는 판이다.
@@ -411,6 +413,7 @@
     rrLabels();        // [10/22] 설비 이름 — 다가가면 상시 노출
     travelSync();   // 층 이동 — 층마다 선을 켜고 끄고 표식을 놓는다
     renderer.render(scene, camera);
+    rrDog();           // [10/29 v5] 로봇 = 우측 패널의 3D 로봇개 — 깊이를 지우고 맨 위에 한 번 더 그린다
     placeCard();
     placeBot();
     placeWp();
@@ -2212,6 +2215,63 @@
    * 월드 각을 쓰지 않는 것은 카메라를 돌리면 화면에서의 방향이 달라지기 때문이다.
    * CSS 는 위쪽을 0도로 치므로 atan2(가로, -세로) 로 옮긴다.
    */
+  /*
+   * [10/29 v5] 지도 위 로봇 = 우측 패널의 3D 로봇개(robot-stage.js 가 여는 APRISM_ROBOT_DOG — 같은 모델 · 같은 동작 클립).
+   * 로봇 자리(onLane.here)에 세우고 가는 쪽(ahead)을 본다. 크기는 화면에서 약 46px(배율 1) — 확대하면 함께 커진다.
+   * 로봇은 설비에 가려지지 않는다(시안 "로봇은 늘 맨 위") — 지도를 그린 뒤 깊이만 지우고 따로 한 번 더 그린다.
+   * 동작은 상태(.map-bot[data-rr])를 따른다 — 이동 · 위험 감지 · 자동복귀 걷기, 측정 검사, 일시정지 · 끊김 대기, 긴급정지 · 완료 앉기.
+   * 평면 로봇 머리(.rr-khead) · 둘레 빛은 v5.css 가 숨긴다. 바닥 시야 빔은 그대로 둔다.
+   */
+  var dog3 = null;
+  var DOG_PX = 46;
+  var DOG_MOTION = { run: "walk", alert: "walk", "return": "walk", inspect: "inspect", pause: "idle", lost: "idle", estop: "sit", done: "sit" };
+  function rrDog() {
+    if (!THREE || !renderer || !camera || !window.APRISM_ROBOT_DOG) { return; }
+    var show = !!(onLane && botBox && !botBox.hidden && botBox.style.visibility !== "hidden" && !botBox.hasAttribute("data-rr-docked"));
+    if (!show) { if (dog3) { dog3.turn.visible = false; } return; }
+    if (!dog3) {
+      var d = window.APRISM_ROBOT_DOG(THREE);
+      var sc = new THREE.Scene();
+      sc.add(new THREE.HemisphereLight(0xffffff, 0x3a4250, 1.6));
+      var key = new THREE.DirectionalLight(0xffffff, 1.6); key.position.set(-2, 4, 3); sc.add(key);
+      var turn = new THREE.Group(); turn.add(d.group); sc.add(turn);
+      var mixer = new THREE.AnimationMixer(d.group), acts = {};
+      d.clips.forEach(function (c) { acts[c.name] = mixer.clipAction(c); });
+      if (acts.sit) { acts.sit.setLoop(THREE.LoopOnce); acts.sit.clampWhenFinished = true; }
+      dog3 = { scene: sc, turn: turn, mixer: mixer, acts: acts, playing: null, last: 0, raf: 0 };
+    }
+    var g = dog3.turn;
+    g.visible = true;
+    g.position.copy(onLane.here);
+    var dx = onLane.ahead.x - onLane.here.x, dz = onLane.ahead.z - onLane.here.z;
+    if (dx * dx + dz * dz > 1e-10) { g.rotation.y = Math.atan2(dx, dz) - Math.PI / 2; }   // 패널과 같은 코 방향(NOSE -90도)
+    var sz = DOG_PX * baseSize / (view.clientHeight || 1);   // 배율 1 에서 화면 약 46px — 월드 크기로 붙박아 확대하면 커진다
+    g.scale.setScalar(sz);
+    var st = (botBox && botBox.getAttribute("data-rr")) || "run";
+    var next = dog3.acts[DOG_MOTION[st] || "idle"] || dog3.acts.idle;
+    if (next && dog3.playing !== next) {
+      next.reset().setEffectiveWeight(1).play();
+      if (dog3.playing) { dog3.playing.crossFadeTo(next, 0.35, false); }
+      dog3.playing = next;
+    }
+    var ac = renderer.autoClear;
+    renderer.autoClear = false;
+    renderer.clearDepth();
+    renderer.render(dog3.scene, camera);
+    renderer.autoClear = ac;
+    // 동작 클립을 돌린다 — 지도는 필요할 때만 다시 그리므로, 로봇이 보이는 동안 따로 박자를 낸다
+    if (!dog3.raf) {
+      dog3.raf = window.requestAnimationFrame(function tick(t) {
+        dog3.raf = 0;
+        if (!dog3.turn.visible || document.hidden) { return; }
+        var dt = dog3.last ? Math.min(0.1, (t - dog3.last) / 1000) : 0;
+        dog3.last = t;
+        dog3.mixer.update(dt);
+        frame();
+      });
+    }
+  }
+
   function placeBot() {
     if (!botBox || !onLane || botBox.hidden) { return; }
     // 층을 건너는 길(crossLane)의 로봇은 제 층에서만 보인다 — B4 에 선 로봇이 B3 화면에 뜨면 안 된다.
@@ -2667,7 +2727,7 @@
    * 지나온 길 38% · 지금 가는 길(로봇 → 다음 웨이포인트) 진한 실선 + 진행 방향 흐름 · 앞으로 갈 길 점선.
    * 흐름은 머리가 흰 혜성이고, 지금 가는 길에만 지나간다(지도에서 움직이는 선은 하나).
    */
-  var RR = { doneAlpha: 0.38, wpExcept: true, k: 2.85, lanes: "side", occl: false, prune: false, ahead: "C4", pins: "PF", pastNo: "off", flow: "floor", thin: "on" };   // thin — 번호가 화면에서 겹치면 중요한 번호만 남긴다(지점이 많을 때)   // flow — 흐름 빛 round 화면 선(둥근 머리) / floor 바닥에 깐 띠(머리를 길과 직각으로 자름, 원근을 받음)   // pastNo — 지나온 지점 번호 off 숨김 / on 옅게   // [10/22 실험] ahead — 앞으로 갈 길 A 점선 / C4 바닥에 칠한 실선. pins — P0 핀 / P1 바닥 번호 / P2 바닥에 눕힌 번호   // [10/22] k 1.9→2.85 — 경로 선을 자동복귀 도로 굵기 정도로   // occl — 가려짐 F(가려진 길·빔 점선, 가려진 지점 점선 고리). 10/22 보류   // lanes — 겹치는 길: side 나란히(기본, 10/22) / stack 겹치기   // k — 시안(SVG)은 선이 지도 크기만큼 커진다. 같은 굵기로 보이게 곱한다
+  var RR = { doneAlpha: 0.38, wpExcept: true, k: 2.85, lanes: "side", occl: false, prune: false, ahead: "A", pins: "P0", pastNo: "on", flow: "floor", thin: "on" };   // thin — 번호가 화면에서 겹치면 중요한 번호만 남긴다(지점이 많을 때)   // flow — 흐름 빛 round 화면 선(둥근 머리) / floor 바닥에 깐 띠(머리를 길과 직각으로 자름, 원근을 받음)   // pastNo — 지나온 지점 번호 off 숨김 / on 옅게   // [10/22 실험] ahead — 앞으로 갈 길 A 점선 / C4 바닥에 칠한 실선. pins — P0 핀 / P1 바닥 번호 / P2 바닥에 눕힌 번호   // [10/22] k 1.9→2.85 — 경로 선을 자동복귀 도로 굵기 정도로   // occl — 가려짐 F(가려진 길·빔 점선, 가려진 지점 점선 고리). 10/22 보류   // lanes — 겹치는 길: side 나란히(기본, 10/22) / stack 겹치기   // k — 시안(SVG)은 선이 지도 크기만큼 커진다. 같은 굵기로 보이게 곱한다
   var RR_N = 14, rrReduce = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
   var rrOn = false, rrLast = 0, rrPh = 0, rrPrev = 0;   // rrPh — 흐름이 지나온 시간(초), 프레임마다 쌓는다
   function rrFlat(pts) { var f = []; pts.forEach(function (q) { f.push(q.x, q.y, q.z); }); return f; }
@@ -2847,6 +2907,7 @@
   var RRS = { mode: "run", s: null, lane: null, at: 0 };
   function rrNeutral() { return isLight() ? 0x2b3445 : 0xe4e8ef; }   // 복귀 도로색(시안 --rt-return)
   var RR_GRAY = 0x9ea8bb, RR_NEUTRAL = 0xe4e8ef;
+  // [10/29 v5] 시안 1022 기준 — 앞으로 갈 길은 로봇색 동그란 점선(2/6, 80%), 번호는 막대 핀(지나온 지점도 옅게). 위 RR 의 ahead "A" · pins "P0" · pastNo "on".
   /*
    * [10/28] 반투명 선을 불투명하게 — 굵은 선(Line2)은 짧은 토막을 이어 그려서, 반투명이면 토막이 맞닿는 자리마다
    * 두 번 칠해져 그 자리만 진해졌다(구슬처럼 끊겨 보이는 선, 디자이너 지적). 바탕색과 미리 섞은 색을 불투명으로 칠한다.
@@ -2901,6 +2962,13 @@
       show(ln.parts[1], true); show(ln.cur, true); show(ln.home, true); show(ln.comet, m !== "inspect"); show(ln.fan, true);   // F 시야 빔은 로봇 표식의 일부 — 위험 감지 때도 그대로
     }
     rrAhead(ln, m);
+    // [10/29 v5] ④ 돌아가는 길을 ③ 앞으로 갈 길과 같게(디자이너) — 색 · 투명도 · 굵기 · 점선 무늬를 앞길에서 그대로 옮긴다.
+    // 앞길이 꺼지는 상태(자동복귀 · 미션 완료)는 돌아가는 길도 원래대로 따라 꺼진다(show).
+    if (ln.home && ln.parts[1] && ln.parts[1].material) {
+      var hm = ln.home.material, am = ln.parts[1].material;
+      hm.color.copy(am.color); hm.opacity = am.opacity; hm.linewidth = am.linewidth;
+      if (hm.dashed !== am.dashed) { hm.dashed = am.dashed; hm.needsUpdate = true; }
+    }
     if (ln.fan && !ln.fanEdge && Fat && ln.fan.geometry && ln.fan.geometry.attributes.position) {   // [가려짐 F] 빔 테두리 — 가려진 곳에서만 점선
       var fp = ln.fan.geometry.attributes.position.array, fe = [];
       for (var fi = 0; fi < fp.length; fi += 3) { fe.push(fp[fi], fp[fi + 1], fp[fi + 2]); }

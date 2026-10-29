@@ -3,3 +3,8 @@
  * v5 화면은 body 에 .ver-3 과 .ver-5 가 함께 붙는다 — v4 의 동작(.ver-3)은 그대로 물려받고,
  * v5 에서만 바꿀 것은 여기(body.ver-5)에 둔다. Delta 는 위젯형으로 고정(delta-form.js).
  */
+
+/* [10/29] 지도 로봇 = 우측 패널의 3D 로봇개(map-v5.js rrDog) — 평면 머리(K) · 캡슐 · 둘레 빛은 숨긴다. 누르는 자리(.map-bot-hit)는 남긴다. */
+body.ver-5 .map-bot .rr-khead,
+body.ver-5 .map-bot .rr-spot,
+body.ver-5 .map-bot .map-bot-halo { display: none !important; }
