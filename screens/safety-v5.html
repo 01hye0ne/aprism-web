@@ -14,7 +14,7 @@
   <link rel="stylesheet" href="../assets/css/app-shell.css?v=01264297" />
   <link rel="stylesheet" href="../assets/css/icons-outline.css?v=13527115" />
   <link rel="stylesheet" href="../assets/css/text-parts.css?v=e38e19ea" />
-  <link rel="stylesheet" href="../assets/css/safety.css?v=397772e7" />
+  <link rel="stylesheet" href="../assets/css/safety.css?v=8553204a" />
   <!-- v3 전용 규칙 — v2.2 는 10/21 부로 멈췄다. v3 에서 바꾸는 것은 여기(body.ver-3)에. -->
   <link rel="stylesheet" href="../assets/css/v3.css?v=7fce80d4" />
   <!-- v5 전용 규칙 — v4 는 10/29 부로 멈췄다. v5 에서 바꾸는 것은 여기(body.ver-5)에. -->
@@ -126,15 +126,28 @@
     </nav>
 
     <!-- ---------- Body — 안전진단 ---------- -->
-    <!-- 머리(제목 · 라이브 · 요청 전 건수 · 카드/표) 아래 미션 레일 | 미션 2D 지도 | 감지 6종 카드(또는 표). 카드를 누르면 자세히 보기(① 판정 ~ ⑥ 조치). safety.js 가 채운다. -->
+    <!-- 왼쪽 340 패널(관제 · 보고서와 같은 짜임: 머리 [접기] 안전진단 + 본문) | 오른쪽 본문(라이브 · 요청 전 건수 · 카드/표 → 감지 6종 카드 또는 표).
+         패널 본문은 미션 하나면 그 미션의 2D 지도(자세히 보기에서는 그 지점 · 연관 지점), 전체면 미션별 작은 지도 목록이다.
+         미션 고르기는 상단바 경로 하나로(10/29 점검 — 세로 레일 · [6종 보기] 단추를 걷었다). safety.js 가 채운다. -->
     <main class="sf" data-sf aria-label="안전진단">
-      <div id="sfv"></div>
+      <aside class="sf-side" aria-label="미션 지도">
+        <div class="sf-phead">
+          <button type="button" class="sf-ptog" data-sf-fold aria-expanded="true" aria-label="안전진단 패널 접기">
+            <span class="i i-20" style="--i:var(--ic-panel-left)" aria-hidden="true"></span>
+          </button>
+          <p class="t-overline sf-plabel">안전진단</p>
+        </div>
+        <div class="sf-sbody" data-sf-sb></div>
+      </aside>
+      <section class="sf-main" aria-label="감지 결과">
+        <div id="sfv"></div>
+      </section>
     </main>
 
   </div>
 </div>
 
 <script src="../assets/js/theme.js?v=c86093d9"></script>
-<script src="../assets/js/safety.js?v=cd5620b5"></script>
+<script src="../assets/js/safety.js?v=f2d168d2"></script>
 </body>
 </html>

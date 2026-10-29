@@ -60,7 +60,7 @@
   const RANK = {crit:3, warn:2, done:1, ok:0};
   const WORD = {crit:'위험', warn:'주의', done:'요청됨', ok:'정상 범위', plan:'예정'};
   const COLR = {crit:'var(--status-critical-icon)', warn:'var(--status-warning-icon)', done:'var(--text-tertiary)', ok:'var(--text-disabled)'};
-  let M, scope, menu, fired, toasts, drawer, newSeen, ixOpen = false, lay = 'card', dt = null, bigD = false, navMode = 'rail';
+  let M, scope, menu, fired, toasts, drawer, newSeen, lay = 'card', dt = null, bigD = false;
   const COND = {'안전감지':null,'누출감지':[0,100,55,70,'%'],'온도감지':[18,90,40,55,' ℃'],'계기인식':null,'이상음향':[0,30,19,22.8,''],'부분방전':[0,10,8.6,9.23,'']};
   const SUG = {'안전감지':['작업자에게 즉시 착용을 안내하고 고소 작업을 멈춰야 함',[['작업자 즉시 착용 안내',1,'현장 작업자, 무전 2채널'],['고소 작업 일시 중지',1,'작업 감독자, 내선 2214'],['안전관리팀 전달',0,'안전관리팀, 업무 메신저']]],
     '누출감지':['구역 출입을 통제하고 설비팀에 밸브 확인을 요청해야 함',[['구역 출입 통제',1,'현장 작업자, 무전 2채널'],['설비팀 밸브 확인 요청',1,'설비팀, 내선 2310'],['현장 확인',0,'순회 근무자, 무전 1채널']]],
@@ -78,15 +78,6 @@
     const isHit = !!hx, here = cellOf(k, wp), spi = sp.find(p => p[0]===wp) || [wp, ''];
     const x = isHit ? hx : [here && here[0]==='plan' ? 'plan' : 'ok', here && here[1] ? here[1] : '정상 범위', wp, spi[1]];
     const st = x[0];
-    const pos = sp.map((p, j) => { const rr = Math.floor(j / 4), c = rr % 2 ? 3 - j % 4 : j % 4; return [24 + c * 58, 20 + rr * 32]; });
-    const H = 26 + Math.ceil(sp.length / 4) * 32;
-    const meas = sp.filter(p => !p[3]).length;
-    const gcols = `grid-template-columns:52px repeat(${sp.length},minmax(0,1fr))`;
-    const grid = `<div class="dg dgw"><div class="dgcap">순회 순서 →</div><div class="dgr dgh" style="${gcols}"><span></span>${sp.map(([w]) => `<span class="${w===wp ? 'on' : ''}" data-hw="${w}">${w}</span>`).join('')}</div>${K.map(k2 => `<div class="dgr ${k2===k ? 'sel' : ''}" style="${gcols}"><span class="w">${k2.slice(0, 2)}</span>${sp.map(([w]) => { const c = cellOf(k2, w), on = w===wp ? ' on' : '';
-      if(!c) return `<span class="${on}"></span>`;
-      const cls = c[0]==='plan' ? 'p' : c[0]==='ok' ? 'o' : c[0];
-      const go = c[0] !== 'plan' ? ` data-dk="${k2}" data-dw="${w}"` : '';
-      return `<span class="${on}"${go}><i class="${cls}"></i></span>`; }).join('')}</div>`).join('')}<div class="dgl"><i class="crit"></i>위험 <i class="warn"></i>주의 <i class="o"></i>정상 범위 <i class="p"></i>예정, 빈칸: 측정 대상 아님</div></div>`;
     const tabs = K.map(k2 => { const y = m.r[k2]; if(!y) return `<span class="tb na">${k2}</span>`; const s2 = y[0]==='ok' ? '' : y[0];
       return `<button type="button" class="tb ${k2===k ? 'on' : ''}" data-dk="${k2}">${k2}<i class="d ${s2}"></i></button>`; }).join('');
     const md = MD[k], canBig = !md[1].includes('canvas');
@@ -106,26 +97,26 @@
       : `<div class="dl"><div class="hh"><span>◆ DELTA 조치 제안</span><span>오탐 가능성 <b>낮음</b></span></div><div class="ti">${sug[0]}</div>
         <div class="cks">${sug[1].map(([l, a2, to]) => `<label class="c1x"><input type="checkbox" ${a2 ? 'checked' : ''}><span><b>${l}</b><small>${to}</small></span>${a2 ? '<em class="badge badge-mode badge-info t-caption">AI 추천</em>' : ''}</label>`).join('')}</div>
         <label class="mm" for="sfMemo">메모 (선택)</label><textarea class="fd" id="sfMemo" rows="2" placeholder="현장에 전달할 내용"></textarea></div><button type="button" class="btn btn-accent rqx" data-req="1">현장 조치 요청</button>`;
-    const step = (n, q, t) => `<div class="sth k${t}"><span class="sn">${n}</span><b>${q}</b></div>`;
+    const step = q => `<div class="sth"><b>${q}</b></div>`;   // [v5 점검] 번호 원을 뺐다 — 배치가 동시에 보는 격자라 순서를 강요하지 않는다(위계는 판 밝기가 말한다)
     const lks = (LINKS[dt.mi] || []).filter(l => l[0]===k || l[1]===k).map(l => { const k2 = l[0]===k ? l[1] : l[0], y = m.r[k2]; return y && (y[0]==='crit' || y[0]==='warn') ? {k2, y, w2:y[2].split(' ')[0], role:l[0]===k ? '영향 후보' : '원인 후보', why:l[2], p:l[3]} : null; }).filter(Boolean);
     const rest = rel.filter(k2 => !lks.some(l => l.k2===k2));
     const lkRow = l => `<button type="button" class="rlx lk" data-dk="${l.k2}" data-dw="${l.w2}" data-rel="1"><span class="rlt"><span class="pl ${l.y[0]}">${WORD[l.y[0]]}</span><b>${l.k2}</b><span>${l.w2}</span><em class="rr r0">${l.role}</em><small class="lp">가능성 ${l.p}</small><span class="t">${SHORT[l.y[1]] || l.y[1]}</span></span><span class="rwhy">${l.why}</span></button>`;
     const restRow = k2 => { const y = m.r[k2], w2 = y[2].split(' ')[0]; return `<button type="button" class="rlx" data-dk="${k2}" data-dw="${w2}" data-rel="1"><span class="pl ${y[0]}">${WORD[y[0]]}</span><b>${k2}</b><span>${w2}</span><span class="t">${SHORT[y[1]] || y[1]}</span></button>`; };
     const relB = (lks.length ? `<div class="rl b">${lks.map(lkRow).join('')}</div>` : '<span class="why1">연관 근거가 있는 감지 없음</span>');
-    const relHead = `<div class="sth k2"><span class="sn">4</span><b>연관 감지</b><span class="qt" tabindex="0" role="button" aria-label="연관 감지 설명">?<span class="tip" role="tooltip">◆ DELTA가 같은 계통 정보와 함께 움직이는 감지 짝으로 고른 연관 후보다. 확정된 원인이 아니라 판단을 돕는 참고용 가설이다. 시안의 계통 정보는 예시 값이다.</span></span></div>`;
-    const map = `<div class="dmap2">${svg2(dt.mi, flOf(m, wp), false, 132, wp, lks.map(l => l.w2))}</div>`;
+    const relHead = `<div class="sth"><b>연관 감지</b><span class="qt" tabindex="0" role="button" aria-label="연관 감지 설명">?<span class="tip" role="tooltip">◆ DELTA가 같은 계통 정보와 함께 움직이는 감지 짝으로 고른 연관 후보다. 확정된 원인이 아니라 판단을 돕는 참고용 가설이다. 시안의 계통 정보는 예시 값이다.</span></span></div>`;
+    dt.wp = wp; dt.lk = lks.map(l => l.w2);   // 왼쪽 패널 지도가 이 지점과 연관 지점을 표시한다(sideHtml)
+    const loc = `<p class="loc"><b>${wp}</b>${isHit ? '<span>' + x[2].split(' ').slice(1).join(' ') + '</span>' : ''}<span class="lm">${m.fl}, ${m.robot}${x[3] ? ' 측정 ' + x[3] : ''}</span></p>`;
     return `<div class="dtop"><button type="button" class="btn btn-secondary bkx" data-dback="1"><span class="i i-16" style="--i:var(--ic-chevron-left)" aria-hidden="true"></span>돌아가기</button><div class="tbs">${tabs}</div></div>
       <div class="dB">
         <div class="dBm">
-          <div class="lvA s1 ${st}">${step(1, '이상 판정', 1)}<div class="tt"><span class="pl ${st}">${WORD[st]}</span><h5>${k}, ${isHit ? x[1] : st==='plan' ? '측정 전' : '정상 범위 ' + x[1]}</h5></div>${cond}</div>
+          <div class="lvA s1 ${st}">${step('이상 판정')}<div class="tt"><span class="pl ${st}">${WORD[st]}</span><h5>${k}, ${isHit ? x[1] : st==='plan' ? '측정 전' : '정상 범위 ' + x[1]}</h5></div>${loc}${cond}</div>
           <div class="dBr2">
-            <div class="lvA s2">${step(2, '영상 확인', 1)}${!isHit ? '<span class="why1">시안용 예시 이미지(같은 감지의 사진)</span>' : ''}${media}</div>
-            <div class="dBc"><div class="lvB">${step(3, '재발 여부', 2)}<div class="hist">${hist.map(([t, val, s2, a], n) => `<div class="hi ${n===3 ? 'now' : ''}"><span class="t">${t}</span><span>${val}</span><span class="pl ${s2}">${WORD[s2]}</span><span class="hia ${a && a !== '조치 없음' ? 'on' : ''}">${a}</span></div>`).join('')}</div>${again}</div>
+            <div class="lvA s2">${step('영상 확인')}${!isHit ? '<span class="why1">시안용 예시 이미지(같은 감지의 사진)</span>' : ''}${media}</div>
+            <div class="dBc"><div class="lvB">${step('재발 여부')}<div class="hist">${hist.map(([t, val, s2, a], n) => `<div class="hi ${n===3 ? 'now' : ''}"><span class="t">${t}</span><span>${val}</span><span class="pl ${s2}">${WORD[s2]}</span><span class="hia ${a && a !== '조치 없음' ? 'on' : ''}">${a}</span></div>`).join('')}</div>${again}</div>
               <div class="lvB s4 ref">${relHead}${relB}</div></div>
           </div>
-          <div class="lvC"><div class="sth k3"><span class="sn">5</span><b>위치 확인</b></div><div class="locb"><b class="lw">${wp}</b>${isHit ? '<span class="ln">' + x[2].split(' ').slice(1).join(' ') + '</span>' : ''}<span class="lm">${m.fl}, ${m.robot}${x[3] ? ' 측정 ' + x[3] : ''}</span></div><div class="lvCb">${map}${grid}</div></div>
         </div>
-        <div class="lvD">${step(6, '조치 결정', 6)}${side}</div>
+        <div class="lvD">${step('조치 결정')}${side}</div>
       </div>${dt.from ? `<div class="rtbar" role="group" aria-label="동시 발생에서 이동함"><span class="ri" aria-hidden="true">↩</span><button type="button" class="rtb" data-dret="1">${dt.from.k}로 돌아가기</button><button type="button" class="rtx" data-dretx="1" aria-label="돌아가기 닫기">✕</button></div>` : ''}`;
   }
   const STD = {'안전감지':'미착용 0명','누출감지':'55% 미만','온도감지':'40 ℃ 미만','계기인식':'0.60 ~ 0.80 MPa','이상음향':'19.0 미만','부분방전':'8.60 미만'};
@@ -195,7 +186,7 @@
     // 행 = 층(미션), 열 = 감지 6종. 카드 전체 보기와 같은 축
     const head = `<tr><th class="tn">층, 미션</th>${K.map(k => `<th class="tw"><b>${k}</b><span>${STD[k]}</span></th>`).join('')}</tr>`;
     const body = M.map((m, i) => { const w = worst(i);
-      return `<tr class="${w}"><td class="tn"><span class="bar"></span><div class="tnw"><button type="button" class="tmap" data-sc="${i}" aria-label="${m.mis} 지도, 이 미션 6종 보기">${svg2(i, viewF(i).robotF, false, 112)}</button><div class="tnt"><b class="fl2">${m.fl}</b><small>${m.mis}</small><span class="trb"><i></i>${m.robot}${nowOf(i) ? ', ' + nowOf(i) + ' 지나 이동 중' : ', 순회 끝'}</span><small>측정 ${m.done}/${m.total}곳</small>${i===1 && !newSeen ? '<em class="nwm">새로</em>' : ''}<button type="button" class="mgo sm" data-sc="${i}">6종 보기 ›</button></div></div></td>
+      return `<tr class="${w}"><td class="tn"><span class="bar"></span><div class="tnw"><button type="button" class="tmap" data-sc="${i}" aria-label="${m.mis} 지도, 이 미션 6종 보기">${svg2(i, viewF(i).robotF, false, 112)}</button><div class="tnt"><b class="fl2">${m.fl}</b><small>${m.mis}</small><span class="trb"><i></i>${m.robot}${nowOf(i) ? ', ' + nowOf(i) + ' 지나 이동 중' : ', 순회 끝'}</span><small>측정 ${m.done}/${m.total}곳</small>${i===1 && !newSeen ? '<em class="nwm">새로</em>' : ''}</div></div></td>
         ${K.map(k => { const x = m.r[k]; if(!x) return '<td class="tc"><span class="nat">' + NAW[naOf(i, k)] + '</span></td>';
           if(x[0]==='ok') return `<td class="tc"><span class="cv ok" data-dk="${k}" data-dm="${i}"><i></i>정상 범위</span></td>`;
           return `<td class="tc"><span class="cv ${x[0]}" data-dk="${k}" data-dm="${i}"><i></i>${SHORT[x[1]] || x[1]}</span><small class="twp">${x[2].split(' ')[0]}${moreTxt(i, k)}, ${x[3]}</small></td>`; }).join('')}</tr>`; }).join('');
@@ -231,7 +222,7 @@
     const a = L.pts[i - 1], b = L.pts[i], t = (sv - L.cum[i - 1]) / ((L.cum[i] - L.cum[i - 1]) || 1);
     return {x:a[0] + (b[0] - a[0]) * t, y:a[1] + (b[1] - a[1]) * t, ang:Math.atan2(b[1] - a[1], b[0] - a[0])}; }
   function cut2(L, s0, s1){ if(s1 <= s0) return ''; const o = [pos2(L, s0)]; for(let i = 1; i < L.pts.length; i++) if(L.cum[i] > s0 && L.cum[i] < s1) o.push({x:L.pts[i][0], y:L.pts[i][1]}); o.push(pos2(L, s1)); return o.map(p => p.x.toFixed(1) + ',' + p.y.toFixed(1)).join(' '); }
-  let mapF = {}, mapT = null, bigMap = null;
+  let mapF = {}, mapT = null;
   // 지금 지점: 여러 층 미션은 순회 순서(층 순, 번호 순)의 마지막 측정 지점
   const nowOf = i => { const m = M[i], ed = eData(i); if(m.done >= m.total) return ''; if(!m.fls) return ed.now; const ms = ed.sp.filter(p => !p[3]).map(p => p[0]).sort(); return ms[ms.length - 1] || ''; };
   // 한 층 그림. big = 크게 보기(벽, 계단, 지점 번호, 방 이름까지)
@@ -277,16 +268,19 @@
   function floorBar(i, big){ const {fls, robotF, cur} = viewF(i);
     if(fls.length < 2) return `<span class="m2f"><span>${fls[0]}</span></span>`;
     return `<span class="m2f" role="group" aria-label="층">${fls.map(f => `<button type="button" data-mf="${f}" data-mi="${i}" class="${f===cur ? 'on' : ''}" aria-pressed="${f===cur}">${f}${f===robotF ? '<i title="로봇 있는 층"></i>' : ''}</button>`).join('')}</span>`; }
-  const BIGI = '<svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9.5 2.5h4v4M6.5 13.5h-4v-4M13.5 2.5 9 7M2.5 13.5 7 9"/></svg>';
-  function mapPanel(i){
-    const m = M[i], {fls, cur} = viewF(i), multi = fls.length > 1;
-    const mini = `<div class="m2"><div class="m2b">${floorBar(i)}<span class="sp"></span><a class="btn btn-ghost is-xs m2go" href="${mainUrl(i, cur)}" title="관제 3D 지도에서 이 미션과 층을 연다">관제에서 보기<span class="i i-16" style="--i:var(--ic-chevron-right)" aria-hidden="true"></span></a></div>${svg2(i, cur, false)}</div>`;
-    return `<aside class="mapp"><div class="mph"><b>${m.mis}</b><span>${m.robot}, ${multi ? fls.join(' → ') + ', ' : ''}측정 ${m.done}/${m.total}곳</span></div>${mini}<div class="mlg"><i class="c"></i>위험 <i class="w"></i>주의 <i class="o"></i>정상 범위 <i class="p"></i>예정 <svg viewBox="-9 -9 20 18" width="11" height="10"><path class="rbt" d="M10 0-7.5 8.5-3.6 0-7.5-8.5Z" stroke="none"/></svg>로봇</div></aside>`;
+  const LEG = '<div class="mlg"><i class="c"></i>위험 <i class="w"></i>주의 <i class="o"></i>정상 범위 <i class="p"></i>예정 <svg viewBox="-9 -9 20 18" width="11" height="10"><path class="rbt" d="M10 0-7.5 8.5-3.6 0-7.5-8.5Z" stroke="none"/></svg>로봇</div>';
+  // [v5 점검] 왼쪽 패널(관제 · 보고서와 같은 340) 본문 — 미션 하나: 요약 + 2D 지도(자세히 보기에서는 그 지점 · 연관 지점 표시), 전체: 미션별 작은 지도 목록
+  function sideHtml(){
+    if(scope==='all') return `<div class="sf-mlist">${M.map((m, i) => { const w = worst(i), h = hits(i), nw = i===1 && !newSeen;
+      return `<button type="button" class="sf-mrow" data-sc="${i}"><span class="sf-mmap">${svg2(i, viewF(i).robotF, false, 96)}</span><span class="sf-mtx"><span class="sf-mt1"><i class="ixd ${w} ${nw ? 'blink' : ''}"></i><b>${m.fl}</b>${nw ? '<em class="nwm">새로</em>' : ''}</span><span class="t-body-4">${m.mis}, ${m.robot}</span><span class="t-caption">측정 ${m.done}/${m.total}곳${m.done===m.total ? ', 순회 끝' : ''}${h ? ', 요청 전 ' + h + '건' : ''}</span></span></button>`; }).join('')}</div>${LEG}`;
+    const i = scope, m = M[i], {fls} = viewF(i), multi = fls.length > 1;
+    const cur = dt && dt.wp ? flOf(m, dt.wp) : viewF(i).cur;
+    const sel = dt ? dt.wp : undefined, lk = dt ? dt.lk : undefined;
+    return `<div class="mph"><b>${m.mis}</b><span>${m.robot}, ${multi ? fls.join(' → ') + ', ' : ''}측정 ${m.done}/${m.total}곳</span></div>
+      <div class="m2"><div class="m2b">${floorBar(i)}<span class="sp"></span><a class="btn btn-ghost is-xs m2go" href="${mainUrl(i, cur)}" title="관제 3D 지도에서 이 미션과 층을 연다">관제에서 보기<span class="i i-16" style="--i:var(--ic-chevron-right)" aria-hidden="true"></span></a></div>${svg2(i, cur, false, 316, sel, lk)}</div>${LEG}`;
   }
   const MAINV3 = "./main-v5.html";   // [v5] 같은 판의 관제로
   function mainUrl(i, ab){ const m = M[i], q = new URLSearchParams({mission:m.mis, floor:PLANOF[ab] || ab}); const nw = nowOf(i); if(nw) q.set("wp", nw); return MAINV3 + "?" + q.toString(); }
-  function bigPanel(){ if(bigMap===null || dt || scope==='all') return ''; const i = bigMap, m = M[i], {cur} = viewF(i);
-    return `<div class="m2big" data-mbx><div class="m2bp" role="dialog" aria-label="2D 지도 크게 보기"><div class="m2b"><b>${m.mis}</b>${floorBar(i, true)}<span>${m.robot}, 측정 ${m.done}/${m.total}곳</span><span class="sp"></span><button type="button" class="m2c" data-mbx>닫기</button></div>${svg2(i, cur, true)}</div></div>`; }
   function pickF(i, f){ const {robotF} = viewF(i); mapF[i] = f; clearTimeout(mapT);
     if(f !== robotF) mapT = setTimeout(() => { delete mapF[i]; if(!dt) render(); }, 10000); render(); }
   // 판정하지 않는 감지 카드. scope = 이 미션 대상 아님(카메라는 송출 중), sensor = 이 로봇에 센서 없음
@@ -314,8 +308,8 @@
   }
   function init(){ M = JSON.parse(JSON.stringify(BASE)); scope = 0; menu = false; fired = false; toasts = []; drawer = null; newSeen = true; M.forEach(sync); }
   init();
-  const scr = document.querySelector('.app'), sf = document.querySelector('[data-sf]'), v = document.getElementById('sfv'), bc = document.querySelector('[data-sf-crumb]');
-  if(!sf || !v || !bc) return;
+  const scr = document.querySelector('.app'), sf = document.querySelector('[data-sf]'), v = document.getElementById('sfv'), bc = document.querySelector('[data-sf-crumb]'), side = document.querySelector('[data-sf-sb]');
+  if(!sf || !v || !bc || !side) return;
   const hits = i => K.reduce((a, k) => a + itemsOf(i, k).filter(isOpen).length, 0);
   const worst = i => K.reduce((a, k) => { const x = M[i].r[k]; return x && RANK[x[0]] > RANK[a] ? x[0] : a; }, 'ok');
   const worstAll = () => M.reduce((a, m, i) => RANK[worst(i)] > RANK[a] ? worst(i) : a, 'ok');
@@ -327,20 +321,20 @@
       <div class="big">${sent}</div><span class="sm">${loc}, ${t}</span>${rq ? `<span class="req">${rq} 현장 조치 요청됨</span>` : ''}${extra || ''}<div class="md ${md[0]}">${md[1]}</div><span class="more">자세히 보기 →</span></div>`;
   }
   function head(title, done, total, n){
-    return `<div class="hd"><h1 class="t-title-1">안전진단</h1><span class="badge badge-mode badge-info t-caption lvh" title="6종 영상과 센서를 실시간으로 받는 중"><span class="badge-dot"></span>라이브</span><span class="sp"></span><span class="todo t-body-4"><b class="t-label-1">${n}</b>건 현장 조치 요청 전</span>${LAYB()}</div>`;
+    return `<div class="hd"><span class="badge badge-mode badge-info t-caption lvh" title="6종 영상과 센서를 실시간으로 받는 중"><span class="badge-dot"></span>라이브</span><span class="sp"></span><span class="todo t-body-4"><b class="t-label-1">${n}</b>건 현장 조치 요청 전</span>${LAYB()}</div>`;
   }
   function crumb(){
     const isAll = scope==='all';
     const items = [['all','통합 순회 현황','전체 미션 ' + M.length + '개']].concat(M.map((m, i) => [i, m.mis, m.fl + ', ' + m.robot])).map(([id, a, b]) => { const w = id==='all' ? '' : worst(id), on = String(scope)===String(id);
-      return `<button type="button" class="menu-item sf-mi" role="menuitemradio" aria-checked="${on}" data-sc="${id}"><i class="wd" ${w ? `style="background:${COLR[w]}"` : ''}></i><span class="t-label-2">${a}${id===1 && !newSeen ? ' <em class="nwm">새 위험</em>' : ''}</span><span class="t-caption">${b}</span></button>`; }).join('');
+      return `<button type="button" class="menu-item sf-mi" role="menuitemradio" aria-checked="${on}" data-sc="${id}"><i class="wd ${w}"></i><span class="t-label-2">${a}${id===1 && !newSeen ? ' <em class="nwm">새 위험</em>' : ''}</span><span class="t-caption">${b}</span></button>`; }).join('');
     return `<button type="button" class="sb-overview t-title-2 ${isAll ? 'is-on' : ''}" data-sc="all">통합 순회 현황</button><span class="status-bar-sep t-title-2" aria-hidden="true">›</span>
-      <div class="scope-menu-box"><button type="button" class="scope-trigger" data-menu="1" aria-haspopup="true" aria-expanded="${menu}"><span class="t-title-2">${isAll ? '미션 고르기' : M[scope].mis}</span><span class="i i-16" style="--i:var(--ic-chevron-down)" aria-hidden="true"></span></button><div class="dropdown-menu scope-menu sf-scope" role="menu" aria-label="미션"${menu ? '' : ' hidden'}>${items}</div></div>`;
+      <div class="scope-menu-box"><button type="button" class="scope-trigger" data-menu="1" aria-haspopup="true" aria-expanded="${menu}"><span class="t-title-2">${isAll ? '미션 고르기' : M[scope].mis}</span><span class="i i-16" style="--i:var(--ic-chevron-down)" aria-hidden="true"></span></button><div class="dropdown-menu scope-menu sf-scope" role="menu" aria-label="미션"${menu ? '' : ' hidden'}>${items}</div></div>${dt ? `<span class="status-bar-sep t-title-2" aria-hidden="true">›</span><span class="t-title-2 sf-crumb-k">${dt.k}</span>` : ''}`;
   }
   // 전체 카드: 미션(위치)마다 한 줄, 그 미션에서 넘은 결과만 C 카드로
   function secsAll(){
     return '<div class="msecs">' + M.map((m, i) => { const rk = k => m.r[k] ? RANK[m.r[k][0]] : -1, fl = K.slice().sort((a, b) => rk(b) - rk(a));
       const okn = K.filter(k => m.r[k] && m.r[k][0]==='ok').length, nsc = K.filter(k => !m.r[k] && naOf(i, k)==='scope').length, nse = K.filter(k => !m.r[k] && naOf(i, k)==='sensor').length, w = worst(i);
-      return `<section class="msec ${w}" data-mi="${i}"><div class="msh2"><i class="ixd ${w}"></i><b>${m.fl}</b><span class="mn2">${m.mis}, ${m.robot}</span><span class="mt2">측정 ${m.done}/${m.total}곳${m.done===m.total ? ', 순회 끝' : ''}</span>${i===1 && !newSeen ? '<em class="nwm">새로</em>' : ''}<span class="sp"></span><span class="mok">정상 범위 ${okn}종${nsc ? ', 대상 아님 ' + nsc + '종' : ''}${nse ? ', 센서 없음 ' + nse + '종' : ''}</span><button type="button" class="mgo" data-sc="${i}">이 미션 6종 보기 ›</button></div>
+      return `<section class="msec ${w}" data-mi="${i}"><div class="msh2"><i class="ixd ${w}"></i><b>${m.fl}</b><span class="mn2">${m.mis}, ${m.robot}</span><span class="mt2">측정 ${m.done}/${m.total}곳${m.done===m.total ? ', 순회 끝' : ''}</span>${i===1 && !newSeen ? '<em class="nwm">새로</em>' : ''}<span class="sp"></span><span class="mok">정상 범위 ${okn}종${nsc ? ', 대상 아님 ' + nsc + '종' : ''}${nse ? ', 센서 없음 ' + nse + '종' : ''}</span></div>
         <div class="mrow vC">${fl.length ? fl.map(k => cardM(M.indexOf(m), k)).join('') : '<p class="mnone2">넘은 결과 없음</p>'}</div></section>`; }).join('') + '</div>';
   }
   function cardsAll(){
@@ -349,41 +343,12 @@
       const top = has.reduce((a, b) => RANK[b[1][0]] > RANK[a[1][0]] ? b : a), others = has.filter(([i, x]) => i !== top[0] && x[0] !== 'ok').length;
       return cardC(k, top[1], top[1][0]==='ok' ? '' : `<span class="mchip"><b>${M[top[0]].mis} ${M[top[0]].fl}</b>${others ? ` 외 ${others}개 미션` : ''}</span>`); }).join('');
   }
-  // 인덱스 틀: 펼침(탭) / 접힘(얇은 띠). 안쪽은 확정 C 카드 그대로
-  function frame(inner){
-    if(scope !== 'all') inner = `<div class="mapw">${mapPanel(scope)}<div>${inner}</div></div>`;
-    const cur = String(scope);
-    if(navMode==='tab'){
-      const tab = (id, name, sub, w, n, nw) => `<button type="button" class="mtb2 ${cur===String(id) ? 'on' : ''}" data-sc="${id}" aria-pressed="${cur===String(id)}"><i class="ixd ${w} ${nw ? 'blink' : ''}"></i><b>${name}</b>${sub ? `<span>${sub}</span>` : ''}<em class="${n ? 'has' : ''}">${n}</em>${nw ? '<em class="nwm">새로</em>' : ''}</button>`;
-      const tabs = tab('all', '전체', '미션 ' + M.length + '개', worstAll(), M.reduce((a, m, i) => a + hits(i), 0), false) + '<span class="mtsep"></span>' + M.map((m, i) => tab(i, m.fl, m.mis, worst(i), hits(i), i===1 && !newSeen)).join('');
-      return `<div class="tabw"><div class="mtabs2" role="group" aria-label="미션 고르기">${tabs}</div><div class="ixp2">${inner}</div></div>`;
-    }
-    if(ixOpen){
-      const allC = M.reduce((a, m, i) => a + hits(i), 0);
-      const top = `<button type="button" class="ixt ${cur==='all' ? 'on' : ''}" data-sc="all"><i class="ixd ${worstAll()}"></i><span><b>전체</b><small>미션 ${M.length}개, 초과 ${allC}</small></span></button>`;
-      const tabs = M.map((m, i) => { const h = hits(i); return `<button type="button" class="ixt ${cur===String(i) ? 'on' : ''}" data-sc="${i}"><i class="ixd ${worst(i)}"></i><span><b>${m.mis}</b><small>${m.fl}, ${h ? '초과 ' + h : '이상 없음'}</small></span>${i===1 && !newSeen ? '<em class="nwm">새로</em>' : ''}</button>`; }).join('');
-      return `<div class="ixw lonly"><div class="ixl">${top}<span class="ixsep"></span>${tabs}<button type="button" class="ixfold" data-ixfold="1" aria-label="인덱스 접기">≪ 접기</button></div><div class="ixp">${inner}</div></div>`;
-    }
-    const dot = (id, label, w, nw, name, sub) => `<button type="button" class="rd ${cur===String(id) ? 'on' : ''}" data-sc="${id}"><span class="rdi"><i class="ixd ${w} ${nw ? 'blink' : ''}"></i><span>${label}</span>${nw ? '<em class="rnew"></em>' : ''}</span><span class="rfull"><b>${name}</b><small>${sub}</small></span>${nw ? '<em class="nwm rfn">새로</em>' : ''}</button>`;
-    return `<div class="ixc"><div class="rail"><button type="button" class="rex" data-ixfold="1" aria-label="인덱스 고정해서 펼치기" title="고정해서 펼치기">≫</button><div class="railin">${dot('all', '전체', worstAll(), false, '전체', '미션 ' + M.length + '개, 초과 ' + M.reduce((a, m, i) => a + hits(i), 0))}<span class="rsep"></span>${M.map((m, i) => dot(i, m.fls ? m.fls.map(f => f[0]).join('<br>') : m.ab, worst(i), i===1 && !newSeen, m.mis, m.fl + ', ' + (hits(i) ? '초과 ' + hits(i) : '이상 없음'))).join('')}</div></div><div class="ixp2">${inner}</div></div>`;
-  }
   function view(){
     if(dt) return detail();
     if(scope==='all'){ const done = M.reduce((a, m) => a + m.done, 0), total = M.reduce((a, m) => a + m.total, 0), n = M.reduce((a, m, i) => a + hits(i), 0);
-      return head('통합 순회 현황', done, total, n) + frame(lay==='table' ? tableAll() : secsAll()); }
+      return head('통합 순회 현황', done, total, n) + (lay==='table' ? tableAll() : secsAll()); }
     const m = M[scope];
-    return head(m.mis, m.done, m.total, hits(scope)) + frame(lay==='table' ? tableOne(scope) : `<div class="g6 vC mmg ${ixOpen ? 'ixg' : ''}">${K.map(k => cardM(M.indexOf(m), k)).join('')}</div>`);
-  }
-  function overlay(){
-    let h = '';
-    const list = []; // 다른 미션 알림 팝업(토스트) 없음: 레일의 점과 새로 표시만
-    if(list.length) h += `<div class="mstk">${list.map(t => { const x = M[t.mi].r[t.k];
-      return `<div class="mnt ${x[0]}" role="button" tabindex="0" data-drawer="${t.mi}"><span class="mni"><span class="dlogo"><i></i><i></i><i></i></span></span><span class="mnb"><span class="m1"><b>${M[t.mi].mis} ${M[t.mi].fl}</b><span class="pl ${x[0]}">${WORD[x[0]]}</span><em>${x[3]}</em></span><span class="m2">${t.k} ${x[1]}, ${x[2]}</span></span><button type="button" class="mcl" data-tclose="${t.mi}" aria-label="닫기">×</button></div>`; }).join('')}</div>`;
-    if(drawer !== null){ const m = M[drawer], rows = K.filter(k => m.r[k] && m.r[k][0] !== 'ok').sort((a, b) => RANK[m.r[b][0]] - RANK[m.r[a][0]]);
-      h += `<div class="mscrim" data-dclose="1"></div><aside class="mdrw"><div class="mdh"><div><b>${m.mis}</b><span>${m.fl}, ${m.robot}, 측정 ${m.done}/${m.total}곳</span></div><button type="button" class="mdx" data-dclose="1">×</button></div>
-        <div class="mdl">${rows.map(k => { const x = m.r[k]; return `<div class="mdr ${x[0]}"><span class="pl ${x[0]}">${WORD[x[0]]}</span><b>${k}</b><span class="mv">${x[1]}</span><span class="mp">${x[2]}${moreTxt(drawer, k)}, ${x[3]}</span></div>`; }).join('')}</div>
-        <div class="mdf"><button type="button" class="bk2" data-dclose="1">닫기</button><button type="button" class="mdgo" data-sc="${drawer}">이 미션으로 이동</button></div></aside>`; }
-    return h;
+    return head(m.mis, m.done, m.total, hits(scope)) + (lay==='table' ? tableOne(scope) : `<div class="g6 vC mmg">${K.map(k => cardM(M.indexOf(m), k)).join('')}</div>`);
   }
   function spec3(cv){ const W = cv.clientWidth || 400, H = cv.clientHeight || 160; cv.width = W; cv.height = H; let seed = 7; const R = () => { seed = seed + 0x6D2B79F5 | 0; let q = Math.imul(seed ^ seed >>> 15, 1 | seed); q = q + Math.imul(q ^ q >>> 7, 61 | q) ^ q; return ((q ^ q >>> 14) >>> 0) / 4294967296; }; const c = cv.getContext('2d'); for(let x = 0; x < 40; x++) for(let y = 0; y < 18; y++){ const vv = .25 + (y / 18) * .35 + R() * .3, h = x / 40 > .6 && x / 40 < .78 && y / 18 > .5 && y / 18 < .85; c.fillStyle = h ? `rgb(250,${190 + R() * 50 | 0},60)` : `rgb(${30 + 50 * vv | 0},${70 + 110 * vv | 0},${150 + 90 * vv | 0})`; c.fillRect(x * W / 40, y * H / 18, W / 40 + .6, H / 18 + .6); } }
   const pv = document.createElement('div'); pv.className = 'pvx'; pv.hidden = true; sf.appendChild(pv);
@@ -424,19 +389,18 @@
   }
   // 표: 마우스가 있는 열(지점)과 행(감지)을 함께 강조
   scr.addEventListener('mouseover', e => { scr.querySelectorAll('.colhi').forEach(x => x.classList.remove('colhi')); if(dt) return; const c = e.target.closest('.mx [data-col]'); if(c) scr.querySelectorAll(`.mx [data-col="${c.dataset.col}"]`).forEach(x => x.classList.add('colhi')); });
-  scr.addEventListener('mouseover', e => { const kd = e.target.closest('.kd[data-n]'); scr.querySelectorAll('.mapp .m2v').forEach(sv => { sv.classList.toggle('dimk', !!kd); sv.querySelectorAll('.wpm').forEach(g => g.classList.toggle('hit', !!kd && g.dataset.ks.split(',').includes(kd.dataset.n))); }); });
+  scr.addEventListener('mouseover', e => { const kd = e.target.closest('.kd[data-n]'); side.querySelectorAll('.m2v').forEach(sv => { sv.classList.toggle('dimk', !!kd); sv.querySelectorAll('.wpm').forEach(g => g.classList.toggle('hit', !!kd && g.dataset.ks.split(',').includes(kd.dataset.n))); }); });
   scr.addEventListener('mouseleave', () => scr.querySelectorAll('.colhi').forEach(x => x.classList.remove('colhi')));
   function render(){
     pv.hidden = true;
+    v.innerHTML = view();   // 자세히 보기가 dt.wp · dt.lk 를 정하므로 본문을 먼저 그린다
     bc.innerHTML = crumb();
-    v.innerHTML = view() + overlay();
+    side.innerHTML = sideHtml();
     requestAnimationFrame(() => v.querySelectorAll('canvas[data-spec3]').forEach(spec3));
   }
-  function go(id){ bigMap = null; mapF = {}; dt = null; menu = false; drawer = null; scope = id==='all' ? 'all' : +id; if(scope===1){ newSeen = true; toasts = toasts.filter(t => t.mi !== 1); } render(); }
+  function go(id){ mapF = {}; dt = null; menu = false; drawer = null; scope = id==='all' ? 'all' : +id; if(scope===1){ newSeen = true; toasts = toasts.filter(t => t.mi !== 1); } render(); }
   scr.addEventListener('click', e => {
     const mfb = e.target.closest('[data-mf]'); if(mfb){ return pickF(+mfb.dataset.mi, mfb.dataset.mf); }
-    if(e.target.closest('[data-mbig]')){ bigMap = +e.target.closest('[data-mbig]').dataset.mbig; return render(); }
-    if(bigMap !== null && e.target.closest('[data-mbx]') && (e.target.matches('[data-mbx]') || e.target.closest('.m2c'))){ bigMap = null; return render(); }
     if(e.target.closest('[data-menu]')){ menu = !menu; bc.innerHTML = crumb(); return; }
     if(dt){
       if(e.target.closest('[data-dback]')){ const k = dt.k, w = dt.w, mi = dt.mi; dt = null; render(); const c = v.querySelector(`.kd[data-n="${k}"]`) || v.querySelector(`[data-dk="${k}"][data-dm="${mi}"]${w ? `[data-dw="${w}"]` : ''}`) || v.querySelector(`[data-dk="${k}"][data-dm="${mi}"]`); if(c){ const t = c.closest('td') || c; zoomOut(t, () => { t.classList.add('ring'); setTimeout(() => t.classList.remove('ring'), 1500); }); } return; }
@@ -449,26 +413,22 @@
       if(e.target.closest('[data-dretx]')){ delete dt.from; return render(); }
       const dk2 = e.target.closest('[data-dk]'); if(dk2){ const from = dk2.dataset.rel ? (dt.from || {k:dt.k, w:dt.w}) : null; dt = {mi:dt.mi, k:dk2.dataset.dk, w:dk2.dataset.dw}; if(from) dt.from = from; return render(); }
     }
+    // 왼쪽 패널 접기(보고서와 같다)
+    if(e.target.closest('[data-sf-fold]')){ const f = sf.classList.toggle('is-fold'), t = e.target.closest('[data-sf-fold]'); t.setAttribute('aria-expanded', String(!f)); t.setAttribute('aria-label', f ? '안전진단 패널 펼치기' : '안전진단 패널 접기'); return; }
     const kd = e.target.closest('.kd[data-n][role="button"]');
     if(kd && !dt){ const sec = kd.closest('[data-mi]'); const mi = sec ? +sec.dataset.mi : scope==='all' ? null : scope; if(mi !== null){ return zoomIn(kd, () => { dt = {mi, k:kd.dataset.n}; render(); }); } }
     const tdc = e.target.closest('[data-dk][data-dm]'); if(tdc && !dt){ pv.hidden = true; const cell = tdc.closest('td') || tdc; return zoomIn(cell, () => { dt = {mi:+tdc.dataset.dm, k:tdc.dataset.dk, w:tdc.dataset.dw}; render(); }); }
     const ly = e.target.closest('[data-lay]'); if(ly){ lay = ly.dataset.lay; return render(); }
-    if(e.target.closest('[data-ixfold]')){ ixOpen = !ixOpen; return render(); }
-    const tc = e.target.closest('[data-tclose]'); if(tc){ e.stopPropagation(); toasts = toasts.filter(t => t.mi !== +tc.dataset.tclose); return render(); }
     const sc = e.target.closest('[data-sc]'); if(sc) return go(sc.dataset.sc);
     if(menu){ menu = false; bc.innerHTML = crumb(); }
-    if(e.target.closest('[data-dclose]')){ drawer = null; return render(); }
-    const dw = e.target.closest('[data-drawer]'); if(dw){ drawer = +dw.dataset.drawer; return render(); }
   });
   // 시연 — 다른 미션에 새 위험이 들어온 상태(레일 점 깜빡임 · 새로 표시). 화면에는 단추를 두지 않고 콘솔에서 부른다(APRISM_SAFETY.fire · reset)
   window.APRISM_SAFETY = {
     fire(){ if(fired) return; fired = true; newSeen = false; if(scope===1) scope = 0; M[NEWR[0]].r[NEWR[1]] = NEWR[2].slice(); toasts.unshift({mi:NEWR[0], k:NEWR[1]}); render(); },
-    reset(){ bigMap = null; mapF = {}; init(); dt = null; render(); }
+    reset(){ mapF = {}; init(); dt = null; render(); }
   };
-  document.addEventListener('keydown', e => { if(e.key==='Escape' && bigMap !== null){ bigMap = null; render(); } });
-  const hlSet = b => { const lv = sf.querySelector('.lvC'); if(!lv) return; lv.querySelectorAll('.hl').forEach(x => x.classList.remove('hl'));
-    if(!b) return; const k2 = b.dataset.dk, w2 = b.dataset.dw; const c = lv.querySelector(`.dgr span[data-dk="${k2}"][data-dw="${w2}"]`);
-    if(c){ c.classList.add('hl'); c.closest('.dgr').classList.add('hl'); } const h = lv.querySelector(`.dgh [data-hw="${w2}"]`); if(h) h.classList.add('hl'); const g = lv.querySelector(`.wpm[data-w="${w2}"]`); if(g) g.classList.add('hl'); };
+  // 연관 감지에 올리면 왼쪽 지도의 그 지점이 노랗게
+  const hlSet = b => { side.querySelectorAll('.wpm.hl').forEach(x => x.classList.remove('hl')); if(!b) return; const g = side.querySelector(`.wpm[data-w="${b.dataset.dw}"]`); if(g) g.classList.add('hl'); };
   ['mouseover', 'focusin'].forEach(ev => document.addEventListener(ev, e => { const b = e.target.closest && e.target.closest('[data-sf] .lvB.ref .rlx'); if(b) hlSet(b); }));
   ['mouseout', 'focusout'].forEach(ev => document.addEventListener(ev, e => { const b = e.target.closest && e.target.closest('[data-sf] .lvB.ref .rlx'); if(b && !(e.relatedTarget && b.contains(e.relatedTarget))) hlSet(null); }));
   // 메뉴 밖을 누르면 닫는다(상태바 메뉴와 같다)
