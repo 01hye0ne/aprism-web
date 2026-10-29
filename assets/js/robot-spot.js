@@ -208,6 +208,7 @@
         });
       }
 
+      var GAIT_S = 1.2;   // 걸음 한 주기(초) — 2D 패널 로봇과 같다
       var st = { amp: 0, phase: 0, sit: 0 };
       pose(0, 0, 0);
       var ease = function (t) { return t * t * (3 - 2 * t); };
@@ -218,7 +219,8 @@
           st.sit += Math.max(-dt * 1.1, Math.min(dt * 1.1, sitT - st.sit));
           var want = motion === "walk" && st.sit < 0.02 ? 1 : 0;   // 앉아 있을 때는 다리를 들지 않는다
           st.amp += (want - st.amp) * Math.min(1, dt * 6);
-          if (st.amp > 0.002) { st.phase += dt * Math.PI * 2 * 1.7; } else { st.phase = 0; }
+          // 걸음 박자 — 2D 4족(v5.css --r2-dur 1.2s)과 같은 한 주기 1.2초. 시안은 1.7Hz(0.59초)로 두 배쯤 빨랐다
+          if (st.amp > 0.002) { st.phase += dt * Math.PI * 2 / GAIT_S; } else { st.phase = 0; }
           pose(st.amp, st.phase, ease(st.sit));
         }
       };
