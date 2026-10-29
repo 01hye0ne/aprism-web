@@ -412,6 +412,7 @@
     rrPins();          // [10/22] 번호 핀(시안의 핀 형태)
     rrLabels();        // [10/22] 설비 이름 — 다가가면 상시 노출
     travelSync();   // 층 이동 — 층마다 선을 켜고 끄고 표식을 놓는다
+    rrRibbons();    // [10/29] 경로 실선 · 흰 테 · 점선 바탕 띠 = 바닥에 깐 띠 — 선의 자리 · 색 · 보이기를 따라간다
     renderer.render(scene, camera);
     rrDog();           // [10/29 v5] 로봇 = 3D SPOT(robot-spot.js) — 깊이를 지우고 맨 위에 한 번 더 그린다
     placeCard();
@@ -3027,41 +3028,117 @@
     }
   }
   /*
-   * [10/29 v5] 경로 다듬기 — 디자이너 레퍼런스(어두운 지도 위 내비 경로)에서 가져온 두 가지.
-   *   흰 테   파란 실선(지나온 길 · 지금 가는 토막) 양옆에 1px 흰 선 — 선 아래에 2px 더 굵은 흰 선을 한 벌 깐다.
-   *           선이 어두운 바닥 · 설비 위에서도 또렷하게 떨어진다. 길이 회색으로 굳는 상태(완료 · 자동복귀)에는 걷는다.
-   *   바탕 띠 점선(앞으로 갈 길 · 돌아가는 길) 밑에 같은 굵기의 은은한 실선 — 점이 흩어진 점이 아니라 한 줄로 읽힌다.
-   * 둘 다 본선의 기하를 같이 쓴다(길이 줄어들면 함께 줄어든다). 반투명 선을 겹치면 토막 이음매가 구슬처럼 진해지므로
-   * 바닥색과 미리 섞은 불투명 색으로 칠한다(rrMix · rrStyle 과 같은 이유).
+   * [10/29 v5] 경로를 바닥에 깐 띠(리본)로 — 디자이너: "라인이 꺾이는 데서 찌그러진다".
+   *
+   * 예전 경로 실선은 굵은 선(Line2)이었다. 화면에 편 띠를 토막마다 따로 그려 잇는 방식이라
+   *   · 꺾이는 자리에 이음매가 없어 안쪽이 계단처럼 잘리고 바깥 흰 테가 끊겼다
+   *   · 지나온 길 · 지금 토막 · 돌아가는 길이 따로라 만나는 자리마다 끝과 흰 테가 겹쳐 흰 토막이 튀었다
+   *   · 화면에 편 판이라 기울어진 바닥과 깊이가 안 맞아 가장자리가 바닥에 먹혔다(톱니 · 한쪽 흰 테 — 깊이를 당겨 덮어 왔다)
+   * 이제 실선 · 흰 테 · 점선 바탕 띠는 바닥 위에 실제로 깐 얇은 판이다. 꺾이는 자리는 이어서(마이터) 계산하고, 바닥과 같은 면이라
+   * 깊이 문제가 없고, 굵기도 원근을 받는다(레퍼런스처럼 바닥에 붙어 보인다). 굵기는 지금 배율에서 화면 px 가 되게 월드로 잰다.
+   *
+   * 무엇을 그릴지(길 토막 · 색 · 상태)는 그대로 굵은 선 쪽이 정한다 — 리본은 그 선의 자리 · 색 · 굵기 · 보이기를 매 프레임 따라간다.
+   * 실선의 굵은 선은 감추고(material.visible), 점선의 점은 굵은 선 그대로 둔다.
+   *   main  실선 본체(지나온 길 · 지금 토막)         edge  그 아래 2px 넓은 흰 테(양옆 1px)         band  점선 밑 은은한 바탕 띠
    */
-  function rrUnder2(part, key, order) {
-    if (!part || !part.material || !Fat) { return null; }
-    if (part.userData[key]) { return part.userData[key]; }
-    var mt = new Fat.LineMaterial({ color: 0xffffff, linewidth: 1, transparent: true, opacity: 1, depthWrite: false });
-    rrLift(mt); mt.resolution.copy(part.material.resolution); fatMats.push(mt);
-    // 본선보다 넓은 띠라 화면 아래쪽(카메라에 가까운 쪽) 가장자리가 기울어진 바닥 깊이에 먹혀 한쪽 테만 남았다(디자이너 지적) — 깊이를 더 당긴다
-    mt.polygonOffsetFactor = -40; mt.polygonOffsetUnits = -40;
-    var l = new Fat.Line2(part.geometry, mt);
-    l.renderOrder = order; l.userData.rrKeep = true; l.raycast = function () {};
-    l.onBeforeRender = function () { if (l.geometry !== part.geometry) { l.geometry = part.geometry; } };
-    part.add(l); part.userData[key] = l;
-    return l;
+  var ribs = [];   // { part, kind: "solid" | "band", main, edge, key }
+  var RIB_K = 1.35;   // 바닥 리본 굵기 보정 — 눕힌 만큼 얇아 보이는 것을 되돌린다
+  function ribPoints(part) {
+    var g = part.geometry, st = g && g.attributes && g.attributes.instanceStart;
+    if (!st || !g.instanceCount && !st.count) { return []; }
+    var n = st.count, pts = [], a = st.data.array, stride = st.data.stride, i;
+    for (i = 0; i < n; i++) { pts.push(new THREE.Vector3(a[i * stride], a[i * stride + 1], a[i * stride + 2])); }
+    if (n) { pts.push(new THREE.Vector3(a[(n - 1) * stride + 3], a[(n - 1) * stride + 4], a[(n - 1) * stride + 5])); }
+    // 겹친 점은 뺀다 — 길이 0 토막은 방향이 없어 이음 계산이 무너진다
+    return pts.filter(function (p, k) { return k === 0 || p.distanceToSquared(pts[k - 1]) > 1e-10; });
   }
+  // 바닥 리본 — 점들을 바닥(XZ)에서 좌우로 half 만큼 벌린 띠. 꺾이는 자리는 두 토막의 법선을 이어(마이터), 너무 뾰족하면 2배에서 자른다
+  function ribGeo(pts, half, lift) {
+    var n = pts.length, pos = new Float32Array(n * 6), idx = [], nrm = [], k;
+    for (k = 0; k < n - 1; k++) {
+      var dx = pts[k + 1].x - pts[k].x, dz = pts[k + 1].z - pts[k].z, l = Math.sqrt(dx * dx + dz * dz);
+      nrm.push(l > 1e-9 ? [-dz / l, dx / l] : null);   // 계단처럼 곧장 위아래로 가는 토막은 바닥 방향이 없다
+    }
+    for (k = 0; k < n - 1; k++) { if (!nrm[k]) { nrm[k] = nrm[k - 1] || null; } }
+    for (k = n - 2; k >= 0; k--) { if (!nrm[k]) { nrm[k] = nrm[k + 1] || [1, 0]; } }
+    for (k = 0; k < n; k++) {
+      var a = nrm[Math.max(0, k - 1)], b = nrm[Math.min(n - 2, k)];
+      var mx = a[0] + b[0], mz = a[1] + b[1], ml = Math.sqrt(mx * mx + mz * mz), s = half;
+      if (ml > 1e-6) { mx /= ml; mz /= ml; var d = mx * a[0] + mz * a[1]; s = half / Math.max(0.5, d); } else { mx = a[0]; mz = a[1]; }
+      var p = pts[k];
+      pos.set([p.x + mx * s, p.y + lift, p.z + mz * s, p.x - mx * s, p.y + lift, p.z - mz * s], k * 6);
+      if (k < n - 1) { var i0 = k * 2; idx.push(i0, i0 + 1, i0 + 2, i0 + 1, i0 + 3, i0 + 2); }
+    }
+    var g = new THREE.BufferGeometry();
+    g.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+    g.setIndex(idx);
+    return g;
+  }
+  function ribMesh(order) {
+    var m = new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide, transparent: true, opacity: 1, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -4 }));
+    // 바닥 · 설비 판이 반투명 칸(투명 순서)에서 그려지므로 리본도 같은 칸에 넣어야 renderOrder 대로 그 위에 얹힌다(불투명이면 바닥이 덮었다)
+    m.renderOrder = order; m.frustumCulled = false; m.raycast = function () {};
+    scene.add(m);
+    return m;
+  }
+  function ribAdd(part, kind) {
+    if (!part || !part.material || !scene) { return null; }
+    for (var i = 0; i < ribs.length; i++) { if (ribs[i].part === part) { return ribs[i]; } }
+    var r = { part: part, kind: kind, main: ribMesh(kind === "band" ? 1.8 : 2), edge: kind === "solid" ? ribMesh(1.9) : null, key: "" };
+    if (kind === "solid") { part.material.visible = false; }   // 실선은 리본이 대신 그린다 — 굵은 선은 자리 · 색만 내준다
+    ribs.push(r);
+    return r;
+  }
+  function ribDrop(r) {
+    [r.main, r.edge].forEach(function (m) { if (m) { scene.remove(m); m.geometry.dispose(); m.material.dispose(); } });
+  }
+  // 매 프레임 — 선을 따라 자리 · 굵기 · 색 · 보이기를 맞춘다. 자리나 배율이 바뀐 때만 판을 다시 짠다
+  function rrRibbons() {
+    if (!ribs.length) { return; }
+    var pp = perPixel();
+    ribs = ribs.filter(function (r) {
+      var p = r.part, alive = !!p.parent;
+      if (!alive) { ribDrop(r); return false; }
+      var on = p.visible && p.parent.visible !== false && (r.kind !== "band" || (p.material.dashed && p.userData.ribBand !== false));
+      r.main.visible = on; if (r.edge) { r.edge.visible = on && p.userData.ribEdge !== false; }
+      if (!on) { return true; }
+      var st = p.geometry.attributes.instanceStart, lw = p.material.linewidth || 2;
+      var key = (st ? st.data.array.length + ":" + st.data.array[0] + ":" + st.data.array[st.data.array.length - 1] + ":" + st.data.version : "") + "|" + pp.toPrecision(5) + "|" + lw;
+      if (key !== r.key) {
+        r.key = key;
+        var pts = ribPoints(p), lift = span * 0.0025;   // 바닥 판 위로 살짝 — 선 자리는 바닥 면과 거의 같은 높이라 띄우지 않으면 바닥에 묻힌다
+        if (pts.length >= 2) {
+          // 같은 높이에 깐다 — 본선을 더 띄우면 화면에서 위로 밀려 위쪽 흰 테를 덮었다. 겹침 순서는 renderOrder(테 1.9 → 본선 2)가 정한다.
+          // 바닥에 누우면 화면에서 기울기만큼 얇아진다 — 굵은 선 시절과 비슷한 두께로 읽히게 RIB_K 배로 깐다
+          r.main.geometry.dispose(); r.main.geometry = ribGeo(pts, lw / 2 * RIB_K * pp, lift);
+          if (r.edge) { r.edge.geometry.dispose(); r.edge.geometry = ribGeo(pts, (lw / 2 * RIB_K + 1.2) * pp, lift); }
+        } else { r.main.visible = false; if (r.edge) { r.edge.visible = false; } }
+      }
+      if (r.kind === "band") { r.main.material.color.setHex(p.userData.ribBandHex || 0x444444); }
+      else {
+        r.main.material.color.copy(p.material.color);
+        r.main.material.opacity = p.material.opacity;
+        if (r.edge) { r.edge.material.color.setHex(p.userData.ribEdgeHex || 0xffffff); }
+      }
+      return true;
+    });
+  }
+  /*
+   * 경로 다듬기 — 디자이너 레퍼런스(어두운 지도 위 내비 경로)에서 가져온 두 가지. 색만 여기서 정하고 그리기는 리본(rrRibbons)이 한다.
+   *   흰 테   파란 실선(지나온 길 · 지금 가는 토막) 양옆에 1px 흰 선. 길이 회색으로 굳는 상태(완료 · 자동복귀)에는 걷는다.
+   *   바탕 띠 점선(앞으로 갈 길 · 돌아가는 길) 밑에 같은 굵기의 은은한 실선 — 점이 흩어진 점이 아니라 한 줄로 읽힌다.
+   * 반투명을 겹치면 진해지는 자리가 생기므로 바닥색과 미리 섞은 불투명 색으로 칠한다(rrMix · rrStyle 과 같은 이유).
+   */
   function rrPolish(ln, m) {
     var gray = m === "done" || m === "return", under = rrUnder();
-    [ln.parts[0], ln.cur].forEach(function (p) {   // 흰 테
-      var e = rrUnder2(p, "rrEdge", 1.9); if (!e) { return; }
-      e.visible = !gray;
-      // 본선도 같은 만큼 당긴다 — 본선 아래쪽만 바닥에 먹히면 그 자리에 흰 테가 두껍게 드러나 양쪽 테 굵기가 달라 보였다
-      if (p.material.polygonOffsetFactor !== -40) { p.material.polygonOffsetFactor = -40; p.material.polygonOffsetUnits = -40; }
-      e.material.linewidth = p.material.linewidth + 2;
-      e.material.color.setHex(rrMix(0xffffff, p === ln.cur ? 0.9 : 0.55, under));   // 지나온 길(옅은 파랑)은 테도 한 단 옅게
+    [ln.parts[0], ln.cur].forEach(function (p) {   // 실선 + 흰 테
+      if (!ribAdd(p, "solid")) { return; }
+      p.userData.ribEdge = !gray;
+      p.userData.ribEdgeHex = rrMix(0xffffff, p === ln.cur ? 0.9 : 0.55, under);   // 지나온 길(옅은 파랑)은 테도 한 단 옅게
     });
     [ln.parts[1], ln.home].forEach(function (p) {   // 점선 바탕 띠
-      var b = rrUnder2(p, "rrBand", 1.8); if (!b) { return; }
-      b.visible = !!p.material.dashed;
-      b.material.linewidth = p.material.linewidth;
-      b.material.color.copy(p.material.color).lerp(new THREE.Color(under), isLight() ? 0.88 : 0.75);   // 점 색을 바닥에 다크 25% · 라이트 12% 남긴다(10/29 더 연하게) — 점보다 한참 옅지만 한 줄로 읽히게
+      if (!ribAdd(p, "band")) { return; }
+      p.userData.ribBandHex = new THREE.Color(p.material.color).lerp(new THREE.Color(under), isLight() ? 0.88 : 0.75).getHex();   // 점 색을 바닥에 다크 25% · 라이트 12% 남긴다
     });
   }
   function rrApply(ln) {
