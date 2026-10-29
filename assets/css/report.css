@@ -54,13 +54,12 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
-  border-right: var(--border-width-thin) solid var(--border-divider);
   overflow: hidden;
 }
-/* 패널 머리 — 관제 패널(.panel-head · app-shell v2.2 머리줄)과 같다: 안쪽 12 · 사이 8 · 45 높이,
-   구분선은 좌우 12 안쪽에서만 border/default(양끝까지 그으면 잘린 선으로 읽힌다) */
+/* 패널 머리 — 관제 패널(.panel-head · app-shell v2.2 머리줄)과 같다: 안쪽 12 · 사이 8 · 45 높이.
+   구분선은 border/default — 관제는 좌우 12 안쪽만 긋지만 여기는 양끝까지(10/29 디자이너, 오른쪽 세로 구분선을 뺐으니 잘린 선으로 읽히지 않는다) */
 .rp-phead { position: relative; flex: none; display: flex; align-items: center; gap: var(--space-8); padding: var(--space-12); border-bottom: var(--border-width-thin) solid transparent; }
-.rp-phead::after { content: ""; position: absolute; left: var(--space-12); right: var(--space-12); bottom: calc(var(--border-width-thin) * -1); height: var(--border-width-thin); background-color: var(--border-default); }
+.rp-phead::after { content: ""; position: absolute; left: 0; right: 0; bottom: calc(var(--border-width-thin) * -1); height: var(--border-width-thin); background-color: var(--border-default); }
 .rp-body.is-fold .rp-phead { gap: 0; }
 .rp-body.is-fold .rp-phead::after { opacity: 0; }
 .rp-ptog { display: grid; place-items: center; width: 20px; height: 20px; color: var(--text-primary) !important; }
