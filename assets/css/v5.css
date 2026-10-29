@@ -174,3 +174,11 @@ body.ver-5 .ah-box,
 :root[data-theme="light"] body.ver-5 .ah-box::before { content: none; }
 :root[data-theme="light"] body.ver-5 .ah-box.is-scrolled { box-shadow: inset 0 10px 8px rgb(0 0 0 / 8%); }
 :root[data-theme="light"] body.ver-5 .ah-box.has-fade::after { background: linear-gradient(rgb(0 0 0 / 0%), rgb(0 0 0 / 6%)); }
+
+/*
+ * [10/29] 웨이포인트 번호 = JetBrains Mono Bold — 지도 번호 핀(.rr-pin-head)과 오른쪽 웨이포인트 목록 번호(.step-no)를 함께.
+ * 알림의 WP-04 · 지도 경로 작은 번호(.rr-wpnum)가 이미 고정폭이다 — 자릿수가 흔들리면 안 되는 세는 값(monitor.css .ma-wp).
+ * 두 자리 번호(11 · 18)도 같은 폭으로 원 가운데에 앉는다. 굵기 700 은 v5 화면 머리에서 함께 받는다.
+ */
+body.ver-5 .rr-pin-head::after { font-family: var(--font-family-mono); font-weight: 700; letter-spacing: -0.4px; }
+body.ver-5 .step-no { font-family: var(--font-family-mono); font-weight: 700; }
