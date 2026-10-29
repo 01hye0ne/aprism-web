@@ -112,6 +112,31 @@ body.ver-5 [data-r2="sit"] .r2-knee { animation: r2-sit-knee 0.9s 0.15s ease-in-
 @keyframes r2-sit-knee { to { transform: rotate(58.25deg); } }
 
 /*
+ * 바닥 그림자(robot-2d.js DOG_SHADOW) — 걷기는 엉덩이 키프레임과 같은 박자 · 같은 위상(r2-p1~p4)으로 발을 따라간다.
+ * 엉덩이 ±16° 면 발(엉덩이에서 59)이 ±16.3 움직인다. 스윙(76~100%)에 발을 들면 그림자가 줄고 옅어진다.
+ */
+body.ver-5 .robot-2d .r2-foot-s,
+body.ver-5 .robot-2d .r2-body-sh { transform-box: fill-box; transform-origin: center; }
+body.ver-5 .robot-2d .r2-body-sh { opacity: 0.6; }
+body.ver-5 [data-r2="walk"] .r2-foot { animation: r2-foot var(--r2-dur) ease-in-out infinite; }
+body.ver-5 [data-r2="walk"] .r2-foot-s { animation: r2-foot-lift var(--r2-dur) ease-in-out infinite; }
+@keyframes r2-foot {
+  0% { transform: translateX(-16.3px); animation-timing-function: linear; }
+  76% { transform: translateX(16.3px); animation-timing-function: cubic-bezier(0.45, 0.02, 0.3, 1); }
+  100% { transform: translateX(-16.3px); }
+}
+@keyframes r2-foot-lift {
+  0%, 76% { transform: scale(1); opacity: 1; }
+  88% { transform: scale(0.55); opacity: 0.4; }
+  100% { transform: scale(1); opacity: 1; }
+}
+/* 앉기 — 발이 7.4 뒤로 가고, 몸통이 바닥에 가까워지니 몸통 그림자가 진해진다. */
+body.ver-5 [data-r2="sit"] .r2-foot { animation: r2-sit-foot 0.9s 0.15s ease-in-out both; }
+body.ver-5 [data-r2="sit"] .r2-body-sh { animation: r2-sit-sh 0.9s 0.15s ease-in-out both; }
+@keyframes r2-sit-foot { to { transform: translateX(7.4px); } }
+@keyframes r2-sit-sh { to { opacity: 1; transform: scaleX(0.94); } }
+
+/*
  * 모베드(robot-2d.js MOBED · Figma 1412:16371 / 1412:16401) — 바퀴형이라 관절 대신 바퀴가 움직인다.
  *   운행중  바퀴가 왼쪽으로 구른다(반시계, 한 바퀴 1.6s) · 몸통이 0.6 떤다.
  *   충전중  바퀴가 몸통 안쪽으로 모이며 구르고(왼 +19 · 오른 -17 = 반지름 20 기준 +54° · -49°), 몸통이 6 내려앉는다.

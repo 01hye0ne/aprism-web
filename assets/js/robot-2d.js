@@ -46,6 +46,8 @@
     '<path fill="url(#r2-g-pay)" d="M59.841 37.5698L61.8404 22.9203C61.9425 22.1719 61.7387 21.4139 61.2749 20.8178C60.8254 20.24 60.168 19.8608 59.4429 19.7609L54.8309 19.1257C54.3151 19.0547 53.8312 19.3912 53.7182 19.8994L51.2397 31.0503C51.138 31.5078 50.7322 31.8333 50.2636 31.8333H40.9877C40.4948 31.8333 40.0754 32.1925 39.9996 32.6796L38.8845 39.8463C38.7902 40.4525 39.2591 41 39.8727 41H55.1345C55.5855 41 56.0308 40.8983 56.4371 40.7024L58.1712 39.8665C59.0778 39.4295 59.7049 38.567 59.841 37.5698Z"/>' +
     '</g>' +
     /* 모베드 — Figma 운행중 1412:16371 · 충전중 1412:16401. 바퀴는 가운데(0,0) 기준 하나를 두 번 건다. */
+    /* 바닥 그림자 — 가운데 진하고 가장자리로 사라지는 타원(4족 · 모베드 공용). */
+    '<radialGradient id="r2-g-shadow"><stop stop-color="#000" stop-opacity="0.75"/><stop offset="0.45" stop-color="#000" stop-opacity="0.45"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient>' +
     '<radialGradient id="mb-g-tire" cx="0" cy="0" r="20" gradientUnits="userSpaceOnUse"><stop offset="0.889423" stop-color="#2C3443"/><stop offset="1" stop-color="#070A10"/></radialGradient>' +
     '<radialGradient id="mb-g-hub" cx="0" cy="0" r="17" gradientUnits="userSpaceOnUse"><stop stop-color="#9EA8BB"/><stop offset="0.75" stop-color="#9EA8BB"/><stop offset="1" stop-color="#D1D5DE"/></radialGradient>' +
     '<linearGradient id="mb-g-body" x1="83" y1="70" x2="83" y2="88" gradientUnits="userSpaceOnUse"><stop stop-color="#9EA8BB"/><stop offset="1" stop-color="#2C3443"/></linearGradient>' +
@@ -79,8 +81,24 @@
   }
 
   /* 뒤쪽(먼 쪽) 다리는 몸통 아래, 앞쪽 다리는 위. 위상 0 / .25 / .5 / .75 — 예전 리그와 같다. */
+  /*
+   * 바닥 그림자(10/29 디자이너) — 몸 · 다리와 따로 바닥(y 115.5)에 붙어 있다(앉을 때 몸이 내려가도 그림자는 바닥에 남는다).
+   *   몸통 그림자  몸통 아래 넓고 옅은 타원. 앉으면 진해진다.
+   *   발 그림자    발마다 하나. 걸을 때 엉덩이 회전을 따라 앞뒤로 ±16.3 움직이고, 발을 들면(스윙) 작고 옅어진다.
+   *               앉으면 발이 7.4 뒤(오른쪽)로 가므로 따라간다.
+   */
+  function foot(side, phase) {
+    var x = side === "r" ? 104.5 : 38.5;
+    return '<g class="r2-foot ' + phase + '"><ellipse class="r2-foot-s ' + phase + '" cx="' + x + '" cy="115.5" rx="8" ry="2" fill="url(#r2-g-shadow)"/></g>';
+  }
+
+  var DOG_SHADOW =
+    '<g class="r2-shadow"><ellipse class="r2-body-sh" cx="80" cy="115.5" rx="50" ry="3.5" fill="url(#r2-g-shadow)"/>' +
+    foot("l", "r2-p2") + foot("r", "r2-p3") + foot("l", "r2-p1") + foot("r", "r2-p4") + '</g>';
+
   var DOG =
     '<svg class="robot-2d" viewBox="26 14 116 102" aria-hidden="true" xmlns="' + NS + '">' +
+    DOG_SHADOW +
     '<g class="r2-all"><g class="r2-bob">' +
     leg("l", "r2-p2", "#8F9D29") + leg("r", "r2-p3", "#8F9D29") +
     '<use href="#r2-body"/>' +
@@ -101,6 +119,10 @@
 
   var MOBED =
     '<svg class="robot-2d is-mobed" viewBox="27 14 116 102" aria-hidden="true" xmlns="' + NS + '">' +
+    /* 바닥 그림자 — 몸통 아래 옅게 하나, 바퀴마다 하나(앉을 때 바퀴를 따라 안쪽으로 온다). */
+    '<g class="r2-shadow"><ellipse class="r2-body-sh" cx="82" cy="115.5" rx="56" ry="3.5" fill="url(#r2-g-shadow)"/>' +
+    '<g class="mb-slide mb-slide-l"><ellipse cx="40" cy="115.5" rx="16" ry="2.4" fill="url(#r2-g-shadow)"/></g>' +
+    '<g class="mb-slide mb-slide-r"><ellipse cx="124" cy="115.5" rx="16" ry="2.4" fill="url(#r2-g-shadow)"/></g></g>' +
     '<g class="mb-body"><use href="#mb-body"/></g>' +
     wheel("l", 40) + wheel("r", 124) +
     '</svg>';
