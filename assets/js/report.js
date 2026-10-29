@@ -394,7 +394,12 @@
   function makeMonth() {
     if (vm !== 10) { plainToast("시안에서는 10월만 연결돼요"); return; }
     moState = "busy"; renderList();
-    setTimeout(function () { moState = "made"; selectDoc("mo10"); plainToast("10월 월 보고서를 만들었어요"); }, 1200);
+    setTimeout(function () {
+      moState = "made"; selectDoc("mo10"); plainToast("10월 월 보고서를 만들었어요");
+      // 막 생긴 월 보고서 줄이 잠깐 초록으로 빛난다 — 관제 "오늘 확인 완료"에 막 들어온 줄(monitor.css done-new)과 같은 인터랙션
+      var row = list.querySelector(".rp-grp.is-month .rp-item");
+      if (row) { row.classList.add("is-new"); setTimeout(function () { row.classList.remove("is-new"); }, 1300); }
+    }, 1200);
   }
 
   function renderList() {

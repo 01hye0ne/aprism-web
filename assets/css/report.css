@@ -441,3 +441,17 @@
 }
 /* 쪽 표시는 막대(12) 바로 안쪽 — 예전 기본 막대(16) 자리에서 옮긴다 */
 .rp-detail .rp-pgno { right: calc(var(--space-20) + 12px); }
+
+/*
+ * 막 생성한 월 보고서 줄 — 관제 "오늘 확인 완료"에 막 들어온 줄과 같은 초록 빛(monitor.css .done-item.is-new · done-new 키프레임과 같은 값:
+ * status/safe 30% 에서 처음 1/4 머물렀다가 1.2s 에 사그라든다). 줄은 고른 상태(bg/selected !important)로 열리므로
+ * 면 위에 한 겹(::after)을 얹어 빛낸다 — 끝나면 고른 면이 그대로 남는다.
+ */
+.rp-item.is-day { position: relative; }
+.rp-item.is-day.is-new::after { content: ""; position: absolute; inset: 0; pointer-events: none; animation: rp-new 1.2s ease-out forwards; }
+/* 보고서 화면은 monitor.css 를 읽지 않아 같은 값을 여기 둔다 — 관제 done-new 를 고치면 같이 고친다 */
+@keyframes rp-new {
+  0%, 25% { background-color: color-mix(in srgb, var(--status-safe-icon) 30%, transparent); }
+  100% { background-color: transparent; }
+}
+@media (prefers-reduced-motion: reduce) { .rp-item.is-day.is-new::after { animation: none; } }
