@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <!-- 렌더 실험 — main-v5.html 을 10/29 에 복제해 지도에 1단계 효과(톤 매핑 · 환경광 · AO · 블룸 · 비네트)를 얹었다.
-     효과는 assets/js/lab-map-render.js 에만 있다. 화면 자체는 main-v5.html 을 따라가지 않는다 — 필요하면 다시 복제한다. -->
+     효과는 assets/js/map-fx-v5.js 다(운영 v5 화면과 같은 파일) — 이 화면만 <html data-fx-lab> 으로 조절판을 띄운다. 화면 자체는 main-v5.html 을 따라가지 않는다 — 필요하면 다시 복제한다. -->
 <!-- v5 — v4(*-v3.html)를 10/29 에 복제해 시작했다. 이후 작업은 v5 에서만. Delta 는 위젯형만 쓴다. -->
 <!-- v3 — main-v2-2.html 을 10/21 에 복제해 시작했다. 이후 작업은 v3 에서만. -->
 <!-- data-delta="glass" — 위험 Delta 를 빛으로(2026-10-12 채택). ?delta=off 로 이전 판을 본다.
      data-glow="top" — 빛은 왼쪽 위 모서리(Delta 아이콘 자리)에서 나온다(10/13 채택). ?glow=off 로 아래 빛을 본다. -->
-<html lang="ko" data-theme="dark" data-delta="glass" data-glow="top">
+<html data-fx-lab lang="ko" data-theme="dark" data-delta="glass" data-glow="top">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -1773,8 +1773,8 @@
 <script src="../assets/js/screen.js?v=51665b3f"></script>
 <script src="../assets/js/map-model.js?v=0f88c871"></script>
 <!-- v5 전용 지도(map-v3.js 를 10/29 에 복제) -->
-<script src="../assets/js/lab-map-render.js?v=9572650e"></script>
-<script src="../assets/js/map-v5.js?v=17882b63"></script>
+<script src="../assets/js/map-fx-v5.js?v=230be683"></script>
+<script src="../assets/js/map-v5.js?v=0306b590"></script>
 <!-- 지도 위 3D 로봇(SPOT · 휠 로봇) — 10/29 디자이너 "SPOT 로봇 360 시안". 예전 로봇개(robot-stage.js)는 v5 에서 안 쓴다. -->
 <script src="../assets/js/robot-spot.js?v=2a3061e4"></script>
 <script src="../assets/js/robot-2d.js?v=8011b14e"></script>

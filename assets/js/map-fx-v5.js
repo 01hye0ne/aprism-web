@@ -1,4 +1,5 @@
-// 지도 렌더 실험 — screens/lab-map-render-v5.html 만 읽는다(10/29 디자이너 "레퍼런스처럼 3D 맵 퀄리티").
+// v5 지도 효과 — map-v5.js 를 쓰는 v5 화면이 모두 읽는다(10/29 디자이너가 렌더 실험에서 고른 값을 운영에 반영).
+// 조절판 · 효과 표시 · B 키는 렌더 실험(screens/lab-map-render-v5.html · <html data-fx-lab>)에서만 뜬다.
 // map-v5.js 가 지도를 다 세운 뒤 APRISM_MAP_FX.init 을 부르고, 그릴 때마다 render 를 부른다.
 // render 가 false 를 돌려주면 map-v5.js 가 예전처럼 직접 그린다 — 효과를 끄면 운영 화면과 똑같다.
 //
@@ -19,18 +20,20 @@
 (function () {
   "use strict";
 
+  // 값 — 10/29 디자이너가 렌더 실험 조절판에서 고른 값 그대로.
   var S = {
     on: true,
-    tone: "none", exposure: 1.0,   // AgX 는 경로 · 상태색의 채도를 크게 뺀다(10/29 캡처) — 기본은 끔
-    env: true, envAmt: 0.12, rough: 0.8,   // 0.35 는 덩이가 뿌옇게 바랬다
-    ao: true, aoRadius: 8, aoAmt: 1.2, aoDeep: 2, aoRest: true, aoView: 0,   // aoView 0 합친 화면 · 5 AO 만 · 3 노멀 판
-    bloom: true, bloomAmt: 0.45, bloomRadius: 0.5, bloomTh: 0.6,
-    vignette: 0.5,
-    shadow: 2048, shadowSoft: 4,
-    res: 1   // 후처리 판 배율 — 1 이면 운영 화면(2)의 ¼ 픽셀
+    tone: "none", exposure: 0.9,   // AgX 는 경로 · 상태색의 채도를 크게 뺀다(10/29 캡처) — 톤 매핑은 끔
+    env: true, envAmt: 0.1, rough: 0.8,
+    ao: true, aoRadius: 4.5, aoAmt: 0.6, aoDeep: 1, aoRest: true, aoView: 0,   // aoView 0 합친 화면 · 5 AO 만 · 3 노멀 판
+    bloom: true, bloomAmt: 0.4, bloomRadius: 0.15, bloomTh: 0.51,
+    vignette: 0.25,
+    shadow: 2048, shadowSoft: 5,
+    res: 1   // 후처리 판 배율 — 1 이면 효과 없던 때(2)의 ¼ 픽셀
   };
   var TONES = { "없음": "none", "AgX": "AgX", "ACES": "ACES" };
-  if (/[?&]fx=off/.test(window.location.search)) { S.on = false; }   // ?fx=off — 꺼진 채로 연다(전후 캡처용)
+  var LAB = document.documentElement.hasAttribute("data-fx-lab");
+  if (/[?&]fx=off/.test(window.location.search)) { S.on = false; }   // ?fx=off — 효과 없이 연다(전후 비교 · 느린 PC)
   // ?fxset=tone:ACES,envAmt:0.2 — 값을 주소로 넘긴다. 마음에 드는 조합을 링크 하나로 나눌 수 있다.
   ((window.location.search.match(/[?&]fxset=([^&]+)/) || [])[1] || "").split(",").forEach(function (kv) {
     var p = decodeURIComponent(kv).split(":");
@@ -58,7 +61,7 @@
       import("three/addons/postprocessing/OutputPass.js"),
       import("three/addons/postprocessing/ShaderPass.js"),
       import("three/addons/environments/RoomEnvironment.js"),
-      import("https://cdn.jsdelivr.net/npm/lil-gui@0.19.2/dist/lil-gui.esm.min.js")
+      LAB ? import("https://cdn.jsdelivr.net/npm/lil-gui@0.19.2/dist/lil-gui.esm.min.js") : null
     ]).then(build).catch(function (e) { console.warn("[렌더 실험] 효과를 못 불러와 원래대로 그린다", e); });
   }
 
@@ -146,10 +149,12 @@
     envTex = pm.fromScene(new m[6].RoomEnvironment(r), 0.04).texture;
     pm.dispose();
 
-    panel(m[7].GUI);
-    window.addEventListener("keydown", function (e) {
-      if ((e.key === "b" || e.key === "B") && !/INPUT|TEXTAREA/.test(document.activeElement.tagName)) { S.on = !S.on; sync(); }
-    });
+    if (LAB) {
+      panel(m[7].GUI);
+      window.addEventListener("keydown", function (e) {
+        if ((e.key === "b" || e.key === "B") && !/INPUT|TEXTAREA/.test(document.activeElement.tagName)) { S.on = !S.on; sync(); }
+      });
+    }
     if (window.MutationObserver) {
       new MutationObserver(sync).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
     }
@@ -213,10 +218,10 @@
     P.bloom.strength = S.bloomAmt;
     P.bloom.radius = S.bloomRadius;
     P.bloom.threshold = S.bloomTh;
-    P.vig.enabled = S.vignette > 0;
+    P.vig.enabled = S.vignette > 0 && !light;   // 라이트는 밝은 바탕 가장자리가 회색으로 때 묻어 보인다 — 다크만
     P.vig.uniforms.amount.value = S.vignette;
 
-    badge();
+    if (LAB) { badge(); }
     ctx.redraw();
   }
 
@@ -265,7 +270,7 @@
     var t = performance.now();
     if (!fps.t0) { fps.t0 = t; }
     fps.n += 1;
-    if (t - fps.t0 >= 1000) { fps.v = Math.round(fps.n * 1000 / (t - fps.t0)); fps.n = 0; fps.t0 = t; badge(); }
+    if (t - fps.t0 >= 1000) { fps.v = Math.round(fps.n * 1000 / (t - fps.t0)); fps.n = 0; fps.t0 = t; if (LAB) { badge(); } }
   }
 
   var tag = null;
@@ -280,7 +285,7 @@
   }
 
   function panel(GUI) {
-    var gui = new GUI({ title: "렌더 실험 (1단계)" });
+    var gui = new GUI({ title: "렌더 실험 (1단계) — 기본값 = 운영" });
     gui.domElement.classList.add("lab-fx-gui");
     gui.add(S, "on").name("효과 켜기 (B)").onChange(sync).listen();
 

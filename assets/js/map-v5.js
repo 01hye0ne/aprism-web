@@ -392,7 +392,7 @@
     baseSize = Math.max(fitV, fitH * h / cell) * FIT_AIR;
   }
 
-  // [10/29 렌더 실험] 시험 페이지(lab-map-render-v5.html)가 다는 효과 고리. 운영 화면에는 없다 — 늘 null.
+  // [10/29] 지도 효과 고리 — map-fx-v5.js(v5 화면 모두 읽는다)가 단다. 그 파일이 없거나 ?fx=off 면 예전처럼 직접 그린다.
   var fx = null;
 
   function frame() {
