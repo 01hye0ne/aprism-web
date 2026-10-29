@@ -132,18 +132,17 @@
 /* 미션 목록 — [전체] + 미션 줄(작은 지도 + 미션 · 층 · 측정). 고른 줄은 bg/selected 면, 그 아래 지도가 펼쳐진다 */
 /* [10/30 GUI · Figma 1467:8482] 목록 한 덩이 — 모서리 8. 위 [미션 전체] 줄, 아래 안으로 꺼진 칸에 미션 줄. 범례는 패널 맨 아래로 밀린다 */
 .sf-mlist { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; border-radius: var(--radius-8); overflow: hidden auto; overscroll-behavior: contain; }   /* 막대가 둥근 목록 안쪽에 선다(10/30) */
-.sf-mrow { display: flex; align-items: flex-start; gap: var(--space-8); width: 100%; padding: var(--space-12) var(--space-8); text-align: left; }
+.sf-mrow { display: flex; flex-direction: column; gap: var(--space-8); width: 100%; padding: var(--space-12) var(--space-8); text-align: left; }
+.sf-mbody { display: flex; align-items: flex-start; gap: var(--space-12); }   /* 썸네일 | 키-값 */
 .sf-mrow:hover { background-color: var(--state-hover); }
 .sf-mrow.on { background-color: var(--bg-selected); cursor: default; }
 /* [미션 전체] 줄 — 미션 줄과 같은 꼴. 썸네일 자리(72)는 단계별 미션 수 블록(위험 · 주의 · 정상).
    블록 세 줄은 옆 키-값 세 줄(미션 · 측정 · 요청 전)과 같은 높이(18 + 사이 4)로 아래에 붙여 한 줄 맞춤으로 읽힌다 */
 /* 블록은 키-값 세 줄 높이만큼만 — 위아래 4 로 감싸 아래에 붙인다. 제목 줄 높이까지 늘이면 블록 위가 비어 거슬렸다(10/30) */
-.sf-allsum { align-self: flex-start; display: flex; flex-direction: column; gap: var(--space-4); padding: var(--space-4) var(--space-8); background-color: var(--bg-cell); }
+/* 블록 세 줄(위험 · 주의 · 정상)은 옆 키-값 세 줄(미션 · 측정 · 요청 전)과 같은 높이 — 블록 위 여백 4 + 테 1 만큼 키-값을 내린다 */
+.sf-allsum { display: flex; flex-direction: column; gap: var(--space-4); padding: var(--space-4) var(--space-8); background-color: var(--bg-cell); }
+.sf-all .sf-meta { padding-top: 5px; }
 /* 블록 맨 위 '미션 n' 줄이 제목 줄 자리 — 블록이 썸네일처럼 줄 위 끝에서 시작하고, 위험 · 주의 줄이 측정 · 요청 전 줄과 맞도록 글 칸을 4 내린다(10/30) */
-.sf-all .sf-mtx { padding-top: var(--space-4); }
-.sf-all .sf-meta { margin-top: var(--space-4); }   /* 블록 '미션' 줄 아래 선 · 여백(4 + 1)만큼 — 측정 · 요청 전이 위험 · 주의 줄과 맞는다 */
-.sf-cnt.all { padding-bottom: var(--space-4); margin-bottom: 0; border-bottom: var(--border-width-thin) solid var(--border-default); color: var(--text-primary); }
-.sf-cnt.all b { font-weight: 700; }
 .sf-cnt { display: flex; align-items: center; gap: var(--space-4); font-size: var(--font-size-13); line-height: var(--font-line-height-18); color: var(--text-secondary); white-space: nowrap; }
 .sf-cnt b { margin-left: auto; font-weight: 700; }
 .sf-cnt.crit { color: var(--status-critical-text); }
