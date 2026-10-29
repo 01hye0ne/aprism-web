@@ -2344,11 +2344,12 @@
    *   https://claude.ai/artifact/7if9hac6XnvmEGHNKwtBaY · 시안 좌표 R=120 이 1m, 몸체 132 × 60 이 1.1 × 0.5m.
    *   모델 몸길이(0.85)가 1.1m 라 1m = 0.77 모델 단위 — 로봇개와 같은 배율(sz)로 키운다.
    *   설비에 가려지지 않게 깊이를 안 보고 그린다(로봇과 같은 규칙) — 처음엔 바닥에 묻었더니 옆 설비가 앞 호를 덮었다.
+   *   앞은 빛이 퍼지게 강조한다(10/29 디자이너) — 링 안 부채꼴 그라데이션 + 앞 호, 링 밖은 초록 시야 빔이 이어받는다(파랑 빔과 겹치던 것).
    *   그림은 시안의 05 기립완료: 빗금 원판 + 겹친 원 넷(보조선) + 옅은 3방위 호(30%) + 갈 방향(앞) 호만 그린 점멸(2.4초 · 35↔100%).
    *   상태 — 걷기(이동 · 위험 감지 · 자동복귀)는 앞 호 점멸, 서기(측정 · 일시정지)는 앞 호를 켠 채 멈춤, 완료는 01 대기(링 12%),
    *   긴급정지 · 끊김은 끈다 — 초록 빛이 "괜찮다"로 읽히면 안 된다. 휠 로봇(Robot 05)은 시안 밖이라 뺀다.
    */
-  var HALO_R = 0.77, HALO_G = "#3BE07A";
+  var HALO_R = 0.77, HALO_G = "#3BE07A", HALO_GX = 0x3BE07A;
   var halo = null;
   function haloArt(light) {
     // 시안 SVG 를 캔버스에 그대로 옮긴다. 한 칸 = 시안 1단위 × k. 둘레 여유는 겹친 원(1.03R)과 빛 번짐 몫.
@@ -2373,8 +2374,12 @@
     g.lineWidth = 12; g.strokeStyle = light ? "rgba(23,128,74,.25)" : "#1F3328"; g.beginPath(); g.arc(0, 0, R, 0, Math.PI * 2); g.stroke();
     g.globalAlpha = 0.12; g.strokeStyle = HALO_G; g.beginPath(); g.arc(0, 0, R, 0, Math.PI * 2); g.stroke();
 
-    var front = pad(); g = front.g;   // 갈 방향(앞 = +x) 호 — 굵기 14 · 반각 44도 · 번짐 8
-    g.strokeStyle = HALO_G; g.lineWidth = 14; g.lineCap = "round"; g.shadowColor = HALO_G; g.shadowBlur = 8 * k;
+    var front = pad(); g = front.g;   // 갈 방향(앞 = +x) — 부채꼴 빛 + 호
+    // 빛이 퍼지는 부채꼴(시안 라이팅 A 주변감지의 wA — 가운데 0 → 링 55%). 링 밖으로는 시야 빔(초록)이 이어받는다.
+    var wash = g.createRadialGradient(0, 0, R * 0.15, 0, 0, R);
+    wash.addColorStop(0, "rgba(59,224,122,0)"); wash.addColorStop(1, "rgba(59,224,122,.55)");
+    g.fillStyle = wash; g.beginPath(); g.moveTo(0, 0); g.arc(0, 0, R, -44 * Math.PI / 180, 44 * Math.PI / 180); g.closePath(); g.fill();
+    g.strokeStyle = HALO_G; g.lineWidth = 14; g.lineCap = "round"; g.shadowColor = HALO_G; g.shadowBlur = 12 * k;   // 호 — 굵기 14 · 반각 44도 · 번짐 12(시안 8에서 한 단 키워 앞을 강조)
     arcPath(g, 0, 44, R - 10); g.stroke();
 
     return { base: base.c, ring: ring.c, front: front.c, size: half / R };
@@ -3311,8 +3316,10 @@
       ln.fanEdge.renderOrder = 1;
       ln.fan.add(ln.fanEdge);
     }
-    if (ln.fanEdge) { var fo = rrGhostMats.filter(function (o) { return o.fan === ln.fan; })[0]; if (fo) { fo.p.color.setHex(m === "pause" ? RR_GRAY : m === "return" ? rrNeutral() : blue); } }
-    if (ln.fan && ln.fan.material) { ln.fan.material.color.setHex(m === "pause" ? RR_GRAY : m === "return" ? rrNeutral() : blue); ln.fan.material.opacity = 0.9; }   // F 시야 빔 — 로봇색 부채꼴
+    // [10/29] Spot 은 시야 빔도 바닥 투사(라이팅 A)의 초록 — 파랑 빔과 초록 호가 앞쪽에서 겹쳤다(디자이너). 앞 호에서 빔으로 빛이 퍼져 나간다.
+    var fanHex = robotKind(ln.id) === "spot" ? HALO_GX : (m === "pause" ? RR_GRAY : m === "return" ? rrNeutral() : blue);
+    if (ln.fanEdge) { var fo = rrGhostMats.filter(function (o) { return o.fan === ln.fan; })[0]; if (fo) { fo.p.color.setHex(fanHex); } }
+    if (ln.fan && ln.fan.material) { ln.fan.material.color.setHex(fanHex); ln.fan.material.opacity = robotKind(ln.id) === "spot" ? (m === "pause" ? 0.3 : 0.55) : 0.9; }   // F 시야 빔 — 로봇색 부채꼴. Spot 초록은 진해서 0.9 면 칠한 면이 된다 — 0.55(일시정지 0.3)로 빛처럼
     if (botBox) { botBox.setAttribute("data-rr", m); }
     var cl = rrChevLayer();
     if (cl) { cl.style.display = m === "return" && on ? "" : "none"; if (m !== "return") { cl.textContent = ""; } }
