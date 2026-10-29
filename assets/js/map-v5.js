@@ -2926,12 +2926,19 @@
       ln.parts.push(ln.ribbon);
     }
     var P = ln.ribbon.geometry.attributes.position.array, Cc = ln.ribbon.geometry.attributes.color.array;
-    var hw = 2 * RR.k * perPixel();   // 지금 가는 길(4 x k px)과 같은 폭의 절반
+    var hw = 2 * RR.k * RIB_K * perPixel();   // 지금 가는 길 리본(4 x k px × RIB_K)과 같은 폭의 절반
+    // [10/29] 흐름 점들은 굵은 선(comet)용으로 위로 띄워 둔 자리다(span*0.001). 위로 뜨면 아이소 화면에서 위로 밀려 길 띠와 어긋난다 —
+    // 길 높이로 되돌리고 길 리본(ribGeo)처럼 카메라 쪽으로 당긴다. 화면 자리는 길과 같고 깊이만 앞선다
+    var cam = camera.position, up = span * 0.001, pull = span * 0.0025;
     for (var k = 0; k < n; k += 1) {
       var k0 = Math.max(0, k - 1), k1 = Math.min(n - 1, k + 1);
       var dx = pos[k1 * 3] - pos[k0 * 3], dz = pos[k1 * 3 + 2] - pos[k0 * 3 + 2], L = Math.hypot(dx, dz) || 1, nx = -dz / L * hw, nz = dx / L * hw;
-      var x = pos[k * 3], y = pos[k * 3 + 1], z = pos[k * 3 + 2];
+      var x = pos[k * 3], y = pos[k * 3 + 1] - up, z = pos[k * 3 + 2];
       P[k * 6] = x + nx; P[k * 6 + 1] = y; P[k * 6 + 2] = z + nz; P[k * 6 + 3] = x - nx; P[k * 6 + 4] = y; P[k * 6 + 5] = z - nz;
+      for (var e = 0; e < 2; e += 1) {
+        var o3 = k * 6 + e * 3, vx = cam.x - P[o3], vy = cam.y - P[o3 + 1], vz = cam.z - P[o3 + 2], vl = Math.sqrt(vx * vx + vy * vy + vz * vz) || 1;
+        P[o3] += vx / vl * pull; P[o3 + 1] += vy / vl * pull; P[o3 + 2] += vz / vl * pull;
+      }
       var f = k / (n - 1), al = 0.15 + 0.85 * f;   // 꼬리는 길에 스며들고 머리는 선명하게, 머리 끝은 길과 직각으로 잘린다
       for (var q = 0; q < 2; q += 1) { var o = k * 8 + q * 4; Cc[o] = col[k * 3]; Cc[o + 1] = col[k * 3 + 1]; Cc[o + 2] = col[k * 3 + 2]; Cc[o + 3] = al; }
     }
