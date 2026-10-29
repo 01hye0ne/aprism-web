@@ -282,7 +282,7 @@
     const kv = (k, v) => `<span class="sf-kv"><span class="k">${k}</span><span class="v">${v}</span></span>`;
     // [10/30 A안] [미션 전체]도 목록의 한 줄 — 미션 줄과 같은 칸 · 여백 · 썸네일 자리(72) · 키-값. 썸네일 자리는 단계별 미션 수를 쌓은 블록,
     // 왼쪽 선은 중립(전체 단계를 빨강으로 칠하면 바로 아래 위험 미션과 빨강이 겹친다). 고른 줄은 어느 깊이에서나 bg/selected 면 하나로 말한다
-    const cnt = (w, n, t) => `<span class="sf-cnt ${w} ${n ? '' : 'zero'}"><i class="ixd ${w}"></i>${t}<b>${n}</b></span>`;   // 라벨을 붙여 숫자의 뜻을 말한다(옆 키-값 숫자와 섞이지 않게)
+    const cnt = (w, n, t) => `<span class="sf-cnt ${w} ${n ? '' : 'zero'}"><b>${n}</b><span class="l"><i class="ixd ${w}"></i>${t}</span></span>`;   // 가로 블록 한 칸 — 숫자 위, 기호 + 단계 아래   // 라벨을 붙여 숫자의 뜻을 말한다(옆 키-값 숫자와 섞이지 않게)
     const sumD = M.reduce((a, m) => a + m.done, 0), sumT = M.reduce((a, m) => a + m.total, 0);
     // [10/30] 줄 꼴 — 제목 줄이 맨 위(썸네일 위까지 한 줄), 그 아래 썸네일 | 키-값. 고른 미션(제목 줄 + 테 안 정보 · 지도)과 제목 자리가 같아 깊이가 바뀌어도 줄이 흔들리지 않는다
     const top = `<button type="button" class="sf-mrow sf-all ${scope==='all' ? 'on' : ''}" data-sc="all" aria-current="${scope==='all'}"><span class="sf-mt1"><b>미션 전체</b></span><span class="sf-mbody"><span class="sf-mmap sf-allsum" aria-hidden="true">${cnt('crit', nc, '위험')}${cnt('warn', nw0, '주의')}${cnt('ok', M.length - nc - nw0, '정상')}</span><span class="sf-meta">${kv('미션', M.length + '개')}${kv('측정', sumD + '/' + sumT + '곳')}${kv('요청 전', allN + '건')}</span></span></button>`;
