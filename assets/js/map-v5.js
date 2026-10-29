@@ -3143,7 +3143,9 @@
     });
     [ln.parts[1], ln.home].forEach(function (p) {   // 점선 바탕 띠
       if (!ribAdd(p, "band")) { return; }
-      p.userData.ribBandHex = new THREE.Color(p.material.color).lerp(new THREE.Color(under), isLight() ? 0.88 : 0.75).getHex();   // 점 색을 바닥에 다크 25% · 라이트 12% 남긴다
+      // [10/29] 점 색을 섞지 않고 바닥보다 살짝 밝은 색으로(디자이너) — 길이 하나로 읽히되 파란 점과 겨루지 않는다.
+      // 화면에서 잰 통로 바닥(다크 #2A3344 · 라이트 #D6DBE1)에서 한 단 밝힌 값. Color.lerp 는 선형 공간이라 섞지 않고 값으로 둔다
+      p.userData.ribBandHex = isLight() ? 0xe6e9ee : 0x343e53;
     });
   }
   function rrApply(ln) {
@@ -4919,7 +4921,8 @@
     safety: 0.2,      // 안전거리(m)
     height: 1.5,      // 이 높이 안에 걸치는 것만 장애물(m)
     lift: 0.02,       // 경로선을 바닥에서 띄우는 높이(m) — 그릴 때만
-    turn45: 0.6, turn90: 1.4, turn135: 4   // 꺾는 값(m 로 친다)
+    turn45: 0.6, turn90: 1.4, turn135: 4,  // 꺾는 값(m 로 친다)
+    reuse: 0.5        // [10/29] 앞 구간이 지난 마디는 반값 — 같은 통로를 오갈 때 옆 한 칸(0.5 m)에 따로 길을 내지 않고 지난 길을 다시 탄다
   };
   var navByFloor = {};
   var routeLog = [];    // 좌표 보정 · 여유 부족 구간 기록 — APRISM_ROUTE.report()
@@ -5032,7 +5035,7 @@
 
   var DIRS = [[1, 0], [1, 1], [0, 1], [-1, 1], [-1, 0], [-1, -1], [0, -1], [1, -1]];
 
-  function astar(nav, s, g, need) {
+  function astar(nav, s, g, need, used) {
     var ni = nav.ni, nj = nav.nj, N = ni * nj;
     var cost = new Float32Array(N * 9).fill(Infinity);
     var from = new Int32Array(N * 9).fill(-1);
@@ -5089,7 +5092,7 @@
         if (!free(ii, jj)) { continue; }
         if ((k & 1) && (!free(i + DIRS[k][0], j) || !free(i, j + DIRS[k][1]))) { continue; }
         var nst = (jj * ni + ii) * 9 + k;
-        var nc = base + NAV.cell * ((k & 1) ? Math.SQRT2 : 1) + turn;
+        var nc = base + NAV.cell * ((k & 1) ? Math.SQRT2 : 1) * (used && used[jj * ni + ii] ? NAV.reuse : 1) + turn;
         if (nc < cost[nst]) { cost[nst] = nc; from[nst] = st; push(nc + h(ii, jj), nst); }
       }
     }
@@ -5120,7 +5123,7 @@
    * 점들을 차례로 잇는 길(도면 좌표). closed 면 마지막 점에서 처음 점으로 돌아온다.
    * 돌려주는 것: { path:[{X,Y,Z}], stops:[{X,Y,Z}](보정된 웨이포인트), reduced:[구간 번호] }
    */
-  function planChain(fid, pts, closed, names) {
+  function planChain(fid, pts, closed, names, merge) {
     var nav = navOf(fid);
     var need = NAV.radius + NAV.safety;
     var stops = pts.map(function (P, k) {
@@ -5134,18 +5137,37 @@
     });
     var order = closed ? stops.concat([stops[0]]) : stops;
     var nodes = [], reduced = [];
+    /*
+     * [10/29 v5] 같은 통로를 오가는 길은 한 줄로 — 디자이너: "핀이 경로 위에 없다 · 점선과 띠가 어긋난다".
+     * 갈 때(지나온 실선)와 올 때(남은 점선)가 마디 한 칸(0.5 m) 옆에 따로 나서, 점선이 실선 띠 가장자리를 타고
+     * 그 줄의 핀도 실선 밖에 꽂힌 것처럼 보였다. 지난 마디는 싸게 쳐서 다시 타게 하고(NAV.reuse),
+     * 지난 길에서 한 칸 옆에 찍힌 웨이포인트는 그 길 위로 옮긴다(장애물 여유는 지킨다).
+     */
+    // 씨앗 길(웨이포인트를 뿌리는 바탕)에는 쓰지 않는다 — 웨이포인트 자리가 통째로 바뀐다
+    var used = merge ? new Uint8Array(nav.ni * nav.nj) : null;
     for (var k = 0; k < order.length - 1; k += 1) {
       var a = [Math.round(order[k].X / NAV.cell), Math.round(order[k].Y / NAV.cell)];
       var b = [Math.round(order[k + 1].X / NAV.cell), Math.round(order[k + 1].Y / NAV.cell)];
-      var leg = astar(nav, a, b, need);
+      if (used && k + 1 < stops.length && !used[b[1] * nav.ni + b[0]]) {
+        for (var dj = -1; dj <= 1; dj += 1) {
+          for (var di = -1; di <= 1; di += 1) {
+            var bi = b[0] + di, bj = b[1] + dj;
+            if ((di || dj) && bi >= 0 && bj >= 0 && bi < nav.ni && bj < nav.nj && used[bj * nav.ni + bi] && clearAt(nav, bi, bj) >= need) {
+              b = [bi, bj]; stops[k + 1] = order[k + 1] = { X: bi * NAV.cell, Y: bj * NAV.cell, Z: 0 }; di = dj = 2;
+            }
+          }
+        }
+      }
+      var leg = astar(nav, a, b, need, used);
       if (!leg) {
-        leg = astar(nav, a, b, NAV.radius) || astar(nav, a, b, 0);
+        leg = astar(nav, a, b, NAV.radius, used) || astar(nav, a, b, 0, used);
         reduced.push(k);
         routeLog.push((names ? names[k] + " → " + (names[k + 1] || names[0]) : "구간 " + k) +
           (leg ? " : 안전거리 미확보(반경만 지킴)" : " : 길 없음 — 직선으로 둠"));
       }
       leg = leg || [a, b];
       nodes = nodes.concat(nodes.length ? leg.slice(1) : leg);
+      if (used) { leg.forEach(function (n) { used[n[1] * nav.ni + n[0]] = 1; }); }
     }
     var path = straighten(nodes).map(function (n) { return { X: n[0] * NAV.cell, Y: n[1] * NAV.cell, Z: 0 }; });
     return { path: path, stops: stops, reduced: reduced };
@@ -5188,7 +5210,7 @@
       routeLog.push(bot.name + " 웨이포인트 " + count + "개는 씨앗 좌표(ROBOT_WPS 비어 있음)");
     }
     var pts = [dock].concat(wps.map(function (w) { return { X: w[0], Y: w[1] }; }));
-    var res = planChain(fid, pts, true, names);
+    var res = planChain(fid, pts, true, names, true);
     var lift = NAV.lift;
     return {
       fid: fid, names: names, dockPlan: res.stops[0], wpPlan: res.stops.slice(1), pathPlan: res.path,
