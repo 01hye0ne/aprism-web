@@ -279,16 +279,19 @@
   function sideHtml(){
     const allN = M.reduce((a, m, i) => a + hits(i), 0);
     const nOf = w => M.filter((m, i) => worst(i)===w).length, nc = nOf('crit'), nw0 = nOf('warn');   // 단계별 미션 수
-    const cnt = (w, n, t) => n ? `<span class="sf-cnt ${w}"><i class="ixd ${w}"></i>${t} ${n}</span>` : '';
-    const top = `<button type="button" class="sf-mrow sf-all ${scope==='all' ? 'on' : ''}" data-sc="all" aria-current="${scope==='all'}"><span class="sf-mtx"><span class="sf-mt1"><b>미션 전체</b></span><span class="sf-allsub"><span class="t-caption">미션 ${M.length}개${allN ? ', 요청 전 ' + allN + '건' : ''}</span><span class="sp"></span>${cnt('crit', nc, '위험')}${cnt('warn', nw0, '주의')}</span></span></button>`;
     const kv = (k, v) => `<span class="sf-kv"><span class="k">${k}</span><span class="v">${v}</span></span>`;
+    // [10/30 A안] [미션 전체]도 목록의 한 줄 — 미션 줄과 같은 칸 · 여백 · 썸네일 자리(72) · 키-값. 썸네일 자리는 단계별 미션 수를 쌓은 블록,
+    // 왼쪽 선은 중립(전체 단계를 빨강으로 칠하면 바로 아래 위험 미션과 빨강이 겹친다). 고른 줄은 어느 깊이에서나 bg/selected 면 하나로 말한다
+    const cnt = (w, n) => `<span class="sf-cnt ${w} ${n ? '' : 'zero'}"><i class="ixd ${w}"></i>${n}</span>`;
+    const sumD = M.reduce((a, m) => a + m.done, 0), sumT = M.reduce((a, m) => a + m.total, 0);
+    const top = `<button type="button" class="sf-mrow sf-all ${scope==='all' ? 'on' : ''}" data-sc="all" aria-current="${scope==='all'}"><span class="sf-mmap sf-allsum" aria-hidden="true">${cnt('crit', nc)}${cnt('warn', nw0)}${cnt('ok', M.length - nc - nw0)}</span><span class="sf-mtx"><span class="sf-mt1"><b>미션 전체</b></span><span class="sf-meta">${kv('미션', M.length + '개')}${kv('측정', sumD + '/' + sumT + '곳')}${kv('요청 전', allN + '건')}</span></span></button>`;
     const rows = M.map((m, i) => { const w = worst(i), h = hits(i), nw = i===1 && !newSeen, on = scope===i;
       const tx = `<span class="sf-mtx"><span class="sf-mt1"><i class="ixd ${w} ${nw ? 'blink' : ''}"></i><b>${m.mis}</b>${nw ? '<em class="nwm">새로</em>' : ''}</span><span class="sf-meta">${kv('위치', flN(m))}${kv('측정', `${m.done}/${m.total}곳${m.done===m.total ? ', 순회 끝' : ''}`)}${kv('로봇', m.robot)}${kv('요청 전', h + '건')}</span></span>`;
       if(!on) return `<button type="button" class="sf-mrow ${w}" data-sc="${i}"><span class="sf-mmap">${svg2(i, viewF(i).robotF, false, 96)}</span>${tx}</button>`;
       const cur = dt && dt.wp ? flOf(m, dt.wp) : viewF(i).cur, sel = dt ? dt.wp : undefined, lk = dt ? dt.lk : undefined;
       return `<div class="sf-mon ${w}"><button type="button" class="sf-mrow on" data-sc="${i}" aria-current="true">${tx}</button>
         <div class="m2"><div class="m2b">${floorBar(i)}<span class="sp"></span><a class="btn btn-ghost is-xs m2go" href="${mainUrl(i, cur)}" title="관제 3D 지도에서 이 미션과 층을 연다">관제에서 보기<span class="i i-16" style="--i:var(--ic-chevron-right)" aria-hidden="true"></span></a></div>${svg2(i, cur, false, 316, sel, lk)}</div></div>`; }).join('');
-    return `<div class="sf-mlist">${top}<div class="sf-mwell">${rows}</div></div>${LEG}`;
+    return `<div class="sf-mlist"><div class="sf-mwell">${top}${rows}</div></div>${LEG}`;
   }
   const MAINV3 = "./main-v5.html";   // [v5] 같은 판의 관제로
   function mainUrl(i, ab){ const m = M[i], q = new URLSearchParams({mission:m.mis, floor:PLANOF[ab] || ab}); const nw = nowOf(i); if(nw) q.set("wp", nw); return MAINV3 + "?" + q.toString(); }
