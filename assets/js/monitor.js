@@ -232,7 +232,10 @@
   }
   COPY.brief = function (j) {
     var copy = COPY.keyword(j), two;
-    var top = j.all && j.all[0];   // items() 순서 — 위험 먼저, 그다음 오래된 순. [위험 n건부터 조치]가 여는 알림과 같다
+    // 1줄은 지금 보는 미션의 알림에서 고른다 — 왼쪽 목록과 같은 알림이어야 한다. 순서는 items() 그대로(위험 먼저, 그다음 오래된 순)
+    var mine = j.mine || j.all || [];
+    var myCrit = mine.filter(function (a) { return a.sev === "critical"; })[0];
+    var otherCrit = (j.all || []).filter(function (a) { return a.sev === "critical" && mine.indexOf(a) < 0; })[0];
     if (!j.total) {
       two = ["Robot 01 이상 없어요.", "궁금한 건 물어보세요."];
     } else if (j.level === "normal") {
@@ -242,7 +245,16 @@
       two = f && f.n > 1 ? [f.floor + " 설비 " + f.n + "곳에서 겹쳐요.", "추세를 묶어서 보세요."]
                          : ["주의 알림이 " + j.total + "건이에요.", "추세를 묶어서 보세요."];
     } else {
-      two = top && top.brief ? top.brief : ["위험 알림이 " + j.crit + "건이에요.", "위험 알림부터 보세요."];
+      if (myCrit) {
+        two = myCrit.brief || ["위험 알림이 " + j.crit + "건이에요.", "위험 알림부터 보세요."];
+      } else {
+        // 이 미션의 위험은 다 조치했는데 다른 미션에 남았다(10/29 디자이너) — 테두리 · Delta 색은 전체를 따라 빨강이 남으므로 왜 빨간지 말한다
+        var om = otherCrit && missionOf(otherCrit);
+        var others = (j.all || []).filter(function (a) { return a.sev === "critical" && mine.indexOf(a) < 0; });
+        var oms = others.map(missionOf).filter(function (m, i, l) { return m && l.indexOf(m) === i; });
+        two = ["다른 미션에 위험 " + others.length + "건 있어요.",
+          oms.length > 1 ? "미션 " + oms.length + "곳에서 났어요." : om ? om + (josa(om) === "이" ? "이에요." : "예요.") : "위험 알림부터 보세요."];
+      }
     }
     copy.line2 = two.join("\n");
     return copy;
@@ -533,7 +545,9 @@
     // v3 Delta 근거 줄 — 판단에 들어간 알림의 감지 종류(위험 먼저). v3-panel.js 가 아이콘으로 단다(10/21).
     window.APRISM_DELTA_DETECTS = all.slice().sort(function (a, b) { return (a.sev === "critical" ? 0 : 1) - (b.sev === "critical" ? 0 : 1); })
       .map(function (a) { return a.detect || a.title || ""; });
-    tellAi(judge(all), top);
+    var jd = judge(all);
+    jd.mine = mine;   // Delta 두 줄(brief)이 지금 미션의 알림부터 말하도록
+    tellAi(jd, top);
     markWaypoints();
   }
 
