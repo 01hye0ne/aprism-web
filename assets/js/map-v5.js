@@ -183,12 +183,17 @@
    *   lift 1.2 → 0.9 · 윗면 빛 0.9 → 0.4. 윗면 빛이 바닥도 비추므로 바닥 면을 한 단 밝혀(a3a9b3 → acb2bc) 바닥 L* 78 을 지킨다.
    *   실측 바탕 74 · 바닥 77.5 · 해 등진 옆면 73 · 해 받는 옆면 93 · 윗면 95.5. 순백은 카드에만 남는다.
    */
+  /*
+   * [10/29 v5] 라이트 지도 = 디자이너 확정 "단계 톤" 지도(예시 화면 관제 톤 v4 · 색상 수정 로그) — 회색 단계 톤 color/neutral 을 따른다.
+   *   바탕 400(CSS) · 격자 400 · 바닥 300 · 해 받는 옆면 · 설비 윗면 150 언저리 · 윤곽선 500. 바닥을 설비 윗면보다 L* 14 낮춰 설비가 바닥 위로 선다.
+   *   조명(LAB.light)도 같이 — 앰비언트 0.7 · 방향광 1.8 · 반구광 1.6(위 흰색) · 윗면 빛 끔 · lift 0.18. 그림자를 옅게, 설비 윗면이 흰 카드보다 밝지 않게.
+   */
   var LIGHT = {
-    face: { floor: 0xacb2bc, wall: 0xc8cdd5, equipment: 0xc3c9d2, stairs: 0xd2d6dd, other: 0xc8cdd5 },
-    edge: 0x8b94a1, ghost: 0xeef0f3, grid: 0x8a93a5,
-    pickFace: 0xe6e9ef, pickLine: 0x4e576a, hoverLine: 0x93979e
+    face: { floor: 0xbfc4cc, wall: 0xdfe2e6, equipment: 0xe1e4e8, stairs: 0xd8dbdf, other: 0xdfe2e6 },
+    edge: 0x868c93, ghost: 0xf2f4f5, grid: 0xa4a9b0,
+    pickFace: 0xcfe0ff, pickLine: 0x1d5fd6, hoverLine: 0x5b6577
   };
-  var LIGHT_LIFT = 0.9;
+  var LIGHT_LIFT = 0.18;
 
   /*
    * 제안 팔레트(?palette=neutral · 톤 실험실 비교용) — 다크 남색을 같은 명도의 무채색으로.
@@ -1852,7 +1857,7 @@
    * 라이트 표식 색 — 우측 목록 표식(라이트 상태 토큰)과 같은 값이다(10/19 · 위험 red/500 채도 기준).
    *   safe green/400 · caution yellow/600 · current blue/650. 위험 · 회색은 다크와 같다.
    */
-  var WP_TINT_LIGHT = { safe: 0x14c552, caution: 0xe1ab13, current: 0x0d8df9 };
+  var WP_TINT_LIGHT = { safe: 0x14c552, caution: 0xe1ab13, current: 0x1d4ed8 };   // [10/29] 지금 지점 = 갈 길 파랑(단계 톤)
   function wpTint(tone) {
     return (isLight() && WP_TINT_LIGHT[tone]) || WP_TINT[tone] || WP_TINT.upcoming;
   }
@@ -2639,7 +2644,7 @@
    * 지나온 길은 진한 회색, 로봇 표식은 거의 검정(라이트의 inverse)으로 뒤집는다. 갈 길(main)은 한 단 진하게.
    */
   var BOT_TINT_LIGHT = {
-    "수행중": { done: 0x4b5563, left: 0x4990e0, dot: 0x2b2f36, mark: 0x2b2f36 },
+    "수행중": { done: 0x4b5563, left: 0x1d4ed8, dot: 0x2b2f36, mark: 0x2b2f36 },   // [10/29] 갈 길 파랑 — 밝은 바닥 위에서 또렷하게 한 단 진하게(단계 톤)
     "완료":   { done: 0x1da67f, left: 0x34c759, dot: 0x1da67f },
     "대기":   { done: 0x5d6675, left: 0x8894aa, dot: 0x5d6675 },
     "끊김":   { done: 0x4e576a, left: 0x667085, dot: 0x4e576a }
@@ -2996,7 +3001,7 @@
    * 두 번 칠해져 그 자리만 진해졌다(구슬처럼 끊겨 보이는 선, 디자이너 지적). 바탕색과 미리 섞은 색을 불투명으로 칠한다.
    * 바탕은 화면에 찍힌 바닥색. 앞길은 그 밑의 바닥 홈 색과 섞는다(rrAhead).
    */
-  function rrUnder() { return isLight() ? 0xb8c0cd : 0x181d28; }   // 화면에 찍힌 바닥 화소색(조명 받은 뒤) — 라이트 · 다크
+  function rrUnder() { return isLight() ? 0x9ca3af : 0x181d28; }   // [10/29] 라이트 = 단계 톤 바닥(300)이 조명 받은 화소색   // 화면에 찍힌 바닥 화소색(조명 받은 뒤) — 라이트 · 다크
   function rrMix(color, op, under) { return new THREE.Color(color).lerp(new THREE.Color(under == null ? rrUnder() : under), 1 - op).getHex(); }
   function rrStyle(part, color, op, lw, under) {
     if (!part || !part.material) { return; }
@@ -3389,7 +3394,8 @@
     if (camera) { var cdv = new THREE.Vector3(); camera.getWorldDirection(cdv); rrPinBox.style.setProperty("--tilt", Math.max(0.25, Math.abs(cdv.y)).toFixed(3)); }   // P2 — 바닥에 눕힌 만큼 납작하게
     if (!on) { return; }
     var light = isLight(), blue = "#" + new THREE.Color(onLane.bot ? onLane.bot.left : 0x89b9ed).getHexString();
-    var C = { up: light ? "#667085" : "#8894AA", bg: light ? "#EEF0F3" : "#0A0F18", cau: light ? "#E1AB13" : "#FFCC00", dan: "#FF383C", gray: "#9EA8BB" };
+    // [10/29] 라이트 핀 = 단계 톤(판 50 · 테 950 24% · 글자 700 · 예정 600)
+    var C = { up: light ? "#63686F" : "#8894AA", bg: light ? "#F2F4F5" : "#0A0F18", cau: light ? "#E1AB13" : "#FFCC00", dan: "#FF383C", gray: "#9EA8BB" };
     var key = wpSpots.map(function (w) { return w.id + w.info.tone + (w.buried ? "b" : "") + (w.off ? "x" : ""); }).join(",") + RRS.mode + light + blue;
     // 지점 목록은 시점이 바뀔 때마다 새로 깔린다(layWaypoints) — 새 목록에 핀이 안 붙어 있으면 다시 만든다(예전엔 처음 자리에 멈춰 있었다)
     if (key !== rrPinKey || wpSpots.some(function (w) { return !w.pinEl; })) {
@@ -3408,7 +3414,7 @@
         if (next) { head.style.background = col; head.style.borderColor = "#FFFFFF"; head.style.color = "#FFFFFF"; }
         else if (past) { head.style.background = C.bg; head.style.borderColor = col; head.style.color = col; }
         else if (cau || dan) { head.style.background = col; head.style.borderColor = C.bg; head.style.color = cau ? "#1A1300" : "#FFFFFF"; }
-        else { head.style.background = C.bg; head.style.borderColor = light ? "#98A2B3" : "#AFB7C8"; head.style.color = light ? "#344054" : "#E4E8EF"; }
+        else { head.style.background = C.bg; head.style.borderColor = light ? "rgb(11 14 19 / 24%)" : "#AFB7C8"; head.style.color = light ? "#494E54" : "#E4E8EF"; }
         el.appendChild(head);
         if (w.off) { el.hidden = true; }
         w.pinEl = el;
@@ -3857,16 +3863,16 @@
    * 격자(GridHelper)는 색이 꼭짓점에 구워져 있어 꼭짓점 색을 새로 채운다.
    */
   var topLight = null, keyLight = null, hemiLight = null, ambLight = null;
-  var AMB_LIGHT = 0.4;   // 라이트 앰비언트 — 낮을수록 그림자가 진하다(4차)
+  var AMB_LIGHT = 0.7;   // 라이트 앰비언트 — 낮을수록 그림자가 진하다(10/29 단계 톤 0.4 → 0.7)
   // 라이트 반구광 아래쪽 색 — 다크의 거의 검정(0x05070c)이면 해를 등진 옆면이 바닥보다 어두워진다
-  var HEMI_GROUND_LIGHT = 0xd8dde5;
-  var TOP_LIGHT = 0.4;   // 라이트 윗면 빛 세기
-  var KEY_LIGHT_LIGHT = 2.8;   // 라이트 옆면 빛(방향광) 세기 — 낮출수록 옆면 두 쪽 차이가 줄어든다
+  var HEMI_GROUND_LIGHT = 0xe4e6ea;
+  var TOP_LIGHT = 0;   // 라이트 윗면 빛 세기(10/29 끔 — 설비 윗면이 흰 카드보다 밝지 않게)
+  var KEY_LIGHT_LIGHT = 1.8;   // 라이트 옆면 빛(방향광) 세기 — 낮출수록 옆면 두 쪽 차이가 줄어든다
 
   /* 지도 표현 실험실 — 조명과 다크 판을 바깥에서 바꿀 수 있게 한 묶음으로 둔다 */
   var LAB = {
-    light: { amb: AMB_LIGHT, key: KEY_LIGHT_LIGHT, top: TOP_LIGHT, hemi: 1.25, hemiGround: HEMI_GROUND_LIGHT, lift: LIGHT_LIFT },
-    dark: { amb: 0.25, key: 1, top: 0, hemi: 1.25, hemiGround: 0x05070c },
+    light: { amb: AMB_LIGHT, key: KEY_LIGHT_LIGHT, top: TOP_LIGHT, hemi: 1.6, hemiSky: 0xffffff, hemiGround: HEMI_GROUND_LIGHT, lift: LIGHT_LIFT },
+    dark: { amb: 0.25, key: 1, top: 0, hemi: 1.25, hemiSky: 0xe4edfb, hemiGround: 0x05070c },
     darkSet: { face: null, edge: EDGE, ghost: GHOST, grid: GRID, pickFace: PICK_FACE, pickLine: PICK_LINE, hoverLine: HOVER_LINE },
     wallScale: 1, wallAlpha: 1
   };
@@ -3877,7 +3883,7 @@
     if (topLight) { topLight.intensity = Lb.top; }
     if (keyLight) { keyLight.intensity = Lb.key; }
     if (ambLight) { ambLight.intensity = Lb.amb; }
-    if (hemiLight) { hemiLight.groundColor.setHex(Lb.hemiGround); hemiLight.intensity = Lb.hemi; }
+    if (hemiLight) { hemiLight.groundColor.setHex(Lb.hemiGround); hemiLight.intensity = Lb.hemi; if (Lb.hemiSky != null) { hemiLight.color.setHex(Lb.hemiSky); } }
     // 라이트 · 제안 팔레트 · 지금 다크 — 셋 중 하나의 판을 고른다.
     var set = light ? LIGHT : (isNeutral() ? NEUTRAL : LAB.darkSet);
     meshes.forEach(function (item) {
