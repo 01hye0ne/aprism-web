@@ -9,6 +9,8 @@
  *   · 버튼    — 44 높이 자체 버튼 → .btn(Size Medium 36) · Accent 는 영역에 하나(PDF 내려받기), DOCX 는 Secondary, 문서 구성 · 특이 사항은 Ghost
  *   · 고른 줄 — 왼쪽 3px 흰 막대 + 회색 면 → bg/selected 면 + 왼쪽 2px border/strong 막대(파랑은 상태 · 주요 행동에만 쓴다)
  *   · 토스트  — 자체 검은 상자 → .toast(app-shell, Figma UI_99 1605:38529 · bg/inverse 알약)
+ * [10/29 2차] 디자이너 Figma UI_09 · 보고서(1432:40952) — 목록 · 머리 · 목차 · 쪽 표시를 Figma 대로, 평가 때 짚은 것은 추천대로 고쳐 옮겼다.
+ *   (고른 줄은 막대 없이 bg/selected 면만 · 원시 색 → text/* · border/divider · 머리 라벨 미션 → 유형 · 건수 점 없음 · PDF 는 Accent 그대로)
  * 문서 종이(.rp-page)는 테마와 상관없이 인쇄 색이다 — 그 안의 색은 그대로 두고 글자 크기만 토큰 단계에 맞췄다.
  */
 
@@ -18,9 +20,9 @@
   flex: 1 1 auto;
   min-width: 0;
   display: grid;
-  grid-template-columns: 360px minmax(0, 1fr);
-  gap: var(--space-12);
-  padding: var(--space-20);
+  grid-template-columns: 420px minmax(0, 1fr);
+  gap: 0;
+  padding: 0;
   border-radius: var(--radius-container) var(--radius-container) 0 0;
   background-color: var(--bg-frame);
   overflow: hidden;
@@ -30,147 +32,130 @@
 :where(.rp-body, .rp-modal, .rp-lb) :where(button):focus-visible { outline: var(--border-width-strong) solid var(--border-focus); outline-offset: 1px; }
 :where(.rp-body, .rp-modal) :where(h1, h2, h3, h4, p) { margin: 0; }
 
-/* 작은 칸 버튼(이전 · 다음 달, 달력) — 32 · border/default · radius/control */
+/* 작은 칸 버튼(이전 · 다음 달) — Figma Icon Button 32 · button/secondary 면 · 테 · radius/control */
 .rp-ib {
   flex: none;
   display: grid;
   place-items: center;
   width: var(--size-control-sm);
   height: var(--size-control-sm);
-  border: var(--border-width-thin) solid var(--border-default) !important;
+  border: var(--border-width-thin) solid var(--comp-button-secondary-border-default) !important;
   border-radius: var(--radius-control);
-  background-color: var(--bg-cell) !important;
-  color: var(--text-secondary) !important;
+  background-color: var(--comp-button-secondary-bg-default) !important;
+  color: var(--text-primary) !important;
 }
-.rp-ib:hover:not(:disabled) { color: var(--text-primary) !important; border-color: var(--border-strong) !important; }
+.rp-ib:hover:not(:disabled) { border-color: var(--border-strong) !important; }
 .rp-ib:disabled { opacity: 0.4; cursor: default !important; }
 
-/* ---------- 왼쪽 — 보고서 목록 ---------- */
+/* ---------- 왼쪽 — 보고서 목록(Figma Sidebar 420) ---------- */
 .rp-side {
   position: relative;
   min-height: 0;
   display: flex;
   flex-direction: column;
-  border-radius: var(--radius-card);
-  background-color: var(--bg-panel);
+  border-right: var(--border-width-thin) solid var(--border-divider);
   overflow: hidden;
 }
-.rp-side-head { display: flex; flex-direction: column; gap: var(--space-16); padding: var(--space-20) var(--space-16) var(--space-12); }
-.rp-side-head p { margin-top: var(--space-4); color: var(--text-secondary); }
+/* 패널 머리 — 관제 패널과 같은 모양(접기 아이콘 · 라벨, 아래 border/default) */
+.rp-phead { flex: none; display: flex; align-items: center; gap: var(--space-8); padding: var(--space-8); border-bottom: var(--border-width-thin) solid var(--border-default); }
+.rp-ptog { display: grid; place-items: center; width: 20px; height: 20px; color: var(--text-primary) !important; }
+.rp-plabel { color: var(--text-tertiary); white-space: nowrap; }
+.rp-sbody { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: var(--space-12); padding: var(--space-12) var(--space-8) var(--space-8); }
+/* 접으면 머리 아이콘만 남는다 */
+.rp-body.is-fold { grid-template-columns: 37px minmax(0, 1fr); }
+.rp-body.is-fold .rp-plabel,
+.rp-body.is-fold .rp-sbody { display: none; }
+.rp-body.is-fold .rp-ptog { transform: scaleX(-1); }
+
+.rp-mrow { flex: none; display: flex; align-items: center; justify-content: space-between; gap: var(--space-8); }
 .rp-mnav { display: flex; align-items: center; gap: var(--space-8); }
-.rp-mnav .rp-mt { flex: 1; text-align: center; }
+.rp-mnav .rp-mt { color: var(--text-primary); white-space: nowrap; }
+.rp-cnt { display: flex; align-items: center; gap: var(--space-8); color: var(--text-tertiary); white-space: nowrap; }
+.rp-cnt .rp-cn { color: var(--text-secondary); }
+.rp-mobtn { flex: none; width: 100%; justify-content: center; }
+.rp-mobtn .rp-spin { margin-right: var(--space-4); }
 
-/* 월 보고서 줄 — 만들기 전에는 점선 칸(행동), 만든 뒤에는 목록 줄 */
-.rp-morow {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: var(--space-8);
-  margin: 0 var(--space-16) var(--space-8);
-  padding: var(--space-12) var(--space-16);
-  border: var(--border-width-thin) dashed var(--border-default);
-  border-radius: var(--radius-card);
-  color: var(--text-secondary);
-}
-.rp-morow > span { display: flex; align-items: center; gap: var(--space-8); }
-.rp-morow .rp-mk { color: var(--fg-link); }
-.rp-morow .rp-mk:hover { text-decoration: underline; }
+/* 목록 상자 — bg/map-chip · radius 8. 날짜 묶음마다 아래 구분선 */
+.rp-list { flex: 1; min-height: 0; overflow: auto; border-radius: var(--radius-8); background-color: var(--bg-map-chip); }
+.rp-grp { padding-top: var(--space-4); border-bottom: var(--border-width-thin) solid var(--border-divider); }
+.rp-grp.is-month { padding-bottom: var(--space-4); }
+.rp-empty { padding: var(--space-24) var(--space-16); color: var(--text-tertiary); text-align: center; }
 
-.rp-cnt { display: flex; justify-content: space-between; padding: 0 var(--space-16) var(--space-4); color: var(--text-tertiary); }
-.rp-list { flex: 1; min-height: 0; overflow: auto; padding-bottom: var(--space-16); }
-.rp-dg { padding: var(--space-16) var(--space-16) var(--space-4); color: var(--text-tertiary); }
-.rp-dg.is-flash { color: var(--text-primary); font-weight: 600; }
-
+/* 줄 — 날짜(=일일 보고서) 40 · 미션 46. 고른 줄은 bg/selected 면만(막대 없음 — 글자가 밀리지 않는다) */
 .rp-item {
   width: 100%;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  display: flex;
   align-items: center;
   gap: var(--space-8);
-  padding: var(--space-12) var(--space-16);
-  border-bottom: var(--border-width-thin) solid var(--border-divider) !important;
+  padding: var(--space-8) var(--space-16);
   text-align: left;
 }
-.rp-item:hover { background-color: var(--bg-cell) !important; }
-.rp-item[aria-current="true"] { background-color: var(--bg-selected) !important; box-shadow: inset 2px 0 0 var(--border-strong); }
-.rp-item .rp-a { display: flex; align-items: center; gap: var(--space-8); min-width: 0; color: var(--text-primary); }
-.rp-item .rp-a .i { flex: none; color: var(--text-tertiary); }
+.rp-item.is-day { min-height: 40px; }
+.rp-item.is-mission { min-height: 46px; }
+.rp-item:hover:not(:disabled) { background-color: var(--bg-glass) !important; }
+.rp-item[aria-current="true"] { background-color: var(--bg-selected) !important; }
+.rp-item:disabled { cursor: default !important; }
+.rp-item .rp-a { flex: 1; min-width: 0; display: flex; align-items: center; gap: var(--space-4); color: var(--text-primary); }
+.rp-item .rp-a .i { flex: none; color: var(--text-primary); }
 .rp-item .rp-a b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: inherit; }
-.rp-item.is-mission { padding-left: calc(var(--space-16) + var(--space-24)); }
-.rp-item.is-mission .rp-a { color: var(--text-secondary); }
-.rp-item[aria-current="true"].is-mission .rp-a { color: var(--text-primary); }
-.rp-item .rp-tm { color: var(--text-tertiary); white-space: nowrap; }
-.rp-side-foot { padding: var(--space-8) var(--space-16); border-top: var(--border-width-thin) solid var(--border-divider); color: var(--text-tertiary); }
+.rp-item .rp-tm { flex: none; color: var(--text-tertiary); white-space: nowrap; }
+.rp-item[aria-current="true"] .rp-tm { color: var(--text-secondary); }
+/* 작성 중(근무가 안 끝난 날) — 아직 문서가 없어 못 누른다 */
+.rp-item.is-live .rp-a { color: var(--text-secondary); }
+.rp-item.is-live .rp-a .i { color: var(--text-tertiary); }
+/* └ 가지 — 20 칸 가운데에서 11 × 11 */
+.rp-br { flex: none; position: relative; width: 20px; height: 20px; }
+.rp-br::before { content: ""; position: absolute; left: 10px; top: 0; width: 11px; height: 11px; border-left: var(--border-width-thin) solid var(--text-tertiary); border-bottom: var(--border-width-thin) solid var(--text-tertiary); }
+.rp-item.is-mission .rp-a { gap: var(--space-8); }
 
-/* 달력 — 날짜로 찾기 */
-.rp-cal {
-  position: absolute;
-  left: var(--space-16);
-  right: var(--space-16);
-  top: 156px;
-  z-index: 16;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-8);
-  padding: var(--space-16);
-  border: var(--border-width-thin) solid var(--border-strong);
-  border-radius: var(--radius-card);
-  background-color: var(--bg-raised);
-  box-shadow: 0 4px 16px rgb(0 0 0 / 35%);
-}
-.rp-cal-h { display: flex; align-items: center; justify-content: space-between; }
-.rp-cg { display: grid; grid-template-columns: repeat(7, 1fr); gap: var(--space-4); text-align: center; }
-.rp-cg .rp-w { padding: var(--space-4) 0; color: var(--text-tertiary); }
-.rp-cd { position: relative; height: var(--size-control-md); border-radius: var(--radius-control); color: var(--text-tertiary) !important; }
-.rp-cd:disabled { opacity: 0.45; cursor: default !important; }
-.rp-cd.has { color: var(--text-primary) !important; font-weight: 600; }
-.rp-cd.has::after { content: ""; position: absolute; left: 50%; bottom: var(--space-4); width: 4px; height: 4px; margin-left: -2px; border-radius: 50%; background-color: var(--text-secondary); }
-.rp-cd.has:hover { background-color: var(--bg-cell) !important; }
-.rp-cd.is-sel { background-color: var(--bg-inverse) !important; color: var(--text-on-inverse) !important; }
-.rp-cd.is-sel::after { background-color: var(--text-on-inverse); }
-.rp-cf { display: flex; justify-content: space-between; color: var(--text-tertiary); }
-.rp-cf i { display: inline-block; width: 4px; height: 4px; margin-right: var(--space-4); border-radius: 50%; background-color: var(--text-secondary); vertical-align: middle; }
-
-/* ---------- 오른쪽 — 보고서 ---------- */
+/* ---------- 오른쪽 — 보고서(위 · 오른쪽 · 아래 8 띄운 bg/page 판) ---------- */
 .rp-detail {
   position: relative;
   min-width: 0;
   min-height: 0;
   display: flex;
   flex-direction: column;
-  border-radius: var(--radius-card);
-  background-color: var(--bg-panel);
+  margin: var(--space-8) var(--space-8) var(--space-8) 0;
+  border-radius: var(--radius-8);
+  background-color: var(--bg-page);
   overflow: hidden;
 }
+/* 머리 — bg/glass · 아래 border/divider · 위 24 · 좌우 아래 20 */
 .rp-dh {
+  flex: none;
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
   gap: var(--space-24);
-  padding: var(--space-20) var(--space-24) var(--space-16);
+  padding: var(--space-24) var(--space-20) var(--space-20);
   border-bottom: var(--border-width-thin) solid var(--border-divider);
+  background-color: var(--bg-glass);
 }
 .rp-dh .rp-eb { color: var(--text-tertiary); }
-.rp-dh h2 { display: flex; align-items: baseline; gap: var(--space-12); margin-top: var(--space-4); color: var(--text-primary); }
-.rp-dh h2 .rp-sub { color: var(--text-secondary); font-weight: 500; }
-.rp-meta { display: flex; align-items: center; gap: var(--space-16); margin-top: var(--space-8); color: var(--text-secondary); }
-.rp-meta .rp-mlb { margin-right: var(--space-4); color: var(--text-tertiary); }
+.rp-dh h2 { display: flex; align-items: center; gap: var(--space-8); margin-top: var(--space-4); color: var(--text-primary); }
+.rp-meta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4) var(--space-24); margin-top: var(--space-4); color: var(--text-primary); }
+.rp-meta > span { display: inline-flex; gap: var(--space-8); }
+.rp-meta .rp-mlb { color: var(--text-tertiary); }
 .rp-acts { position: relative; display: flex; align-items: center; gap: var(--space-8); }
 .rp-acts .btn .i { width: 16px; height: 16px; }
+/* 머리 단추는 Figma Size=Large — 40 · 좌우 20 */
+.rp-dh .rp-acts .btn.is-md { height: var(--size-control-lg); padding: 0 var(--space-20); gap: var(--space-8); }
 .rp-spin { width: 14px; height: 14px; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: rp-spin 0.8s linear infinite; }
 @keyframes rp-spin { to { transform: rotate(360deg); } }
 
-/* 뷰어 — 목차 | 종이. 종이는 한 단 꺼진 면(bg/inset) 위에 놓인다 */
-.rp-viewer { position: relative; flex: 1; min-height: 0; display: grid; grid-template-columns: 232px minmax(0, 1fr); background-color: var(--bg-inset); }
-.rp-toc { display: flex; flex-direction: column; gap: var(--space-2); padding: var(--space-24) 0 var(--space-24) var(--space-16); overflow: auto; }
-.rp-toc h4 { margin-bottom: var(--space-8); color: var(--text-tertiary); }
-.rp-toc button { display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-8); padding: var(--space-8) var(--space-12) !important; border-radius: 0 var(--radius-control) var(--radius-control) 0; color: var(--text-secondary) !important; text-align: left; box-shadow: inset 2px 0 0 transparent; }
+/* 뷰어 — 목차 209 | 종이. 판 안쪽 20 · 사이 20 */
+.rp-viewer { position: relative; flex: 1; min-height: 0; display: grid; grid-template-columns: 209px minmax(0, 1fr); gap: var(--space-20); padding: var(--space-20) var(--space-20) 0; }
+.rp-toc { display: flex; flex-direction: column; overflow: auto; padding-bottom: var(--space-20); }
+.rp-toc .rp-th { display: flex; justify-content: space-between; padding-bottom: 10px; color: var(--text-tertiary); }
+.rp-toc button { display: flex; justify-content: space-between; align-items: center; gap: var(--space-8); min-height: 30px; padding: var(--space-4) var(--space-12) !important; border-radius: var(--radius-control); color: var(--text-secondary) !important; text-align: left; }
 .rp-toc button span { flex: none; color: var(--text-tertiary); }
-.rp-toc button:hover { color: var(--text-primary) !important; background-color: var(--bg-cell) !important; }
-.rp-toc button.is-on { color: var(--text-primary) !important; font-weight: 600; box-shadow: inset 2px 0 0 var(--text-primary); }
-.rp-toc .rp-pn { margin-top: var(--space-12); padding: var(--space-12) var(--space-12) 0; border-top: var(--border-width-thin) solid var(--border-divider); color: var(--text-tertiary); }
-.rp-pages { min-width: 0; display: flex; flex-direction: column; align-items: center; gap: var(--space-24); padding: var(--space-24) var(--space-24) var(--space-40) 0; overflow: auto; }
-.rp-pgno { position: absolute; top: var(--space-24); right: var(--space-32); color: var(--text-tertiary); pointer-events: none; }
+.rp-toc button:hover { color: var(--text-primary) !important; background-color: var(--bg-glass) !important; }
+.rp-toc button.is-on { color: var(--text-primary) !important; background-color: var(--bg-selected) !important; }
+.rp-toc button.is-on span { color: var(--text-secondary); }
+.rp-toc .rp-pn { margin-top: var(--space-2); padding: var(--space-8) 0; border-top: var(--border-width-thin) solid var(--border-divider); color: var(--text-tertiary); }
+.rp-pages { min-width: 0; display: flex; flex-direction: column; align-items: center; gap: var(--space-24); padding-bottom: var(--space-40); overflow: auto; }
+/* 쪽 표시 — 문서 칸 오른쪽 위(목차 머리와 같은 높이), Caption · text/tertiary. 종이 칸 스크롤바(16) 안쪽에 둔다 */
+.rp-pgno { position: absolute; top: var(--space-20); right: calc(var(--space-20) + 16px); color: var(--text-tertiary); pointer-events: none; }
 
 /* 팝오버 — 문서 구성 · 특이 사항(드롭다운과 같은 면 · 테 · 그림자) */
 .rp-pop {
@@ -342,20 +327,10 @@
 
 /*
  * 색 위계(10/12 확정) — 파랑은 상태이거나 영역에 하나뿐인 주요 행동(PDF 내려받기)에만.
- * 보조 단추(문서 구성 · 특이 사항 입력)와 이동 링크(보고서 메뉴에서 보기 · 월 보고서 만들기)는 무채색이다.
+ * 보조 단추(문서 구성 · 특이 사항 입력)와 월 보고서 생성 단추와 이동 링크(보고서 메뉴에서 보기)는 무채색이다.
  * Ghost 단추의 기본 글자색(button/ghost/text)이 파랑이라 이 화면에서는 text/secondary 로 내린다.
  */
 .rp-acts .btn-ghost { color: var(--text-secondary); }
 .rp-acts .btn-ghost:hover { color: var(--text-primary); }
-.rp-morow .rp-mk,
 .rp-modal .rp-link { color: var(--text-primary); text-decoration: underline; text-underline-offset: 3px; }
-.rp-morow .rp-mk:hover,
 .rp-modal .rp-link:hover { color: var(--text-secondary); }
-
-/*
- * [10/29 디자이너] 좌측 목록은 패딩 · 배경 없이 본문 판(bg/frame)에 바로 — 판 위 · 왼쪽 · 아래 끝까지 붙고,
- * 오른쪽에 구분선(border/divider) 한 줄로 보고서와 나뉜다. 오른쪽 보고서 카드는 판 안쪽 20 을 그대로 둔다.
- */
-.rp-body { gap: 0; padding: 0; }
-.rp-side { border-radius: 0; background-color: transparent; border-right: var(--border-width-thin) solid var(--border-divider); }
-.rp-detail { margin: var(--space-20); }

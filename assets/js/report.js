@@ -1,7 +1,8 @@
 /*
  * 보고서(GNB [보고서]) — v5 · 10/29 디자이너 시안 "UI_전주기 보고서 탭"을 옮겼다(동작 · 데이터는 시안 그대로, 겉모양은 디자인 시스템).
  *
- *   왼쪽   보고서 목록 — 달 이동 · 달력(날짜로 찾기) · 월 보고서 만들기 · 날짜별 일일 보고서 + 미션별 보고서
+ *   왼쪽   보고서 목록 — 달 이동 · [월 보고서 생성] · 날짜 줄(= 그날 일일 보고서) + └ 미션 보고서
+ *          (10/29 2차 Figma 1432:40952 — 달력은 Figma 에서 빠져 지웠다. 오늘처럼 근무가 안 끝난 날은 "작성 중")
  *   오른쪽 보고서 — 머리(종류 · 제목 · 문서 번호 · 내려받기) + 뷰어(목차 | A4 관제 양식 문서)
  *   다른 화면(관제)에서 여는 경우 — 같은 뷰어를 모달로(window.APRISM_REPORT.open(id), 주소 #modal 로 시연)
  *
@@ -18,6 +19,7 @@
   /* ---------- 데이터(시안 그대로) ---------- */
   var NAME = "{미션이름}";
   var DAYS = [
+    { d: "10월 22일 (목)", day: 22, live: true, dayRpt: { n: 1 }, missions: [{ t: "09:10 ~ 09:32" }] },
     { d: "10월 21일 (수)", day: 21, dayRpt: { n: 2 }, missions: [{ t: "16:20 ~ 16:51" }, { t: "09:40 ~ 09:58" }] },
     { d: "10월 16일 (금)", day: 16, dayRpt: { n: 1 }, missions: [{ t: "13:10 ~ 13:34" }] },
     { d: "10월 13일 (화)", day: 13, dayRpt: { n: 2, id: "d1013" }, missions: [{ t: "10:17 ~ 10:46", id: "m1017" }, { t: "08:02 ~ 08:14" }] },
@@ -34,20 +36,20 @@
   var OPEN = AL.filter(function (a) { return !a[4]; });
   var TYPES6 = ["안전감지", "누출감지", "온도감지", "계기인식", "이상음향", "부분방전"];
   var DOCS = {
-    m1017: { kind: "m", no: "mission-20261013-1017", title: "순시 점검 결과 보고서", head: NAME, sub: "2026.10.13 (화) 10:17 ~ 10:46", meta: "수동 미션", file: "순시점검결과보고서",
+    m1017: { kind: "m", no: "mission-20261013-1017", title: "순시 점검 결과 보고서", head: NAME, meta: [["날짜 및 시간", "2026.10.13 (화) 10:17 ~ 10:46"], ["유형", "수동"]], file: "순시점검결과보고서",
       counts: { 안전감지: ["1", "0", "1", "0", "0"], 온도감지: ["10", "0", "7", "2", "1"] }, sum: ["11", "0", "8", "2", "1"],
       flow: [["a", "위험 이벤트와 조치"], ["c", "주의 이벤트와 조치"], ["p", "이벤트 사진"], ["g", "게이지 판독 결과"], ["th", "열화상 분석 결과"], ["o", "종합 소견"]] },
-    d1013: { kind: "d", no: "day-20261013-1800", title: "로봇 관제 일일 보고서", head: "2026.10.13 (화)", sub: "일일 보고서", meta: "미션 2건", file: "로봇관제일일보고서",
+    d1013: { kind: "d", no: "day-20261013-1800", title: "로봇 관제 일일 보고서", head: "10월 13일 (화)", meta: [["날짜", "2026.10.13 (화)"], ["미션", "2건"]], file: "로봇관제일일보고서",
       counts: { 안전감지: ["1", "0", "1", "0", "0"], 온도감지: ["11", "0", "7", "3", "1"] }, sum: ["12", "0", "8", "3", "1"],
       flow: [["th", "열화상 분석 결과"], ["o", "종합 소견"], ["n", "특이 사항"]] },
-    mo10: { kind: "mo", no: "month-202610", title: "로봇 관제 월간 보고서", head: "2026년 10월", sub: "1일 ~ 21일", meta: "미션 6건", file: "로봇관제월간보고서",
+    mo10: { kind: "mo", no: "month-202610", title: "로봇 관제 월간 보고서", head: "10월 월 보고서", part: true, meta: [["기간", "2026.10.01 ~ 10.21"], ["미션", "6건"]], file: "로봇관제월간보고서",
       counts: { 안전감지: ["1", "0", "1", "0", "0"], 누출감지: ["0", "2", "2", "0", "0"], 온도감지: ["13", "0", "9", "3", "1"], 계기인식: ["0", "7", "5", "1", "1"] }, sum: ["14", "9", "17", "4", "2"],
       flow: [["th", "열화상 분석 결과"], ["o", "종합 소견"], ["n", "특이 사항"], ["tr", "설비별 추이"], ["ab", "비정상 감지 추이"]] }
   };
   var MDAYS = [["10.12 (월)", "1", "2", "0", "2", "0", "day-20261012-1800", ""], ["10.13 (화)", "2", "12", "12", "0", "1", "day-20261013-1800", "d1013"], ["10.16 (금)", "1", "3", "0", "3", "0", "day-20261016-1800", ""], ["10.21 (수)", "2", "6", "2", "4", "1", "day-20261021-1800", ""]];
   var MOPEN = OPEN.map(function (a) { return ["10.13 " + a[0].slice(0, 5)].concat(a.slice(1)); }).concat([["10.21 16:42", "주의", "계기인식", "#1 Gov. Air Tank Pr. 7.2 kg/cm² (기준 74 ~ 76)", null, null]]);
   var opt = { m1017: new Set(["a", "c", "g", "th", "p", "o"]), d1013: new Set(["th", "o", "n"]), mo10: new Set(["th", "o", "n", "tr", "ab"]) };
-  var moMade = false;
+  var moState = "none";   // 월 보고서: none(아직) · busy(만드는 중) · made(만듦)
   var THERM = { m1017: ["134.85°C", "21건"], d1013: ["134.85°C (10:17 미션)", "22건"], mo10: ["134.85°C (10.13)", "26건"] };
   var OPINION = {
     m1017: "본 순시에서 위험 이벤트 11건이 감지되었다(온도감지 10건, 안전감지 1건). 게이지 판독 결과 비정상 231건이 확인되어 점검이 필요하다. 열화상 분석에서 고온 21건이 감지되었다(최고 134.85°C).",
@@ -216,7 +218,7 @@
   function sizeEst(id) { var s = 0.1; if (id === "m1017" && opt[id].has("p")) { s += 1.5; } return s < 1 ? Math.round(s * 1000) + " KB" : s.toFixed(1) + " MB"; }
 
   /* ---------- 뷰어 ---------- */
-  var VIEWER = '<div class="rp-viewer"><nav class="rp-toc" data-v="toc" aria-label="문서 목차"></nav><div class="rp-pages" data-v="pages"></div><div class="rp-pgno t-label-2 num" data-v="pgno" aria-live="polite"></div></div>';
+  var VIEWER = '<div class="rp-viewer"><nav class="rp-toc" data-v="toc" aria-label="문서 목차"></nav><div class="rp-pages" data-v="pages"></div><div class="rp-pgno t-caption num" data-v="pgno" aria-live="polite"></div></div>';
   var DL = '<button type="button" class="btn btn-ghost is-md" data-v="cfg" aria-haspopup="dialog">' + ic("settings") + '문서 구성</button>' +
     '<button type="button" class="btn btn-secondary is-md" data-v="docx">DOCX 내려받기</button>' +
     '<button type="button" class="btn btn-accent is-md" data-v="pdf">PDF 내려받기</button>';
@@ -245,7 +247,8 @@
         var pg = Array.prototype.indexOf.call(pagesEl.children, el.closest(".rp-page")) + 1;
         return '<button type="button" class="t-body-4" data-k="' + el.getAttribute("data-sec") + '">' + el.querySelector(".f-h").textContent + '<span class="t-caption">' + pg + "쪽</span></button>";
       }).join("");
-      tocEl.innerHTML = '<h4 class="t-caption">목차</h4>' + items + '<div class="rp-pn t-caption">총 ' + count + "쪽<br>" + (doc.kind === "m" ? "자동 생성 2026.10.13 10:46" : doc.kind === "d" ? "자동 생성 2026.10.13 18:00" : "생성 2026.10.22 14:12") + "</div>";
+      // 목차 — 머리(목차 · 총 N쪽) · 항목 · 아래 생성 시각(Figma 목차 209)
+      tocEl.innerHTML = '<h4 class="rp-th t-caption"><span>목차</span><span>총 ' + count + "쪽</span></h4>" + items + '<div class="rp-pn t-caption">' + (doc.kind === "m" ? "자동 생성 2026.10.13 10:46" : doc.kind === "d" ? "자동 생성 2026.10.13 18:00" : "생성 2026.10.22 14:12") + "</div>";
       Array.prototype.forEach.call(tocEl.querySelectorAll("button"), function (b) {
         b.onclick = function () { var el = pagesEl.querySelector('[data-sec="' + b.getAttribute("data-k") + '"]'); if (el) { pagesEl.scrollTo({ top: topOf(el) - 60, behavior: "smooth" }); } };
       });
@@ -327,14 +330,20 @@
   }
 
   /* ---------- 보고서 메뉴 ---------- */
-  var vm = 10, selDay = null;   // 보고 있는 달(2026년), 달력에서 고른 날
+  var vm = 10;   // 보고 있는 달(2026년)
   var MAXM = 10, TODAY = 22;
   var list = body.querySelector("[data-rp-list]"), side = body.querySelector("[data-rp-side]"), detail = body.querySelector("[data-rp-detail]");
   var dh = body.querySelector("[data-rp-dh]");
+  // 머리 메타 — 라벨(text/tertiary) · 값 짝. 마지막은 늘 문서 번호
+  function metaHtml(d) {
+    return d.meta.concat([["문서 번호", d.no]]).map(function (m) { return '<span><span class="rp-mlb">' + m[0] + '</span><span class="num">' + m[1] + "</span></span>"; }).join("");
+  }
+  // 그달이 다 끝나기 전에 만든 월 보고서 — 제목 옆 "중간 집계"(다 끝난 달 보고서와 헷갈리지 않게)
+  function partTag(d) { return d.part ? '<span class="badge badge-idle t-caption">중간 집계</span>' : ""; }
   function detailHead(id) {
     var d = DOCS[id];
-    return '<div><p class="rp-eb t-overline">' + d.title + '</p><h2 class="t-heading-2">' + d.head + '<span class="rp-sub t-title-1">' + d.sub + '</span></h2>' +
-      '<p class="rp-meta t-body-4"><span>' + d.meta + '</span><span><span class="rp-mlb">문서 번호</span><span class="num">' + d.no + "</span></span></p></div>" +
+    return '<div><p class="rp-eb t-body-4">' + d.title + '</p><h2 class="t-heading-2">' + d.head + partTag(d) + "</h2>" +
+      '<p class="rp-meta t-body-3">' + metaHtml(d) + "</p></div>" +
       '<div class="rp-acts" data-rp-acts>' + DL + "</div>";
   }
   function openDetail() {
@@ -346,63 +355,59 @@
   }
   function selectDoc(id) { cur = id; closeModal(); renderList(); openDetail(); }
   function daysIn(m) { return new Date(2026, m, 0).getDate(); }
-  function reportDays(m) { return m === 10 ? DAYS.map(function (d) { return d.day; }) : []; }
-  function closeCal() { var c = side.querySelector(".rp-cal"); if (c) { c.remove(); } }
-  function toggleCal() {
-    if (side.querySelector(".rp-cal")) { closeCal(); return; }
-    var p = document.createElement("div");
-    p.className = "rp-cal";
-    p.setAttribute("role", "dialog");
-    p.setAttribute("aria-label", "날짜로 찾기");
-    side.appendChild(p);
-    drawCal(p, vm);
+  function rangeOf(m) { return m === MAXM ? "10.01 ~ 10." + (TODAY - 1) : String(m).padStart(2, "0") + ".01 ~ " + String(m).padStart(2, "0") + "." + daysIn(m); }
+
+  /*
+   * 줄 하나. 날짜 줄(is-day) = 그날 일일 보고서 — 문서 아이콘 · Title/2, 오른쪽 미션 수.
+   * 미션 줄(is-mission) = └ 가지 · Body/3, 오른쪽 시각. 근무가 안 끝난 날(live)은 "작성 중"으로 못 누른다.
+   */
+  function dayRow(id, name, meta, isOn, live) {
+    return '<button type="button" class="rp-item is-day' + (live ? " is-live" : "") + '" data-id="' + (id || "") + '"' + (isOn ? ' aria-current="true"' : "") + (live ? " disabled" : "") + ">" +
+      '<span class="rp-a t-title-2">' + ic("document") + "<b>" + name + '</b></span><span class="rp-tm t-body-4 num">' + meta + "</span></button>";
   }
-  function drawCal(p, m) {
-    var first = new Date(2026, m - 1, 1).getDay(), n = daysIn(m), has = reportDays(m), cells = "";
-    for (var i = 0; i < first; i++) { cells += "<span></span>"; }
-    for (var d = 1; d <= n; d++) {
-      var fut = m === MAXM && d >= TODAY, on = has.indexOf(d) >= 0;
-      cells += '<button type="button" class="rp-cd t-body-3 num' + (on ? " has" : "") + (selDay === d && m === vm ? " is-sel" : "") + '" data-d="' + d + '"' + (on ? "" : " disabled") + ' aria-label="' + m + "월 " + d + "일" + (on ? ", 보고서 있음" : fut ? ", 아직 없음" : ", 보고서 없음") + '">' + d + "</button>";
-    }
-    p.innerHTML = '<div class="rp-cal-h"><button type="button" class="rp-ib" data-cm="-1" aria-label="이전 달">' + ic("chevron-left") + '</button><b class="t-title-2">2026년 ' + m + '월</b><button type="button" class="rp-ib" data-cm="1" aria-label="다음 달"' + (m >= MAXM ? " disabled" : "") + ">" + ic("chevron-right") + "</button></div>" +
-      '<div class="rp-cg"><span class="rp-w t-caption">일</span><span class="rp-w t-caption">월</span><span class="rp-w t-caption">화</span><span class="rp-w t-caption">수</span><span class="rp-w t-caption">목</span><span class="rp-w t-caption">금</span><span class="rp-w t-caption">토</span>' + cells + "</div>" +
-      '<div class="rp-cf t-caption"><span><i></i>보고서 있는 날</span>' + (m === 10 ? "" : "<span>시안 예시는 10월만</span>") + "</div>";
-    Array.prototype.forEach.call(p.querySelectorAll("[data-cm]"), function (b) { b.onclick = function () { var nm = m + (+b.getAttribute("data-cm")); if (nm <= MAXM) { drawCal(p, nm); } }; });
-    Array.prototype.forEach.call(p.querySelectorAll(".rp-cd.has"), function (b) {
-      b.onclick = function () {
-        vm = m; selDay = +b.getAttribute("data-d"); closeCal();
-        var dd = DAYS.filter(function (x) { return x.day === selDay; })[0];
-        if (dd && dd.dayRpt.id) { selectDoc(dd.dayRpt.id); } else { renderList(); }
-        var g = list.querySelector('.rp-dg[data-day="' + selDay + '"]');
-        if (g) { g.scrollIntoView({ block: "start" }); g.classList.add("is-flash"); }
-      };
-    });
+  function missionRow(id, time, isOn) {
+    return '<button type="button" class="rp-item is-mission" data-id="' + (id || "") + '"' + (isOn ? ' aria-current="true"' : "") + ">" +
+      '<span class="rp-a t-body-3"><span class="rp-br" aria-hidden="true"></span><b>' + NAME + '</b></span><span class="rp-tm t-body-4 num">' + time + "</span></button>";
   }
-  function rowHtml(cls, id, name, meta, isOn) {
-    return '<button type="button" class="rp-item ' + cls + '" data-id="' + (id || "") + '"' + (isOn ? ' aria-current="true"' : "") + '><span class="rp-a">' + ic("document") + "<b>" + name + '</b></span><span class="rp-tm t-caption num">' + meta + "</span></button>";
+
+  /*
+   * 월 보고서 단추 — 한 단추가 상태만 바꾼다.
+   *   none  [월 보고서 생성]
+   *   busy  돌림표 + 월 보고서 만드는 중(누를 수 없음)
+   *   made  월 보고서 최신 · 기간(누를 수 없음) — 만든 뒤 날짜가 더 쌓이면 실제 서비스에선 "다시 만들기 (기간)"으로 살아난다
+   * 만든 월 보고서는 목록 맨 위(날짜 줄들 위)에 고정된다.
+   */
+  var moBtn = body.querySelector("[data-mo-go]");
+  function drawMoBtn() {
+    var made = vm === 10 && moState === "made", busy = vm === 10 && moState === "busy";
+    moBtn.disabled = made || busy;
+    moBtn.innerHTML = busy ? '<span class="rp-spin" aria-hidden="true"></span>월 보고서 만드는 중' : made ? "월 보고서 최신 · " + rangeOf(vm) : "월 보고서 생성";
+    moBtn.title = made ? "이 달에 새로 쌓인 날짜가 없어요" : "";
   }
+  moBtn.onclick = function () {
+    if (vm !== 10) { plainToast("시안에서는 10월만 연결돼요"); return; }
+    moState = "busy"; drawMoBtn();
+    setTimeout(function () { moState = "made"; selectDoc("mo10"); plainToast("10월 월 보고서를 만들었어요"); }, 1200);
+  };
+
   function renderList() {
     var html = "", n = 0;
     body.querySelector("[data-rp-mt]").textContent = "2026년 " + vm + "월";
     body.querySelector("[data-rp-next]").disabled = vm >= MAXM;
-    var range = vm === MAXM ? "1일 ~ " + (TODAY - 1) + "일" : "1일 ~ " + daysIn(vm) + "일";
-    // 월 보고서 줄 — 만들기 전에는 행동, 만든 뒤에는 고를 수 있는 보고서
-    if (vm === 10 && moMade) { html += rowHtml("is-day t-title-2", "mo10", "월 보고서", range, cur === "mo10"); }
-    else { html += '<div class="rp-morow t-body-3"><span>' + ic("document") + vm + '월 월 보고서</span><button type="button" class="rp-mk t-label-2" data-mo-go>' + range + "로 만들기</button></div>"; }
     if (vm === 10) {
+      if (moState === "made") { n++; html += '<div class="rp-grp is-month">' + dayRow("mo10", "10월 월 보고서", rangeOf(vm), cur === "mo10") + "</div>"; }
       DAYS.forEach(function (d) {
-        html += '<div class="rp-dg t-caption" data-day="' + d.day + '">' + d.d + "</div>";
-        n++;
-        html += rowHtml("is-day t-title-2", d.dayRpt.id, "일일 보고서", "미션 " + d.dayRpt.n, d.dayRpt.id && d.dayRpt.id === cur);
-        d.missions.forEach(function (m) { n++; html += rowHtml("is-mission t-body-3", m.id, NAME, m.t, m.id && m.id === cur); });
+        if (!d.live) { n++; }
+        html += '<div class="rp-grp" role="listitem">' + dayRow(d.dayRpt.id, d.d, d.live ? "작성 중" : "미션 " + d.dayRpt.n, d.dayRpt.id && d.dayRpt.id === cur, d.live);
+        d.missions.forEach(function (m) { n++; html += missionRow(m.id, m.t, m.id && m.id === cur); });
+        html += "</div>";
       });
     } else {
-      html += '<div class="rp-dg t-caption">이 달의 보고서 없음 (시안 예시는 10월만)</div>';
+      html += '<p class="rp-empty t-body-4">이 달의 보고서가 없어요 (시안 예시는 10월만)</p>';
     }
     body.querySelector("[data-rp-cnt]").textContent = n + "건";
     list.innerHTML = html;
-    var mk = list.querySelector("[data-mo-go]");
-    if (mk) { mk.onclick = function () { if (vm !== 10) { plainToast("시안에서는 10월만 연결돼요"); return; } moMade = true; selectDoc("mo10"); }; }
+    drawMoBtn();
     Array.prototype.forEach.call(list.querySelectorAll(".rp-item"), function (b) {
       b.onclick = function () {
         var id = b.getAttribute("data-id");
@@ -411,9 +416,15 @@
       };
     });
   }
-  body.querySelector("[data-rp-prev]").onclick = function () { vm--; selDay = null; closeCal(); renderList(); };
-  body.querySelector("[data-rp-next]").onclick = function () { if (vm < MAXM) { vm++; selDay = null; closeCal(); renderList(); } };
-  body.querySelector("[data-rp-cal]").onclick = toggleCal;
+  body.querySelector("[data-rp-prev]").onclick = function () { vm--; renderList(); };
+  body.querySelector("[data-rp-next]").onclick = function () { if (vm < MAXM) { vm++; renderList(); } };
+  // 목록 접기 — 머리 아이콘만 남기고 보고서를 넓게 본다
+  var fold = body.querySelector("[data-rp-fold]");
+  fold.onclick = function () {
+    var on = body.classList.toggle("is-fold");
+    fold.setAttribute("aria-expanded", on ? "false" : "true");
+    fold.setAttribute("aria-label", on ? "보고서 목록 펴기" : "보고서 목록 접기");
+  };
 
   /* ---------- 다른 화면(관제)에서 열기 — 같은 뷰어를 모달로 ---------- */
   var modal = null;
@@ -423,7 +434,7 @@
     var d = DOCS[id];
     modal = document.createElement("div");
     modal.innerHTML = '<div class="rp-modal-scrim" data-m-close></div><section class="rp-modal" role="dialog" aria-modal="true" aria-labelledby="rp-mt">' +
-      '<div class="rp-mhd"><div><h2 class="t-heading-2" id="rp-mt">' + d.title + '</h2><p class="rp-meta t-body-4"><span>' + d.head + "</span><span>" + d.sub + '</span><span><span class="rp-mlb">문서 번호</span><span class="num">' + d.no + '</span></span></p></div>' +
+      '<div class="rp-mhd"><div><h2 class="t-heading-2" id="rp-mt">' + d.title + partTag(d) + '</h2><p class="rp-meta t-body-3">' + metaHtml(d) + "</p></div>" +
       '<button type="button" class="icon-button modal-close" data-m-close aria-label="닫기"><span class="i i-20" style="--i:var(--ic-close)"></span></button></div>' +
       '<div style="display:flex;min-height:0">' + VIEWER + "</div>" +
       '<div class="rp-mft"><button type="button" class="rp-link t-label-2" data-m-menu>보고서 메뉴에서 보기' + ic("chevron-right") + '</button><div class="rp-acts" data-m-acts>' + DL + "</div></div></section>";
@@ -486,16 +497,15 @@
     }
     if (e.key === "Escape") {
       var pops = document.querySelectorAll(".rp-pop");
-      if (pops.length) { Array.prototype.forEach.call(pops, function (p) { p.remove(); }); } else if (modal) { closeModal(); } else { closeCal(); }
+      if (pops.length) { Array.prototype.forEach.call(pops, function (p) { p.remove(); }); } else if (modal) { closeModal(); }
     }
   });
 
-  /* ---------- 시작 — 주소 #day · #month · #cal · #modal 로 장면을 바로 연다(시안과 같은 이름) ---------- */
+  /* ---------- 시작 — 주소 #day · #month · #modal 로 장면을 바로 연다(시안과 같은 이름) ---------- */
   var hash = location.hash;
   if (hash === "#day") { cur = "d1013"; }
-  if (hash === "#month") { cur = "mo10"; moMade = true; }
+  if (hash === "#month") { cur = "mo10"; moState = "made"; }
   renderList();
   openDetail();
-  if (hash === "#cal") { setTimeout(toggleCal, 50); }
   if (hash === "#modal") { setTimeout(function () { openModal("m1017"); }, 50); }
 })();
