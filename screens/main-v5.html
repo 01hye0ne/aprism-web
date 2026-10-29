@@ -33,7 +33,7 @@
   <!-- v3 전용 규칙 — v2.2 는 10/21 부로 멈췄다. v3 에서 바꾸는 것은 여기(body.ver-3)에. -->
   <link rel="stylesheet" href="../assets/css/v3.css?v=7fce80d4" />
   <!-- v5 전용 규칙 — v4 는 10/29 부로 멈췄다. v5 에서 바꾸는 것은 여기(body.ver-5)에. -->
-  <link rel="stylesheet" href="../assets/css/v5.css?v=7f594aa8" />
+  <link rel="stylesheet" href="../assets/css/v5.css?v=b9d694a6" />
   <!-- 지도 경로 표현 규칙(10/28 반영, 지도 경로 표현 전달서 1022) — 경로 네 구간 · 흐름 빛 · 번호 핀 · 시야 빔 로봇 · 충전 스테이션 · 아래 상태 시뮬레이션 막대 -->
   <link rel="stylesheet" href="../assets/css/route-rules.css?v=4eeed062" />
   <style>
@@ -1043,12 +1043,7 @@
                       </span>
                     </button>
                   </div>
-                  <!-- 로봇 3D — 캐러셀에 보이는 한 대만 그린다. 그래픽 칸에 겹쳐 놓고
-                       아래의 SVG 로봇은 가린다(assets/js/robot-stage.js).
-                       three.js 를 못 가져오면 이 칸은 비고 SVG 가 그대로 보인다. -->
-                  <span class="robot-stage" data-robot-stage aria-hidden="true">
-                    <canvas class="robot-scene"></canvas>
-                  </span>
+                  <!-- [10/29 v5] 우측 패널 로봇은 2D(assets/js/robot-2d.js) — 3D 판(robot-stage)은 뺐다. 지도 로봇만 3D 다. -->
                   <div class="rc-side">
                     <div class="rc-nav">
                       <button type="button" class="rc-arrow" data-rc-step="-1" aria-label="이전 로봇">
@@ -1769,6 +1764,7 @@
 <!-- v5 전용 지도(map-v3.js 를 10/29 에 복제) -->
 <script src="../assets/js/map-v5.js?v=0f8b9b20"></script>
 <script src="../assets/js/robot-stage.js?v=f154b57d"></script>
+<script src="../assets/js/robot-2d.js?v=67a64068"></script>
 <script src="../assets/js/monitor.js?v=babca6fa"></script>
 <script src="../assets/js/mission-scope.js?v=475687bd"></script>
 <script src="../assets/js/delta-pulse.js?v=2d0afced"></script>

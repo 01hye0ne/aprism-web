@@ -8,3 +8,65 @@
 body.ver-5 .map-bot .rr-khead,
 body.ver-5 .map-bot .rr-spot,
 body.ver-5 .map-bot .map-bot-halo { display: none !important; }
+
+/*
+ * [10/29] 우측 패널 로봇 = 2D 4족(robot-2d.js · Figma 566:19167). 운행중 걷기 · 충전중 앉기 두 가지다.
+ * 그림은 Figma 1:1(viewBox 116 × 102)이고 그래픽 칸(142) 바닥에 발을 붙인다.
+ * 관절 자리는 Figma 좌표 그대로다 — 오른쪽(뒷)다리는 왼쪽(앞)다리 + 66.
+ */
+/* 앉으면 접힌 다리 끝이 칸 오른쪽으로 11 쯤 나온다 — 칸 옆 여백(16) 안이라 자르지 않는다. */
+body.ver-5 .robot-strip.is-carousel .robot-thumb { overflow: visible; }
+
+body.ver-5 .robot-strip.is-carousel .robot-2d {
+  display: block;
+  width: 116px;
+  height: 102px;
+  overflow: visible;
+}
+
+body.ver-5 .robot-2d .r2-hip-l { transform-origin: 44.5px 54.5px; }
+body.ver-5 .robot-2d .r2-hip-r { transform-origin: 110.5px 54.5px; }
+body.ver-5 .robot-2d .r2-knee-l { transform-origin: 67.3px 84.6px; }
+body.ver-5 .robot-2d .r2-knee-r { transform-origin: 133.3px 84.6px; }
+body.ver-5 .robot-2d .r2-all,
+body.ver-5 .robot-2d .r2-bob,
+body.ver-5 .robot-2d .r2-hip,
+body.ver-5 .robot-2d .r2-knee { transform-box: view-box; }
+
+/* 운행중 — 머리(페이로드)가 왼쪽이라 왼쪽으로 걷는다. 지지 76%(+amp → -amp) · 스윙 24%(무릎 굽힘). */
+body.ver-5 [data-r2="walk"] .robot-2d {
+  --r2-dur: 1.2s;
+  --r2-amp: 16deg;
+  --r2-knee: 30deg;
+  --r2-bob: 1.4px;
+}
+body.ver-5 [data-r2="walk"] .r2-hip { animation: r2-hip var(--r2-dur) ease-in-out infinite; }
+body.ver-5 [data-r2="walk"] .r2-knee { animation: r2-knee var(--r2-dur) ease-in-out infinite; }
+body.ver-5 [data-r2="walk"] .r2-bob { animation: r2-bob calc(var(--r2-dur) / 4) ease-in-out infinite; }
+body.ver-5 [data-r2="walk"] .r2-p2 { animation-delay: calc(var(--r2-dur) * -0.5); }
+body.ver-5 [data-r2="walk"] .r2-p3 { animation-delay: calc(var(--r2-dur) * -0.75); }
+body.ver-5 [data-r2="walk"] .r2-p4 { animation-delay: calc(var(--r2-dur) * -0.25); }
+
+@keyframes r2-hip {
+  0% { transform: rotate(var(--r2-amp)); animation-timing-function: linear; }
+  76% { transform: rotate(calc(var(--r2-amp) * -1)); animation-timing-function: cubic-bezier(0.45, 0.02, 0.3, 1); }
+  100% { transform: rotate(var(--r2-amp)); }
+}
+@keyframes r2-knee {
+  0%, 76% { transform: rotate(0deg); }
+  88% { transform: rotate(var(--r2-knee)); }
+  100% { transform: rotate(0deg); }
+}
+@keyframes r2-bob { 50% { transform: translateY(calc(var(--r2-bob) * -1)); } }
+
+/* 충전중 — 서 있다가 앉는다(Figma 충전중 566:19979 의 각도). 카드가 보일 때마다 한 번 돌고 앉은 채 멈춘다. */
+body.ver-5 [data-r2="sit"] .r2-all { animation: r2-sit-all 0.9s 0.15s ease-in-out both; }
+body.ver-5 [data-r2="sit"] .r2-hip { animation: r2-sit-hip 0.9s 0.15s ease-in-out both; }
+body.ver-5 [data-r2="sit"] .r2-knee { animation: r2-sit-knee 0.9s 0.15s ease-in-out both; }
+@keyframes r2-sit-all { to { transform: translateY(32px); } }
+@keyframes r2-sit-hip { to { transform: rotate(-40.94deg); } }
+@keyframes r2-sit-knee { to { transform: rotate(58.25deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+  body.ver-5 .robot-2d * { animation-duration: 0s !important; animation-delay: 0s !important; animation-iteration-count: 1 !important; }
+}
