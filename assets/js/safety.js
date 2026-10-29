@@ -289,8 +289,10 @@
       const tx = `<span class="sf-mtx"><span class="sf-mt1"><i class="ixd ${w} ${nw ? 'blink' : ''}"></i><b>${m.mis}</b>${nw ? '<em class="nwm">새로</em>' : ''}</span><span class="sf-meta">${kv('위치', flN(m))}${kv('측정', `${m.done}/${m.total}곳${m.done===m.total ? ', 순회 끝' : ''}`)}${kv('로봇', m.robot)}${kv('요청 전', h + '건')}</span></span>`;
       if(!on) return `<button type="button" class="sf-mrow ${w}" data-sc="${i}"><span class="sf-mmap">${svg2(i, viewF(i).robotF, false, 96)}</span>${tx}</button>`;
       const cur = dt && dt.wp ? flOf(m, dt.wp) : viewF(i).cur, sel = dt ? dt.wp : undefined, lk = dt ? dt.lk : undefined;
-      return `<div class="sf-mon ${w}"><button type="button" class="sf-mrow on" data-sc="${i}" aria-current="true">${tx}</button>
-        <div class="m2"><div class="m2b">${floorBar(i)}<span class="sp"></span><a class="btn btn-ghost is-xs m2go" href="${mainUrl(i, cur)}" title="관제 3D 지도에서 이 미션과 층을 연다">관제에서 보기<span class="i i-16" style="--i:var(--ic-chevron-right)" aria-hidden="true"></span></a></div>${svg2(i, cur, false, 316, sel, lk)}</div></div>`; }).join('');
+      // [10/30] 고른 미션은 테 하나 안에 정보 + 지도 — [관제에서 보기]는 머리 줄 오른쪽 위, 층 표시는 층이 여럿일 때만(고르는 단추) 지도 위에 남긴다
+      const multi = !!(m.fls && m.fls.length > 1);
+      return `<div class="sf-mon ${w}"><button type="button" class="sf-mrow on" data-sc="${i}" aria-current="true">${tx}</button><a class="btn btn-ghost is-xs m2go" href="${mainUrl(i, cur)}" title="관제 3D 지도에서 이 미션과 층을 연다">관제에서 보기<span class="i i-16" style="--i:var(--ic-chevron-right)" aria-hidden="true"></span></a>
+        <div class="m2">${multi ? `<div class="m2b">${floorBar(i)}</div>` : ''}${svg2(i, cur, false, 316, sel, lk)}</div></div>`; }).join('');
     return `<div class="sf-mlist"><div class="sf-mwell">${top}${rows}</div></div>${LEG}`;
   }
   const MAINV3 = "./main-v5.html";   // [v5] 같은 판의 관제로
