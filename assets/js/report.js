@@ -377,24 +377,25 @@
   }
 
   /*
-   * 월 보고서 단추 — 한 단추가 상태만 바꾼다.
-   *   none  [월 보고서 생성]
-   *   busy  돌림표 + 월 보고서 만드는 중(누를 수 없음)
-   *   made  월 보고서 최신 · 기간(누를 수 없음) — 만든 뒤 날짜가 더 쌓이면 실제 서비스에선 "다시 만들기 (기간)"으로 살아난다
-   * 만든 월 보고서는 목록 맨 위(날짜 줄들 위)에 고정된다.
+   * 월 보고서 자리 — 목록 맨 위 한 줄(10/29 디자이너: 따로 있던 [월 보고서 생성] 단추를 목록 안으로).
+   * 만들기 전과 뒤가 같은 자리다 — 상태가 한 곳에만 있다.
+   *   none  빈 자리: 흐린 문서 아이콘 · "N월 월 보고서" · 기간 + [만들기](xSmall). 문서 줄로 읽히지 않게 줄 자체는 누를 수 없다
+   *   busy  [만들기] 자리에 돌림표 + 만드는 중
+   *   made  그 자리가 바로 월 보고서 줄(누르면 연다). 날짜가 더 쌓이면 실제 서비스에선 오른쪽에 [다시 만들기]가 뜬다
    */
-  var moBtn = body.querySelector("[data-mo-go]");
-  function drawMoBtn() {
-    var made = vm === 10 && moState === "made", busy = vm === 10 && moState === "busy";
-    moBtn.disabled = made || busy;
-    moBtn.innerHTML = busy ? '<span class="rp-spin" aria-hidden="true"></span>월 보고서 만드는 중' : made ? "월 보고서 최신 · " + rangeOf(vm) : "월 보고서 생성";
-    moBtn.title = made ? "이 달에 새로 쌓인 날짜가 없어요" : "";
+  function moSlot() {
+    var name = vm + "월 월 보고서", range = rangeOf(vm);
+    if (vm === 10 && moState === "made") { return dayRow("mo10", name, range, cur === "mo10"); }
+    var busy = vm === 10 && moState === "busy";
+    return '<div class="rp-moslot"><span class="rp-a t-label-1">' + ic("document") + "<b>" + name + '</b></span><span class="rp-tm t-caption num">' + range + "</span>" +
+      (busy ? '<span class="rp-mobusy t-caption"><span class="rp-spin" aria-hidden="true"></span>만드는 중</span>'
+            : '<button type="button" class="btn btn-secondary is-xs" data-mo-go aria-label="' + name + ' 만들기">만들기</button>') + "</div>";
   }
-  moBtn.onclick = function () {
+  function makeMonth() {
     if (vm !== 10) { plainToast("시안에서는 10월만 연결돼요"); return; }
-    moState = "busy"; drawMoBtn();
+    moState = "busy"; renderList();
     setTimeout(function () { moState = "made"; selectDoc("mo10"); plainToast("10월 월 보고서를 만들었어요"); }, 1200);
-  };
+  }
 
   function renderList() {
     var html = "", n = 0;
@@ -402,8 +403,10 @@
     mt.textContent = "2026년 " + vm + "월";
     mt.setAttribute("aria-label", "2026년 " + vm + "월, 날짜로 찾기");
     body.querySelector("[data-rp-next]").disabled = vm >= MAXM;
+    if (vm === 10 && moState === "made") { n++; }
+    // 보고서가 하나도 없는 달은 묶을 것이 없어 자리를 두지 않는다(시안에서는 10월만 있다)
+    if (vm === 10) { html += '<div class="rp-grp is-month">' + moSlot() + "</div>"; }
     if (vm === 10) {
-      if (moState === "made") { n++; html += '<div class="rp-grp is-month">' + dayRow("mo10", "10월 월 보고서", rangeOf(vm), cur === "mo10") + "</div>"; }
       DAYS.forEach(function (d) {
         if (!d.live) { n++; }
         html += '<div class="rp-grp" role="listitem" data-day="' + d.day + '">' + dayRow(d.dayRpt.id, d.d, d.live ? "작성 중" : "미션 " + d.dayRpt.n, d.dayRpt.id && d.dayRpt.id === cur, d.live);
@@ -415,7 +418,8 @@
     }
     body.querySelector("[data-rp-cnt]").textContent = n + "건";
     list.innerHTML = html;
-    drawMoBtn();
+    var mk = list.querySelector("[data-mo-go]");
+    if (mk) { mk.onclick = makeMonth; }
     Array.prototype.forEach.call(list.querySelectorAll(".rp-item"), function (b) {
       b.onclick = function () {
         var id = b.getAttribute("data-id");

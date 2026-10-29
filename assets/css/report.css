@@ -66,8 +66,7 @@
 .rp-plabel { color: var(--text-tertiary); white-space: nowrap; }
 /* 본문 — 관제 패널(.ah-body)과 같다: 위 16 · 글줄(달 이동 · 단추)은 좌우 12 · 목록 상자는 좌우 8 · 묶음 사이 12 */
 .rp-sbody { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: var(--space-12); padding: var(--space-16) var(--space-8) var(--space-8); }
-.rp-sbody > .rp-mrow,
-.rp-sbody > .rp-mobtn { margin: 0 var(--space-4); }
+.rp-sbody > .rp-mrow { margin: 0 var(--space-4); }
 /* 접으면 머리 아이콘만 남는다 */
 .rp-body.is-fold { grid-template-columns: calc(var(--size-icon-20) + var(--space-12) * 2) minmax(0, 1fr); }
 .rp-body.is-fold .rp-plabel,
@@ -111,8 +110,18 @@
 .rp-grp.is-flash .rp-item.is-day { background-color: var(--bg-glass) !important; transition: background-color 0.3s; }
 .rp-cnt { display: flex; align-items: center; gap: var(--space-8); color: var(--text-tertiary); white-space: nowrap; }
 .rp-cnt .rp-cn { color: var(--text-secondary); }
-.rp-mobtn { flex: none; justify-content: center; }
-.rp-mobtn .rp-spin { margin-right: var(--space-4); }
+/*
+ * 월 보고서 자리(만들기 전) — 날짜 줄과 같은 높이 · 여백이지만 "빈 자리 + 행동"으로 읽히게:
+ * 문서 아이콘 · 이름은 흐리게(text/tertiary · secondary), 오른쪽 기간 옆에 [만들기](Secondary xSmall). 줄 자체는 누를 수 없다.
+ */
+.rp-moslot { display: flex; align-items: center; gap: var(--space-8); min-height: 32px; padding: var(--space-4) var(--space-12) var(--space-4) var(--space-16); }
+.rp-moslot .rp-a { flex: 1; min-width: 0; display: flex; align-items: center; gap: var(--space-4); color: var(--text-secondary); font-weight: 500; }
+.rp-moslot .rp-a .i { flex: none; color: var(--text-tertiary); }
+.rp-moslot .rp-a b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: inherit; }
+.rp-moslot .rp-tm { flex: none; color: var(--text-tertiary); white-space: nowrap; }
+.rp-moslot .btn { flex: none; }
+.rp-mobusy { flex: none; display: inline-flex; align-items: center; gap: var(--space-4); height: 24px; color: var(--text-secondary); }
+.rp-mobusy .rp-spin { width: 12px; height: 12px; }
 
 /* 목록 상자 — bg/map-chip · radius 8. 날짜 묶음마다 아래 구분선 */
 .rp-list { flex: 1; min-height: 0; overflow: auto; border-radius: var(--radius-8); background-color: var(--bg-map-chip); }

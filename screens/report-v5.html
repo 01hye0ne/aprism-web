@@ -14,7 +14,7 @@
   <link rel="stylesheet" href="../assets/css/app-shell.css?v=01264297" />
   <link rel="stylesheet" href="../assets/css/icons-outline.css?v=13527115" />
   <link rel="stylesheet" href="../assets/css/text-parts.css?v=e38e19ea" />
-  <link rel="stylesheet" href="../assets/css/report.css?v=06ab62a8" />
+  <link rel="stylesheet" href="../assets/css/report.css?v=c0a1a8cb" />
   <!-- v3 전용 규칙 — v2.2 는 10/21 부로 멈췄다. v3 에서 바꾸는 것은 여기(body.ver-3)에. -->
   <link rel="stylesheet" href="../assets/css/v3.css?v=7fce80d4" />
   <!-- v5 전용 규칙 — v4 는 10/29 부로 멈췄다. v5 에서 바꾸는 것은 여기(body.ver-5)에. -->
@@ -126,7 +126,7 @@
     <!-- ---------- Body — 보고서 목록 | 보고서 ---------- -->
     <main class="rp-body" data-report>
 
-      <!-- 왼쪽 — 보고서 목록(Figma UI_09 · 보고서 1432:40952). 미션과 하루 근무가 끝나면 자동으로 만들어지고, 월 보고서는 [월 보고서 생성]으로 만든다.
+      <!-- 왼쪽 — 보고서 목록(Figma UI_09 · 보고서 1432:40952). 미션과 하루 근무가 끝나면 자동으로 만들어지고, 월 보고서는 목록 맨 위 "월 보고서 자리"의 [만들기]로 만든다(10/29 — 따로 있던 전체 폭 단추를 목록 안으로).
            날짜 줄 = 그날의 일일 보고서(1:1 이라 합쳤다), 그 아래 └ 가지로 미션 보고서. 오늘처럼 근무가 안 끝난 날은 "작성 중"으로 못 누른다. -->
       <aside class="rp-side" data-rp-side aria-label="보고서 목록">
         <div class="rp-phead">
@@ -145,7 +145,6 @@
             </div>
             <p class="rp-cnt t-caption"><span>최신순 정렬</span><span class="rp-cn" data-rp-cnt></span></p>
           </div>
-          <button type="button" class="btn btn-secondary rp-mobtn" data-mo-go>월 보고서 생성</button>
           <div class="rp-list" data-rp-list role="list"></div>
         </div>
       </aside>
@@ -161,6 +160,6 @@
 </div>
 
 <script src="../assets/js/theme.js?v=c86093d9"></script>
-<script src="../assets/js/report.js?v=f61e16cd"></script>
+<script src="../assets/js/report.js?v=9abd895a"></script>
 </body>
 </html>
