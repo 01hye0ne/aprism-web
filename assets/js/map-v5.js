@@ -3178,10 +3178,10 @@
       rrStyle(ln.parts[0], rrNeutral(), 0.75, 3.4);   // k 를 키운 만큼 줄여 도로 굵기는 그대로(≈9.7px)   // [10/21] 복귀 도로를 가늘고 차분하게(9 → 5) rrStyle(ln.parts[1], RR_GRAY, 0.14);
       show(ln.parts[1], true); show(ln.cur, false); show(ln.home, false); show(ln.comet, false); show(ln.fan, true);   // F 시야 빔 — 복귀 중에도 방향을 보인다(중립색)
     } else if (m === "pause" || m === "estop" || m === "lost") {   // 앞길이 회색으로 굳는다
-      rrStyle(ln.parts[0], blue, RR.doneAlpha, 3); rrStyle(ln.cur, RR_GRAY, m === "lost" ? 0.35 : 0.55, 4); rrStyle(ln.parts[1], RR_GRAY, 0.45);
+      rrStyle(ln.parts[0], blue, RR.doneAlpha, 4); rrStyle(ln.cur, RR_GRAY, m === "lost" ? 0.35 : 0.55, 4); rrStyle(ln.parts[1], RR_GRAY, 0.45);
       show(ln.parts[1], true); show(ln.cur, true); show(ln.home, true); show(ln.comet, false); show(ln.fan, m === "pause");   // F — 일시정지는 회색 빔, 긴급정지 · 끊김은 끔
     } else {
-      rrStyle(ln.parts[0], blue, RR.doneAlpha, 3); rrStyle(ln.cur, blue, 1, 4); rrStyle(ln.parts[1], blue, 0.8);
+      rrStyle(ln.parts[0], blue, RR.doneAlpha, 4); rrStyle(ln.cur, blue, 1, 4); rrStyle(ln.parts[1], blue, 0.8);   // [10/29] 지나온 길도 지금 길과 같은 굵기(3 → 4) — 바닥 띠가 된 뒤로 로봇 발밑 이음매에 굵기 차만큼 턱이 졌다. 둘은 색(옅은 파랑)으로 가른다
       show(ln.parts[1], true); show(ln.cur, true); show(ln.home, true); show(ln.comet, m !== "inspect"); show(ln.fan, true);   // F 시야 빔은 로봇 표식의 일부 — 위험 감지 때도 그대로
     }
     rrAhead(ln, m);
