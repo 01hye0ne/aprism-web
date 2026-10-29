@@ -307,8 +307,10 @@
 .sf .mhead span { display: flex; flex-direction: column; }
 .sf .mhead b { font-size: var(--font-size-13); line-height: var(--font-line-height-18); font-weight: 700; color: var(--text-primary); }
 .sf .mhead small { font-size: var(--font-size-12); line-height: var(--font-line-height-18); color: var(--text-tertiary); }
-/* 미션 → 전체로 나올 때 돌아온 묶음 — 테 대신 면(bg/selected)이 잠깐 깔렸다 천천히 빠진다(10/30, 묶음 테를 걷어 면 모핑이 자연스럽다) */
-.sf .msec.ring { background-color: var(--bg-selected); transition: none; }
+/* 미션 → 전체로 나올 때 돌아온 묶음 — 테 대신 면이 잠깐 깔렸다 천천히 빠진다(10/30, 묶음 테를 걷어 면 모핑이 자연스럽다).
+   면은 차분한 남색(브랜드 파랑 14% + bg/page) — '방금 보던 곳' 상태 표시라 파랑, 회색(bg/selected)은 넓게 뿌옇고 카드보다 밝아 걷었다(10/30 B안) */
+.sf { --sf-focus: color-mix(in srgb, var(--border-brand) 14%, var(--bg-page)); }
+.sf .msec.ring { background-color: var(--sf-focus); transition: none; }
 .sf .msec { transition: background-color .9s ease-out; }
 /* [10/30 GUI] 미션 묶음은 테 · 면 없이 여백만 — 카드(bg/cell)가 덩이를 만든다.
    묶음은 스크롤 칸 가로를 꽉 채운다(바깥 여백 0) — 돌아올 때 깔리는 면(.ring)이 판 끝에서 끝까지 닿는다. 카드 자리는 예전과 같게 묶음 안 여백으로 옮겼다(왼 20+12, 오른 8+12) */
@@ -445,7 +447,7 @@
 .sf .rtx:hover { opacity: 1; }
 
 /* 카드 ↔ 자세히 보기 옮겨 가는 틀 · 표 칸 미리 보기 */
-.sf .gx { position: absolute; z-index: 18; border-radius: var(--radius-card); background-color: var(--bg-selected); opacity: .7; pointer-events: none; }   /* 모핑 분신 — 테 없이 면만(묶음의 돌아온 면과 같은 색) */
+.sf .gx { position: absolute; z-index: 18; border-radius: var(--radius-card); background-color: var(--sf-focus); opacity: .85; pointer-events: none; }   /* 모핑 분신 — 테 없이 면만(묶음의 돌아온 면과 같은 남색) */
 .sf .pvx { position: absolute; z-index: 20; width: 300px; display: flex; flex-direction: column; gap: var(--space-8); padding: var(--space-12); border: var(--border-width-thin) solid var(--border-strong); border-radius: var(--radius-card); background-color: var(--bg-raised); box-shadow: 0 4px 16px rgb(0 0 0 / 35%); pointer-events: none; }
 .sf .pvx[hidden] { display: none; }
 .sf .pvh { display: flex; flex-direction: column; gap: var(--space-2); }
