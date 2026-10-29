@@ -61,7 +61,7 @@
 .sf .hd .lvh { align-self: center; }
 .sf .hd .lvh .badge-dot { animation: sf-blink 1.6s ease-in-out infinite; }
 .sf .hd .sp { flex: 1; }
-.sf .todo { color: var(--text-secondary); }
+.sf .todo { margin-left: var(--space-4); color: var(--text-secondary); }
 .sf .todo b { margin-right: var(--space-2); color: var(--text-primary); }
 
 /* 카드 · 표 — 두 칸 고르개. Secondary 단추 면에 고른 쪽만 bg/selected */
@@ -123,10 +123,16 @@
 .sf .m2v .wpm.hl .hlr { opacity: 1; }
 .sf .m2v .lkl, .sf .m2v .lkc { stroke: var(--status-warning-icon); }
 .sf .rbt { fill: var(--status-info-icon); stroke: var(--color-gray-0); }
-/* 전체 — 미션 줄(작은 지도 + 층 · 미션 · 측정). 누르면 그 미션으로 */
+/* 미션 목록 — [전체] + 미션 줄(작은 지도 + 미션 · 층 · 측정). 고른 줄은 bg/selected 면, 그 아래 지도가 펼쳐진다 */
 .sf-mlist { display: flex; flex-direction: column; gap: var(--space-4); }
 .sf-mrow { display: flex; align-items: center; gap: var(--space-12); padding: var(--space-8); border-radius: var(--radius-card); text-align: left; }
 .sf-mrow:hover { background-color: var(--state-hover); }
+.sf-mrow.on { background-color: var(--bg-selected); cursor: default; }
+.sf-all { padding-top: var(--space-8); padding-bottom: var(--space-8); }
+.sf-msep { height: 1px; margin: var(--space-4) 0; background-color: var(--border-divider); }
+.sf-mon { display: flex; flex-direction: column; gap: var(--space-8); padding-bottom: var(--space-8); }
+.sf-mon .m2 { padding: 0 var(--space-4); }
+.sf-mon .m2v { width: auto; max-width: 100%; height: 420px; margin: 0 auto; }
 .sf-mmap { flex: none; width: 72px; }
 .sf-mmap .m2v { width: 72px; }
 .sf-mtx { min-width: 0; display: flex; flex-direction: column; gap: var(--space-2); }
@@ -253,6 +259,13 @@
 
 /* ---------- 전체 카드 — 미션마다 한 줄, 넘은 결과만 ---------- */
 .sf .msecs { display: flex; flex-direction: column; gap: var(--space-8); }
+/* 감지 열 머리 — 표 머리와 같은 이름 · 기준. 본문을 스크롤해도 위에 붙는다. 열은 묶음 안 카드 격자와 같다(묶음 안쪽 12 + 테 1) */
+.sf .mhead { position: sticky; top: 0; z-index: 5; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: var(--space-8); margin-bottom: calc(var(--space-8) * -1 + var(--space-4)); padding: var(--space-4) calc(var(--space-12) + 1px) var(--space-8); background-color: var(--bg-frame); border-bottom: var(--border-width-thin) solid var(--border-divider); }
+.sf .mhead span { display: flex; flex-direction: column; }
+.sf .mhead b { font-size: var(--font-size-13); line-height: var(--font-line-height-18); font-weight: 700; color: var(--text-primary); }
+.sf .mhead small { font-size: var(--font-size-12); line-height: var(--font-line-height-18); color: var(--text-tertiary); }
+.sf .msec.ring { box-shadow: 0 0 0 3px var(--border-brand); }
+.sf .msec { transition: box-shadow .3s; }
 .sf .msec { padding: var(--space-12); border: var(--border-width-thin) solid var(--border-default); border-radius: var(--radius-card); background-color: var(--bg-panel); }
 .sf .msh2 { display: flex; align-items: center; gap: var(--space-8); margin-bottom: var(--space-8); }
 .sf .msh2 b { color: var(--text-primary); }

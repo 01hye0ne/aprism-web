@@ -272,14 +272,18 @@
     return `<span class="m2f" role="group" aria-label="층">${fls.map(f => `<button type="button" data-mf="${f}" data-mi="${i}" class="${f===cur ? 'on' : ''}" aria-pressed="${f===cur}">${f}${f===robotF ? '<i title="로봇 있는 층"></i>' : ''}</button>`).join('')}</span>`; }
   const LEG = '<div class="mlg"><i class="c"></i>위험 <i class="w"></i>주의 <i class="o"></i>정상 범위 <i class="p"></i>예정 <svg viewBox="-9 -9 20 18" width="11" height="10"><path class="rbt" d="M10 0-7.5 8.5-3.6 0-7.5-8.5Z" stroke="none"/></svg>로봇</div>';
   // [v5 점검] 왼쪽 패널(관제 · 보고서와 같은 340) 본문 — 미션 하나: 요약 + 2D 지도(자세히 보기에서는 그 지점 · 연관 지점 표시), 전체: 미션별 작은 지도 목록
+  // [10/29] 왼쪽 패널은 깊이와 상관없이 늘 미션 목록(보고서 목록과 같은 짜임) — 지금 어디인지는 고른 줄이 말한다.
+  // 맨 위 [전체], 아래 미션 줄. 고른 미션은 줄 아래로 2D 지도가 펼쳐지고(자세히 보기에서는 그 지점 · 연관 지점), 나머지는 작은 지도 줄
   function sideHtml(){
-    if(scope==='all') return `<div class="sf-mlist">${M.map((m, i) => { const w = worst(i), h = hits(i), nw = i===1 && !newSeen;
-      return `<button type="button" class="sf-mrow" data-sc="${i}"><span class="sf-mmap">${svg2(i, viewF(i).robotF, false, 96)}</span><span class="sf-mtx"><span class="sf-mt1"><i class="ixd ${w} ${nw ? 'blink' : ''}"></i><b>${m.mis}</b>${nw ? '<em class="nwm">새로</em>' : ''}</span><span class="t-body-4">${flN(m)}, ${m.robot}</span><span class="t-caption">측정 ${m.done}/${m.total}곳${m.done===m.total ? ', 순회 끝' : ''}${h ? ', 요청 전 ' + h + '건' : ''}</span></span></button>`; }).join('')}</div>${LEG}`;
-    const i = scope, m = M[i], {fls} = viewF(i), multi = fls.length > 1;
-    const cur = dt && dt.wp ? flOf(m, dt.wp) : viewF(i).cur;
-    const sel = dt ? dt.wp : undefined, lk = dt ? dt.lk : undefined;
-    return `<div class="mph"><b>${m.mis}</b><span>${m.robot}, ${multi ? fls.join(' → ') + ', ' : ''}측정 ${m.done}/${m.total}곳</span></div>
-      <div class="m2"><div class="m2b">${floorBar(i)}<span class="sp"></span><a class="btn btn-ghost is-xs m2go" href="${mainUrl(i, cur)}" title="관제 3D 지도에서 이 미션과 층을 연다">관제에서 보기<span class="i i-16" style="--i:var(--ic-chevron-right)" aria-hidden="true"></span></a></div>${svg2(i, cur, false, 316, sel, lk)}</div>${LEG}`;
+    const allN = M.reduce((a, m, i) => a + hits(i), 0);
+    const top = `<button type="button" class="sf-mrow sf-all ${scope==='all' ? 'on' : ''}" data-sc="all" aria-current="${scope==='all'}"><span class="sf-mtx"><span class="sf-mt1"><i class="ixd ${worstAll()}"></i><b>전체</b></span><span class="t-caption">미션 ${M.length}개${allN ? ', 요청 전 ' + allN + '건' : ''}</span></span></button>`;
+    const rows = M.map((m, i) => { const w = worst(i), h = hits(i), nw = i===1 && !newSeen, on = scope===i;
+      const tx = `<span class="sf-mtx"><span class="sf-mt1"><i class="ixd ${w} ${nw ? 'blink' : ''}"></i><b>${m.mis}</b>${nw ? '<em class="nwm">새로</em>' : ''}</span><span class="t-body-4">${flN(m)}, ${m.robot}</span><span class="t-caption">측정 ${m.done}/${m.total}곳${m.done===m.total ? ', 순회 끝' : ''}${h ? ', 요청 전 ' + h + '건' : ''}</span></span>`;
+      if(!on) return `<button type="button" class="sf-mrow" data-sc="${i}"><span class="sf-mmap">${svg2(i, viewF(i).robotF, false, 96)}</span>${tx}</button>`;
+      const cur = dt && dt.wp ? flOf(m, dt.wp) : viewF(i).cur, sel = dt ? dt.wp : undefined, lk = dt ? dt.lk : undefined;
+      return `<div class="sf-mon"><button type="button" class="sf-mrow on" data-sc="${i}" aria-current="true">${tx}</button>
+        <div class="m2"><div class="m2b">${floorBar(i)}<span class="sp"></span><a class="btn btn-ghost is-xs m2go" href="${mainUrl(i, cur)}" title="관제 3D 지도에서 이 미션과 층을 연다">관제에서 보기<span class="i i-16" style="--i:var(--ic-chevron-right)" aria-hidden="true"></span></a></div>${svg2(i, cur, false, 316, sel, lk)}</div></div>`; }).join('');
+    return `<div class="sf-mlist">${top}<span class="sf-msep"></span>${rows}</div>${LEG}`;
   }
   const MAINV3 = "./main-v5.html";   // [v5] 같은 판의 관제로
   function mainUrl(i, ab){ const m = M[i], q = new URLSearchParams({mission:m.mis, floor:PLANOF[ab] || ab}); const nw = nowOf(i); if(nw) q.set("wp", nw); return MAINV3 + "?" + q.toString(); }
@@ -323,7 +327,7 @@
       <div class="big">${sent}</div><span class="sm">${loc}, ${t}</span>${rq ? `<span class="req">${rq} 현장 조치 요청됨</span>` : ''}${extra || ''}<div class="md ${md[0]}">${md[1]}</div><span class="more">자세히 보기 →</span></div>`;
   }
   function head(title, done, total, n){
-    return `<div class="hd"><span class="badge badge-mode badge-info t-caption lvh" title="6종 영상과 센서를 실시간으로 받는 중"><span class="badge-dot"></span>라이브</span><span class="sp"></span><span class="todo t-body-4"><b class="t-label-1">${n}</b>건 현장 조치 요청 전</span>${LAYB()}</div>`;
+    return `<div class="hd"><span class="badge badge-mode badge-info t-caption lvh" title="6종 영상과 센서를 실시간으로 받는 중"><span class="badge-dot"></span>라이브</span><span class="todo t-body-4"><b class="t-label-1">${n}</b>건 현장 조치 요청 전</span><span class="sp"></span>${LAYB()}</div>`;
   }
   function crumb(){
     const isAll = scope==='all';
@@ -334,10 +338,11 @@
   }
   // 전체 카드: 미션(위치)마다 한 줄, 그 미션에서 넘은 결과만 C 카드로
   function secsAll(){
-    return '<div class="msecs">' + M.map((m, i) => { const rk = k => m.r[k] ? RANK[m.r[k][0]] : -1, fl = K.slice().sort((a, b) => rk(b) - rk(a));
+    const mh = `<div class="mhead" aria-hidden="true">${K.map(k => `<span><b>${k}</b><small>${STD[k]}</small></span>`).join('')}</div>`;   // 감지 이름은 머리 줄이 말한다(스크롤해도 붙어 있다)
+    return '<div class="msecs">' + mh + M.map((m, i) => { const fl = K;   // [10/29] 열 고정 — 표 · 미션 하나(3×2) · 감지 탭과 같은 순서. 급한 것은 ⓧ/△ 기호와 위험 글자색이 알린다
       const okn = K.filter(k => m.r[k] && m.r[k][0]==='ok').length, nsc = K.filter(k => !m.r[k] && naOf(i, k)==='scope').length, nse = K.filter(k => !m.r[k] && naOf(i, k)==='sensor').length, w = worst(i);
       return `<section class="msec ${w}" data-mi="${i}"><div class="msh2"><i class="ixd ${w}"></i><b>${m.mis}</b><span class="mn2">${flN(m)}, ${m.robot}</span><span class="mt2">측정 ${m.done}/${m.total}곳${m.done===m.total ? ', 순회 끝' : ''}</span>${i===1 && !newSeen ? '<em class="nwm">새로</em>' : ''}<span class="sp"></span><span class="mok">정상 범위 ${okn}종${nsc ? ', 대상 아님 ' + nsc + '종' : ''}${nse ? ', 센서 없음 ' + nse + '종' : ''}</span></div>
-        <div class="mrow vC">${fl.length ? fl.map(k => cardM(M.indexOf(m), k)).join('') : '<p class="mnone2">넘은 결과 없음</p>'}</div></section>`; }).join('') + '</div>';
+        <div class="mrow vC">${fl.map(k => cardM(i, k).replace(/<span class="nm">([^<]*)<\/span>/, (a, t) => `<span class="nm">${t.replace(k, '').trim()}</span>`)).join('')}</div></section>`; }).join('') + '</div>';
   }
   function cardsAll(){
     return K.map(k => { const has = M.map((m, i) => [i, m.r[k]]).filter(([, x]) => x);
@@ -400,7 +405,18 @@
     side.innerHTML = sideHtml();
     requestAnimationFrame(() => v.querySelectorAll('canvas[data-spec3]').forEach(spec3));
   }
-  function go(id){ mapF = {}; dt = null; menu = false; drawer = null; scope = id==='all' ? 'all' : +id; if(scope===1){ newSeen = true; toasts = toasts.filter(t => t.mi !== 1); } render(); }
+  function go(id){
+    const to = id==='all' ? 'all' : +id, from = scope, wasDt = !!dt;
+    const apply = () => { mapF = {}; dt = null; menu = false; drawer = null; scope = to; if(scope===1){ newSeen = true; toasts = toasts.filter(t => t.mi !== 1); } render(); };
+    if(to===from && !wasDt){ menu = false; return render(); }
+    // 전체 → 미션: 본문의 그 미션 묶음이 커져 미션 화면이 된다
+    const sec = from==='all' && to !== 'all' && !wasDt ? v.querySelector(`.msec[data-mi="${to}"]`) : null;
+    if(sec) return zoomIn(sec, apply);
+    apply();
+    // 미션 → 전체: 본문이 그 미션 묶음으로 줄어들고, 묶음 테가 잠깐 빛난다
+    if(to==='all' && from !== 'all'){ const back = v.querySelector(`.msec[data-mi="${from}"]`);
+      if(back){ back.scrollIntoView({block:'nearest'}); zoomOut(back, () => { back.classList.add('ring'); setTimeout(() => back.classList.remove('ring'), 1500); }); } }
+  }
   scr.addEventListener('click', e => {
     const mfb = e.target.closest('[data-mf]'); if(mfb){ return pickF(+mfb.dataset.mi, mfb.dataset.mf); }
     if(e.target.closest('[data-menu]')){ menu = !menu; bc.innerHTML = crumb(); return; }

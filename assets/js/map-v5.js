@@ -392,6 +392,9 @@
     baseSize = Math.max(fitV, fitH * h / cell) * FIT_AIR;
   }
 
+  // [10/29 렌더 실험] 시험 페이지(lab-map-render-v5.html)가 다는 효과 고리. 운영 화면에는 없다 — 늘 null.
+  var fx = null;
+
   function frame() {
     if (!renderer) { return; }
     var w = view.clientWidth, h = view.clientHeight;
@@ -418,7 +421,7 @@
     rrLabels();        // [10/22] 설비 이름 — 다가가면 상시 노출
     travelSync();   // 층 이동 — 층마다 선을 켜고 끄고 표식을 놓는다
     rrRibbons();    // [10/29] 경로 실선 · 흰 테 · 점선 바탕 띠 = 바닥에 깐 띠 — 선의 자리 · 색 · 보이기를 따라간다
-    renderer.render(scene, camera);
+    if (!(fx && fx.render(w, h))) { renderer.render(scene, camera); }   // 효과가 아직 안 섰거나 꺼져 있으면 그냥 그린다
     rrDog();           // [10/29 v5] 로봇 = 3D SPOT(robot-spot.js) — 깊이를 지우고 맨 위에 한 번 더 그린다
     placeCard();
     placeBot();
@@ -5725,6 +5728,11 @@
     cam.top = span; cam.bottom = -span;
     cam.near = span * 0.2; cam.far = span * 4;
     cam.updateProjectionMatrix();
+
+    if (window.APRISM_MAP_FX) {
+      fx = window.APRISM_MAP_FX;
+      fx.init({ THREE: THREE, renderer: renderer, scene: scene, camera: camera, view: view, key: key, meshes: meshes, span: span, isLight: isLight, redraw: frame });
+    }
 
     plan();
     frame();
