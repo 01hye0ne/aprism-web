@@ -325,15 +325,20 @@
       var sev = first.sev, word = sev === "critical" ? "위험" : "주의";
       if (!inMine(first)) {
         var om = missionOf(first);
-        say = { l: ["다른 미션에 " + word + (sev === "critical" ? "이" : "가") + " 있어요!", "그 미션으로 이동해 드릴까요?"],
-          clue: om, scope: sev, yes: "네, 이동해 주세요", act: { go: om } };
+        say = { l: ["다른 미션에 " + word + " 단계 알림이 있어요!", "먼저 확인하는 것을 추천드릴게요."],
+          clue: om, scope: sev, yes: word + " 단계 미션으로 이동하기", act: { go: om } };
       } else {
         var mc = all.filter(function (a) { return a.sev === sev && inMine(a); }).length;
         var oc = all.filter(function (a) { return a.sev === sev && !inMine(a); }).length;
-        say = { l: [(j.crit ? "위험 " + j.crit + "건" + (j.warn ? ", 주의 " + j.warn + "건" : "") : "주의 " + j.warn + "건") + "이 있어요.",
-            (first.eq || first.title) + "부터 확인하세요."],
-          clue: ["이 미션 " + word + " " + mc, oc ? "다른 미션 " + word + " " + oc : ""].filter(Boolean).join(", "),
-          scope: oc ? sev : "", yes: "처리 순서 보기", act: "order", open: "처리 순서 알려 줘" };
+        if (sev === "critical") {
+          say = { l: ["위험 " + j.crit + "건" + (j.warn ? ", 주의 " + j.warn + "건" : "") + "이 있어요.", (first.eq || first.title) + "부터 확인하세요."],
+            clue: ["이 미션 위험 " + mc, oc ? "다른 미션 위험 " + oc : ""].filter(Boolean).join(", "),
+            scope: oc ? sev : "", yes: "처리 순서 보기", act: "order", open: "처리 순서 알려 줘" };
+        } else {
+          // 주의만 있을 때 — 한 문장(굵은 1줄 없이), 근거 줄에 먼저 볼 설비(10/30 디자이너 문구)
+          say = { l: ["지금 미션에서 " + mc + "건" + (oc ? ", 다른 미션에서 " + oc + "건" : "") + "의 확인해야 할 주의 단계 알림이 있어요."],
+            clue: "먼저: " + (first.eq || first.title), yes: "처리 순서 보기", act: "order", open: "처리 순서 알려 줘" };
+        }
       }
     } else {
       var card = $(".robot-strip .robot-card[aria-pressed='true']");
