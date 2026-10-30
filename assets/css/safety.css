@@ -58,7 +58,7 @@
 
 /* 글자 단계 — 시안 클래스에 그대로 건다(값은 app-shell .t-* 와 같다) */
 .sf .mph b, .sf .kd .nm, .sf .sth b, .sf .dl .ti, .sf .donec b, .sf .pvh b, .sf .mx td.c-n b { font-size: var(--font-size-14); line-height: var(--font-line-height-20); font-weight: 800; }
-.sf .msh2 b, .sf .mtb td.tn .fl2, .sf .pvf b, .sf .mrow .kd .big { font-size: var(--font-size-16); line-height: var(--font-line-height-24); font-weight: 700; }
+.sf .msh2 b, .sf .mtb td.tn .fl2, .sf .pvf b, .sf .cx .kd .big { font-size: var(--font-size-16); line-height: var(--font-line-height-24); font-weight: 700; }
 .sf .kd .big, .sf .lvA .sm2, .sf .locb .lw { font-size: var(--font-size-20); line-height: var(--font-line-height-28); font-weight: 800; letter-spacing: -0.01em; }
 .sf .lvA .tt h5 { font-size: var(--font-size-24); line-height: var(--font-line-height-32); font-weight: 600; letter-spacing: -0.01em; }
 
@@ -340,24 +340,26 @@
 .sf .mrow { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: var(--space-8); }
 /* [10/30 GUI · Figma 1494:14581] 전체 카드 — 사진(16:9) 위, 글 칸 아래(좌우 8 · 아래 8 · 사이 4). 단계 배지는 사진 아래 끝에 걸치고 건수를 안에 담는다(위험 2).
    위치 13/20 text/secondary · 시각 12/18 text/tertiary 두 줄 — 아이콘 없음(카드 18장에 36개라 너무 많고 글만으로 구분된다) */
-.sf .mrow .kd { min-height: 0; gap: var(--space-4); padding: var(--space-4) var(--space-4) var(--space-8); border-color: transparent; background-color: var(--bg-cell); }
-.sf .mrow .kd[role="button"]:hover { border-color: var(--border-strong); }
-.sf .mrow .kd > :not(.md):not(.more) { margin-left: var(--space-8); margin-right: var(--space-8); }
+.sf .cx .kd { min-height: 0; gap: var(--space-4); padding: var(--space-4) var(--space-4) var(--space-8); border-color: transparent; background-color: var(--bg-cell); }
+.sf .cx .kd[role="button"]:hover { border-color: var(--border-strong); }
+.sf .cx .kd > :not(.md):not(.more) { margin-left: var(--space-8); margin-right: var(--space-8); }
 /* [10/30 GUI · Figma 1494:14581] 사진이 위, 단계 배지가 사진 아래 끝에 16 걸쳐 얹힌다. 건수는 배지 안으로(위험 2) */
-.sf .mrow .kd > .rw { position: relative; z-index: 2; justify-content: flex-start; margin-top: calc(var(--space-16) * -1); }
-.sf .mrow .kd .nm:empty { display: none; }
+.sf .cx .kd > .rw { position: relative; z-index: 2; justify-content: flex-start; margin-top: calc(var(--space-16) * -1); }
+.sf .cx .kd .nm:empty { display: none; }
+.sf .cx .kd .knm { font-size: var(--font-size-12); line-height: var(--font-line-height-18); color: var(--text-tertiary); }   /* 감지 이름(미션 하나) */
+.sf .g6.cx { grid-template-rows: none; align-content: start; }   /* 사진이 16:9 라 줄 높이는 내용대로 */
 /* [자세히 보기] — 전체 카드에서는 글 없이 아이콘 단추만(10/30). 24 · 모서리 4 · 오른쪽 아래 8, 카드에 올렸을 때 뜬다 */
-.sf .mrow .kd .more { right: var(--space-8); bottom: var(--space-8); display: grid; place-items: center; width: 24px; height: 24px; padding: 0; border-radius: var(--radius-control); font-size: 0; }
-.sf .mrow .kd .more::before { content: ""; width: 16px; height: 16px; background-color: currentColor; -webkit-mask: var(--ic-chevron-right) center / contain no-repeat; mask: var(--ic-chevron-right) center / contain no-repeat; }
-.sf .mrow .kd .nm { font-size: var(--font-size-14); line-height: var(--font-line-height-20); font-weight: 800; }
-.sf .mrow .kd .md { order: -1; flex: none; height: auto; aspect-ratio: 16 / 9; }   /* 사진 칸 16:9 고정(10/30) — 카메라 영상 비율, 카드 맨 위 */
-.sf .mrow .kd .mt { display: block; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.sf .mrow .kd .lc { font-size: var(--font-size-13); line-height: var(--font-line-height-20); color: var(--text-secondary); }
-.sf .mrow .kd .tm { font-size: var(--font-size-12); line-height: var(--font-line-height-18); color: var(--text-tertiary); }
+.sf .cx .kd .more { right: var(--space-8); bottom: var(--space-8); display: grid; place-items: center; width: 24px; height: 24px; padding: 0; border-radius: var(--radius-control); font-size: 0; }
+.sf .cx .kd .more::before { content: ""; width: 16px; height: 16px; background-color: currentColor; -webkit-mask: var(--ic-chevron-right) center / contain no-repeat; mask: var(--ic-chevron-right) center / contain no-repeat; }
+.sf .cx .kd .nm { font-size: var(--font-size-14); line-height: var(--font-line-height-20); font-weight: 800; }
+.sf .cx .kd .md { order: -1; flex: none; height: auto; aspect-ratio: 16 / 9; }   /* 사진 칸 16:9 고정(10/30) — 카메라 영상 비율, 카드 맨 위 */
+.sf .cx .kd .mt { display: block; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sf .cx .kd .lc { font-size: var(--font-size-13); line-height: var(--font-line-height-20); color: var(--text-secondary); }
+.sf .cx .kd .tm { font-size: var(--font-size-12); line-height: var(--font-line-height-18); color: var(--text-tertiary); }
 /* 현장 조치 요청은 시각 줄 오른쪽에 — 사이 세로선 1(10/30) */
-.sf .mrow .kd .trow { display: flex; align-items: center; gap: var(--space-8); }
-.sf .mrow .kd .trow .req { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--font-size-12); line-height: var(--font-line-height-18); color: var(--text-secondary); }
-.sf .mrow .kd .trow .req::before { content: ""; display: inline-block; width: 1px; height: 10px; margin-right: var(--space-8); vertical-align: -1px; background-color: var(--border-default); }
+.sf .cx .kd .trow { display: flex; align-items: center; gap: var(--space-8); }
+.sf .cx .kd .trow .req { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--font-size-12); line-height: var(--font-line-height-18); color: var(--text-secondary); }
+.sf .cx .kd .trow .req::before { content: ""; display: inline-block; width: 1px; height: 10px; margin-right: var(--space-8); vertical-align: -1px; background-color: var(--border-default); }
 .sf .mchip { font-size: var(--font-size-12); line-height: var(--font-line-height-18); color: var(--text-secondary); }
 .sf .mchip b { margin-right: var(--space-4); padding: 1px var(--space-4); border: var(--border-width-thin) solid var(--border-default); border-radius: var(--radius-chart); background-color: var(--bg-cell); color: var(--text-primary); font-weight: 600; }
 .sf .mnone2 { margin: 0; font-size: var(--font-size-12); color: var(--text-disabled); }

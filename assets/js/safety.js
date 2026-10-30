@@ -351,6 +351,15 @@
       <div class="scope-menu-box"><button type="button" class="scope-trigger" data-menu="1" aria-haspopup="true" aria-expanded="${menu}"><span class="t-title-2">${isAll ? '미션 고르기' : M[scope].mis}</span><span class="i i-16" style="--i:var(--ic-chevron-down)" aria-hidden="true"></span></button><div class="dropdown-menu scope-menu sf-scope" role="menu" aria-label="미션"${menu ? '' : ' hidden'}>${items}</div></div>${dt ? `<span class="status-bar-sep t-title-2" aria-hidden="true">›</span><span class="t-title-2 sf-crumb-k">${dt.k}</span>` : ''}`;
   }
   // 전체 카드: 미션(위치)마다 한 줄, 그 미션에서 넘은 결과만 C 카드로
+  // [10/30 GUI · Figma 1494:14581] 카드 꼴 — 미션 전체 · 미션 하나 같은 꼴(.cx). 건수는 단계 배지 안으로(위험 2), 위치 · 시각 두 줄, 현장 조치 요청은 시각 줄 오른쪽.
+  // named: 감지 이름 줄을 남긴다(미션 하나 — 감지 열 머리가 없다). 미션 전체는 머리 줄이 감지 이름을 말해 뺀다
+  function cardX(h, k, named){
+    let c = h.replace(/<span class="nm">([^<]*)<\/span>(<span class="pl ([a-z]+)">([^<]*)<\/span>)?/, (a, t, pl, st, w) => { const n = (t.match(/(\d+)개/) || [])[1];
+      return '<span class="nm"></span>' + (pl ? `<span class="pl ${st}">${w}${n ? ' ' + n : ''}</span>` : ''); });
+    if(named) c = c.replace('</div>', `</div><span class="knm">${k}</span>`);   // 첫 </div> = 배지 줄 끝
+    return c.replace(/<span class="sm">([^<]*), (\d\d:\d\d)<\/span>/, '<span class="mt lc">$1</span><span class="mt tm">$2</span>')
+      .replace(/<span class="mt tm">([^<]*)<\/span>(<span class="req">[^<]*<\/span>)?/, (q, t, r) => `<span class="mt trow"><span class="tm">${t}</span>${r || ''}</span>`);
+  }
   function secsAll(){
     const mh = `<div class="mhead" aria-hidden="true">${K.map(k => `<span><b>${k}</b><small>${STD[k]}</small></span>`).join('')}</div>`;   // 감지 이름은 머리 줄이 말한다(스크롤해도 붙어 있다)
     return '<div class="msecs">' + mh + M.map((m, i) => { const fl = K;   // [10/29] 열 고정 — 표 · 미션 하나(3×2) · 감지 탭과 같은 순서. 급한 것은 ⓧ/△ 기호와 위험 글자색이 알린다
@@ -358,7 +367,7 @@
       // [10/30 GUI · Figma 1467:8854] 카드 — 배지 왼쪽 · 건수 오른쪽, 위치(핀) · 시각(시계) 두 줄, 아래 사진은 카드 안 4 만 띄워 꽉 채운다
       // [10/30] 묶음 제목 앞 단계 기호는 뺐다 — 바로 아래 카드 배지와 왼쪽 목록이 같은 말을 한다(한 화면에 세 번)
       return `<section class="msec ${w}" data-mi="${i}"><div class="msh2"><b>${m.mis}</b><span class="mil"><span>${flN(m)}</span><span>${m.robot}</span><span>측정 ${m.done}/${m.total}곳${m.done===m.total ? ', 순회 끝' : ''}</span></span>${i===1 && !newSeen ? '<em class="nwm">새로</em>' : ''}<span class="sp"></span><span class="mil mok"><span>정상 범위 ${okn}종</span>${nsc ? '<span>대상 아님 ' + nsc + '종</span>' : ''}${nse ? '<span>센서 없음 ' + nse + '종</span>' : ''}</span></div>
-        <div class="mrow vC">${fl.map(k => cardM(i, k).replace(/<span class="nm">([^<]*)<\/span>/, (a, t) => `<span class="nm">${t.replace(k, '').trim()}</span>`).replace(/<span class="nm">(\d+)개<\/span><span class="pl ([a-z]+)">([^<]*)<\/span>/, '<span class="nm"></span><span class="pl $2">$3 $1</span>').replace(/<span class="sm">([^<]*), (\d\d:\d\d)<\/span>/, '<span class="mt lc">$1</span><span class="mt tm">$2</span>').replace(/<span class="mt tm">([^<]*)<\/span>(<span class="req">[^<]*<\/span>)?/, (q, t, r) => `<span class="mt trow"><span class="tm">${t}</span>${r || ''}</span>`)).join('')}</div></section>`; }).join('') + '</div>';
+        <div class="mrow cx vC">${fl.map(k => cardX(cardM(i, k), k, false)).join('')}</div></section>`; }).join('') + '</div>';
   }
   function cardsAll(){
     return K.map(k => { const has = M.map((m, i) => [i, m.r[k]]).filter(([, x]) => x);
@@ -371,7 +380,7 @@
     if(scope==='all'){ const done = M.reduce((a, m) => a + m.done, 0), total = M.reduce((a, m) => a + m.total, 0), n = M.reduce((a, m, i) => a + hits(i), 0);
       return head('통합 순회 현황', done, total, n) + (lay==='table' ? tableAll() : secsAll()); }
     const m = M[scope];
-    return head(m.mis, m.done, m.total, hits(scope)) + (lay==='table' ? tableOne(scope) : `<div class="g6 vC mmg">${K.map(k => cardM(M.indexOf(m), k)).join('')}</div>`);
+    return head(m.mis, m.done, m.total, hits(scope)) + (lay==='table' ? tableOne(scope) : `<div class="g6 cx vC mmg">${K.map(k => cardX(cardM(M.indexOf(m), k), k, true)).join('')}</div>`);
   }
   function spec3(cv){ const W = cv.clientWidth || 400, H = cv.clientHeight || 160; cv.width = W; cv.height = H; let seed = 7; const R = () => { seed = seed + 0x6D2B79F5 | 0; let q = Math.imul(seed ^ seed >>> 15, 1 | seed); q = q + Math.imul(q ^ q >>> 7, 61 | q) ^ q; return ((q ^ q >>> 14) >>> 0) / 4294967296; }; const c = cv.getContext('2d'); for(let x = 0; x < 40; x++) for(let y = 0; y < 18; y++){ const vv = .25 + (y / 18) * .35 + R() * .3, h = x / 40 > .6 && x / 40 < .78 && y / 18 > .5 && y / 18 < .85; c.fillStyle = h ? `rgb(250,${190 + R() * 50 | 0},60)` : `rgb(${30 + 50 * vv | 0},${70 + 110 * vv | 0},${150 + 90 * vv | 0})`; c.fillRect(x * W / 40, y * H / 18, W / 40 + .6, H / 18 + .6); } }
   const pv = document.createElement('div'); pv.className = 'pvx'; pv.hidden = true; sf.appendChild(pv);
