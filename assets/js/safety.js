@@ -300,6 +300,7 @@
         <div class="sf-monb">${meta}<div class="m2">${multi ? `<div class="m2b">${floorBar(i)}</div>` : ''}<div class="m2rot">${svg2(i, cur, false, 316, sel, lk)}</div></div></div></div>`; }).join('');
     return `${LEG}<div class="sf-mwrap"><div class="sf-mlist"><div class="sf-mwell">${top}${rows}</div></div><span class="sf-mthumb" aria-hidden="true"></span></div>`;   // 범례는 목록 위(10/30) — 기호를 먼저 읽고 목록으로
   }
+  const gnbMain = document.querySelector('.gnb-item[href^="./main-v5.html"]');
   const MAINV3 = "./main-v5.html";   // [v5] 같은 판의 관제로
   function mainUrl(i, ab){ const m = M[i], q = new URLSearchParams({mission:m.mis, floor:PLANOF[ab] || ab}); const nw = nowOf(i); if(nw) q.set("wp", nw); return MAINV3 + "?" + q.toString(); }
   function pickF(i, f){ const {robotF} = viewF(i); mapF[i] = f; clearTimeout(mapT);
@@ -439,6 +440,8 @@
     bc.innerHTML = crumb();
     side.innerHTML = sideHtml();
     bindThumb();
+    // [10/30] GNB [관제] — 미션 전체를 보고 있으면 통합 순회 현황, 미션 하나면 그 미션의 관제(관제에서 보기와 같은 주소)
+    if(gnbMain) gnbMain.href = scope==='all' ? './building-v5.html' : mainUrl(scope, viewF(scope).cur);
     requestAnimationFrame(() => v.querySelectorAll('canvas[data-spec3]').forEach(spec3));
   }
   /*
