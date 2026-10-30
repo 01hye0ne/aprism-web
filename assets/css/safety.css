@@ -315,7 +315,8 @@
 .sf .msecs { display: flex; flex-direction: column; gap: 0; }
 /* 감지 열 머리 — 표 머리와 같은 이름 · 기준. 본문을 스크롤해도 위에 붙는다. 열은 묶음 안 카드 격자와 같다(묶음 안쪽 12 + 테 1) */
 .sf .mhead { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: var(--space-8); padding: 0 calc(var(--space-8) + 12px + var(--space-12)) var(--space-8) calc(var(--space-20) + var(--space-12)); }   /* 열 = 아래 카드 열(본문 왼 20 + 묶음 12, 오른 8 + 막대 12 + 묶음 12) */
-.sf .mhead span { display: flex; flex-direction: column; }
+.sf .mhead span { display: flex; align-items: baseline; gap: var(--space-8); min-width: 0; white-space: nowrap; }   /* [10/30] 이름 · 기준 한 줄 — 미션 하나 칸 머리(.mch)와 같은 짜임 */
+.sf .mhead small { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 .sf .mhead b { font-size: var(--font-size-13); line-height: var(--font-line-height-18); font-weight: 700; color: var(--text-primary); }
 .sf .mhead small { font-size: var(--font-size-12); line-height: var(--font-line-height-18); color: var(--text-tertiary); }
 /* 미션 → 전체로 나올 때 돌아온 묶음 — 테 대신 면이 잠깐 깔렸다 천천히 빠진다(10/30, 묶음 테를 걷어 면 모핑이 자연스럽다).
