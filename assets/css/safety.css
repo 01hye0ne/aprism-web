@@ -183,6 +183,11 @@
 /* [10/30] 고른 미션 테 안(정보 + 지도)은 한 바탕 — bg/panel(디자이너). 본문 판(bg/page)은 너무 어두웠다 */
 .sf-monb { background-color: var(--bg-panel) !important; }
 .sf-monb > .sf-meta { padding: 0 var(--space-12) var(--space-12); border-bottom: var(--border-width-thin) solid var(--border-default); }   /* 정보와 지도 사이 가로 구분선(10/30) */
+/* [10/30] 고른 미션 정보는 1행 4열 — 이름 위 · 값 아래로 세워 높이를 줄인다(4줄 → 2줄). 칸은 내용만큼, 사이는 고르게 */
+.sf-monb > .sf-meta { display: grid; grid-template-columns: repeat(4, auto); justify-content: space-between; column-gap: var(--space-12); }
+.sf-monb > .sf-meta .sf-kv { flex-direction: column; align-items: flex-start; gap: var(--space-2); height: auto; }
+.sf-monb > .sf-meta .sf-kv .k { min-width: 0; }
+.sf-monb > .sf-meta .sf-kv .v { white-space: nowrap; }
 .sf-side .sf-mon .m2 { gap: var(--space-8); padding: 0; }
 .sf-mon .m2b { padding: 0 var(--space-12); }
 .sf-mon .m2v { width: 100%; height: auto; max-height: 400px; margin: 0; border: 0; border-radius: 0; }
