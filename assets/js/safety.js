@@ -469,13 +469,30 @@
     const to = id==='all' ? 'all' : +id, from = scope, wasDt = !!dt;
     const apply = () => { mapF = {}; dt = null; menu = false; drawer = null; scope = to; if(scope===1){ newSeen = true; toasts = toasts.filter(t => t.mi !== 1); } render(); };
     if(to===from && !wasDt){ menu = false; return render(); }
-    // 전체 → 미션: 본문의 그 미션 묶음이 커져 미션 화면이 된다
+    // [10/30] 전체 → 미션: 그 미션의 카드 여섯 장이 1행 6열에서 2행 3열 자리로 옮겨 앉는다(FLIP). 머리 · 칸 이름은 옅게 들어온다
     const sec = from==='all' && to !== 'all' && !wasDt ? v.querySelector(`.msec[data-mi="${to}"]`) : null;
-    if(sec) return zoomIn(sec, apply);
+    if(sec){ if(RM2) return apply(); const prev = cardRects(sec); apply(); return flipCards(prev, v); }
+    // 미션 → 전체: 반대로 2행 3열에서 그 미션 묶음의 1행 6열로 돌아가고, 묶음 테가 잠깐 빛난다
+    if(to==='all' && from !== 'all' && !wasDt && !RM2){ const prev = cardRects(v); apply(); const back = v.querySelector(`.msec[data-mi="${from}"]`);
+      if(back){ back.scrollIntoView({block:'nearest'}); flipCards(prev, back); back.classList.add('ring'); setTimeout(() => back.classList.remove('ring'), 1500); } return; }
     apply();
-    // 미션 → 전체: 본문이 그 미션 묶음으로 줄어들고, 묶음 테가 잠깐 빛난다
     if(to==='all' && from !== 'all'){ const back = v.querySelector(`.msec[data-mi="${from}"]`);
       if(back){ back.scrollIntoView({block:'nearest'}); zoomOut(back, () => { back.classList.add('ring'); setTimeout(() => back.classList.remove('ring'), 1500); }); } }
+  }
+  // 카드 자리 재기 — 감지 이름(data-n)으로 짝을 짓는다
+  function cardRects(root){ const o = {}; root.querySelectorAll('.kd[data-n]').forEach(k => { o[k.dataset.n] = k.getBoundingClientRect(); }); return o; }
+  // 새로 그린 카드를 예전 자리 · 크기에서 출발시켜 제자리로(360ms). 크기는 가로 · 세로를 따로 줄였다 늘린다
+  function flipCards(prev, root){
+    const ks = [...root.querySelectorAll('.kd[data-n]')].filter(k => prev[k.dataset.n]);
+    ks.forEach(k => { const a = prev[k.dataset.n], b = k.getBoundingClientRect(); if(!b.width || !b.height) return;
+      k.style.transition = 'none'; k.style.transformOrigin = '0 0'; k.style.zIndex = '3';
+      k.style.transform = `translate(${a.left - b.left}px, ${a.top - b.top}px) scale(${a.width / b.width}, ${a.height / b.height})`; });
+    v.classList.add('flip');
+    v.getBoundingClientRect();
+    requestAnimationFrame(() => {
+      ks.forEach(k => { k.style.transition = 'transform 360ms cubic-bezier(.2,.7,.2,1)'; k.style.transform = ''; });
+      setTimeout(() => { ks.forEach(k => { k.style.transition = k.style.transformOrigin = k.style.zIndex = ''; }); v.classList.remove('flip'); }, 400);
+    });
   }
   scr.addEventListener('click', e => {
     const mfb = e.target.closest('[data-mf]'); if(mfb){ return pickF(+mfb.dataset.mi, mfb.dataset.mf); }

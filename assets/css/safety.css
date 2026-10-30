@@ -569,3 +569,10 @@ button.sb-overview:not(.is-on):hover { background-color: var(--bg-cell); color: 
   #sfv, .sf .kd, .sf .kd .more { transition: none; }
   .sf .ixd.blink, .sf .hd .lvh .lvd { animation: none; }
 }
+
+/* [10/30] 전체 ↔ 미션 카드 모핑(safety.js flipCards) — 카드는 자리를 옮기고, 머리 · 칸 이름 · 묶음 제목은 옅게 들어온다.
+   미션 하나 화면은 스크롤이 없어 옮기는 동안 본문 칸이 카드를 자르지 않게 넘침을 연다 */
+.sf #sfv.flip:has(.mmg) .sfsc { overflow: visible; }
+.sf #sfv.flip .sftop, .sf #sfv.flip .mch, .sf #sfv.flip .msh2 { animation: sf-flipin .36s ease both; }
+@keyframes sf-flipin { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .sf #sfv.flip * { animation: none !important; transition: none !important; } }
