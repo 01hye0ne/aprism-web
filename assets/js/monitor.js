@@ -294,10 +294,12 @@
    *   1줄 상황(굵게) · 2줄 다음 행동 · 근거 줄 범위나 원인. Delta 가 빨강 · 노랑이면 셋 중 하나는 그 색의 이유를 말한다.
    *   위에서부터 묻고 처음 "예"인 문형을 쓴다 — 교대 직후 → 비상정지 → 다른 미션 알림 → 이 미션 위험 → 주의 누적 → 확인 전 알림 → 평상시.
    *   보는 미션의 알림은 왼쪽 목록이 이미 보여 주므로, 화면에 안 보이는 다른 미션의 알림을 먼저 말한다.
-   *   장소는 WP 번호를 쓰지 않는다 — 다른 미션은 "{층} {미션 이름} 미션", 이 미션은 설비 짧은 이름(eq).
+   *   장소는 WP 번호를 쓰지 않는다 — 다른 미션은 미션 이름만(10/30 디자이너, 층 · "미션" 낱말 뺌), 이 미션은 설비 짧은 이름(eq).
    *   2줄 질문("~해 드릴까요?")은 Delta 가 화면 안에서 할 수 있는 일만 — 올리면 근거 줄이 답 단추(yes)가 되고 누르면 그 일(act)을 한다.
    *   문체는 ~요 하나, 가운뎃점 없음. 두 줄은 줄바꿈(\n)으로 잇고 v3-panel.js 가 줄마다 감싼다.
    */
+  // 으로 / 로 — 받침 없거나 ㄹ 받침이면 "로"
+  function euro(w) { var c = w.charCodeAt(w.length - 1), b = c >= 0xac00 && c <= 0xd7a3 ? (c - 0xac00) % 28 : 0; return b && b !== 8 ? "으로" : "로"; }
   function yeyo(w) { var c = w.charCodeAt(w.length - 1); return c >= 0xac00 && c <= 0xd7a3 && (c - 0xac00) % 28 ? "이에요" : "예요"; }
   function operatorName() {
     var slot = document.querySelector(".account-chip .t-label-2");
@@ -318,7 +320,7 @@
     } else if (others.length) {
       var o = others[0], om = missionOf(o);   // items() 순서 — 위험 먼저, 그다음 오래된 순
       say = { l: ["다른 미션에도 알림이 있어요!", "그 미션으로 이동해 드릴까요?"],
-        clue: (o.floor ? o.floor + " " : "") + om + " 미션", scope: o.sev, yes: "네, 이동해 주세요", act: { go: om } };
+        clue: om, scope: o.sev, yes: "네, 이동해 주세요", act: { go: om } };
     } else if (myCrit) {
       say = { l: [myCrit.eq ? myCrit.eq + " " + myCrit.phen + yeyo(myCrit.phen) + "." : myCrit.title, myCrit.next || "위험 알림부터 보세요."],
         clue: myCrit.val ? "측정 " + myCrit.val + ", 기준 " + myCrit.std : "" };
@@ -428,7 +430,7 @@
     if (s.act.go) {
       if (window.APRISM_SCOPE_TO) { window.APRISM_SCOPE_TO(s.act.go); }
       var here = mineNow(), hc = here.filter(function (a) { return a.sev === "critical"; }).length;
-      said = { text: s.clue + "으로 옮겼어요. " + (hc ? "위험이 " + hc + "건 있어요." : here.length ? "주의가 " + here.length + "건 있어요." : "확인할 알림은 없어요."),
+      said = { text: s.clue + euro(s.clue) + " 옮겼어요. " + (hc ? "위험이 " + hc + "건 있어요." : here.length ? "주의가 " + here.length + "건 있어요." : "확인할 알림은 없어요."),
         btn: here[0] ? { label: "알림 열기", act: function () { window.APRISM_OPEN_ALERT(here[0]); } } : null };
     } else if (s.act === "warn") {
       setFilter("warning");
