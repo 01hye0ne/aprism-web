@@ -34,7 +34,8 @@
 .sf-phead { flex: none; display: flex; align-items: center; gap: var(--space-8); padding: var(--space-12); border-bottom: var(--border-width-thin) solid var(--border-default); }
 .sf-ptog { display: grid; place-items: center; width: 20px; height: 20px; color: var(--text-primary) !important; }
 .sf-plabel { color: var(--text-tertiary); white-space: nowrap; }
-.sf-sbody { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: var(--space-12); padding: var(--space-12) 0 var(--space-8) var(--space-8); overflow: hidden; }   /* 스크롤은 목록(.sf-mlist) 안에서. 오른쪽 여백 0 — 목록이 본문 판에 닿아 감싸는 느낌(10/30) */
+.sf-sbody { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: var(--space-16); padding: var(--space-12) 0 var(--space-8) var(--space-8); overflow: hidden; }   /* 스크롤은 목록(.sf-mlist) 안에서. 오른쪽 여백 0 — 목록이 본문 판에 닿아 감싸는 느낌(10/30)
+   범례 ↔ 목록 16 — 목록 윗선을 오른쪽 감지 머리 줄 아래 선(미션 전체)과 한 줄에(10/30 디자이너, 12 면 4px 위였다) */
 .sf-sbody > .mlg { padding-right: var(--space-8); }
 /* [10/30 GUI] 본문은 보고서 .rp-detail 과 같은 판 — 위 · 오른쪽 · 아래 8 띄운 bg/page(모서리 8), 카드(bg/cell)가 떠 보인다 */
 .sf-main { position: relative; min-width: 0; min-height: 0; display: flex; flex-direction: column; margin: var(--space-8) var(--space-8) var(--space-8) 0; border-radius: var(--radius-8); background-color: var(--bg-page); overflow: hidden; }
