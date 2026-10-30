@@ -311,6 +311,9 @@ body.ver-5 .dc-v5 { display: flex; flex-direction: column; gap: var(--space-8); 
 body.ver-5 .dc-v5 .dc-lead { font-weight: var(--font-weight-bold); min-height: var(--font-line-height-22); }
 body.ver-5 .dc-v5 .dc-grp { margin-top: var(--space-4); color: var(--text-tertiary); font-size: var(--font-size-12); line-height: var(--font-line-height-18); }
 body.ver-5 .dc-v5 .dc-more, body.ver-5 .dc-v5 .dc-tail { color: var(--text-secondary); font-size: var(--font-size-13); line-height: var(--font-line-height-20); }
+/* "N건 더 보기" · "주의 n건 묶어 보기" — 대화 안에서 펼치거나 묻는 글 단추(라이팅 시스템 5 · 8) */
+body.ver-5 .dc-v5 .dc-more { align-self: flex-start; padding: 0; border: 0; background: none; font-family: inherit; text-align: left; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+body.ver-5 .dc-v5 .dc-more:hover { color: var(--text-primary); }
 body.ver-5 .dc-v5 .dc-arow {
   display: flex; align-items: center; gap: var(--space-8); width: 100%;
   margin-top: calc(var(--space-4) * -1);
@@ -344,7 +347,7 @@ body.ver-5[data-delta-copy="brief"] .delta3:not(.is-open) .delta3-body { cursor:
 
 /* [10/30 라이팅 시스템 6] 답 단추 오른쪽 대화 단추 — 말풍선 24, 답 단추와 같은 반투명 면(v3-panel.js) */
 body.ver-5 .delta3 .delta3-talk {
-  flex: none; display: grid; place-items: center; width: 24px; height: 24px; margin-left: -1px; padding: 0;   /* 답 단추와 사이 7(줄 간격 8 - 1) — 10/30 디자이너 "반으로" */
+  flex: none; display: grid; place-items: center; width: 24px; height: 24px; padding: 0;   /* 답 단추와 사이 8 — 줄 양끝 여백(8)과 같게(10/30 디자이너 "간격 맞춰") */
   border: var(--border-width-thin) solid rgb(255 255 255 / 18%); border-radius: var(--radius-pill);
   background-color: rgb(255 255 255 / 10%); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); cursor: pointer;
 }

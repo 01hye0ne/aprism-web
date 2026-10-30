@@ -216,29 +216,54 @@
       return { lead: (top.floor ? top.floor + " " : "") + (mm ? mm + " 미션의 " : "") + (top.eq || top.title) + (/[가-힣]$/.test(top.eq || "") && batchim(top.eq || "") ? "이에요." : "예요."),
         btns: [{ label: "지도에서 보기", primary: true, act: openA(top) }] };
     }
-    // 할 일
-    if (/뭐부터|무엇부터|할 일|할일|어떻게|조치/.test(q)) {
-      var todo = all.filter(function (a) { return a.sev === "critical"; }).concat(all.filter(function (a) { return a.sev !== "critical"; })).slice(0, 3);
-      return { lead: (todo[0].next || (todo[0].btn ? todo[0].btn + "부터 하세요." : "위험 알림부터 보세요.")),
-        todo: todo.map(function (a) { return label(a) + ", " + (a.btn || "알림 확인"); }),
-        btns: [{ label: todo[0].btn || "알림 열기", primary: true, act: openA(todo[0]) }] };
+    // 처리 순서(10/30 디자이너) — 위험 · 주의가 몇 건, 어디서, 어떤 순서로. 순서는 monitor.js handleOrder 와 같다.
+    //   이 미션 위험 → 다른 미션 위험(미션마다) → 주의(위험을 다 본 뒤 묶어서). 보는 미션 위험이 남았으면 다른 미션으로 보내지 않는다.
+    if (/순서|가이드|뭐부터|무엇부터|할 일|할일|어떻게|조치/.test(q)) {
+      var ord = A.order || all;
+      var crits = ord.filter(function (a) { return a.sev === "critical"; });
+      var warns = ord.filter(function (a) { return a.sev !== "critical"; });
+      var orows = [], step = 0;
+      var hereC = crits.filter(function (a) { return A.mine.indexOf(a) >= 0; });
+      if (hereC.length) {
+        step += 1;
+        orows.push({ grp: step + ". 이 미션 위험: " + floorOf(A.mission, A.mine) + " " + A.mission });
+        hereC.forEach(function (a) { orows.push({ a: a }); });
+      }
+      var byC = {};
+      crits.filter(function (a) { return A.mine.indexOf(a) < 0; }).forEach(function (a) { var m = A.missionOf(a) || "기타"; (byC[m] = byC[m] || []).push(a); });
+      Object.keys(byC).forEach(function (m) {
+        step += 1;
+        orows.push({ grp: step + ". 다른 미션 위험: " + floorOf(m, byC[m]) + " " + m });
+        byC[m].forEach(function (a) { orows.push({ a: a }); });
+      });
+      if (warns.length) {
+        step += 1;
+        var wHere = warns.filter(function (a) { return A.mine.indexOf(a) >= 0; }).length;
+        orows.push({ grp: step + ". 주의 " + warns.length + "건(이 미션 " + wHere + ", 다른 미션 " + (warns.length - wHere) + ")" });
+        orows.push({ go: "주의 " + warns.length + "건 묶어 보기", act: function () { ask("주의 묶어서 확인"); } });
+      }
+      var f0 = ord[0];
+      return { lead: (n.crit ? "위험 " + n.crit + "건" + (n.warn ? ", 주의 " + n.warn + "건" : "") : "주의 " + n.warn + "건") + "이에요. 이 순서로 보세요.",
+        rows: orows,
+        btns: [{ label: f0.btn || "알림 열기", primary: true, act: openA(f0) }, { label: "지도에서 보기", act: openA(f0) }] };
     }
     // 개수 · 목록(기본) — 위험을 물으면 위험, 주의를 물으면 주의, 아니면 전체
     var sev = /주의|묶|추세/.test(q) ? "warning" : /위험/.test(q) || n.crit ? "critical" : null;
     var pool = all.filter(function (a) { return !sev || a.sev === sev; });
     var mine = pool.filter(function (a) { return A.mine.indexOf(a) >= 0; });
     var rest = pool.filter(function (a) { return A.mine.indexOf(a) < 0; });
-    var rows = [], shown = 0;
+    var rows = [], shown = 0, seen = [];
     function group(title, list) {
       if (!list.length || shown >= 3) { return; }
       rows.push({ grp: title });
-      list.forEach(function (a) { if (shown < 3) { rows.push({ a: a }); shown += 1; } });
+      list.forEach(function (a) { if (shown < 3) { rows.push({ a: a }); seen.push(a); shown += 1; } });
     }
     group("이 미션: " + floorOf(A.mission, A.mine) + " " + A.mission, mine);
     var byM = {};
     rest.forEach(function (a) { var m = A.missionOf(a) || "기타"; (byM[m] = byM[m] || []).push(a); });
     Object.keys(byM).forEach(function (m) { group("다른 미션: " + floorOf(m, byM[m]) + " " + m, byM[m]); });
-    if (pool.length > shown) { rows.push({ more: "나머지 " + (pool.length - shown) + "건은 목록에서 보세요." }); }
+    // 넘친 알림은 다른 곳으로 보내지 않고 대화 안에서 펼친다(라이팅 시스템 5 · 8 — "목록"이 어디인지 모른다)
+    if (pool.length > shown) { rows.push({ more: (pool.length - shown) + "건 더 보기", moreRows: pool.filter(function (a) { return seen.indexOf(a) < 0; }) }); }
     var first = mine[0] || rest[0] || top;
     if (first) { rows.push({ tail: "가장 급한 것은 " + (first.eq || first.title) + (batchim(first.eq || first.title) ? "이에요." : "예요.") }); }
     return { lead: (sev === "critical" ? "위험은 " : sev === "warning" ? "주의는 " : "알림은 ") + pool.length + "건이에요.", rows: rows,
@@ -250,17 +275,30 @@
     var lead = el("p", "dc-lead");
     m.appendChild(lead);
     var blocks = [];
-    (r.rows || []).forEach(function (x) {
-      if (x.grp) { blocks.push(el("p", "dc-grp", x.grp)); return; }
-      if (x.more) { blocks.push(el("p", "dc-more", x.more)); return; }
-      if (x.tail) { blocks.push(el("p", "dc-tail", x.tail)); return; }
-      var row = el("button", "dc-arow is-" + x.a.sev);
+    function arow(a) {
+      var row = el("button", "dc-arow is-" + a.sev);
       row.type = "button";
       row.appendChild(el("i"));
-      row.appendChild(el("span", null, label(x.a)));
-      row.appendChild(el("small", "num", hhmm(x.a.time)));
-      row.addEventListener("click", openA(x.a));
-      blocks.push(row);
+      row.appendChild(el("span", null, label(a)));
+      row.appendChild(el("small", "num", hhmm(a.time)));
+      row.addEventListener("click", openA(a));
+      return row;
+    }
+    (r.rows || []).forEach(function (x) {
+      if (x.grp) { blocks.push(el("p", "dc-grp", x.grp)); return; }
+      if (x.tail) { blocks.push(el("p", "dc-tail", x.tail)); return; }
+      if (x.more || x.go) {
+        var mb = el("button", "dc-more", x.more || x.go);
+        mb.type = "button";
+        mb.addEventListener("click", x.go ? x.act : function () {
+          var frag = document.createDocumentFragment();
+          x.moreRows.forEach(function (a) { frag.appendChild(arow(a)); });
+          grow(function () { mb.replaceWith(frag); });
+        });
+        blocks.push(mb);
+        return;
+      }
+      blocks.push(arow(x.a));
     });
     if (r.why && r.why.length) {
       var ul = el("ul", "dc-why");
