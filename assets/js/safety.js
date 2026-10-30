@@ -380,7 +380,8 @@
     if(scope==='all'){ const done = M.reduce((a, m) => a + m.done, 0), total = M.reduce((a, m) => a + m.total, 0), n = M.reduce((a, m, i) => a + hits(i), 0);
       return head('통합 순회 현황', done, total, n) + (lay==='table' ? tableAll() : secsAll()); }
     const m = M[scope];
-    return head(m.mis, m.done, m.total, hits(scope)) + (lay==='table' ? tableOne(scope) : `<div class="g6 cx vC mmg">${K.map(k => cardX(cardM(M.indexOf(m), k), k, true)).join('')}</div>`);
+    // [10/30 Figma 1468:8819] 미션 하나 — 칸마다 위에 감지 이름 · 기준, 아래 카드
+    return head(m.mis, m.done, m.total, hits(scope)) + (lay==='table' ? tableOne(scope) : `<div class="g6 cx vC mmg">${K.map(k => `<div class="mcell"><div class="mch"><b>${k}</b><small>${STD[k]}</small></div>${cardX(cardM(M.indexOf(m), k), k, false)}</div>`).join('')}</div>`);
   }
   function spec3(cv){ const W = cv.clientWidth || 400, H = cv.clientHeight || 160; cv.width = W; cv.height = H; let seed = 7; const R = () => { seed = seed + 0x6D2B79F5 | 0; let q = Math.imul(seed ^ seed >>> 15, 1 | seed); q = q + Math.imul(q ^ q >>> 7, 61 | q) ^ q; return ((q ^ q >>> 14) >>> 0) / 4294967296; }; const c = cv.getContext('2d'); for(let x = 0; x < 40; x++) for(let y = 0; y < 18; y++){ const vv = .25 + (y / 18) * .35 + R() * .3, h = x / 40 > .6 && x / 40 < .78 && y / 18 > .5 && y / 18 < .85; c.fillStyle = h ? `rgb(250,${190 + R() * 50 | 0},60)` : `rgb(${30 + 50 * vv | 0},${70 + 110 * vv | 0},${150 + 90 * vv | 0})`; c.fillRect(x * W / 40, y * H / 18, W / 40 + .6, H / 18 + .6); } }
   const pv = document.createElement('div'); pv.className = 'pvx'; pv.hidden = true; sf.appendChild(pv);

@@ -347,7 +347,19 @@
 .sf .cx .kd > .rw { position: relative; z-index: 2; justify-content: flex-start; margin-top: calc(var(--space-16) * -1); }
 .sf .cx .kd .nm:empty { display: none; }
 .sf .cx .kd .knm { font-size: var(--font-size-12); line-height: var(--font-line-height-18); color: var(--text-tertiary); }   /* 감지 이름(미션 하나) */
-.sf .g6.cx { grid-template-rows: none; align-content: start; }   /* 사진이 16:9 라 줄 높이는 내용대로 */
+.sf .g6.cx { grid-template-rows: none; align-content: start; gap: var(--space-20) var(--space-8); }   /* 사진이 16:9 라 줄 높이는 내용대로 */
+/* [10/30 GUI · Figma 1468:8819] 미션 하나 — 칸마다 위에 감지 이름(13 Bold) · 기준(12 tertiary), 사이 12, 아래 카드.
+   카드는 미션 전체 카드와 같은 짜임에 크기만 한 단 크게: 안 8 · 모서리 8 · 면 bg/panel → bg/cell 위에서 아래 그라데이션,
+   사진 테 border/default, 글 칸 12(배지가 사진 아래 끝에 12 걸침), 제목 20/28 ExtraBold, 시각 12/18 */
+.sf .mcell { display: flex; flex-direction: column; gap: var(--space-12); min-width: 0; }
+.sf .mch { display: flex; align-items: baseline; gap: var(--space-8); }
+.sf .mch b { font-size: var(--font-size-13); line-height: var(--font-line-height-18); font-weight: 700; color: var(--text-primary); }
+.sf .mch small { font-size: var(--font-size-12); line-height: var(--font-line-height-18); color: var(--text-tertiary); }
+.sf .g6.cx .kd { flex: 1; gap: var(--space-4); padding: var(--space-8) var(--space-8) var(--space-12); border-radius: var(--radius-8); background: linear-gradient(to bottom, var(--bg-panel), var(--bg-cell)); }
+.sf .g6.cx .kd > :not(.md):not(.more) { margin-left: var(--space-12); margin-right: var(--space-12); }
+.sf .g6.cx .kd > .rw { margin-top: calc(var(--space-12) * -1); }
+.sf .g6.cx .kd .md { border: var(--border-width-thin) solid var(--border-default); }
+.sf .g6.cx .kd .big { font-size: var(--font-size-20); line-height: var(--font-line-height-28); font-weight: 800; }
 /* [자세히 보기] — 전체 카드에서는 글 없이 아이콘 단추만(10/30). 24 · 모서리 4 · 오른쪽 아래 8, 카드에 올렸을 때 뜬다 */
 .sf .cx .kd .more { right: var(--space-8); bottom: var(--space-8); display: grid; place-items: center; width: 24px; height: 24px; padding: 0; border-radius: var(--radius-control); font-size: 0; }
 .sf .cx .kd .more::before { content: ""; width: 16px; height: 16px; background-color: currentColor; -webkit-mask: var(--ic-chevron-right) center / contain no-repeat; mask: var(--ic-chevron-right) center / contain no-repeat; }
