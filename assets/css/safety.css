@@ -346,6 +346,9 @@
 /* [10/30 GUI · Figma 1494:14581] 사진이 위, 단계 배지가 사진 아래 끝에 16 걸쳐 얹힌다. 건수는 배지 안으로(위험 2) */
 .sf .mrow .kd > .rw { position: relative; z-index: 2; justify-content: flex-start; margin-top: calc(var(--space-16) * -1); }
 .sf .mrow .kd .nm:empty { display: none; }
+/* [자세히 보기] — 전체 카드에서는 글 없이 아이콘 단추만(10/30). 24 · 모서리 4 · 오른쪽 아래 8, 카드에 올렸을 때 뜬다 */
+.sf .mrow .kd .more { right: var(--space-8); bottom: var(--space-8); display: grid; place-items: center; width: 24px; height: 24px; padding: 0; border-radius: var(--radius-control); font-size: 0; }
+.sf .mrow .kd .more::before { content: ""; width: 16px; height: 16px; background-color: currentColor; -webkit-mask: var(--ic-chevron-right) center / contain no-repeat; mask: var(--ic-chevron-right) center / contain no-repeat; }
 .sf .mrow .kd .nm { font-size: var(--font-size-14); line-height: var(--font-line-height-20); font-weight: 800; }
 .sf .mrow .kd .md { order: -1; flex: none; height: auto; aspect-ratio: 16 / 9; }   /* 사진 칸 16:9 고정(10/30) — 카메라 영상 비율, 카드 맨 위 */
 .sf .mrow .kd .mt { display: block; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
