@@ -240,6 +240,7 @@
 
 /* 사진 · 열화상 · 계기 · PRPD — 시안 그대로(사진 처리라 색 토큰과 무관) */
 .sf .md img, .sf .md canvas { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+.sf .md img[src*="/pd_"] { object-fit: contain; background-color: #0b0e13; }   /* [10/30] PRPD 그래프는 축이 잘리면 안 된다 — 칸 비율이 16:9 가 아니어도 통째로(그림 바탕과 같은 색으로 메움) */
 .sf .md .bx { position: absolute; border: 2px solid var(--status-warning-icon); }
 .sf .md.ir img { filter: grayscale(1) contrast(1.2); }
 .sf .md.ir::after { content: ""; position: absolute; inset: 0; mix-blend-mode: color; background: linear-gradient(180deg, #4b1db0, #a01fb8 40%, #e0329a 70%, #ff8a3d); }
