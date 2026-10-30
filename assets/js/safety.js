@@ -293,7 +293,7 @@
     const top = `<button type="button" class="sf-mrow sf-all ${scope==='all' ? 'on' : ''}" data-sc="all" aria-current="${scope==='all'}"><span class="sf-mt1"><b>미션 전체</b></span><span class="sf-mbody"><span class="sf-mmap sf-allsum" aria-hidden="true">${cnt('crit', nc, '위험')}${cnt('warn', nw0, '주의')}${cnt('ok', M.length - nc - nw0, '정상')}</span><span class="sf-meta">${kv('미션', M.length + '개')}${kv('측정', sumD + '/' + sumT + '곳')}${kv('요청 전', allN + '건')}</span></span></button>`;
     const rows = M.map((m, i) => { const w = worst(i), h = hits(i), nw = i===1 && !newSeen, on = scope===i;
       const t1 = `<span class="sf-mt1"><i class="ixd ${w} ${nw ? 'blink' : ''}"></i><b>${m.mis}</b>${nw ? '<em class="nwm">새로</em>' : ''}</span>`;
-      const meta = `<span class="sf-meta">${kv('위치', flN(m))}${kv('측정', `${m.done}/${m.total}곳${m.done===m.total ? ', 순회 끝' : ''}`)}${kv('로봇', m.robot)}${kv('요청 전', h + '건')}</span>`;
+      const meta = `<span class="sf-meta">${kv('층', flN(m))}${kv('측정', `${m.done}/${m.total}곳${m.done===m.total ? ', 순회 끝' : ''}`)}${kv('로봇', m.robot)}${kv('요청 전', h + '건')}</span>`;
       if(!on) return `<button type="button" class="sf-mrow ${w}" data-sc="${i}">${t1}<span class="sf-mbody"><span class="sf-mmap">${svg2(i, viewF(i).robotF, false, 96)}</span>${meta}</span></button>`;
       const cur = dt && dt.wp ? flOf(m, dt.wp) : viewF(i).cur, sel = dt ? dt.wp : undefined, lk = dt ? dt.lk : undefined;
       // [10/30] 고른 미션 — 제목 줄(+ [관제에서 보기])은 테 밖, 테(border/default) 하나 안에 정보 + 지도. 면은 깔지 않는다.
