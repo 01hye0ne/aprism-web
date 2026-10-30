@@ -338,15 +338,16 @@
 .sf .msh2 .mt2, .sf .msh2 .mok { font-size: var(--font-size-12); line-height: var(--font-line-height-18); color: var(--text-tertiary); }
 .sf .msh2 .sp { flex: 1; }
 .sf .mrow { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: var(--space-8); }
-/* [10/30 GUI · Figma 1467:8854] 전체 카드 — 카드 안 4, 글 칸은 위 4 · 좌우 8 · 아래 8(사이 4). 배지는 왼쪽 · 건수는 오른쪽.
-   위치 13/20 text/secondary · 시각 12/18 text/tertiary 두 줄 — 아이콘은 뺐다(10/30, 카드 18장에 36개라 너무 많고 글만으로 구분된다). 사진 칸은 남는 높이를 다 쓰고 bg/page · 모서리 4 */
-.sf .mrow .kd { min-height: 0; gap: var(--space-4); padding: var(--space-4); border-color: transparent; background-color: var(--bg-cell); }
+/* [10/30 GUI · Figma 1494:14581] 전체 카드 — 사진(16:9) 위, 글 칸 아래(좌우 8 · 아래 8 · 사이 4). 단계 배지는 사진 아래 끝에 걸치고 건수를 안에 담는다(위험 2).
+   위치 13/20 text/secondary · 시각 12/18 text/tertiary 두 줄 — 아이콘 없음(카드 18장에 36개라 너무 많고 글만으로 구분된다) */
+.sf .mrow .kd { min-height: 0; gap: var(--space-4); padding: var(--space-4) var(--space-4) var(--space-8); border-color: transparent; background-color: var(--bg-cell); }
 .sf .mrow .kd[role="button"]:hover { border-color: var(--border-strong); }
 .sf .mrow .kd > :not(.md):not(.more) { margin-left: var(--space-8); margin-right: var(--space-8); }
-.sf .mrow .kd > .rw { flex-direction: row-reverse; margin-top: var(--space-4); }
+/* [10/30 GUI · Figma 1494:14581] 사진이 위, 단계 배지가 사진 아래 끝에 16 걸쳐 얹힌다. 건수는 배지 안으로(위험 2) */
+.sf .mrow .kd > .rw { position: relative; z-index: 2; justify-content: flex-start; margin-top: calc(var(--space-16) * -1); }
+.sf .mrow .kd .nm:empty { display: none; }
 .sf .mrow .kd .nm { font-size: var(--font-size-14); line-height: var(--font-line-height-20); font-weight: 800; }
-.sf .mrow .kd .md { flex: none; height: auto; aspect-ratio: 16 / 9; margin-top: auto; }   /* 사진 칸 16:9 고정(10/30) — 카메라 영상 비율. 카드 아래에 붙고, 글이 짧은 카드는 글과 사진 사이가 벌어진다 */
-.sf .mrow .kd > :has(+ .md) { margin-bottom: var(--space-4); }   /* 글 칸 아래 8(사이 4 + 4) */
+.sf .mrow .kd .md { order: -1; flex: none; height: auto; aspect-ratio: 16 / 9; }   /* 사진 칸 16:9 고정(10/30) — 카메라 영상 비율, 카드 맨 위 */
 .sf .mrow .kd .mt { display: block; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .sf .mrow .kd .lc { font-size: var(--font-size-13); line-height: var(--font-line-height-20); color: var(--text-secondary); }
 .sf .mrow .kd .tm { font-size: var(--font-size-12); line-height: var(--font-line-height-18); color: var(--text-tertiary); }
