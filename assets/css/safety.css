@@ -372,6 +372,9 @@
 /* [10/30 GUI · Figma 1494:14581] 사진이 위, 단계 배지가 사진 아래 끝에 16 걸쳐 얹힌다. 건수는 배지 안으로(위험 2) */
 .sf .cx .kd > .rw { position: relative; z-index: 2; justify-content: flex-start; margin-top: calc(var(--space-16) * -1); }
 .sf .cx .kd .nm:empty { display: none; }
+.sf .cx .kd > .rw:not(:has(.pl)) { display: none; }   /* 배지 없는 정상 카드 — 사진에 걸치는 줄이 비면 제목이 사진으로 올라간다 */
+.sf .cx .kd > .rw:not(:has(.pl)) + * { margin-top: var(--space-12); }   /* 제목 높이를 배지 있는 카드와 같게(사진 아래 16) */
+.sf .g6.cx .kd > .rw:not(:has(.pl)) + * { margin-top: var(--space-16); }   /* 미션 하나(배지 걸침 12) — 사진 아래 20 */
 .sf .cx .kd .knm { font-size: var(--font-size-12); line-height: var(--font-line-height-18); color: var(--text-tertiary); }   /* 감지 이름(미션 하나) */
 /* [10/30] 미션 하나는 스크롤 없이 한 화면 — 두 줄이 남은 높이를 반씩 나누고, 사진이 글 칸을 뺀 나머지를 채운다(비율은 화면 따라, 1920×1080 에서 16:9 에 가깝다) */
 .sf .g6.cx { grid-template-rows: repeat(2, minmax(0, 1fr)); gap: var(--space-20) var(--space-8); }

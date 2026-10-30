@@ -368,7 +368,8 @@
   // named: 감지 이름 줄을 남긴다(미션 하나 — 감지 열 머리가 없다). 미션 전체는 머리 줄이 감지 이름을 말해 뺀다
   function cardX(h, k, named){
     let c = h.replace(/<span class="nm">([^<]*)<\/span>(<span class="pl ([a-z]+)">([^<]*)<\/span>)?/, (a, t, pl, st, w) => { const n = (t.match(/(\d+)개/) || [])[1];
-      return '<span class="nm"></span>' + (pl ? `<span class="pl ${st}">${w}${n ? ' ' + n : ''}</span>` : ''); });
+      // [10/30] 정상 카드는 배지를 뺀다 — 큰 제목이 같은 말(정상 범위)을 한다. 주의 · 위험 · 대상 아님 · 센서 없음은 그대로
+      return '<span class="nm"></span>' + (pl && st !== 'ok' ? `<span class="pl ${st}">${w}${n ? ' ' + n : ''}</span>` : ''); });
     if(named) c = c.replace('</div>', `</div><span class="knm">${k}</span>`);   // 첫 </div> = 배지 줄 끝
     return c.replace(/<span class="sm">([^<]*), (\d\d:\d\d)<\/span>/, '<span class="mt lc">$1</span><span class="mt tm">$2</span>')
       .replace(/<span class="mt tm">([^<]*)<\/span>(<span class="req">[^<]*<\/span>)?/, (q, t, r) => `<span class="mt trow"><span class="tm">${t}</span>${r || ''}</span>`);
@@ -376,10 +377,11 @@
   function secsAll(){
     const mh = `<div class="mhead" aria-hidden="true">${K.map(k => `<span><b>${k}</b><small>${STD[k]}</small></span>`).join('')}</div>`;   // 감지 이름은 머리 줄이 말한다(스크롤해도 붙어 있다)
     return '<div class="msecs">' + mh + M.map((m, i) => { const fl = K;   // [10/29] 열 고정 — 표 · 미션 하나(3×2) · 감지 탭과 같은 순서. 급한 것은 ⓧ/△ 기호와 위험 글자색이 알린다
-      const okn = K.filter(k => m.r[k] && m.r[k][0]==='ok').length, nsc = K.filter(k => !m.r[k] && naOf(i, k)==='scope').length, nse = K.filter(k => !m.r[k] && naOf(i, k)==='sensor').length, w = worst(i);
+      const w = worst(i);
       // [10/30 GUI · Figma 1467:8854] 카드 — 배지 왼쪽 · 건수 오른쪽, 위치(핀) · 시각(시계) 두 줄, 아래 사진은 카드 안 4 만 띄워 꽉 채운다
       // [10/30] 묶음 제목 앞 단계 기호는 뺐다 — 바로 아래 카드 배지와 왼쪽 목록이 같은 말을 한다(한 화면에 세 번)
-      return `<section class="msec ${w}" data-mi="${i}"><div class="msh2"><b>${m.mis}</b><span class="mil"><span>${flN(m)}</span><span>${m.robot}</span><span>측정 ${m.done}/${m.total}곳${m.done===m.total ? ', 순회 끝' : ''}</span></span>${i===1 && !newSeen ? '<em class="nwm">새로</em>' : ''}<span class="sp"></span><span class="mil mok"><span>정상 범위 ${okn}종</span>${nsc ? '<span>대상 아님 ' + nsc + '종</span>' : ''}${nse ? '<span>센서 없음 ' + nse + '종</span>' : ''}</span></div>
+      // [10/30] 제목 옆 층 · 로봇 · 측정(왼쪽 목록과 같다)과 오른쪽 정상 범위 n종(카드가 보여 준다)도 뺐다 — 제목은 미션 이름만
+      return `<section class="msec ${w}" data-mi="${i}"><div class="msh2"><b>${m.mis}</b>${i===1 && !newSeen ? '<em class="nwm">새로</em>' : ''}</div>
         <div class="mrow cx vC">${fl.map(k => cardX(cardM(i, k), k, false)).join('')}</div></section>`; }).join('') + '</div>';
   }
   function cardsAll(){
