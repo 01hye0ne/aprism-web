@@ -328,6 +328,16 @@ body.ver-5 .dc-v5 .dc-arow i { flex: none; width: 6px; height: 6px; border-radiu
 body.ver-5 .dc-v5 .dc-arow.is-critical i { background-color: var(--status-critical-icon); }
 body.ver-5 .dc-v5 .dc-arow span { font-weight: 400; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 body.ver-5 .dc-v5 .dc-arow small { flex: none; color: var(--text-tertiary); font-size: var(--font-size-12); }
+/* [10/30 라이팅 시스템 10] 처리한 알림 — 취소선 · 흐림 · 점 대신 체크. 다음 줄은 면 한 단 밝게 + "다음" 꼬리표(delta-chat.js refreshLive) */
+body.ver-5 .dc-v5 .dc-arow.is-done span { text-decoration: line-through; color: var(--text-tertiary); }
+body.ver-5 .dc-v5 .dc-arow.is-done i,
+body.ver-5 .dc-v5 .dc-arow.is-done.is-critical i {
+  width: 9px; height: 5px; border-radius: 0; background: none;
+  border: solid var(--text-tertiary); border-width: 0 0 2px 2px; transform: translateY(-2px) rotate(-45deg);
+}
+body.ver-5 .dc-v5 .dc-arow.is-next { background-color: rgb(255 255 255 / 14%); box-shadow: inset 0 0 0 1px rgb(255 255 255 / 20%); }
+:root[data-theme="light"] body.ver-5 .dc-v5 .dc-arow.is-next { background-color: rgb(0 0 0 / 8%); box-shadow: inset 0 0 0 1px rgb(0 0 0 / 14%); }
+body.ver-5 .dc-v5 .dc-tag { flex: none; padding: 0 var(--space-4); border-radius: var(--radius-4, 4px); background-color: var(--text-primary); color: var(--bg-cell); font-size: var(--font-size-12); line-height: var(--font-line-height-18); font-weight: var(--font-weight-bold); }
 body.ver-5 .dc-v5 .dc-why, body.ver-5 .dc-v5 .dc-todo { margin: 0; padding-left: var(--space-20); color: var(--text-secondary); font-size: var(--font-size-13); line-height: var(--font-line-height-20); }
 body.ver-5 .dc-v5 .dc-why li + li, body.ver-5 .dc-v5 .dc-todo li + li { margin-top: var(--space-2); }
 body.ver-5 .dc-v5 .dc-btns { display: flex; flex-wrap: wrap; gap: var(--space-4); margin-top: var(--space-4); }

@@ -156,6 +156,7 @@
    *   쓰는 동안 Delta 표식의 네모 셋이 1 → 2 → 3 차례로 켜진다(한 바퀴 1.2초). 첫 줄은 글자가 차례로, 알림 줄과 단추는 한 덩어리씩.
    */
   var V5 = body.classList.contains("ver-5");
+  var LIVE = [];   // 처리 순서 답(라이팅 시스템 10) — 조치 완료에 따라 줄을 바꾼다
   var CALM = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   function alerts() { return window.APRISM_DELTA_ALERTS || { all: [], mine: [], mission: null, missionOf: function () { return null; } }; }
   function hhmm(t) { return (t || "").slice(0, 5); }
@@ -226,14 +227,14 @@
       var hereC = crits.filter(function (a) { return A.mine.indexOf(a) >= 0; });
       if (hereC.length) {
         step += 1;
-        orows.push({ grp: step + ". 이 미션 위험: " + floorOf(A.mission, A.mine) + " " + A.mission });
+        orows.push({ grp: step + ". 이 미션 위험: " + floorOf(A.mission, A.mine) + " " + A.mission, list: hereC });
         hereC.forEach(function (a) { orows.push({ a: a }); });
       }
       var byC = {};
       crits.filter(function (a) { return A.mine.indexOf(a) < 0; }).forEach(function (a) { var m = A.missionOf(a) || "기타"; (byC[m] = byC[m] || []).push(a); });
       Object.keys(byC).forEach(function (m) {
         step += 1;
-        orows.push({ grp: step + ". 다른 미션 위험: " + floorOf(m, byC[m]) + " " + m });
+        orows.push({ grp: step + ". 다른 미션 위험: " + floorOf(m, byC[m]) + " " + m, list: byC[m] });
         byC[m].forEach(function (a) { orows.push({ a: a }); });
       });
       if (warns.length) {
@@ -242,10 +243,12 @@
         orows.push({ grp: step + ". 주의 " + warns.length + "건(이 미션 " + wHere + ", 다른 미션 " + (warns.length - wHere) + ")" });
         orows.push({ go: "주의 " + warns.length + "건 묶어 보기", act: function () { ask("주의 묶어서 확인"); } });
       }
-      var f0 = ord[0];
+      // cur — 버튼이 가리키는 알림. 조치 완료가 오면 refreshLive 가 다음 알림으로 옮긴다(라이팅 시스템 10).
+      var cur = { a: crits[0] || ord[0] };
       return { lead: (n.crit ? "위험 " + n.crit + "건" + (n.warn ? ", 주의 " + n.warn + "건" : "") : "주의 " + n.warn + "건") + "이에요. 이 순서로 보세요.",
-        rows: orows,
-        btns: [{ label: f0.btn || "알림 열기", primary: true, act: openA(f0) }, { label: "지도에서 보기", act: openA(f0) }] };
+        rows: orows, live: { cur: cur, warnN: warns.length },
+        btns: [{ label: cur.a.btn || "알림 열기", primary: true, act: function () { if (cur.a) { openA(cur.a)(); } else { ask("주의 묶어서 확인"); } } },
+          { label: "지도에서 보기", act: function () { if (cur.a) { openA(cur.a)(); } } }] };
     }
     // 개수 · 목록(기본) — 위험을 물으면 위험, 주의를 물으면 주의, 아니면 전체
     var sev = /주의|묶|추세/.test(q) ? "warning" : /위험/.test(q) || n.crit ? "critical" : null;
@@ -275,6 +278,7 @@
     var lead = el("p", "dc-lead");
     m.appendChild(lead);
     var blocks = [];
+    var live = r.live ? { rows: [], grps: [], cur: r.live.cur, warnN: r.live.warnN, m: m, btn: null, said: false } : null;
     function arow(a) {
       var row = el("button", "dc-arow is-" + a.sev);
       row.type = "button";
@@ -285,7 +289,12 @@
       return row;
     }
     (r.rows || []).forEach(function (x) {
-      if (x.grp) { blocks.push(el("p", "dc-grp", x.grp)); return; }
+      if (x.grp) {
+        var g = el("p", "dc-grp", x.grp);
+        if (live && x.list) { live.grps.push({ el: g, text: x.grp, list: x.list }); }
+        blocks.push(g);
+        return;
+      }
       if (x.tail) { blocks.push(el("p", "dc-tail", x.tail)); return; }
       if (x.more || x.go) {
         var mb = el("button", "dc-more", x.more || x.go);
@@ -298,7 +307,9 @@
         blocks.push(mb);
         return;
       }
-      blocks.push(arow(x.a));
+      var rw = arow(x.a);
+      if (live) { live.rows.push({ a: x.a, el: rw }); }
+      blocks.push(rw);
     });
     if (r.why && r.why.length) {
       var ul = el("ul", "dc-why");
@@ -317,10 +328,12 @@
         var b = el("button", "btn is-xs " + (c.primary && i === 0 ? "btn-primary" : "btn-secondary"), c.label);
         b.type = "button";
         b.addEventListener("click", c.act || function () { ask(c.label); });
+        if (live && i === 0) { live.btn = b; }
         row2.appendChild(b);
       });
       blocks.push(row2);
     }
+    if (live) { LIVE.push(live); refreshLive(live); }
     if (CALM) { lead.textContent = r.lead; blocks.forEach(function (b) { m.appendChild(b); }); return m; }
     var chars = Array.from(r.lead);
     chars.forEach(function (ch, i) { setTimeout(function () { lead.textContent += ch; scrollEnd(); }, i * 45); });
@@ -329,6 +342,44 @@
     });
     return m;
   }
+  /*
+   * 처리한 알림 표시(10/30 디자이너, 라이팅 시스템 10) — 처리 순서 답은 대화에 남은 채로 따라 바뀐다.
+   *   조치 완료로 목록에서 빠진 알림은 취소선 · 흐림 · 체크, 오른쪽은 처리 시각. 줄은 지우지 않고 순서도 그대로.
+   *   처리 안 한 첫 줄에 "다음", 묶음 머리에 처리 수(1/2), 채운 버튼은 다음 알림의 조치로.
+   *   위험을 다 처리하면 한 줄 덧붙인다. monitor.js 가 다시 그릴 때마다(aprism:severity) 맞춘다.
+   */
+  function nowHM() { var d = new Date(); return (d.getHours() < 10 ? "0" : "") + d.getHours() + ":" + (d.getMinutes() < 10 ? "0" : "") + d.getMinutes(); }
+  function refreshLive(L) {
+    var A = alerts(), next = null;
+    L.rows.forEach(function (r) {
+      var done = A.all.indexOf(r.a) < 0;
+      if (done && !r.at) { r.at = nowHM(); }
+      r.el.classList.toggle("is-done", done);
+      r.el.querySelector("small").textContent = done ? r.at + " 처리" : hhmm(r.a.time);
+      if (!done && !next) { next = r; }
+    });
+    L.rows.forEach(function (r) {
+      var tag = r.el.querySelector(".dc-tag");
+      r.el.classList.toggle("is-next", r === next);
+      if (r === next && !tag) { r.el.insertBefore(el("b", "dc-tag", "다음"), r.el.querySelector("small")); }
+      if (r !== next && tag) { tag.remove(); }
+    });
+    L.grps.forEach(function (g) {
+      var n = g.list.filter(function (a) { return A.all.indexOf(a) < 0; }).length;
+      g.el.textContent = g.text + "  " + n + "/" + g.list.length;
+    });
+    if (!L.rows.length) { return; }
+    L.cur.a = next ? next.a : null;
+    if (L.btn) { L.btn.textContent = next ? (next.a.btn || "알림 열기") : L.warnN ? "주의 " + L.warnN + "건 묶어 보기" : "알림 열기"; }
+    if (!next && !L.said) {
+      L.said = true;
+      var s = el("p", "dc-tail", "위험 " + L.rows.length + "건을 모두 처리했어요." + (L.warnN ? " 다음은 주의 " + L.warnN + "건이에요." : ""));
+      grow(function () { L.m.appendChild(s); });
+      scrollEnd();
+    }
+  }
+  document.addEventListener("aprism:severity", function () { setTimeout(function () { LIVE.forEach(refreshLive); }, 0); });
+
   // 쓰는 중 표시 — Delta 육각 표식(Figma 1510:18568 "Delta-Thinking" 세 장). 안의 빈 삼각이 1 → 2 → 3 으로 바뀌어 도는 것처럼 보인다(한 바퀴 1.2초)
   var THINK = ["M21.2264 10.588C21.5837 11.2067 21.5837 11.9691 21.2265 12.5878L17.5364 18.9802C17.1791 19.5992 16.5187 19.9804 15.8041 19.9804L8.42216 19.9796C7.70769 19.9795 7.04753 19.5983 6.6903 18.9796L3.00017 12.5879C2.64292 11.9691 2.64292 11.2067 3.00017 10.5879L6.69023 4.19632C7.04749 3.5775 7.70776 3.19629 8.4223 3.19629H15.8043C16.5188 3.19629 17.1791 3.5775 17.5363 4.19631L21.2264 10.588ZM9.27566 5.19629C8.89373 5.19629 8.65282 5.60719 8.83935 5.94048L12 11.5879L8.83927 17.2363C8.65277 17.5696 8.89368 17.9805 9.2756 17.9805H14.9115C15.2989 17.9805 15.5391 17.5588 15.3416 17.2255L12 11.5879L15.3207 5.95004C15.517 5.61673 15.2767 5.19629 14.8899 5.19629H9.27566Z", "M21.5151 11.0889C21.6937 11.3983 21.6937 11.7794 21.5151 12.0888L17.2477 19.4805C17.069 19.7899 16.7389 19.9805 16.3816 19.9805H7.84494C7.48767 19.9805 7.15754 19.7899 6.97891 19.4805L2.71149 12.0888C2.53288 11.7794 2.53287 11.3983 2.71147 11.0889L6.97891 3.69635C7.15754 3.38691 7.48768 3.19629 7.84497 3.19629H16.3816C16.7389 3.19629 17.069 3.38691 17.2476 3.69635L21.5151 11.0889ZM11.7266 11.5879H5.59837C5.21349 11.5879 4.97292 12.0045 5.16534 12.3379L7.92291 17.115C8.11927 17.4552 8.61316 17.4465 8.79747 17.0997L11.7266 11.5879H18.6281C19.013 11.5879 19.2536 11.1712 19.0611 10.8379L16.2154 5.90937C16.0279 5.5845 15.5626 5.57422 15.3609 5.89048L11.7266 11.5879Z", "M21.8037 11.5879L16.959 19.9805H7.26758L2.42285 11.5889L7.26758 3.19629H16.959L21.8037 11.5879ZM5.16541 10.838C4.97296 11.1713 5.21347 11.588 5.59835 11.588L12.5 11.5889L15.4282 17.0997C15.6125 17.4465 16.1063 17.4552 16.3027 17.1151L19.061 12.338C19.2535 12.0047 19.0129 11.588 18.6279 11.588L12.5 11.5889L8.86566 5.89057C8.66393 5.57428 8.19868 5.58454 8.0111 5.90942L5.16541 10.838Z"];
   function typingMark() {
@@ -441,6 +492,7 @@
   document.addEventListener("aprism:shift", function () {
     if (!thread) { return; }
     thread.remove();
+    LIVE.length = 0;
     thread = null;
     win.classList.remove("is-chat");
     hint();
