@@ -449,6 +449,7 @@ a.map-floor {
   position: absolute;
   right: var(--space-12);
   bottom: 10px;
+  text-decoration: none;   /* v5 는 안전진단으로 가는 링크(a) */
 }
 
 .ah-caps .btn:focus-visible,

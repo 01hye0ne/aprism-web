@@ -410,14 +410,26 @@
     if (!withReport) { return node; }
 
     // [안전진단] 은 알림 버튼 안에 넣을 수 없다(버튼 안 버튼) — 한 줄을 감싸고 오른쪽 아래에 얹는다.
-    // 10/19 디자이너 — [보고서] 를 [안전진단] 으로 바꿨다. 안전진단 화면은 아직 없다 — 자리만 잡았다.
+    // 10/19 디자이너 — [보고서] 를 [안전진단] 으로 바꿨다. v5 만 안전진단 화면으로 이어진다(아래), 예전 판은 자리만.
     var row = el("div", "ah-row");
     row.setAttribute("role", "listitem");
     node.removeAttribute("role");
     // 평소엔 아이콘만, 그 줄에 올라가면 글자가 붙는다 — 알림마다 반복돼 글자까지 늘 서 있으면 목록이 시끄럽다.
-    var report = el("button", "btn btn-ghost is-xs ah-report");
-    report.type = "button";
-    report.title = "안전진단 화면 준비 중";
+    // v5(10/30) — 안전진단(safety-v5.html)으로 간다. 이 알림의 미션 · 감지 종류를 주소에 실어 그 카드의 자세히 보기를 바로 연다.
+    var v5 = body.classList.contains("ver-5"), report;
+    if (v5) {
+      report = el("a", "btn btn-ghost is-xs ah-report");
+      var q = new URLSearchParams();
+      var mis = missionOf(a);
+      if (mis) { q.set("mission", mis); }
+      if (a.detect) { q.set("detect", a.detect); }
+      report.href = "./safety-v5.html?" + q.toString();
+      report.title = "안전진단에서 이 알림의 감지 결과 보기";
+    } else {
+      report = el("button", "btn btn-ghost is-xs ah-report");
+      report.type = "button";
+      report.title = "안전진단 화면 준비 중";
+    }
     report.setAttribute("aria-label", "안전진단");
     report.appendChild(icon("shield"));
     report.appendChild(el("span", "ah-report-label", "안전진단"));

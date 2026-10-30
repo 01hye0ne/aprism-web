@@ -506,5 +506,15 @@
   // 주소로 장면을 바로 연다(인덱스 링크) — #table 표 · #all 전체 미션 · #detail 자세히 보기(정기 순회 점검 안전감지)
   const h = location.hash.slice(1);
   if(h==='table') lay = 'table'; else if(h==='all') scope = 'all'; else if(h==='detail') dt = {mi:0, k:'안전감지'};
+  // 관제 최신 알림의 [안전진단](10/30) — ?mission=관제 미션 이름&detect=감지 종류. 그 미션의 그 감지 카드 자세히 보기를 연다.
+  //   관제 미션(screen.js)과 이 화면 미션은 아직 임시 값이라 이름이 어긋날 수 있다 — 같은 이름, 이름 포함 순으로 찾고 못 찾으면 미션 전체.
+  //   감지 종류가 이 화면 여섯에 없거나(진동감지) 그 미션이 판정하지 않으면 미션 카드 화면까지만 간다.
+  const qs = new URLSearchParams(location.search), qm = qs.get('mission'), qk = qs.get('detect');
+  if(qm || qk){
+    let mi = qm ? M.findIndex(m => m.mis===qm) : -1;
+    if(mi < 0 && qm) mi = M.findIndex(m => qm.includes(m.mis) || m.mis.includes(qm));
+    if(mi < 0) scope = 'all';
+    else { scope = mi; if(mi===1){ newSeen = true; toasts = toasts.filter(t => t.mi !== 1); } if(K.includes(qk) && M[mi].r[qk]) dt = {mi, k:qk}; }
+  }
   render();
 })();
