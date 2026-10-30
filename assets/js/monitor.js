@@ -542,15 +542,16 @@
       if (mis) { q.set("mission", mis); }
       if (a.detect) { q.set("detect", a.detect); }
       report.href = (body.classList.contains("ver-6") ? "./safety-v6.html?" : "./safety-v5.html?") + q.toString();
-      report.title = "안전진단에서 이 알림의 감지 결과 보기";
+      report.title = body.classList.contains("ver-6") ? "안전진단 상세 확인" : "안전진단에서 이 알림의 감지 결과 보기";
     } else {
       report = el("button", "btn btn-ghost is-xs ah-report");
       report.type = "button";
       report.title = "안전진단 화면 준비 중";
     }
-    report.setAttribute("aria-label", "안전진단");
+    // [10/30 v6] 이름을 하나로 — 목록 버튼 · 팝오버 버튼 모두 "안전진단 상세 확인"(디자이너)
+    report.setAttribute("aria-label", (body.classList.contains("ver-6") ? "안전진단 상세 확인" : "안전진단"));
     report.appendChild(icon("shield"));
-    report.appendChild(el("span", "ah-report-label", "안전진단"));
+    report.appendChild(el("span", "ah-report-label", (body.classList.contains("ver-6") ? "안전진단 상세 확인" : "안전진단")));
     row.appendChild(node);
     row.appendChild(report);
     return row;
