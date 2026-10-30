@@ -82,9 +82,10 @@
     const st = x[0];
     const tabs = K.map(k2 => { const y = m.r[k2]; if(!y) return `<span class="tb na">${k2}</span>`; const s2 = y[0]==='ok' ? '' : y[0];
       return `<button type="button" class="tb ${k2===k ? 'on' : ''}" data-dk="${k2}">${k2}<i class="d ${s2}"></i></button>`; }).join('');
-    const md = MD(k, st), canBig = !md[1].includes('canvas');
-    const media = bigD && canBig ? `<div class="dmw two"><div class="md ${md[0]}">${md[1]}<span class="dlab">원본</span></div><div class="md hm ${md[0]}">${md[1].replace(/<span class="bx"[^>]*><\/span>/, '')}<span class="heat"></span><span class="dlab">히트맵</span></div><button type="button" class="bigb on" data-bigd="1">원본 크게 끄기</button></div>`
-      : `<div class="dmw"><div class="md ${md[0]}">${md[1]}</div>${canBig ? '<button type="button" class="bigb" data-bigd="1">원본과 히트맵 크게</button>' : ''}</div>`;
+    // [10/30] 안전감지(안전모 · 안전벨트 착용)는 히트맵 칸이 없다 — 원본만 크게
+    const md = MD(k, st), canBig = !md[1].includes('canvas'), heat = k !== '안전감지';
+    const media = bigD && canBig ? `<div class="dmw ${heat ? 'two' : ''}"><div class="md ${md[0]}">${md[1]}<span class="dlab">원본</span></div>${heat ? `<div class="md hm ${md[0]}">${md[1].replace(/<span class="bx"[^>]*><\/span>/, '')}<span class="heat"></span><span class="dlab">히트맵</span></div>` : ''}<button type="button" class="bigb on" data-bigd="1">원본 크게 끄기</button></div>`
+      : `<div class="dmw"><div class="md ${md[0]}">${md[1]}</div>${canBig ? `<button type="button" class="bigb" data-bigd="1">${heat ? '원본과 히트맵 크게' : '원본 크게'}</button>` : ''}</div>`;
     const cd = COND[k], num = parseFloat(SHORT[x[1]] || x[1]);
     const cond = !isHit ? `<span class="why1">기준: ${STD[k]}</span>` : cd && !isNaN(num) ? (() => { const [lo, hi, w2, c2, u] = cd, p = q => Math.max(0, Math.min(100, (q - lo) / (hi - lo) * 100)).toFixed(1);
         return `<span class="sm2 ${st}">${x[1].includes(String(num)) ? '' : num + u + ', '}${num >= c2 ? '위험 기준 ' + c2 + u + ' 초과' : '주의 기준 ' + w2 + u + ' 초과'}</span><div class="trk"><span class="f ${st}" style="width:${p(num)}%"></span><span class="m w" style="left:${p(w2)}%"><span>주의 ${w2}${u}</span></span><span class="m c" style="left:${p(c2)}%"><span>위험 ${c2}${u}</span></span></div><span class="why1">기준: ${STD[k]}</span>`; })()
