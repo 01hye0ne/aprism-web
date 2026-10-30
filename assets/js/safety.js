@@ -297,8 +297,8 @@
       // [10/30] 고른 미션 — 제목 줄(+ [관제에서 보기])은 테 밖, 테(border/default) 하나 안에 정보 + 지도. 면은 깔지 않는다.
       // 층 표시는 층이 여럿일 때만(고르는 단추) 지도 위에 남긴다
       const multi = !!(m.fls && m.fls.length > 1);
-      return `<div class="sf-mon ${w}"><div class="sf-monh"><button type="button" class="sf-mrow on" data-sc="${i}" aria-current="true">${t1}</button><a class="btn btn-ghost is-xs m2go" href="${mainUrl(i, cur)}" title="관제 3D 지도에서 이 미션과 층을 연다">관제에서 보기<span class="i i-16" style="--i:var(--ic-chevron-right)" aria-hidden="true"></span></a></div>
-        <div class="sf-monb">${meta}<div class="m2">${multi ? `<div class="m2b">${floorBar(i)}</div>` : ''}<div class="m2rot">${svg2(i, cur, false, 316, sel, lk)}</div></div></div></div>`; }).join('');
+      return `<div class="sf-mon ${w}"><div class="sf-monh"><button type="button" class="sf-mrow on" data-sc="${i}" aria-current="true">${t1}</button></div>
+        <div class="sf-monb">${meta}<div class="m2"><div class="m2b">${multi ? floorBar(i) : ''}<span class="sp"></span><a class="m2go" href="${mainUrl(i, cur)}" title="관제 3D 지도에서 이 미션과 층을 연다">관제에서 보기<span class="i i-14" style="--i:var(--ic-chevron-right)" aria-hidden="true"></span></a></div><div class="m2rot">${svg2(i, cur, false, 316, sel, lk)}</div></div></div></div>`; }).join('');
     return `${LEG}<div class="sf-mwrap"><div class="sf-mlist"><div class="sf-mwell">${top}${rows}</div></div><span class="sf-mthumb" aria-hidden="true"></span></div>`;   // 범례는 목록 위(10/30) — 기호를 먼저 읽고 목록으로
   }
   const gnbMain = document.querySelector('.gnb-item[href^="./main-v5.html"]');

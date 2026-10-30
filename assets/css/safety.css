@@ -100,7 +100,8 @@
 .sf .m2f span { color: var(--text-secondary); background-color: var(--bg-cell); }
 .sf .m2f button.on { color: var(--text-primary); background-color: var(--bg-cell); }
 .sf .m2f button i { position: absolute; right: 1px; top: 1px; width: 5px; height: 5px; border-radius: var(--radius-pill); background-color: var(--status-info-icon); }
-.sf .m2go { gap: var(--space-2); padding-right: var(--space-4); text-decoration: none; }
+.sf .m2go { display: inline-flex; align-items: center; gap: var(--space-2); padding: var(--space-2) var(--space-4) var(--space-2) var(--space-8); border-radius: var(--radius-control); background-color: var(--bg-selected); font-size: var(--font-size-13); line-height: var(--font-line-height-18); font-weight: 700; color: var(--text-secondary); text-decoration: none; }   /* [10/30] 층 단추(.m2f)와 같은 꼴 — 지도 위 층 단추 줄 오른쪽 */
+.sf .m2go:hover { color: var(--text-primary); }
 .sf .mlg { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4) var(--space-8); font-size: var(--font-size-12); line-height: var(--font-line-height-18); color: var(--text-tertiary); }
 .sf .mlg i { display: inline-block; width: 8px; height: 8px; margin-right: -4px; border-radius: var(--radius-pill); }
 .sf .mlg i.c, .sf .mlg i.w { width: 12px; height: 12px; margin-right: -2px; border-radius: 0; -webkit-mask: var(--ic-error) center / contain no-repeat; mask: var(--ic-error) center / contain no-repeat; background-color: var(--status-critical-icon); }
@@ -177,7 +178,6 @@
 /* 테도 오른쪽 끝까지(10/30) — 오른쪽 선 · 모서리를 걷어 본문 판에 닿는다 */
 .sf-side .sf-mwell .sf-mon .sf-mrow { flex: 1; min-width: 0; padding: var(--space-12) 0 0; }
 .sf-side .sf-mwell .sf-mon .sf-mrow.on, .sf-side .sf-mwell .sf-mon .sf-mrow:hover { background: none; }
-.sf-mon .m2go { margin-top: var(--space-12); }
 .sf-monb { display: flex; flex-direction: column; gap: var(--space-12); padding-top: var(--space-12); border: var(--border-width-thin) solid var(--border-default); border-right: 0; border-radius: var(--radius-8) 0 0 var(--radius-8); background-color: var(--bg-frame); overflow: hidden; }   /* 지도 바탕 — bg/inset 은 밝은 선택 면 위에서 설비 칸(border/default)과 같은 색이 돼 bg/cell 로 한 단 내린다 */
 .sf-monb .m2v .bg, .sf-side .m2v .bg { fill: transparent; }   /* 왼쪽 지도는 바탕을 따로 깔지 않는다 — 썸네일은 패널 바탕, 고른 미션은 테(.sf-monb)의 바탕 */
 .sf-monb .m2f button.on { background-color: var(--bg-selected); }   /* 고른 층 — 테 안 바탕(bg/cell)과 같아지지 않게 */   /* 지도 바탕은 테(.sf-monb)가 깐다 — 두 겹으로 어두워지지 않게 */
