@@ -22,6 +22,23 @@
     '<p class="rsim-wait">지도 모델을 불러오는 중</p>';
   document.body.appendChild(box);
 
+  (function () {   // [10/30] 접기 — 접으면 오른쪽 아래 구석에 작은 화살표만 남는다. 접힘 여부는 기억한다
+    var fold = document.createElement("button");
+    fold.type = "button";
+    fold.className = "rsim-fold";
+    fold.innerHTML = '<svg viewBox="0 0 12 12" width="12" height="12" aria-hidden="true"><path d="M3 4.5 6 7.5 9 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    box.appendChild(fold);
+    function setFold(on) {
+      box.classList.toggle("is-folded", on);
+      fold.setAttribute("aria-expanded", String(!on));
+      fold.setAttribute("aria-label", on ? "움직임 시뮬레이션 펼치기" : "움직임 시뮬레이션 접기");
+      try { localStorage.setItem("rsim-folded", on ? "1" : "0"); } catch (e) { }
+    }
+    var saved = false; try { saved = localStorage.getItem("rsim-folded") === "1"; } catch (e) { }
+    setFold(saved);
+    fold.addEventListener("click", function () { setFold(!box.classList.contains("is-folded")); });
+  })();
+
   var api = null, range = box.querySelector("input"), pct = box.querySelector(".rsim-pct"), play = box.querySelector(".rsim-play");
   var mode = "run", playing = false, dwell = null, last = 0, modeAt = performance.now(), touched = false;
   var SPEED_SEC = 70;   // 한 바퀴 시간
