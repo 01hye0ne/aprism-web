@@ -36,7 +36,7 @@
   <!-- v5 전용 규칙 — v4 는 10/29 부로 멈췄다. v5 에서 바꾸는 것은 여기(body.ver-5)에. -->
   <link rel="stylesheet" href="../assets/css/v5.css?v=b7962425" />
   <!-- v6 전용 규칙 — v5 는 10/30 부로 멈췄다. v6 에서 바꾸는 것은 여기(body.ver-6)에. -->
-  <link rel="stylesheet" href="../assets/css/v6.css?v=bbed60e3" />
+  <link rel="stylesheet" href="../assets/css/v6.css?v=795db37e" />
   <!-- 지도 경로 표현 규칙(10/28 반영, 지도 경로 표현 전달서 1022) — 경로 네 구간 · 흐름 빛 · 번호 핀 · 시야 빔 로봇 · 충전 스테이션 · 아래 상태 시뮬레이션 막대 -->
   <link rel="stylesheet" href="../assets/css/route-rules.css?v=6a34168a" />
   <style>
@@ -598,14 +598,19 @@
 
                   <div class="robot-bar">
                     <!-- Figma 710:24540 — 수행 대수가 맨 글자에서 Badge(Info · Emphasis=Text)로 바뀌었다. -->
+                    <!-- [10/30 v6] Figma Mission-in progress-2 "로봇 선택"(1533:19576) — 미션 고르기로는 다른 미션의 알림이 안 보여,
+                         전체 미션 로봇을 한 줄에 두고 이상을 찾은 로봇을 칸 오른쪽 위 아이콘으로 표시한다. 대수 · 위험 · 주의는 robot-fleet-v6.js 가 채운다(로봇 수로 센다). -->
                     <p class="robot-counts t-caption">
                       <span class="i i-16" style="--i:var(--ic-bot)" aria-hidden="true"></span>
-                      <!-- v2.2 — 고른 미션에 배정된 로봇만 센다. 전체 대수는 [전체 로봇 보기](예전 [로봇 현황]) 가 맡는다. -->
-                      <span data-scope-count>2대 배정</span>
-                      <span class="badge badge-info t-caption"><span class="badge-dot"></span><span data-scope-running>1대 수행중</span></span>
+                      <span data-fleet-conn>0대 연결</span>
+                      <span class="badge badge-danger t-caption" data-fleet-crit hidden><span class="badge-dot"></span><span>위험 0</span></span>
+                      <span class="badge badge-warning t-caption" data-fleet-warn hidden><span class="badge-dot"></span><span>주의 0</span></span>
                     </p>
                     <button type="button" class="btn btn-ghost" data-modal-open="robots" data-robot-more>전체 로봇 보기</button>
                   </div>
+
+                  <!-- [10/30 v6] 전체 미션 로봇 — 칸을 누르면 그 로봇의 미션으로 넘어가며 그 로봇을 고른다(robot-fleet-v6.js). -->
+                  <div class="robot-fleet" role="group" aria-label="전체 미션 로봇" data-robot-fleet></div>
 
                   <!-- 한 대씩 넘겨 본다 — 왼쪽 < 그래픽 > , 오른쪽 이름 · 자동복귀 · E-STOP · 상태 세 줄.
                        카드는 메인 화면 것 그대로이고 선택된 한 장만 보인다(is-carousel). -->
@@ -1772,6 +1777,8 @@
 <script src="../assets/js/robot-2d.js?v=8011b14e"></script>
 <script src="../assets/js/monitor.js?v=2f038ab2"></script>
 <script src="../assets/js/mission-scope.js?v=bc969b8c"></script>
+<!-- [10/30 v6] 우측 패널 전체 미션 로봇 줄(Figma 1533:19576) — mission-scope.js 다음에(칸을 누르면 그 미션으로 넘긴다) -->
+<script src="../assets/js/robot-fleet-v6.js?v=eaddb3f2"></script>
 <script src="../assets/js/delta-pulse.js?v=2d0afced"></script>
 <script src="../assets/js/delta-chat.js?v=59cae5eb"></script>
 <script src="../assets/js/delta-v3.js?v=403861c7"></script>
