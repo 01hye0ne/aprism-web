@@ -865,6 +865,14 @@
       $("[data-ma-wp]", box).textContent = a.wp || "";
       $("[data-ma-place]", box).textContent = placeOf(a);
       $("[data-ma-detect]", box).textContent = a.detect || "";
+      // v6(10/30) — [안전진단에서 확인] 도 알림 목록의 [안전진단]처럼 이 알림의 미션 · 감지 종류를 실어 자세히 보기로 바로 간다(미션 카드 화면에서 멈추지 않게)
+      var more = $("[data-ma-more]", box);
+      if (more && body.classList.contains("ver-6")) {
+        var mq = new URLSearchParams(), mm = missionOf(a);
+        if (mm) { mq.set("mission", mm); }
+        if (a.detect) { mq.set("detect", a.detect); }
+        more.href = "./safety-v6.html" + (mq.toString() ? "?" + mq.toString() : "");
+      }
 
       // 그림이 없는 알림(E-STOP 등)은 사진 칸과 [크게보기] 를 함께 접는다.
       if (V3) { box.classList.toggle("no-snap", !a.live); img.hidden = !a.live; } else { snap.hidden = !a.live; }
