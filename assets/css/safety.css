@@ -367,7 +367,7 @@
 .sf .mch b { font-size: var(--font-size-13); line-height: var(--font-line-height-18); font-weight: 700; color: var(--text-primary); }
 .sf .mch small { font-size: var(--font-size-12); line-height: var(--font-line-height-18); color: var(--text-tertiary); }
 .sf .g6.cx .kd { flex: 1; gap: var(--space-4); padding: var(--space-8) var(--space-8) var(--space-12); border-radius: var(--radius-8); border-color: var(--border-on-glass); background: linear-gradient(to bottom, var(--sf-card-glass) 55%, var(--bg-cell)); }   /* [10/30 Figma 1468:8820] 면 bg/glass → 55% 부터 bg/cell, 테 border/on-glass */
-.sf .g6.cx .kd > :not(.md):not(.more) { margin-left: var(--space-12); margin-right: var(--space-12); }
+.sf .g6.cx .kd > :not(.md):not(.more) { margin-left: var(--space-8); margin-right: var(--space-8); }   /* [10/30 Figma 1468:8820] 글 칸 좌우 8(카드 안 8 + 8 = 카드 끝에서 16) */
 .sf .g6.cx .kd > .rw { margin-top: calc(var(--space-12) * -1); }
 .sf .g6.cx .kd .md { border: var(--border-width-thin) solid var(--border-default); }
 .sf .g6.cx .kd .big { font-size: var(--font-size-20); line-height: var(--font-line-height-28); font-weight: 800; }
