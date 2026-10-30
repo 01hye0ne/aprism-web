@@ -279,28 +279,31 @@
    * 나머지 알림은 근거 줄 아이콘(+N)과 왼쪽 목록이 맡는다. 질문 · 인사 · "~게 좋겠어요" 같은 완충 문구는 없다.
    * 두 줄은 줄바꿈(\n)으로 잇고, 굵기 · 한 줄 말줄임은 CSS(v5.css)가 맡는다.
    */
-  function topWarnFloor(all) {
-    var by = {};
-    all.forEach(function (a) {
-      if (a.sev !== "warning" || !a.floor) { return; }
-      (by[a.floor] = by[a.floor] || {})[a.wp] = 1;
-    });
-    var best = null, n = 0;
-    Object.keys(by).forEach(function (f) { var c = Object.keys(by[f]).length; if (c > n) { best = f; n = c; } });
-    return best ? { floor: best, n: n } : null;
+  /*
+   * 처리 순서(10/30 디자이너 — "지금 위험 · 주의가 몇 개, 어디서, 어떤 순서로"). 보는 미션의 위험을 먼저 끝내게 한다.
+   *   이 미션 위험 → 다른 미션 위험 → 이 미션 주의 → 다른 미션 주의. 같은 칸 안은 items() 순서(오래된 순) 그대로.
+   *   delta-chat.js 의 "처리 순서" 답도 같은 순서다.
+   */
+  function handleOrder(all, mine) {
+    var here = function (a) { return mine.indexOf(a) >= 0; };
+    var crit = function (a) { return a.sev === "critical"; };
+    return all.filter(function (a) { return here(a) && crit(a); })
+      .concat(all.filter(function (a) { return !here(a) && crit(a); }))
+      .concat(all.filter(function (a) { return here(a) && !crit(a); }))
+      .concat(all.filter(function (a) { return !here(a) && !crit(a); }));
   }
   /*
    * [10/30 디자이너 "Delta 라이팅 시스템"(artifact XjCvTz2qd9YPJmBpfheUCk)] 접힘 위젯 세 줄.
    *   1줄 상황(굵게) · 2줄 다음 행동 · 근거 줄 범위나 원인. Delta 가 빨강 · 노랑이면 셋 중 하나는 그 색의 이유를 말한다.
-   *   위에서부터 묻고 처음 "예"인 문형을 쓴다 — 교대 직후 → 비상정지 → 다른 미션 알림 → 이 미션 위험 → 주의 누적 → 확인 전 알림 → 평상시.
-   *   보는 미션의 알림은 왼쪽 목록이 이미 보여 주므로, 화면에 안 보이는 다른 미션의 알림을 먼저 말한다.
+   *   위에서부터 묻고 처음 "예"인 문형을 쓴다 — 교대 직후 → 비상정지 → 알림 안내 → 평상시.
+   *   알림 안내는 처리 순서(handleOrder)의 첫 알림을 본다. 보는 미션에 있으면 1줄 건수, 2줄 그 설비부터, 근거 줄 이 미션 · 다른 미션 나눔,
+   *   올리면 "처리 순서 보기"가 대화 창을 열어 순서를 답한다. 다른 미션에 있으면(그쪽이 더 높은 등급) 그때만 옮기자고 묻는다.
    *   장소는 WP 번호를 쓰지 않는다 — 다른 미션은 미션 이름만(10/30 디자이너, 층 · "미션" 낱말 뺌), 이 미션은 설비 짧은 이름(eq).
    *   2줄 질문("~해 드릴까요?")은 Delta 가 화면 안에서 할 수 있는 일만 — 올리면 근거 줄이 답 단추(yes)가 되고 누르면 그 일(act)을 한다.
    *   문체는 ~요 하나, 가운뎃점 없음. 두 줄은 줄바꿈(\n)으로 잇고 v3-panel.js 가 줄마다 감싼다.
    */
   // 으로 / 로 — 받침 없거나 ㄹ 받침이면 "로"
   function euro(w) { var c = w.charCodeAt(w.length - 1), b = c >= 0xac00 && c <= 0xd7a3 ? (c - 0xac00) % 28 : 0; return b && b !== 8 ? "으로" : "로"; }
-  function yeyo(w) { var c = w.charCodeAt(w.length - 1); return c >= 0xac00 && c <= 0xd7a3 && (c - 0xac00) % 28 ? "이에요" : "예요"; }
   function operatorName() {
     var slot = document.querySelector(".account-chip .t-label-2");
     return slot ? slot.textContent.trim() : "관제사";
@@ -308,8 +311,6 @@
   COPY.brief = function (j) {
     var copy = COPY.keyword(j);
     var all = j.all || [], mine = j.mine || all;
-    var others = all.filter(function (a) { return mine.indexOf(a) < 0 && missionOf(a); });
-    var myCrit = mine.filter(function (a) { return a.sev === "critical"; })[0];
     var es = all.filter(function (a) { return a.estop; })[0];
     var say;
     if (j.handover !== null && j.handover !== undefined && j.total) {
@@ -317,20 +318,23 @@
         clue: "인계 알림 " + j.total + "건", yes: "네, 보여 주세요", act: "shift" };
     } else if (es) {
       say = { l: es.brief, clue: "구동 차단됨" };
-    } else if (others.length) {
-      var o = others[0], om = missionOf(o);   // items() 순서 — 위험 먼저, 그다음 오래된 순
-      say = { l: ["다른 미션에도 알림이 있어요!", "그 미션으로 이동해 드릴까요?"],
-        clue: om, scope: o.sev, yes: "네, 이동해 주세요", act: { go: om } };
-    } else if (myCrit) {
-      say = { l: [myCrit.eq ? myCrit.eq + " " + myCrit.phen + yeyo(myCrit.phen) + "." : myCrit.title, myCrit.next || "위험 알림부터 보세요."],
-        clue: myCrit.val ? "측정 " + myCrit.val + ", 기준 " + myCrit.std : "" };
-    } else if (j.level === "warning") {
-      var f = topWarnFloor(all);
-      say = { l: [f && f.n > 1 ? f.floor + " 설비 " + f.n + "곳에서 겹쳐요." : "주의 알림이 " + j.warn + "건이에요.", "묶어서 보여 드릴까요?"],
-        clue: "주의 " + j.warn + "건 묶어 보는 중", yes: "네, 묶어서 보여 주세요", act: "warn" };
     } else if (j.total) {
-      say = { l: ["확인할 알림이 " + j.total + "건이에요.", "첫 알림부터 열어 드릴까요?"],
-        clue: "순회 경로 지켜보는 중", yes: "네, 열어 주세요", act: "first" };
+      // 처리 순서의 첫 알림이 어디 있는지로 가른다 — 다른 미션 알림이 더 높은 등급일 때만 옮기자고 묻는다(10/30 디자이너)
+      var ord = handleOrder(all, mine), first = ord[0];
+      var inMine = function (a) { return mine.indexOf(a) >= 0; };
+      var sev = first.sev, word = sev === "critical" ? "위험" : "주의";
+      if (!inMine(first)) {
+        var om = missionOf(first);
+        say = { l: ["다른 미션에 " + word + (sev === "critical" ? "이" : "가") + " 있어요!", "그 미션으로 이동해 드릴까요?"],
+          clue: om, scope: sev, yes: "네, 이동해 주세요", act: { go: om } };
+      } else {
+        var mc = all.filter(function (a) { return a.sev === sev && inMine(a); }).length;
+        var oc = all.filter(function (a) { return a.sev === sev && !inMine(a); }).length;
+        say = { l: [(j.crit ? "위험 " + j.crit + "건" + (j.warn ? ", 주의 " + j.warn + "건" : "") : "주의 " + j.warn + "건") + "이 있어요.",
+            (first.eq || first.title) + "부터 확인하세요."],
+          clue: ["이 미션 " + word + " " + mc, oc ? "다른 미션 " + word + " " + oc : ""].filter(Boolean).join(", "),
+          scope: oc ? sev : "", yes: "처리 순서 보기", act: "order", open: "처리 순서 알려 줘" };
+      }
     } else {
       var card = $(".robot-strip .robot-card[aria-pressed='true']");
       var rn = card && card.querySelector(".robot-id") ? card.querySelector(".robot-id").textContent.trim() : "Robot 01";
@@ -391,17 +395,12 @@
 
   /*
    * Delta 조치 버튼 — 문구의 첫 낱말로 할 일을 고른다(10/20 디자이너).
-   *   위험 n건부터 조치   → Delta 창을 접고 가장 오래된 위험 알림의 팝오버를 연다(창이 팝오버를 가리지 않게).
+   *   위험 n건부터 조치   → 가장 오래된 위험 알림의 팝오버를 연다. Delta 창은 펼친 채 둔다(10/30 디자이너).
    *   주의 n건 묶어서 확인 → 목록을 주의로 거르고, Delta 가 주의 n건을 묶어 답한다(대화).
    *   추세 한 번에 보기    → Delta 가 추세를 답한다(대화).
    *   현장 점검 한꺼번에 요청 → Delta 가 요청을 정리해 답한다(대화). 실제 전송은 아직 없다.
    * 대화는 delta-chat.js 의 APRISM_DELTA.ask 로 보낸다.
    */
-  function foldDelta() {
-    var win = $("[data-delta3]");
-    var tg = $("[data-ai-toggle]");
-    if (win && tg && win.classList.contains("is-open")) { tg.click(); }
-  }
   function askDelta(text) { if (window.APRISM_DELTA) { window.APRISM_DELTA.ask(text); } }
   function setFilter(sev) {
     var b = $("[data-ah-filter='" + sev + "']");
@@ -412,7 +411,6 @@
       var crit = items().filter(function (a) { return a.sev === "critical" && (!scoped || missionOf(a) === mission); });
       if (!crit.length) { crit = items().filter(function (a) { return a.sev === "critical"; }); }
       if (!crit.length) { return; }
-      foldDelta();
       setFilter("all");
       if (picked !== crit[0]) { note.open(crit[0]); }
       return;
@@ -432,24 +430,16 @@
       var here = mineNow(), hc = here.filter(function (a) { return a.sev === "critical"; }).length;
       said = { text: s.clue + euro(s.clue) + " 옮겼어요. " + (hc ? "위험이 " + hc + "건 있어요." : here.length ? "주의가 " + here.length + "건 있어요." : "확인할 알림은 없어요."),
         btn: here[0] ? { label: "알림 열기", act: function () { window.APRISM_OPEN_ALERT(here[0]); } } : null };
-    } else if (s.act === "warn") {
-      setFilter("warning");
-      said = { text: "주의 " + mineNow().filter(function (a) { return a.sev === "warning"; }).length + "건을 목록에 묶었어요." };
     } else if (s.act === "shift") {
       var anyCrit = items().some(function (a) { return a.sev === "critical"; });
       setFilter(anyCrit ? "critical" : "all");
       said = { text: anyCrit ? "위험 알림만 목록에 걸렀어요." : "인계 알림을 목록에 펼쳤어요." };
-    } else if (s.act === "first") {
-      var first = mineNow()[0];
-      if (first && picked !== first) { note.open(first); }
-      said = first ? { text: (first.eq ? first.eq + " " + first.phen : first.title) + " 알림을 열었어요." } : null;
     }
     if (said && window.APRISM_DELTA && window.APRISM_DELTA.log) { window.APRISM_DELTA.log(s.yes, said.text, said.btn); }
     return true;
   };
-  // 펼침 대화(delta-chat.js)가 알림 줄을 누르면 그 알림 쪽지를 연다
+  // 펼침 대화(delta-chat.js)가 알림 줄을 누르면 그 알림 쪽지를 연다 — 대화 창은 펼친 채 둔다(10/30 디자이너, 라이팅 시스템 6 · 8)
   window.APRISM_OPEN_ALERT = function (a) {
-    foldDelta();
     setFilter("all");
     if (picked !== a) { note.open(a); }
   };
@@ -680,7 +670,7 @@
     var jd = judge(all);
     jd.mine = mine;
     // 펼침 대화가 답에 쓰는 알림(라이팅 시스템 8 — 이 미션 먼저, 다른 미션은 미션 이름을 붙여)
-    window.APRISM_DELTA_ALERTS = { all: all, mine: mine, mission: mission, missionOf: missionOf };   // Delta 두 줄(brief)이 지금 미션의 알림부터 말하도록
+    window.APRISM_DELTA_ALERTS = { all: all, mine: mine, mission: mission, missionOf: missionOf, order: handleOrder(all, mine) };   // Delta 두 줄(brief)과 대화의 처리 순서
     tellAi(jd, top);
     markWaypoints();
   }

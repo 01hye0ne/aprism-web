@@ -121,6 +121,11 @@
       return;
     }
     if (!s || !s.yes || !window.APRISM_DELTA_DO) { return; }
+    // "처리 순서 보기"는 답이 길어 대화 창을 연 채 답한다 — 여는 것은 원래 단추 동작에 맡긴다.
+    if (s.open) {
+      setTimeout(function () { if (window.APRISM_DELTA) { window.APRISM_DELTA.ask(s.open); } }, 320);
+      return;
+    }
     event.preventDefault();
     event.stopImmediatePropagation();
     window.APRISM_DELTA_DO();
