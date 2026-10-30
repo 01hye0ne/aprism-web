@@ -62,7 +62,8 @@
 .rp-phead::after { content: ""; position: absolute; left: 0; right: 0; bottom: calc(var(--border-width-thin) * -1); height: var(--border-width-thin); background-color: var(--border-default); }
 .rp-body.is-fold .rp-phead { gap: 0; }
 .rp-body.is-fold .rp-phead::after { opacity: 0; }
-.rp-ptog { display: grid; place-items: center; width: 20px; height: 20px; color: var(--text-primary) !important; }
+.rp-ptog { display: grid; place-items: center; width: 20px; height: 20px; color: var(--text-secondary) !important; }   /* 관제 접기(.panel-head button)와 같게 — 평소 text/secondary, 올리면 primary(10/30) */
+.rp-ptog:hover { color: var(--text-primary) !important; }
 .rp-plabel { color: var(--text-tertiary); white-space: nowrap; }
 /* 본문 — 관제 패널(.ah-body)과 같다: 위 16 · 글줄(달 이동 · 단추)은 좌우 12 · 목록 상자는 좌우 8 · 묶음 사이 12 */
 .rp-sbody { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: var(--space-12); padding: var(--space-16) var(--space-8) var(--space-8); }

@@ -32,7 +32,8 @@
 .sf-side { position: relative; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }   /* 오른쪽 선 없음 — 본문 판이 8 띄워 떠 있어 경계가 된다(10/30) */
 /* 패널 머리 — 보고서 .rp-phead 와 같다: 안쪽 12 · 사이 8 · 아래 구분선 양끝까지 */
 .sf-phead { flex: none; display: flex; align-items: center; gap: var(--space-8); padding: var(--space-12); border-bottom: var(--border-width-thin) solid var(--border-default); }
-.sf-ptog { display: grid; place-items: center; width: 20px; height: 20px; color: var(--text-primary) !important; }
+.sf-ptog { display: grid; place-items: center; width: 20px; height: 20px; color: var(--text-secondary) !important; }   /* 관제 접기(.panel-head button)와 같게 — 평소 text/secondary, 올리면 primary(10/30) */
+.sf-ptog:hover { color: var(--text-primary) !important; }
 .sf-plabel { color: var(--text-tertiary); white-space: nowrap; }
 .sf-sbody { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: var(--space-16); padding: var(--space-12) 0 var(--space-8) var(--space-8); overflow: hidden; }   /* 스크롤은 목록(.sf-mlist) 안에서. 오른쪽 여백 0 — 목록이 본문 판에 닿아 감싸는 느낌(10/30)
    범례 ↔ 목록 16 — 목록 윗선을 오른쪽 감지 머리 줄 아래 선(미션 전체)과 한 줄에(10/30 디자이너, 12 면 4px 위였다) */
