@@ -202,7 +202,7 @@
     // 못 하는 일
     if (/보고서|메일|전송|보내/.test(q)) {
       return { lead: "보내기는 Delta가 할 수 없어요. 보고서 화면에서 보내 주세요.",
-        btns: [{ label: "보고서 화면으로", primary: true, act: function () { location.href = "./report-v5.html"; } }] };
+        btns: [{ label: "보고서 화면으로", primary: true, act: function () { location.href = body.classList.contains("ver-6") ? "./report-v6.html" : "./report-v5.html"; } }] };
     }
     if (!top) { return { lead: "지금은 확인할 알림이 없어요.", btns: [] }; }
     /*

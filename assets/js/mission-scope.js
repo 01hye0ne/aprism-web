@@ -220,8 +220,9 @@
 
     buildMenu();
     // 왼쪽 메뉴 [안전진단]도 지금 미션으로 연다(10/30) — 그냥 열면 안전진단 첫 미션으로 풀린다. 미션이 없으면 미션 전체.
-    Array.prototype.forEach.call(document.querySelectorAll(".gnb-item[href^='./safety-v5.html']"), function (a) {
-      a.href = m ? "./safety-v5.html?mission=" + encodeURIComponent(m) : "./safety-v5.html#all";
+    Array.prototype.forEach.call(document.querySelectorAll(".gnb-item[href^='./safety-v5.html'], .gnb-item[href^='./safety-v6.html']"), function (a) {
+      var sf = document.body.classList.contains("ver-6") ? "./safety-v6.html" : "./safety-v5.html";   // [10/30] v6 는 v6 안전진단으로
+      a.href = m ? sf + "?mission=" + encodeURIComponent(m) : sf + "#all";
     });
     document.dispatchEvent(new CustomEvent("aprism:scope", { detail: { mission: m } }));
   }

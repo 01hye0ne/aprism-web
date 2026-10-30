@@ -541,7 +541,7 @@
       var mis = missionOf(a);
       if (mis) { q.set("mission", mis); }
       if (a.detect) { q.set("detect", a.detect); }
-      report.href = "./safety-v5.html?" + q.toString();
+      report.href = (body.classList.contains("ver-6") ? "./safety-v6.html?" : "./safety-v5.html?") + q.toString();
       report.title = "안전진단에서 이 알림의 감지 결과 보기";
     } else {
       report = el("button", "btn btn-ghost is-xs ah-report");
@@ -765,7 +765,7 @@
   var allBtn = $("[data-ah-all]");
   if (allBtn) {
     allBtn.addEventListener("click", function () {
-      var url = document.body.classList.contains("ver-5") ? "./alert-center-v5.html" : document.body.classList.contains("ver-3") ? "./alert-center-v3.html" : "./alert-center.html";
+      var url = document.body.classList.contains("ver-6") ? "./alert-center-v6.html" : document.body.classList.contains("ver-5") ? "./alert-center-v5.html" : document.body.classList.contains("ver-3") ? "./alert-center-v3.html" : "./alert-center.html";
       var name = "aprism-alert-center";
       if (!window.screen.isExtended || !window.getScreenDetails) {
         window.open(url, name);
