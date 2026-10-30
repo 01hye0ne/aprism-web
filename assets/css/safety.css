@@ -343,6 +343,12 @@
    위치 13/20 text/secondary · 시각 12/18 text/tertiary 두 줄 — 아이콘 없음(카드 18장에 36개라 너무 많고 글만으로 구분된다) */
 .sf .cx .kd { min-height: 0; gap: var(--space-4); padding: var(--space-4) var(--space-4) var(--space-8); border-color: transparent; background-color: var(--bg-cell); }
 .sf .cx .kd[role="button"]:hover { border-color: var(--border-strong); }
+/* [10/30 Figma 1494:14581] 전체 카드 면 · 테 — 면 bg/glass(Figma 값 gray-750 55%), 테 border/on-glass. 사진 칸도 border/on-glass 테.
+   tokens.css 의 --bg-glass 는 예전 값(gray-600 40%)이라 Figma 값을 직접 쓴다 — monitor.css .v2-2 와 같은 값. 라이트는 v5 유리 면 */
+.sf { --sf-card-glass: var(--color-alpha-gray-750-55); }
+:root[data-theme="light"] .sf { --sf-card-glass: var(--bg-glass); }
+.sf .mrow.cx .kd { border-color: var(--border-on-glass); background-color: var(--sf-card-glass); }
+.sf .mrow.cx .kd .md { border: var(--border-width-thin) solid var(--border-on-glass); }
 .sf .cx .kd > :not(.md):not(.more) { margin-left: var(--space-8); margin-right: var(--space-8); }
 /* [10/30 GUI · Figma 1494:14581] 사진이 위, 단계 배지가 사진 아래 끝에 16 걸쳐 얹힌다. 건수는 배지 안으로(위험 2) */
 .sf .cx .kd > .rw { position: relative; z-index: 2; justify-content: flex-start; margin-top: calc(var(--space-16) * -1); }
