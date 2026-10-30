@@ -29,7 +29,7 @@
     env: true, envAmt: 0.1, rough: 0.8,
     ao: true, aoRadius: 4.5, aoAmt: 0.6, aoDeep: 1, aoRest: true, aoView: 0,   // aoView 0 합친 화면 · 5 AO 만 · 3 노멀 판
     bloom: true, bloomAmt: 0.4, bloomRadius: 0.15, bloomTh: 0.51,
-    vignette: 0.25,
+    vignette: 0.3,   // 10/30 디자이너 0.25 → 0.3
     shadow: 2048, shadowSoft: 5,
     res: 1   // 후처리 판 배율 — 1 이면 효과 없던 때(2)의 ¼ 픽셀
   };
