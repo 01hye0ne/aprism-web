@@ -155,12 +155,14 @@
 .sf-cnt.warn { color: var(--status-warning-text); }
 .sf-cnt.zero { color: var(--text-disabled); }
 .sf-cnt.zero b { font-weight: 400; }
+.sf-mrow.on .sf-cnt.zero { color: var(--text-tertiary); }   /* 고른 줄 — 다크는 text/disabled 와 bg/selected 가 같은 gray-600 이라 '정상 0' 이 사라졌다(10/30) */
 /*
  * 왼쪽 패널 면은 3단만(10/30 디자이너 "회색 톤이 너무 많다") — 바탕 bg/frame · 고른 줄 bg/selected · 선 border/default.
  *   미션 칸의 bg/map-chip 50% 면과 안쪽 그림자(꺼짐)는 걷었다 — 목록은 패널 머리와 같은 바탕에 놓인다.
+ *   목록 영역은 테(border/default)로 둘러 남긴다(디자이너) — 고른 미션 지도 상자처럼 오른쪽은 열어 본문 판에 닿고, 왼쪽 모서리만 8.
  *   들어간 상자(미션 전체 건수 · 썸네일)는 면 없이 테만, 고른 미션의 지도 상자는 바탕색(bg/frame) 창.
  */
-.sf-mwell { flex: 1 0 auto; display: flex; flex-direction: column; }
+.sf-mwell { flex: 1 0 auto; display: flex; flex-direction: column; border: var(--border-width-thin) solid var(--border-default); border-right: 0; border-radius: var(--radius-8) 0 0 var(--radius-8); overflow: hidden; }
 /* 미션 줄 왼쪽 단계 선은 뺐다(10/30) — 이름 앞 ⓧ/△ 와 같은 말을 두 번 해 빨강이 겹쳤다. 비운 4 는 왼쪽 여백(8 → 12)으로 돌려 글 자리를 지킨다 */
 .sf-side .sf-mwell .sf-mrow { border: 0; padding-left: var(--space-12); }
 /*
