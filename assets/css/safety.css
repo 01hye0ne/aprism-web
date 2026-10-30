@@ -184,7 +184,7 @@
 .sf-monb { background-color: var(--bg-panel) !important; }
 .sf-monb > .sf-meta { padding: 0 var(--space-12) var(--space-12); border-bottom: var(--border-width-thin) solid var(--border-default); }   /* 정보와 지도 사이 가로 구분선(10/30) */
 /* [10/30] 고른 미션 정보는 1행 4열 — 이름 위 · 값 아래로 세워 높이를 줄인다(4줄 → 2줄). 칸은 내용만큼, 사이는 고르게 */
-.sf-monb > .sf-meta { display: grid; grid-template-columns: repeat(4, auto); justify-content: space-between; column-gap: var(--space-12); }
+.sf-monb > .sf-meta { display: grid; grid-template-columns: repeat(4, minmax(max-content, 1fr)); column-gap: var(--space-12); }   /* 칸은 고른 폭 — 값이 긴 칸(층)만 내용만큼 넓어진다 */
 .sf-monb > .sf-meta .sf-kv { flex-direction: column; align-items: flex-start; gap: var(--space-2); height: auto; }
 .sf-monb > .sf-meta .sf-kv .k { min-width: 0; }
 .sf-monb > .sf-meta .sf-kv .v { white-space: nowrap; }
