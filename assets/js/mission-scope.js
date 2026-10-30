@@ -219,6 +219,10 @@
     if (floorBtn && floorBtn.getAttribute("aria-pressed") !== "true") { floorBtn.click(); }
 
     buildMenu();
+    // 왼쪽 메뉴 [안전진단]도 지금 미션으로 연다(10/30) — 그냥 열면 안전진단 첫 미션으로 풀린다. 미션이 없으면 미션 전체.
+    Array.prototype.forEach.call(document.querySelectorAll(".gnb-item[href^='./safety-v5.html']"), function (a) {
+      a.href = m ? "./safety-v5.html?mission=" + encodeURIComponent(m) : "./safety-v5.html#all";
+    });
     document.dispatchEvent(new CustomEvent("aprism:scope", { detail: { mission: m } }));
   }
 
