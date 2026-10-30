@@ -345,6 +345,10 @@
 .sf .mrow .kd .mt { display: block; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .sf .mrow .kd .lc { font-size: var(--font-size-13); line-height: var(--font-line-height-20); color: var(--text-secondary); }
 .sf .mrow .kd .tm { font-size: var(--font-size-12); line-height: var(--font-line-height-18); color: var(--text-tertiary); }
+/* 현장 조치 요청은 시각 줄 오른쪽에 — 사이 세로선 1(10/30) */
+.sf .mrow .kd .trow { display: flex; align-items: center; gap: var(--space-8); }
+.sf .mrow .kd .trow .req { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--font-size-12); line-height: var(--font-line-height-18); color: var(--text-secondary); }
+.sf .mrow .kd .trow .req::before { content: ""; display: inline-block; width: 1px; height: 10px; margin-right: var(--space-8); vertical-align: -1px; background-color: var(--border-default); }
 .sf .mchip { font-size: var(--font-size-12); line-height: var(--font-line-height-18); color: var(--text-secondary); }
 .sf .mchip b { margin-right: var(--space-4); padding: 1px var(--space-4); border: var(--border-width-thin) solid var(--border-default); border-radius: var(--radius-chart); background-color: var(--bg-cell); color: var(--text-primary); font-weight: 600; }
 .sf .mnone2 { margin: 0; font-size: var(--font-size-12); color: var(--text-disabled); }

@@ -358,7 +358,7 @@
       // [10/30 GUI · Figma 1467:8854] 카드 — 배지 왼쪽 · 건수 오른쪽, 위치(핀) · 시각(시계) 두 줄, 아래 사진은 카드 안 4 만 띄워 꽉 채운다
       // [10/30] 묶음 제목 앞 단계 기호는 뺐다 — 바로 아래 카드 배지와 왼쪽 목록이 같은 말을 한다(한 화면에 세 번)
       return `<section class="msec ${w}" data-mi="${i}"><div class="msh2"><b>${m.mis}</b><span class="mn2">${flN(m)}, ${m.robot}</span><span class="mt2">측정 ${m.done}/${m.total}곳${m.done===m.total ? ', 순회 끝' : ''}</span>${i===1 && !newSeen ? '<em class="nwm">새로</em>' : ''}<span class="sp"></span><span class="mok">정상 범위 ${okn}종${nsc ? ', 대상 아님 ' + nsc + '종' : ''}${nse ? ', 센서 없음 ' + nse + '종' : ''}</span></div>
-        <div class="mrow vC">${fl.map(k => cardM(i, k).replace(/<span class="nm">([^<]*)<\/span>/, (a, t) => `<span class="nm">${t.replace(k, '').trim()}</span>`).replace(/<span class="sm">([^<]*), (\d\d:\d\d)<\/span>/, '<span class="mt lc">$1</span><span class="mt tm">$2</span>')).join('')}</div></section>`; }).join('') + '</div>';
+        <div class="mrow vC">${fl.map(k => cardM(i, k).replace(/<span class="nm">([^<]*)<\/span>/, (a, t) => `<span class="nm">${t.replace(k, '').trim()}</span>`).replace(/<span class="sm">([^<]*), (\d\d:\d\d)<\/span>/, '<span class="mt lc">$1</span><span class="mt tm">$2</span>').replace(/<span class="mt tm">([^<]*)<\/span>(<span class="req">[^<]*<\/span>)?/, (q, t, r) => `<span class="mt trow"><span class="tm">${t}</span>${r || ''}</span>`)).join('')}</div></section>`; }).join('') + '</div>';
   }
   function cardsAll(){
     return K.map(k => { const has = M.map((m, i) => [i, m.r[k]]).filter(([, x]) => x);
