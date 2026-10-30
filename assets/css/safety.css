@@ -290,9 +290,9 @@
 .sf .mx .c-m { width: 230px; white-space: normal; font-size: var(--font-size-13); line-height: var(--font-line-height-20); color: var(--text-secondary); background-color: color-mix(in srgb, var(--status-info-icon) 8%, transparent); }
 .sf .mx th.dmh { color: var(--status-info-text); font-weight: 700; }
 .sf .mx th.dmh .dlogo { margin-right: var(--space-4); vertical-align: -1px; }
-.sf .dlogo { display: inline-grid; grid-template-columns: 5px 5px; gap: 2px; width: 12px; height: 12px; }
-.sf .dlogo i { display: block; width: 5px; height: 5px; border-radius: 1px; background-color: var(--status-info-icon); }
-.sf .dlogo i:nth-child(3) { grid-column: 1; }
+.sf .dlogo { display: inline-block; flex: none; width: 14px; height: 14px; background-color: var(--status-info-icon); -webkit-mask: var(--ic-delta) center / contain no-repeat; mask: var(--ic-delta) center / contain no-repeat; }   /* [10/30] Delta 표식 = 육각 아이콘(Figma Icon / Delta 1001:19631) — 네모 셋을 걷었다 */
+.sf .dlogo i { display: none; }
+.sf .dl .hh .dlogo { margin-right: var(--space-4); vertical-align: -2px; }
 .sf .mx .dmm { display: flex; gap: var(--space-8); align-items: flex-start; color: var(--status-info-text); }
 .sf .mx .dmm .dlogo { flex: none; margin-top: 4px; }
 
