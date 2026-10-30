@@ -3126,6 +3126,14 @@
     if (lw) { lw *= RR.k; part.material.linewidth = lw; }
     part.children.forEach(function (ch) { if (!ch.userData.rrKeep && ch.material && ch.material.color) { ch.material.color.setHex(color); ch.material.opacity = op * 0.3; if (lw) { ch.material.linewidth = lw; } } });
   }
+  // [10/30 v6] 선을 점선 ⇄ 실선으로 — 점선이 되는 선은 동그란 바닥 점(rrRoundDots)을 처음 한 번 단다
+  function rrForm(part, dotted) {
+    if (!part || !part.material) { return; }
+    var mat = part.material;
+    if (dotted && dotMats.indexOf(mat) < 0) { dotMats.push(mat); rrRoundDots(mat); mat.needsUpdate = true; syncDots(); }
+    if (mat.dashed !== dotted) { mat.dashed = dotted; mat.needsUpdate = true; part.computeLineDistances(); }
+    part.renderOrder = dotted ? 2.5 : 2;
+  }
   /* [10/22 실험 C4] 앞으로 갈 길을 바닥에 칠한 실선으로 — 회색 실선 + 바닥 홈(어두운 테두리) + 바닥 꺾쇠. 지점은 납작한 점(layWaypoints) */
   function rrAhead(ln, m) {
     var left = ln.parts[1]; if (!left || !left.material || !Fat) { return; }
@@ -3216,7 +3224,8 @@
   function ribAdd(part, kind) {
     if (!part || !part.material || !scene) { return null; }
     for (var i = 0; i < ribs.length; i++) { if (ribs[i].part === part) { return ribs[i]; } }
-    var r = { part: part, kind: kind, main: ribMesh(kind === "band" ? 1.8 : 2), edge: kind === "solid" ? ribMesh(1.9) : null, key: "" };
+    // [10/30 v6] 지나온 길 ⇄ 앞으로 갈 길 모양을 바꿔 그리므로 한 선이 실선도 점선도 될 수 있다 — 테는 늘 만들어 두고, 종류는 매 프레임 dashed 로 정한다(rrRibbons)
+    var r = { part: part, kind: kind, main: ribMesh(kind === "band" ? 1.8 : 2), edge: ribMesh(1.9), key: "" };
     if (kind === "solid") { part.material.visible = false; }   // 실선은 리본이 대신 그린다 — 굵은 선은 자리 · 색만 내준다
     ribs.push(r);
     return r;
@@ -3231,8 +3240,10 @@
     ribs = ribs.filter(function (r) {
       var p = r.part, alive = !!p.parent;
       if (!alive) { ribDrop(r); return false; }
+      var kind = p.material.dashed ? "band" : "solid";   // [10/30 v6] 점선이면 밑 띠, 실선이면 리본이 대신 그린다
+      if (r.kind !== kind) { r.kind = kind; r.main.renderOrder = kind === "band" ? 1.8 : 2; p.material.visible = kind === "band"; }
       var on = p.visible && p.parent.visible !== false && (r.kind !== "band" || (p.material.dashed && p.userData.ribBand !== false));
-      r.main.visible = on; if (r.edge) { r.edge.visible = on && p.userData.ribEdge !== false; }
+      r.main.visible = on; if (r.edge) { r.edge.visible = on && r.kind === "solid" && p.userData.ribEdge !== false; }
       if (!on) { return true; }
       var st = p.geometry.attributes.instanceStart, lw = p.material.linewidth || 2;
       var key = (st ? st.data.array.length + ":" + st.data.array[0] + ":" + st.data.array[st.data.array.length - 1] + ":" + st.data.version : "") + "|" + pp.toPrecision(5) + "|" + lw + "|" + camera.position.x.toFixed(2) + "," + camera.position.y.toFixed(2) + "," + camera.position.z.toFixed(2);   // 시선 쪽으로 당기므로 시점이 바뀌어도 다시 짠다
@@ -3263,13 +3274,13 @@
    */
   function rrPolish(ln, m) {
     var gray = m === "done" || m === "return", under = rrUnder();
-    [ln.parts[0], ln.cur].forEach(function (p) {   // 실선 + 흰 테
-      if (!ribAdd(p, "solid")) { return; }
+    [ln.parts[0], ln.cur, ln.parts[1], ln.home].forEach(function (p) {   // 실선 + 흰 테
+      if (!ribAdd(p, p && p.material && p.material.dashed ? "band" : "solid")) { return; }
       p.userData.ribEdge = !gray;
-      p.userData.ribEdgeHex = rrMix(0xffffff, p === ln.cur ? 0.9 : 0.55, under);   // 지나온 길(옅은 파랑)은 테도 한 단 옅게
+      p.userData.ribEdgeHex = rrMix(0xffffff, p === ln.cur ? 0.9 : 0.55, under);   // 옅은 파랑 실선(v6 = 앞으로 갈 길)은 테도 한 단 옅게
     });
-    [ln.parts[1], ln.home].forEach(function (p) {   // 점선 바탕 띠
-      if (!ribAdd(p, "band")) { return; }
+    [ln.parts[1], ln.home, ln.parts[0]].forEach(function (p) {   // 점선 바탕 띠
+      if (!p || !p.material) { return; }
       // [10/29] 점 색을 섞지 않고 바닥보다 살짝 밝은 색으로(디자이너) — 길이 하나로 읽히되 파란 점과 겨루지 않는다.
       // 화면에서 잰 통로 바닥(다크 #2A3344 · 라이트 #D6DBE1)에서 한 단 밝힌 값. Color.lerp 는 선형 공간이라 섞지 않고 값으로 둔다
       p.userData.ribBandHex = isLight() ? 0xe6e9ee : 0x343e53;
@@ -3280,19 +3291,22 @@
     var on = !!(ln.parts[0] && ln.parts[0].visible), m = RRS.mode, blue = ln.bot.left;
     function show(part, v) { if (part) { part.visible = on && v; } }
     if (m === "done") {
-      rrStyle(ln.parts[0], RR_GRAY, 0.3, 2);
+      rrStyle(ln.parts[0], RR_GRAY, 0.6, 2);   // [10/30 v6] 지나온 길 = 점선 — 옅은 0.3 은 점으로는 안 읽혀 0.6
       show(ln.parts[1], false); show(ln.cur, false); show(ln.home, false); show(ln.comet, false); show(ln.fan, false);
     } else if (m === "return") {   // 미션 길은 거의 지우고, 왔던 길이 중립색 도로가 된다
       rrStyle(ln.parts[0], rrNeutral(), 0.75, 3.4);   // k 를 키운 만큼 줄여 도로 굵기는 그대로(≈9.7px)   // [10/21] 복귀 도로를 가늘고 차분하게(9 → 5) rrStyle(ln.parts[1], RR_GRAY, 0.14);
       show(ln.parts[1], true); show(ln.cur, false); show(ln.home, false); show(ln.comet, false); show(ln.fan, true);   // F 시야 빔 — 복귀 중에도 방향을 보인다(중립색)
     } else if (m === "pause" || m === "estop" || m === "lost") {   // 앞길이 회색으로 굳는다
-      rrStyle(ln.parts[0], blue, RR.doneAlpha, 4); rrStyle(ln.cur, RR_GRAY, m === "lost" ? 0.35 : 0.55, 4); rrStyle(ln.parts[1], RR_GRAY, 0.45);
+      rrStyle(ln.parts[0], blue, 0.8, 2); rrStyle(ln.cur, RR_GRAY, m === "lost" ? 0.35 : 0.55, 4); rrStyle(ln.parts[1], RR_GRAY, 0.45, 4);   // [10/30 v6] 모양 바꿈 — 지나온 길 점선 · 앞길 실선(색 뜻은 그대로: 멈추면 앞길이 회색)
       show(ln.parts[1], true); show(ln.cur, true); show(ln.home, true); show(ln.comet, false); show(ln.fan, m === "pause");   // F — 일시정지는 회색 빔, 긴급정지 · 끊김은 끔
     } else {
-      rrStyle(ln.parts[0], blue, RR.doneAlpha, 4); rrStyle(ln.cur, blue, 1, 4); rrStyle(ln.parts[1], blue, 0.8);   // [10/29] 지나온 길도 지금 길과 같은 굵기(3 → 4) — 바닥 띠가 된 뒤로 로봇 발밑 이음매에 굵기 차만큼 턱이 졌다. 둘은 색(옅은 파랑)으로 가른다
+      rrStyle(ln.parts[0], blue, 0.8, 2); rrStyle(ln.cur, blue, 1, 4); rrStyle(ln.parts[1], blue, RR.doneAlpha, 4);   // [10/30 v6] 디자이너: 지나온 길 ⇄ 앞으로 갈 길 디자인을 바꾼다 — 지나온 길 = 동그란 점선(80%), 앞길 = 옅은 파랑 실선 띠(흰 테)   // [10/29] 지나온 길도 지금 길과 같은 굵기(3 → 4) — 바닥 띠가 된 뒤로 로봇 발밑 이음매에 굵기 차만큼 턱이 졌다. 둘은 색(옅은 파랑)으로 가른다
       show(ln.parts[1], true); show(ln.cur, true); show(ln.home, true); show(ln.comet, m !== "inspect"); show(ln.fan, true);   // F 시야 빔은 로봇 표식의 일부 — 위험 감지 때도 그대로
     }
     rrAhead(ln, m);
+    // [10/30 v6] 모양 바꿈 — 지나온 길은 점선, 앞으로 갈 길은 실선. 자동복귀는 지나온 길이 도로(실선)가 되므로 그대로 둔다.
+    rrForm(ln.parts[0], m !== "return");
+    rrForm(ln.parts[1], false);
     // [10/29 v5] ④ 돌아가는 길을 ③ 앞으로 갈 길과 같게(디자이너) — 색 · 투명도 · 굵기 · 점선 무늬를 앞길에서 그대로 옮긴다.
     // 앞길이 꺼지는 상태(자동복귀 · 미션 완료)는 돌아가는 길도 원래대로 따라 꺼진다(show).
     if (ln.home && ln.parts[1] && ln.parts[1].material) {
