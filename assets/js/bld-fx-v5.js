@@ -8,11 +8,19 @@
 // 색 — 구조는 청백(차가운 흰빛), 올린 층의 테두리만 브랜드 파랑. 빨강 · 노랑은 알림 표식(HTML)에만 남긴다.
 //      "파랑은 상태 또는 단 하나의 주요 행동"(10/12)이라 구조 전체를 파랑으로 빛내지 않는다.
 // 지금은 렌더 실험(screens/lab-bld-render-v5.html · <html data-fx-lab>)만 읽는다. 키보드 B — 켜기 · 끄기.
+//
+// 스타일 둘(조절판 "스타일") —
+//   solid  면(클레이, 기본 · 10/30 디자이너 "라인보다는 면으로", 레퍼런스 IOC Smart Campus) — 흰 벽 · 회색 바닥의 불투명 덩이,
+//          선은 거의 지우고 해 그림자로 깊이를 준다. 어두운 회색 바탕. 블룸 · 스캔 빛 없음.
+//   holo   홀로그램 — 반투명 남색 면 · 청백 윤곽선 · 블룸(처음 시안).
 (function () {
   "use strict";
 
   var S = {
     on: true,
+    style: "solid",
+    // 면(클레이) — 벽 · 설비 · 바닥 색, 선 세기, 그림자
+    wall: "#eef0f3", equip: "#cfd4db", floor: "#5b616b", solidEdge: 0.12, shadow: true, shadowOp: 0.55,
     edge: "#8fbcff", edgeOp: 0.5,           // 윤곽선 — 청백. 0.85 · 블룸 0.85 면 판 전체가 우윳빛으로 하얗게 번졌다(10/30 첫 캡처)
     face: "#0d1b36", faceOp: 0.45, faceSolidOp: 0.9,   // 면 — 쌓인 판은 비치고, 들어간 층은 차오른다
     base: "#3d8bff", baseGlow: 0.8, hotGlow: 2.2,      // 층 바닥 빛 테두리 — 브랜드 파랑, 올리면 밝아진다
@@ -37,8 +45,11 @@
   var size = { w: 0, h: 0, pr: 0 };
   var fps = { n: 0, t0: 0, v: 0 };
   var c1 = null, c2 = null;
+  var sun = null, sky = null, lit0 = null, shSig = "", sunDir = null, SH_D = 160;
 
-  window.APRISM_BLD_FX = { init: init, step: step, render: render, S: S };
+  window.APRISM_BLD_FX = { init: init, step: step, render: render, S: S,
+    // 콘솔 점검용 — 해 · 층 그림자 빛의 세기 · 자리
+    dbg: function () { return { sun: sun && sun.intensity, sky: sky && sky.intensity, sig: shSig, lights: ctx.FLOORS.map(function (f) { var L = X[f] && X[f].sl; return L ? [f, L.intensity, L.castShadow, L.position.toArray().map(Math.round), L.target.position.toArray().map(Math.round)] : f; }) }; } };
 
   function init(c) {
     ctx = c; T = c.THREE;
@@ -81,11 +92,11 @@
     g.fillStyle = r; g.fillRect(0, 0, N, N);
     return tex(cv);
   }
-  // 바탕 — 가운데가 한 단 밝은 남색.
-  function bgArt() {
+  // 바탕 — 가운데가 한 단 밝다. 홀로그램은 남색, 면(클레이)은 무채 회색(레퍼런스의 어두운 회색 땅).
+  function bgArt(stops) {
     var N = 512, cv = pad(N, N), g = cv.getContext("2d");
     var r = g.createRadialGradient(N / 2, N * 0.45, 0, N / 2, N * 0.45, N * 0.75);
-    r.addColorStop(0, "#0e1d38"); r.addColorStop(0.6, "#070d1a"); r.addColorStop(1, "#04070d");
+    r.addColorStop(0, stops[0]); r.addColorStop(0.6, stops[1]); r.addColorStop(1, stops[2]);
     g.fillStyle = r; g.fillRect(0, 0, N, N);
     return tex(cv);
   }
@@ -98,7 +109,22 @@
     composer.addPass(P.render = new m[1].RenderPass(ctx.scene, ctx.camera));
     composer.addPass(P.bloom = new m[2].UnrealBloomPass(new T.Vector2(1, 1), S.bloomAmt, S.bloomRadius, S.bloomTh));
     composer.addPass(new m[3].OutputPass());
-    bgTex = bgArt();
+    bgTex = { holo: bgArt(["#0e1d38", "#070d1a", "#04070d"]), solid: bgArt(["#33373e", "#24272c", "#17191c"]) };
+
+    // 면(클레이) 그림자 — 해(방향광)가 벽 그림자를 바닥에 떨군다. 층이 움직일 때만 다시 굽는다(shadowSig).
+    r.shadowMap.enabled = true;
+    r.shadowMap.type = T.PCFSoftShadowMap;
+    r.shadowMap.autoUpdate = false;
+    ctx.scene.traverse(function (o) { if (o.isDirectionalLight && !sun) { sun = o; } if (o.isHemisphereLight && !sky) { sky = o; } });
+    if (sun) { lit0 = { sun: sun.intensity, sky: sky ? sky.intensity : 0, ground: sky ? sky.groundColor.getHex() : 0 }; }
+    /*
+     * 그림자는 층마다 따로 — 해 하나로 그리면 위층 벽 그림자가 층 사이 틈을 지나 아래층 바닥에 줄무늬로 떨어졌다(10/30 캡처).
+     * 층마다 그림자 전용 방향광을 두고, 그 그림자 카메라 깊이를 제 층 두께만큼만 잡는다.
+     * three 는 그림자 카메라 깊이 밖은 그늘로 치지 않으므로 아래층은 위층 그림자를 받지 않는다.
+     */
+    if (sun) {
+      sunDir = sun.position.clone().sub(sun.target.position).normalize();
+    }
 
     var foot = null;   // 가장 넓은 층의 바닥 — 격자 · 스캔 · 모서리 점선이 쓴다
     ctx.FLOORS.forEach(function (f) {
@@ -114,6 +140,18 @@
       X[f] = { glow: glow, line: line };
       if (!foot || w * d > foot.w * foot.d) { foot = { w: w, d: d, cx: cx, cz: cz, b: b }; }
     });
+
+    // 층마다 그림자 빛(위 설명) — 층(X)을 만든 뒤에 단다
+    if (sun) {
+      ctx.FLOORS.forEach(function (f) {
+        if (!X[f]) { return; }
+        var L = new T.DirectionalLight(sun.color.getHex(), 0);
+        L.shadow.mapSize.set(1536, 1536); L.shadow.bias = -0.0008; L.shadow.normalBias = 0.35; L.shadow.radius = 4;
+        var sc = L.shadow.camera; sc.left = -72; sc.right = 72; sc.top = 72; sc.bottom = -72; sc.near = SH_D - 45; sc.far = SH_D + 45; sc.updateProjectionMatrix();
+        ctx.scene.add(L, L.target);
+        X[f].sl = L;
+      });
+    }
 
     var gs = Math.max(foot.w, foot.d) * 4;
     grid = flat(gs, gs, gridArt(), S.gridOp);
@@ -145,11 +183,13 @@
 
   function step(now) {
     if (!ready) { return; }
-    var on = active();
-    ctx.scene.background = on && S.bg ? bgTex : null;
+    var on = active(), solid = S.style === "solid";
+    ctx.scene.background = on && S.bg ? bgTex[solid ? "solid" : "holo"] : null;
     grid.visible = pillars.visible = scan.visible = false;
     ctx.FLOORS.forEach(function (f) { if (X[f]) { X[f].glow.visible = X[f].line.visible = on; } });
+    shadows(on && solid && S.shadow);
     if (!on) { return; }   // building.js 가 매 프레임 제 색을 다시 칠하므로 되돌릴 것이 없다
+    if (solid) { stepSolid(now); return; }
 
     var st = ctx.state(), base = c2.set(S.base), lo = Infinity, hi = -Infinity;
     ctx.FLOORS.forEach(function (f) {
@@ -202,6 +242,75 @@
     }
   }
 
+  /*
+   * 면(클레이) — 레퍼런스처럼 불투명한 흰 벽 · 회색 바닥. 선은 형태를 거드는 만큼만(solidEdge).
+   * 쌓인 판에서 올린 층은 바닥 테두리가 브랜드 파랑으로 켜지고, 다른 층은 한 단 물러난다.
+   * 빛 테두리(가산 혼합 판)는 쓰지 않는다 — 덩이 위에서 뿌옇게 뜬다. 선(LineLoop)만 남긴다.
+   */
+  function stepSolid(now) {
+    var st = ctx.state(), base = c2.set(S.base), lo = Infinity, hi = -Infinity;
+    ctx.FLOORS.forEach(function (f) {
+      var s = ctx.F[f], x = X[f]; if (!s || !x) { return; }
+      var back = (st.hot && st.mode === "all" && st.hot !== f) ? 1 : 0;
+      s.meshes.forEach(function (mesh) {
+        var mt = mesh.material, k = mesh.userData.kind;
+        mt.color.set(k === "floor" ? S.floor : k === "wall" ? S.wall : S.equip);
+        if (back) { mt.color.lerp(c1.set(S.floor), 0.35); }
+        // 벽 · 설비는 옆면이 그늘로 죽지 않게 제 색을 조금 스스로 밝힌다 — 바닥(윗면)은 빛을 정면으로 받아 벽보다 밝아지던 것을 막는다
+        mt.emissive.copy(mt.color).multiplyScalar(k === "floor" ? 0 : k === "wall" ? 0.32 : 0.22);
+        mt.opacity = s.op;
+        mt.transparent = s.op < 0.999;
+        mt.depthWrite = s.op > 0.5;
+      });
+      s.lines.forEach(function (ls) {
+        ls.material.color.setRGB(0.12, 0.14, 0.17);
+        ls.material.opacity = S.solidEdge * s.op;
+      });
+      x.glow.visible = false;
+      x.line.visible = s.op > 0.01;
+      x.line.material.color.copy(base).lerp(c1.setRGB(0.55, 0.58, 0.63), 1 - s.hot);   // 평소 회색 테, 올리면 파랑
+      x.line.material.opacity = (0.5 + 0.5 * s.hot) * s.op;
+      if (s.op > 0.01) { lo = Math.min(lo, s.y); hi = Math.max(hi, s.y + s.size.y); }
+    });
+    if (lo === Infinity) { return; }
+    grid.visible = S.grid;
+    grid.position.y = lo - 1.5;
+    grid.material.opacity = S.gridOp * 0.6;
+    var ft = pillars.userData.foot;
+    pillars.visible = S.pillars && st.mode === "all";
+    if (pillars.visible) {
+      var arr = [];
+      [[ft.b.min.x, ft.b.min.z], [ft.b.max.x, ft.b.min.z], [ft.b.max.x, ft.b.max.z], [ft.b.min.x, ft.b.max.z]].forEach(function (p) { arr.push(p[0], lo, p[1], p[0], hi, p[1]); });
+      pillars.geometry.setAttribute("position", new T.Float32BufferAttribute(arr, 3));
+      pillars.computeLineDistances();
+      pillars.material.color.setRGB(0.6, 0.63, 0.68); pillars.material.opacity = 0.3;
+    }
+  }
+
+  // 그림자 켜기 · 끄기 + 층이 움직였을 때만 다시 굽기
+  function shadows(want) {
+    if (!sun) { return; }
+    var sig = want ? ctx.FLOORS.map(function (f) { var s = ctx.F[f]; return s ? s.y.toFixed(2) + ":" + s.op.toFixed(2) : ""; }).join("|") + S.shadowOp : "off";
+    if (sig === shSig) { return; }
+    shSig = sig;
+    // 그림자 진하기 — r160 은 그림자 세기 값이 없어 해 · 하늘빛 비율로 낸다(해가 셀수록 그림자 대비가 크다). 끄면 원래 빛으로.
+    // 켜면 해(빛만)는 끄고 층마다의 그림자 빛이 해 몫을 나눠 맡는다.
+    var sunAmt = 0.5 + 1.6 * S.shadowOp;
+    ctx.FLOORS.forEach(function (f) {
+      var s = ctx.F[f], x = X[f]; if (!s || !x) { return; }
+      s.meshes.forEach(function (m) { m.castShadow = want && m.userData.kind !== "floor"; m.receiveShadow = want; });
+      if (!x.sl) { return; }
+      x.sl.castShadow = want;
+      x.sl.intensity = want ? sunAmt * 0.8 : 0;   // 층 빛은 두 층 모두를 비춘다 — 둘이 합쳐 해보다 조금 밝게
+      var b = s.bounds, c = new T.Vector3((b.min.x + b.max.x) / 2, s.y + s.size.y / 2, (b.min.z + b.max.z) / 2);
+      x.sl.target.position.copy(c); x.sl.position.copy(c).addScaledVector(sunDir, SH_D);
+      x.sl.target.updateMatrixWorld(); x.sl.updateMatrixWorld();
+    });
+    sun.intensity = want ? 0 : lit0.sun;
+    if (sky) { sky.intensity = want ? 1.9 - 1.1 * S.shadowOp : lit0.sky; sky.groundColor.setHex(want ? 0x6b717b : lit0.ground); }   // 아래 빛을 회색으로 — 옆면이 검게 떨어지지 않게
+    ctx.renderer.shadowMap.needsUpdate = true;
+  }
+
   function render() {
     if (!active()) { return false; }
     var r = ctx.renderer, v = r.getSize(new T.Vector2()), pr = Math.min(r.getPixelRatio(), S.res);
@@ -209,7 +318,7 @@
       size = { w: v.x, h: v.y, pr: pr };
       composer.setPixelRatio(pr); composer.setSize(v.x, v.y);
     }
-    P.bloom.enabled = S.bloom;
+    P.bloom.enabled = S.bloom && S.style !== "solid";   // 면(클레이)은 빛 번짐 없이
     P.bloom.strength = S.bloomAmt; P.bloom.radius = S.bloomRadius; P.bloom.threshold = S.bloomTh;
     composer.render();
     tick();
@@ -235,13 +344,22 @@
     var gui = new GUI({ title: "통합 순회 연출 (홀로그램)" });
     gui.domElement.classList.add("lab-fx-gui");
     gui.add(S, "on").name("연출 켜기 (B)").onChange(badge).listen();
-    var f = gui.addFolder("구조");
+    gui.add(S, "style", { "면 (클레이)": "solid", "홀로그램": "holo" }).name("스타일");
+    var f = gui.addFolder("면 (클레이)");
+    f.addColor(S, "wall").name("벽 색");
+    f.addColor(S, "equip").name("설비 색");
+    f.addColor(S, "floor").name("바닥 색");
+    f.add(S, "solidEdge", 0, 0.6, 0.02).name("선 세기");
+    f.add(S, "shadow").name("그림자");
+    f.add(S, "shadowOp", 0, 1, 0.05).name("그림자 진하기");
+    f = gui.addFolder("홀로그램 — 구조");
+    f.close();
     f.addColor(S, "edge").name("윤곽선 색");
     f.add(S, "edgeOp", 0, 1, 0.05).name("윤곽선 세기");
     f.addColor(S, "face").name("면 색");
     f.add(S, "faceOp", 0, 1, 0.05).name("면 (쌓인 판)");
     f.add(S, "faceSolidOp", 0, 1, 0.05).name("면 (들어간 층)");
-    f = gui.addFolder("층 빛 테두리");
+    f = gui.addFolder("층 테두리 (올린 층 색)");
     f.addColor(S, "base").name("색");
     f.add(S, "baseGlow", 0, 2, 0.05).name("평소");
     f.add(S, "hotGlow", 0, 3, 0.05).name("올렸을 때");
