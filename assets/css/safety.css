@@ -334,9 +334,19 @@
 .sf .msh2 .mt2, .sf .msh2 .mok { font-size: var(--font-size-12); line-height: var(--font-line-height-18); color: var(--text-tertiary); }
 .sf .msh2 .sp { flex: 1; }
 .sf .mrow { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: var(--space-8); }
-.sf .mrow .kd { min-height: 0; padding: var(--space-8) var(--space-12) var(--space-12); border-color: transparent; background-color: var(--bg-cell); }
+/* [10/30 GUI · Figma 1467:8854] 전체 카드 — 카드 안 4, 글 칸은 위 4 · 좌우 8 · 아래 8(사이 4). 배지는 왼쪽 · 건수는 오른쪽.
+   위치(map-pin) 13/20 · 시각(clock) 12/18 두 줄, 아이콘 16 text/tertiary. 사진 칸은 남는 높이를 다 쓰고 bg/page · 모서리 4 */
+.sf .mrow .kd { min-height: 0; gap: var(--space-4); padding: var(--space-4); border-color: transparent; background-color: var(--bg-cell); }
 .sf .mrow .kd[role="button"]:hover { border-color: var(--border-strong); }
-.sf .mrow .kd .md { flex: none; height: 96px; }
+.sf .mrow .kd > :not(.md):not(.more) { margin-left: var(--space-8); margin-right: var(--space-8); }
+.sf .mrow .kd > .rw { flex-direction: row-reverse; margin-top: var(--space-4); }
+.sf .mrow .kd .nm { font-size: var(--font-size-14); line-height: var(--font-line-height-20); font-weight: 800; }
+.sf .mrow .kd .md { flex: 1 0 96px; height: auto; margin-top: var(--space-4); }
+.sf .mrow .kd .mt { display: flex; align-items: center; gap: var(--space-8); min-width: 0; color: var(--text-secondary); }
+.sf .mrow .kd .mt::before { content: ""; flex: none; width: 16px; height: 16px; background-color: var(--text-tertiary); -webkit-mask: var(--ic-map-pin) center / contain no-repeat; mask: var(--ic-map-pin) center / contain no-repeat; }
+.sf .mrow .kd .mt.tm::before { -webkit-mask-image: var(--ic-clock); mask-image: var(--ic-clock); }
+.sf .mrow .kd .lc { font-size: var(--font-size-13); line-height: var(--font-line-height-20); }
+.sf .mrow .kd .tm { font-size: var(--font-size-12); line-height: var(--font-line-height-18); }
 .sf .mchip { font-size: var(--font-size-12); line-height: var(--font-line-height-18); color: var(--text-secondary); }
 .sf .mchip b { margin-right: var(--space-4); padding: 1px var(--space-4); border: var(--border-width-thin) solid var(--border-default); border-radius: var(--radius-chart); background-color: var(--bg-cell); color: var(--text-primary); font-weight: 600; }
 .sf .mnone2 { margin: 0; font-size: var(--font-size-12); color: var(--text-disabled); }
