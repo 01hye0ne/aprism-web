@@ -70,7 +70,7 @@
    *   uv    층 바닥 위 자리(0~1). building.js 가 열린 바닥으로 옮겨 앉힌다.
    */
   var ROBOTS = [
-    { n: 1,  floor: "B4", st: "run",  mission: "정기 순회 점검",     now: "N₂ 배관 압력 점검",     done: 3,  total: 20, bat: 78, sig: 4, uv: [0.42, 0.40] },
+    { n: 1,  floor: "B4", st: "run",  mission: "정기 순회 점검",     now: "N₂ 배관 압력 점검",     done: 7,  total: 20, bat: 78, sig: 4, uv: [0.42, 0.40] },
     { n: 2,  floor: "B4", st: "idle", mission: null,                          now: "복귀 중",               bat: 18, chg: false, sig: 2, uv: [0.70, 0.66], moving: true },   // 10/20 — 미션 하나에 로봇 한 대, 배정 없음
     { n: 3,  floor: "B4", st: "idle", mission: null,                          now: "대기 중",               bat: 35, chg: true, sig: 3, uv: [0.90, 0.92], dock: true },
     { n: 4,  floor: "B4", st: "done", mission: "야간 순회 점검",     now: "순회 완료",             done: 20, total: 20, bat: 92, sig: 4, uv: [0.76, 0.92], dock: true },
