@@ -331,6 +331,10 @@
 .sf .msh2 { display: flex; align-items: center; gap: var(--space-8); margin-bottom: var(--space-12); }
 .sf .msh2 b { color: var(--text-primary); }
 .sf .msh2 .mn2 { font-size: var(--font-size-13); line-height: var(--font-line-height-20); color: var(--text-secondary); }
+/* 미션 제목 옆 정보 · 오른쪽 종류 수 — 항목 사이 세로선 1(높이 10, border/default). 쉼표 없이, 13 text/secondary 로 맞춘다(10/30). 카드 시각 줄과 같은 나열 문법 */
+.sf .msh2 .mil { display: inline-flex; align-items: center; gap: var(--space-8); font-size: var(--font-size-13); line-height: var(--font-line-height-20); color: var(--text-secondary); white-space: nowrap; }
+.sf .msh2 .mil > span + span::before { content: ""; display: inline-block; width: 1px; height: 10px; margin-right: var(--space-8); vertical-align: -1px; background-color: var(--border-default); }
+.sf .msh2 .mil.mok { color: var(--text-tertiary); }
 .sf .msh2 .mt2, .sf .msh2 .mok { font-size: var(--font-size-12); line-height: var(--font-line-height-18); color: var(--text-tertiary); }
 .sf .msh2 .sp { flex: 1; }
 .sf .mrow { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: var(--space-8); }
