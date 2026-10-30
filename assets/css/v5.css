@@ -328,14 +328,16 @@ body.ver-5 .dc-v5 .dc-arow small { flex: none; color: var(--text-tertiary); font
 body.ver-5 .dc-v5 .dc-why, body.ver-5 .dc-v5 .dc-todo { margin: 0; padding-left: var(--space-20); color: var(--text-secondary); font-size: var(--font-size-13); line-height: var(--font-line-height-20); }
 body.ver-5 .dc-v5 .dc-why li + li, body.ver-5 .dc-v5 .dc-todo li + li { margin-top: var(--space-2); }
 body.ver-5 .dc-v5 .dc-btns { display: flex; flex-wrap: wrap; gap: var(--space-4); margin-top: var(--space-4); }
-body.ver-5 .dc-dmark { display: inline-flex; padding: var(--space-4) 0; }
-body.ver-5 .dc-dmark svg { width: 16px; height: 16px; }
-body.ver-5 .dc-dmark rect { fill: var(--text-primary); opacity: 0.2; animation: dc-sq 1.2s steps(1) infinite; }
-body.ver-5 .dc-dmark .r2 { animation-delay: 0.4s; }
-body.ver-5 .dc-dmark .r3 { animation-delay: 0.8s; }
-@keyframes dc-sq { 0% { opacity: 1; } 33.3% { opacity: 0.2; } }
+body.ver-5 .dc-dmark { display: inline-flex; padding: var(--space-4) 0; color: var(--text-primary); }
+body.ver-5 .dc-dmark svg { width: 20px; height: 20px; }
+/* Figma 1510:18568 세 장을 차례로 — 한 장씩 0.4초, 끊어 바꿔 도는 느낌(steps). 움직임 줄이기면 첫 장만 옅게 */
+body.ver-5 .dc-dmark path { fill: currentColor; opacity: 0; animation: dc-turn 1.2s steps(1) infinite; }
+body.ver-5 .dc-dmark .f2 { animation-delay: 0.4s; }
+body.ver-5 .dc-dmark .f3 { animation-delay: 0.8s; }
+@keyframes dc-turn { 0% { opacity: 1; } 33.3% { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) {
-  body.ver-5 .dc-dmark rect { animation: none; opacity: 0.4; }
+  body.ver-5 .dc-dmark path { animation: none; }
+  body.ver-5 .dc-dmark .f1 { opacity: 0.5; }
 }
 /* 답 단추가 선 동안 대화는 글 칸을 눌러 연다(v3-panel.js) */
 body.ver-5[data-delta-copy="brief"] .delta3:not(.is-open) .delta3-body { cursor: pointer; }
