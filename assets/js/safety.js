@@ -347,7 +347,7 @@
   }
   function head(title, done, total, n){
     // [10/30] 'n건 현장 조치 요청 전'은 뺐다 — 왼쪽 목록의 '요청 전'(전체 · 고른 미션)과 같은 숫자다. 요청을 보내면 목록 값이 줄어 피드백이 된다
-    return `<div class="hd"><span class="badge badge-mode badge-info t-caption lvh" title="6종 영상과 센서를 실시간으로 받는 중"><span class="badge-dot"></span>라이브</span><span class="sp"></span>${LAYB()}</div>`;
+    return `<div class="hd"><span class="lvh t-caption" title="6종 영상과 센서를 실시간으로 받는 중"><span class="lvd" aria-hidden="true"></span>라이브</span><span class="sp"></span>${LAYB()}</div>`;
   }
   function crumb(){
     const isAll = scope==='all';
