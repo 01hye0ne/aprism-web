@@ -288,10 +288,9 @@ body.ver-5[data-delta-copy="brief"] .delta3.is-open .ai-line-2 .dl { display: in
 body.ver-5[data-delta-copy="brief"] .delta3.is-open .ai-line-2 .dl1::after { content: " "; }
 
 /* 근거 줄 — 문형의 범위나 원인(v3-panel.js .is-said). 하는 일 흉내가 아니라 반짝이지 않는다.
-   다른 미션 알림(.is-scope)은 그 단계 색 글, 아이콘 없이, 두 줄까지(넘으면 …) */
+   다른 미션 알림(.is-scope)은 그 단계 색 글, 두 줄까지(넘으면 …). 감지 아이콘은 모든 문형에 붙는다(10/30 라이팅 시스템 갱신) */
 body.ver-5.v2-2.v3 .delta3-clue.is-said .delta3-clue-txt { animation: none; background-image: none; color: var(--text-secondary); }
 body.ver-5.v2-2.v3 .delta3-clue.is-scope { height: auto; min-height: 40px; }
-body.ver-5.v2-2.v3 .delta3-clue.is-scope .delta3-clue-ics { display: none; }
 body.ver-5.v2-2.v3 .delta3-clue.is-scope .delta3-clue-txt {
   display: -webkit-box;
   -webkit-box-orient: vertical;
@@ -340,3 +339,20 @@ body.ver-5 .dc-dmark .r3 { animation-delay: 0.8s; }
 }
 /* 답 단추가 선 동안 대화는 글 칸을 눌러 연다(v3-panel.js) */
 body.ver-5[data-delta-copy="brief"] .delta3:not(.is-open) .delta3-body { cursor: pointer; }
+
+/* [10/30 라이팅 시스템 6] 답 단추 오른쪽 대화 단추 — 말풍선 24, 답 단추와 같은 반투명 면(v3-panel.js) */
+body.ver-5 .delta3 .delta3-talk {
+  flex: none; display: grid; place-items: center; width: 24px; height: 24px; margin-left: 6px; padding: 0;
+  border: var(--border-width-thin) solid rgb(255 255 255 / 18%); border-radius: var(--radius-pill);
+  background-color: rgb(255 255 255 / 10%); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); cursor: pointer;
+}
+body.ver-5 .delta3 .delta3-talk:hover { background-color: rgb(255 255 255 / 18%); }
+body.ver-5 .delta3 .delta3-talk::before {
+  content: ""; width: 14px; height: 14px; background-color: var(--text-primary);
+  -webkit-mask: var(--ic-message) center / contain no-repeat; mask: var(--ic-message) center / contain no-repeat;
+}
+:root[data-theme="light"] body.ver-5 .delta3 .delta3-talk { border-color: rgb(0 0 0 / 8%); background-color: rgb(255 255 255 / 45%); }
+body.ver-5 .delta3 .delta3-talk[hidden], body.ver-5 .delta3.is-open .delta3-talk { display: none; }
+/* 답 단추 — 굵게, 한 단 밝은 면(라이팅 시스템 .pill.ans) */
+body.ver-5.v2-2.v3 .delta3:not(.is-open) .delta3-plus.is-answer { background-color: rgb(255 255 255 / 20%); }
+body.ver-5.v2-2.v3 .delta3:not(.is-open) .delta3-plus.is-answer .delta3-plus-label { font-weight: var(--font-weight-bold); background-image: none; color: var(--text-primary); }

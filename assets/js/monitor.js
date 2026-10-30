@@ -422,16 +422,27 @@
   window.APRISM_DELTA_DO = function () {
     var s = window.APRISM_DELTA_SAY;
     if (!s || !s.act) { return false; }
+    // 창은 접힌 채 그 일만 한다 — 주고받음은 대화 기록에 남는다(라이팅 시스템 6, delta-chat.js APRISM_DELTA.log)
+    var said = null;
+    var mineNow = function () { return items().filter(function (a) { return !scoped || missionOf(a) === mission; }); };
     if (s.act.go) {
       if (window.APRISM_SCOPE_TO) { window.APRISM_SCOPE_TO(s.act.go); }
+      var here = mineNow(), hc = here.filter(function (a) { return a.sev === "critical"; }).length;
+      said = { text: s.clue + "으로 옮겼어요. " + (hc ? "위험이 " + hc + "건 있어요." : here.length ? "주의가 " + here.length + "건 있어요." : "확인할 알림은 없어요."),
+        btn: here[0] ? { label: "알림 열기", act: function () { window.APRISM_OPEN_ALERT(here[0]); } } : null };
     } else if (s.act === "warn") {
       setFilter("warning");
+      said = { text: "주의 " + mineNow().filter(function (a) { return a.sev === "warning"; }).length + "건을 목록에 묶었어요." };
     } else if (s.act === "shift") {
-      setFilter(items().some(function (a) { return a.sev === "critical"; }) ? "critical" : "all");
+      var anyCrit = items().some(function (a) { return a.sev === "critical"; });
+      setFilter(anyCrit ? "critical" : "all");
+      said = { text: anyCrit ? "위험 알림만 목록에 걸렀어요." : "인계 알림을 목록에 펼쳤어요." };
     } else if (s.act === "first") {
-      var first = items().filter(function (a) { return !scoped || missionOf(a) === mission; })[0];
+      var first = mineNow()[0];
       if (first && picked !== first) { note.open(first); }
+      said = first ? { text: (first.eq ? first.eq + " " + first.phen : first.title) + " 알림을 열었어요." } : null;
     }
+    if (said && window.APRISM_DELTA && window.APRISM_DELTA.log) { window.APRISM_DELTA.log(s.yes, said.text, said.btn); }
     return true;
   };
   // 펼침 대화(delta-chat.js)가 알림 줄을 누르면 그 알림 쪽지를 연다

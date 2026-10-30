@@ -60,6 +60,18 @@
   var plusLabel = plus && plus.querySelector(".delta3-plus-label");
   var brief = body.getAttribute("data-delta-copy") === "brief";
   function said() { return brief ? window.APRISM_DELTA_SAY : null; }
+  // [10/30 라이팅 시스템 6] 답 단추 오른쪽 대화 단추(말풍선 24) — 누르면 대화 창을 편다. 질문 없는 문형은 "Delta와 대화" 하나라 숨긴다.
+  var talk = null;
+  if (brief && plus) {
+    talk = document.createElement("button");
+    talk.type = "button";
+    talk.className = "delta3-talk";
+    talk.setAttribute("aria-label", "Delta와 대화");
+    talk.title = "Delta와 대화";
+    talk.hidden = true;
+    plus.insertAdjacentElement("afterend", talk);
+    talk.addEventListener("click", function () { opening = true; plus.click(); opening = false; });
+  }
 
   // 통합 순회 현황에서 층을 펼쳐 보면 그 층이 범위다(building.js 의 APRISM_DELTA_SCOPE).
   function update() {
@@ -77,6 +89,7 @@
       var yes = s && s.yes ? s.yes : "Delta와 대화";
       if (plusLabel.textContent !== yes) { plusLabel.textContent = yes; }
       plus.classList.toggle("is-answer", !!(s && s.yes));
+      if (talk) { talk.hidden = !(s && s.yes); }
     }
     if (brief) { lines(); }
   }

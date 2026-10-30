@@ -347,7 +347,33 @@
   }
 
   // 조치 버튼(monitor.js)이 대화를 건다 — 버튼 문구를 내 말로 보낸다.
-  window.APRISM_DELTA = { ask: ask };
+  // 접힌 위젯 답 단추(monitor.js APRISM_DELTA_DO)의 주고받음 — 창은 접힌 채라 기록만 쌓았다가, 대화가 열려 있거나 창을 펼칠 때 붙인다.
+  var pending = [];
+  function logNode(me, text, btn) {
+    var m = el("div", "dc-msg is-ai dc-v5");
+    m.appendChild(el("p", null, text));
+    if (btn) {
+      var row = el("div", "dc-btns");
+      var b = el("button", "btn is-xs btn-primary", btn.label);
+      b.type = "button";
+      b.addEventListener("click", btn.act);
+      row.appendChild(b);
+      m.appendChild(row);
+    }
+    return [el("div", "dc-msg is-me", me), m];
+  }
+  function flush() {
+    if (!pending.length) { return; }
+    start();
+    pending.splice(0).forEach(function (p) { logNode(p[0], p[1], p[2]).forEach(add); });
+  }
+  function log(me, text, btn) {
+    pending.push([me, text, btn]);
+    if (thread || win.classList.contains("is-open")) { flush(); }
+  }
+  new MutationObserver(function () { if (win.classList.contains("is-open")) { flush(); } }).observe(win, { attributes: true, attributeFilter: ["class"] });
+
+  window.APRISM_DELTA = { ask: ask, log: log };
 
   input.addEventListener("input", sync);
   input.addEventListener("keydown", function (event) {
