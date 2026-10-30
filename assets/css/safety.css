@@ -183,7 +183,8 @@
 .sf-monb .m2f button.on { background-color: var(--bg-selected); }   /* 고른 층 — 테 안 바탕(bg/cell)과 같아지지 않게 */   /* 지도 바탕은 테(.sf-monb)가 깐다 — 두 겹으로 어두워지지 않게 */
 /* [10/30] 고른 미션 테 안(정보 + 지도)은 한 바탕 — bg/panel(디자이너). 본문 판(bg/page)은 너무 어두웠다 */
 .sf-monb { background-color: var(--bg-panel) !important; }
-.sf-monb > .sf-meta { padding: 0 var(--space-12) var(--space-12); border-bottom: var(--border-width-thin) solid var(--border-default); }   /* 정보와 지도 사이 가로 구분선(10/30) */
+.sf-monb > .m2 { order: -1; }   /* [10/30] 지도가 위, 정보가 아래(디자이너) */
+.sf-monb > .sf-meta { padding: var(--space-12); border-top: var(--border-width-thin) solid var(--border-default); }   /* 지도와 정보 사이 가로 구분선(10/30) */
 /* [10/30] 고른 미션 정보는 1행 4열 — 이름 위 · 값 아래로 세워 높이를 줄인다(4줄 → 2줄). 칸은 내용만큼, 사이는 고르게 */
 .sf-monb > .sf-meta { display: grid; grid-template-columns: repeat(4, minmax(max-content, 1fr)); column-gap: var(--space-12); }   /* 칸은 고른 폭 — 값이 긴 칸(층)만 내용만큼 넓어진다 */
 .sf-monb > .sf-meta .sf-kv { flex-direction: column; align-items: flex-start; gap: var(--space-2); height: auto; }
