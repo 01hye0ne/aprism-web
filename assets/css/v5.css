@@ -344,7 +344,7 @@ body.ver-5[data-delta-copy="brief"] .delta3:not(.is-open) .delta3-body { cursor:
 
 /* [10/30 라이팅 시스템 6] 답 단추 오른쪽 대화 단추 — 말풍선 24, 답 단추와 같은 반투명 면(v3-panel.js) */
 body.ver-5 .delta3 .delta3-talk {
-  flex: none; display: grid; place-items: center; width: 24px; height: 24px; margin-left: 6px; padding: 0;
+  flex: none; display: grid; place-items: center; width: 24px; height: 24px; margin-left: -1px; padding: 0;   /* 답 단추와 사이 7(줄 간격 8 - 1) — 10/30 디자이너 "반으로" */
   border: var(--border-width-thin) solid rgb(255 255 255 / 18%); border-radius: var(--radius-pill);
   background-color: rgb(255 255 255 / 10%); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); cursor: pointer;
 }
