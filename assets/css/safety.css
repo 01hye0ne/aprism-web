@@ -365,8 +365,8 @@
 .sf .g6.cx .kd .md { border: var(--border-width-thin) solid var(--border-default); }
 .sf .g6.cx .kd .big { font-size: var(--font-size-20); line-height: var(--font-line-height-28); font-weight: 800; }
 /* [자세히 보기] — 전체 카드에서는 글 없이 아이콘 단추만(10/30). 24 · 모서리 4 · 오른쪽 아래 8, 카드에 올렸을 때 뜬다 */
-.sf .cx .kd .more { right: var(--space-8); bottom: var(--space-8); display: grid; place-items: center; width: 24px; height: 24px; padding: 0; border-radius: var(--radius-control); font-size: 0; }
-.sf .cx .kd .more::before { content: ""; width: 16px; height: 16px; background-color: currentColor; -webkit-mask: var(--ic-chevron-right) center / contain no-repeat; mask: var(--ic-chevron-right) center / contain no-repeat; }
+.sf .cx .kd .more { right: var(--space-8); bottom: var(--space-8); display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; padding: 0; border-radius: var(--radius-control); font-size: 0; line-height: 0; }   /* 글 "자세히 보기" 는 읽기용으로 남기되 크기 0 — grid 면 글이 둘째 칸이 돼 아이콘이 위로 밀린다 */
+.sf .cx .kd .more::before { content: ""; flex: none; width: 16px; height: 16px; background-color: currentColor; -webkit-mask: var(--ic-chevron-right) center / contain no-repeat; mask: var(--ic-chevron-right) center / contain no-repeat; }
 .sf .cx .kd .nm { font-size: var(--font-size-14); line-height: var(--font-line-height-20); font-weight: 800; }
 .sf .cx .kd .md { order: -1; flex: none; height: auto; aspect-ratio: 16 / 9; }   /* 사진 칸 16:9 고정(10/30) — 카메라 영상 비율, 카드 맨 위 */
 .sf .cx .kd .mt { display: block; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
