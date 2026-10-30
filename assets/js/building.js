@@ -70,7 +70,7 @@
    *   uv    층 바닥 위 자리(0~1). building.js 가 열린 바닥으로 옮겨 앉힌다.
    */
   var ROBOTS = [
-    { n: 1,  floor: "B4", st: "run",  mission: "정기 순회 점검",     now: "N₂ 배관 압력 점검",     done: 7,  total: 20, bat: 78, sig: 4, uv: [0.42, 0.40] },
+    { n: 1,  floor: "B4", st: "run",  mission: "정기 순회 점검",     now: "N₂ 배관 압력 점검",     done: 3,  total: 20, bat: 78, sig: 4, uv: [0.42, 0.40] },
     { n: 2,  floor: "B4", st: "idle", mission: null,                          now: "복귀 중",               bat: 18, chg: false, sig: 2, uv: [0.70, 0.66], moving: true },   // 10/20 — 미션 하나에 로봇 한 대, 배정 없음
     { n: 3,  floor: "B4", st: "idle", mission: null,                          now: "대기 중",               bat: 35, chg: true, sig: 3, uv: [0.90, 0.92], dock: true },
     { n: 4,  floor: "B4", st: "done", mission: "야간 순회 점검",     now: "순회 완료",             done: 20, total: 20, bat: 92, sig: 4, uv: [0.76, 0.92], dock: true },
@@ -82,7 +82,9 @@
     { n: 10, floor: "B3", st: "off",  mission: null,                          now: "통신 끊김",             bat: 29, sig: 0, uv: [0.30, 0.62] },
     { n: 11, floor: "B3", st: "run",  mission: "전기실 열화상 점검", now: "배전반실 열화상 점검",  done: 3,  total: 20, bat: 71, sig: 4, uv: [0.66, 0.58] },
     { n: 12, floor: "B3", st: "idle", mission: null,                          now: "충전 중",               bat: 55, chg: true, sig: 3, uv: [0.10, 0.80], dock: true }
-  ];
+  ];  // v5(10/30) — Robot 01 진행을 미션 관제 · 안전진단(7/20)과 맞춘다. 멈춘 판(v3 · v4)은 그대로 3/20.
+  if (body.classList.contains("ver-5")) { ROBOTS[0].done = 7; }
+
   // v4(10/28) — Robot 11 은 미션 관제의 웨이포인트 20칸 더미와 같게 7칸 마치고 8번 진행 중
   if (V3) { ROBOTS.forEach(function (r) { if (r.n === 11) { r.now = "케미컬 공급 캐비닛 CDS-02 판독"; r.done = 7; } }); }
   var BADGE = {
