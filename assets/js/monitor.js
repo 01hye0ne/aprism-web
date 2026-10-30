@@ -940,7 +940,28 @@
      * "격자 모자이크 · 감지 라벨" 을 팝오버 폭(370)에서 칸 12(10/19 디자이너 — 팝오버에선 18 보다 잘게) · 틈 2 · 모서리 16% 로 뽑은 그림이다.
      */
     var useDeid = body.classList.contains("v2-2");
+    /*
+     * [10/30] 알림마다 제 검출 장면 — 감지 · 설비 · 값에 맞춘 프로토타입 그림(assets/img/alert/, 960x672).
+     * 상자 · 라벨 · 열화상 최고점 · 음향 얼룩 · PRPD 표가 그림에 들어 있다. 주의는 노랑, 위험은 빨강.
+     * 안전감지는 안전진단 사진(사람 격자 모자이크)을 그대로 쓴다. 표에 없는 알림은 예전 그림(alert-live-*).
+     */
+    var SHOT = {
+      "누출감지 · 냉각수 배관 밸브": "alert/wp03-leak.webp",
+      "부분방전 · 이상 점수 9.41": "alert/wp06-pd-941.webp",
+      "진동 상승 · 냉각 펌프 P-2": "alert/wp12-vib.webp",
+      "과열 · 발전기 베어링 68.4℃": "alert/wp02-temp-684.webp",
+      "압력 편차 · 공기 압축기 C-1": "alert/wp13-gauge-comp.webp",
+      "지하발전소 B3 터빈 2 NG 1건 발견": "alert/wp04-gauge-spiral.webp",
+      "지하발전소 터빈 2 NG 1건 발견": "alert/wp04-gauge-spiral.webp",   // v2.2 부터 쓰는 제목(CRITICAL.title)
+      "이상음향 · 냉각 펌프 P-2": "alert/wp05-sound.webp",
+      "온도감지 · 냉각 펌프 P-2 48.6℃": "alert/wp05-temp-486.webp",
+      "부분방전 · CH1 이상 점수 9.05": "alert/wp06-pd-905.webp",
+      "안전감지 · 안전벨트 미착용 1명": "safety/safety_crit.jpg",
+      "차압 NG · HEPA Filter 차압계": "alert/wp02-gauge-hepa.webp",
+      "압력 편차 · N₂ 배관 압력계": "alert/wp04-gauge-n2.webp"
+    };
     function liveSrc(a) {
+      if (SHOT[a.title]) { return "../assets/img/" + SHOT[a.title]; }
       if (useDeid && a.live === "ppe") { return "../assets/img/alert-live-deid-grid.webp?v=12"; }   // 그림을 바꾸면 v 를 올린다(캐시)
       return "../assets/img/alert-live-" + a.live + ".webp";
     }
