@@ -542,13 +542,23 @@
 .scope-trigger:hover, .scope-trigger[aria-expanded="true"] { background-color: var(--bg-raised); }
 .scope-trigger:focus-visible { outline: var(--border-width-strong) solid var(--border-focus); outline-offset: 1px; }
 .scope-menu { left: 0; min-width: 100%; white-space: nowrap; }
-.sf-scope { min-width: 280px; }
-.sf-scope .sf-mi { display: grid; grid-template-columns: 14px 1fr; align-items: center; gap: 0 var(--space-8); height: auto; padding: var(--space-8) var(--space-12) var(--space-8) var(--space-8); }
-.sf-scope .sf-mi:first-child { grid-template-columns: 1fr; margin-bottom: var(--space-4); border-radius: var(--radius-chart) var(--radius-chart) 0 0; box-shadow: 0 1px 0 var(--border-divider); }
-.sf-scope .sf-mi:first-child .wd { display: none; }
-.sf-scope .sf-mi .t-caption { grid-column: 2; color: var(--text-tertiary); }
-.sf-scope .sf-mi:first-child .t-caption { grid-column: 1; }
-.sf-scope .sf-mi[aria-checked="true"] { background-color: var(--bg-selected); }
+/* [10/30] 미션 메뉴 — 관제 미션 메뉴(monitor.css "미션 메뉴 — 표처럼")와 같은 표. 안전진단은 monitor.css 를 읽지 않아 같은 값을 옮겨 둔다 */
+.sf-scope { --scope-cols: 32px minmax(160px, 1fr) 64px 72px; left: 0; min-width: 100%; white-space: nowrap; }
+.sf-scope .scope-head, .sf-scope .scope-item { display: grid; grid-template-columns: var(--scope-cols); column-gap: var(--space-8); align-items: center; }
+.sf-scope .scope-head { padding: var(--space-4) var(--space-12) var(--space-8) var(--space-8); border-bottom: var(--border-width-thin) solid var(--border-divider); color: var(--text-tertiary); }
+.sf-scope .scope-head > span:first-child { text-align: center; }
+.sf-scope .scope-item { padding-left: var(--space-8); }
+.sf-scope .scope-item + .scope-item { box-shadow: inset 0 1px 0 var(--border-default); }
+.sf-scope .scope-item[aria-checked="true"] { background-color: var(--bg-selected); }
+.sf-scope .scope-run { justify-self: center; width: 8px; height: 8px; border-radius: var(--radius-full); }
+.sf-scope .scope-run[data-run="run"] { background-color: var(--status-info-icon); }
+.sf-scope .scope-name { display: flex; align-items: center; gap: var(--space-4); min-width: 0; }
+.sf-scope .scope-sev { flex: none; color: var(--status-warning-icon); }
+.sf-scope .scope-sev[data-sev="critical"] { color: var(--status-critical-icon); }
+.sf-scope .scope-item.is-done .scope-name > .t-label-2 { color: var(--text-secondary); }
+.sf-scope .scope-floors { display: inline-flex; gap: var(--space-4); }
+.sf-scope .floor-tag { flex: none; padding: 0 var(--space-4); border-radius: var(--radius-4); background-color: var(--bg-cell); color: var(--text-secondary); font-family: var(--font-family-mono); font-size: var(--font-size-12); line-height: var(--font-line-height-18); }
+.sf-scope .scope-robots { color: var(--text-secondary); font-family: var(--font-family-mono); font-size: var(--font-size-12); line-height: var(--font-line-height-18); white-space: nowrap; }
 button.sb-overview { border: 0; font-family: inherit; cursor: pointer; }
 button.sb-overview:not(.is-on):hover { background-color: var(--bg-cell); color: var(--text-primary); }
 

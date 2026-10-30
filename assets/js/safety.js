@@ -351,8 +351,15 @@
   }
   function crumb(){
     const isAll = scope==='all';
-    const items = [['all','통합 순회 현황','전체 미션 ' + M.length + '개']].concat(M.map((m, i) => [i, m.mis, flN(m) + ', ' + m.robot])).map(([id, a, b]) => { const w = id==='all' ? '' : worst(id), on = String(scope)===String(id);
-      return `<button type="button" class="menu-item sf-mi" role="menuitemradio" aria-checked="${on}" data-sc="${id}"><i class="wd ${w}"></i><span class="t-label-2">${a}${id===1 && !newSeen ? ' <em class="nwm">새 위험</em>' : ''}</span><span class="t-caption">${b}</span></button>`; }).join('');
+    // [10/30] 미션 메뉴는 관제(mission-scope.js buildMenu)와 같은 표 — 머리(수행 · 미션 · 층 · 로봇) + 줄마다 수행 점 · 이름 뒤 알림 기호 · 층 꼬리표 · 로봇 번호.
+    //   미션 전체는 왼쪽 "통합 순회 현황" 단추가 맡아 메뉴 줄에서 뺐다(관제 메뉴에도 없다)
+    const SEV = {crit:['critical','error','위험'], warn:['warning','warning','주의']};
+    const head = '<div class="scope-head t-caption" aria-hidden="true"><span>수행</span><span>미션</span><span>층</span><span>로봇</span></div>';
+    // 줄 차례도 관제와 같게 — 로봇 번호 순
+    const ord = M.map((m, i) => i).sort((x, y) => parseInt(M[x].robot.replace(/\D+/g, '')) - parseInt(M[y].robot.replace(/\D+/g, '')));
+    const items = head + ord.map(i => [M[i], i]).map(([m, i]) => { const w = worst(i), on = String(scope)===String(i), sv = SEV[w], run = m.done < m.total ? 'run' : 'done';
+      const fls = (m.fls ? m.fls.map(f => f[0]) : [m.ab]).map(f => `<span class="floor-tag num">${f}</span>`).join('');
+      return `<button type="button" class="menu-item scope-item is-${run}" role="menuitemradio" aria-checked="${on}" data-sc="${i}"><span class="scope-run" data-run="${run}" title="${run==='run' ? '수행중' : '완료'}"></span><span class="scope-name"><span class="t-label-2">${m.mis}</span>${sv ? `<span class="i i-16 scope-sev" data-sev="${sv[0]}" style="--i:var(--ic-${sv[1]})" title="${sv[2]} 알림 있음"></span>` : ''}${i===1 && !newSeen ? '<em class="nwm">새 위험</em>' : ''}</span><span class="scope-floors">${fls}</span><span class="scope-robots num">${m.robot.replace(/\D+/g, '')}</span></button>`; }).join('');
     return `<button type="button" class="sb-overview t-title-2 ${isAll ? 'is-on' : ''}" data-sc="all">통합 순회 현황</button><span class="status-bar-sep t-title-2" aria-hidden="true">›</span>
       <div class="scope-menu-box"><button type="button" class="scope-trigger" data-menu="1" aria-haspopup="true" aria-expanded="${menu}"><span class="t-title-2">${isAll ? '미션 고르기' : M[scope].mis}</span><span class="i i-16" style="--i:var(--ic-chevron-down)" aria-hidden="true"></span></button><div class="dropdown-menu scope-menu sf-scope" role="menu" aria-label="미션"${menu ? '' : ' hidden'}>${items}</div></div>${dt ? `<span class="status-bar-sep t-title-2" aria-hidden="true">›</span><span class="t-title-2 sf-crumb-k">${dt.k}</span>` : ''}`;
   }
