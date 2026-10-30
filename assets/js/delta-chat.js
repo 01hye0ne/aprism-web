@@ -156,6 +156,7 @@
    *   쓰는 동안 Delta 표식의 네모 셋이 1 → 2 → 3 차례로 켜진다(한 바퀴 1.2초). 첫 줄은 글자가 차례로, 알림 줄과 단추는 한 덩어리씩.
    */
   var V5 = body.classList.contains("ver-5");
+  var lastAsk = null;   // 앞 질문(왜 · 어떻게) — 같은 질문을 다시 받으면 빠진 쪽을 답한다
   var LIVE = [];   // 처리 순서 답(라이팅 시스템 10) — 조치 완료에 따라 줄을 바꾼다
   var CALM = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   function alerts() { return window.APRISM_DELTA_ALERTS || { all: [], mine: [], mission: null, missionOf: function () { return null; } }; }
@@ -178,8 +179,10 @@
     return a ? a.floor : "";
   }
   // 질문에 이름이 나온 알림, 없으면 이 미션의 가장 급한 알림
+  // 설비 이름 맞추기 — "n2 압력계"도 "N₂ 압력계"로 알아듣게 아래첨자 · 대소문자 · 띄어쓰기를 걷고 비교한다
+  function norm(s) { return (s || "").toLowerCase().replace(/₂/g, "2").replace(/\s+/g, ""); }
   function target(q, list) {
-    var hit = list.filter(function (a) { return a.eq && q.indexOf(a.eq) >= 0; })[0];
+    var hit = list.filter(function (a) { return a.eq && norm(q).indexOf(norm(a.eq)) >= 0; })[0];
     if (hit) { return hit; }
     var A = alerts();
     return A.mine.filter(function (a) { return a.sev === "critical"; })[0] || A.mine[0] || list[0] || null;
@@ -202,14 +205,47 @@
         btns: [{ label: "보고서 화면으로", primary: true, act: function () { location.href = "./report-v5.html"; } }] };
     }
     if (!top) { return { lead: "지금은 확인할 알림이 없어요.", btns: [] }; }
-    // 이유
-    if (/왜|이유|원인|근거/.test(q)) {
-      var why = [];
-      if (top.trend) { why.push(top.trend); }
-      why.push(hhmm(top.time) + " " + robotName(top) + " 측정");
-      if (top.fp !== undefined) { why.push("오탐 가능성 " + top.fpLabel + " " + top.fp + "%"); }
-      return { lead: top.val ? (top.mname || "측정값") + " " + euro(top.val) + " 기준 " + eul(top.std) + " 넘었어요." : label(top) + (batchim(label(top)) ? "이" : "가") + " 감지됐어요.",
-        why: why.slice(0, 3), btns: [aiBtn, { label: "재측정 후 판단", act: openA(top) }] };
+    /*
+     * 왜 · 어떻게(10/30 디자이너, 라이팅 시스템 11) — 같은 값을 되풀이하지 않고 묻는 쪽을 답한다.
+     *   왜: 실제 이상인지 판독 오류인지 → 근거(측정 추세 · 오탐 가능성) → 원인 후보(현장 확인 전 추정).
+     *   어떻게: 먼저 볼 한 곳 → 현장 점검 순서. 둘 다 물으면 둘 다. 같은 알림에 "왜"를 다시 물으면 "어떻게"를 답한다.
+     *   원인 후보 · 점검 순서는 알림 데이터(cause · fix · fixFirst, monitor.js)에 정해 둔 것만 쓴다 — 지어내지 않는다.
+     *   버튼에서 "재측정 후 판단"(판단이지 할 일이 아님) · "작업 중지 요청"(무전으로 사람이 하는 일)은 뺀다.
+     */
+    var isWhy = /왜|이유|원인|근거/.test(q), isHow = /어떻게|해결|방법|고치/.test(q);
+    if (isWhy && !isHow && lastAsk && lastAsk.a === top && lastAsk.kind === "why") { isWhy = false; isHow = true; }
+    if (isWhy || isHow) {
+      lastAsk = { a: top, kind: isWhy && isHow ? "both" : isWhy ? "why" : "how" };
+      var rr = [];
+      var evid = [];
+      if (top.hist) { evid.push(top.hist.length + "회 측정 " + top.hist.join(" → ") + ", 계속 오름"); } else if (top.trend) { evid.push(top.trend); }
+      if (top.fp !== undefined) { evid.push("오탐 가능성 " + top.fpLabel + " " + top.fp + "%"); }
+      var real = top.fp !== undefined && top.fp < 20;
+      var trendBtn = { label: "추세 보기", act: function () { ask(top.eq + " 추세"); } };
+      var fieldBtn = { label: top.btn || "현장 점검 요청", primary: true, act: openA(top) };
+      if (isWhy && isHow) {
+        if (top.cause) { rr.push({ grp: "가능한 원인(현장 확인 전 추정)" }, { ul: top.cause }); }
+        if (top.fix) { rr.push({ grp: "현장 점검 순서" }, { ol: top.fix }); }
+        return { lead: top.cause ? "가장 그럴듯한 원인은 " + top.cause[0] + (batchim(top.cause[0]) ? "이에요." : "예요.") : "원인 후보는 아직 정리되지 않았어요.",
+          rows: rr, btns: [fieldBtn, trendBtn] };
+      }
+      if (isWhy) {
+        if (evid.length) { rr.push({ ul: evid }); }
+        if (top.cause) { rr.push({ grp: "가능한 원인(현장 확인 전 추정)" }, { ul: top.cause }); } else { rr.push({ tail: "원인 후보는 아직 정리되지 않았어요." }); }
+        return { lead: real ? "판독 오류보다 실제 이상 쪽으로 보여요." : "판독 오류일 수도 있어요. 근거를 같이 보세요.",
+          rows: rr, btns: [trendBtn, { label: "같은 설비 이력", act: function () { ask(top.eq + " 이력"); } }] };
+      }
+      if (top.fix) { rr.push({ grp: "현장 점검 순서" }, { ol: top.fix }); } else { rr.push({ tail: "점검 순서는 아직 정리되지 않았어요. 알림을 열어 조치를 고르세요." }); }
+      return { lead: top.fixFirst || (label(top) + " 현장 점검이 먼저예요."), rows: rr, btns: [fieldBtn, mapBtn] };
+    }
+    // 추세 · 이력 — "왜" 답의 버튼이 묻는다. 있는 기록만 말한다.
+    if (/추세/.test(q)) {
+      return { lead: top.hist ? (top.mname || "측정값") + " 최근 " + top.hist.length + "회예요." : "이 알림은 측정 추세 기록이 없어요.",
+        rows: top.hist ? [{ ul: top.hist.map(function (v, i) { return (i + 1) + "회 " + v + (i === top.hist.length - 1 ? " (기준 " + top.std + ")" : ""); }) }] : [],
+        btns: [aiBtn, mapBtn] };
+    }
+    if (/이력/.test(q)) {
+      return { lead: "오늘 " + (top.eq || "이 설비") + "의 다른 조치 기록은 없어요.", btns: [aiBtn, mapBtn] };
     }
     // 위치
     if (/어디|위치/.test(q)) {
@@ -219,7 +255,7 @@
     }
     // 처리 순서(10/30 디자이너) — 위험 · 주의가 몇 건, 어디서, 어떤 순서로. 순서는 monitor.js handleOrder 와 같다.
     //   이 미션 위험 → 다른 미션 위험(미션마다) → 주의(위험을 다 본 뒤 묶어서). 보는 미션 위험이 남았으면 다른 미션으로 보내지 않는다.
-    if (/순서|가이드|뭐부터|무엇부터|할 일|할일|어떻게|조치/.test(q)) {
+    if (/순서|가이드|뭐부터|무엇부터|할 일|할일/.test(q)) {
       var ord = A.order || all;
       var crits = ord.filter(function (a) { return a.sev === "critical"; });
       var warns = ord.filter(function (a) { return a.sev !== "critical"; });
@@ -296,6 +332,12 @@
         return;
       }
       if (x.tail) { blocks.push(el("p", "dc-tail", x.tail)); return; }
+      if (x.ul || x.ol) {
+        var li = el(x.ul ? "ul" : "ol", x.ul ? "dc-why" : "dc-todo");
+        (x.ul || x.ol).forEach(function (t) { li.appendChild(el("li", null, t)); });
+        blocks.push(li);
+        return;
+      }
       if (x.more || x.go) {
         var mb = el("button", "dc-more", x.more || x.go);
         mb.type = "button";
