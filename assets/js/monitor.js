@@ -145,6 +145,30 @@
       acts: [{ t: "누설 점검 요청", ai: true }, { t: "다음 순회 재측정" }, { t: "추이 관찰" }] }
   ] : [];
 
+  // v5(10/30 "Delta 라이팅 시스템") — Delta 가 쓰는 낱말. 장소는 WP 번호 대신 설비 짧은 이름(eq · 8자 이내),
+  //   현상(phen)은 무엇이 어떻게 됐는지(NG · 이상 대신 기준 초과 · 누출 · 과열 · 압력 낮음). 위험은 값 · 기준(val · std, 측정 이름 mname),
+  //   다음 행동(next · "~부터 하세요"), 추천 조치 단추(btn), 추세(trend)까지 — 접힘 근거 줄 · 펼침 답이 여기서 읽는다.
+  if (V5) {
+    [
+      [CRITICAL, "N₂ 압력계", "기준 초과", { mname: "압력", val: "0.86", std: "0.80", next: "작업 중지부터 요청하세요.", btn: "작업 중지 요청", trend: "최근 3회 측정 계속 오름" }],
+      [WARNINGS[0], "냉각수 밸브", "누출", { btn: "구역 출입 통제" }],
+      [WARNINGS[1], "수배전반", "부분방전", { btn: "재진단 예약" }],
+      [WARNINGS[2], "냉각 펌프", "진동 상승", { btn: "베어링 점검 요청" }],
+      [WARNINGS[3], "발전기 베어링", "과열", { btn: "윤활 상태 점검 요청" }],
+      [WARNINGS[4], "공기 압축기", "압력 낮음", { btn: "필터 점검 요청" }],
+      [R01_MORE[0], "냉각 펌프", "이상음", { btn: "진동 정밀 측정 요청" }],
+      [R01_MORE[1], "냉각 펌프", "과열", { btn: "부하 감소 요청" }],
+      [R01_MORE[2], "수배전반", "부분방전", { btn: "절연 진단 요청" }],
+      [R01_MORE[3], "작업 발판", "벨트 미착용", { mname: "미착용", val: "1명", std: "0명", next: "즉시 착용부터 안내하세요.", btn: "작업자 착용 안내", trend: "연속 2프레임에서 검출" }],
+      [ROUTE_ALERTS[0], "HEPA 차압계", "기준 초과", { mname: "차압", val: "312 Pa", std: "250 Pa", next: "필터 교체부터 요청하세요.", btn: "필터 교체 요청", trend: "최근 3회 측정 계속 오름" }],
+      [ROUTE_ALERTS[1], "N₂ 압력계", "압력 낮음", { btn: "누설 점검 요청" }]
+    ].forEach(function (r) {
+      if (!r[0]) { return; }
+      r[0].eq = r[1]; r[0].phen = r[2];
+      Object.keys(r[3]).forEach(function (k) { r[0][k] = r[3][k]; });
+    });
+  }
+
   // 검토용 단계 — 주소 끝 #… 로 고른다. few 는 알림은 있지만 Delta 종합 기준에 못 미친 판이다.
   var SETS = {
     normal: function () { return []; },
@@ -265,33 +289,55 @@
     Object.keys(by).forEach(function (f) { var c = Object.keys(by[f]).length; if (c > n) { best = f; n = c; } });
     return best ? { floor: best, n: n } : null;
   }
+  /*
+   * [10/30 디자이너 "Delta 라이팅 시스템"(artifact XjCvTz2qd9YPJmBpfheUCk)] 접힘 위젯 세 줄.
+   *   1줄 상황(굵게) · 2줄 다음 행동 · 근거 줄 범위나 원인. Delta 가 빨강 · 노랑이면 셋 중 하나는 그 색의 이유를 말한다.
+   *   위에서부터 묻고 처음 "예"인 문형을 쓴다 — 교대 직후 → 비상정지 → 다른 미션 알림 → 이 미션 위험 → 주의 누적 → 확인 전 알림 → 평상시.
+   *   보는 미션의 알림은 왼쪽 목록이 이미 보여 주므로, 화면에 안 보이는 다른 미션의 알림을 먼저 말한다.
+   *   장소는 WP 번호를 쓰지 않는다 — 다른 미션은 "{층} {미션 이름} 미션", 이 미션은 설비 짧은 이름(eq).
+   *   2줄 질문("~해 드릴까요?")은 Delta 가 화면 안에서 할 수 있는 일만 — 올리면 근거 줄이 답 단추(yes)가 되고 누르면 그 일(act)을 한다.
+   *   문체는 ~요 하나, 가운뎃점 없음. 두 줄은 줄바꿈(\n)으로 잇고 v3-panel.js 가 줄마다 감싼다.
+   */
+  function yeyo(w) { var c = w.charCodeAt(w.length - 1); return c >= 0xac00 && c <= 0xd7a3 && (c - 0xac00) % 28 ? "이에요" : "예요"; }
+  function operatorName() {
+    var slot = document.querySelector(".account-chip .t-label-2");
+    return slot ? slot.textContent.trim() : "관제사";
+  }
   COPY.brief = function (j) {
-    var copy = COPY.keyword(j), two;
-    // 1줄은 지금 보는 미션의 알림에서 고른다 — 왼쪽 목록과 같은 알림이어야 한다. 순서는 items() 그대로(위험 먼저, 그다음 오래된 순)
-    var mine = j.mine || j.all || [];
+    var copy = COPY.keyword(j);
+    var all = j.all || [], mine = j.mine || all;
+    var others = all.filter(function (a) { return mine.indexOf(a) < 0 && missionOf(a); });
     var myCrit = mine.filter(function (a) { return a.sev === "critical"; })[0];
-    var otherCrit = (j.all || []).filter(function (a) { return a.sev === "critical" && mine.indexOf(a) < 0; })[0];
-    if (!j.total) {
-      two = ["Robot 01 이상 없어요.", "궁금한 건 물어보세요."];
-    } else if (j.level === "normal") {
-      two = ["확인할 알림이 " + j.total + "건이에요.", "목록에서 하나씩 보세요."];
+    var es = all.filter(function (a) { return a.estop; })[0];
+    var say;
+    if (j.handover !== null && j.handover !== undefined && j.total) {
+      say = { l: ["어서오세요 " + j.handover + "님", (j.crit ? "위험 " + j.crit : "알림 " + j.total) + "건부터 보여 드릴까요?"],
+        clue: "인계 알림 " + j.total + "건", yes: "네, 보여 주세요", act: "shift" };
+    } else if (es) {
+      say = { l: es.brief, clue: "구동 차단됨" };
+    } else if (others.length) {
+      var o = others[0], om = missionOf(o);   // items() 순서 — 위험 먼저, 그다음 오래된 순
+      say = { l: ["다른 미션에도 알림이 있어요!", "그 미션으로 이동해 드릴까요?"],
+        clue: (o.floor ? o.floor + " " : "") + om + " 미션", scope: o.sev, yes: "네, 이동해 주세요", act: { go: om } };
+    } else if (myCrit) {
+      say = { l: [myCrit.eq ? myCrit.eq + " " + myCrit.phen + yeyo(myCrit.phen) + "." : myCrit.title, myCrit.next || "위험 알림부터 보세요."],
+        clue: myCrit.val ? "측정 " + myCrit.val + ", 기준 " + myCrit.std : "" };
     } else if (j.level === "warning") {
-      var f = topWarnFloor(j.all);
-      two = f && f.n > 1 ? [f.floor + " 설비 " + f.n + "곳에서 겹쳐요.", "추세를 묶어서 보세요."]
-                         : ["주의 알림이 " + j.total + "건이에요.", "추세를 묶어서 보세요."];
+      var f = topWarnFloor(all);
+      say = { l: [f && f.n > 1 ? f.floor + " 설비 " + f.n + "곳에서 겹쳐요." : "주의 알림이 " + j.warn + "건이에요.", "묶어서 보여 드릴까요?"],
+        clue: "주의 " + j.warn + "건 묶어 보는 중", yes: "네, 묶어서 보여 주세요", act: "warn" };
+    } else if (j.total) {
+      say = { l: ["확인할 알림이 " + j.total + "건이에요.", "첫 알림부터 열어 드릴까요?"],
+        clue: "순회 경로 지켜보는 중", yes: "네, 열어 주세요", act: "first" };
     } else {
-      if (myCrit) {
-        two = myCrit.brief || ["위험 알림이 " + j.crit + "건이에요.", "위험 알림부터 보세요."];
-      } else {
-        // 이 미션의 위험은 다 조치했는데 다른 미션에 남았다(10/29 디자이너) — 테두리 · Delta 색은 전체를 따라 빨강이 남으므로 왜 빨간지 말한다
-        var om = otherCrit && missionOf(otherCrit);
-        var others = (j.all || []).filter(function (a) { return a.sev === "critical" && mine.indexOf(a) < 0; });
-        var oms = others.map(missionOf).filter(function (m, i, l) { return m && l.indexOf(m) === i; });
-        two = ["다른 미션에 위험 " + others.length + "건 있어요.",
-          oms.length > 1 ? "미션 " + oms.length + "곳에서 났어요." : om ? om + (josa(om) === "이" ? "이에요." : "예요.") : "위험 알림부터 보세요."];
-      }
+      var card = $(".robot-strip .robot-card[aria-pressed='true']");
+      var rn = card && card.querySelector(".robot-id") ? card.querySelector(".robot-id").textContent.trim() : "Robot 01";
+      var done = !!(card && card.querySelector(".badge-normal"));
+      say = { l: [operatorName() + "님!", rn + josa(rn) + (done ? " 미션을 완료했어요!" : " 순회 중이에요.")],
+        clue: done ? "미션 완료" : "순회 경로 지켜보는 중" };
     }
-    copy.line2 = two.join("\n");
+    copy.line2 = say.l.join("\n");
+    copy.say = say;
     return copy;
   };
 
@@ -372,6 +418,28 @@
     if (/^주의/.test(label)) { setFilter("warning"); askDelta(label); return; }
     askDelta(label);
   }
+  // 접힘 위젯 답 단추(라이팅 시스템 "네, ~해 주세요") — 2줄 질문의 일을 한다. v3-panel.js 가 부른다.
+  window.APRISM_DELTA_DO = function () {
+    var s = window.APRISM_DELTA_SAY;
+    if (!s || !s.act) { return false; }
+    if (s.act.go) {
+      if (window.APRISM_SCOPE_TO) { window.APRISM_SCOPE_TO(s.act.go); }
+    } else if (s.act === "warn") {
+      setFilter("warning");
+    } else if (s.act === "shift") {
+      setFilter(items().some(function (a) { return a.sev === "critical"; }) ? "critical" : "all");
+    } else if (s.act === "first") {
+      var first = items().filter(function (a) { return !scoped || missionOf(a) === mission; })[0];
+      if (first && picked !== first) { note.open(first); }
+    }
+    return true;
+  };
+  // 펼침 대화(delta-chat.js)가 알림 줄을 누르면 그 알림 쪽지를 연다
+  window.APRISM_OPEN_ALERT = function (a) {
+    foldDelta();
+    setFilter("all");
+    if (picked !== a) { note.open(a); }
+  };
   if (aiActions) {
     aiActions.addEventListener("click", function (event) {
       var b = event.target.closest && event.target.closest("button");
@@ -510,13 +578,17 @@
   function tellAi(j, top) {
     // Delta 대화(delta-chat.js)가 답에 쓰는 건수 — 조치 버튼과 같은 판단(전체 미션)이다.
     window.APRISM_DELTA_COUNT = { crit: j.crit, warn: j.warn, total: j.total };
-    var copy = handover === null ? deltaCopy(j) : {
+    var brief = body.getAttribute("data-delta-copy") === "brief";
+    if (brief) { j.handover = handover; }
+    var copy = brief ? COPY.brief(j) : handover === null ? deltaCopy(j) : {
       tag: "관제사 교대 · 인계",
       line1: "안녕하세요. " + handover + " 님",
       line2: body.getAttribute("data-delta-copy") === "brief"
         ? "인계 알림이 " + j.total + "건이에요.\n" + (j.crit ? "위험 " + j.crit + "건부터 보세요." : "목록에서 하나씩 보세요.")
         : "인계된 알림 " + j.total + "건과 진행 예정인 미션 1건이 있어요. 먼저 살펴볼까요?"
     };
+    // 근거 줄 · 답 단추(v3-panel.js)가 읽는다 — 라이팅 시스템 문형(brief)일 때만 있다.
+    window.APRISM_DELTA_SAY = copy.say || null;
     // 테두리와 Delta 가 같은 색을 입는다 — 목록 최고 단계와 종합 판단 중 높은 쪽.
     var tone = TONE[j.level] > TONE[top] ? j.level : top;
     document.dispatchEvent(new CustomEvent("aprism:severity", {
@@ -593,7 +665,9 @@
     window.APRISM_DELTA_DETECTS = all.slice().sort(function (a, b) { return (a.sev === "critical" ? 0 : 1) - (b.sev === "critical" ? 0 : 1); })
       .map(function (a) { return a.detect || a.title || ""; });
     var jd = judge(all);
-    jd.mine = mine;   // Delta 두 줄(brief)이 지금 미션의 알림부터 말하도록
+    jd.mine = mine;
+    // 펼침 대화가 답에 쓰는 알림(라이팅 시스템 8 — 이 미션 먼저, 다른 미션은 미션 이름을 붙여)
+    window.APRISM_DELTA_ALERTS = { all: all, mine: mine, mission: mission, missionOf: missionOf };   // Delta 두 줄(brief)이 지금 미션의 알림부터 말하도록
     tellAi(jd, top);
     markWaypoints();
   }
@@ -700,7 +774,7 @@
       robot: activeRobot(), wp: currentWp(),
       sum: "모터 전원이 차단되었습니다. 현장 안전을 확인한 뒤 해제 절차를 진행하세요.",
       acts: ["현장 무전 연락 · 안전 확인", "해제 절차 진행", "로봇 회수 요청"],
-      brief: [name + josa(name) + " 멈췄어요.", "현장 안전부터 확인하세요."] };
+      brief: [name + josa(name) + " 멈췄어요.", "현장 안전부터 확인하세요."], estop: true };
     extra.unshift(a);
     render();
   });

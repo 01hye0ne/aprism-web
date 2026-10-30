@@ -280,4 +280,63 @@ body.ver-5.v2-2.v3[data-delta-copy="brief"]:not(.d3-bar) .delta3:not(.is-open) .
   background-image: none;
   color: var(--text-primary);
 }
-body.ver-5.v2-2.v3[data-delta-copy="brief"]:not(.d3-bar) .delta3:not(.is-open) .delta3-body > .ai-line-2::first-line { font-weight: var(--font-weight-bold); }
+/* [10/30 "Delta 라이팅 시스템" 7] 넘치면 넘친 낱말만 다음 줄로 — 자르지 않는다(본문 최대 3줄은 문형 길이로 막는다). 1줄 굵게 */
+body.ver-5.v2-2.v3[data-delta-copy="brief"]:not(.d3-bar) .delta3:not(.is-open) .delta3-body > .ai-line-2 { white-space: normal; text-overflow: clip; }
+body.ver-5[data-delta-copy="brief"] .delta3 .ai-line-2 .dl { display: block; word-break: keep-all; overflow-wrap: anywhere; }
+body.ver-5[data-delta-copy="brief"] .delta3 .ai-line-2 .dl1 { font-weight: var(--font-weight-bold); }
+body.ver-5[data-delta-copy="brief"] .delta3.is-open .ai-line-2 .dl { display: inline; }
+body.ver-5[data-delta-copy="brief"] .delta3.is-open .ai-line-2 .dl1::after { content: " "; }
+
+/* 근거 줄 — 문형의 범위나 원인(v3-panel.js .is-said). 하는 일 흉내가 아니라 반짝이지 않는다.
+   다른 미션 알림(.is-scope)은 그 단계 색 글, 아이콘 없이, 두 줄까지(넘으면 …) */
+body.ver-5.v2-2.v3 .delta3-clue.is-said .delta3-clue-txt { animation: none; background-image: none; color: var(--text-secondary); }
+body.ver-5.v2-2.v3 .delta3-clue.is-scope { height: auto; min-height: 40px; }
+body.ver-5.v2-2.v3 .delta3-clue.is-scope .delta3-clue-ics { display: none; }
+body.ver-5.v2-2.v3 .delta3-clue.is-scope .delta3-clue-txt {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  white-space: normal;
+  word-break: keep-all;
+  font-weight: var(--font-weight-bold);
+}
+body.ver-5.v2-2.v3 .delta3-clue.is-scope[data-scope="critical"] .delta3-clue-txt { color: var(--status-critical-text); }
+body.ver-5.v2-2.v3 .delta3-clue.is-scope[data-scope="warning"] .delta3-clue-txt { color: var(--status-warning-text); }
+
+/* ==================================================================
+ * Delta 펼침 대화 답(10/30 디자이너 "Delta 라이팅 시스템" 8 · 9) — delta-chat.js aiMsgV5
+ *   첫 줄 굵게(질문에 바로 답) · 알림 줄 / 근거 글머리 · 단추 최대 2(채운 단추 하나)
+ *   쓰는 중 — Delta 표식 네모 셋이 1 → 2 → 3 차례로(한 바퀴 1.2초). 움직임 줄이기면 깜빡임 없이 옅게.
+ * ================================================================== */
+body.ver-5 .dc-v5 { display: flex; flex-direction: column; gap: var(--space-8); }
+body.ver-5 .dc-v5 .dc-lead { font-weight: var(--font-weight-bold); min-height: var(--font-line-height-22); }
+body.ver-5 .dc-v5 .dc-grp { margin-top: var(--space-4); color: var(--text-tertiary); font-size: var(--font-size-12); line-height: var(--font-line-height-18); }
+body.ver-5 .dc-v5 .dc-more, body.ver-5 .dc-v5 .dc-tail { color: var(--text-secondary); font-size: var(--font-size-13); line-height: var(--font-line-height-20); }
+body.ver-5 .dc-v5 .dc-arow {
+  display: flex; align-items: center; gap: var(--space-8); width: 100%;
+  margin-top: calc(var(--space-4) * -1);
+  padding: var(--space-8); border: 0; border-radius: var(--radius-control); font-weight: 400; cursor: pointer;
+  background-color: rgb(255 255 255 / 6%); color: var(--text-primary); text-align: left;
+  font-size: var(--font-size-13); line-height: var(--font-line-height-20);
+}
+body.ver-5 .dc-v5 .dc-arow:hover { background-color: rgb(255 255 255 / 12%); }
+:root[data-theme="light"] body.ver-5 .dc-v5 .dc-arow { background-color: rgb(0 0 0 / 4%); }
+:root[data-theme="light"] body.ver-5 .dc-v5 .dc-arow:hover { background-color: rgb(0 0 0 / 8%); }
+body.ver-5 .dc-v5 .dc-arow i { flex: none; width: 6px; height: 6px; border-radius: 50%; background-color: var(--status-warning-icon); }
+body.ver-5 .dc-v5 .dc-arow.is-critical i { background-color: var(--status-critical-icon); }
+body.ver-5 .dc-v5 .dc-arow span { font-weight: 400; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+body.ver-5 .dc-v5 .dc-arow small { flex: none; color: var(--text-tertiary); font-size: var(--font-size-12); }
+body.ver-5 .dc-v5 .dc-why, body.ver-5 .dc-v5 .dc-todo { margin: 0; padding-left: var(--space-20); color: var(--text-secondary); font-size: var(--font-size-13); line-height: var(--font-line-height-20); }
+body.ver-5 .dc-v5 .dc-why li + li, body.ver-5 .dc-v5 .dc-todo li + li { margin-top: var(--space-2); }
+body.ver-5 .dc-v5 .dc-btns { display: flex; flex-wrap: wrap; gap: var(--space-4); margin-top: var(--space-4); }
+body.ver-5 .dc-dmark { display: inline-flex; padding: var(--space-4) 0; }
+body.ver-5 .dc-dmark svg { width: 16px; height: 16px; }
+body.ver-5 .dc-dmark rect { fill: var(--text-primary); opacity: 0.2; animation: dc-sq 1.2s steps(1) infinite; }
+body.ver-5 .dc-dmark .r2 { animation-delay: 0.4s; }
+body.ver-5 .dc-dmark .r3 { animation-delay: 0.8s; }
+@keyframes dc-sq { 0% { opacity: 1; } 33.3% { opacity: 0.2; } }
+@media (prefers-reduced-motion: reduce) {
+  body.ver-5 .dc-dmark rect { animation: none; opacity: 0.4; }
+}
+/* 답 단추가 선 동안 대화는 글 칸을 눌러 연다(v3-panel.js) */
+body.ver-5[data-delta-copy="brief"] .delta3:not(.is-open) .delta3-body { cursor: pointer; }

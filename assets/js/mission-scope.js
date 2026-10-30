@@ -263,4 +263,6 @@
   });
 
   apply(current, false);
+  // Delta 답 단추 "네, 이동해 주세요"(monitor.js APRISM_DELTA_DO · 10/30 라이팅 시스템)가 미션을 바꾼다 — 메뉴에서 고른 것과 같다
+  window.APRISM_SCOPE_TO = function (m) { closeMenu(); apply(m, false); };
 })();

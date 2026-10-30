@@ -55,7 +55,8 @@
       thread = el("div", "dc-thread");
       thread.setAttribute("role", "log");
       thread.setAttribute("aria-live", "polite");
-      thread.appendChild(aiMsg(first.textContent, []));
+      // 접힘 두 줄이 대화의 첫 말로 남는다(v5 는 줄마다 감싸 data-raw 에 원문이 있다)
+      thread.appendChild(aiMsg((first.getAttribute("data-raw") || first.textContent).replace(/\n/g, " "), []));
       bodyBox.insertBefore(thread, box);
       win.classList.add("is-chat");
     });
@@ -147,6 +148,157 @@
     };
   }
 
+  /*
+   * v5 — 펼침 대화의 답(10/30 디자이너 "Delta 라이팅 시스템" 8 · 9).
+   *   답은 세 칸 — 첫 줄(굵게) 질문에 바로 답하는 한 문장, 가운데 알림 줄이나 근거 글머리(3개 이내), 끝은 단추(최대 2, 채운 단추 하나).
+   *   질문으로 맺지 않는다. 문체는 ~요 하나, WP 번호 · 계측 태그 · 가운뎃점은 문장에 쓰지 않는다(알림 쪽지의 몫).
+   *   건수는 접힘 위젯 · 왼쪽 목록과 같은 기준(전체 미션). 여러 건은 이 미션 먼저, 다른 미션은 미션 이름을 붙인다.
+   *   쓰는 동안 Delta 표식의 네모 셋이 1 → 2 → 3 차례로 켜진다(한 바퀴 1.2초). 첫 줄은 글자가 차례로, 알림 줄과 단추는 한 덩어리씩.
+   */
+  var V5 = body.classList.contains("ver-5");
+  var CALM = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function alerts() { return window.APRISM_DELTA_ALERTS || { all: [], mine: [], mission: null, missionOf: function () { return null; } }; }
+  function hhmm(t) { return (t || "").slice(0, 5); }
+  function robotName(a) { var n = (a.robot || 0) + 1; return "Robot " + (n < 10 ? "0" : "") + n; }
+  function label(a) { return a.eq ? a.eq + " " + a.phen : a.title; }
+  // 받침 — 숫자 · 단위 끝까지 읽어 고른다(0.86으로 · 250 Pa를)
+  function batchim(w) {
+    var ch = w.trim().slice(-1), c = ch.charCodeAt(0);
+    if (c >= 0xac00 && c <= 0xd7a3) { var b = (c - 0xac00) % 28; return b ? (b === 8 ? "l" : "y") : ""; }
+    var D = { "0": "y", "1": "l", "3": "y", "6": "y", "7": "l", "8": "l" };
+    return D[ch] || "";
+  }
+  function euro(w) { var b = batchim(w); return w + (b && b !== "l" ? "으로" : "로"); }
+  function eul(w) { return w + (batchim(w) ? "을" : "를"); }
+  function floorOf(m, list) {
+    var f = (window.APRISM_MISSION_FLOORS || {})[m];
+    if (f && f.length) { return f[0]; }
+    var a = list.filter(function (x) { return x.floor; })[0];
+    return a ? a.floor : "";
+  }
+  // 질문에 이름이 나온 알림, 없으면 이 미션의 가장 급한 알림
+  function target(q, list) {
+    var hit = list.filter(function (a) { return a.eq && q.indexOf(a.eq) >= 0; })[0];
+    if (hit) { return hit; }
+    var A = alerts();
+    return A.mine.filter(function (a) { return a.sev === "critical"; })[0] || A.mine[0] || list[0] || null;
+  }
+  function openA(a) { return function () { if (a && window.APRISM_OPEN_ALERT) { window.APRISM_OPEN_ALERT(a); } }; }
+  function replyV5(q) {
+    var A = alerts(), n = count();
+    var all = A.all || [];
+    var top = target(q, all);
+    var mapBtn = top ? { label: "지도에서 보기", act: openA(top) } : null;
+    var aiBtn = top ? { label: top.btn || "알림 열기", primary: true, act: openA(top) } : null;
+    // 인사 · 잡담
+    if (/^(안녕|하이|hi|hello)/i.test(q)) {
+      return { lead: "안녕하세요. " + (n.crit ? "지금 위험이 " + n.crit + "건 있어요." : n.total ? "지금 알림이 " + n.total + "건 있어요." : "지금은 알림이 없어요."),
+        btns: n.total ? [{ label: (n.crit ? "위험 " + n.crit : "알림 " + n.total) + "건 보기", primary: true, act: function () { ask(n.crit ? "위험 몇 개야" : "알림 몇 개야"); } }] : [] };
+    }
+    // 못 하는 일
+    if (/보고서|메일|전송|보내/.test(q)) {
+      return { lead: "보내기는 Delta가 할 수 없어요. 보고서 화면에서 보내 주세요.",
+        btns: [{ label: "보고서 화면으로", primary: true, act: function () { location.href = "./report-v5.html"; } }] };
+    }
+    if (!top) { return { lead: "지금은 확인할 알림이 없어요.", btns: [] }; }
+    // 이유
+    if (/왜|이유|원인|근거/.test(q)) {
+      var why = [];
+      if (top.trend) { why.push(top.trend); }
+      why.push(hhmm(top.time) + " " + robotName(top) + " 측정");
+      if (top.fp !== undefined) { why.push("오탐 가능성 " + top.fpLabel + " " + top.fp + "%"); }
+      return { lead: top.val ? (top.mname || "측정값") + " " + euro(top.val) + " 기준 " + eul(top.std) + " 넘었어요." : label(top) + (batchim(label(top)) ? "이" : "가") + " 감지됐어요.",
+        why: why.slice(0, 3), btns: [aiBtn, { label: "재측정 후 판단", act: openA(top) }] };
+    }
+    // 위치
+    if (/어디|위치/.test(q)) {
+      var mm = A.missionOf(top);
+      return { lead: (top.floor ? top.floor + " " : "") + (mm ? mm + " 미션의 " : "") + (top.eq || top.title) + (/[가-힣]$/.test(top.eq || "") && batchim(top.eq || "") ? "이에요." : "예요."),
+        btns: [{ label: "지도에서 보기", primary: true, act: openA(top) }] };
+    }
+    // 할 일
+    if (/뭐부터|무엇부터|할 일|할일|어떻게|조치/.test(q)) {
+      var todo = all.filter(function (a) { return a.sev === "critical"; }).concat(all.filter(function (a) { return a.sev !== "critical"; })).slice(0, 3);
+      return { lead: (todo[0].next || (todo[0].btn ? todo[0].btn + "부터 하세요." : "위험 알림부터 보세요.")),
+        todo: todo.map(function (a) { return label(a) + ", " + (a.btn || "알림 확인"); }),
+        btns: [{ label: todo[0].btn || "알림 열기", primary: true, act: openA(todo[0]) }] };
+    }
+    // 개수 · 목록(기본) — 위험을 물으면 위험, 주의를 물으면 주의, 아니면 전체
+    var sev = /주의|묶|추세/.test(q) ? "warning" : /위험/.test(q) || n.crit ? "critical" : null;
+    var pool = all.filter(function (a) { return !sev || a.sev === sev; });
+    var mine = pool.filter(function (a) { return A.mine.indexOf(a) >= 0; });
+    var rest = pool.filter(function (a) { return A.mine.indexOf(a) < 0; });
+    var rows = [], shown = 0;
+    function group(title, list) {
+      if (!list.length || shown >= 3) { return; }
+      rows.push({ grp: title });
+      list.forEach(function (a) { if (shown < 3) { rows.push({ a: a }); shown += 1; } });
+    }
+    group("이 미션: " + floorOf(A.mission, A.mine) + " " + A.mission, mine);
+    var byM = {};
+    rest.forEach(function (a) { var m = A.missionOf(a) || "기타"; (byM[m] = byM[m] || []).push(a); });
+    Object.keys(byM).forEach(function (m) { group("다른 미션: " + floorOf(m, byM[m]) + " " + m, byM[m]); });
+    if (pool.length > shown) { rows.push({ more: "나머지 " + (pool.length - shown) + "건은 목록에서 보세요." }); }
+    var first = mine[0] || rest[0] || top;
+    if (first) { rows.push({ tail: "가장 급한 것은 " + (first.eq || first.title) + (batchim(first.eq || first.title) ? "이에요." : "예요.") }); }
+    return { lead: (sev === "critical" ? "위험은 " : sev === "warning" ? "주의는 " : "알림은 ") + pool.length + "건이에요.", rows: rows,
+      btns: first ? [{ label: first.btn || "알림 열기", primary: true, act: openA(first) }, { label: "지도에서 보기", act: openA(first) }] : [] };
+  }
+  // 답 한 덩어리씩 — 첫 줄은 글자가 차례로(45ms), 나머지는 220ms 간격
+  function aiMsgV5(r) {
+    var m = el("div", "dc-msg is-ai dc-v5");
+    var lead = el("p", "dc-lead");
+    m.appendChild(lead);
+    var blocks = [];
+    (r.rows || []).forEach(function (x) {
+      if (x.grp) { blocks.push(el("p", "dc-grp", x.grp)); return; }
+      if (x.more) { blocks.push(el("p", "dc-more", x.more)); return; }
+      if (x.tail) { blocks.push(el("p", "dc-tail", x.tail)); return; }
+      var row = el("button", "dc-arow is-" + x.a.sev);
+      row.type = "button";
+      row.appendChild(el("i"));
+      row.appendChild(el("span", null, label(x.a)));
+      row.appendChild(el("small", "num", hhmm(x.a.time)));
+      row.addEventListener("click", openA(x.a));
+      blocks.push(row);
+    });
+    if (r.why && r.why.length) {
+      var ul = el("ul", "dc-why");
+      r.why.forEach(function (t) { ul.appendChild(el("li", null, t)); });
+      blocks.push(ul);
+    }
+    if (r.todo && r.todo.length) {
+      var ol = el("ol", "dc-todo");
+      r.todo.forEach(function (t) { ol.appendChild(el("li", null, t)); });
+      blocks.push(ol);
+    }
+    var btns = (r.btns || []).filter(Boolean).slice(0, 2);
+    if (btns.length) {
+      var row2 = el("div", "dc-btns");
+      btns.forEach(function (c, i) {
+        var b = el("button", "btn is-xs " + (c.primary && i === 0 ? "btn-primary" : "btn-secondary"), c.label);
+        b.type = "button";
+        b.addEventListener("click", c.act || function () { ask(c.label); });
+        row2.appendChild(b);
+      });
+      blocks.push(row2);
+    }
+    if (CALM) { lead.textContent = r.lead; blocks.forEach(function (b) { m.appendChild(b); }); return m; }
+    var chars = Array.from(r.lead);
+    chars.forEach(function (ch, i) { setTimeout(function () { lead.textContent += ch; scrollEnd(); }, i * 45); });
+    blocks.forEach(function (b, i) {
+      setTimeout(function () { grow(function () { m.appendChild(b); }); scrollEnd(); }, chars.length * 45 + 200 + i * 220);
+    });
+    return m;
+  }
+  // 쓰는 중 표시 — Delta 표식의 네모 셋(왼쪽 위 → 오른쪽 위 → 왼쪽 아래)
+  function typingMark() {
+    var s = el("span", "dc-dmark");
+    s.setAttribute("aria-label", "Delta가 답을 쓰는 중");
+    s.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect class="r1" x="3" y="3" width="8" height="8" rx="1.2"/><rect class="r2" x="13" y="3" width="8" height="8" rx="1.2"/><rect class="r3" x="3" y="13" width="8" height="8" rx="1.2"/></svg>';
+    return s;
+  }
+
   function ask(text) {
     text = (text || "").trim();
     if (!text || busy) { return; }
@@ -156,16 +308,17 @@
     sync();
     win.classList.add("is-thinking");
     var wait = el("div", "dc-msg is-ai is-wait");
-    wait.appendChild(el("span", "dc-typing"));
+    wait.appendChild(V5 ? typingMark() : el("span", "dc-typing"));
     add(wait);
     setTimeout(function () {
       wait.remove();
       win.classList.remove("is-thinking");
       busy = false;
       sync();
+      if (V5) { add(aiMsgV5(replyV5(text))); return; }
       var r = reply(text);
       add(aiMsg(r.text, r.chips));
-    }, 900);
+    }, V5 ? 1200 : 900);
   }
 
   // 묻기 칸 안내 문구 — 단계에 맞춰 '더 알고 싶은 것'으로 좁힌다(10/13 디자이너). 대화 중엔 "이어서".

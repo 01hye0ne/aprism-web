@@ -52,13 +52,66 @@
     return "순회 경로 지켜보는 중...";
   }
 
+  // [10/30 "Delta 라이팅 시스템"] 문형(monitor.js APRISM_DELTA_SAY)이 있으면 근거 줄은 그 문형의 범위나 원인이다 — 하는 일("~ 중...") 흉내를 내지 않는다.
+  //   다른 미션 알림은 "{층} {미션 이름} 미션" 을 그 단계 색 글로, 아이콘 없이, 두 줄까지(넘으면 …).
+  //   올리면 아래 줄이 답 단추("네, ~해 주세요")가 된다 — 2줄 질문이 없는 문형은 "Delta와 대화".
+  var clue = win.querySelector(".delta3-clue");
+  var plus = win.querySelector("[data-ai-toggle]");
+  var plusLabel = plus && plus.querySelector(".delta3-plus-label");
+  var brief = body.getAttribute("data-delta-copy") === "brief";
+  function said() { return brief ? window.APRISM_DELTA_SAY : null; }
+
   // 통합 순회 현황에서 층을 펼쳐 보면 그 층이 범위다(building.js 의 APRISM_DELTA_SCOPE).
   function update() {
+    var s = said();
     var scope = window.APRISM_DELTA_SCOPE;
-    var t = say();
-    if (scope && !win.classList.contains("is-thinking")) { t = scope + " " + t; }
+    var t = s && !win.classList.contains("is-thinking") ? (s.clue || "") : say();
+    if (!s && scope && !win.classList.contains("is-thinking")) { t = scope + " " + t; }
     if (out.textContent !== t) { out.textContent = t; }
+    if (clue) {
+      clue.classList.toggle("is-said", !!s);
+      clue.classList.toggle("is-scope", !!(s && s.scope));
+      clue.setAttribute("data-scope", s && s.scope ? s.scope : "");
+    }
+    if (plusLabel && brief) {
+      var yes = s && s.yes ? s.yes : "Delta와 대화";
+      if (plusLabel.textContent !== yes) { plusLabel.textContent = yes; }
+      plus.classList.toggle("is-answer", !!(s && s.yes));
+    }
+    if (brief) { lines(); }
   }
+  // 두 줄을 줄마다 감싼다 — 1줄 굵게. 넘치면 넘친 낱말만 다음 줄로(자르지 않는다, v5.css).
+  function lines() {
+    var p = win.querySelector(".delta3-body > .ai-line-2");
+    if (!p || p.textContent.indexOf("\n") < 0) { return; }
+    var t = p.textContent.split("\n");
+    p.setAttribute("data-raw", t.join("\n"));
+    p.textContent = "";
+    t.forEach(function (x, i) {
+      var e = document.createElement("span");
+      e.className = "dl dl" + (i + 1);
+      e.textContent = x;
+      p.appendChild(e);
+    });
+  }
+  // 접힌 위젯의 답 단추는 창을 열지 않고 그 일을 한다(펼친 창에서는 원래대로 닫기 단추).
+  //   답 단추가 선 동안 대화는 카드 글 칸을 눌러 연다.
+  var opening = false;
+  win.addEventListener("click", function (event) {
+    if (opening || win.classList.contains("is-open")) { return; }
+    var s = said();
+    var b = event.target.closest && event.target.closest("[data-ai-toggle]");
+    if (!b) {
+      if (brief && plus && event.target.closest && event.target.closest(".delta3-body") && !event.target.closest("button, a, input")) {
+        opening = true; plus.click(); opening = false;
+      }
+      return;
+    }
+    if (!s || !s.yes || !window.APRISM_DELTA_DO) { return; }
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    window.APRISM_DELTA_DO();
+  }, true);
   update();
   new MutationObserver(update).observe(body, { attributes: true, attributeFilter: ["data-level"] });
   new MutationObserver(update).observe(win, { attributes: true, attributeFilter: ["class"] });
