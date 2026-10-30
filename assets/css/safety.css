@@ -54,6 +54,7 @@
 #sfv { flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: hidden; transition: opacity .14s; }
 /* [10/30] 스크롤은 머리 아래만 — safety.js render() 가 머리(.hd + 감지 머리 줄)를 .sftop 으로, 나머지를 .sfsc 로 나눈다. 막대 자리는 늘 비워 둬(12) 머리 열과 카드 열이 어긋나지 않는다 */
 .sf .sftop { flex: none; border-bottom: var(--border-width-thin) solid var(--border-divider); border-radius: var(--radius-8) var(--radius-8) 0 0; }   /* 면 없음(10/30) — 스크롤이 머리 아래서만 일어나 유리 면이 할 일이 없다. 아래 선 하나로 나눈다 */
+.sf #sfv:has(.mmg) > .sftop { border-bottom-color: transparent; }   /* [10/30] 미션 하나 카드는 한 화면에 들어 스크롤이 없다 — 머리 아래 선이 할 일이 없다(전체 카드 · 표는 선 유지) */
 .sf .sfsc { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: var(--space-12); padding: var(--space-12) var(--space-8) var(--space-20) var(--space-20); overflow: auto; scrollbar-gutter: stable; }
 .sf .sfsc:only-child { padding-top: var(--space-16); }   /* 머리 없는 깊이(자세히 보기) */
 #sfv.xfade, #sfv.xin { opacity: 0; }
