@@ -3415,8 +3415,7 @@
       if (st === "running") { item.classList.add("is-active"); runItem = item; }
       item.setAttribute("data-wp-state", st === "done" ? "completed" : st === "running" ? "current" : (m === "return" ? "skipped" : "upcoming"));
       if (item.getAttribute("data-rr-alert")) { item.removeAttribute("data-wp-alert"); item.removeAttribute("data-rr-alert"); }
-      var FX = { "WP-02": "danger", "WP-04": "caution" }[w.id];   // [10/22] 고정 판정 — 측정을 마친 뒤에만 세모
-      if (FX && !item.hasAttribute("data-wp-alert") && !item.hasAttribute("data-rr-hold")) { item.setAttribute("data-wp-alert", FX); }
+      // [10/30] 고정 판정(WP-02 위험 · WP-04 주의)을 뺐다 — 세모는 알림 목록(monitor.js markWaypoints)만 따른다. 안전진단 · 관제 알림과 1:1
       // [10/21] 주의 · 위험 세모는 측정을 마친 뒤에야 놓인다 — 아직 안 간 곳, 지금 재는 곳은 결과를 숨겨 둔다
       var hold = st !== "done" || (m === "inspect" && w.id === atId);
       if (hold && item.hasAttribute("data-wp-alert")) { item.setAttribute("data-rr-hold", item.getAttribute("data-wp-alert")); item.removeAttribute("data-wp-alert"); }

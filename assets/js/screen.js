@@ -897,6 +897,25 @@ window.APRISM_TEXT = (function () {
     return out;
   }
 
+  // v5(10/30) — 정기 순회 점검(Robot 01)은 관제 지도(route-sim)처럼 WP-01~07 을 마치고 WP-08 로 가는 중.
+  //   안전진단(safety.js) · 관제 알림(monitor.js) · 통합 순회 현황(building.js)이 이 이름 · 시각으로 맞춰져 있다(알림 시각이 그 칸 안에 든다).
+  if (document.body.classList.contains("ver-5")) {
+    var r01 = ROBOTS[0];
+    r01.current = "WP-08 로 이동 중";
+    r01.steps = r01.steps.slice(0, 3).concat([
+      { title: "N₂ 배관 압력계", state: "done", time: "10:11 – 10:13", duration: "2분", read: "압력 0.86 MPa" },
+      { title: "냉각 펌프 P-2", state: "done", time: "10:13 – 10:15", duration: "2분", read: "이상 점수 20.4 · 최고 48.6℃" },
+      { title: "수배전반 MCC-1", state: "done", time: "10:15 – 10:16", duration: "1분", read: "CH1 이상 점수 9.05" },
+      { title: "고소 작업 발판", state: "done", time: "10:16 – 10:18", duration: "2분", read: "안전벨트 미착용 1명" },
+      { title: "냉각수 열교환기 HX-1", act: "열교환기 출구 온도 측정", state: "running" }
+    ]);
+    r01.steps[2].time = "09:52 – 10:11"; r01.steps[2].duration = "19분";
+    // 지도 쪽지의 측정 요약 — 안전진단 표(E_ROWS0)의 값과 같게. 판정 색은 알림 목록이 덮는다(monitor.js markWaypoints)
+    r01.steps[0].read = "온도 29.8℃ · 이상음향 8.2"; r01.steps[0].result = "safe";
+    r01.steps[1].read = "온도 31.4℃ · 압력 0.71 MPa"; r01.steps[1].result = "safe";
+    r01.steps[2].read = "누출 확률 62% · 온도 30.2℃"; r01.steps[2].result = "caution";
+  }
+
   ROBOTS.forEach(function (robot) {
     robot.steps = padSteps(robot.steps, WP_TOTAL).slice(0, WP_TOTAL);
   });

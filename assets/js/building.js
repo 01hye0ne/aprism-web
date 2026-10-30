@@ -112,6 +112,16 @@
       { sev: "warning",  robot: 11, floor: "B3", where: "Robot 11 · WP-04 N₂ 배관 압력계",     time: "10:15:52", title: "압력 편차 · N₂ 배관 압력계", uv: [0.70, 0.64] }
     );
   }
+  // v5(10/30) — 정기 순회 점검(Robot 01)의 알림 6건 = 관제(monitor.js R01_MORE) = 안전진단 감지 6종. Robot 01 은 7곳을 마치고 WP-08 로 가는 중(관제와 같다)
+  if (body.classList.contains("ver-5")) {
+    ROBOTS.forEach(function (r) { if (r.n === 1) { r.done = 7; r.now = "열교환기로 이동 중"; } });
+    ALERTS.push(
+      { sev: "warning",  robot: 1, floor: "B4", where: "APRO 4F · WP-05 냉각 펌프 P-2",   time: "10:13:52", title: "이상음향 · 냉각 펌프 P-2",        uv: [0.22, 0.62] },
+      { sev: "warning",  robot: 1, floor: "B4", where: "APRO 4F · WP-05 냉각 펌프 P-2",   time: "10:14:10", title: "온도감지 · 냉각 펌프 P-2 48.6℃",   uv: [0.24, 0.66] },
+      { sev: "warning",  robot: 1, floor: "B4", where: "APRO 4F · WP-06 수배전반 MCC-1",  time: "10:15:31", title: "부분방전 · CH1 이상 점수 9.05",   uv: [0.30, 0.78] },
+      { sev: "critical", robot: 1, floor: "B4", where: "APRO 4F · WP-07 고소 작업 발판",  time: "10:16:48", title: "안전감지 · 안전벨트 미착용 1명",  uv: [0.40, 0.62] }
+    );
+  }
   ALERTS.forEach(function (a) {
     // 층은 알림이 난 웨이포인트의 층이다(로봇이 지금 선 층이 아니다 — 메인 v2.2 monitor.js 와 같다).
     a.mission = robotNo(a.robot).mission;
@@ -448,6 +458,8 @@
   };
   // v4(10/28) — 미션 관제 Robot 11 목록(screen.js 웨이포인트 20칸 더미) 8 · 9번과 같다
   if (V3) { STEPS[11] = [["케미컬 공급 캐비닛 CDS-02", "WP-08"], ["FFU-02 토출구", "WP-09"]]; }
+  // v5(10/30) — Robot 01 은 WP-07 까지 마치고 WP-08 로 가는 중(screen.js v5 · 관제 지도와 같다)
+  if (body.classList.contains("ver-5")) { STEPS[1] = [["냉각수 열교환기 HX-1", "WP-08"], ["waypoint name", "WP-09"]]; }
   var ST_TONE = { run: "info", done: "normal", idle: "idle", off: "critical" };
 
   function rcStep(name, sub, now, ic, subCls) {

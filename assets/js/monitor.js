@@ -95,6 +95,41 @@
   // v2.2 — 제목의 층(B3)이 층 꼬리표(B4)와 어긋나 뺐다(10/19 디자이너). 예전 판(v2 · v2.1)은 그대로다.
   if (body.classList.contains("v2-2")) { CRITICAL.title = "지하발전소 터빈 2 NG 1건 발견"; }
 
+  // v5(10/30 디자이너 "데이터 맞춰야 해") — 정기 순회 점검(Robot 01 · B4)의 알림을 안전진단(safety.js) 감지 6종 카드와 1:1 로 맞춘다.
+  //   웨이포인트 · 층 · 로봇 이름은 관제 기준(WP-01~20 · 지하 4층 · Robot 01), 판정값 · 조치는 안전진단 기준(SUG).
+  //   WP-03 누출 · WP-04 계기 · WP-05 이상음향 · 온도 · WP-06 부분방전 · WP-07 안전감지. 웨이포인트 이름은 screen.js Robot 01 steps 와 같다.
+  //   예전 판(v2.2 · v4)은 그대로다.
+  var V5 = body.classList.contains("ver-5");
+  var R01_MORE = [];
+  if (V5) {
+    CRITICAL.sum = "N₂ 배관 압력 0.86 MPa 로 정상 범위(0.60 ~ 0.80)를 넘었습니다. 최근 3회 측정이 잇달아 올라 NG 로 판정했습니다.";
+    WARNINGS[0].sum = "밸브 이음부에서 누출 확률 62% 로 기준 55% 를 넘었습니다. 연속 2프레임에서 나왔습니다.";
+    WARNINGS[0].lead = "구역 출입을 통제하고 설비팀에 밸브 확인을 요청하세요.";
+    WARNINGS[0].acts = [{ t: "구역 출입 통제", ai: true }, { t: "설비팀 밸브 확인 요청", ai: true }, { t: "현장 확인" }];
+    R01_MORE = [
+      { sev: "warning", robot: 0, floor: "B4", wp: "WP-05", live: "discharge", where: "APRO 4F · WP-05 냉각 펌프 P-2", time: "10:13:52",
+        title: "이상음향 · 냉각 펌프 P-2", detect: "이상음향",
+        sum: "이상 점수 20.4 로 기준 19.0 을 넘었습니다. 저주파 대역 에너지가 늘어 베어링 마모 패턴과 비슷합니다.",
+        lead: "진동 정밀 측정을 요청하세요.", fp: 20, fpLabel: "낮음",
+        acts: [{ t: "진동 정밀 측정 요청", ai: true }, { t: "설비 정지 검토 요청" }] },
+      { sev: "warning", robot: 0, floor: "B4", wp: "WP-05", live: "discharge", where: "APRO 4F · WP-05 냉각 펌프 P-2", time: "10:14:10",
+        title: "온도감지 · 냉각 펌프 P-2 48.6℃", detect: "온도감지",
+        sum: "펌프 하우징 최고 48.6℃ 로 기준 40℃ 를 넘었습니다. 평소 36.2℃ 보다 12.4℃ 높습니다.",
+        lead: "부하를 줄이고 점검을 요청하세요.", fp: 18, fpLabel: "낮음",
+        acts: [{ t: "부하 감소 요청", ai: true }, { t: "설비 점검 요청", ai: true }, { t: "현장 확인" }] },
+      { sev: "warning", robot: 0, floor: "B4", wp: "WP-06", live: "discharge", where: "APRO 4F · WP-06 수배전반 MCC-1", time: "10:15:31",
+        title: "부분방전 · CH1 이상 점수 9.05", detect: "부분방전",
+        sum: "CH1 이상 점수 9.05 로 기준 8.60 을 넘었습니다. CH2 · CH3 은 정상 범위입니다.",
+        lead: "절연 진단을 요청하세요.", fp: 22, fpLabel: "보통",
+        acts: [{ t: "절연 진단 요청", ai: true }, { t: "감시 강화", ai: true }] },
+      { sev: "critical", robot: 0, floor: "B4", wp: "WP-07", live: "ppe", where: "APRO 4F · WP-07 고소 작업 발판", time: "10:16:48",
+        title: "안전감지 · 안전벨트 미착용 1명", detect: "안전감지",
+        sum: "고소 작업 발판에서 안전벨트를 매지 않은 작업자 1명이 신뢰도 0.91 로 검출됐습니다.",
+        lead: "작업자에게 즉시 착용을 안내하세요.", fp: 6, fpLabel: "낮음", brief: ["WP-07 작업자가 안전벨트 미착용이에요.", "즉시 착용부터 안내하세요."],
+        acts: [{ t: "작업자 즉시 착용 안내", ai: true }, { t: "고소 작업 일시 중지", ai: true }, { t: "안전관리팀 전달" }] }
+    ];
+  }
+
   // v4 지도 경로 표현(10/28 디자이너) — 전기실 열화상 점검(Robot 11 · B3)에 실제 알림 두 건. 지도 · 우측 목록의 세모(WP-02 위험 · WP-04 주의)와 1:1 이다.
   //   예전에는 세모만 고정으로 그려 최신 알림이 비어 있었다. body[data-route-rules](main-v3.html)에서만 쓴다 — 통합 순회 현황(building.js v3)에도 같은 두 건이 있다.
   var ROUTE_ALERTS = body.hasAttribute("data-route-rules") ? [
@@ -114,8 +149,8 @@
   var SETS = {
     normal: function () { return []; },
     few: function () { return [CRITICAL, WARNINGS[0], WARNINGS[1]]; },
-    warning: function () { return WARNINGS.concat(ROUTE_ALERTS.filter(function (a) { return a.sev === "warning"; })); },
-    critical: function () { return [CRITICAL].concat(WARNINGS, ROUTE_ALERTS); }
+    warning: function () { return WARNINGS.concat(R01_MORE, ROUTE_ALERTS).filter(function (a) { return a.sev === "warning"; }); },
+    critical: function () { return [CRITICAL].concat(WARNINGS, R01_MORE, ROUTE_ALERTS); }
   };
 
   // ==================================================================
