@@ -1054,6 +1054,8 @@
 
   var THREE, renderer, scene, camera;
   var ready = false;
+  // [10/30] 연출 고리 — 렌더 실험(lab-bld-render-v5.html)이 bld-fx-v5.js 로 단다. 다른 화면에서는 늘 null 이다.
+  var fx = null;
   var F = {};            // 층마다 { holder, mats, lines, size, y, op, solid, hot, meshes, base }
   var mode = "all";      // all · one
   var cur = null;
@@ -1197,6 +1199,11 @@
     layout(true);
     ready = true;
     loading.remove();
+    if (window.APRISM_BLD_FX) {
+      fx = window.APRISM_BLD_FX;
+      fx.init({ THREE: THREE, renderer: renderer, scene: scene, camera: camera, view: view, F: F, FLOORS: FLOORS, isLight: isLight,
+                state: function () { return { mode: mode, cur: cur, hot: hot }; } });
+    }
     buildLabels();
     resize();
     requestAnimationFrame(frame);
@@ -1323,7 +1330,8 @@
 
   function frame(now) {
     step(now || performance.now());
-    renderer.render(scene, camera);
+    if (fx) { fx.step(now || performance.now()); }   // 연출이 step 이 칠한 색 위에 덧칠한다
+    if (!(fx && fx.render())) { renderer.render(scene, camera); }
     placeLabels();
     requestAnimationFrame(frame);
   }
