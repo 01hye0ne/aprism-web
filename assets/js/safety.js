@@ -27,7 +27,11 @@
   //   열화상 색 · 음향 히트맵 · PRPD 그래프 · 감지 상자 · 얼굴 모자이크가 그림에 이미 들어 있어 CSS 필터 · 상자 · 스펙트로그램 캔버스를 걷었다.
   //   요청됨(done)은 주의 사진, 예정 · 판정 안 함은 정상 사진.
   const MDF = {'안전감지':'safety_%.jpg','누출감지':'leak_%.jpg','온도감지':'temp_%.jpg','계기인식':'gauge_%.jpg','이상음향':'sound_%.jpg','부분방전':'pd_%.png'};
-  const MD = (k, st) => ['', `<img src="../assets/img/safety/${MDF[k].replace('%', st==='crit' ? 'crit' : st==='warn' || st==='done' ? 'warn' : 'ok')}" alt="">`];
+  // [10/30] 미션마다 다른 사진 — 같은 감지 · 같은 판정이 두 미션에 있으면 뒤 미션은 제 사진(MV, 키 '미션 번호|감지|판정').
+  //   0 정기 순회 점검은 기본(MDF), 1 전기실 열화상 점검 · 2 발전기실 설비 점검에서 겹치던 칸만 새로 만든 그림을 쓴다.
+  const MV = {'1|부분방전|warn':'m1_pd_warn.png', '2|온도감지|warn':'m2_temp_warn.jpg', '2|이상음향|ok':'m2_sound_ok.jpg', '2|안전감지|ok':'m2_safety_na.jpg'};
+  const MD = (k, st, mi) => { const s3 = st==='crit' ? 'crit' : st==='warn' || st==='done' ? 'warn' : 'ok';
+    return ['', `<img src="../assets/img/safety/${MV[mi + '|' + k + '|' + s3] || MDF[k].replace('%', s3)}" alt="">`]; };
 
   // 연관 감지 근거(시안용 예시): 계통 정보와 함께 움직이는 감지 짝. [원인 쪽 감지, 영향 쪽 감지, 근거, 가능성]
   const LINKS = {0:[
@@ -83,7 +87,7 @@
     const tabs = K.map(k2 => { const y = m.r[k2]; if(!y) return `<span class="tb na">${k2}</span>`; const s2 = y[0]==='ok' ? '' : y[0];
       return `<button type="button" class="tb ${k2===k ? 'on' : ''}" data-dk="${k2}">${k2}<i class="d ${s2}"></i></button>`; }).join('');
     // [10/30] 안전감지(안전모 · 안전벨트 착용)는 히트맵 칸이 없다 — 원본만 크게
-    const md = MD(k, st), canBig = !md[1].includes('canvas'), heat = k !== '안전감지';
+    const md = MD(k, st, mi), canBig = !md[1].includes('canvas'), heat = k !== '안전감지';
     const media = bigD && canBig ? `<div class="dmw ${heat ? 'two' : ''}"><div class="md ${md[0]}">${md[1]}<span class="dlab">원본</span></div>${heat ? `<div class="md hm ${md[0]}">${md[1].replace(/<span class="bx"[^>]*><\/span>/, '')}<span class="heat"></span><span class="dlab">히트맵</span></div>` : ''}<button type="button" class="bigb on" data-bigd="1">원본 크게 끄기</button></div>`
       : `<div class="dmw"><div class="md ${md[0]}">${md[1]}</div>${canBig ? `<button type="button" class="bigb" data-bigd="1">${heat ? '원본과 히트맵 크게' : '원본 크게'}</button>` : ''}</div>`;
     const cd = COND[k], num = parseFloat(SHORT[x[1]] || x[1]);
@@ -315,7 +319,7 @@
   function okLatest(i, k){ const ed = eData(i), r = ed.rows.find(r2 => r2.n===k); if(!r) return '';
     const hit = ed.sp.filter(p => !p[3] && r.c[p[0]] && r.c[p[0]][0]==='ok').sort((p, q) => p[1] < q[1] ? -1 : 1).pop();
     return hit ? hit[0] + ' ' + OKN[k] + ', ' + hit[1] : ''; }
-  function cardNA(i, k){ const m = M[i], why = naOf(i, k), md = MD(k, 'ok');
+  function cardNA(i, k){ const m = M[i], why = naOf(i, k), md = MD(k, 'ok', i);
     const judged = K.filter(k2 => m.r[k2]).map(k2 => k2.replace('감지', '').replace('인식', '')).join(', ');
     if(why==='sensor') return `<div class="kd na" data-n="${k}"><div class="rw"><span class="nm">${k}</span><span class="pl na">센서 없음</span></div><div class="big">센서 없음</div><span class="sm">${m.robot}에 ${k==='부분방전' ? 'PD' : k} 센서가 달려 있지 않음</span><div class="md naempty"><span><b>송출할 센서 없음</b>센서를 단 로봇이 순회하면 표시</span></div></div>`;
     return `<div class="kd na" data-n="${k}"><div class="rw"><span class="nm">${k}</span><span class="pl na">대상 아님</span></div><div class="big">판정하지 않음</div><span class="sm">${m.mis}는 ${judged}만 판정</span><div class="md nadim ${md[0]}">${md[1].replace(/<span class="bx"[^>]*><\/span>/, '')}</div></div>`;
@@ -323,11 +327,11 @@
   function cardM(i, k){
     const m = M[i], x = m.r[k];
     if(!x) return cardNA(i, k);
-    if(x[0]==='ok') return cardC(k, ['ok', x[1], okLatest(i, k) || x[2]]);
-    if(!m.rs || !m.rs[k]) return cardC(k, x);
+    if(x[0]==='ok') return cardC(k, ['ok', x[1], okLatest(i, k) || x[2]], '', i);
+    if(!m.rs || !m.rs[k]) return cardC(k, x, '', i);
     const its = itemsOf(i, k), dn = its.filter(it => it[4] && it !== its[0]);
     const extra = dn.length ? `<span class="req">${dn.map(wpOf).join(', ')} ${dn[0][4]} 현장 조치 요청됨</span>` : '';
-    const html = cardC(k, [x[0], x[1], x[2], x[3], x[4]], extra);
+    const html = cardC(k, [x[0], x[1], x[2], x[3], x[4]], extra, i);
     return its.length > 1 ? html.replace(`<span class="nm">${k}</span>`, `<span class="nm">${k} ${its.length}개</span>`) : html;
   }
   function init(){ M = JSON.parse(JSON.stringify(BASE)); scope = 0; menu = false; fired = false; toasts = []; drawer = null; newSeen = true; M.forEach(sync); }
@@ -337,9 +341,9 @@
   const hits = i => K.reduce((a, k) => a + itemsOf(i, k).filter(isOpen).length, 0);
   const worst = i => K.reduce((a, k) => { const x = M[i].r[k]; return x && RANK[x[0]] > RANK[a] ? x[0] : a; }, 'ok');
   const worstAll = () => M.reduce((a, m, i) => RANK[worst(i)] > RANK[a] ? worst(i) : a, 'ok');
-  function cardC(k, x, extra){
+  function cardC(k, x, extra, mi){
     if(!x) return `<div class="kd ok" data-n="${k}"><div class="rw"><span class="nm">${k}</span></div><div class="big">재지 않음</div></div>`;
-    const [s, sent, loc, t, rq] = x, md = MD(k, s);
+    const [s, sent, loc, t, rq] = x, md = MD(k, s, mi);
     if(s==='ok') return `<div class="kd ok" data-n="${k}" tabindex="0" role="button"><div class="rw"><span class="nm">${k}</span><span class="pl ok">정상 범위</span></div><div class="big">정상 범위</div><span class="sm">${loc}</span>${extra || ''}<div class="md ${md[0]}">${md[1].replace(/<span class="bx"[^>]*><\/span>/, '')}</div><span class="more">자세히 보기 →</span></div>`;
     return `<div class="kd ${s} ${s==='done' ? 'dim' : ''}" data-n="${k}" tabindex="0" role="button"><div class="rw"><span class="nm">${k}</span><span class="pl ${s}">${WORD[s]}</span></div>
       <div class="big">${sent}</div><span class="sm">${loc}, ${t}</span>${rq ? `<span class="req">${rq} 현장 조치 요청됨</span>` : ''}${extra || ''}<div class="md ${md[0]}">${md[1]}</div><span class="more">자세히 보기 →</span></div>`;
@@ -387,7 +391,7 @@
     return K.map(k => { const has = M.map((m, i) => [i, m.r[k]]).filter(([, x]) => x);
       if(!has.length) return cardC(k, null);
       const top = has.reduce((a, b) => RANK[b[1][0]] > RANK[a[1][0]] ? b : a), others = has.filter(([i, x]) => i !== top[0] && x[0] !== 'ok').length;
-      return cardC(k, top[1], top[1][0]==='ok' ? '' : `<span class="mchip"><b>${M[top[0]].mis} ${M[top[0]].fl}</b>${others ? ` 외 ${others}개 미션` : ''}</span>`); }).join('');
+      return cardC(k, top[1], top[1][0]==='ok' ? '' : `<span class="mchip"><b>${M[top[0]].mis} ${M[top[0]].fl}</b>${others ? ` 외 ${others}개 미션` : ''}</span>`, top[0]); }).join('');
   }
   function view(){
     if(dt) return detail();
@@ -402,7 +406,7 @@
   function showPv(el){
     const k = el.dataset.dk, mi = +el.dataset.dm, m = M[mi], x = m.r[k]; if(!x) return;
     const wp = el.dataset.dw || (x[0] !== 'ok' ? wpOf(x) : ''), hx = el.dataset.dw ? itemsOf(mi, k).find(y => y[0] !== 'ok' && wpOf(y)===el.dataset.dw) : (x[0] !== 'ok' ? x : null), hit = !!hx;
-    const st = hit ? hx[0] : (el.classList.contains('plan') ? 'plan' : 'ok'), val = el.textContent.trim(), md = MD(k, st);
+    const st = hit ? hx[0] : (el.classList.contains('plan') ? 'plan' : 'ok'), val = el.textContent.trim(), md = MD(k, st, mi);
     pv.innerHTML = `<div class="pvh"><b>${k}</b><span>${m.mis} ${m.fl}${wp ? ', ' + wp : ''}${hit ? ', ' + hx[3] : ''}</span></div><div class="pvm md ${md[0]}">${md[1]}</div>
       <div class="pvf"><span class="pl ${st}">${WORD[st]}</span><b>${val}</b><span>기준 ${STD[k]}</span></div><span class="pvn">${hit ? '누르면 자세히 보기' : '시안용 예시 이미지(같은 감지의 사진), 누르면 자세히 보기'}</span>`;
     pv.querySelectorAll('canvas[data-spec3]').forEach(spec3);
