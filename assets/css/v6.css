@@ -15,21 +15,39 @@ body.ver-6, body.ver-6 .i-16, body.ver-6 .i-14 { --ic-shield: url("data:image/sv
  * 칸 selected — 면 bg/selected, 이름은 inverse(흰 면 · 검은 글). 이상 표시 14 는 오른쪽 위(위 5 · 오른쪽 5).
  * 로봇이 넷보다 많으면 옆으로 넘긴다 — 공통 스크롤바(트랙 12 · 막대 4).
  */
-body.ver-6 .robot-fleet {
-  display: flex;
+/* [10/30] 판(radius 4 · 잘림)은 바깥 상자가 든다 — 브라우저 막대는 숨기고 판 안 아래에 띄운 막대(rf-thumb)로 넘긴다. 그래야 아래 두 모서리도 둥글다(디자이너) */
+body.ver-6 .robot-fleet-wrap {
+  position: relative;
   margin: 0 var(--space-4) var(--space-4);
   border-radius: 4px;
+  overflow: hidden;
   background-color: color-mix(in srgb, var(--bg-map-chip) 50%, transparent);
   box-shadow: inset 0 10px 8px rgb(0 0 0 / 25%);
+}
+body.ver-6 .robot-fleet {
+  display: flex;
   overflow-x: auto;
   overflow-y: hidden;
-  scrollbar-width: thin;
-  scrollbar-color: var(--border-default) transparent;
+  scrollbar-width: none;
 }
-body.ver-6 .robot-fleet::-webkit-scrollbar { height: 12px; }
-body.ver-6 .robot-fleet::-webkit-scrollbar-track { background: transparent; }
-body.ver-6 .robot-fleet::-webkit-scrollbar-thumb { border: 4px solid transparent; border-radius: var(--radius-pill); background-color: var(--border-default); background-clip: content-box; }
-body.ver-6 .robot-fleet::-webkit-scrollbar-thumb:hover { background-color: var(--border-strong); }
+body.ver-6 .robot-fleet::-webkit-scrollbar { display: none; }
+body.ver-6 .rf-thumb {
+  position: absolute;
+  left: 0;
+  bottom: 2px;
+  height: 4px;
+  border-radius: var(--radius-pill);
+  background-color: var(--border-default);
+  opacity: 0;
+  transition: opacity 160ms ease;
+  cursor: grab;
+  z-index: 2;
+}
+body.ver-6 .rf-thumb[hidden] { display: none; }
+body.ver-6 .robot-fleet-wrap:hover .rf-thumb,
+body.ver-6 .rf-thumb.is-drag { opacity: 1; }
+body.ver-6 .rf-thumb:hover, body.ver-6 .rf-thumb.is-drag { background-color: var(--border-strong); }
+@media (prefers-reduced-motion: reduce) { body.ver-6 .rf-thumb { transition: none; } }
 body.ver-6 .rf-tile {
   position: relative;
   flex: 1 0 88px;
@@ -164,3 +182,33 @@ body.ver-6 .sb-tab.is-on:first-child::after {
   right: -8px;
   background: radial-gradient(circle at 100% 0, transparent 7.5px, var(--sb-tab-on) 8px) right bottom / 8px 8px no-repeat;
 }
+
+/*
+ * [10/30 v6] 우측 패널 머리 — Figma Header(1533:19577): 높이 38 · 패딩 4/4/8/8 · 사이 8.
+ * 오른쪽 정렬 "위험도 순 ⌄" — 13 Medium text/secondary · 화살표 16 · 사이 2. [+] — Icon Button Secondary xSmall 24 · 아이콘 plus 16.
+ */
+body.ver-6.v2 .robot-bar { height: 38px; gap: var(--space-8); padding: 4px 4px 8px 8px; }
+body.ver-6 .rf-sort { position: relative; flex: none; }
+body.ver-6 .rf-sort-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  height: 24px;
+  padding: 0 var(--space-4);
+  border: 0;
+  border-radius: var(--radius-control);
+  background: none;
+  color: var(--text-secondary);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 18px;
+  cursor: pointer;
+}
+body.ver-6 .rf-sort-btn:hover,
+body.ver-6 .rf-sort-btn[aria-expanded="true"] { color: var(--text-primary); }
+body.ver-6 .rf-sort-btn:focus-visible { outline: var(--border-width-strong) solid var(--border-focus); outline-offset: 2px; }
+body.ver-6 .rf-sort-btn[aria-expanded="true"] .i { transform: rotate(180deg); }
+body.ver-6 .rf-sort-menu { right: 0; min-width: 132px; }
+body.ver-6 .rf-sort-menu .menu-item[aria-checked="true"] { background-color: var(--bg-cell); }   /* 파랑(bg/selected)은 상태 · 주요 행동에만 — 무채색 */
+body.ver-6 .robot-bar .icon-button { flex: none; }

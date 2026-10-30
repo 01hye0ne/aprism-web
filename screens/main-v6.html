@@ -36,7 +36,7 @@
   <!-- v5 전용 규칙 — v4 는 10/29 부로 멈췄다. v5 에서 바꾸는 것은 여기(body.ver-5)에. -->
   <link rel="stylesheet" href="../assets/css/v5.css?v=b7962425" />
   <!-- v6 전용 규칙 — v5 는 10/30 부로 멈췄다. v6 에서 바꾸는 것은 여기(body.ver-6)에. -->
-  <link rel="stylesheet" href="../assets/css/v6.css?v=52627fce" />
+  <link rel="stylesheet" href="../assets/css/v6.css?v=28d3690e" />
   <!-- 지도 경로 표현 규칙(10/28 반영, 지도 경로 표현 전달서 1022) — 경로 네 구간 · 흐름 빛 · 번호 핀 · 시야 빔 로봇 · 충전 스테이션 · 아래 상태 시뮬레이션 막대 -->
   <link rel="stylesheet" href="../assets/css/route-rules.css?v=6a34168a" />
   <style>
@@ -606,11 +606,24 @@
                       <span class="badge badge-danger t-caption" data-fleet-crit hidden><span class="badge-dot"></span><span>위험 0</span></span>
                       <span class="badge badge-warning t-caption" data-fleet-warn hidden><span class="badge-dot"></span><span>주의 0</span></span>
                     </p>
-                    <button type="button" class="btn btn-ghost" data-modal-open="robots" data-robot-more>전체 로봇 보기</button>
+                    <!-- [10/30 v6] Figma Header(1533:19577) — 오른쪽은 정렬(위험도 순 ⌄)과 [+](Icon Button Secondary xSmall). [+] 는 예전 [전체 로봇 보기] 모달을 연다. -->
+                    <div class="rf-sort" data-fleet-sort-box>
+                      <button type="button" class="rf-sort-btn" data-fleet-sort-btn aria-haspopup="true" aria-expanded="false">
+                        <span data-fleet-sort-label>위험도 순</span>
+                        <span class="i i-16" style="--i:var(--ic-chevron-down)" aria-hidden="true"></span>
+                      </button>
+                      <div class="dropdown-menu rf-sort-menu" role="menu" aria-label="로봇 정렬" data-fleet-sort-menu hidden>
+                        <button type="button" class="menu-item" role="menuitemradio" aria-checked="true" data-fleet-sort="risk"><span class="t-label-2">위험도 순</span></button>
+                        <button type="button" class="menu-item" role="menuitemradio" aria-checked="false" data-fleet-sort="name"><span class="t-label-2">로봇 이름 순</span></button>
+                      </div>
+                    </div>
+                    <button type="button" class="icon-button is-xs is-secondary" data-modal-open="robots" data-robot-more aria-label="전체 로봇 보기" title="전체 로봇 보기">
+                      <span class="i i-16" style="--i:var(--ic-plus)" aria-hidden="true"></span>
+                    </button>
                   </div>
 
                   <!-- [10/30 v6] 전체 미션 로봇 — 칸을 누르면 그 로봇의 미션으로 넘어가며 그 로봇을 고른다(robot-fleet-v6.js). -->
-                  <div class="robot-fleet" role="group" aria-label="전체 미션 로봇" data-robot-fleet></div>
+                  <div class="robot-fleet-wrap" data-fleet-wrap><div class="robot-fleet" role="group" aria-label="전체 미션 로봇" data-robot-fleet></div><span class="rf-thumb" data-fleet-thumb aria-hidden="true"></span></div>
 
                   <!-- 한 대씩 넘겨 본다 — 왼쪽 < 그래픽 > , 오른쪽 이름 · 자동복귀 · E-STOP · 상태 세 줄.
                        카드는 메인 화면 것 그대로이고 선택된 한 장만 보인다(is-carousel). -->
@@ -1778,7 +1791,7 @@
 <script src="../assets/js/monitor.js?v=c32f7831"></script>
 <script src="../assets/js/mission-scope.js?v=bc969b8c"></script>
 <!-- [10/30 v6] 우측 패널 전체 미션 로봇 줄(Figma 1533:19576) — mission-scope.js 다음에(칸을 누르면 그 미션으로 넘긴다) -->
-<script src="../assets/js/robot-fleet-v6.js?v=eaddb3f2"></script>
+<script src="../assets/js/robot-fleet-v6.js?v=dec7760e"></script>
 <!-- [10/30 v6] 상단 미션 탭(윈도우 탐색기 꼴) — 미션 메뉴를 읽어 탭으로 늘어놓는다. 메뉴를 만드는 스크립트 다음에 -->
 <script src="../assets/js/mission-tabs-v6.js?v=ea1ab5fb"></script>
 <script src="../assets/js/delta-pulse.js?v=2d0afced"></script>
