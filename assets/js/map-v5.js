@@ -2068,9 +2068,9 @@
       mark.userData.tone = wk === "disc" ? null : tone;   // 테마가 바뀌면 applyTheme 이 이 이름으로 다시 칠한다(길색 점은 길을 다시 깔 때 칠한다)
       scene.add(mark);
       wpMarks.push(mark);
-      // [10/29] 다음 지점 · 주의 · 위험 — 표식 아래 바닥에 은은한 빛
-      if (RR.floorMarks && key.split("|")[2] !== "o" && /current|next|active|caution|danger/.test(tone)) {
-        var glow = floorGlow(bucket[key], wpTint(tone), tone === "caution" || tone === "danger" ? 46 : 52);
+      // [10/29] 다음 지점 — 표식 아래 바닥에 은은한 빛. 주의 · 위험 지점의 빛은 뺐다(10/30 클라이언트 피드백 "위험/주의 지점 라이팅 없애 주세요")
+      if (RR.floorMarks && key.split("|")[2] !== "o" && /current|next|active/.test(tone)) {
+        var glow = floorGlow(bucket[key], wpTint(tone), 52);
         glow.userData.floor = mark.userData.floor;
         glow.userData.tone = glow.material ? tone : null;   // 카메라 전 빈 묶음은 칠할 재질이 없다
         scene.add(glow);
