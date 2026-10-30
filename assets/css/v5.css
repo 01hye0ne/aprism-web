@@ -358,3 +358,6 @@ body.ver-5 .delta3 .delta3-talk[hidden], body.ver-5 .delta3.is-open .delta3-talk
 /* 답 단추 — 굵게, 한 단 밝은 면(라이팅 시스템 .pill.ans) */
 body.ver-5.v2-2.v3 .delta3:not(.is-open) .delta3-plus.is-answer { background-color: rgb(255 255 255 / 20%); }
 body.ver-5.v2-2.v3 .delta3:not(.is-open) .delta3-plus.is-answer .delta3-plus-label { font-weight: var(--font-weight-bold); background-image: none; color: var(--text-primary); }
+
+/* [10/30] Delta 아이콘 — v5 만 육각(Figma Icon / Delta 1001:19631). 지난 판(v2.2 · v3 · v4)은 네모 셋 그대로(icons-outline.css --ic-delta) */
+body.ver-5.v2-2, body.ver-5.v2-2 .i-16 { --ic-delta: var(--ic-delta-hex); }
