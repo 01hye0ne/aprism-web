@@ -345,7 +345,8 @@
 .sf .mrow .kd > :not(.md):not(.more) { margin-left: var(--space-8); margin-right: var(--space-8); }
 .sf .mrow .kd > .rw { flex-direction: row-reverse; margin-top: var(--space-4); }
 .sf .mrow .kd .nm { font-size: var(--font-size-14); line-height: var(--font-line-height-20); font-weight: 800; }
-.sf .mrow .kd .md { flex: 1 0 96px; height: auto; margin-top: var(--space-4); }
+.sf .mrow .kd .md { flex: none; height: auto; aspect-ratio: 16 / 9; margin-top: auto; }   /* 사진 칸 16:9 고정(10/30) — 카메라 영상 비율. 카드 아래에 붙고, 글이 짧은 카드는 글과 사진 사이가 벌어진다 */
+.sf .mrow .kd > :has(+ .md) { margin-bottom: var(--space-4); }   /* 글 칸 아래 8(사이 4 + 4) */
 .sf .mrow .kd .mt { display: block; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .sf .mrow .kd .lc { font-size: var(--font-size-13); line-height: var(--font-line-height-20); color: var(--text-secondary); }
 .sf .mrow .kd .tm { font-size: var(--font-size-12); line-height: var(--font-line-height-18); color: var(--text-tertiary); }
