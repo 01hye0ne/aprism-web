@@ -18,7 +18,7 @@ body.ver-6, body.ver-6 .i-16, body.ver-6 .i-14 { --ic-shield: url("data:image/sv
 /* [10/30] 판(radius 4 · 잘림)은 바깥 상자가 든다 — 브라우저 막대는 숨기고 판 안 아래에 띄운 막대(rf-thumb)로 넘긴다. 그래야 아래 두 모서리도 둥글다(디자이너) */
 body.ver-6 .robot-fleet-wrap {
   position: relative;
-  margin: 0 var(--space-4) var(--space-4);
+  margin: 0 0 var(--space-4);   /* 좌우는 아래 로봇 카드 · 웨이포인트 판과 같은 선(10/30 디자이너) */
   border-radius: 4px;
   overflow: hidden;
   background-color: color-mix(in srgb, var(--bg-map-chip) 50%, transparent);
