@@ -212,3 +212,16 @@ body.ver-6 .rf-sort-btn[aria-expanded="true"] .i { transform: rotate(180deg); }
 body.ver-6 .rf-sort-menu { right: 0; min-width: 132px; }
 body.ver-6 .rf-sort-menu .menu-item[aria-checked="true"] { background-color: var(--bg-cell); }   /* 파랑(bg/selected)은 상태 · 주요 행동에만 — 무채색 */
 body.ver-6 .robot-bar .icon-button { flex: none; }
+
+/* [10/30 v6] 탭 끌어서 순서 바꾸기(mission-tabs-v6.js) — 미션 탭은 잡을 수 있다는 손, 끄는 탭은 위에 떠서 살짝 그림자 */
+body.ver-6 .sb-tab[data-mission] { touch-action: none; user-select: none; }
+body.ver-6 .sb-tabs.is-sorting .sb-tab { cursor: grabbing; }
+body.ver-6 .sb-tab.is-dragging {
+  z-index: 3;
+  background-color: var(--sb-tab-on);
+  color: var(--text-primary);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 35%);
+  opacity: 0.96;
+}
+body.ver-6 .sb-tab.is-dragging::after { opacity: 0; }   /* 떠 있는 동안은 발을 걷는다 */
+body.ver-6 .sb-tabs.is-sorting .sb-tab::before { opacity: 0; }

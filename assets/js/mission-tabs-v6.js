@@ -42,9 +42,13 @@
     if (!onOverview && overview) { first.href = overview.getAttribute("href") || "building-v6.html"; }
     bar.appendChild(first);
 
-    Array.prototype.forEach.call(menu.querySelectorAll(".scope-item"), function (item) {
+    // 끌어서 바꾼 순서(저장된 이름 차례)를 먼저, 처음 보는 미션은 메뉴 차례대로 뒤에
+    var saved = loadOrder();
+    var items = Array.prototype.slice.call(menu.querySelectorAll(".scope-item")).filter(function (item) { return item.querySelector(".scope-name .t-label-2"); });
+    var at = function (item) { var i = saved.indexOf(item.querySelector(".scope-name .t-label-2").textContent); return i < 0 ? 1e3 + items.indexOf(item) : i; };
+    items.sort(function (a, b) { return at(a) - at(b); });
+    items.forEach(function (item) {
       var nm = item.querySelector(".scope-name .t-label-2");
-      if (!nm) { return; }
       var on = !onOverview && item.getAttribute("aria-checked") === "true";
       var t = tab("button", nm.textContent, on);
       var run = item.querySelector(".scope-run");
@@ -63,11 +67,111 @@
       }
       t.title = label;
       t.setAttribute("aria-label", label);
-      t.addEventListener("click", function () { item.click(); });
+      t.setAttribute("data-mission", nm.textContent);
+      t.title = label + " — 끌어서 순서 바꾸기";
+      t.addEventListener("click", function () { if (justDragged) { return; } item.click(); });
+      t.addEventListener("pointerdown", startDrag);
+      t.addEventListener("keydown", keyMove);
       bar.appendChild(t);
     });
   }
 
+  /*
+   * [10/30 v6] 탭 순서 바꾸기 — 미션 탭을 잡고 옆으로 끌면 자리가 바뀐다(디자이너). [통합 순회 현황]은 맨 앞에 고정.
+   * 끄는 탭은 손을 따라오고, 지나치는 탭은 반 넘게 넘어가면 비켜 선다(부드럽게 미끄러짐). 놓으면 제자리로 붙는다.
+   * 순서는 이 브라우저에 기억한다(localStorage) — 관제 · 통합 순회 현황 두 화면이 같은 순서를 쓴다.
+   * 키보드: 탭에 초점을 두고 Alt + ← / → 로 한 칸씩 옮긴다.
+   */
+  var KEY = "aprism-v6-tab-order";
+  function loadOrder() { try { return JSON.parse(localStorage.getItem(KEY) || "[]") || []; } catch (e) { return []; } }
+  function saveOrder() {
+    var names = Array.prototype.map.call(bar.querySelectorAll(".sb-tab[data-mission]"), function (t) { return t.getAttribute("data-mission"); });
+    try { localStorage.setItem(KEY, JSON.stringify(names)); } catch (e) { /* 저장 못 하면 이번 화면에서만 */ }
+  }
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var drag = null, justDragged = false, pending = false;
+
+  function missionTabs() { return Array.prototype.slice.call(bar.querySelectorAll(".sb-tab[data-mission]")); }
+  // 옮기기 전후 자리를 재서 비켜 서는 탭을 미끄러뜨린다(FLIP)
+  function slide(moveFn, except) {
+    var tabs = missionTabs().filter(function (t) { return t !== except; });
+    var before = tabs.map(function (t) { return t.getBoundingClientRect().left; });
+    moveFn();
+    if (reduce) { return; }
+    tabs.forEach(function (t, i) {
+      var dx = before[i] - t.getBoundingClientRect().left;
+      if (!dx) { return; }
+      t.style.transition = "none";
+      t.style.transform = "translateX(" + dx + "px)";
+      requestAnimationFrame(function () { t.style.transition = "transform 180ms ease"; t.style.transform = ""; });
+    });
+  }
+  function startDrag(event) {
+    if (event.button !== 0) { return; }
+    var t = event.currentTarget;
+    drag = { t: t, x0: event.clientX, moved: false, id: event.pointerId };
+    t.addEventListener("pointermove", onDrag);
+    t.addEventListener("pointerup", endDrag);
+    t.addEventListener("pointercancel", endDrag);
+  }
+  function onDrag(event) {
+    if (!drag) { return; }
+    var t = drag.t, dx = event.clientX - drag.x0;
+    if (!drag.moved) {
+      if (Math.abs(dx) < 5) { return; }
+      drag.moved = true;
+      try { t.setPointerCapture(drag.id); } catch (e) { /* 합성 이벤트 등 */ }
+      t.classList.add("is-dragging");
+      bar.classList.add("is-sorting");
+      t.style.transition = "none";
+    }
+    // 손 자리 — 끄는 탭의 원래 자리(transform 뺀 것)에서 dx 만큼. 맨 앞 · 맨 뒤 미션 탭 밖으로는 안 나간다
+    t.style.transform = "";
+    var home = t.getBoundingClientRect();
+    var tabs = missionTabs(), lo = tabs[0].getBoundingClientRect().left - home.left, hi = tabs[tabs.length - 1].getBoundingClientRect().right - home.right;
+    var off = Math.max(lo, Math.min(hi, event.clientX - drag.x0));
+    var cx = home.left + home.width / 2 + off;
+    // 반 넘게 넘어간 옆 탭과 자리를 바꾼다
+    var prev = t.previousElementSibling, next = t.nextElementSibling;
+    if (next && next.hasAttribute("data-mission") && cx > next.getBoundingClientRect().left + next.getBoundingClientRect().width / 2) {
+      slide(function () { bar.insertBefore(next, t); }, t);
+    } else if (prev && prev.hasAttribute("data-mission") && cx < prev.getBoundingClientRect().left + prev.getBoundingClientRect().width / 2) {
+      slide(function () { bar.insertBefore(t, prev); }, t);
+    }
+    // 자리를 바꿨으면 원래 자리가 옮겨졌다 — 그만큼 기준을 옮겨 탭이 손 밑에 그대로 있게
+    var shift = t.getBoundingClientRect().left - home.left;
+    drag.x0 += shift;
+    t.style.transform = "translateX(" + (off - shift) + "px)";
+  }
+  function endDrag() {
+    if (!drag) { return; }
+    var t = drag.t, moved = drag.moved;
+    t.removeEventListener("pointermove", onDrag);
+    t.removeEventListener("pointerup", endDrag);
+    t.removeEventListener("pointercancel", endDrag);
+    drag = null;
+    if (!moved) { return; }
+    // 놓으면 제자리로 붙는다. 끈 뒤 바로 오는 click 은 미션을 바꾸지 않게 한 번 막는다
+    t.style.transition = reduce ? "none" : "transform 160ms ease";
+    t.style.transform = "";
+    t.classList.remove("is-dragging");
+    bar.classList.remove("is-sorting");
+    justDragged = true;
+    setTimeout(function () { justDragged = false; }, 0);
+    saveOrder();
+    if (pending) { pending = false; build(); }
+  }
+  function keyMove(event) {
+    if (!event.altKey || (event.key !== "ArrowLeft" && event.key !== "ArrowRight")) { return; }
+    event.preventDefault();
+    var t = event.currentTarget, sib = event.key === "ArrowLeft" ? t.previousElementSibling : t.nextElementSibling;
+    if (!sib || !sib.hasAttribute("data-mission")) { return; }
+    slide(function () { if (event.key === "ArrowLeft") { bar.insertBefore(t, sib); } else { bar.insertBefore(sib, t); } });
+    t.focus();
+    saveOrder();
+  }
+
   build();
-  new MutationObserver(build).observe(menu, { childList: true });
+  // 메뉴가 다시 그려지면(알림 단계 · 미션) 탭도 — 끄는 중이면 놓은 뒤에
+  new MutationObserver(function () { if (drag && drag.moved) { pending = true; } else { build(); } }).observe(menu, { childList: true });
 })();
