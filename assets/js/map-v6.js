@@ -2040,7 +2040,7 @@
       var spot = spotOf(info.id, i);
       var fl = (spot.userData && spot.userData.floor) || "";
       var tri = info.tone === "caution" || info.tone === "danger", occ = !tri && rrHidden(spot);
-      var homing = RRS.mode === "return" && !tri;   // 자동복귀 — 돌아가는 길에는 지점 표식이 필요 없다
+      var homing = rrM(onLane) === "return" && !tri;   // 자동복귀 — 돌아가는 길에는 지점 표식이 필요 없다
       var buried = !tri && rrHidden(spot, true);   // [10/22] 설비에 가려진 지점 — 고리는 숨기고 핀만 높이 세운다
       wpSpots.push({ id: info.id, spot: spot, info: info, floor: fl, no: i + 1, occ: occ, off: homing, buried: buried });
       if (homing || buried) { return; }
@@ -2057,12 +2057,12 @@
       if (RR.wpExcept && tone === "upcoming") { ws = 12; }   // 예정 — 작은 회색 고리(시안 r5.5)
       if (RR.ahead === "C4" && tone === "upcoming") { wk = "disc"; ws = 5; }   // [10/22 실험 C4] 납작한 지점 — 선 안의 바닥색 점
       if (tone === "skipped") { wk = "dash"; ws = 11; }   // 건너뜀 — 점선 고리(자동복귀)
-      if (RR.wpExcept && tone === "safe" && RRS.mode === "done") { ws = 5; }   // 미션 완료 — 정상 지점은 더 조용히
+      if (RR.wpExcept && tone === "safe" && rrM(onLane) === "done") { ws = 5; }   // 미션 완료 — 정상 지점은 더 조용히
       if (key.split("|")[2] === "o") { wk = "dash"; ws = tone === "safe" ? 9 : Math.max(ws, 12); }   // [가려짐 F] 가려진 지점 — 점선 고리
       // [번호] 숫자가 들어가게 키운다. 다음 지점은 가운데 점 대신 번호라 빈 고리로
       // [번호를 뺐으니 원래 크기로] if (wk === "full") { wk = "ring"; }
       // if (wk === "ring" || (wk === "dash" && tone !== "safe" && tone !== "skipped")) { ws = 19; }   // 번호는 앞으로 갈 지점에만 — 지나온 점 · 세모는 원래 크기
-      var wc = (RR.wpExcept && tone === "safe" && onLane.bot) ? (RRS.mode === "done" ? RR_GRAY : onLane.bot.left) : wpTint(tone);   // 지나온 정상 — 길과 같은 색
+      var wc = (RR.wpExcept && tone === "safe" && onLane.bot) ? (rrM(onLane) === "done" ? RR_GRAY : onLane.bot.left) : wpTint(tone);   // 지나온 정상 — 길과 같은 색
       if (RR.ahead === "C4" && tone === "upcoming") { wc = isLight() ? 0xf2f4f7 : 0x141b27; }
       var mark = (RR.floorMarks && wk !== "tri") ? floorStops(bucket[key], wc, wk, ws) : stopDots(bucket[key], wc, wk, ws);
       mark.userData.floor = key.split("|")[0];
@@ -2282,6 +2282,9 @@
     // 다른 미션의 같은 순번은 같은 자리가 아니다.
     // 처음 깔 때(keep)는 놓지 않는다 — 지도가 뜨기 전에 알림 목록 · 타임라인에서 이미 골랐을 수 있다.
     if (!keep) { chosenWp = null; }
+    // [10/30 v6] 경로 모양은 rrApply 가 입힌다 — 예전엔 시뮬레이션이 붙은 첫 로봇만 칠해져, 다른 미션으로 넘어가면 예전 모양(지나온 길 실선 · 앞길 점선)이었다
+    if (onLane && onLane.rr) { rrApply(onLane); }
+    if (onLane && onLane.travel) { rrTravel(onLane); }
     layWaypoints();
     tellWaypoint();
 
@@ -2911,7 +2914,13 @@
       fan: fan
     };
     if (bot.walk && plan && plan.wpWorld) { walkSetup(lanes[String(id)], bot.walk); }
-    if (!bot.ended && !back && !lanes[String(id)].rr) { rrSplit(lanes[String(id)], mark); }
+    if (!lanes[String(id)].rr) {
+      if (bot.ended) {   // [10/30 v6] 완료한 미션도 경로 규칙으로 — 온 길 전체가 지나온 길(미션 완료 모양). 로봇 자리는 그대로(도크)
+        var lnE = lanes[String(id)];
+        parts[0].geometry.setPositions(rrFlat(turns)); parts[0].computeLineDistances();
+        rrSplit(lnE, total);
+      } else if (!back) { rrSplit(lanes[String(id)], mark); }
+    }
   }
 
   /*
@@ -3286,9 +3295,11 @@
       p.userData.ribBandHex = isLight() ? 0xe6e9ee : 0x343e53;
     });
   }
+  // [10/30 v6] 완료한 미션은 시뮬레이션 상태와 상관없이 늘 "미션 완료" 모양
+  function rrM(ln) { return ln && ln.bot && ln.bot.ended ? "done" : RRS.mode; }
   function rrApply(ln) {
     if (!ln || !ln.rr) { return; }
-    var on = !!(ln.parts[0] && ln.parts[0].visible), m = RRS.mode, blue = ln.bot.left;
+    var on = !!(ln.parts[0] && ln.parts[0].visible), m = rrM(ln), blue = ln.bot.left;
     function show(part, v) { if (part) { part.visible = on && v; } }
     if (m === "done") {
       rrStyle(ln.parts[0], RR_GRAY, 0.6, 2);   // [10/30 v6] 지나온 길 = 점선 — 옅은 0.3 은 점으로는 안 읽혀 0.6
@@ -3464,6 +3475,7 @@
     set: function (s) {
       var ln = onLane;
       if (!ln || !ln.rr) { return; }
+      if (ln.bot.ended) { rrApply(ln); frame(); return; }   // [10/30 v6] 완료한 미션은 시뮬레이션이 옮기지 않는다
       ln.walk = null;   // 시연용 걸음은 멈춘다 — 이제 시뮬레이션이 자리를 정한다
       RRS.lane = ln.id;
       RRS.s = Math.max(0, Math.min(ln.total, s));
@@ -3540,13 +3552,13 @@
     var light = isLight(), blue = "#" + new THREE.Color(onLane.bot ? onLane.bot.left : 0x89b9ed).getHexString();
     // [10/29] 라이트 핀 = 단계 톤(판 50 · 테 950 24% · 글자 700 · 예정 600)
     var C = { up: light ? "#63686F" : "#8894AA", bg: light ? "#F2F4F5" : "#0A0F18", cau: light ? "#E1AB13" : "#FFCC00", dan: "#FF383C", gray: "#9EA8BB" };
-    var key = wpSpots.map(function (w) { return w.id + w.info.tone + (w.buried ? "b" : "") + (w.off ? "x" : ""); }).join(",") + RRS.mode + light + blue;
+    var key = wpSpots.map(function (w) { return w.id + w.info.tone + (w.buried ? "b" : "") + (w.off ? "x" : ""); }).join(",") + rrM(onLane) + light + blue;
     // 지점 목록은 시점이 바뀔 때마다 새로 깔린다(layWaypoints) — 새 목록에 핀이 안 붙어 있으면 다시 만든다(예전엔 처음 자리에 멈춰 있었다)
     if (key !== rrPinKey || wpSpots.some(function (w) { return !w.pinEl; })) {
       rrPinKey = key; rrPinBox.textContent = "";
       wpSpots.forEach(function (w) {
         var t = w.info.tone, next = t === "current" || t === "next" || t === "active", past = t === "safe", cau = t === "caution", dan = t === "danger";
-        var col = cau ? C.cau : dan ? C.dan : past ? (RRS.mode === "done" ? C.gray : blue) : next ? blue : C.up;
+        var col = cau ? C.cau : dan ? C.dan : past ? (rrM(onLane) === "done" ? C.gray : blue) : next ? blue : C.up;
         var solid = past || cau || dan || next;
         var el = document.createElement("div");
         el.className = "rr-pin" + (w.buried ? " is-buried" : "") + (past ? " is-past" : "") + (next ? " is-next" : "") + (cau || dan ? " is-alert" : "");   // [10/28] 알림 지점 — 번호를 비켜 바닥 세모가 보이게(route-rules.css)
@@ -3649,9 +3661,9 @@
     var show = !!(ln && ln.dock) && (ln.floor || ROBOT_ON) === floorNow && !floorBusy;
     rrDockBox.hidden = !show;
     if (!show) { return; }
-    rrDockBox.setAttribute("data-rr", RRS.lane === ln.id ? RRS.mode : "run");
+    rrDockBox.setAttribute("data-rr", ln.bot && ln.bot.ended ? "done" : RRS.lane === ln.id ? RRS.mode : "run");
     // 로봇이 충전 스테이션 안에 있으면(출발 전, 미션 완료) 로봇 표식을 따로 두지 않고 칸 안에 넣는다
-    var inDock = RRS.lane === ln.id && (RRS.mode === "done" || (RRS.s !== null && RRS.s <= ln.total * 0.006 && RRS.mode !== "return"));
+    var inDock = (ln.bot && ln.bot.ended) || RRS.lane === ln.id && (RRS.mode === "done" || (RRS.s !== null && RRS.s <= ln.total * 0.006 && RRS.mode !== "return"));
     rrDockBox.classList.toggle("is-docked", inDock);
     if (botBox) { if (inDock) { botBox.setAttribute("data-rr-docked", "1"); } else { botBox.removeAttribute("data-rr-docked"); } }
     put(rrDockBox, ln.dock);
@@ -4973,6 +4985,18 @@
   var CROSS_ID = "4";
   var CROSS = { up: "B3", low: "B4", split: 12, atLow: 0.18,
     tour: [[0.62, 0.30], [0.30, 0.30], [0.20, 0.55], [0.45, 0.70], [0.70, 0.62]] };
+  /*
+   * [10/30 v6] 층을 건너는 길(Robot 05)도 경로 규칙 모양으로 — 토막(위층 · 계단 · 아래층)마다
+   * 지나온 길 = 로봇색 동그란 점선(80%) · 앞으로 갈 길 = 옅은 로봇색 실선(38%, 굵게). 바닥 띠(리본) 대신 굵은 선 그대로다.
+   */
+  function rrTravel(ln) {
+    if (!ln || !ln.segs) { return; }
+    var blue = ln.bot.left;
+    ln.segs.forEach(function (sg) {
+      rrStyle(sg.done, blue, 0.8, 2); rrForm(sg.done, true);
+      rrStyle(sg.left, blue, RR.doneAlpha, 4); rrForm(sg.left, false);
+    });
+  }
   function crossLane() {
     if (!document.body.classList.contains("v2-2") || floors.length < 2 || trav) { return; }
     var built = travelBuild(CROSS.up, CROSS.low, CROSS.tour);
