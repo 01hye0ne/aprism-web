@@ -7,15 +7,21 @@
  * 탭 내용은 기존 미션 메뉴(관제 mission-scope.js 의 [data-scope-menu] · 통합 순회 building.js 의 [data-bld-menu])에서 읽는다.
  * 메뉴는 숨겨 두고 그대로 살려 둔다 — 탭을 누르면 그 메뉴 줄을 대신 누르므로 미션 바꾸기 · 들어가기 동작이 같다.
  * 메뉴가 다시 그려지면(알림 단계 · 미션이 바뀌면) 탭도 다시 그린다.
+ * [10/30] 안전진단(safety.js)도 — 상단 경로([data-sf-crumb])를 그릴 때마다 통째로 새로 깔므로, 메뉴 · 통합 순회 단추는 매번 다시 찾는다.
+ *   거기서 첫 탭은 다른 화면으로 가지 않고 그 화면의 "미션 전체" 보기(단추 data-sc="all")를 누른다.
  */
 (function () {
   "use strict";
 
   var left = document.querySelector(".status-bar-left");
-  var menu = document.querySelector("[data-scope-menu], [data-bld-menu]");
-  if (!left || !menu) { return; }
-  var overview = left.querySelector(".sb-overview");
-  var onOverview = !!(overview && overview.classList.contains("is-on"));
+  var MENU = "[data-scope-menu], [data-bld-menu], .sf-scope";
+  if (!left || !document.querySelector(MENU)) { return; }
+  var menu, overview, onOverview;
+  function find() {
+    menu = document.querySelector(MENU);
+    overview = left.querySelector(".sb-overview");
+    onOverview = !!(overview && overview.classList.contains("is-on"));
+  }
 
   var bar = document.createElement("nav");
   bar.className = "sb-tabs";
@@ -36,10 +42,14 @@
   }
 
   function build() {
+    find();
+    if (!menu) { return; }
     bar.textContent = "";
-    // 통합 순회 현황 — 관제에서는 그 화면으로 가는 링크, 통합 순회 현황에서는 지금 탭
-    var first = tab(onOverview ? "span" : "a", "통합 순회 현황", onOverview);
-    if (!onOverview && overview) { first.href = overview.getAttribute("href") || "building-v6.html"; }
+    // 통합 순회 현황 — 관제에서는 그 화면으로 가는 링크, 통합 순회 현황에서는 지금 탭, 안전진단에서는 "미션 전체" 단추
+    var isBtn = !!(overview && overview.tagName === "BUTTON");
+    var first = tab(isBtn ? "button" : onOverview ? "span" : "a", "통합 순회 현황", onOverview);
+    if (isBtn) { var ov = overview; first.addEventListener("click", function () { if (!first.classList.contains("is-on")) { ov.click(); } }); }
+    else if (!onOverview && overview) { first.href = overview.getAttribute("href") || "building-v6.html"; }
     bar.appendChild(first);
 
     // 끌어서 바꾼 순서(저장된 이름 차례)를 먼저, 처음 보는 미션은 메뉴 차례대로 뒤에
@@ -173,5 +183,9 @@
 
   build();
   // 메뉴가 다시 그려지면(알림 단계 · 미션) 탭도 — 끄는 중이면 놓은 뒤에
-  new MutationObserver(function () { if (drag && drag.moved) { pending = true; } else { build(); } }).observe(menu, { childList: true });
+  // 상태바 왼쪽 전체를 본다 — 메뉴가 통째로 바뀌는 화면(안전진단)도 있다. 탭 줄 자신이 바뀐 것은 무시한다
+  new MutationObserver(function (list) {
+    if (list.every(function (r) { return bar.contains(r.target); })) { return; }
+    if (drag && drag.moved) { pending = true; } else { build(); }
+  }).observe(left, { childList: true, subtree: true, attributes: true, attributeFilter: ["aria-checked", "class"] });
 })();
