@@ -733,3 +733,5 @@ body.ver-6 .map-alert.is-critical .ma-title .ma-val { color: var(--status-critic
 /* [11/02 v6] 미션 카드 띠 바깥 여백 = 다른 패널(로봇 현황 · 지도 도구)과 같은 20 — 지도 칸(테두리에서 20 안쪽) 가장자리에 붙인다. 오른쪽은 지도 도구 열(44) 앞까지 */
 body.ver-6 .bld-sum.has-cards { left: 0; bottom: 0; right: calc(44px + var(--space-20)); }
 body.ver-6 .bld-mcards { padding-bottom: 0; }
+/* [11/02 v6] 층 펼침 요약의 층 이름("지하 3층")은 뺀다 — 층 선택(B3 켜짐) · Delta 첫 마디가 이미 말한다(디자이너) */
+body.ver-6 .bld-sum.has-cards .bld-sum-label { display: none; }
