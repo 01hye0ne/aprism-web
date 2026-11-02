@@ -316,3 +316,6 @@ body.ver-6 .sf .ewrap .mx tr > .c-m { position: sticky; right: 0; z-index: 2; ba
 /* [10/30] 표 선 — 맨 위(라이브 줄 아래) 선은 빼고, 머리줄 아래 선(border/default)은 그대로, 줄 사이 선은 바탕에 묻히게 옅게(border/divider 45%) */
 body.ver-6 .sf #sfv:has(.ewrap) > .sftop, body.ver-6 .sf #sfv:has(.mtbw) > .sftop { border-bottom: 0; }
 body.ver-6 .sf .ewrap .mx td, body.ver-6 .sf .mtbw .mtb td { border-bottom-color: color-mix(in srgb, var(--border-divider) 45%, transparent); }
+/* [10/30] 라이트 줄 사이 선은 한 단 진하게(80%) · DELTA 메모 머리 칸은 면 없이(본문 판 색 — 붙박이라 불투명이어야 한다). 메모 본문 칸 면은 그대로 */
+:root[data-theme="light"] body.ver-6 .sf .ewrap .mx td, :root[data-theme="light"] body.ver-6 .sf .mtbw .mtb td { border-bottom-color: color-mix(in srgb, var(--border-divider) 80%, transparent); }
+body.ver-6 .sf .ewrap .mx th.c-m { background-color: var(--bg-page); }
