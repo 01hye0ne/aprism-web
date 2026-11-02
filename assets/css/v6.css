@@ -784,3 +784,9 @@ body.ver-6 .map-alert .ma-info, body.ver-6 .map-alert .ma-meta { display: none !
  *   "메모 (선택)" 은 칸 이름이라 "DELTA 조치 제안 · 오탐 가능성" 과 같은 보조 단 · 같은 회색(fg/secondary)으로. 배지 · 버튼 · AI 추천은 부품 크기 그대로
  */
 body.ver-6 .map-alert .ma-memo-row #ma-memo-label { font-size: var(--font-size-12); line-height: var(--font-line-height-18); font-weight: 400; color: var(--text-secondary); }
+
+/*
+ * [11/02 v6] 대상 아님 · 센서 없음 카드 — 아래 글이 한 줄(설명)뿐이라 사진이 그만큼(22) 더 늘어나 제목 · 배지 줄이 옆 카드보다 내려앉았다.
+ *   옆 카드의 시각 줄(18 + 간격 4) 만큼 비워 사진 · 배지 · 제목 줄을 맞춘다.
+ */
+body.ver-6 .sf .g6.cx .kd.na > .sm { margin-bottom: calc(var(--font-line-height-18) + var(--space-4)); }
