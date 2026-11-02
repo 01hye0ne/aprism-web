@@ -18,8 +18,6 @@
  */
 (function () {
   "use strict";
-  // [11/02 v6] 보여 주는 제목 = 감지 · 측정 항목 + 값(alert-text-v6.js — v6 화면만 싣는다)
-  function T6(t) { return window.APRISM_ALERT6 ? window.APRISM_ALERT6.title(t) : t; }
 
   function $(sel, root) { return (root || document).querySelector(sel); }
   function $$(sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); }
@@ -379,7 +377,7 @@
         '<span class="ac-c-sev" role="gridcell">' + icon(SEV_ICON[a.sev], 16) +
           '<span class="ac-sr">' + SEV_LABEL[a.sev] + '</span></span>' +
         '<span class="ac-c-time ac-mono" role="gridcell">' + esc(a.time) + '</span>' +
-        '<span class="ac-c-title t-label-1" role="gridcell">' + esc(T6(a.title)) + '</span>' +
+        '<span class="ac-c-title t-label-1" role="gridcell">' + esc(a.title) + '</span>' +
         '<span class="ac-c-place" role="gridcell">' +
           '<span class="ac-wp ac-mono-label">' + esc(a.wp) + '</span>' +
           '<span class="ac-place t-body-4">' + esc(a.place) + '</span>' +
@@ -409,7 +407,7 @@
           '<span class="ac-sr">조치 완료</span></span>' +
         '<span class="ac-dc-time ac-mono" role="gridcell">' + esc(d.at) + '</span>' +
         '<span class="ac-dc-body" role="gridcell">' +
-          '<span class="ac-dc-title t-label-2">' + esc(T6(a.title)) + '</span>' +
+          '<span class="ac-dc-title t-label-2">' + esc(a.title) + '</span>' +
           '<span class="ac-dc-act t-caption">' + esc(d.picked.join(", ")) + '</span>' +
         '</span>' +
         '<span class="ac-dc-sev t-caption" role="gridcell">' +
@@ -590,7 +588,7 @@
   function snapMeta(a, rows) {
     return '<div class="ac-d-snap-meta">' +
       '<figure class="ac-d-snap">' +
-        '<img src="../assets/img/alert-live-' + a.live + '.webp" alt="' + esc(T6(a.title)) + ' 검출 장면" />' +
+        '<img src="../assets/img/alert-live-' + a.live + '.webp" alt="' + esc(a.title) + ' 검출 장면" />' +
       '</figure>' +
       '<dl class="ac-d-meta">' + rows + '</dl>' +
     '</div>';
@@ -609,7 +607,7 @@
         '<div class="ac-d-title-block">' +
           '<p class="ac-d-age t-caption">' + esc(a.stamp) + ' 발생</p>' +
           '<div class="ac-d-title-row">' + sevBadge(a, "") +
-            '<h2 class="t-title-1">' + esc(T6(a.title)) + '</h2>' +
+            '<h2 class="t-title-1">' + esc(a.title) + '</h2>' +
           '</div>' +
         '</div>' +
         snapMeta(a,
@@ -693,7 +691,7 @@
     return '<div class="ac-record">' +
       '<div class="ac-record-title">' +
         '<div class="ac-record-title-row">' + sevBadge(a, "원 등급 ") +
-          '<h2 class="t-title-1">' + esc(T6(a.title)) + '</h2>' +
+          '<h2 class="t-title-1">' + esc(a.title) + '</h2>' +
         '</div>' +
         '<p class="ac-record-age">' +
           '<span class="ac-record-at t-label-1">' + esc(DAYS[d.day].label) + ' ' + esc(d.at) + '</span>' +

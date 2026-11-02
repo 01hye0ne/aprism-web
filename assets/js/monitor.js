@@ -1194,7 +1194,7 @@
 
     function showToast(a) {
       if (!toast) { return; }
-      toastMsg.textContent = a.title + " 조치를 요청했어요";   // [10/30] 버튼이 [조치 요청] 으로 바뀜   // 가운뎃점 구분 대신 문장으로(10/29 피드백)
+      toastMsg.textContent = (window.APRISM_ALERT6 ? window.APRISM_ALERT6.title(a.title) : a.title) + " 조치를 요청했어요";   // [10/30] 버튼이 [조치 요청] 으로 바뀜   // 가운뎃점 구분 대신 문장으로(10/29 피드백)
       toast.hidden = false;
       clearTimeout(toastTimer);
       toastTimer = setTimeout(hideToast, 5000);
@@ -1251,7 +1251,7 @@
       busy = true;
       hideToast();
 
-      var rec = { time: clock(), title: a.title, how: picks.join(" · "), who: "홍길동", fresh: true,
+      var rec = { time: clock(), title: window.APRISM_ALERT6 ? window.APRISM_ALERT6.title(a.title) : a.title, how: picks.join(" · "), who: "홍길동", fresh: true,
                   memo: memoField ? memoField.value.trim() : "" };
       var from = box.getBoundingClientRect();
       // 분신을 먼저 띄우고 진짜 쪽지를 닫는다 — 순서가 바뀌면 잴 자리가 사라진다.
