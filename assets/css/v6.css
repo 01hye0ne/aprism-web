@@ -654,3 +654,20 @@ body.ver-6 .sfx-plan .m2v .dir { stroke: var(--bg-map-chip); stroke-opacity: .75
   background-image: linear-gradient(to top, rgb(255 255 255 / 70%) 0%, var(--color-red-100) 81.7%, #ffd4d6 100%);
   box-shadow: none;
 }
+
+/*
+ * [11/02 v6] 우측 웨이포인트 레일 이음매(디자이너 "라인이 끊김").
+ *   1 예정 칸 머리 선 — map-v6 가 예정 칸에도 고리(rr-mark)를 달며 머리 선이 회색 실선 4 토막으로 남아, 위 칸에서 내려오던 점선(2)이
+ *     칸 경계에서 굵은 실선으로 바뀌며 끊겨 보였다. 앞으로 갈 길이라 아래 선과 같은 점선(2 켜고 6 쉼)으로.
+ *   2 칸 경계 — 레일이 칸마다 따로라 소수 배율(125% 등)에서 위 칸 선 끝 · 아래 칸 머리 선 시작이 반올림되며 틈이 났다. 머리 선을 1 위로 겹친다.
+ */
+body.ver-6 [data-timeline] .timeline-item:not(:first-child) .rail-stub { margin-top: -1px; height: 19px; }
+body.ver-6 [data-timeline] .timeline-item.is-pending .rail-stub {
+  width: 2px;
+  background-color: var(--border-default);
+  background-image: none;
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2' height='8'%3E%3Crect width='2' height='2'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2' height='8'%3E%3Crect width='2' height='2'/%3E%3C/svg%3E");
+  -webkit-mask-repeat: repeat-y; mask-repeat: repeat-y;
+  -webkit-mask-size: 2px 8px; mask-size: 2px 8px;
+}
