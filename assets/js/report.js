@@ -58,6 +58,39 @@
   var NOTE = {};
   var cur = "m1017";
 
+  // 월 보고서 첫 쪽 · 일별 차트의 숫자(시안: 10/22 에 만든 10/01 ~ 21 중간 집계). v6 는 아래에서 10월 한 달 전체로 다시 센다.
+  var MO = { range: "2026.10.01 ~ 2026.10.21", made: "2026.10.22 14:12", days: "4일", missions: "6건 (정상 완료 5, 중단 종료 1)", time: "2시간 14분",
+    alerts: "23건 (위험 14, 주의 9)", undone: "2건", tot: ["6건", "23건", "14건", "9건", "2건"], ab: { 12: [0, 2], 13: [12, 0], 16: [0, 3], 21: [2, 4] }, abNote: "합계 위험 14건, 주의 9건" };
+  /*
+   * [11/02 v6] 오늘 = 2026-11-02(월) — 상태바 시계와 같다(디자이너: 실제 오늘 날짜로). 예전 판(v5)은 시안 그대로(오늘 10/22).
+   *   10월은 끝난 달 — 10/22 는 더 이상 작성 중이 아니고, 월 보고서는 10/01 ~ 31 전체(11/02 생성)다.
+   *   알림 센터 지난 기록(alert-center-data-v6.js)이 있는 날에 일일 보고서가 선다 —
+   *     10/31(토) 미션 2건 = 전기실 열화상 점검 14:07 · 유틸리티 순회 09:37
+   *     11/01(일) 미션 5건 = 야간 순회 21:15 · 22:41, 공조 15:05 · 16:32, 유틸리티 11:42, 정기 순회 10:18, 발전기실 09:00
+   *     11/02(월) 작성 중 = 오늘 끝난 미션 셋(야간 순회 · 공조 설비 순회 · 유틸리티 순회 — 관제 탭의 완료 미션)
+   *   10/22 는 알림 0건, 10/31 은 위험 1(온도 · 조치 완료) · 주의 1(계기 · 오탐 종료)로 10월 합계에 더했다.
+   */
+  var V6 = document.body.classList.contains("ver-6");
+  if (V6) {
+    DAYS = [
+      { m: 11, d: "11월 2일 (월)", day: 2, live: true, dayRpt: { n: 3 }, missions: [{ t: "08:40 ~ 09:40" }, { t: "07:20 ~ 08:15" }, { t: "02:00 ~ 03:10" }] },
+      { m: 11, d: "11월 1일 (일)", day: 1, dayRpt: { n: 5 }, missions: [{ t: "21:00 ~ 23:10" }, { t: "15:00 ~ 16:50" }, { t: "11:30 ~ 12:10" }, { t: "09:58 ~ 10:40" }, { t: "08:50 ~ 09:45" }] },
+      { m: 10, d: "10월 31일 (토)", day: 31, dayRpt: { n: 2 }, missions: [{ t: "13:50 ~ 14:30" }, { t: "09:20 ~ 10:05" }] },
+      { m: 10, d: "10월 22일 (목)", day: 22, dayRpt: { n: 1 }, missions: [{ t: "09:10 ~ 09:32" }] }
+    ].concat(DAYS.slice(1));
+    MDAYS = MDAYS.concat([["10.22 (목)", "1", "0", "0", "0", "0", "day-20261022-1800", ""], ["10.31 (토)", "2", "2", "1", "1", "0", "day-20261031-1800", ""]]);
+    DOCS.mo10.part = false;
+    DOCS.mo10.meta = [["기간", "2026.10.01 ~ 10.31"], ["미션", "9건"]];
+    DOCS.mo10.counts["온도감지"] = ["14", "0", "10", "3", "1"];
+    DOCS.mo10.counts["계기인식"] = ["0", "8", "5", "2", "1"];
+    DOCS.mo10.sum = ["15", "10", "18", "5", "2"];
+    THERM.mo10 = ["134.85°C (10.13)", "27건"];
+    OPINION.mo10 = "10월 한 달 동안 미션 9건, 알림 25건(위험 15, 주의 10)이 발생했다. 미조치 2건은 온도감지 1건(10.13), 계기인식 1건(10.21)이다. 10.13 열화상 최고 134.85°C 구간은 재점검이 필요하다.";
+    MO = { range: "2026.10.01 ~ 2026.10.31", made: "2026.11.02 09:05", days: "6일", missions: "9건 (정상 완료 8, 중단 종료 1)", time: "4시간 1분",
+      alerts: "25건 (위험 15, 주의 10)", undone: "2건", tot: ["9건", "25건", "15건", "10건", "2건"], ab: { 12: [0, 2], 13: [12, 0], 16: [0, 3], 21: [2, 4], 31: [1, 1] }, abNote: "합계 위험 15건, 주의 10건" };
+  }
+  function monthOf(d) { return d.m || 10; }
+
   function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;" }[c]; }); }
   function ic(name, size) { return '<span class="i i-' + (size || 16) + '" style="--i:var(--ic-' + name + ')" aria-hidden="true"></span>'; }
 
@@ -94,11 +127,11 @@
       h += secH("s", "점검 결과 요약") + '<div class="ft">' + f2("점검 구간", "WP-01 ~ WP-12 (12곳)", "소요 시간", "29분 0초") + f2("알림", "11건 (위험 11, 주의 0)", "미조치", OPEN.length + "건", true) + "</div></div>";
       h += secH("t", "감지 유형별 처리 현황") + countTable(doc) + fl("참고 사항", "AI 감지 원본 수치: 게이지 비정상 231건, 읽기 실패 1807건. 안전(PPE) 총 인원 802명, 안전모 위반 40건. 오디오 분석 1710건.") + "</div></div>";
     } else if (doc.kind === "mo") {
-      h += secH("b", "기본 정보") + '<div class="ft">' + f2("사업장", "{사업장명}", "기간", "2026.10.01 ~ 2026.10.21") + f2("로봇", "{로봇 ID}", "작성 일시", "2026.10.22 14:12") + f2("작성자", "{관제사}", "점검일 수", "4일") + "</div></div>";
-      h += secH("s", "처리 결과 요약") + '<div class="ft">' + f2("미션", "6건 (정상 완료 5, 중단 종료 1)", "점검 시간", "2시간 14분") + f2("알림", "23건 (위험 14, 주의 9)", "미조치", "2건", true) + "</div></div>";
+      h += secH("b", "기본 정보") + '<div class="ft">' + f2("사업장", "{사업장명}", "기간", MO.range) + f2("로봇", "{로봇 ID}", "작성 일시", MO.made) + f2("작성자", "{관제사}", "점검일 수", MO.days) + "</div></div>";
+      h += secH("s", "처리 결과 요약") + '<div class="ft">' + f2("미션", MO.missions, "점검 시간", MO.time) + f2("알림", MO.alerts, "미조치", MO.undone, true) + "</div></div>";
       h += secH("y", "일자별 결과") + '<div class="ft"><div class="fr dyt hd"><span>일자</span><span>미션</span><span>알림</span><span>위험</span><span>주의</span><span>미조치</span><span>일일 보고서</span></div>' +
         MDAYS.map(function (r) { return '<div class="fr dyt"><span class="c">' + r[0] + "</span>" + r.slice(1, 6).map(function (x, i) { return '<span class="c' + (i === 4 && x !== "0" ? " red" : "") + '">' + x + "건</span>"; }).join("") + '<span class="c"><button class="lk" data-doc="' + (r[7] || "x") + '">' + r[6] + "</button></span></div>"; }).join("") +
-        '<div class="fr dyt sum"><span class="c">합계</span><span class="c">6건</span><span class="c">23건</span><span class="c">14건</span><span class="c">9건</span><span class="c red">2건</span><span></span></div></div></div>';
+        '<div class="fr dyt sum"><span class="c">합계</span>' + MO.tot.map(function (x, i) { return '<span class="c' + (i === 4 ? " red" : "") + '">' + x + "</span>"; }).join("") + '<span></span></div></div></div>';
       h += secH("t", "감지 유형별 처리 현황") + countTable(doc) + "</div></div>";
     } else {
       h += secH("b", "기본 정보") + '<div class="ft">' + f2("사업장", "{사업장명}", "일자", "2026.10.13 (화)") + f2("근무자", "{관제사}", "근무 시간", "{근무 시간}") + f2("로봇", "{로봇 ID}", "미션 수", "2건") + "</div></div>";
@@ -170,7 +203,7 @@
     return '<div class="ch"><div class="cht"><b>' + t.name + "</b><span>" + t.type + ", " + t.thrLabel + '</span></div><svg viewBox="0 0 ' + CW + " " + H + '" width="100%" role="img" aria-label="' + t.name + ' 점검일별 측정값">' + g + xAxis(bot) + "</svg></div>";
   }
   function abChart() {
-    var D = { 12: [0, 2], 13: [12, 0], 16: [0, 3], 21: [2, 4] }, H = 178, top = 18, bot = H - 22, mx = 12, bw = 12;
+    var D = MO.ab, H = 178, top = 18, bot = H - 22, mx = 12, bw = 12;
     function y(v) { return bot - v * (bot - top) / mx; }
     var g = "";
     [0, 4, 8, 12].forEach(function (v) { g += '<line x1="' + PL + '" x2="' + (CW - PR) + '" y1="' + y(v) + '" y2="' + y(v) + '" class="gl"/><text x="' + (PL - 6) + '" y="' + (y(v) + 4) + '" text-anchor="end" class="ax">' + v + "</text>"; });
@@ -180,7 +213,7 @@
       if (ca) { h = y(0) - y(ca); g += '<path d="M' + x + "," + yy + " v" + (-(h - 3)) + " q0,-3 3,-3 h" + (bw - 6) + " q3,0 3,3 v" + (h - 3) + ' z" class="br ca"/>'; yy -= h; }
       g += '<text x="' + xd(+d) + '" y="' + (yy - 6) + '" text-anchor="middle" class="vl n">' + (cr + ca) + '</text><rect x="' + (x - 6) + '" y="' + top + '" width="' + (bw + 12) + '" height="' + (bot - top) + '" fill="transparent"><title>10.' + d + " 위험 " + cr + "건, 주의 " + ca + "건</title></rect>";
     });
-    return '<div class="ch"><div class="cht"><b>일별 위험, 주의 알림</b><span class="lg"><i class="cr"></i>위험<i class="ca"></i>주의</span></div><svg viewBox="0 0 ' + CW + " " + H + '" width="100%" role="img" aria-label="10월 일별 위험, 주의 알림 건수">' + g + xAxis(bot) + '</svg><div class="chn">점검하지 않은 날은 막대 없음. 합계 위험 14건, 주의 9건</div></div>';
+    return '<div class="ch"><div class="cht"><b>일별 위험, 주의 알림</b><span class="lg"><i class="cr"></i>위험<i class="ca"></i>주의</span></div><svg viewBox="0 0 ' + CW + " " + H + '" width="100%" role="img" aria-label="10월 일별 위험, 주의 알림 건수">' + g + xAxis(bot) + '</svg><div class="chn">점검하지 않은 날은 막대 없음. ' + MO.abNote + '</div></div>';
   }
   function thermBlk(id) { return { h: secH("th", "열화상 분석 결과") + '<div class="ft">' + f2("최고 온도", THERM[id][0], "고온감지", THERM[id][1]) + "</div></div>" }; }
   function opinionBlk(id) { return { h: secH("o", "종합 소견") + '<div class="ft">' + fl("소견", OPINION[id]) + "</div></div>" }; }
@@ -250,7 +283,7 @@
         return '<button type="button" class="t-body-4" data-k="' + el.getAttribute("data-sec") + '">' + el.querySelector(".f-h").textContent + '<span class="t-caption">' + pg + "쪽</span></button>";
       }).join("");
       // 목차 — 머리(목차 · 총 N쪽) · 항목 · 아래 생성 시각(Figma 목차 209)
-      tocEl.innerHTML = '<h4 class="rp-th t-caption"><span>목차</span><span>총 ' + count + "쪽</span></h4>" + items + '<div class="rp-pn t-caption">' + (doc.kind === "m" ? "자동 생성 2026.10.13 10:46" : doc.kind === "d" ? "자동 생성 2026.10.13 18:00" : "생성 2026.10.22 14:12") + "</div>";
+      tocEl.innerHTML = '<h4 class="rp-th t-caption"><span>목차</span><span>총 ' + count + "쪽</span></h4>" + items + '<div class="rp-pn t-caption">' + (doc.kind === "m" ? "자동 생성 2026.10.13 10:46" : doc.kind === "d" ? "자동 생성 2026.10.13 18:00" : "생성 " + MO.made) + "</div>";
       Array.prototype.forEach.call(tocEl.querySelectorAll("button"), function (b) {
         b.onclick = function () { var el = pagesEl.querySelector('[data-sec="' + b.getAttribute("data-k") + '"]'); if (el) { pagesEl.scrollTo({ top: topOf(el) - over() - 60, behavior: "smooth" }); } };
       });
@@ -334,6 +367,7 @@
   /* ---------- 보고서 메뉴 ---------- */
   var vm = 10;   // 보고 있는 달(2026년)
   var MAXM = 10, TODAY = 22;
+  if (V6) { vm = 11; MAXM = 11; TODAY = 2; }   // [11/02 v6] 오늘 11/02 — 목록은 이번 달(11월)부터
   var list = body.querySelector("[data-rp-list]"), side = body.querySelector("[data-rp-side]"), detail = body.querySelector("[data-rp-detail]");
   var dh = body.querySelector("[data-rp-dh]");
   // 머리 메타 — 라벨(text/tertiary) · 값 짝. 마지막은 늘 문서 번호
@@ -361,7 +395,7 @@
   }
   function selectDoc(id) { cur = id; closeModal(); renderList(); openDetail(); }
   function daysIn(m) { return new Date(2026, m, 0).getDate(); }
-  function rangeOf(m) { return m === MAXM ? "10.01 ~ 10." + (TODAY - 1) : String(m).padStart(2, "0") + ".01 ~ " + String(m).padStart(2, "0") + "." + daysIn(m); }
+  function rangeOf(m) { var mm = String(m).padStart(2, "0"); return mm + ".01 ~ " + mm + "." + String(m === MAXM ? Math.max(1, TODAY - 1) : daysIn(m)).padStart(2, "0"); }
 
   /*
    * 줄 하나. 날짜 줄(is-day) = 그날 일일 보고서 — 문서 아이콘 · Title/2, 오른쪽 미션 수.
@@ -410,9 +444,10 @@
     body.querySelector("[data-rp-next]").disabled = vm >= MAXM;
     if (vm === 10 && moState === "made") { n++; }
     // 보고서가 하나도 없는 달은 묶을 것이 없어 자리를 두지 않는다(시안에서는 10월만 있다)
-    if (vm === 10) { html += '<div class="rp-grp is-month">' + moSlot() + "</div>"; }
-    if (vm === 10) {
-      DAYS.forEach(function (d) {
+    var mdays = DAYS.filter(function (d) { return monthOf(d) === vm; });
+    if (vm === 10 || mdays.length) { html += '<div class="rp-grp is-month">' + moSlot() + "</div>"; }
+    if (mdays.length) {
+      mdays.forEach(function (d) {
         if (!d.live) { n++; }
         html += '<div class="rp-grp" role="listitem" data-day="' + d.day + '">' + dayRow(d.dayRpt.id, d.d, d.live ? "작성 중" : "미션 " + d.dayRpt.n, d.dayRpt.id && d.dayRpt.id === cur, d.live);
         d.missions.forEach(function (m) { n++; html += missionRow(m.id, m.t, m.id && m.id === cur); });
@@ -459,7 +494,7 @@
     mtBtn.setAttribute("aria-expanded", "true");
     drawCal(p, vm);
   }
-  function reportDays(m) { return m === 10 ? DAYS.map(function (d) { return d.day; }) : []; }
+  function reportDays(m) { return DAYS.filter(function (d) { return monthOf(d) === m; }).map(function (d) { return d.day; }); }
   function drawCal(p, m) {
     var first = new Date(2026, m - 1, 1).getDay(), n = daysIn(m), has = reportDays(m), cells = "";
     for (var i = 0; i < first; i++) { cells += "<span></span>"; }
@@ -470,11 +505,11 @@
     }
     p.innerHTML = '<div class="rp-cal-h"><button type="button" class="rp-ib" data-cm="-1" aria-label="이전 달">' + ic("chevron-left") + '</button><b class="t-title-2">2026년 ' + m + '월</b><button type="button" class="rp-ib" data-cm="1" aria-label="다음 달"' + (m >= MAXM ? " disabled" : "") + ">" + ic("chevron-right") + "</button></div>" +
       '<div class="rp-cg">' + ["일", "월", "화", "수", "목", "금", "토"].map(function (w) { return '<span class="rp-w t-caption">' + w + "</span>"; }).join("") + cells + "</div>" +
-      '<div class="rp-cf t-caption"><span><i></i>보고서 있는 날</span>' + (m === 10 ? "" : "<span>시안 예시는 10월만</span>") + "</div>";
+      '<div class="rp-cf t-caption"><span><i></i>보고서 있는 날</span>' + (reportDays(m).length ? "" : "<span>시안 예시는 10월만</span>") + "</div>";
     Array.prototype.forEach.call(p.querySelectorAll("[data-cm]"), function (b) { b.onclick = function () { var nm = m + (+b.getAttribute("data-cm")); if (nm <= MAXM) { drawCal(p, nm); } }; });
     Array.prototype.forEach.call(p.querySelectorAll(".rp-cd.has"), function (b) {
       b.onclick = function () {
-        var day = +b.getAttribute("data-d"), dd = DAYS.filter(function (x) { return x.day === day; })[0];
+        var day = +b.getAttribute("data-d"), dd = DAYS.filter(function (x) { return x.day === day && monthOf(x) === m; })[0];
         vm = m; closeCal();
         if (dd && dd.dayRpt.id) { selectDoc(dd.dayRpt.id); } else { renderList(); }
         var g = list.querySelector('.rp-grp[data-day="' + day + '"]');

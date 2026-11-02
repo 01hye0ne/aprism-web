@@ -116,7 +116,7 @@ function pressureTank() {
   return g;
 }
 function firePump(i) {
-  const g = mod("소화 펌프 FP-" + i, "소화 · 가로형 펌프 + 모터", [["구분", i === 1 ? "주 펌프" : "예비 펌프"], ["상태", "대기"], ["최근 점검", "08/25 09:00"]]);
+  const g = mod("소화 펌프 FP-" + i, "소화 · 가로형 펌프 + 모터", [["구분", i === 1 ? "주 펌프" : "예비 펌프"], ["상태", "대기"], ["최근 점검", "11/01 09:00"]]);
   g.add(tile(3.4, 1.6));
   g.add(rbox(3.0, 0.22, 0.9, P.mid, 0, Y0, 0, 0.06));                        // ① 받침
   const motor = shade(new THREE.Mesh(new THREE.CapsuleGeometry(0.42, 1.1, 8, 32), mat(P.white))); motor.rotation.z = Math.PI / 2; motor.position.set(0.55, Y0 + 0.7, 0); g.add(motor);   // ② 모터
