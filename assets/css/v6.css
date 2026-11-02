@@ -389,3 +389,29 @@ body.ver-6 .sf .hmore summary::after { content: none; }
 body.ver-6 .sf .hmore summary .i { transition: transform 160ms ease; }
 body.ver-6 .sf .hmore[open] summary .i { transform: rotate(180deg); }
 body.ver-6 .sf .hmore { margin-top: var(--space-4); }
+
+/*
+ * [11/02 v6] 통합 순회 [로봇 현황] 카드의 지금 · 다음 표식 — 관제 미션 타임라인 표식과 같게(디자이너).
+ *   지금 = 길색(main/400) 빈 고리 16 · 테 2 — 관제 타임라인 · 지도의 "지금" 칸과 같다
+ *   다음 = 회색(gray/450) 빈 고리 12 · 테 2 — 관제의 "예정" 칸
+ *   잇는 선 = 앞으로 갈 길이라 점선 2(2 켜고 6 쉼, border/default) — 관제 .rail-line 과 같은 SVG 타일 mask
+ * 수행중 카드만 바꾼다. 완료 · 대기 · 끊김 카드의 상태 아이콘(체크 · 번개 · 시계)은 그대로.
+ */
+body.ver-6 .bld-rc2.is-run .bld-rc2-mark .i { display: none; }
+body.ver-6 .bld-rc2.is-run .bld-rc2-mark::before { box-sizing: border-box; border: 2px solid currentColor; }
+body.ver-6 .bld-rc2.is-run .bld-rc2-step.is-now .bld-rc2-mark { color: var(--color-blue-400); }
+body.ver-6 .bld-rc2.is-run .bld-rc2-step.is-next .bld-rc2-mark { color: var(--color-gray-450); }
+body.ver-6 .bld-rc2.is-run .bld-rc2-step.is-next .bld-rc2-mark::before { width: 12px; height: 12px; }
+body.ver-6 .bld-rc2-body.has-next::before {
+  top: calc(var(--space-12) + 20px);
+  bottom: 13px;
+  border-radius: 0;
+  background-image: none;
+  background-color: var(--border-default);
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2' height='8'%3E%3Crect width='2' height='2'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2' height='8'%3E%3Crect width='2' height='2'/%3E%3C/svg%3E");
+  -webkit-mask-repeat: repeat-y; mask-repeat: repeat-y;
+  -webkit-mask-size: 2px 8px; mask-size: 2px 8px;
+  -webkit-mask-position: 0 2px; mask-position: 0 2px;
+}
+:root[data-theme="light"] body.ver-6 .bld-rc2.is-run .bld-rc2-step.is-now .bld-rc2-mark { color: var(--status-info-icon); }
