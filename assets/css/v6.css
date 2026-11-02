@@ -370,3 +370,14 @@ body.ver-6 .status-bar-logo { padding-top: 0; padding-bottom: 0; }
 body.ver-6 .sb-tab { height: 40px; }
 /* [10/30] 조치 제안 판 — 모서리는 다른 카드와 같은 radius/card, 아래 끝 그라데이션 없이 한 면(bg/raised) */
 body.ver-6 .sf .dl.is-light-scope { border-radius: var(--radius-card); background: var(--bg-raised); }
+/* [10/30] 안전진단 자세히 보기 — 재발 여부 한 줄 요약(.hsum)과 접힌 지난 기록(.hmore). 반복이면 요약 머리를 주의색으로 */
+body.ver-6 .sf .hsum { margin: 0 0 var(--space-8); font-size: var(--font-size-13); line-height: var(--font-line-height-20); color: var(--text-secondary); }
+body.ver-6 .sf .hsum b { margin-right: var(--space-4); color: var(--text-primary); font-weight: 700; }
+body.ver-6 .sf .hsum.is-rep b { color: var(--status-warning-text); }
+body.ver-6 .sf .hmore { margin-top: var(--space-8); }
+body.ver-6 .sf .hmore summary { display: inline-flex; align-items: center; gap: var(--space-4); padding: var(--space-2) 0; font-size: var(--font-size-12); line-height: var(--font-line-height-18); color: var(--text-tertiary); cursor: pointer; list-style: none; }
+body.ver-6 .sf .hmore summary::-webkit-details-marker { display: none; }
+body.ver-6 .sf .hmore summary::after { content: "›"; transform: rotate(90deg); transition: transform 160ms ease; }
+body.ver-6 .sf .hmore[open] summary::after { transform: rotate(-90deg); }
+body.ver-6 .sf .hmore summary:hover { color: var(--text-primary); }
+body.ver-6 .sf .hmore[open] .hist { margin-top: var(--space-4); }

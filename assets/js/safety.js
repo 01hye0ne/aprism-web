@@ -121,6 +121,16 @@
     const nowAct = !isHit ? (st==='plan' ? '' : '조치 없음') : st==='done' ? (x[4] || '10:17') + ' 현장 조치 요청됨' : '';
     const hist = !isHit ? [['10/22 09:00','정상 범위','ok','조치 없음'],['10/22 14:00','정상 범위','ok','조치 없음'],['10/23 09:00','정상 범위','ok','조치 없음'],['오늘 ' + (x[3] || ''), st==='plan' ? '측정 전' : x[1], st, nowAct]] : [['10/22 09:00','정상 범위','ok','조치 없음'],['10/22 14:00','정상 범위','ok','조치 없음'],['10/23 09:00', st==='warn' ? '주의' : '정상 범위', st==='warn' ? 'warn' : 'ok', st==='warn' ? '09:14 ' + prevAct : '조치 없음'],['오늘 ' + x[3], SHORT[x[1]] || x[1], st, nowAct]];
     const again = '';
+    /*
+     * [10/30 v6] 재발 여부 — 지난 3회가 모두 정상이면(처음 넘음 · 정상) 한 줄 요약 + 오늘 줄, 지난 기록은 [지난 3회 보기]로 접는다.
+     * 지난 회에도 넘었으면(반복) 예전처럼 네 줄을 다 보인다 — 반복일 때 판단이 달라진다(디자이너 10/30).
+     * 연관 감지는 근거가 있을 때만 카드를 둔다(아래 dBc).
+     */
+    const hiRow = ([t, val, s2, a], n) => `<div class="hi ${n===3 ? 'now' : ''}"><span class="t">${t}</span><span>${val}</span><span class="pl ${s2}">${WORD[s2]}</span><span class="hia ${a && a !== '조치 없음' ? 'on' : ''}">${a}</span></div>`;
+    const rep3 = hist.slice(0, 3).some(h => h[2] !== 'ok');
+    const histHtml = !V6 || rep3 ? `${V6 ? '<p class="hsum is-rep"><b>반복</b> 지난 순회에서도 기준을 넘었음</p>' : ''}<div class="hist">${hist.map(hiRow).join('')}</div>`
+      : `<p class="hsum"><b>${isHit ? '처음 넘음' : '계속 정상 범위'}</b> 최근 3회(${hist[0][0]} ~ ${hist[2][0]}) 모두 정상 범위</p><div class="hist">${hiRow(hist[3], 3)}</div>
+        <details class="hmore"><summary>지난 3회 보기</summary><div class="hist">${hist.slice(0, 3).map(hiRow).join('')}</div></details>`;
     const rel = K.filter(k2 => k2 !== k && m.r[k2] && (m.r[k2][0]==='crit' || m.r[k2][0]==='warn'));
     const sug = SG;
     const side = !isHit ? `<div class="donec"><b>${st==='plan' ? '아직 측정 전' : '조치 필요 없음'}</b><span>${st==='plan' ? '로봇이 도착하면 결과가 표시됨' : '정상 범위의 측정값'}</span></div>` : st==='done' ? `<div class="donec"><b>${x[4] || '10:17'} 현장 조치 요청됨</b><span>재측정에서 다시 넘으면 다시 표시</span></div>`
@@ -142,8 +152,8 @@
           <div class="lvA s1 ${st}">${step('이상 판정')}<div class="tt"><span class="pl ${st}">${WORD[st]}</span><h5>${k}, ${isHit ? x[1] : st==='plan' ? '측정 전' : '정상 범위 ' + x[1]}</h5></div>${loc}${cond}</div>
           <div class="dBr2">
             <div class="lvA s2">${step('영상 확인')}${!isHit ? '<span class="why1">시안용 예시 이미지(같은 감지의 사진)</span>' : ''}${media}</div>
-            <div class="dBc"><div class="lvB">${step('재발 여부')}<div class="hist">${hist.map(([t, val, s2, a], n) => `<div class="hi ${n===3 ? 'now' : ''}"><span class="t">${t}</span><span>${val}</span><span class="pl ${s2}">${WORD[s2]}</span><span class="hia ${a && a !== '조치 없음' ? 'on' : ''}">${a}</span></div>`).join('')}</div>${again}</div>
-              <div class="lvB s4 ref">${relHead}${relB}</div></div>
+            <div class="dBc"><div class="lvB">${step('재발 여부')}${histHtml}${again}</div>
+              ${V6 && !lks.length ? '' : `<div class="lvB s4 ref">${relHead}${relB}</div>`}</div>
           </div>
         </div>
         <div class="lvD">${V6 ? '' : step('조치 결정')}${side}</div>
@@ -523,8 +533,11 @@
     while(v.firstChild) sc.appendChild(v.firstChild);
     if(hd) v.appendChild(top);
     v.appendChild(sc);
+    // [10/30 v6] 자세히 보기는 그 미션의 것 — 상단 탭 · 왼쪽 판도 그 미션으로(전체 미션에서 카드를 눌러 들어와도). 돌아가기는 원래 범위로
+    const sc0 = scope; if(V6 && dt) scope = dt.mi;
     bc.innerHTML = crumb();
     side.innerHTML = sideHtml();
+    scope = sc0;
     bindThumb();
     // [10/30] GNB [관제] — 미션 전체를 보고 있으면 통합 순회 현황, 미션 하나면 그 미션의 관제(관제에서 보기와 같은 주소)
     if(gnbMain) gnbMain.href = scope==='all' ? (V6 ? './building-v6.html' : './building-v5.html') : mainUrl(scope, viewF(scope).cur);
