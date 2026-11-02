@@ -613,7 +613,7 @@
       // [10/30 GUI · Figma 1467:8854] 카드 — 배지 왼쪽 · 건수 오른쪽, 위치(핀) · 시각(시계) 두 줄, 아래 사진은 카드 안 4 만 띄워 꽉 채운다
       // [10/30] 묶음 제목 앞 단계 기호는 뺐다 — 바로 아래 카드 배지와 왼쪽 목록이 같은 말을 한다(한 화면에 세 번)
       // [10/30] 제목 옆 층 · 로봇 · 측정(왼쪽 목록과 같다)과 오른쪽 정상 범위 n종(카드가 보여 준다)도 뺐다 — 제목은 미션 이름만
-      return `<section class="msec ${w}" data-mi="${i}"><div class="msh2"><b>${m.mis}</b>${i===1 && !newSeen ? '<em class="nwm">새로</em>' : ''}</div>
+      return `<section class="msec ${w}" data-mi="${i}"><div class="msh2">${V6 ? `<button type="button" class="msh-go" data-sc="${i}" aria-label="${m.mis} 미션 보기"><b>${m.mis}</b><span class="i i-16" style="--i:var(--ic-chevron-right)" aria-hidden="true"></span></button>` : `<b>${m.mis}</b>`}${i===1 && !newSeen ? '<em class="nwm">새로</em>' : ''}</div>
         <div class="mrow cx vC">${fl.map(k => cardX(cardM(i, k), k, false)).join('')}</div></section>`; }).join('') + '</div>';
   }
   function cardsAll(){

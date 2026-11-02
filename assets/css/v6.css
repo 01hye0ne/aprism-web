@@ -844,3 +844,28 @@ body.ver-6 .sf .c1x input[type="checkbox"]::after {
 body.ver-6 .sf .c1x input[type="checkbox"]:checked { border-color: transparent; background-color: var(--comp-gnb-brand); }
 body.ver-6 .sf .c1x input[type="checkbox"]:checked::after { opacity: 1; }
 body.ver-6 .sf .c1x input[type="checkbox"]:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 2px; }
+
+/*
+ * [11/02 v6] 전체 미션 — 미션 묶음 제목(정기 순회 점검 …)을 그 미션으로 가는 ghost 단추로(디자이너). 평소엔 배경 없이 글 + 꺾쇠,
+ *   올리거나 누를 때만 배경(btn-ghost 와 같은 bg/glass). 글 시작은 아래 카드 왼쪽 선 그대로 — 단추 안 여백 8 만큼 왼쪽으로 당긴다.
+ */
+body.ver-6 .sf .msh2 .msh-go {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4);
+  height: 32px;
+  margin: -4px 0 -4px calc(var(--space-8) * -1);
+  padding: 0 var(--space-4) 0 var(--space-8);
+  border: 0;
+  border-radius: var(--radius-4);
+  background-color: transparent;
+  color: var(--text-primary);
+  font: inherit;
+  cursor: pointer;
+  transition: background-color 120ms ease;
+}
+body.ver-6 .sf .msh2 .msh-go .i { color: var(--text-tertiary); }
+body.ver-6 .sf .msh2 .msh-go:hover { background-color: var(--bg-glass); }
+body.ver-6 .sf .msh2 .msh-go:hover .i { color: var(--text-secondary); }
+body.ver-6 .sf .msh2 .msh-go:active { background-color: var(--bg-selected); }
+body.ver-6 .sf .msh2 .msh-go:focus-visible { outline: var(--border-width-strong) solid var(--border-focus); outline-offset: 1px; }
