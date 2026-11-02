@@ -454,7 +454,7 @@
     return '<div class="ac-done-row" role="row" data-id="' + a.id + '" data-sev="' + a.sev + '"' +
         ' tabindex="' + (sel ? "0" : "-1") + '" aria-selected="' + (sel ? "true" : "false") + '">' +
         '<span class="ac-dc-check" role="gridcell">' + icon("--ic-check", 16) +
-          '<span class="ac-sr">조치 완료</span></span>' +
+          '<span class="ac-sr">' + (V6 ? "조치 요청됨" : "조치 완료") + '</span></span>' +
         '<span class="ac-dc-time ac-mono" role="gridcell">' + esc(d.at) + '</span>' +
         '<span class="ac-dc-body" role="gridcell">' +
           '<span class="ac-dc-title t-label-2">' + esc(titleOf(a)) + '</span>' +
@@ -852,6 +852,9 @@
           esc(a.fpLabel || "") + '(' + fp + '%)</span></span>' +
       '</div>' +
       '<p class="ac-dl-lead">' + esc(a.lead) + '</p>' +
+      // 근거 — 팝오버에는 자리가 없어 빠진 줄. 알림 센터는 넉넉해 제안 바로 아래에 둔다(11/02 디자이너)
+      (a.why && a.why.length ? '<ul class="ac-dl-why">' +
+        a.why.map(function (w) { return '<li class="t-body-4">' + esc(w) + '</li>'; }).join("") + '</ul>' : "") +
       '<div class="ma-checks" role="group" aria-label="조치 내용">' + rows + '</div>' +
       '<div class="ac-dl-memo">' +
         '<label class="t-label-2" for="ac-memo">메모 (선택)</label>' +

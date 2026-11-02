@@ -1343,3 +1343,8 @@ body.ver-6 .ac-dl .ma-memo-field:focus-visible { outline: var(--border-width-thi
 body.ver-6 .ac-d6-head { view-transition-name: dx-head; }
 body.ver-6 .ac-detail-contents .ac-d-snap { view-transition-name: dx-shot; }
 body.ver-6 .ac-dl { view-transition-name: dx-act; }
+
+/* [11/02 v6] DELTA 판 근거 줄 — 제안 바로 아래, 글은 secondary · 앞 점 4(예전 .ac-delta-reasons 와 같은 짜임). 판이 반대색이라 토큰이 따라 뒤집힌다 */
+body.ver-6 .ac-dl-why { display: flex; flex-direction: column; gap: var(--space-4); margin: calc(var(--space-4) * -1) 0 0; padding: 0; list-style: none; }
+body.ver-6 .ac-dl-why li { display: flex; gap: var(--space-8); color: var(--text-secondary); }
+body.ver-6 .ac-dl-why li::before { content: ""; flex: none; width: 4px; height: 4px; margin-top: 9px; border-radius: var(--radius-pill); background-color: var(--text-tertiary); }

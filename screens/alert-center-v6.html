@@ -21,7 +21,7 @@
   <link rel="stylesheet" href="../assets/css/app-shell.css?v=01264297" />
   <link rel="stylesheet" href="../assets/css/icons-outline.css?v=86d19675" />
   <link rel="stylesheet" href="../assets/css/text-parts.css?v=e38e19ea" />
-  <link rel="stylesheet" href="../assets/css/alert-center.css?v=b540852b" />
+  <link rel="stylesheet" href="../assets/css/alert-center.css?v=6a57ea31" />
   <!-- v3 전용 규칙 — v2.2 는 10/21 부로 멈췄다. v3 에서 바꾸는 것은 여기(body.ver-3)에. -->
   <link rel="stylesheet" href="../assets/css/v3.css?v=7fce80d4" />
   <!-- v5 전용 규칙 — v4 는 10/29 부로 멈췄다. v5 에서 바꾸는 것은 여기(body.ver-5)에. -->
@@ -261,7 +261,8 @@
                 <span class="ac-tab-count ac-mono" data-ac-count-open>11건</span>
               </button>
               <button type="button" class="ac-tab" role="tab" aria-selected="false" data-ac-tab="done">
-                <span class="t-label-1">조치 완료</span>
+                <!-- [11/02 v6] "조치 완료" → "조치 요청됨" — 상세 버튼이 [조치 요청](관제 팝오버와 같다)이라 누른 뒤 가는 곳의 이름도 같은 말로. 안전진단의 상태 이름(요청됨)과도 같다 -->
+                <span class="t-label-1">조치 요청됨</span>
                 <span class="ac-tab-count ac-mono" data-ac-count-done>11건</span>
               </button>
             </div>
@@ -277,10 +278,10 @@
               </span>
             </div>
             <!-- Figma 1202:16190 — 끝난 조치를 묶어 인수인계 초안을 만든다. 조치 완료 탭에만 선다.
-                 [11/02 v6] "오늘" 을 뺐다 — v6 조치 완료 기록은 지난 이틀(어제 · 8/24)이라 오늘 것만 묶는 말이 맞지 않는다. -->
+                 [11/02 v6] 오늘 조치 5건(관제 "오늘 확인 완료"와 같다)이 들어와 "오늘" 을 다시 붙였다. -->
             <button type="button" class="btn btn-secondary is-xs ac-summary-btn" data-ac-summary hidden>
               <span class="i i-16" style="--i:var(--ic-delta)" aria-hidden="true"></span>
-              조치 요약 만들기
+              오늘 조치 요약 만들기
             </button>
           </div>
 
@@ -326,7 +327,7 @@
 <script src="../assets/js/theme.js?v=c86093d9"></script>
 <!-- [11/02 v6] 알림 제목 표(관제와 같다) · v6 알림 데이터 — alert-center.js 보다 먼저 -->
 <script src="../assets/js/alert-text-v6.js?v=7a2c3088"></script>
-<script src="../assets/js/alert-center-data-v6.js?v=f1fd9b24"></script>
-<script src="../assets/js/alert-center.js?v=9d5b239e"></script>
+<script src="../assets/js/alert-center-data-v6.js?v=902619f5"></script>
+<script src="../assets/js/alert-center.js?v=1702febd"></script>
 </body>
 </html>
