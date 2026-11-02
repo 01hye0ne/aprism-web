@@ -313,3 +313,6 @@ body.ver-6 .sf .ewrap .mx tr > :nth-child(1) { left: 0; }
 body.ver-6 .sf .ewrap .mx tr > :nth-child(2) { left: 170px; }
 body.ver-6 .sf .ewrap .mx tr > :nth-child(3) { left: 254px; box-shadow: 1px 0 0 var(--border-divider); }
 body.ver-6 .sf .ewrap .mx tr > .c-m { position: sticky; right: 0; z-index: 2; background-color: color-mix(in srgb, var(--status-info-icon) 8%, var(--bg-page)); box-shadow: -1px 0 0 var(--border-divider); }
+/* [10/30] 표 선 — 맨 위(라이브 줄 아래) 선은 빼고, 머리줄 아래 선(border/default)은 그대로, 줄 사이 선은 바탕에 묻히게 옅게(border/divider 45%) */
+body.ver-6 .sf #sfv:has(.ewrap) > .sftop, body.ver-6 .sf #sfv:has(.mtbw) > .sftop { border-bottom: 0; }
+body.ver-6 .sf .ewrap .mx td, body.ver-6 .sf .mtbw .mtb td { border-bottom-color: color-mix(in srgb, var(--border-divider) 45%, transparent); }
