@@ -73,8 +73,8 @@
     BASE[1].r = {'안전감지':ok(3), '누출감지':ok(2), '온도감지':ok(3), '계기인식':['crit','차압 312 Pa','WP-02 HEPA Filter 차압계','09:44'], '이상음향':ok(2), '부분방전':ok(2)};
     BASE[1].rs = {'계기인식':[['crit','차압 312 Pa','WP-02 HEPA Filter 차압계','09:44'], ['warn','압력 0.62 MPa','WP-04 N₂ 배관 압력계','10:15']]};
     BASE[2].na = {'안전감지':'scope'};
-    BASE[2].r = {'안전감지':null, '누출감지':ok(4), '온도감지':['warn','최고 68.4 ℃','WP-02 발전기 베어링','10:03'], '계기인식':['warn','압력 7.9 bar','WP-13 공기 압축기 C-1','10:01'],
-      '이상음향':['warn','이상 점수 21.6','WP-12 냉각 펌프 P-2','10:06'], '부분방전':['warn','이상 점수 9.41','WP-06 수배전반','10:09']};   // 이상음향 = 관제 "진동 상승"을 6종으로 옮긴 것(10/30)
+    BASE[2].r = {'안전감지':null, '누출감지':ok(4), '온도감지':['warn','최고 68.4 ℃','WP-02 발전기 베어링','09:20'], '계기인식':['warn','압력 7.9 bar','WP-13 공기 압축기 C-1','10:01'],
+      '이상음향':['warn','이상 점수 21.6','WP-12 냉각 펌프 P-2','09:56'], '부분방전':['warn','이상 점수 9.41','WP-06 수배전반','09:36']};   // 이상음향 = 관제 "진동 상승"을 6종으로 옮긴 것(10/30)
     MV['2|이상음향|warn'] = 'm2_sound_warn.jpg';
     LINKS[2] = [['부분방전', '온도감지', '같은 발전기 계통. WP-06 수배전반 방전과 WP-02 베어링 과열이 함께 나타날 수 있다', '보통']];
     BASE.push(
@@ -192,6 +192,15 @@
     const m = M[i], list = spotsOne(i);
     let tt = 9 * 60 + 50; const sp = list.map(p => { const t = p.t || (String(Math.floor(tt / 60)).padStart(2, '0') + ':' + String(tt % 60).padStart(2, '0')); tt += 4; return [p.w, t, m.robot, p.plan ? 1 : 0]; });
     sp.sort((x, y) => x[3] - y[3] || (x[1] < y[1] ? -1 : 1));
+    if(V6){   // [10/30 v6] 시각을 지점 번호 차례로 — 넘은 곳의 시각(관제 알림)은 그대로, 나머지 측정 지점은 그 사이를 4분씩, 예정은 마지막 측정 뒤로. 예전엔 WP-02 09:44 → WP-01 09:50 처럼 거꾸로 섰다
+      const mn = t => parseInt(t.slice(0, 2)) * 60 + parseInt(t.slice(3)), hh = n => String(Math.floor(n / 60)).padStart(2, '0') + ':' + String(n % 60).padStart(2, '0');
+      const ms = sp.filter(x => !x[3]).sort((x, y) => x[0] < y[0] ? -1 : 1), hit = new Set(list.filter(p => p.t).map(p => p.w));
+      const fi = ms.findIndex(x => hit.has(x[0]));
+      let t = fi < 0 ? 9 * 60 + 50 : mn(ms[fi][1]) - 4 * fi;
+      ms.forEach(x => { if(hit.has(x[0])) t = Math.max(t, mn(x[1])); else x[1] = hh(t); t += 4; });
+      sp.filter(x => x[3]).forEach(x => { x[1] = hh(t); t += 4; });
+      sp.sort((x, y) => x[3] - y[3] || (x[0] < y[0] ? -1 : 1));
+    }
     const meas = sp.filter(x => !x[3]), now = m.done < m.total && meas.length ? meas[meas.length - 1][0] : '';
     const rows = K.map((k, ki) => { const x = m.r[k]; if(!x){ const why = naOf(i, k); return {n:k, src:SRC[k], s:'na', na:why, std:STD[k], memo:why==='sensor' ? m.robot + '에 센서가 달려 있지 않음' : '이 미션에서 판정하지 않음', c:{}}; }
       const c = {}, cnt = x[0]==='ok' ? (parseInt(x[2].replace(/\D/g, '')) || 3) : 3; let n = 0;

@@ -300,3 +300,16 @@ body.ver-6 .sf .sfsc:has(> .ewrap), body.ver-6 .sf .sfsc:has(> .mtbw) { padding:
 body.ver-6 .sf .ewrap .mx tr > :first-child, body.ver-6 .sf .mtbw .mtb tr > :first-child { padding-left: 36px; }
 body.ver-6 .sf .ewrap .mx tr > :last-child, body.ver-6 .sf .mtbw .mtb tr > :last-child { padding-right: var(--space-20); }
 body.ver-6 .sf .ewrap .mx tr:first-child > th:nth-child(1) { width: 170px; }   /* 첫 열이 20 넓어진 만큼 */
+/*
+ * [10/30] 지점이 많은 미션(전기실 20곳) — WP 열은 최소 88 을 지키고, 넘치면 표 칸(.ewrap) 안에서 옆으로 넘긴다(디자이너).
+ * 넘겨도 무엇을 보는지 알게 왼쪽 감지 · 판정 · 기준 열과 오른쪽 DELTA 메모 열은 붙박이(sticky). 붙박이 칸은 본문 판 색(bg/page)을 깔아 밑으로 지나가는 칸을 가린다.
+ * 막대는 표 바로 아래 — 공통 스크롤바(.sf ::-webkit-scrollbar).
+ */
+body.ver-6 .sf .ewrap { overflow-x: auto; overflow-y: hidden; }
+body.ver-6 .sf .ewrap .mx { width: max-content; min-width: 100%; }
+body.ver-6 .sf .ewrap .mx th.c-wp { width: 88px; }
+body.ver-6 .sf .ewrap .mx tr > :nth-child(-n+3) { position: sticky; z-index: 2; background-color: var(--bg-page); }
+body.ver-6 .sf .ewrap .mx tr > :nth-child(1) { left: 0; }
+body.ver-6 .sf .ewrap .mx tr > :nth-child(2) { left: 170px; }
+body.ver-6 .sf .ewrap .mx tr > :nth-child(3) { left: 254px; box-shadow: 1px 0 0 var(--border-divider); }
+body.ver-6 .sf .ewrap .mx tr > .c-m { position: sticky; right: 0; z-index: 2; background-color: color-mix(in srgb, var(--status-info-icon) 8%, var(--bg-page)); box-shadow: -1px 0 0 var(--border-divider); }

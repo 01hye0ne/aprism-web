@@ -129,7 +129,7 @@
     a.mission = robotNo(a.robot).mission;
   });
   // [10/30 v6] WP-12 진동 상승 → 이상음향(관제 monitor.js · 안전진단과 같다)
-  if (body.classList.contains("ver-6")) { ALERTS.forEach(function (al) { if (al.title === "진동 상승 · 냉각 펌프 P-2") { al.title = "이상음향 · 이상 점수 21.6"; } }); }
+  if (body.classList.contains("ver-6")) { ALERTS.forEach(function (al) { if (al.title === "진동 상승 · 냉각 펌프 P-2") { al.title = "이상음향 · 이상 점수 21.6"; } var T = { "이상음향 · 이상 점수 21.6": "09:56:05", "부분방전 · 이상 점수 9.41": "09:36:42", "과열 · 발전기 베어링 68.4℃": "09:20:14" }; if (T[al.title]) { al.time = T[al.title]; } }); }   // 시각도 경로 차례로(monitor.js 와 같다)
 
   var DONE = [
     { time: "10:29:10", title: "온도감지 · WP-03 펌프 하우징", how: "추이 관찰 · 다음 순회 재측정", who: "김현대" },
