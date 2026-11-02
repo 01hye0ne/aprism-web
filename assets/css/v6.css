@@ -187,7 +187,7 @@ body.ver-6 .sb-tab.is-on:first-child::after {
  * [10/30 v6] 우측 패널 머리 — Figma Header(1533:19577): 높이 38 · 패딩 4/4/8/8 · 사이 8.
  * 오른쪽 정렬 "위험도 순 ⌄" — 13 Medium text/secondary · 화살표 16 · 사이 2. [+] — Icon Button Secondary xSmall 24 · 아이콘 plus 16.
  */
-body.ver-6.v2 .robot-bar { height: 38px; gap: var(--space-8); padding: 4px 4px 8px 8px; }
+/* [11/02] 로봇 줄 머리 높이 38 은 v5 로봇 패널로 되돌리며 뺐다(디자이너) — 아래 정렬 · [+] 규칙은 쓰는 마크업이 없다 */
 body.ver-6 .rf-sort { position: relative; flex: none; }
 body.ver-6 .rf-sort-btn {
   display: inline-flex;
