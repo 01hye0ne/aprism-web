@@ -152,16 +152,16 @@
     dt.wp = wp; dt.lk = lks.map(l => l.w2);   // 왼쪽 패널 지도가 이 지점과 연관 지점을 표시한다(sideHtml)
     const loc = `<p class="loc"><b>${wp}</b>${isHit ? '<span>' + x[2].split(' ').slice(1).join(' ') + '</span>' : ''}<span class="lm">${m.fl}, ${m.robot}${x[3] ? ' 측정 ' + x[3] : ''}</span></p>`;
     /*
-     * [11/02 v6] 판정 카드 — Figma DS 1469:8820. 머리 이름(이상 판정) · 왼쪽 단계 띠 없이 배지 → 제목 18 → 값 36 + 막대(기준 표식 하나) → 정보 넷(미션 · 로봇 · 발생위치 · 발생시간).
+     * [11/02 v6] 판정 카드 — Figma DS 1469:8820. 머리 이름(이상 판정) · 왼쪽 단계 띠 없이 배지 → 제목 18 + 위치 · 시각 한 줄 → 값 36 + 막대(주의 · 위험 기준 표식).
      *   막대는 측정 범위(COND) 위에 값 채움, 주의 · 위험 기준 자리에 표식 둘(11/02 디자이너 — 둘 다 표시). 수치 막대가 없는 감지(안전 · 계기)는 값과 기준 글만.
      */
     const jv = (() => { if(!isHit) return `<span class="why1">기준: ${STD[k]}</span>`;
       if(cd && !isNaN(num)){ const [lo, hi, w2, c2, u] = cd, p = q => Math.max(0, Math.min(100, (q - lo) / (hi - lo) * 100)).toFixed(1);
         return `<div class="jv"><b class="jn ${st}">${num}${u==='%' ? '%' : u}</b><div class="jtrk"><span class="f ${st}" style="width:${p(num)}%"></span><span class="jm w" style="left:${p(w2)}%"><span>주의 ${w2}${u}</span></span><span class="jm c" style="left:${p(c2)}%"><span>위험 ${c2}${u}</span></span></div></div>`; }
       return `<div class="jv"><b class="jn ${st}">${SHORT[x[1]] || x[1]}</b><span class="why1">기준: ${STD[k]}</span></div>`; })();
-    const jinfo = [['미션', m.mis], ['로봇', m.robot], ['발생위치', `${wp}${isHit ? ' ' + x[2].split(' ').slice(1).join(' ') : ''}`], [isHit ? '발생시간' : '측정 시간', x[3] || '—']]
-      .map(([a, b]) => `<div><span>${a}</span><b title="${b}">${b}</b></div>`).join('');
-    const judge = V6 ? `<div class="lvA s1 jx ${st}"><div class="jtop"><span class="pl ${st}">${WORD[st]}</span><h5>${k}, ${isHit ? x[1] : st==='plan' ? '측정 전' : '정상 범위 ' + x[1]}</h5>${jv}</div><div class="jinfo">${jinfo}</div></div>`
+    // [11/02] 정보 넷 → 한 줄. 미션(상단 탭 · 왼쪽 패널 제목) · 로봇(왼쪽 패널)은 같은 화면에 이미 있어 뺐고, 발생위치 · 발생시간을 제목 아래 한 줄로(디자이너)
+    const jloc = `<p class="jloc"><b>${wp}</b>${isHit ? '<span>' + x[2].split(' ').slice(1).join(' ') + '</span>' : ''}${x[3] ? `<span class="jt">${isHit ? '' : '측정 '}${x[3]}</span>` : ''}</p>`;
+    const judge = V6 ? `<div class="lvA s1 jx ${st}"><div class="jtop"><span class="pl ${st}">${WORD[st]}</span><div class="jhd"><h5>${k}, ${isHit ? x[1] : st==='plan' ? '측정 전' : '정상 범위 ' + x[1]}</h5>${jloc}</div>${jv}</div></div>`
       : `<div class="lvA s1 ${st}">${step('이상 판정')}<div class="tt"><span class="pl ${st}">${WORD[st]}</span><h5>${k}, ${isHit ? x[1] : st==='plan' ? '측정 전' : '정상 범위 ' + x[1]}</h5></div>${loc}${cond}</div>`;
     // [11/02 v6] 재발 여부 — Figma 처럼 네 줄을 다 보이고(줄 32 라 접을 만큼 길지 않다), 결론(처음 넘음 · 반복)은 머리 오른쪽 꼬리표로
     const histV6 = `<div class="sth"><b>재발 여부</b><span class="hfl ${rep3 ? 'is-rep' : ''}">${rep3 ? '반복' : isHit ? '처음 넘음' : '계속 정상 범위'}</span></div><div class="hist">${hist.map(hiRow).join('')}</div>`;

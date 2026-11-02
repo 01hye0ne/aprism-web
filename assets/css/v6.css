@@ -507,3 +507,9 @@ body.ver-6 .sf .jtrk .jm.c span { left: 0; transform: none; color: var(--status-
 
 /* [11/02 v6] 알림 팝오버 [더보기 ⋮] 삭제(디자이너) — 메뉴(크게 보기 · 패널에 고정)도 같이 들어갔다. 머리 오른쪽엔 [닫기]만 */
 body.ver-6 .ma-more-box { display: none; }
+/* [11/02 v6] 판정 — 정보 넷 상자 대신 제목 아래 한 줄(위치 · 시각). 제목과 한 덩어리라 둘 사이 4 */
+body.ver-6 .sf .jx .jhd { display: flex; flex-direction: column; gap: var(--space-4); }
+body.ver-6 .sf .jloc { display: flex; align-items: baseline; gap: var(--space-8); margin: 0; font-size: var(--font-size-14); line-height: var(--font-line-height-22); color: var(--text-secondary); }
+body.ver-6 .sf .jloc b { font-weight: 700; color: var(--text-primary); }
+body.ver-6 .sf .jloc .jt { color: var(--text-tertiary); font-variant-numeric: tabular-nums; }
+body.ver-6 .sf .jloc .jt::before { content: "·"; margin-right: var(--space-8); }
