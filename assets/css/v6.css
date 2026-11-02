@@ -237,3 +237,10 @@ body.ver-6 .sb-tab-new {
 }
 @keyframes sb-tab-blink { 50% { opacity: 0.3; } }
 @media (prefers-reduced-motion: reduce) { body.ver-6 .sb-tab-new { animation: none; } }
+
+/* [10/30 v6] 안전진단 좌측 패널 — 범례 줄을 뺐고(safety.js), 목록 칸의 테두리 · 고른 미션의 면(bg/selected) · 지도 상자 테두리와 면을 걷었다(디자이너).
+   패널 바탕 위에 제목 · 지도 · 정보가 바로 놓인다. 지도와 정보 사이 가는 선만 남긴다. */
+body.ver-6 .sf-side .sf-mwell { border: 0; border-radius: 0; }
+body.ver-6 .sf-side .sf-mon { background: none; }
+body.ver-6 .sf-side .sf-monb { border: 0; border-radius: 0; background-color: transparent !important; }
+body.ver-6 .sf-side .sf-mrow.on { background: none; }

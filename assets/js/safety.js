@@ -337,10 +337,11 @@
      * [10/30 v6] 상단 미션 탭이 미션 고르기 · 단계 기호를 맡아 패널을 줄였다(디자이너). 패널 = 지금 보는 범위의 현황만.
      *   전체 미션 — 단계별 미션 수 · 미션 · 측정 · 요청 전 합계(누를 것 없음). 미션 하나 — 그 미션의 진행 · 로봇 · 요청 전 + 지도 · 층 · [관제].
      *   다른 미션의 새 위험 표시(점 깜빡임 · 새로)는 탭으로 옮겼다(crumb 의 data-new → mission-tabs-v6.js).
+     *   범례 줄(위험 · 주의 · 정상 범위 · 예정 · 로봇)도 뺐다(10/30 디자이너).
      */
     if(V6){
       const head = scope==='all' ? top.replace(/^<button type="button"/, '<div').replace(' data-sc="all"', '').replace(/ aria-current="[^"]*"/, '').replace(/<\/button>$/, '</div>') : '';
-      return `${LEG}<div class="sf-mwrap is-one"><div class="sf-mlist"><div class="sf-mwell">${head}${rows}</div></div><span class="sf-mthumb" aria-hidden="true"></span></div>`;
+      return `<div class="sf-mwrap is-one"><div class="sf-mlist"><div class="sf-mwell">${head}${rows}</div></div><span class="sf-mthumb" aria-hidden="true"></span></div>`;
     }
     return `${LEG}<div class="sf-mwrap"><div class="sf-mlist"><div class="sf-mwell">${top}${rows}</div></div><span class="sf-mthumb" aria-hidden="true"></span></div>`;   // 범례는 목록 위(10/30) — 기호를 먼저 읽고 목록으로
   }
