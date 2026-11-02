@@ -409,7 +409,8 @@
    */
   if (body.classList.contains("ver-6")) {
     var DONE6 = ["온도감지 · 최고 온도 44.2 ℃", "부분방전 · 이상 점수 8.92", "이상음향 · 이상 점수 19.6", "온도감지 · 최고 온도 41.5 ℃", "누출감지 · 누출 확률 58%"];
-    DONE_BASE.forEach(function (d, i) { if (DONE6[i]) { d.title = DONE6[i]; } });
+    var WP6 = ["WP-03", "WP-11", "WP-02", "WP-03", "WP-09"];   // 어디서 — 처리 내용 줄 끝에 지점 번호만(디자이너, 위치 줄 대신)
+    DONE_BASE.forEach(function (d, i) { if (DONE6[i]) { d.title = DONE6[i]; d.wp = WP6[i]; } });
   }
   var DONE = DONE_BASE.slice();
 
@@ -592,7 +593,7 @@
 
     var how = el("span", "done-how t-caption");
     how.appendChild(icon("check"));
-    how.appendChild(el("span", null, d.how));
+    how.appendChild(el("span", null, d.how + (d.wp && body.classList.contains("ver-6") ? " · " + d.wp : "")));   // [11/02 v6] 끝에 지점 번호
     how.appendChild(el("span", null, d.who));
 
     node.appendChild(head);
@@ -1259,7 +1260,7 @@
       busy = true;
       hideToast();
 
-      var rec = { time: clock(), title: window.APRISM_ALERT6 ? window.APRISM_ALERT6.title(a.title) : a.title, how: picks.join(" · "), who: "홍길동", fresh: true,
+      var rec = { wp: a.wp || "", time: clock(), title: window.APRISM_ALERT6 ? window.APRISM_ALERT6.title(a.title) : a.title, how: picks.join(" · "), who: "홍길동", fresh: true,
                   memo: memoField ? memoField.value.trim() : "" };
       var from = box.getBoundingClientRect();
       // 분신을 먼저 띄우고 진짜 쪽지를 닫는다 — 순서가 바뀌면 잴 자리가 사라진다.
