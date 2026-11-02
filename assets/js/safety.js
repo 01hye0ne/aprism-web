@@ -161,7 +161,7 @@
       return `<div class="jv"><b class="jn ${st}">${SHORT[x[1]] || x[1]}</b><span class="why1">기준: ${STD[k]}</span></div>`; })();
     // [11/02] 정보 넷 → 한 줄. 미션(상단 탭 · 왼쪽 패널 제목) · 로봇(왼쪽 패널)은 같은 화면에 이미 있어 뺐고, 발생위치 · 발생시간을 제목 아래 한 줄로(디자이너)
     const jloc = `<p class="jloc"><b>${wp}</b>${isHit ? '<span>' + x[2].split(' ').slice(1).join(' ') + '</span>' : ''}${x[3] ? `<span class="jt">${isHit ? '' : '측정 '}${x[3]}</span>` : ''}</p>`;
-    const judge = V6 ? `<div class="lvA s1 jx ${st}"><div class="jtop"><span class="pl ${st}">${WORD[st]}</span><div class="jhd"><h5>${k}, ${isHit ? x[1] : st==='plan' ? '측정 전' : '정상 범위 ' + x[1]}</h5>${jloc}</div>${jv}</div></div>`
+    const judge = V6 ? `<div class="lvA s1 jx ${st}"><div class="jtop"><div class="jhd"><div class="jrow"><span class="pl ${st}">${WORD[st]}</span><h5>${k}, ${isHit ? x[1] : st==='plan' ? '측정 전' : '정상 범위 ' + x[1]}</h5></div>${jloc}</div>${jv}</div></div>`
       : `<div class="lvA s1 ${st}">${step('이상 판정')}<div class="tt"><span class="pl ${st}">${WORD[st]}</span><h5>${k}, ${isHit ? x[1] : st==='plan' ? '측정 전' : '정상 범위 ' + x[1]}</h5></div>${loc}${cond}</div>`;
     // [11/02 v6] 재발 여부 — Figma 처럼 네 줄을 다 보이고(줄 32 라 접을 만큼 길지 않다), 결론(처음 넘음 · 반복)은 머리 오른쪽 꼬리표로
     const histV6 = `<div class="sth"><b>재발 여부</b><span class="hfl ${rep3 ? 'is-rep' : ''}">${rep3 ? '반복' : isHit ? '처음 넘음' : '계속 정상 범위'}</span></div><div class="hist">${hist.map(hiRow).join('')}</div>`;
