@@ -427,3 +427,10 @@ body.ver-6,
 body.ver-6 .i,
 body.ver-6 .i-14,
 body.ver-6 .i-16 { --ic-error: var(--ic-warning); }
+
+/*
+ * [11/02 v6] 안전진단 상세 [원본과 히트맵 크게] — 시안(아티팩트 5uJoxgMf…)처럼 원본 · 히트맵을 나란히 놓되,
+ * v6 은 영상 칸이 줄의 60% 라 둘로 쪼개면 한 장일 때보다 작아졌다. 켜면 영상 칸이 줄 전체를 쓰고 재발 여부는 아래 줄로 내려간다.
+ */
+body.ver-6 .sf .dBr2.is-big { grid-template-columns: minmax(0, 1fr); }
+body.ver-6 .sf .dBr2.is-big .dmw.two .md { aspect-ratio: 16 / 10; }

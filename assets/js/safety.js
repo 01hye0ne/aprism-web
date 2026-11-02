@@ -151,7 +151,7 @@
       <div class="dB">
         <div class="dBm">
           <div class="lvA s1 ${st}">${step('이상 판정')}<div class="tt"><span class="pl ${st}">${WORD[st]}</span><h5>${k}, ${isHit ? x[1] : st==='plan' ? '측정 전' : '정상 범위 ' + x[1]}</h5></div>${loc}${cond}</div>
-          <div class="dBr2">
+          <div class="dBr2${V6 && bigD && canBig ? ' is-big' : ''}">
             <div class="lvA s2">${step('영상 확인')}${!isHit ? '<span class="why1">시안용 예시 이미지(같은 감지의 사진)</span>' : ''}${media}</div>
             <div class="dBc"><div class="lvB">${step('재발 여부')}${histHtml}${again}</div>
               ${V6 && !lks.length ? '' : `<div class="lvB s4 ref">${relHead}${relB}</div>`}</div>
