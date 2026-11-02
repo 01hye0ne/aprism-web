@@ -368,3 +368,5 @@ body.ver-6 .sf .dl.is-light-scope .fd:focus { outline: var(--border-width-thin) 
 body.ver-6 .status-bar { height: 52px; flex: 0 0 52px; }
 body.ver-6 .status-bar-logo { padding-top: 0; padding-bottom: 0; }
 body.ver-6 .sb-tab { height: 40px; }
+/* [10/30] 조치 제안 판 — 모서리는 다른 카드와 같은 radius/card, 아래 끝 그라데이션 없이 한 면(bg/raised) */
+body.ver-6 .sf .dl.is-light-scope { border-radius: var(--radius-card); background: var(--bg-raised); }

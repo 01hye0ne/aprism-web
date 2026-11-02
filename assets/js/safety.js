@@ -146,7 +146,7 @@
               <div class="lvB s4 ref">${relHead}${relB}</div></div>
           </div>
         </div>
-        <div class="lvD">${step('조치 결정')}${side}</div>
+        <div class="lvD">${V6 ? '' : step('조치 결정')}${side}</div>
       </div>${dt.from ? `<div class="rtbar" role="group" aria-label="동시 발생에서 이동함"><span class="ri" aria-hidden="true">↩</span><button type="button" class="rtb" data-dret="1">${dt.from.k}로 돌아가기</button><button type="button" class="rtx" data-dretx="1" aria-label="돌아가기 닫기">✕</button></div>` : ''}`;
   }
   const STD = {'안전감지':'미착용 0명','누출감지':'55% 미만','온도감지':'40 ℃ 미만','계기인식':'0.60 ~ 0.80 MPa','이상음향':'19.0 미만','부분방전':'8.60 미만'};
