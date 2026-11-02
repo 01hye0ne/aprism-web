@@ -44,6 +44,7 @@
     .sw-primary { background: var(--comp-button-inverse-bg-default); color: var(--comp-button-inverse-text-default); }
     .sw-secondary { background: var(--comp-button-secondary-bg-default); color: var(--comp-button-secondary-text-default); border-color: var(--comp-button-secondary-border-default); }
     .sw-ghost { color: var(--text-secondary); padding-left: 0; }
+    .sev { width: 16px; height: 16px; vertical-align: -3px; }
     .dot { display: inline-block; width: 8px; height: 8px; margin-right: 6px; border-radius: 50%; vertical-align: 1px; }
     .open {
       margin-top: var(--space-16); padding: var(--space-12) var(--space-16);
@@ -86,20 +87,24 @@
 
       <h3>알림 단계 (알림 위험도 정책 · Figma UI_99 1016:1055)</h3>
       <div class="scroll"><table class="tbl">
-        <thead><tr><th>단계</th><th>의미</th><th>화면 대응</th><th>해제</th></tr></thead>
+        <thead><tr><th>단계</th><th>기호</th><th>의미</th><th>화면 대응</th><th>해제</th></tr></thead>
         <tbody>
-          <tr><td>default</td><td>정상적인 상태 변경 안내</td><td>목록에 기록만</td><td>자동</td></tr>
-          <tr><td>안전 · 정보</td><td>정상 범위지만 운영상 확인이 필요</td><td>목록에 기록, 확인 권장</td><td>정상 확인 시 자동</td></tr>
-          <tr><td><span class="dot" style="background:var(--status-warning-icon)"></span>주의</td><td>악화 가능성 — 모니터링 · 선제 조치</td><td>목록 강조 · 엣지 글로우(노란 선) · 미확인 시 재알림</td><td>확인 후</td></tr>
-          <tr><td><span class="dot" style="background:var(--status-critical-icon)"></span>위험</td><td>인명 · 시설 안전, 운행 불가 — 즉시 대응</td><td>긴급 팝업 · 경고음 · 상단 고정 · 엣지 글로우(맥박)</td><td>조치 입력 후 수동</td></tr>
+          <tr><td>default</td><td>—</td><td>정상적인 상태 변경 안내</td><td>목록에 기록만</td><td>자동</td></tr>
+          <tr><td>안전 · 정보</td><td>—</td><td>정상 범위지만 운영상 확인이 필요</td><td>목록에 기록, 확인 권장</td><td>정상 확인 시 자동</td></tr>
+          <tr><td>주의</td><td><svg class="sev" viewBox="0 0 24 24" aria-hidden="true"><path fill="var(--status-warning-icon)" d="M11.1347 3.49512C11.5198 2.82983 12.481 2.82983 12.8661 3.49512L22.1308 19.499C22.5168 20.1657 22.0359 21 21.2656 21H2.73422C1.9642 20.9997 1.48328 20.1655 1.86898 19.499L11.1347 3.49512ZM11.9999 15C12.552 14.9998 12.9999 14.5522 12.9999 14V10C12.9999 9.44786 12.552 9.00019 11.9999 9C11.4476 9 10.9999 9.44775 10.9999 10V14C10.9999 14.5523 11.4476 15 11.9999 15ZM11.9999 19C12.552 18.9998 12.9999 18.5522 12.9999 18C12.9999 17.4479 12.552 17.0002 11.9999 17C11.4476 17 10.9999 17.4477 10.9999 18C10.9999 18.5523 11.4476 19 11.9999 19Z"/></svg> 노란 세모</td><td>악화 가능성 — 모니터링 · 선제 조치</td><td>목록 강조 · 엣지 글로우(노란 선) · 미확인 시 재알림</td><td>확인 후</td></tr>
+          <tr><td>위험</td><td><svg class="sev" viewBox="0 0 24 24" aria-hidden="true"><path fill="var(--status-critical-icon)" d="M11.1347 3.49512C11.5198 2.82983 12.481 2.82983 12.8661 3.49512L22.1308 19.499C22.5168 20.1657 22.0359 21 21.2656 21H2.73422C1.9642 20.9997 1.48328 20.1655 1.86898 19.499L11.1347 3.49512ZM11.9999 15C12.552 14.9998 12.9999 14.5522 12.9999 14V10C12.9999 9.44786 12.552 9.00019 11.9999 9C11.4476 9 10.9999 9.44775 10.9999 10V14C10.9999 14.5523 11.4476 15 11.9999 15ZM11.9999 19C12.552 18.9998 12.9999 18.5522 12.9999 18C12.9999 17.4479 12.552 17.0002 11.9999 17C11.4476 17 10.9999 17.4477 10.9999 18C10.9999 18.5523 11.4476 19 11.9999 19Z"/></svg> 빨간 세모</td><td>인명 · 시설 안전, 운행 불가 — 즉시 대응</td><td>긴급 팝업 · 경고음 · 상단 고정 · 엣지 글로우(맥박)</td><td>조치 입력 후 수동</td></tr>
         </tbody>
       </table></div>
+      <ul>
+        <li>알림 단계는 <b>기호</b>로 말한다 — 목록 · 탭 · 로봇 칸 · 팝오버 칩 · 지도 위 위험 지점이 같은 기호. 점(●)은 상태(수행중 · 완료 …) 전용.</li>
+        <li>위험도 주의와 같은 세모이고 <b>색</b>으로 가른다(2026-11-02 v6). 예전 위험 기호 원 안 ×(Icon / error)는 너무 부정적인 느낌이 강하다는 의견으로 바꿨다. 지도의 위험 지점이 이미 빨간 세모였다.</li>
+      </ul>
 
       <h3>Delta 의 판단</h3>
       <ul>
         <li>주의 + 위험이 <b>5건 이상</b> 쌓이면 그 전체를 종합해 주의 또는 위험으로 말한다. 그 아래에서는 "알림 N건 관찰 중"으로 건수만 알린다.</li>
         <li>화면의 경고 색은 하나다 — <b>엣지 글로우 · Delta = max(목록에서 가장 높은 단계, Delta 종합 판단)</b>.</li>
-        <li>Delta 와 엣지 글로우는 <b>미션과 상관없이 전체 알림</b>을 본다. 다른 미션의 알림은 상단 미션 메뉴에 점(주의 노랑 · 위험 빨강)으로 표시한다.</li>
+        <li>Delta 와 엣지 글로우는 <b>미션과 상관없이 전체 알림</b>을 본다. 다른 미션의 알림은 상단 미션 탭에 기호(주의 노란 세모 · 위험 빨간 세모)로 표시한다.</li>
         <li>펼치면 알림 하나가 아니라 여러 알림에 대한 행동 버튼이 나온다. 문구가 정해지기 전까지는 모두 같은 Secondary 로 둔다(4. 버튼 위계).</li>
       </ul>
 
@@ -124,6 +129,7 @@
           <li>종합 판단 기준 — 지금은 임시 규칙(5건 이상 · 위험 1건이라도 있으면 위험).</li>
           <li>펼친 창의 행동 버튼 문구.</li>
           <li>위험의 확인 흐름 — 관제사가 확인한 뒤 박자를 낮출지, 해제까지 유지할지(경보 피로).</li>
+          <li>위험 · 주의가 같은 세모라 색으로만 갈린다 — 색 구분이 어려운 사람 · 흐린 모니터에서 기호만 있는 자리(탭 · 로봇 칸)는 헷갈릴 수 있다. 안: 위험만 속을 꽉 채운 면 세모.</li>
           <li>정책과 아직 어긋난 곳 — 위험의 긴급 팝업 · 경고음 · 조치 입력 후 수동 해제, 주의의 재알림이 화면에 없다.</li>
         </ul>
       </div>
