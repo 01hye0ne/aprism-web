@@ -693,6 +693,3 @@ body.ver-6 .sf .kd.is-todo:hover, body.ver-6 .sf .kd.is-todo:focus-visible { ani
 @media (prefers-reduced-motion: reduce) {
   body.ver-6 .sf .kd.is-todo, body.ver-6 .sf .kd.is-todo.is-new { animation: none; box-shadow: 0 0 0 2px var(--status-critical-icon); }
 }
-/* [11/02 v6] 전체 미션 — 로봇이 3D 모델로 보일 때(is-3d)는 점을 숨기고 번호표만 남긴다(상태는 발밑 고리가 말한다) */
-body.ver-6 .bld-bot.is-3d > i { opacity: 0; }
-body.ver-6 .bld-bot.is-3d .bld-bot-name { transform: translateY(6px); }
