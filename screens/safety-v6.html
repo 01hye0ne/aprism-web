@@ -21,7 +21,7 @@
   <!-- v5 전용 규칙 — v4 는 10/29 부로 멈췄다. v5 에서 바꾸는 것은 여기(body.ver-5)에. -->
   <link rel="stylesheet" href="../assets/css/v5.css?v=b7962425" />
   <!-- v6 전용 규칙 — v5 는 10/30 부로 멈췄다. v6 에서 바꾸는 것은 여기(body.ver-6)에. -->
-  <link rel="stylesheet" href="../assets/css/v6.css?v=ddcf88fb" />
+  <link rel="stylesheet" href="../assets/css/v6.css?v=e6b9a8e6" />
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
@@ -35,6 +35,9 @@
 
     h1, h2, h3, p { margin: 0; }
   </style>
+  <!-- [11/02] [진단 상세] 모핑 — 이 두 화면만 페이지 전환을 연다(morph-v6.js 가 다른 길은 건너뛴다) -->
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="../assets/js/morph-v6.js?v=dd212795"></script>
 </head>
 <!-- .v2-2 — v2.2 와 같은 아웃라인 아이콘 세트(icons-outline.css). -->
 <body class="v2-2 ver-3 ver-5 ver-6">

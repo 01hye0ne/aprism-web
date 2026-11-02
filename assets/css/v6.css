@@ -752,3 +752,24 @@ body.ver-6 .bld-mcard-map {
 body.ver-6 .bld-mcard-map .mini-plan { border-radius: var(--radius-4, 4px); background-color: var(--bg-map-chip); }
 body.ver-6 .bld-mcard:hover .bld-mcard-map, body.ver-6 .bld-mcard:focus-visible .bld-mcard-map { opacity: 1; transform: none; }
 :root[data-theme="light"] body.ver-6 .bld-mcard-map { box-shadow: 0 8px 24px rgb(16 24 40 / 18%); }
+
+/*
+ * [11/02 v6] [진단 상세] 모핑 짝(morph-v6.js) — 관제 팝오버 ↔ 안전진단 상세.
+ *   dx-head  팝오버 머리(배지 · 감지 · 측정 항목 + 값)  ↔ 판정 카드 머리
+ *   dx-shot  팝오버 사진                                  ↔ 영상 확인 사진
+ *   dx-act   팝오버 DELTA 조치 제안(흰 판)                ↔ 오른쪽 DELTA 조치 제안
+ * 나머지는 바탕(root)과 함께 옅게 바뀐다. 동작 줄이기면 끈다.
+ */
+body.ver-6 .map-alert:not([hidden]) .ma-title-block { view-transition-name: dx-head; }
+body.ver-6 .map-alert:not([hidden]) .ma-snap { view-transition-name: dx-shot; }
+body.ver-6 .map-alert:not([hidden]) .ma-delta { view-transition-name: dx-act; }
+body.ver-6 .sf .jx .jtop { view-transition-name: dx-head; }
+body.ver-6 .sf .lvA.s2 .dmw { view-transition-name: dx-shot; }
+body.ver-6 .sf .dl { view-transition-name: dx-act; }
+::view-transition-group(dx-head), ::view-transition-group(dx-shot), ::view-transition-group(dx-act) { animation-duration: 460ms; animation-timing-function: cubic-bezier(.2, .7, .2, 1); }
+::view-transition-old(dx-shot), ::view-transition-new(dx-shot) { height: 100%; object-fit: cover; }
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: 280ms; }
+::view-transition-new(root) { animation-delay: 120ms; }
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
+}
