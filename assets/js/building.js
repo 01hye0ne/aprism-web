@@ -1057,7 +1057,7 @@
 
   var THREE, renderer, scene, camera;
   var ready = false;
-  // [10/30] 연출 고리 — 렌더 실험(lab-bld-render-v5.html)이 bld-fx-v5.js 로 단다. 다른 화면에서는 늘 null 이다.
+  // [10/30] 연출 고리 — 렌더 실험(lab-bld-render-v6.html)이 bld-fx-v6.js 로 단다(11/02 — v5 홀로그램 실험을 이 판으로 바꿨다). 다른 화면에서는 늘 null 이다.
   var fx = null;
   var F = {};            // 층마다 { holder, mats, lines, size, y, op, solid, hot, meshes, base }
   var mode = "all";      // all · one
