@@ -896,6 +896,7 @@
 
   function renderSum() {
     var rows = $("[data-bld-sum-rows]");
+    var sumBox = $("[data-bld-sum]"); if (sumBox && !floorView) { sumBox.classList.remove("has-cards"); }
     if (floorView) { renderFloorSum(rows); return; }
     if (scopeMission) { renderMissionSum(rows); return; }
     var label = $(".bld-sum-label");
@@ -927,9 +928,62 @@
    * v3 — 펼친 층의 요약: 이 층을 지나는 미션을 줄로 세운다. 줄을 누르면 그 미션으로, 이 층 그대로 들어간다.
    * 미션 줄 오른쪽은 그 미션이 이 층에서 낸 알림(위험 · 주의 건수)이다.
    */
+  /*
+   * [11/02 v6] 펼친 층 아래 미션 카드(디자이너 · Figma DS 1570:10797) — 미션마다 이 층의 순회 경로 미니맵(mini-plan.js).
+   *   지도 칸 맨 아래 띠: 카드 한 장 = 머리(미션 이름 · 이 층 알림 수 · 완료/대기면 상태) + 가로로 눕힌 미니맵. 넘치면 옆으로 넘긴다.
+   *   카드를 누르면 예전 줄처럼 그 미션으로 이 층 그대로 들어가고, 올리면 그 미션 로봇 번호표를 띄운다.
+   *   여러 층 미션(발전기실 설비 점검 — B3 WP-01~12 → B4 WP-13~20)은 이 층 몫의 지점만 그린다.
+   */
+  var FLOOR_WP = { 5: { B3: [1, 12], B4: [13, 20] } };
+  function renderFloorCards(rows, f, ms) {
+    var box = $("[data-bld-sum]");
+    box.classList.add("has-cards");
+    var row = el("div", "bld-cards");
+    ms.forEach(function (m) {
+      var r = ROBOTS.filter(function (x) { return x.mission === m; })[0];
+      var here = alertsOf(m).filter(function (a) { return a.floor === f; });
+      var rng = (r && FLOOR_WP[r.n] && FLOOR_WP[r.n][f]) || [1, (r && r.total) || 20];
+      var n = rng[1] - rng[0] + 1, done = r ? Math.max(0, Math.min(n, (r.done || 0) - (rng[0] - 1))) : 0;
+      var marks = {};
+      here.forEach(function (a) { var mm = /WP-(\d+)/.exec(a.where || ""); if (mm) { var k = +mm[1] - rng[0]; if (k >= 0 && k < n) { marks[k] = a.sev === "critical" ? "crit" : "warn"; } } });
+      var card = el("button", "bld-card");
+      card.type = "button";
+      card.setAttribute("aria-label", m + " 미션으로 들어가기");
+      var head = el("span", "bld-card-head");
+      head.appendChild(el("span", "t-label-1 bld-card-name", m));
+      if (r && r.st !== "run") { head.appendChild(el("span", "t-caption bld-card-st", r.st === "done" ? "완료" : "대기")); }
+      var sv = el("span", "t-caption bld-sev");
+      var s0 = topSev(here); if (s0) { sv.setAttribute("data-sev", s0); }
+      sv.appendChild(el("span", "bld-sev-dot"));
+      sv.appendChild(document.createTextNode(here.length ? sevCount(here) : "알림 없음"));
+      head.appendChild(sv);
+      card.appendChild(head);
+      var map = el("span", "bld-card-map");
+      map.innerHTML = window.APRISM_MINI.svg({ floor: f, n: n, done: done, robot: !!(r && r.floor === f && r.st === "run"), marks: marks,
+        kind: r && r.n === 5 ? "wheel" : "spot", land: true, w: 230, label: m + " " + FNAME[f] + " 경로" });
+      card.appendChild(map);
+      card.addEventListener("click", function () { enter(f, m); });
+      if (r) {
+        card.addEventListener("mouseenter", function () { markRobot(r, true); });
+        card.addEventListener("mouseleave", function () { markRobot(r, false); });
+      }
+      row.appendChild(card);
+    });
+    rows.appendChild(row);
+  }
+
   function renderFloorSum(rows) {
     var f = floorView;
     var ms = missionsOn(f);
+    if (V6 && window.APRISM_MINI) {
+      $(".bld-sum-label").textContent = FNAME[f];
+      $("[data-bld-sum-floors]").textContent = ms.length;
+      $(".bld-sum-num .t-label-2").textContent = "개 미션이 지나요";
+      rows.textContent = "";
+      renderFloorCards(rows, f, ms);
+      return;
+    }
+    var bx = $("[data-bld-sum]"); if (bx) { bx.classList.remove("has-cards"); }
     $(".bld-sum-label").textContent = FNAME[f];
     $("[data-bld-sum-floors]").textContent = ms.length;
     $(".bld-sum-num .t-label-2").textContent = "개 미션이 지나요";
@@ -1347,7 +1401,10 @@
         var above = FLOORS.indexOf(f) < FLOORS.indexOf(cur);
         targets[f] = { y: on ? stackY(cur) : stackY(cur) + (above ? 80 : -80), op: on ? 1 : 0, solid: on ? 1 : 0 };
       });
-      animate(targets, new THREE.Vector3(0, stackY(cur) + F[cur].size.y * 0.3, 0), 1.5, instant);
+      // [11/02 v6] 층 펼침은 아래 미션 카드 띠(≈ 200px)만큼 판을 화면 위로 — 카메라가 보는 점을 세로(y)로 내린다(시선 방향으로 옮기면 화면에선 그대로다)
+      var tgt = new THREE.Vector3(0, stackY(cur) + F[cur].size.y * 0.3, 0);
+      if (V6 && floorView && window.APRISM_MINI) { tgt.y -= 15; }
+      animate(targets, tgt, 1.5, instant);
     }
   }
 

@@ -693,3 +693,33 @@ body.ver-6 .sf .kd.is-todo:hover, body.ver-6 .sf .kd.is-todo:focus-visible { ani
 @media (prefers-reduced-motion: reduce) {
   body.ver-6 .sf .kd.is-todo, body.ver-6 .sf .kd.is-todo.is-new { animation: none; box-shadow: 0 0 0 2px var(--status-critical-icon); }
 }
+
+/*
+ * [11/02 v6] 통합 순회 층 펼침 — 아래 미션 카드 띠(building.js renderFloorCards · mini-plan.js).
+ *   요약 블록이 지도 칸 아래 폭을 다 쓰고, 카드(230)는 한 줄 · 넘치면 옆으로 넘긴다(공용 스크롤바).
+ *   카드: bg/cell 면 · 머리(미션 Label/1 · 상태 · 알림) · 가로 미니맵(높이 ≈ 144). 올리면 테가 밝아진다.
+ *   미니맵 표현은 안전진단 큰 지도와 같다(지나온 점선 · 지금 실선 · 앞길 옅은 띠 · 작은 세모 · 로봇 탑뷰).
+ */
+body.ver-6 .bld-sum.has-cards { right: var(--space-20); pointer-events: auto; }
+body.ver-6 .bld-sum.has-cards .bld-sum-rows { margin-top: var(--space-8); }
+body.ver-6 .bld-cards { display: flex; gap: var(--space-8); overflow-x: auto; padding-bottom: var(--space-4); scrollbar-width: thin; scrollbar-color: var(--border-default) transparent; }
+body.ver-6 .bld-card { flex: none; width: 246px; display: flex; flex-direction: column; gap: var(--space-4); padding: var(--space-4); border: var(--border-width-thin) solid transparent; border-radius: var(--radius-card); background-color: color-mix(in srgb, var(--bg-cell) 92%, transparent); color: inherit; font: inherit; text-align: left; cursor: pointer; -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+body.ver-6 .bld-card:hover { border-color: var(--border-strong); }
+body.ver-6 .bld-card:focus-visible { outline: var(--border-width-strong) solid var(--border-focus); outline-offset: 2px; }
+body.ver-6 .bld-card-head { display: flex; align-items: center; gap: var(--space-8); padding: var(--space-4) var(--space-8); }
+body.ver-6 .bld-card-name { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-primary); }
+body.ver-6 .bld-card-st { flex: none; color: var(--text-tertiary); }
+body.ver-6 .bld-card .bld-sev { flex: none; color: var(--text-secondary); }
+body.ver-6 .bld-card-map { display: block; border-radius: var(--radius-4, 4px); overflow: hidden; background-color: var(--bg-map-chip); }
+body.ver-6 .mini-plan { display: block; width: 100%; height: auto; }
+body.ver-6 .mini-plan .mp-road { fill: none; stroke: color-mix(in srgb, var(--text-primary) 7%, transparent); stroke-linecap: round; stroke-linejoin: round; }
+body.ver-6 .mini-plan .mp-eq { fill: color-mix(in srgb, var(--border-default) 85%, var(--bg-page)); }
+body.ver-6 .mini-plan .mp-wl { fill: color-mix(in srgb, var(--text-tertiary) 55%, transparent); }
+body.ver-6 .mini-plan .mp-past { fill: none; stroke: color-mix(in srgb, var(--status-info-icon) 80%, var(--bg-map-chip)); stroke-linecap: round; stroke-linejoin: round; }
+body.ver-6 .mini-plan .mp-cur { fill: none; stroke: var(--status-info-icon); stroke-linecap: round; stroke-linejoin: round; }
+body.ver-6 .mini-plan .mp-ahead { fill: none; stroke: color-mix(in srgb, var(--status-info-icon) 38%, var(--bg-map-chip)); stroke-linecap: round; stroke-linejoin: round; }
+body.ver-6 .mini-plan .mp-c { fill: var(--status-critical-icon); stroke: var(--bg-frame); }
+body.ver-6 .mini-plan .mp-w { fill: var(--status-warning-icon); stroke: var(--bg-frame); }
+body.ver-6 .mini-plan .mp-ok { fill: var(--text-tertiary); fill-opacity: .7; }
+body.ver-6 .mini-plan .mp-plan { fill: var(--bg-frame); stroke: var(--text-tertiary); stroke-opacity: .7; }
+body.ver-6 .mini-plan .mp-sh { fill: #000; opacity: .5; }
