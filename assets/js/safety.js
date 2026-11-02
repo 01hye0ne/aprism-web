@@ -319,6 +319,11 @@
   let mapF = {}, mapT = null;
   // 지금 지점: 여러 층 미션은 순회 순서(층 순, 번호 순)의 마지막 측정 지점
   const nowOf = i => { const m = M[i], ed = eData(i); if(m.done >= m.total) return ''; if(!m.fls) return ed.now; const ms = ed.sp.filter(p => !p[3]).map(p => p[0]).sort(); return ms[ms.length - 1] || ''; };
+  // [11/02 v6] 위에서 본 로봇(머리 +x) — 그림자 · 다리 넷 · 몸통 · 머리 · 가는 방향 꺾쇠. 큰 지도(rich)에서 화살표 대신
+  const ROBOT_TOP = '<ellipse class="rsh" cx="1" cy="2.5" rx="13" ry="9" filter="url(#m2bl)"/>'
+    + '<rect class="rlg" x="-9" y="-9.5" width="4" height="4" rx="1.4"/><rect class="rlg" x="3" y="-9.5" width="4" height="4" rx="1.4"/><rect class="rlg" x="-9" y="5.5" width="4" height="4" rx="1.4"/><rect class="rlg" x="3" y="5.5" width="4" height="4" rx="1.4"/>'
+    + '<rect class="rbd" x="-11" y="-6.5" width="19" height="13" rx="4.5"/><rect class="rhd" x="7" y="-4" width="6" height="8" rx="2.5"/>'
+    + '<path class="rch" d="M-4.5-3.2 0.5 0-4.5 3.2" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>';
   // 한 층 그림. big = 크게 보기(벽, 계단, 지점 번호, 방 이름까지)
   function svg2(i, ab, big, w, sel, lk){
     const m = M[i], ed = eData(i), sp = ed.sp, rows = ed.rows, pf = PLANOF[ab] || 'B4', P = PLAN2[pf];
@@ -335,11 +340,26 @@
     const sCut = sR !== null ? sR : allDone ? L.len : noneDone ? 0 : L.sAt[list.filter(p => !p[3]).length - 1];
     let g = `<svg class="m2v" viewBox="-24 -24 888 1418" role="img" aria-label="${m.mis} ${ab} 평면, 지점 ${list.length}곳">`;
     g += '<rect class="bg" x="-24" y="-24" width="888" height="1418"/>';
-    P.equipment.forEach(r => { g += `<rect class="${big ? 'eqb' : 'eq'}" x="${r[0]}" y="${r[1]}" width="${r[2]}" height="${r[3]}"/>`; });
+    /*
+     * [11/02 v6] 왼쪽 패널 큰 지도(rich)를 "완성된 지도"로 — 디자이너 레퍼런스(차량 호출 앱 지도)에서 가져온 넷.
+     *   1 바닥 층위   로봇이 다니는 길(순회 경로 전체)을 넓은 한 단 밝은 면으로 깔고(도로), 설비는 그 위 덩이, 벽은 옅은 선
+     *   2 경로 테      지나온 길 아래 어두운 테(casing)를 둘러 바닥 위에 뜨게 · 끝은 둥글게
+     *   3 사진 말풍선  자세히 보기의 그 지점에 영상 확인 사진 썸네일 — 누르면 영상 카드로
+     *   4 로봇         화살표 대신 위에서 본 로봇 + 옅은 그림자, 가는 방향으로 돈다
+     * 목록의 작은 지도(썸네일)는 그대로 — 작아서 층위가 뭉갠다.
+     */
+    const rich = V6 && !big && (w || 220) >= 200;
+    if(rich){
+      g += '<defs><filter id="m2sh" x="-50%" y="-50%" width="200%" height="200%"><feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000" flood-opacity=".55"/></filter><filter id="m2bl" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="2.2"/></filter></defs>';
+      g += `<polyline class="road" points="${cut2(L, 0, L.len)}" stroke-width="${u(13)}"/>`;
+    }
+    P.equipment.forEach(r => { g += `<rect class="${big ? 'eqb' : 'eq'}${rich ? ' eqr' : ''}" x="${r[0]}" y="${r[1]}" width="${r[2]}" height="${r[3]}"${rich ? ' rx="4"' : ''}/>`; });
+    if(rich) P.wall.forEach(r => { g += `<rect class="wlr" x="${r[0]}" y="${r[1]}" width="${r[2]}" height="${r[3]}"/>`; });
     if(big){ P.stairs.forEach(r => { g += `<rect class="stz" x="${r[0]}" y="${r[1]}" width="${r[2]}" height="${r[3]}" stroke-width=".6"/>`; });
       P.wall.forEach(r => { g += `<rect class="wl" x="${r[0]}" y="${r[1]}" width="${r[2]}" height="${r[3]}"/>`; }); }
     const sw = big ? 1 : 1.15;
     g += `<polyline class="ra" points="${cut2(L, sCut, L.len)}" stroke-width="${u(1.4 * sw)}" stroke-dasharray="${u(1.5)} ${u(4)}" vector-effect="none"/>`;
+    if(rich) g += `<polyline class="rdc" points="${cut2(L, 0, sCut)}" stroke-width="${u(2.4 * sw + 2.4)}"/>`;
     g += `<polyline class="rd" points="${cut2(L, 0, sCut)}" stroke-width="${u(2.4 * sw)}"/>`;
     if(sel && lk && lk.length){ const at2 = w2 => { const j = list.findIndex(p => p[0]===w2); return j < 0 ? null : pos2(L, L.sAt[j]); }, q0 = at2(sel);
       if(q0) lk.forEach(w2 => { const q1 = at2(w2); if(q1 && w2 !== sel) g += `<line x1="${q1.x.toFixed(1)}" y1="${q1.y.toFixed(1)}" x2="${q0.x.toFixed(1)}" y2="${q0.y.toFixed(1)}" class="lkl" stroke-width="${u(1.6)}" stroke-dasharray="${u(3)} ${u(2.5)}"/><circle class="lkc" cx="${q1.x.toFixed(1)}" cy="${q1.y.toFixed(1)}" r="${u(6)}" fill="none" stroke-width="${u(1.2)}"/>`; }); }
@@ -352,7 +372,21 @@
       const nm = sel===w ? `<circle class="mk-sel" r="${u(6.5)}" fill="none" stroke-width="${u(1.4)}"/><text class="wpn" x="${q.x > 420 ? -u(9) : u(9)}" text-anchor="${q.x > 420 ? 'end' : 'start'}" y="${u(-7)}" font-size="${u(12)}" font-weight="800" stroke-width="${u(3)}">${w}</text>` : big ? `<text class="wpn" x="${u(7)}" y="${u(-6)}" font-size="${u(11)}" stroke-width="${u(3)}">${w}</text>` : '';
       g += `<g class="wpm" data-w="${w}" data-ks="${ksOf(w)}" transform="translate(${q.x.toFixed(1)},${q.y.toFixed(1)})"><title>${w}, ${s2==='plan' ? '예정' : WORD[s2]}</title><circle r="${u(9)}" fill="transparent"/><circle class="hlr" r="${u(8)}" fill="none" stroke-width="${u(2.4)}"/>${sel && sel !== w ? `<text class="wpn hlr" x="${q.x > 420 ? -u(10) : u(10)}" text-anchor="${q.x > 420 ? 'end' : 'start'}" y="${u(4)}" font-size="${u(12)}" font-weight="800" stroke-width="${u(3)}">${w}</text>` : ''}${mk}${nm}</g>`; });
     if(sR !== null){ const q = pos2(L, sR);
-      g += `<g transform="translate(${q.x.toFixed(1)},${q.y.toFixed(1)}) rotate(${(q.ang * 180 / Math.PI).toFixed(1)}) scale(${(px * (big ? 1 : .62)).toFixed(3)})"><title>${m.robot} 이동 중</title><path class="rbt" d="M10 0-7.5 8.5-3.6 0-7.5-8.5Z" stroke-width="1.6" stroke-linejoin="round"/></g>`; }
+      g += rich
+        ? `<g class="rbx" transform="translate(${q.x.toFixed(1)},${q.y.toFixed(1)}) rotate(${(q.ang * 180 / Math.PI).toFixed(1)}) scale(${(px * .78).toFixed(3)})"><title>${m.robot} 이동 중</title>${ROBOT_TOP}</g>`
+        : `<g transform="translate(${q.x.toFixed(1)},${q.y.toFixed(1)}) rotate(${(q.ang * 180 / Math.PI).toFixed(1)}) scale(${(px * (big ? 1 : .62)).toFixed(3)})"><title>${m.robot} 이동 중</title><path class="rbt" d="M10 0-7.5 8.5-3.6 0-7.5-8.5Z" stroke-width="1.6" stroke-linejoin="round"/></g>`; }
+    // 사진 말풍선 — 자세히 보기에서 고른 지점(sel) 옆. 판 가운데 쪽으로 펴서 가장자리에 잘리지 않게
+    if(rich && sel && dt && dt.mi===i){ const j = list.findIndex(p => p[0]===sel);
+      if(j >= 0){ const q = pos2(L, L.sAt[j]), src = (MD(dt.k, stOf(sel), i)[1].match(/src="([^"]+)"/) || [])[1];
+        if(src){ const tw = +u(64), th = +u(46), gap = +u(12), r2 = +u(6), bd = +u(2);
+          const right = q.x < 420, down = q.y < 260;
+          const x0 = right ? q.x + gap : q.x - gap - tw, y0 = down ? q.y + gap * .4 : q.y - gap * .4 - th;
+          const cx = right ? x0 : x0 + tw, cy = down ? y0 + r2 : y0 + th - r2;
+          g += `<g class="thb" data-thumb="1" role="button" tabindex="0" aria-label="${sel} 영상 확인으로"><title>${sel} 영상 확인 보기</title>`
+            + `<line class="thl" x1="${q.x.toFixed(1)}" y1="${q.y.toFixed(1)}" x2="${cx.toFixed(1)}" y2="${cy.toFixed(1)}" stroke-width="${u(1.4)}"/>`
+            + `<clipPath id="m2clip${i}"><rect x="${(x0 + bd).toFixed(1)}" y="${(y0 + bd).toFixed(1)}" width="${(tw - bd * 2).toFixed(1)}" height="${(th - bd * 2).toFixed(1)}" rx="${(r2 - bd).toFixed(1)}"/></clipPath>`
+            + `<rect class="thf" x="${x0.toFixed(1)}" y="${y0.toFixed(1)}" width="${tw}" height="${th}" rx="${r2}" filter="url(#m2sh)"/>`
+            + `<image href="${src}" x="${(x0 + bd).toFixed(1)}" y="${(y0 + bd).toFixed(1)}" width="${(tw - bd * 2).toFixed(1)}" height="${(th - bd * 2).toFixed(1)}" preserveAspectRatio="xMidYMid slice" clip-path="url(#m2clip${i})"/></g>`; } } }
     g += '</svg>';
     return g;
   }
@@ -629,6 +663,8 @@
   }
   scr.addEventListener('click', e => {
     const mfb = e.target.closest('[data-mf]'); if(mfb){ return pickF(+mfb.dataset.mi, mfb.dataset.mf); }
+    // [11/02 v6] 지도 사진 말풍선 → 영상 확인 카드로(잠깐 테두리)
+    if(e.target.closest('[data-thumb]')){ const c = v.querySelector('.lvA.s2'); if(c){ c.scrollIntoView({block:'nearest', behavior:'smooth'}); c.classList.add('ring'); setTimeout(() => c.classList.remove('ring'), 1200); } return; }
     if(e.target.closest('[data-menu]')){ menu = !menu; bc.innerHTML = crumb(); return; }
     if(dt){
       if(e.target.closest('[data-dback]')){ const k = dt.k, w = dt.w, mi = dt.mi; dt = null; render(); const c = v.querySelector(`.kd[data-n="${k}"]`) || v.querySelector(`[data-dk="${k}"][data-dm="${mi}"]${w ? `[data-dw="${w}"]` : ''}`) || v.querySelector(`[data-dk="${k}"][data-dm="${mi}"]`); if(c){ const t = c.closest('td') || c; zoomOut(t, () => { t.classList.add('ring'); setTimeout(() => t.classList.remove('ring'), 1500); }); } return; }

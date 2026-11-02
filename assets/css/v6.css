@@ -589,3 +589,25 @@ body.ver-6 .sf .tb:focus-visible { outline: var(--border-width-strong) solid var
 :root[data-theme="light"] body.ver-6 .sf .tb.on:hover { background-color: var(--comp-button-inverse-bg-hover); }
 :root[data-theme="light"] body.ver-6 .sf .tb.on .d.crit { background-color: var(--color-red-500); }
 :root[data-theme="light"] body.ver-6 .sf .tb.on .d.warn { background-color: var(--color-yellow-500); }
+
+/*
+ * [11/02 v6] 왼쪽 큰 지도 마감 — safety.js svg2 rich. 다크 바탕이라 면끼리 한두 단 차이로만 가른다(위험 · 주의 표식이 늘 먼저 보이게).
+ *   길(.road) 한 단 밝은 면 · 설비(.eqr) 그보다 진한 덩이 + 둥근 모서리 · 벽(.wlr) 옅은 선
+ *   지나온 길 테(.rdc) = 판 바탕색 · 로봇 = 흰 몸통 + 길색 꺾쇠 · 사진 말풍선 = 흰 테 + 그림자
+ */
+body.ver-6 .sfx-plan .m2v .road { fill: none; stroke: color-mix(in srgb, var(--text-primary) 7%, transparent); stroke-linecap: round; stroke-linejoin: round; }
+body.ver-6 .sfx-plan .m2v .eqr { fill: color-mix(in srgb, var(--border-default) 85%, var(--bg-page)); stroke: color-mix(in srgb, var(--text-primary) 10%, transparent); stroke-width: 1.5; }
+body.ver-6 .sfx-plan .m2v .wlr { fill: color-mix(in srgb, var(--text-tertiary) 55%, transparent); }
+body.ver-6 .sfx-plan .m2v .rdc { fill: none; stroke: var(--bg-map-chip); stroke-linecap: round; stroke-linejoin: round; }
+body.ver-6 .sfx-plan .m2v .rsh { fill: #000; opacity: .5; }
+body.ver-6 .sfx-plan .m2v .rlg { fill: var(--color-gray-400, #9aa3b4); }
+body.ver-6 .sfx-plan .m2v .rbd { fill: var(--color-gray-50, #f4f6f9); stroke: var(--bg-map-chip); stroke-width: 1.2; }
+body.ver-6 .sfx-plan .m2v .rhd { fill: var(--color-gray-200, #d5d9e0); stroke: var(--bg-map-chip); stroke-width: 1; }
+body.ver-6 .sfx-plan .m2v .rch { stroke: var(--status-info-icon); }
+body.ver-6 .sfx-plan .m2v .thb { cursor: pointer; }
+body.ver-6 .sfx-plan .m2v .thf { fill: var(--color-gray-50, #f4f6f9); }
+body.ver-6 .sfx-plan .m2v .thl { stroke: var(--color-gray-50, #f4f6f9); stroke-linecap: round; }
+body.ver-6 .sfx-plan .m2v .thb:hover .thf, body.ver-6 .sfx-plan .m2v .thb:focus-visible .thf { fill: var(--status-info-icon); }
+body.ver-6 .sf .lvA.s2.ring { box-shadow: 0 0 0 2px var(--border-focus); transition: box-shadow 200ms ease; }
+:root[data-theme="light"] body.ver-6 .sfx-plan .m2v .road { stroke: color-mix(in srgb, var(--bg-raised) 80%, transparent); }
+:root[data-theme="light"] body.ver-6 .sfx-plan .m2v .rsh { opacity: .25; }
