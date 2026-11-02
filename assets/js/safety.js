@@ -177,7 +177,11 @@
       : (x[1] || '').replace(jvalT, '').trim() || '미착용 인원';
     const jtrk = isHit && cd && !isNaN(num) ? (() => { const [lo, hi, w2, c2, u] = cd, p = q => Math.max(0, Math.min(100, (q - lo) / (hi - lo) * 100)).toFixed(1);
       return `<div class="jtrk"><span class="f ${st}" style="width:${p(num)}%"></span><span class="jm w" style="left:${p(w2)}%"><span>주의 ${w2}${u}</span></span><span class="jm c" style="left:${p(c2)}%"><span>위험 ${c2}${u}</span></span></div>`; })() : '';
-    const jv = `<div class="jmain"><h5>${jwhat}</h5>${isHit ? `<b class="jn ${st}">${jvalT}</b>` : `<span class="why1">기준: ${STD[k]}</span>`}</div>${jtrk}${isHit && !jtrk ? `<span class="why1">기준: ${STD[k]}</span>` : ''}`;
+    // [11/02] 세부 묘사(미세 누출 1곳 등) — 판정 글에 값이 안 들어 있으면 결과 옆에 흐린 글로(디자이너 1번). 항목 + 값 규칙은 그대로
+    const jdet = isHit && x[1] && !x[1].includes(jvalT) && x[1] !== jwhat ? `<span class="jdt">${x[1]}</span>` : '';
+    // [11/02] 계기 기준은 값의 단위를 따른다 — 같은 계기인식이라도 차압(Pa) · 압력(bar · MPa) 계기가 섞여 있다(디자이너 2번 "아무거나" → 화면끼리 데이터는 그대로 두고 기준을 맞춤)
+    const stdK = k==='계기인식' && numU && numU[2]==='Pa' ? '250 Pa 미만' : k==='계기인식' && numU && numU[2]==='bar' ? '6.0 ~ 7.5 bar' : STD[k];
+    const jv = `<div class="jmain"><h5>${jwhat}</h5>${isHit ? `<b class="jn ${st}">${jvalT}</b>${jdet}` : `<span class="why1">기준: ${stdK}</span>`}</div>${jtrk}${isHit && !jtrk ? `<span class="why1">기준: ${stdK}</span>` : ''}`;
     /*
      * [11/02] 정보 넷(디자이너) — 미션 · 로봇은 화면에 이미 있어(상단 탭 · 왼쪽 패널) 빼고, 이 화면 어디에도 없는 둘로 채운다.
      *   조치 상태  이 감지 하나에 누가 손댔나 — 요청 전 / HH:MM 요청됨([현장 조치 요청]을 누르면 바로 바뀐다). 왼쪽 패널 "요청 전 N건"은 미션 전체 수

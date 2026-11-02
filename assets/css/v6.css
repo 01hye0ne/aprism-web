@@ -631,3 +631,5 @@ body.ver-6 .sfx-map .sfx-go:hover { color: var(--text-primary); background-color
 body.ver-6 .sfx-map .sfx-plan { padding: 0; }
 :root[data-theme="light"] body.ver-6 .sfx-map .m2f, :root[data-theme="light"] body.ver-6 .sfx-map .sfx-fl, :root[data-theme="light"] body.ver-6 .sfx-map .sfx-go { box-shadow: 0 2px 8px rgb(16 24 40 / 14%); }
 body.ver-6 .mlg .mlg-rb { width: 16px; height: 16px; transform: rotate(90deg); vertical-align: -4px; margin-right: 2px; }
+/* [11/02 v6] 판정 결과 옆 세부 묘사(미세 누출 1곳) — 결과 한 문장 뒤 흐린 14 글, 값과 같은 줄 바닥선 */
+body.ver-6 .sf .jx .jdt { margin-left: var(--space-4); font-size: var(--font-size-14); line-height: var(--font-line-height-20); font-weight: 500; color: var(--text-tertiary); }
