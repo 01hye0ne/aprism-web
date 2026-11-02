@@ -88,6 +88,9 @@
   const COLR = {crit:'var(--status-critical-icon)', warn:'var(--status-warning-icon)', done:'var(--text-tertiary)', ok:'var(--text-disabled)'};
   let M, scope, menu, fired, toasts, drawer, newSeen, lay = 'card', dt = null, bigD = false;
   const COND = {'안전감지':null,'누출감지':[0,100,55,70,'%'],'온도감지':[18,90,40,55,' ℃'],'계기인식':null,'이상음향':[0,30,19,22.8,''],'부분방전':[0,10,8.6,9.23,'']};
+  // [11/02 v6] 판정 막대에 위험 기준까지 세우니 v6 값(관제 알림 기준 주의 — 발전기 베어링 68.4 ℃ · 수배전반 9.41)이 위험 기준(55 ℃ · 9.23)을 넘어 판정과 어긋났다.
+  //   시안 값이라 판정(관제 알림)을 그대로 두고 위험 기준을 올린다 — 온도 70 ℃(변압기 71.2 ℃ 위험은 그대로 위험), 부분방전 9.60.
+  if(V6){ COND['온도감지'] = [18, 90, 40, 70, ' ℃']; COND['부분방전'] = [0, 10, 8.6, 9.6, '']; }
   const SUG = {'안전감지':['작업자에게 즉시 착용을 안내하고 고소 작업을 멈춰야 함',[['작업자 즉시 착용 안내',1,'현장 작업자, 무전 2채널'],['고소 작업 일시 중지',1,'작업 감독자, 내선 2214'],['안전관리팀 전달',0,'안전관리팀, 업무 메신저']]],
     '누출감지':['구역 출입을 통제하고 설비팀에 밸브 확인을 요청해야 함',[['구역 출입 통제',1,'현장 작업자, 무전 2채널'],['설비팀 밸브 확인 요청',1,'설비팀, 내선 2310'],['현장 확인',0,'순회 근무자, 무전 1채널']]],
     '온도감지':['부하를 줄이고 점검을 요청해야 함',[['부하 감소 요청',1,'운전원, 내선 2201'],['설비 점검 요청',1,'설비팀, 내선 2310'],['현장 확인',0,'순회 근무자, 무전 1채널']]],
@@ -150,11 +153,11 @@
     const loc = `<p class="loc"><b>${wp}</b>${isHit ? '<span>' + x[2].split(' ').slice(1).join(' ') + '</span>' : ''}<span class="lm">${m.fl}, ${m.robot}${x[3] ? ' 측정 ' + x[3] : ''}</span></p>`;
     /*
      * [11/02 v6] 판정 카드 — Figma DS 1469:8820. 머리 이름(이상 판정) · 왼쪽 단계 띠 없이 배지 → 제목 18 → 값 36 + 막대(기준 표식 하나) → 정보 넷(미션 · 로봇 · 발생위치 · 발생시간).
-     *   막대는 측정 범위(COND) 위에 값 채움, 기준(STD, 예: 55% 미만) 자리에 세운 표식. 수치 막대가 없는 감지(안전 · 계기)는 값과 기준 글만.
+     *   막대는 측정 범위(COND) 위에 값 채움, 주의 · 위험 기준 자리에 표식 둘(11/02 디자이너 — 둘 다 표시). 수치 막대가 없는 감지(안전 · 계기)는 값과 기준 글만.
      */
     const jv = (() => { if(!isHit) return `<span class="why1">기준: ${STD[k]}</span>`;
-      if(cd && !isNaN(num)){ const [lo, hi, w2, , u] = cd, p = q => Math.max(0, Math.min(100, (q - lo) / (hi - lo) * 100)).toFixed(1);
-        return `<div class="jv"><b class="jn ${st}">${num}${u==='%' ? '%' : u}</b><div class="jtrk"><span class="f ${st}" style="width:${p(num)}%"></span><span class="jm" style="left:${p(w2)}%"><span>${STD[k]}</span></span></div></div>`; }
+      if(cd && !isNaN(num)){ const [lo, hi, w2, c2, u] = cd, p = q => Math.max(0, Math.min(100, (q - lo) / (hi - lo) * 100)).toFixed(1);
+        return `<div class="jv"><b class="jn ${st}">${num}${u==='%' ? '%' : u}</b><div class="jtrk"><span class="f ${st}" style="width:${p(num)}%"></span><span class="jm w" style="left:${p(w2)}%"><span>주의 ${w2}${u}</span></span><span class="jm c" style="left:${p(c2)}%"><span>위험 ${c2}${u}</span></span></div></div>`; }
       return `<div class="jv"><b class="jn ${st}">${SHORT[x[1]] || x[1]}</b><span class="why1">기준: ${STD[k]}</span></div>`; })();
     const jinfo = [['미션', m.mis], ['로봇', m.robot], ['발생위치', `${wp}${isHit ? ' ' + x[2].split(' ').slice(1).join(' ') : ''}`], [isHit ? '발생시간' : '측정 시간', x[3] || '—']]
       .map(([a, b]) => `<div><span>${a}</span><b title="${b}">${b}</b></div>`).join('');

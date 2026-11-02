@@ -501,3 +501,6 @@ body.ver-6 .sf .rlx .rwhy { padding-left: 0; }
 
 /* Delta 칸 — 카드와 버튼 사이 12(Figma) */
 body.ver-6 .sf .rqx { margin-top: var(--space-12); }
+/* [11/02 v6] 판정 막대 기준 둘 — 주의 글은 표식 왼쪽 끝에, 위험 글은 오른쪽에 붙인다(부분방전처럼 두 기준이 가까워도 안 겹친다). 글색 = 단계색 */
+body.ver-6 .sf .jtrk .jm.w span { left: auto; right: 0; transform: none; color: var(--status-warning-text); }
+body.ver-6 .sf .jtrk .jm.c span { left: 0; transform: none; color: var(--status-critical-text); }
