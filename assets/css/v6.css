@@ -543,3 +543,12 @@ body.ver-6 .sf .jx .jn { font-size: 28px; line-height: 32px; font-weight: 600; m
 body.ver-6 .sf .jx .jtrk { align-self: stretch; }
 body.ver-6 .sf .jtrk .jm span { bottom: calc(100% + 8px); }
 body.ver-6 .sf .jx .jtop > .why1 { margin-top: calc(var(--space-4) * -1); }
+/*
+ * [11/02 v6] 판정 카드 3차(디자이너) — 1) 감지 이름을 한 단 낮춘다(탭에도 있는 이름이라 꼬리표 정도로: 14/20 Medium fg/secondary)
+ *   2) 결과를 좌우로 가르지 않고 이어 쓴다 — "최고 온도 48.6 ℃". 값만 단계색, 크기는 같은 24/32
+ */
+body.ver-6 .sf .jx .jk { font-size: var(--font-size-14); line-height: var(--font-line-height-20); font-weight: 500; color: var(--text-secondary); }
+body.ver-6 .sf .jx .jrow { gap: var(--space-8); }
+body.ver-6 .sf .jx .jmain { justify-content: flex-start; gap: var(--space-8); }
+body.ver-6 .sf .jx .jn { font-size: var(--font-size-24); line-height: var(--font-line-height-32); font-weight: 700; }
+body.ver-6 .sf .jx .jmain > .why1 { margin-left: var(--space-8); }
