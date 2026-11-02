@@ -342,7 +342,7 @@
     if(V6){
       /*
        * [10/30 v6] 좌측 패널 = 디자이너 시안 "안전진단 한 화면 흐름"(artifact 5uJoxgMfRJzwP6xouav8RS)의 왼쪽 판 레이아웃.
-       *   제목(미션) + 한 줄 부제(로봇, 측정, 요청 전) → 층 · [관제에서 보기] 한 줄 → 세로로 긴 지도(어두운 판) → 범례.
+       *   제목(미션) → 지도 판(안 위 층 · [관제에서 보기], 가운데 세로 지도, 안 아래 로봇 · 측정 · 요청 전 3칸) → 범례.
        *   시안 맨 왼쪽의 세로 미션 인덱스(전체 · 3F · 1F …)는 상단 미션 탭과 같은 일이라 뺐다. 시안의 파란 링크는 이동이라 무채색(색 위계).
        *   전체 미션은 지도 대신 단계별 미션 수.
        */
@@ -354,9 +354,12 @@
       const i = scope, m = M[i], h = hits(i);
       const cur = dt && dt.wp ? flOf(m, dt.wp) : viewF(i).cur, sel = dt ? dt.wp : undefined, lk = dt ? dt.lk : undefined;
       const fl = m.fls && m.fls.length > 1 ? floorBar(i) : `<span class="sfx-fl">${m.ab}</span>`;
-      return `<div class="sfx"><div class="sfx-h"><b class="sfx-t">${m.mis}</b>${sub(m.robot, '측정 ' + m.done + '/' + m.total + '곳' + (m.done===m.total ? ' 순회 끝' : ''), '요청 전 ' + h + '건')}</div>
-        <div class="sfx-f">${fl}<a class="sfx-go" href="${mainUrl(i, cur)}" title="관제 3D 지도에서 이 미션과 층을 연다">관제에서 보기<span class="i i-14" style="--i:var(--ic-chevron-right)" aria-hidden="true"></span></a></div>
-        <div class="sfx-map">${svg2(i, cur, false, 316, sel, lk)}</div>${LEG}</div>`;
+      // [10/30] 층 · [관제에서 보기]는 지도 판 안 위로, 로봇 · 측정 · 요청 전은 판 안 아래 3칸 한 줄로(디자이너)
+      const kv3 = (k, v) => `<span class="sfx-kv"><span class="k">${k}</span><span class="v">${v}</span></span>`;
+      return `<div class="sfx"><div class="sfx-h"><b class="sfx-t">${m.mis}</b></div>
+        <div class="sfx-map"><div class="sfx-f">${fl}<a class="sfx-go" href="${mainUrl(i, cur)}" title="관제 3D 지도에서 이 미션과 층을 연다">관제에서 보기<span class="i i-14" style="--i:var(--ic-chevron-right)" aria-hidden="true"></span></a></div>
+        <div class="sfx-plan">${svg2(i, cur, false, 316, sel, lk)}</div>
+        <div class="sfx-info">${kv3('로봇', m.robot)}${kv3('측정', m.done + '/' + m.total + '곳' + (m.done===m.total ? ' 순회 끝' : ''))}${kv3('요청 전', h + '건')}</div></div>${LEG}</div>`;
     }
     return `${LEG}<div class="sf-mwrap"><div class="sf-mlist"><div class="sf-mwell">${top}${rows}</div></div><span class="sf-mthumb" aria-hidden="true"></span></div>`;   // 범례는 목록 위(10/30) — 기호를 먼저 읽고 목록으로
   }

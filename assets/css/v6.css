@@ -264,3 +264,13 @@ body.ver-6 .sfx-map { position: relative; flex: none; aspect-ratio: 912 / 1442; 
 body.ver-6 .sfx-map .m2v { display: block; width: 100%; height: 100%; max-height: none; margin: 0; border: 0; border-radius: 0; transform: none; }   /* 평면이 원래 세로(viewBox 888 × 1418) — 돌리지 않고 판에 꽉 */
 body.ver-6 .sfx .mlg { padding: 0; }
 body.ver-6 .sfx-sum { align-self: stretch; }
+
+/* [10/30] 지도 판 = 위 층 · [관제에서 보기] / 가운데 세로 평면 / 아래 로봇 · 측정 · 요청 전 3칸(가는 위 선). 판 높이는 내용이 정한다 */
+body.ver-6 .sfx-map { display: flex; flex-direction: column; aspect-ratio: auto; }
+body.ver-6 .sfx-map .sfx-f { padding: var(--space-8) var(--space-12) 0; }
+body.ver-6 .sfx-plan { padding: 0 var(--space-4); }
+body.ver-6 .sfx-plan .m2v { display: block; width: 100%; height: auto; }
+body.ver-6 .sfx-info { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: var(--space-12); padding: var(--space-12); border-top: var(--border-width-thin) solid var(--border-default); }
+body.ver-6 .sfx-kv { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+body.ver-6 .sfx-kv .k { font-size: var(--font-size-12); line-height: var(--font-line-height-18); color: var(--text-tertiary); }
+body.ver-6 .sfx-kv .v { font-size: var(--font-size-13); line-height: var(--font-line-height-20); color: var(--text-primary); word-break: keep-all; overflow-wrap: anywhere; }
