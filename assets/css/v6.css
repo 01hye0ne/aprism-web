@@ -319,3 +319,5 @@ body.ver-6 .sf .ewrap .mx td, body.ver-6 .sf .mtbw .mtb td { border-bottom-color
 /* [10/30] 라이트 줄 사이 선은 한 단 진하게(80%) · DELTA 메모 머리 칸은 면 없이(본문 판 색 — 붙박이라 불투명이어야 한다). 메모 본문 칸 면은 그대로 */
 :root[data-theme="light"] body.ver-6 .sf .ewrap .mx td, :root[data-theme="light"] body.ver-6 .sf .mtbw .mtb td { border-bottom-color: color-mix(in srgb, var(--border-divider) 80%, transparent); }
 body.ver-6 .sf .ewrap .mx th.c-m { background-color: var(--bg-page); }
+/* [10/30] 관제 우측 로봇 카드 — 모베드(Robot 05)는 왼쪽 바퀴가 그림 틀(viewBox x 27) 밖으로 나가는데, 4족 기준으로 왼쪽에 당겨 둔 자리라 카드 왼 끝에서 잘렸다. 모베드만 12 오른쪽으로 */
+body.ver-6 .robot-strip.is-carousel .robot-2d.is-mobed { margin-left: calc(15.07 * 100cqw / 336 - 24px + 12px); }
