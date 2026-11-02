@@ -231,7 +231,7 @@
     // 행 = 층(미션), 열 = 감지 6종. 카드 전체 보기와 같은 축
     const head = `<tr><th class="tn">미션, 층</th>${K.map(k => `<th class="tw"><b>${k}</b><span>${STD[k]}</span></th>`).join('')}</tr>`;
     const body = M.map((m, i) => { const w = worst(i);
-      return `<tr class="${w}"><td class="tn"><span class="bar"></span><div class="tnw"><div class="tnt"><b class="fl2">${m.mis}</b><small>${flN(m)}</small><span class="trb"><i></i>${m.robot}${nowOf(i) ? ', ' + nowOf(i) + ' 지나 이동 중' : ', 순회 끝'}</span><small>측정 ${m.done}/${m.total}곳</small>${i===1 && !newSeen ? '<em class="nwm">새로</em>' : ''}</div></div></td>
+      return `<tr class="${w}"><td class="tn"><span class="bar"></span><div class="tnw"><div class="tnt"><b class="fl2">${m.mis}</b><small>${flN(m)}</small><span class="trb"><i></i>${m.robot}${nowOf(i) ? ', ' + nowOf(i) + ' 지나 이동 중' : V6 ? '' : ', 순회 끝'}</span><small>측정 ${m.done}/${m.total}곳</small>${i===1 && !newSeen ? '<em class="nwm">새로</em>' : ''}</div></div></td>
         ${K.map(k => { const x = m.r[k]; if(!x) return '<td class="tc"><span class="nat">' + NAW[naOf(i, k)] + '</span></td>';
           if(x[0]==='ok') return `<td class="tc"><span class="cv ok" data-dk="${k}" data-dm="${i}"><i></i>정상 범위</span></td>`;
           return `<td class="tc"><span class="cv ${x[0]}" data-dk="${k}" data-dm="${i}"><i></i>${SHORT[x[1]] || x[1]}</span><small class="twp">${x[2].split(' ')[0]}${moreTxt(i, k)}, ${x[3]}</small></td>`; }).join('')}</tr>`; }).join('');
@@ -369,7 +369,7 @@
       return `<div class="sfx"><div class="sfx-h"><b class="sfx-t">${m.mis}</b></div>
         <div class="sfx-map"><div class="sfx-f">${fl}<a class="sfx-go" href="${mainUrl(i, cur)}" title="관제 3D 지도에서 이 미션과 층을 연다">관제에서 보기<span class="i i-14" style="--i:var(--ic-chevron-right)" aria-hidden="true"></span></a></div>
         <div class="sfx-plan">${svg2(i, cur, false, 316, sel, lk)}</div>
-        <div class="sfx-info">${kv3('로봇', m.robot)}${kv3('측정', m.done + '/' + m.total + '곳' + (m.done===m.total ? ' 순회 끝' : ''))}${kv3('요청 전', h + '건')}</div></div>${LEG}</div>`;
+        <div class="sfx-info">${kv3('로봇', m.robot)}${kv3('측정', m.done + '/' + m.total + '곳')}${kv3('요청 전', h + '건')}</div></div>${LEG}</div>`;
     }
     return `${LEG}<div class="sf-mwrap"><div class="sf-mlist"><div class="sf-mwell">${top}${rows}</div></div><span class="sf-mthumb" aria-hidden="true"></span></div>`;   // 범례는 목록 위(10/30) — 기호를 먼저 읽고 목록으로
   }
