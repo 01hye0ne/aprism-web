@@ -359,9 +359,9 @@
     var go = el("button", "btn btn-ghost is-xs ah-report");
     go.type = "button";
     go.title = "안전진단 화면 준비 중";
-    go.setAttribute("aria-label", (document.body.classList.contains("ver-6") ? "안전진단 상세 확인" : "안전진단"));   // [10/30 v6] 이름 통일 "안전진단 상세 확인"
+    go.setAttribute("aria-label", (document.body.classList.contains("ver-6") ? "진단 상세" : "안전진단"));   // [10/30 v6] 이름 통일 "진단 상세"
     go.appendChild(icon("shield"));
-    go.appendChild(el("span", "ah-report-label", (document.body.classList.contains("ver-6") ? "안전진단 상세 확인" : "안전진단")));
+    go.appendChild(el("span", "ah-report-label", (document.body.classList.contains("ver-6") ? "진단 상세" : "안전진단")));
     row.appendChild(node);
     row.appendChild(go);
     return row;
