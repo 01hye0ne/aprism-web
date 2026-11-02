@@ -244,3 +244,23 @@ body.ver-6 .sf-side .sf-mwell { border: 0; border-radius: 0; }
 body.ver-6 .sf-side .sf-mon { background: none; }
 body.ver-6 .sf-side .sf-monb { border: 0; border-radius: 0; background-color: transparent !important; }
 body.ver-6 .sf-side .sf-mrow.on { background: none; }
+
+/*
+ * [10/30 v6] 안전진단 좌측 판 — 디자이너 시안 "안전진단 한 화면 흐름"의 왼쪽 판(safety.js V6 sideHtml).
+ * 제목 15 SemiBold · 부제 13 text/tertiary → 층 · [관제에서 보기] 줄 → 세로 지도(어두운 판 bg/map-chip, 모서리 8) → 범례.
+ * 패널 안쪽 여백은 왼 12 · 오른 12(패널 머리 글과 같은 선). 지도는 세로 평면 그대로 판 폭에 맞춘다(시안처럼).
+ */
+body.ver-6 .sfx { display: flex; flex-direction: column; gap: var(--space-12); min-height: 0; padding: var(--space-4) var(--space-12) 0 var(--space-4); overflow: hidden auto; scrollbar-width: none; }
+body.ver-6 .sfx::-webkit-scrollbar { display: none; }
+body.ver-6 .sfx-h { display: flex; flex-direction: column; gap: 2px; }
+body.ver-6 .sfx-t { font-size: var(--font-size-15, 15px); line-height: var(--font-line-height-22, 22px); font-weight: 600; color: var(--text-primary); }
+body.ver-6 .sfx-s { font-size: var(--font-size-13); line-height: var(--font-line-height-20); color: var(--text-tertiary); }
+body.ver-6 .sfx-f { display: flex; align-items: center; justify-content: space-between; gap: var(--space-8); min-height: 24px; }
+body.ver-6 .sfx-fl { font-size: var(--font-size-13); line-height: var(--font-line-height-20); font-weight: 600; color: var(--text-primary); }
+body.ver-6 .sfx-go { display: inline-flex; align-items: center; gap: 2px; font-size: var(--font-size-13); line-height: var(--font-line-height-20); font-weight: 500; color: var(--text-secondary); text-decoration: none; }
+body.ver-6 .sfx-go:hover { color: var(--text-primary); }
+body.ver-6 .sfx-go:focus-visible { outline: var(--border-width-strong) solid var(--border-focus); outline-offset: 2px; border-radius: var(--radius-4); }
+body.ver-6 .sfx-map { position: relative; flex: none; aspect-ratio: 912 / 1442; overflow: hidden; border-radius: var(--radius-8); background-color: var(--bg-map-chip); }
+body.ver-6 .sfx-map .m2v { display: block; width: 100%; height: 100%; max-height: none; margin: 0; border: 0; border-radius: 0; transform: none; }   /* 평면이 원래 세로(viewBox 888 × 1418) — 돌리지 않고 판에 꽉 */
+body.ver-6 .sfx .mlg { padding: 0; }
+body.ver-6 .sfx-sum { align-self: stretch; }
