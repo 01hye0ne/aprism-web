@@ -631,7 +631,7 @@ body.ver-6 .sfx-map .sfx-go:hover { color: var(--text-primary); background-color
 body.ver-6 .sfx-map .sfx-plan { padding: 0; }
 :root[data-theme="light"] body.ver-6 .sfx-map .m2f, :root[data-theme="light"] body.ver-6 .sfx-map .sfx-fl, :root[data-theme="light"] body.ver-6 .sfx-map .sfx-go { box-shadow: 0 2px 8px rgb(16 24 40 / 14%); }
 body.ver-6 .mlg .mlg-rb { width: 16px; height: 16px; transform: rotate(90deg); vertical-align: -4px; margin-right: 2px; }
-/* [11/02 v6] 판정 결과 옆 세부 묘사(미세 누출 1곳) — 결과 한 문장 뒤 흐린 14 글, 값과 같은 줄 바닥선 */
+/* [11/02 v6] 판정 결과 옆 세부 묘사(누출 의심 1곳) — 결과 한 문장 뒤 흐린 14 글, 값과 같은 줄 바닥선 */
 body.ver-6 .sf .jx .jdt { margin-left: var(--space-4); font-size: var(--font-size-14); line-height: var(--font-line-height-20); font-weight: 500; color: var(--text-tertiary); }
 /* [11/02 v6] 큰 지도 경로 = 관제 규칙 — 지나온 길 동그란 점선(파랑 80%) · 지금 구간 진한 파랑 실선 · 앞길 옅은 파랑 띠(38%) + 밝은 테. 꺾쇠는 띠 위에 바탕색으로 */
 body.ver-6 .sfx-plan .m2v .rp6 { fill: none; stroke: color-mix(in srgb, var(--status-info-icon) 80%, var(--bg-map-chip)); stroke-linecap: round; stroke-linejoin: round; }
@@ -775,7 +775,7 @@ body.ver-6 .sf .dl { view-transition-name: dx-act; }
 }
 /* [11/02 v6] 알림 목록 어디서 줄 끝 측정 채널(· CH1) — 지점 이름과 같은 흐린 글 */
 body.ver-6 .ah-where .ah-ch { margin-left: var(--space-4); color: var(--text-tertiary); white-space: nowrap; }
-/* [11/02 v6] 안전진단 카드 결과 옆 세부 묘사(미세 누출 1곳) — 상세(.jdt)와 같은 흐린 글 */
+/* [11/02 v6] 안전진단 카드 결과 옆 세부 묘사(누출 의심 1곳) — 상세(.jdt)와 같은 흐린 글 */
 body.ver-6 .sf .kd .big .kdt { margin-left: var(--space-8); font-size: var(--font-size-14); font-weight: 500; color: var(--text-tertiary); }
 /* [11/02 v6] 알림 팝오버 사진 위 [정보 ⓘ] · 호버 정보(위치 · 감지 · 로봇) 삭제 — 위치는 제목 아래 줄, 감지는 배지 옆에 이미 있다. 로봇은 지금 보는 미션의 로봇(디자이너) */
 body.ver-6 .map-alert .ma-info, body.ver-6 .map-alert .ma-meta { display: none !important; }

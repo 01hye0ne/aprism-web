@@ -46,9 +46,9 @@
       acts: [{ t: "필터 교체 요청", delta: true }, { t: "현장 점검 요청", delta: true }, { t: "재측정 후 판단" }] },
 
     { id: "A-4", sev: "warning", day: "today", time: "10:11:19", stamp: T + "10:11:19",
-      title: "누출감지 · 냉각수 배관 밸브", res: ["누출 확률", "62%"], floor: "B4", wp: "WP-03", place: "냉각수 배관 밸브",
+      title: "누출감지 · 냉각수 배관 밸브", res: ["누출 의심도", "62%"], floor: "B4", wp: "WP-03", place: "냉각수 배관 밸브",
       mission: "정기 순회 점검", detect: "누출감지", robot: "Robot 01", img: "alert/wp03-leak.webp",
-      why: ["누출 확률 62% · 기준 55% 초과", "밸브 이음부 같은 자리에서 연속 2프레임 검출", "같은 냉각수 계통 WP-05 펌프 온도도 기준을 넘음"],
+      why: ["누출 의심도 62% · 기준 55% 초과", "밸브 이음부 같은 자리에서 연속 2프레임 검출", "같은 냉각수 계통 WP-05 펌프 온도도 기준을 넘음"],
       lead: "구역 출입을 통제하고 설비팀에 밸브 확인을 요청하세요.", fp: 15, fpLabel: "낮음",
       acts: [{ t: "구역 출입 통제", delta: true }, { t: "설비팀 밸브 확인 요청", delta: true }, { t: "현장 확인" }] },
 
@@ -138,7 +138,7 @@
               delta: "AI 추천 그대로 사용 (현장 점검 요청)" } },
 
     { id: "C-5", sev: "warning", day: "today", time: "09:12:44", stamp: T + "09:12:44",
-      title: "누출감지 · 누출 확률 58%", res: ["누출 확률", "58%"], floor: "B4", wp: "WP-09", place: "유압 유닛 HU-2",
+      title: "누출감지 · 누출 의심도 58%", res: ["누출 의심도", "58%"], floor: "B4", wp: "WP-09", place: "유압 유닛 HU-2",
       mission: "유틸리티 순회", detect: "누출감지", robot: "Robot 09", img: "safety/leak_warn.jpg",
       done: { day: "today", at: "09:30", by: "김현대", took: "발생 후 18분",
               picked: ["청소 후 재측정"], memo: "누유 흔적 청소 · 재측정 정상",
@@ -153,7 +153,7 @@
               delta: "AI 추천 그대로 사용 (작업자 즉시 착용 안내)" } },
 
     { id: "B-2", sev: "warning", day: "yesterday", time: "어제 21:15", stamp: Y + "21:15:37",
-      title: "누출감지 · 누출 확률 57%", res: ["누출 확률", "57%"], floor: "B4", wp: "WP-14", place: "급수 배관 분기부",
+      title: "누출감지 · 누출 의심도 57%", res: ["누출 의심도", "57%"], floor: "B4", wp: "WP-14", place: "급수 배관 분기부",
       mission: "야간 순회 점검", detect: "누출감지", robot: "Robot 04", img: "safety/leak_warn.jpg",
       done: { day: "yesterday", at: "21:27", by: "홍길동", took: "발생 후 12분",
               picked: ["현장 확인"], memo: "결로로 확인 · 누출 아님",

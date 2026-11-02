@@ -913,7 +913,7 @@ window.APRISM_TEXT = (function () {
     // 지도 쪽지의 측정 요약 — 안전진단 표(E_ROWS0)의 값과 같게. 판정 색은 알림 목록이 덮는다(monitor.js markWaypoints)
     r01.steps[0].read = "온도 29.8℃ · 이상음향 8.2"; r01.steps[0].result = "safe";
     r01.steps[1].read = "온도 31.4℃ · 압력 0.71 MPa"; r01.steps[1].result = "safe";
-    r01.steps[2].read = "누출 확률 62% · 온도 30.2℃"; r01.steps[2].result = "caution";
+    r01.steps[2].read = "누출 의심도 62% · 온도 30.2℃"; r01.steps[2].result = "caution";
   }
 
   ROBOTS.forEach(function (robot) {
