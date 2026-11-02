@@ -671,3 +671,25 @@ body.ver-6 [data-timeline] .timeline-item.is-pending .rail-stub {
   -webkit-mask-repeat: repeat-y; mask-repeat: repeat-y;
   -webkit-mask-size: 2px 8px; mask-size: 2px 8px;
 }
+
+/*
+ * [11/02 v6] 안전진단 조치 전 위험 카드(.kd.is-todo) — 테두리 숨쉬기. 관제 Delta 위험 박자(두근두근 — 쉼, 2.4초)와 같은 언어.
+ *   처음 보일 때(is-new) 두 번 또렷하게 → 그 뒤 은은하게. 깜빡임은 초당 3번 아래. 동작 줄이기면 움직임 없이 굵은 빨간 테만.
+ *   카드 크기가 흔들리지 않게 바깥 그림자(box-shadow)로만 긋는다.
+ */
+@keyframes kd-beat {
+  0%, 46%, 100% { box-shadow: 0 0 0 1px color-mix(in srgb, var(--status-critical-icon) 35%, transparent); }
+  10% { box-shadow: 0 0 0 2px color-mix(in srgb, var(--status-critical-icon) 85%, transparent), 0 0 14px 0 color-mix(in srgb, var(--status-critical-icon) 35%, transparent); }
+  20% { box-shadow: 0 0 0 1px color-mix(in srgb, var(--status-critical-icon) 45%, transparent); }
+  30% { box-shadow: 0 0 0 2px color-mix(in srgb, var(--status-critical-icon) 70%, transparent), 0 0 10px 0 color-mix(in srgb, var(--status-critical-icon) 25%, transparent); }
+}
+@keyframes kd-first {
+  0%, 50%, 100% { box-shadow: 0 0 0 1px color-mix(in srgb, var(--status-critical-icon) 35%, transparent); }
+  25%, 75% { box-shadow: 0 0 0 3px var(--status-critical-icon), 0 0 18px 2px color-mix(in srgb, var(--status-critical-icon) 50%, transparent); }
+}
+body.ver-6 .sf .kd.is-todo { animation: kd-beat 2.4s ease-in-out infinite; }
+body.ver-6 .sf .kd.is-todo.is-new { animation: kd-first .7s ease-in-out 2, kd-beat 2.4s ease-in-out 1.4s infinite; }
+body.ver-6 .sf .kd.is-todo:hover, body.ver-6 .sf .kd.is-todo:focus-visible { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) {
+  body.ver-6 .sf .kd.is-todo, body.ver-6 .sf .kd.is-todo.is-new { animation: none; box-shadow: 0 0 0 2px var(--status-critical-icon); }
+}
