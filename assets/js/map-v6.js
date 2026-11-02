@@ -3583,7 +3583,7 @@
       if (!w.pinEl || w.off) { return; }
       var vis = !w.floor || w.floor === floorNow;
       w.pinEl.hidden = !vis;
-      if (vis) { put(w.pinEl, w.spot); if (RR.thin === "on") { var q = onCanvas(w.spot); cand.push({ w: w, x: q.x, y: q.y, p: rrPinRank(w, lastNo) }); } else { w.pinEl.classList.remove("is-thin"); } }
+      if (vis) { put(w.pinEl, w.spot); rrPinEdge(w, pz); if (RR.thin === "on") { var q = onCanvas(w.spot); cand.push({ w: w, x: q.x, y: q.y, p: rrPinRank(w, lastNo) }); } else { w.pinEl.classList.remove("is-thin"); } }
     });
     // [10/22 실험] 번호 솎기 — 화면에서 겹치는 번호는 중요한 순서대로 하나만 남긴다. 다음 지점 > 위험 · 주의 > 마지막 > 10의 배수 > 5의 배수 > 나머지 > 지나온 지점.
     // 확대하면 지점 사이가 벌어져 모두 보이고, 축소하면 몇 개만 남는다. 숨긴 번호 자리에는 바닥 점(고리)이 그대로 있다
@@ -3593,6 +3593,25 @@
       c.w.pinEl.classList.toggle("is-thin", hit2);
       if (!hit2) { placed.push(c); }
     });
+  }
+  /*
+   * [10/30 v6] 가장자리 핀 — 바닥 점은 화면 안인데 위로 선 머리(번호)가 지도 칸 밖으로 나가 잘렸다(디자이너).
+   * 좌우로 넘치면 머리만 안쪽으로 비키고(--hx), 위로 넘치면 막대를 그만큼 줄인다(--stem). 막대가 0 보다 짧아야 하면 머리를 바닥 점 아래로 내린다(is-low, 막대 숨김).
+   * 바닥 점이 화면 밖이면 그대로 둔다(칸이 잘라 숨긴다).
+   */
+  function rrPinEdge(w, pz) {
+    var el = w.pinEl, q = onCanvas(w.spot), W = hit.clientWidth, H = hit.clientHeight, m = 4;
+    el.style.removeProperty("--hx"); el.style.removeProperty("--stem"); el.classList.remove("is-low");
+    if (q.x < 0 || q.x > W || q.y < 0 || q.y > H) { return; }
+    var s = 20 * pz, st = (el.classList.contains("is-buried") ? 44 : 20) * pz, dx = 0;
+    if (q.x - s / 2 < m) { dx = m - (q.x - s / 2); } else if (q.x + s / 2 > W - m) { dx = (W - m) - (q.x + s / 2); }
+    if (dx) { el.style.setProperty("--hx", dx.toFixed(1) + "px"); }
+    var top = q.y - st - s + 2 * pz;
+    if (top < m) {
+      var ns = q.y - m - s + 2 * pz;   // 머리 윗선이 m 에 오는 막대 길이
+      if (ns < 0) { el.classList.add("is-low"); ns = Math.max(-s - 2 * pz, ns); }
+      el.style.setProperty("--stem", ns.toFixed(1) + "px");
+    }
   }
   function rrPinRank(w, lastNo) {
     var t = w.info.tone;

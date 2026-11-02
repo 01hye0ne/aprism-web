@@ -326,3 +326,6 @@ body.ver-6 .sb-tab { height: 44px; }
 /* [10/30] 모베드(휠 로봇)는 그림 칸 가운데로(디자이너) — 4족처럼 왼쪽에 당기지 않는다. 위의 +12 보정을 대신한다 */
 body.ver-6 .robot-strip.is-carousel .robot-thumb:has(.robot-2d.is-mobed) { justify-content: center; }
 body.ver-6 .robot-strip.is-carousel .robot-2d.is-mobed { margin-left: 0; position: relative; left: 5px; }   /* 그림 틀 안 모베드가 왼쪽으로 치우쳐 5 보정 — 카드 왼 끝 ~ 정보 칸 사이 가운데 */
+/* [10/30] 가장자리 핀 머리 비키기(map-v6.js rrPinEdge) — --hx 만큼 옆으로, is-low 면 막대를 감추고 머리를 바닥 점 아래로 */
+body.ver-6 .rr-pin-head { left: calc(-10px * var(--pz, 1) + var(--hx, 0px)); }
+body.ver-6 .rr-pin.is-low::before { display: none; }
