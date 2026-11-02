@@ -434,3 +434,6 @@ body.ver-6 .i-16 { --ic-error: var(--ic-warning); }
  */
 body.ver-6 .sf .dBr2.is-big { grid-template-columns: minmax(0, 1fr); }
 body.ver-6 .sf .dBr2.is-big .dmw.two .md { aspect-ratio: 16 / 10; }
+
+/* [11/02 v6] 안전진단 상세 — 위 여백 16 → 20. 왼쪽 20 · 오른쪽 20(8 + 막대 자리 12) · 아래 20 과 네 변을 맞춘다(디자이너) */
+body.ver-6 .sf .sfsc:only-child { padding-top: var(--space-20); }
