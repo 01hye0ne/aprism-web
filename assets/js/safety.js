@@ -349,7 +349,8 @@
       const sub = (...a) => `<span class="sfx-s">${a.filter(Boolean).join(', ')}</span>`;
       if(scope==='all'){
         return `<div class="sfx"><div class="sfx-h"><b class="sfx-t">전체 미션</b>${sub('미션 ' + M.length + '개', '측정 ' + sumD + '/' + sumT + '곳', '요청 전 ' + allN + '건')}</div>
-          <div class="sfx-sum sf-allsum">${cnt('crit', nc, '위험')}${cnt('warn', nw0, '주의')}${cnt('ok', M.length - nc - nw0, '정상')}</div></div>`;
+          <div class="sfx-rows">${[['crit', 'error', '위험', nc], ['warn', 'warning', '주의', nw0], ['ok', '', '정상', M.length - nc - nw0]].map(([w, ic, t, n]) =>
+            `<div class="sfx-row ${w} ${n ? '' : 'zero'}"><span class="sfx-rl">${ic ? `<span class="i i-16" style="--i:var(--ic-${ic})" aria-hidden="true"></span>` : '<i class="sfx-dot" aria-hidden="true"></i>'}${t}</span><b>${n}<small>개 미션</small></b></div>`).join('')}</div></div>`;   // [10/30] 단계별 미션 수를 한 줄씩(디자이너)
       }
       const i = scope, m = M[i], h = hits(i);
       const cur = dt && dt.wp ? flOf(m, dt.wp) : viewF(i).cur, sel = dt ? dt.wp : undefined, lk = dt ? dt.lk : undefined;
