@@ -552,3 +552,10 @@ body.ver-6 .sf .jx .jrow { gap: var(--space-8); }
 body.ver-6 .sf .jx .jmain { justify-content: flex-start; gap: var(--space-8); }
 body.ver-6 .sf .jx .jn { font-size: var(--font-size-24); line-height: var(--font-line-height-32); font-weight: 700; }
 body.ver-6 .sf .jx .jmain > .why1 { margin-left: var(--space-8); }
+/* [11/02 v6] 연관 감지 줄 — 왼쪽(그 감지: 배지 · 이름 · 지점 · 값) | 오른쪽(관계: 후보 꼬리표 · 가능성). 지점은 흐리게, 값은 이름 뒤 한 칸 띄워 */
+body.ver-6 .sf .rlx .rlt { justify-content: space-between; gap: var(--space-12); }
+body.ver-6 .sf .rlx .rlw { display: inline-flex; align-items: center; gap: var(--space-8); min-width: 0; }
+body.ver-6 .sf .rlx .rlw b { font-weight: 600; color: var(--text-primary); }
+body.ver-6 .sf .rlx .rwp { color: var(--text-tertiary); }
+body.ver-6 .sf .rlx .rv { margin-left: var(--space-4); color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+body.ver-6 .sf .rlx .rlr { display: inline-flex; align-items: center; gap: var(--space-8); flex: none; }
