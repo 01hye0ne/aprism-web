@@ -324,7 +324,7 @@
    *   assets/img/safety/robot-top-spot.png · robot-top-wheel.png — 코가 위(-y). 지도에서는 가는 방향(+x)으로 90° 돌린다.
    *   휠 로봇은 Robot 05(모베드). 바닥 그림자는 지도에서 따로 깐다.
    */
-  const robotTop = (m, u) => { const kind = /Robot 05/.test(m.robot) ? 'wheel' : 'spot', S = +u(30), h = (S / 2).toFixed(1);
+  const robotTop = (m, u) => { const kind = robotKind(m), S = +u(30), h = (S / 2).toFixed(1);
     return `<ellipse class="rsh" cx="${u(1)}" cy="${u(1.5)}" rx="${u(13)}" ry="${u(8)}" filter="url(#m2bl)"/><image href="../assets/img/safety/robot-top-${kind}.png" x="-${h}" y="-${h}" width="${S}" height="${S}" transform="rotate(90)"/>`; };
   // 한 층 그림. big = 크게 보기(벽, 계단, 지점 번호, 방 이름까지)
   function svg2(i, ab, big, w, sel, lk){
@@ -420,7 +420,9 @@
     return `<span class="m2f" role="group" aria-label="층">${fls.map(f => `<button type="button" data-mf="${f}" data-mi="${i}" class="${f===cur ? 'on' : ''}" aria-pressed="${f===cur}">${f}${f===robotF ? '<i title="로봇 있는 층"></i>' : ''}</button>`).join('')}</span>`; }
   const LEG = '<div class="mlg"><i class="c"></i>위험 <i class="w"></i>주의 <i class="o"></i>정상 범위 <i class="p"></i>예정 <svg viewBox="-9 -9 20 18" width="11" height="10"><path class="rbt" d="M10 0-7.5 8.5-3.6 0-7.5-8.5Z" stroke="none"/></svg>로봇</div>';
   // [11/02 v6] 범례 로봇도 지도와 같은 3D 탑뷰 그림(코가 오른쪽)
-  const LEG6 = LEG.replace(/<svg[^]*?<\/svg>/, '<img class="mlg-rb" src="../assets/img/safety/robot-top-spot.png" alt="" width="16" height="16">');
+  //   그림은 그 미션 로봇과 같게(휠 로봇 Robot 05 면 모베드) — 지도의 robotTop 과 같은 규칙
+  const robotKind = m => /Robot 05/.test(m.robot) ? 'wheel' : 'spot';
+  const LEG6 = m => LEG.replace(/<svg[^]*?<\/svg>/, `<img class="mlg-rb" src="../assets/img/safety/robot-top-${robotKind(m)}.png" alt="" width="16" height="16">`);
   // [v5 점검] 왼쪽 패널(관제 · 보고서와 같은 340) 본문 — 미션 하나: 요약 + 2D 지도(자세히 보기에서는 그 지점 · 연관 지점 표시), 전체: 미션별 작은 지도 목록
   // [10/29] 왼쪽 패널은 깊이와 상관없이 늘 미션 목록(보고서 목록과 같은 짜임) — 지금 어디인지는 고른 줄이 말한다.
   // 맨 위 [전체], 아래 미션 줄. 고른 미션은 줄 아래로 2D 지도가 펼쳐지고(자세히 보기에서는 그 지점 · 연관 지점), 나머지는 작은 지도 줄
@@ -474,7 +476,7 @@
       return `<div class="sfx"><div class="sfx-h"><b class="sfx-t">${m.mis}</b></div>
         <div class="sfx-map"><div class="sfx-f">${fl}<a class="sfx-go" href="${mainUrl(i, cur)}" title="관제 3D 지도에서 이 미션과 층을 연다">관제에서 보기<span class="i i-14" style="--i:var(--ic-chevron-right)" aria-hidden="true"></span></a></div>
         <div class="sfx-plan">${svg2(i, cur, false, 316, sel, lk)}</div>
-        <div class="sfx-info">${kv3('로봇', m.robot)}${kv3('측정', m.done + '/' + m.total + '곳')}${kv3('요청 전', h + '건')}</div></div>${LEG6}</div>`;
+        <div class="sfx-info">${kv3('로봇', m.robot)}${kv3('측정', m.done + '/' + m.total + '곳')}${kv3('요청 전', h + '건')}</div></div>${LEG6(m)}</div>`;
     }
     return `${LEG}<div class="sf-mwrap"><div class="sf-mlist"><div class="sf-mwell">${top}${rows}</div></div><span class="sf-mthumb" aria-hidden="true"></span></div>`;   // 범례는 목록 위(10/30) — 기호를 먼저 읽고 목록으로
   }
