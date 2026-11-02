@@ -398,7 +398,10 @@
     list.forEach((p, j) => { const w = p[0], q = pos2(L, L.sAt[j]), s2 = p[3] ? 'plan' : stOf(w), isNext = next && next[0]===w && ab===nowF;
       let mk;
       if(s2==='plan') mk = `<circle r="${u(isNext ? 3.4 : 2.6)}" class="mk-p ${isNext ? 'nx' : ''}" stroke-width="${u(isNext ? 1.6 : 1)}"/>`;
-      else if(s2==='crit' || s2==='warn') mk = `<circle r="${u(3.6)}" class="mk-${s2==='crit' ? 'c' : 'w'}" stroke-width="${u(.8)}"/>`;
+      // [11/02 v6] 큰 지도(rich)는 위험 · 주의 = 세모 — 관제 지도 · 타임라인 · 범례와 같은 기호(점은 정상 · 상태 몫). 점과 같은 무게로 작게(약 8×7). 목록 썸네일은 작아 점 그대로
+      else if(s2==='crit' || s2==='warn') mk = rich
+        ? `<path d="M0 ${u(-4.4)} ${u(4.2)} ${u(2.8)} ${u(-4.2)} ${u(2.8)}Z" class="mk-${s2==='crit' ? 'c' : 'w'} mk-tri" stroke-width="${u(.9)}" stroke-linejoin="round"/>`
+        : `<circle r="${u(3.6)}" class="mk-${s2==='crit' ? 'c' : 'w'}" stroke-width="${u(.8)}"/>`;
       else if(s2==='done') mk = `<circle r="${u(3)}" class="mk-d" fill="none" stroke-width="${u(1.4)}"/>`;
       else mk = `<circle r="${u(2.4)}" class="mk-o"/>`;
       const nm = sel===w ? `<circle class="mk-sel" r="${u(6.5)}" fill="none" stroke-width="${u(1.4)}"/><text class="wpn" x="${q.x > 420 ? -u(9) : u(9)}" text-anchor="${q.x > 420 ? 'end' : 'start'}" y="${u(-7)}" font-size="${u(12)}" font-weight="800" stroke-width="${u(3)}">${w}</text>` : big ? `<text class="wpn" x="${u(7)}" y="${u(-6)}" font-size="${u(11)}" stroke-width="${u(3)}">${w}</text>` : '';
