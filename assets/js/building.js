@@ -1149,10 +1149,15 @@
     var rc = new THREE.Raycaster();
     var DIRS = [[1, 0.013, 0.021], [-1, 0.017, -0.011], [0.019, 1, 0.012], [-0.014, -1, 0.018], [0.011, 0.016, 1], [-0.021, 0.012, -1]]
       .map(function (d) { return new THREE.Vector3(d[0], d[1], d[2]).normalize(); });
+    var raw = geos.map(function (g) { return g.boundingBox ? g.boundingBox.clone().expandByScalar(1e-3) : null; });
+    // [11/02 로딩] 어느 벽 상자 안에도 없는 점은 광선 없이 바깥, 상자 안이면 그 벽들에만 쏜다(map-v6 와 같다)
     function inside(pt) {
+      var near = [];
+      for (var j = 0; j < list.length; j += 1) { if (raw[j] && raw[j].containsPoint(pt)) { near.push(list[j]); } }
+      if (!near.length) { return false; }
       for (var i = 0; i < DIRS.length; i += 1) {
         rc.set(pt, DIRS[i]);
-        var h = rc.intersectObjects(list, false)[0];
+        var h = rc.intersectObjects(near, false)[0];
         if (h && h.face && h.face.normal.dot(DIRS[i]) > 0) { return true; }
       }
       return false;

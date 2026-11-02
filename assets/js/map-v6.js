@@ -1030,7 +1030,6 @@
         layLayer(top, "");
       }
     });
-    hideWallJoins();
     return model;
   }
 
@@ -1053,6 +1052,7 @@
     var walls = meshes.filter(function (m) { return m.key === "wall"; });
     if (walls.length < 2) { return; }
     var ray = new THREE.Raycaster();
+    ray.firstHitOnly = true;   // BVH 가 있으면 처음 맞는 면 하나만 찾는다
     var DIRS = [[1, 0.013, 0.021], [-1, 0.017, -0.011], [0.019, 1, 0.012], [-0.014, -1, 0.018], [0.011, 0.016, 1], [-0.021, 0.012, -1]]
       .map(function (d) { return new THREE.Vector3(d[0], d[1], d[2]).normalize(); });
     var EPS = 0.12;
@@ -1061,6 +1061,7 @@
     walls.forEach(function (w) {
       (byFloor[w.floor] = byFloor[w.floor] || []).push(w); w.mat.side = THREE.DoubleSide;
       w.mesh.geometry.computeBoundingBox(); w.box = w.mesh.geometry.boundingBox.clone().expandByScalar(EPS * 2);
+      w.mesh.userData.rawBox = w.mesh.geometry.boundingBox.clone().expandByScalar(1e-3);
     });
     // 선분 a→b 가 상자 안을 지나는 비율 구간 [t0, t1](슬랩 자르기). 안 지나면 null
     function clip(p0, p1, bx) {
@@ -1076,10 +1077,14 @@
       return [t0, t1];
     }
     var nrm = new THREE.Vector3();
+    // [11/02 로딩] 점이 어느 벽 상자 안에도 없으면 광선 없이 바깥 — 표본 대부분이 여기서 끝난다. 상자 안이면 그 벽들에만 쏜다
     function inside(pt, list) {
+      var near = [];
+      for (var j = 0; j < list.length; j += 1) { if (list[j].userData.rawBox.containsPoint(pt)) { near.push(list[j]); } }
+      if (!near.length) { return false; }
       for (var i = 0; i < DIRS.length; i += 1) {
         ray.set(pt, DIRS[i]);
-        var hit = ray.intersectObjects(list, false)[0];
+        var hit = ray.intersectObjects(near, false)[0];
         if (hit && hit.face) {
           nrm.copy(hit.face.normal);
           if (nrm.dot(DIRS[i]) > 0) { return true; }
@@ -5412,7 +5417,23 @@
    * 점들을 차례로 잇는 길(도면 좌표). closed 면 마지막 점에서 처음 점으로 돌아온다.
    * 돌려주는 것: { path:[{X,Y,Z}], stops:[{X,Y,Z}](보정된 웨이포인트), reduced:[구간 번호] }
    */
+  /*
+   * [11/02 로딩] 길찾기(A*) 결과 기억 — 같은 모델 · 같은 층 · 같은 점 · 같은 NAV 값이면 길은 늘 같다.
+   * 처음 한 번 계산해 localStorage 에 두고 다음부터 꺼내 쓴다(측정: 지도 세우기 중 약 0.4초가 A* · 여유 지도였다).
+   * 열쇠에 모델 크기(base64 길이) · NAV 값 · 점 좌표가 다 들어가 하나라도 바뀌면 새로 계산한다. 저장이 안 되면(용량 · 사생활 모드) 그냥 계산한다.
+   */
+  var ROUTE_MEMO = "aprism-v6-route|" + (window.APRISM_MAP_GLB ? window.APRISM_MAP_GLB.length : 0) + "|" + JSON.stringify(NAV) + "|";
   function planChain(fid, pts, closed, names) {
+    var key = ROUTE_MEMO + fid + "|" + (closed ? 1 : 0) + "|" + pts.map(function (P) { return P.X.toFixed(3) + "," + P.Y.toFixed(3); }).join(";") + "|" + (names ? names.join(",") : "");
+    try {
+      var hit = window.localStorage.getItem(key);
+      if (hit) { var o = JSON.parse(hit); o.log.forEach(function (l) { routeLog.push(l); }); return { path: o.path, stops: o.stops, reduced: o.reduced }; }
+    } catch (e) { /* 못 읽으면 계산 */ }
+    var n0 = routeLog.length, res = planChain0(fid, pts, closed, names);
+    try { window.localStorage.setItem(key, JSON.stringify({ path: res.path, stops: res.stops, reduced: res.reduced, log: routeLog.slice(n0) })); } catch (e) { /* 못 쓰면 다음에도 계산 */ }
+    return res;
+  }
+  function planChain0(fid, pts, closed, names) {
     var nav = navOf(fid);
     var need = NAV.radius + NAV.safety;
     var stops = pts.map(function (P, k) {
@@ -5863,6 +5884,8 @@
         item.mesh.raycast = Bvh.acceleratedRaycast;
       });
     }
+    // [11/02] 벽 맞닿는 자리 선 지우기 — 광선 가속(BVH)을 심은 뒤에 돈다(전에는 짓는 중에 돌아 느린 광선으로 0.8~0.9초 걸렸다)
+    hideWallJoins();
 
     var box = new THREE.Box3().setFromObject(model);
     modelBox = box;   // 층 이동이 층마다 길을 찾을 때 쓴다
