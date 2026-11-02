@@ -256,6 +256,10 @@ body.ver-5 .step-no { font-family: var(--font-family-mono); font-weight: 700; }
 /* 지도 바탕 */
 :root[data-theme="light"] body.ver-5 .two-col,
 :root[data-theme="light"] body.ver-5 .map-view { background-color: var(--v5-map-bg); }
+/* [11/02] 지도 위 유리 패널(우측 패널 · 떠 있는 관제 패널) — bg/glass(흰 92%)를 따른다.
+   v2.2 라이트 규칙이 --map-glass-bg 를 옛 남색 gray/100 80% 로 따로 묶어 둬, 흰 관제 칸과 우측 패널 색이 갈렸다 */
+:root[data-theme="light"] body.ver-5 .floating .right-panel,
+:root[data-lp="float"][data-theme="light"] body.ver-5 .two-col > .context-panel { --map-glass-bg: var(--bg-glass); }
 
 /* [10/30] v5 미션 관제 — 지도 하단 상태 시뮬레이션 막대(route-sim.js .rsim)를 다시 보인다. 접으면 구석 화살표만 남는다(route-rules.css .rsim.is-folded) */
 

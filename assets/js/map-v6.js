@@ -191,7 +191,8 @@
    */
   var LIGHT = {
     face: { floor: 0xbfc4cc, wall: 0xdfe2e6, equipment: 0xe1e4e8, stairs: 0xd8dbdf, other: 0xdfe2e6 },
-    edge: 0x868c93, ghost: 0xf2f4f5, grid: 0xa4a9b0,
+    // [11/02] 격자 400 → 300 — 바탕(400)과 같은 색이라 격자선이 안 보였다. 한 단 밝게
+    edge: 0x868c93, ghost: 0xf2f4f5, grid: 0xbfc4cc,
     pickFace: 0xcfe0ff, pickLine: 0x1d5fd6, hoverLine: 0x5b6577
   };
   var LIGHT_LIFT = 0.18;
