@@ -437,3 +437,67 @@ body.ver-6 .sf .dBr2.is-big .dmw.two .md { aspect-ratio: 16 / 10; }
 
 /* [11/02 v6] 안전진단 상세 — 위 여백 16 → 20. 왼쪽 20 · 오른쪽 20(8 + 막대 자리 12) · 아래 20 과 네 변을 맞춘다(디자이너) */
 body.ver-6 .sf .sfsc:only-child { padding-top: var(--space-20); }
+
+/*
+ * [11/02 v6] 안전진단 상세 오른쪽 내용 — Figma DS 1469:8820(디자이너).
+ *   열     가운데 995 : Delta 449(≈ 2.2 : 1) · 가운데 아래 줄은 영상 | 재발 · 연관 반반
+ *   카드   bg/cell · 테 없음 · 안쪽 4, 머리(13/18 Medium fg/tertiary)는 안쪽 8 — 내용 판(사진 · 줄)이 카드 가장자리 4 까지 찬다
+ *   판정   배지 → 제목 18/26 Bold → 값 36/44 SemiBold(단계 글자색) + 막대 12(기준 표식 4×24) → 정보 넷(bg/map-chip, 12/18 이름 · 14/22 Bold 값, 칸 사이 선)
+ *   재발   줄 bg/inset r2 · 32 높이 · 시각 13/20 fg/tertiary · 값 13/20 fg/primary · 배지 · 조치 12/20 SemiBold(왼쪽 정렬)
+ *   연관   줄 bg/inset · 테 border/default · 감지 이름 13/20 Regular
+ * Figma 와 다르게 둔 곳: 재발 결론(처음 넘음 · 반복)을 머리 오른쪽 꼬리표로 남겼다(11/02 디자이너가 고른 요약). 정보 값은 실제 데이터(Figma 는 WP-007 자리표시자).
+ */
+body.ver-6 .sf .dB { grid-template-columns: minmax(0, 995fr) minmax(0, 449fr); }
+body.ver-6 .sf .dBr2 { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+body.ver-6 .sf .dBr2.is-big { grid-template-columns: minmax(0, 1fr); }
+body.ver-6 .sf .lvA, body.ver-6 .sf .lvB { padding: var(--space-4); border: 0; border-radius: var(--radius-4, 4px); background-color: var(--bg-cell); box-shadow: none; }
+body.ver-6 .sf .lvA .sth, body.ver-6 .sf .lvB .sth { margin: 0; padding: var(--space-8); min-height: 34px; }
+body.ver-6 .sf .lvA.s2 { gap: var(--space-4); }
+body.ver-6 .sf .lvA.s2 > .why1 { padding: 0 var(--space-8) var(--space-4); }
+body.ver-6 .sf .dmw .md { border-radius: var(--radius-4, 4px); background-color: var(--bg-page); }
+body.ver-6 .sf .lvA.s2 .dmw:not(.two) .md { min-height: 326px; }   /* Figma 사진 판 높이 — 옆 줄이 짧아도(연관 감지 없음) 납작해지지 않게 */
+body.ver-6 .sf .lvA.s1.crit, body.ver-6 .sf .lvA.s1.warn { box-shadow: none; }
+
+/* 판정 */
+body.ver-6 .sf .jx .jtop { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-12); padding: var(--space-8) var(--space-8) var(--space-16); }
+body.ver-6 .sf .jx h5 { margin: 0; font-size: var(--font-size-18); line-height: var(--font-line-height-26, 26px); font-weight: 700; letter-spacing: 0; color: var(--text-primary); }
+body.ver-6 .sf .jx .jv { align-self: stretch; display: flex; flex-direction: column; gap: var(--space-8); }
+body.ver-6 .sf .jx .jn { font-size: 36px; line-height: 44px; font-weight: 600; color: var(--text-primary); }
+body.ver-6 .sf .jx .jn.crit { color: var(--status-critical-text); }
+body.ver-6 .sf .jx .jn.warn { color: var(--status-warning-text); }
+body.ver-6 .sf .jtrk { position: relative; height: 12px; background-color: var(--comp-chart-track); }
+body.ver-6 .sf .jtrk .f { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 8px; background-color: var(--text-tertiary); }
+body.ver-6 .sf .jtrk .f.crit { background-color: var(--status-critical-text); }
+body.ver-6 .sf .jtrk .f.warn { background-color: var(--status-warning-text); }
+body.ver-6 .sf .jtrk .jm { position: absolute; top: -6px; width: 4px; height: 24px; margin-left: -2px; border: 2px solid var(--border-divider); border-radius: var(--radius-pill); background-color: var(--bg-inverse); box-sizing: content-box; transform: translateX(-2px); }
+body.ver-6 .sf .jtrk .jm span { position: absolute; bottom: calc(100% + 4px); left: 50%; transform: translateX(-50%); font-size: var(--font-size-13); line-height: var(--font-line-height-20); color: var(--text-secondary); white-space: nowrap; }
+body.ver-6 .sf .jx .jv:has(.jtrk) { padding-bottom: var(--space-4); }
+body.ver-6 .sf .jx .jv:has(.jtrk) .jn { margin-bottom: var(--space-12); }   /* 기준 글(위 20)이 값 줄과 겹치지 않게 */
+body.ver-6 .sf .jinfo { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-20); padding: var(--space-12) var(--space-16); border-radius: var(--radius-4, 4px); background-color: var(--bg-map-chip); }
+body.ver-6 .sf .jinfo > div { display: flex; flex-direction: column; gap: var(--space-8); min-width: 0; position: relative; }
+body.ver-6 .sf .jinfo > div + div::before { content: ""; position: absolute; left: calc(var(--space-20) / -2); top: 0; bottom: 0; border-left: var(--border-width-thin) solid var(--border-divider); }
+body.ver-6 .sf .jinfo span { font-size: var(--font-size-12); line-height: var(--font-line-height-18); color: var(--text-tertiary); }
+body.ver-6 .sf .jinfo b { font-size: var(--font-size-14); line-height: var(--font-line-height-22); font-weight: 700; color: var(--text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* 재발 여부 */
+body.ver-6 .sf .lvB .sth .hfl { margin-left: auto; font-size: var(--font-size-12); line-height: var(--font-line-height-18); font-weight: 700; color: var(--text-secondary); }
+body.ver-6 .sf .lvB .sth .hfl.is-rep { color: var(--status-warning-text); }
+body.ver-6 .sf .hist { gap: var(--space-4); }
+body.ver-6 .sf .hi { grid-template-columns: 92px 56px 84px minmax(0, 1fr); min-height: 32px; padding: var(--space-4) var(--space-8); border-radius: 2px; background-color: var(--bg-inset); font-size: var(--font-size-13); line-height: var(--font-line-height-20); }
+body.ver-6 .sf .hi > span:nth-child(2) { font-weight: 400; color: var(--text-primary); }
+body.ver-6 .sf .hi .pl { justify-self: start; }
+body.ver-6 .sf .hi.now { box-shadow: none; }
+body.ver-6 .sf .hia { justify-self: start; font-size: var(--font-size-12); line-height: var(--font-line-height-20); overflow: hidden; text-overflow: ellipsis; }
+body.ver-6 .sf .hia.on { font-weight: 600; color: var(--text-secondary); }
+
+/* 연관 감지 */
+body.ver-6 .sf .lvB.ref .rl.b { gap: var(--space-4); }
+body.ver-6 .sf .rlx { padding: var(--space-4) var(--space-8); border: var(--border-width-thin) solid var(--border-default); border-radius: var(--radius-4, 4px); background-color: var(--bg-inset); text-align: left; }
+body.ver-6 .sf .rlx .rlt { font-size: var(--font-size-13); line-height: var(--font-line-height-20); color: var(--text-primary); }
+body.ver-6 .sf .rlx .rlt b { font-weight: 400; }
+body.ver-6 .sf .rlx em.rr { font-size: var(--font-size-12); line-height: var(--font-line-height-20); font-weight: 600; border-radius: 2px; }
+body.ver-6 .sf .rlx .lp { line-height: var(--font-line-height-20); }
+body.ver-6 .sf .rlx .rwhy { padding-left: 0; }
+
+/* Delta 칸 — 카드와 버튼 사이 12(Figma) */
+body.ver-6 .sf .rqx { margin-top: var(--space-12); }

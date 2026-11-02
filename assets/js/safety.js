@@ -148,13 +148,27 @@
     const relHead = `<div class="sth"><b>연관 감지</b><span class="qt" tabindex="0" role="button" aria-label="연관 감지 설명">?<span class="tip" role="tooltip">DELTA가 같은 계통 정보와 함께 움직이는 감지 짝으로 고른 연관 후보다. 확정된 원인이 아니라 판단을 돕는 참고용 가설이다. 시안의 계통 정보는 예시 값이다.</span></span></div>`;
     dt.wp = wp; dt.lk = lks.map(l => l.w2);   // 왼쪽 패널 지도가 이 지점과 연관 지점을 표시한다(sideHtml)
     const loc = `<p class="loc"><b>${wp}</b>${isHit ? '<span>' + x[2].split(' ').slice(1).join(' ') + '</span>' : ''}<span class="lm">${m.fl}, ${m.robot}${x[3] ? ' 측정 ' + x[3] : ''}</span></p>`;
+    /*
+     * [11/02 v6] 판정 카드 — Figma DS 1469:8820. 머리 이름(이상 판정) · 왼쪽 단계 띠 없이 배지 → 제목 18 → 값 36 + 막대(기준 표식 하나) → 정보 넷(미션 · 로봇 · 발생위치 · 발생시간).
+     *   막대는 측정 범위(COND) 위에 값 채움, 기준(STD, 예: 55% 미만) 자리에 세운 표식. 수치 막대가 없는 감지(안전 · 계기)는 값과 기준 글만.
+     */
+    const jv = (() => { if(!isHit) return `<span class="why1">기준: ${STD[k]}</span>`;
+      if(cd && !isNaN(num)){ const [lo, hi, w2, , u] = cd, p = q => Math.max(0, Math.min(100, (q - lo) / (hi - lo) * 100)).toFixed(1);
+        return `<div class="jv"><b class="jn ${st}">${num}${u==='%' ? '%' : u}</b><div class="jtrk"><span class="f ${st}" style="width:${p(num)}%"></span><span class="jm" style="left:${p(w2)}%"><span>${STD[k]}</span></span></div></div>`; }
+      return `<div class="jv"><b class="jn ${st}">${SHORT[x[1]] || x[1]}</b><span class="why1">기준: ${STD[k]}</span></div>`; })();
+    const jinfo = [['미션', m.mis], ['로봇', m.robot], ['발생위치', `${wp}${isHit ? ' ' + x[2].split(' ').slice(1).join(' ') : ''}`], [isHit ? '발생시간' : '측정 시간', x[3] || '—']]
+      .map(([a, b]) => `<div><span>${a}</span><b title="${b}">${b}</b></div>`).join('');
+    const judge = V6 ? `<div class="lvA s1 jx ${st}"><div class="jtop"><span class="pl ${st}">${WORD[st]}</span><h5>${k}, ${isHit ? x[1] : st==='plan' ? '측정 전' : '정상 범위 ' + x[1]}</h5>${jv}</div><div class="jinfo">${jinfo}</div></div>`
+      : `<div class="lvA s1 ${st}">${step('이상 판정')}<div class="tt"><span class="pl ${st}">${WORD[st]}</span><h5>${k}, ${isHit ? x[1] : st==='plan' ? '측정 전' : '정상 범위 ' + x[1]}</h5></div>${loc}${cond}</div>`;
+    // [11/02 v6] 재발 여부 — Figma 처럼 네 줄을 다 보이고(줄 32 라 접을 만큼 길지 않다), 결론(처음 넘음 · 반복)은 머리 오른쪽 꼬리표로
+    const histV6 = `<div class="sth"><b>재발 여부</b><span class="hfl ${rep3 ? 'is-rep' : ''}">${rep3 ? '반복' : isHit ? '처음 넘음' : '계속 정상 범위'}</span></div><div class="hist">${hist.map(hiRow).join('')}</div>`;
     return `<div class="dtop"><button type="button" class="btn btn-secondary bkx" data-dback="1"><span class="i i-16" style="--i:var(--ic-chevron-left)" aria-hidden="true"></span>돌아가기</button><div class="tbs">${tabs}</div></div>
       <div class="dB">
         <div class="dBm">
-          <div class="lvA s1 ${st}">${step('이상 판정')}<div class="tt"><span class="pl ${st}">${WORD[st]}</span><h5>${k}, ${isHit ? x[1] : st==='plan' ? '측정 전' : '정상 범위 ' + x[1]}</h5></div>${loc}${cond}</div>
+          ${judge}
           <div class="dBr2${V6 && bigD && canBig ? ' is-big' : ''}">
             <div class="lvA s2">${step('영상 확인')}${!isHit ? '<span class="why1">시안용 예시 이미지(같은 감지의 사진)</span>' : ''}${media}</div>
-            <div class="dBc"><div class="lvB">${step('재발 여부')}${histHtml}${again}</div>
+            <div class="dBc"><div class="lvB">${V6 ? histV6 : step('재발 여부') + histHtml}${again}</div>
               ${V6 && !lks.length ? '' : `<div class="lvB s4 ref">${relHead}${relB}</div>`}</div>
           </div>
         </div>
