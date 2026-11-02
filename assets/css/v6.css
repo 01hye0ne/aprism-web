@@ -524,3 +524,6 @@ body.ver-6 .sf .jx .jrow { display: flex; align-items: center; gap: var(--space-
 body.ver-6 .sf .jloc { font-size: var(--font-size-13); line-height: var(--font-line-height-20); color: var(--text-tertiary); gap: var(--space-4); }
 body.ver-6 .sf .jloc b { font-weight: 500; color: var(--text-secondary); }
 body.ver-6 .sf .jloc .jt::before { margin: 0 var(--space-4) 0 0; }
+/* [11/02 v6] 정보 넷 다시(발생위치 · 발생시간 · 조치 상태 · 다음 측정) — 위치 · 시각 한 줄은 상자로 돌아갔다. 요청 전은 할 일이라 주의 글색 */
+body.ver-6 .sf .jx .jtop { gap: var(--space-16); }
+body.ver-6 .sf .jinfo b.is-todo { color: var(--status-warning-text); }

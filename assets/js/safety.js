@@ -159,9 +159,17 @@
       if(cd && !isNaN(num)){ const [lo, hi, w2, c2, u] = cd, p = q => Math.max(0, Math.min(100, (q - lo) / (hi - lo) * 100)).toFixed(1);
         return `<div class="jv"><b class="jn ${st}">${num}${u==='%' ? '%' : u}</b><div class="jtrk"><span class="f ${st}" style="width:${p(num)}%"></span><span class="jm w" style="left:${p(w2)}%"><span>주의 ${w2}${u}</span></span><span class="jm c" style="left:${p(c2)}%"><span>위험 ${c2}${u}</span></span></div></div>`; }
       return `<div class="jv"><b class="jn ${st}">${SHORT[x[1]] || x[1]}</b><span class="why1">기준: ${STD[k]}</span></div>`; })();
-    // [11/02] 정보 넷 → 한 줄. 미션(상단 탭 · 왼쪽 패널 제목) · 로봇(왼쪽 패널)은 같은 화면에 이미 있어 뺐고, 발생위치 · 발생시간을 제목 아래 한 줄로(디자이너)
-    const jloc = `<p class="jloc"><b>${wp}</b>${isHit ? '<span>' + x[2].split(' ').slice(1).join(' ') + '</span>' : ''}${x[3] ? `<span class="jt">${isHit ? '' : '측정 '}${x[3]}</span>` : ''}</p>`;
-    const judge = V6 ? `<div class="lvA s1 jx ${st}"><div class="jtop"><div class="jhd"><div class="jrow"><span class="pl ${st}">${WORD[st]}</span><h5>${k}, ${isHit ? x[1] : st==='plan' ? '측정 전' : '정상 범위 ' + x[1]}</h5></div>${jloc}</div>${jv}</div></div>`
+    /*
+     * [11/02] 정보 넷(디자이너) — 미션 · 로봇은 화면에 이미 있어(상단 탭 · 왼쪽 패널) 빼고, 이 화면 어디에도 없는 둘로 채운다.
+     *   조치 상태  이 감지 하나에 누가 손댔나 — 요청 전 / HH:MM 요청됨([현장 조치 요청]을 누르면 바로 바뀐다). 왼쪽 패널 "요청 전 N건"은 미션 전체 수
+     *   다음 측정  로봇이 이 지점을 언제 다시 재나 — 지켜볼지 지금 조치할지의 근거. 시안 값: 순회 간격(09:00 · 14:00)을 따라 다음 순회 시각
+     */
+    const tm = (x[3] || '').match(/(\d+):(\d+)/), mins = tm ? +tm[1] * 60 + +tm[2] : null;
+    const nextM = st==='plan' ? '이번 순회 중' : mins === null ? '—' : mins < 14 * 60 ? '오늘 14:00' : '내일 09:00';
+    const actS = !isHit ? (st==='plan' ? '—' : '필요 없음') : st==='done' || x[4] ? `${x[4] || '10:17'} 요청됨` : '요청 전';   // 요청 시각은 x[4](data-req 가 적는다)
+    const jinfo = [['발생위치', `${wp}${isHit ? ' ' + x[2].split(' ').slice(1).join(' ') : ''}`, ''], [isHit ? '발생시간' : '측정 시간', x[3] || '—', ''], ['조치 상태', actS, isHit && st !== 'done' && !x[4] ? 'is-todo' : ''], ['다음 측정', nextM, '']]
+      .map(([l, v, c]) => `<div><span>${l}</span><b class="${c}" title="${v}">${v}</b></div>`).join('');
+    const judge = V6 ? `<div class="lvA s1 jx ${st}"><div class="jtop"><div class="jhd"><div class="jrow"><span class="pl ${st}">${WORD[st]}</span><h5>${k}, ${isHit ? x[1] : st==='plan' ? '측정 전' : '정상 범위 ' + x[1]}</h5></div></div>${jv}</div><div class="jinfo">${jinfo}</div></div>`
       : `<div class="lvA s1 ${st}">${step('이상 판정')}<div class="tt"><span class="pl ${st}">${WORD[st]}</span><h5>${k}, ${isHit ? x[1] : st==='plan' ? '측정 전' : '정상 범위 ' + x[1]}</h5></div>${loc}${cond}</div>`;
     // [11/02 v6] 재발 여부 — Figma 처럼 네 줄을 다 보이고(줄 32 라 접을 만큼 길지 않다), 결론(처음 넘음 · 반복)은 머리 오른쪽 꼬리표로
     const histV6 = `<div class="sth"><b>재발 여부</b><span class="hfl ${rep3 ? 'is-rep' : ''}">${rep3 ? '반복' : isHit ? '처음 넘음' : '계속 정상 범위'}</span></div><div class="hist">${hist.map(hiRow).join('')}</div>`;
