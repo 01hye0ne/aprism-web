@@ -607,3 +607,27 @@ body.ver-6 .sfx-plan .m2v .thb:hover .thf, body.ver-6 .sfx-plan .m2v .thb:focus-
 body.ver-6 .sf .lvA.s2.ring { box-shadow: 0 0 0 2px var(--border-focus); transition: box-shadow 200ms ease; }
 :root[data-theme="light"] body.ver-6 .sfx-plan .m2v .road { stroke: color-mix(in srgb, var(--bg-raised) 80%, transparent); }
 :root[data-theme="light"] body.ver-6 .sfx-plan .m2v .rsh { opacity: .25; }
+
+/*
+ * [11/02 v6] 왼쪽 큰 지도 마감 2 — 5 설비 이름(hover 때만) · 6 진행 방향 꺾쇠 · 7 떠 있는 버튼.
+ *   이름표: 맨 위 층 글 + 바탕색 테(paint-order) · 올린 덩이는 한 단 밝게
+ *   꺾쇠: 앞으로 갈 길 위 fg/tertiary — 점선보다 한 단 진해 방향만 읽히게
+ *   층 · [관제에서 보기]: 지도 위에 뜬 알약(bg/raised + 그림자) — 지도가 판 끝까지 찬다
+ */
+body.ver-6 .sfx-plan .m2v .eqr { transition: fill 120ms ease; }
+body.ver-6 .sfx-plan .m2v .eqr.on { fill: color-mix(in srgb, var(--text-primary) 22%, var(--bg-map-chip)); }
+body.ver-6 .sfx-plan .m2v .eql { opacity: 0; pointer-events: none; font-weight: 700; fill: var(--text-primary); stroke: var(--bg-map-chip); paint-order: stroke; stroke-linejoin: round; transition: opacity 120ms ease; }
+body.ver-6 .sfx-plan .m2v .eql.on { opacity: 1; }
+body.ver-6 .sfx-plan .m2v .dir { fill: none; stroke: var(--text-tertiary); stroke-linecap: round; stroke-linejoin: round; }
+body.ver-6 .sfx-map { position: relative; }
+body.ver-6 .sfx-map .sfx-f { position: absolute; z-index: 2; left: var(--space-8); right: var(--space-8); top: var(--space-8); padding: 0; pointer-events: none; }
+body.ver-6 .sfx-map .sfx-f > * { pointer-events: auto; }
+body.ver-6 .sfx-map .m2f { margin-left: 0; gap: 2px; padding: 2px; border-radius: var(--radius-pill); background-color: var(--bg-raised); box-shadow: 0 2px 8px rgb(0 0 0 / 35%); }
+body.ver-6 .sfx-map .m2f button, body.ver-6 .sfx-map .m2f span { border-radius: var(--radius-pill); background-color: transparent; }
+body.ver-6 .sfx-map .m2f button.on { background-color: var(--bg-selected); }
+body.ver-6 .sfx-map .sfx-fl { padding: var(--space-2) var(--space-12); border-radius: var(--radius-pill); background-color: var(--bg-raised); box-shadow: 0 2px 8px rgb(0 0 0 / 35%); }
+body.ver-6 .sfx-map .sfx-go { padding: var(--space-2) var(--space-8) var(--space-2) var(--space-12); border-radius: var(--radius-pill); background-color: var(--bg-raised); color: var(--text-secondary); box-shadow: 0 2px 8px rgb(0 0 0 / 35%); }
+body.ver-6 .sfx-map .sfx-go:hover { color: var(--text-primary); background-color: var(--bg-selected); }
+body.ver-6 .sfx-map .sfx-plan { padding: 0; }
+:root[data-theme="light"] body.ver-6 .sfx-map .m2f, :root[data-theme="light"] body.ver-6 .sfx-map .sfx-fl, :root[data-theme="light"] body.ver-6 .sfx-map .sfx-go { box-shadow: 0 2px 8px rgb(16 24 40 / 14%); }
+body.ver-6 .mlg .mlg-rb { width: 16px; height: 16px; transform: rotate(90deg); vertical-align: -4px; margin-right: 2px; }

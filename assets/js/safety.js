@@ -355,12 +355,18 @@
       g += '<defs><filter id="m2sh" x="-50%" y="-50%" width="200%" height="200%"><feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000" flood-opacity=".55"/></filter><filter id="m2bl" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="2.2"/></filter></defs>';
       g += `<polyline class="road" points="${cut2(L, 0, L.len)}" stroke-width="${u(13)}"/>`;
     }
-    P.equipment.forEach(r => { g += `<rect class="${big ? 'eqb' : 'eq'}${rich ? ' eqr' : ''}" x="${r[0]}" y="${r[1]}" width="${r[2]}" height="${r[3]}"${rich ? ' rx="4"' : ''}/>`; });
+    P.equipment.forEach((r, ei) => { if(rich && (r[2] < 12 || r[3] < 12)) return;   // 3px 띠 같은 조각은 덩이가 아니다
+      g += `<rect class="${big ? 'eqb' : 'eq'}${rich ? ' eqr' : ''}"${rich ? ` data-e="${ei}"` : ''} x="${r[0]}" y="${r[1]}" width="${r[2]}" height="${r[3]}"${rich ? ' rx="4"' : ''}/>`; });
     if(rich) P.wall.forEach(r => { g += `<rect class="wlr" x="${r[0]}" y="${r[1]}" width="${r[2]}" height="${r[3]}"/>`; });
     if(big){ P.stairs.forEach(r => { g += `<rect class="stz" x="${r[0]}" y="${r[1]}" width="${r[2]}" height="${r[3]}" stroke-width=".6"/>`; });
       P.wall.forEach(r => { g += `<rect class="wl" x="${r[0]}" y="${r[1]}" width="${r[2]}" height="${r[3]}"/>`; }); }
     const sw = big ? 1 : 1.15;
     g += `<polyline class="ra" points="${cut2(L, sCut, L.len)}" stroke-width="${u(1.4 * sw)}" stroke-dasharray="${u(1.5)} ${u(4)}" vector-effect="none"/>`;
+    // 6 진행 방향 꺾쇠 — 앞으로 갈 길(점선) 위에 간격을 두고. 지점 표식 근처는 비운다
+    if(rich){ const gapS = +u(34), marks = list.map((p, j) => pos2(L, L.sAt[j]));
+      for(let sv = sCut + gapS * .6; sv < L.len - gapS * .3; sv += gapS){ const q = pos2(L, sv);
+        if(marks.some(mq => Math.hypot(mq.x - q.x, mq.y - q.y) < +u(9))) continue;
+        g += `<path class="dir" transform="translate(${q.x.toFixed(1)},${q.y.toFixed(1)}) rotate(${(q.ang * 180 / Math.PI).toFixed(1)})" d="M${u(-2.2)} ${u(-2.6)} ${u(1)} 0 ${u(-2.2)} ${u(2.6)}" stroke-width="${u(1.3)}"/>`; } }
     if(rich) g += `<polyline class="rdc" points="${cut2(L, 0, sCut)}" stroke-width="${u(2.4 * sw + 2.4)}"/>`;
     g += `<polyline class="rd" points="${cut2(L, 0, sCut)}" stroke-width="${u(2.4 * sw)}"/>`;
     if(sel && lk && lk.length){ const at2 = w2 => { const j = list.findIndex(p => p[0]===w2); return j < 0 ? null : pos2(L, L.sAt[j]); }, q0 = at2(sel);
@@ -389,6 +395,20 @@
             + `<clipPath id="m2clip${i}"><rect x="${(x0 + bd).toFixed(1)}" y="${(y0 + bd).toFixed(1)}" width="${(tw - bd * 2).toFixed(1)}" height="${(th - bd * 2).toFixed(1)}" rx="${(r2 - bd).toFixed(1)}"/></clipPath>`
             + `<rect class="thf" x="${x0.toFixed(1)}" y="${y0.toFixed(1)}" width="${tw}" height="${th}" rx="${r2}" filter="url(#m2sh)"/>`
             + `<image href="${src}" x="${(x0 + bd).toFixed(1)}" y="${(y0 + bd).toFixed(1)}" width="${(tw - bd * 2).toFixed(1)}" height="${(th - bd * 2).toFixed(1)}" preserveAspectRatio="xMidYMid slice" clip-path="url(#m2clip${i})"/></g>`; } } }
+    /*
+     * 5 설비 이름 — 설비 덩이에 마우스를 올리면만 뜬다(디자이너). 모델에 설비 이름이 없어, 가까운 측정 지점의 설비 이름
+     * (알림 · 판정 데이터 "WP-05 냉각 펌프 P-2" 의 뒷부분)을 덩이에 붙이고, 모르면 관제 지도처럼 "설비 NN".
+     * 이름표는 맨 위 층에 따로 둬 경로 · 표식에 덮이지 않게 하고, 덩이 hover 를 safety.js 가 이어 준다(data-e).
+     */
+    if(rich){ const nm = {}; K.forEach(k => itemsOf(i, k).forEach(x => { if(x && x[2]){ const a = x[2].split(' '); if(a.length > 1) nm[a[0]] = a.slice(1).join(' '); } }));
+      const marks = list.map((p, j) => ({w:p[0], q:pos2(L, L.sAt[j])}));
+      let no = 0;
+      P.equipment.forEach((r, ei) => { if(r[2] < 12 || r[3] < 12) return; no += 1;
+        const cx = r[0] + r[2] / 2, cy = r[1] + r[3] / 2;
+        const near = marks.filter(mk => nm[mk.w]).map(mk => ({w:mk.w, d:Math.max(0, Math.abs(mk.q.x - cx) - r[2] / 2) + Math.max(0, Math.abs(mk.q.y - cy) - r[3] / 2)})).sort((a, b) => a.d - b.d)[0];
+        const name = near && near.d < 70 ? `${near.w} ${nm[near.w]}` : `설비 ${String(no).padStart(2, '0')}`;
+        const above = r[1] > 60, ty = above ? r[1] - +u(5) : r[1] + r[3] + +u(13);
+        g += `<text class="eql" data-e="${ei}" x="${cx.toFixed(1)}" y="${ty.toFixed(1)}" text-anchor="middle" font-size="${u(11)}" stroke-width="${u(3.2)}">${name}</text>`; }); }
     g += '</svg>';
     return g;
   }
@@ -399,6 +419,8 @@
     if(fls.length < 2) return `<span class="m2f"><span>${fls[0]}</span></span>`;
     return `<span class="m2f" role="group" aria-label="층">${fls.map(f => `<button type="button" data-mf="${f}" data-mi="${i}" class="${f===cur ? 'on' : ''}" aria-pressed="${f===cur}">${f}${f===robotF ? '<i title="로봇 있는 층"></i>' : ''}</button>`).join('')}</span>`; }
   const LEG = '<div class="mlg"><i class="c"></i>위험 <i class="w"></i>주의 <i class="o"></i>정상 범위 <i class="p"></i>예정 <svg viewBox="-9 -9 20 18" width="11" height="10"><path class="rbt" d="M10 0-7.5 8.5-3.6 0-7.5-8.5Z" stroke="none"/></svg>로봇</div>';
+  // [11/02 v6] 범례 로봇도 지도와 같은 3D 탑뷰 그림(코가 오른쪽)
+  const LEG6 = LEG.replace(/<svg[^]*?<\/svg>/, '<img class="mlg-rb" src="../assets/img/safety/robot-top-spot.png" alt="" width="16" height="16">');
   // [v5 점검] 왼쪽 패널(관제 · 보고서와 같은 340) 본문 — 미션 하나: 요약 + 2D 지도(자세히 보기에서는 그 지점 · 연관 지점 표시), 전체: 미션별 작은 지도 목록
   // [10/29] 왼쪽 패널은 깊이와 상관없이 늘 미션 목록(보고서 목록과 같은 짜임) — 지금 어디인지는 고른 줄이 말한다.
   // 맨 위 [전체], 아래 미션 줄. 고른 미션은 줄 아래로 2D 지도가 펼쳐지고(자세히 보기에서는 그 지점 · 연관 지점), 나머지는 작은 지도 줄
@@ -452,7 +474,7 @@
       return `<div class="sfx"><div class="sfx-h"><b class="sfx-t">${m.mis}</b></div>
         <div class="sfx-map"><div class="sfx-f">${fl}<a class="sfx-go" href="${mainUrl(i, cur)}" title="관제 3D 지도에서 이 미션과 층을 연다">관제에서 보기<span class="i i-14" style="--i:var(--ic-chevron-right)" aria-hidden="true"></span></a></div>
         <div class="sfx-plan">${svg2(i, cur, false, 316, sel, lk)}</div>
-        <div class="sfx-info">${kv3('로봇', m.robot)}${kv3('측정', m.done + '/' + m.total + '곳')}${kv3('요청 전', h + '건')}</div></div>${LEG}</div>`;
+        <div class="sfx-info">${kv3('로봇', m.robot)}${kv3('측정', m.done + '/' + m.total + '곳')}${kv3('요청 전', h + '건')}</div></div>${LEG6}</div>`;
     }
     return `${LEG}<div class="sf-mwrap"><div class="sf-mlist"><div class="sf-mwell">${top}${rows}</div></div><span class="sf-mthumb" aria-hidden="true"></span></div>`;   // 범례는 목록 위(10/30) — 기호를 먼저 읽고 목록으로
   }
@@ -663,6 +685,12 @@
       setTimeout(() => { ks.forEach(k => { k.style.transition = k.style.transformOrigin = k.style.zIndex = ''; }); v.classList.remove('flip'); }, 400);
     });
   }
+  // [11/02 v6] 큰 지도 설비 hover → 그 덩이 이름표(맨 위 층) 켜기
+  scr.addEventListener('pointerover', e => { const svg = e.target.closest && e.target.closest('.sfx-plan .m2v'); if(!svg) return;
+    const r = e.target.closest('.eqr[data-e]');
+    svg.querySelectorAll('.eql.on, .eqr.on').forEach(n => n.classList.remove('on'));
+    if(r){ r.classList.add('on'); const t = svg.querySelector(`.eql[data-e="${r.dataset.e}"]`); if(t) t.classList.add('on'); } });
+  scr.addEventListener('pointerout', e => { const svg = e.target.closest && e.target.closest('.sfx-plan .m2v'); if(svg && !svg.contains(e.relatedTarget)) svg.querySelectorAll('.eql.on, .eqr.on').forEach(n => n.classList.remove('on')); });
   scr.addEventListener('click', e => {
     const mfb = e.target.closest('[data-mf]'); if(mfb){ return pickF(+mfb.dataset.mi, mfb.dataset.mf); }
     // [11/02 v6] 지도 사진 말풍선 → 영상 확인 카드로(잠깐 테두리)
