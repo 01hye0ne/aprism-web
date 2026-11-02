@@ -938,7 +938,7 @@
   function renderFloorCards(rows, f, ms) {
     var box = $("[data-bld-sum]");
     box.classList.add("has-cards");
-    var row = el("div", "bld-cards");
+    var row = el("div", "bld-mcards");
     ms.forEach(function (m) {
       var r = ROBOTS.filter(function (x) { return x.mission === m; })[0];
       var here = alertsOf(m).filter(function (a) { return a.floor === f; });
@@ -946,19 +946,19 @@
       var n = rng[1] - rng[0] + 1, done = r ? Math.max(0, Math.min(n, (r.done || 0) - (rng[0] - 1))) : 0;
       var marks = {};
       here.forEach(function (a) { var mm = /WP-(\d+)/.exec(a.where || ""); if (mm) { var k = +mm[1] - rng[0]; if (k >= 0 && k < n) { marks[k] = a.sev === "critical" ? "crit" : "warn"; } } });
-      var card = el("button", "bld-card");
+      var card = el("button", "bld-mcard");
       card.type = "button";
       card.setAttribute("aria-label", m + " 미션으로 들어가기");
-      var head = el("span", "bld-card-head");
-      head.appendChild(el("span", "t-label-1 bld-card-name", m));
-      if (r && r.st !== "run") { head.appendChild(el("span", "t-caption bld-card-st", r.st === "done" ? "완료" : "대기")); }
+      var head = el("span", "bld-mcard-head");
+      head.appendChild(el("span", "t-label-1 bld-mcard-name", m));
+      if (r && r.st !== "run") { head.appendChild(el("span", "t-caption bld-mcard-st", r.st === "done" ? "완료" : "대기")); }
       var sv = el("span", "t-caption bld-sev");
       var s0 = topSev(here); if (s0) { sv.setAttribute("data-sev", s0); }
       sv.appendChild(el("span", "bld-sev-dot"));
       sv.appendChild(document.createTextNode(here.length ? sevCount(here) : "알림 없음"));
       head.appendChild(sv);
       card.appendChild(head);
-      var map = el("span", "bld-card-map");
+      var map = el("span", "bld-mcard-map");
       map.innerHTML = window.APRISM_MINI.svg({ floor: f, n: n, done: done, robot: !!(r && r.floor === f && r.st === "run"), marks: marks,
         kind: r && r.n === 5 ? "wheel" : "spot", land: true, w: 230, label: m + " " + FNAME[f] + " 경로" });
       card.appendChild(map);

@@ -702,15 +702,15 @@ body.ver-6 .sf .kd.is-todo:hover, body.ver-6 .sf .kd.is-todo:focus-visible { ani
  */
 body.ver-6 .bld-sum.has-cards { right: var(--space-20); pointer-events: auto; }
 body.ver-6 .bld-sum.has-cards .bld-sum-rows { margin-top: var(--space-8); }
-body.ver-6 .bld-cards { display: flex; gap: var(--space-8); overflow-x: auto; padding-bottom: var(--space-4); scrollbar-width: thin; scrollbar-color: var(--border-default) transparent; }
-body.ver-6 .bld-card { flex: none; width: 246px; display: flex; flex-direction: column; gap: var(--space-4); padding: var(--space-4); border: var(--border-width-thin) solid transparent; border-radius: var(--radius-card); background-color: color-mix(in srgb, var(--bg-cell) 92%, transparent); color: inherit; font: inherit; text-align: left; cursor: pointer; -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
-body.ver-6 .bld-card:hover { border-color: var(--border-strong); }
-body.ver-6 .bld-card:focus-visible { outline: var(--border-width-strong) solid var(--border-focus); outline-offset: 2px; }
-body.ver-6 .bld-card-head { display: flex; align-items: center; gap: var(--space-8); padding: var(--space-4) var(--space-8); }
-body.ver-6 .bld-card-name { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-primary); }
-body.ver-6 .bld-card-st { flex: none; color: var(--text-tertiary); }
-body.ver-6 .bld-card .bld-sev { flex: none; color: var(--text-secondary); }
-body.ver-6 .bld-card-map { display: block; border-radius: var(--radius-4, 4px); overflow: hidden; background-color: var(--bg-map-chip); }
+body.ver-6 .bld-mcards { display: flex; gap: var(--space-8); overflow-x: auto; padding-bottom: var(--space-4); scrollbar-width: thin; scrollbar-color: var(--border-default) transparent; }
+body.ver-6 .bld-mcard { flex: none; width: 246px; display: flex; flex-direction: column; gap: var(--space-4); padding: var(--space-4); border: var(--border-width-thin) solid transparent; border-radius: var(--radius-card); background-color: color-mix(in srgb, var(--bg-cell) 92%, transparent); color: inherit; font: inherit; text-align: left; cursor: pointer; -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+body.ver-6 .bld-mcard:hover { border-color: var(--border-strong); }
+body.ver-6 .bld-mcard:focus-visible { outline: var(--border-width-strong) solid var(--border-focus); outline-offset: 2px; }
+body.ver-6 .bld-mcard-head { display: flex; align-items: center; gap: var(--space-8); padding: var(--space-4) var(--space-8); }
+body.ver-6 .bld-mcard-name { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-primary); }
+body.ver-6 .bld-mcard-st { flex: none; color: var(--text-tertiary); }
+body.ver-6 .bld-mcard .bld-sev { flex: none; color: var(--text-secondary); }
+body.ver-6 .bld-mcard-map { display: block; border-radius: var(--radius-4, 4px); overflow: hidden; background-color: var(--bg-map-chip); }
 body.ver-6 .mini-plan { display: block; width: 100%; height: auto; }
 body.ver-6 .mini-plan .mp-road { fill: none; stroke: color-mix(in srgb, var(--text-primary) 7%, transparent); stroke-linecap: round; stroke-linejoin: round; }
 body.ver-6 .mini-plan .mp-eq { fill: color-mix(in srgb, var(--border-default) 85%, var(--bg-page)); }
@@ -730,3 +730,6 @@ body.ver-6 .ma-kind { color: var(--text-secondary); font-weight: 500; }
 body.ver-6 .ma-kind:empty { display: none; }
 body.ver-6 .ma-title .ma-val { font-weight: inherit; color: var(--status-warning-text); }
 body.ver-6 .map-alert.is-critical .ma-title .ma-val { color: var(--status-critical-text); }
+/* [11/02 v6] 미션 카드 띠 바깥 여백 = 다른 패널(로봇 현황 · 지도 도구)과 같은 20 — 지도 칸(테두리에서 20 안쪽) 가장자리에 붙인다. 오른쪽은 지도 도구 열(44) 앞까지 */
+body.ver-6 .bld-sum.has-cards { left: 0; bottom: 0; right: calc(44px + var(--space-20)); }
+body.ver-6 .bld-mcards { padding-bottom: 0; }
