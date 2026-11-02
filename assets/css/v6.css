@@ -292,3 +292,5 @@ body.ver-6 .sfx-dot { display: inline-block; width: 8px; height: 8px; margin: 0 
 body.ver-6 .sfx-row.zero b { color: var(--text-disabled); font-weight: 400; }
 /* [10/30] 안전진단도 — 첫 탭(전체 미션)이 지금 탭이면 아래 판(.sf)의 왼쪽 위 모서리를 각지게(관제 content-surface 와 같은 이유) */
 body.ver-6:has(.sb-tab.is-on:first-child) .sf { border-top-left-radius: 0; }
+/* [10/30 v6] 안전진단 표 — 바깥 테두리 · 모서리를 걷는다(디자이너). 머리 아래 선과 줄 사이 선만 남아 본문 판에 바로 놓인다 */
+body.ver-6 .sf .ewrap, body.ver-6 .sf .mtbw { border: 0; border-radius: 0; }
