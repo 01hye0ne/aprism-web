@@ -796,3 +796,9 @@ body.ver-6 .sf .g6.cx .kd.na > .sm { margin-bottom: calc(var(--font-line-height-
  *   아래 패널 글(관제 · 최신 알림 = 면 + 12 = 88)과 4 어긋났다. 탭 글을 패널 글 세로선에 맞춘다.
  */
 body.ver-6 .sb-tab { padding: 0 var(--space-12); }
+
+/*
+ * [11/02 v6] 로봇개 걷기 — 뒷다리를 뒤로 뻗을 때 카드(overflow:hidden) 왼쪽 끝을 7 넘어가 잘렸다(한 박자 안 최소 왼쪽 1566.5 · 카드 1574).
+ *   그림을 오른쪽으로 12 옮겨 카드 안에 들인다 — 앞쪽 끝은 정보 칸과 18 떨어진다. 모베드는 위(left 5)를 그대로 쓴다.
+ */
+body.ver-6 .robot-strip.is-carousel .robot-2d:not(.is-mobed) { position: relative; left: 12px; }
