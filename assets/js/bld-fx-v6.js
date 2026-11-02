@@ -34,7 +34,7 @@
   var ctx = null, T = null, composer = null, P = {}, ready = false;
   var nrt = null, nMat = null, skyTex = null, fog = null, pool = null, ray = null, ndc = null;
   var U = null;                       // 스캔 유니폼(층 재질이 함께 본다)
-  var scanT0 = -1, scanLo = 0, scanHi = 0, stSig = "";
+  var scanT0 = -1, scanLo = 0, scanHi = 0, stSig = "", warm = 0;
   var cur = { on: 0, want: 0, p: null, f: null };
   var size = { w: 0, h: 0, pr: 0 };
   var fps = { n: 0, t0: 0, v: 0 };
@@ -242,11 +242,21 @@
 
     // 스캔 — 상태(모드 · 층)가 바뀌면 처음부터 다시 차오른다. scanIdle > 0 이면 그 초마다 되풀이
     var st = ctx.state(), sig = st.mode + "|" + st.cur;
-    if (S.scan && (sig !== stSig || scanT0 < 0)) { stSig = sig; scanT0 = now + 250; }
+    // 효과가 붙고 셰이더 컴파일로 첫 몇 프레임이 멈칫한다 — 그 뒤(warm 3 프레임)에 시작해 띠가 처음부터 매끄럽게 오른다
+    if (S.scan && warm >= 3 && (sig !== stSig || scanT0 < 0)) { stSig = sig; scanT0 = now + 120; }
     var t = S.scan && scanT0 >= 0 ? (now - scanT0) / (S.scanSec * 1000) : 2;
     if (S.scanIdle > 0 && t > 1 + S.scanIdle / S.scanSec) { scanT0 = now; t = 0; }
     var live = t >= 0 && t <= 1.15;
-    var front = lo - 1 + (hi - lo + 3) * Math.min(1, Math.max(0, t));
+    /*
+     * [11/02] 층 사이 빈 높이는 건너뛴다(디자이너 "B4 는 1초 만에, B3 는 1초 쉬고") — 쌓인 판은 층 사이가 층 높이보다 훨씬 커서
+     * 띠가 같은 속도로 오르면 시간 대부분을 빈 곳에서 썼다. 보이는 층의 높이만 이어 붙여 그 위를 고르게 오른다.
+     */
+    var spans = [];
+    ctx.FLOORS.forEach(function (f) { var s = ctx.F[f]; if (s && s.op > 0.01) { spans.push([s.y - 1, s.y + s.size.y + 2]); } });
+    spans.sort(function (a, b) { return a[0] - b[0]; });
+    var total = spans.reduce(function (a, sp) { return a + sp[1] - sp[0]; }, 0), go = total * Math.min(1, Math.max(0, t)), front = spans.length ? spans[spans.length - 1][1] : hi;
+    for (var si = 0; si < spans.length; si += 1) { var len = spans[si][1] - spans[si][0]; if (go <= len) { front = spans[si][0] + go; break; } go -= len; }
+    window.APRISM_BLD_FX.front = front;   // 지금 띠 높이(점검용)
     U.uScanFront.value = front; U.uScanBand.value = S.scanBand; U.uScanCol.value.set(S.scanColor);
     U.uScanAmt.value = live ? S.scanAmt * (t > 1 ? 1 - (t - 1) / 0.15 : 1) : 0;
     P.edge.uniforms.front.value = front; P.edge.uniforms.band.value = S.scanBand; P.edge.uniforms.scanAmt.value = U.uScanAmt.value;
@@ -299,6 +309,7 @@
     P.bloom.strength = S.bloomAmt; P.bloom.radius = S.bloomRadius; P.bloom.threshold = S.bloomTh;
     P.vig.enabled = S.vignette > 0; P.vig.uniforms.amount.value = S.vignette;
     composer.render();
+    warm += 1;
     tick();
     return true;
   }
