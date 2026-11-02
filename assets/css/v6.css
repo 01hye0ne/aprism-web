@@ -331,3 +331,36 @@ body.ver-6 .rr-pin-head { left: calc(-10px * var(--pz, 1) + var(--hx, 0px)); }
 body.ver-6 .rr-pin.is-low::before { display: none; }
 /* [10/30] 안전진단 자세히 보기의 상단 경로 끝 감지 이름(› 안전감지) — 상단이 탭이 된 뒤로 탭 줄 옆에 글자만 떠 보였다. 본문 감지 탭이 같은 것을 말해 숨긴다 */
 body.ver-6 .status-bar-left .sf-crumb-k { display: none; }
+
+/*
+ * [10/30 v6] 안전진단 자세히 보기 — 오른쪽 [조치 결정]의 DELTA 조치 제안 판을 관제 팝오버(monitor.css .ma-v3 .ma-delta)와 같게(디자이너).
+ * 반대색 판: 다크 화면에선 흰 판(.is-light-scope 가 토큰을 라이트로 뒤집는다), 라이트 화면에선 짙은 판(.is-dark-scope).
+ * 판 — 테두리 없이 모서리 12 · 여백 12 · 사이 12 · bg/raised(아래 끝 14 만 72% 로 바탕에 묻힘) · 낮은 그림자.
+ * 머리 — Delta 표식만 파랑, 글은 text/secondary. 오탐 가능성 값은 단계색. 제안 문장 14 Bold.
+ * 체크리스트 — bg/map-chip 한 덩이(모서리 6, 바깥 테 없음) · 줄 사이 선 · 체크는 comp/gnb/brand · AI 추천 꼬리표(파랑 면 · 흰 글).
+ * 메모 — 테 없는 칸(bg/map-chip 50%, 모서리 4, 여백 12).
+ */
+body.ver-6 .sf .dl.is-light-scope {
+  gap: var(--space-12);
+  padding: var(--space-12);
+  border: 0;
+  border-radius: 12px;
+  background: linear-gradient(to bottom, var(--bg-raised) calc(100% - 14px), color-mix(in srgb, var(--bg-raised) 72%, transparent) 100%);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 18%), 0 10px 24px -10px rgb(0 0 0 / 45%);
+  color: var(--text-primary);
+}
+body.ver-6 .sf .dl.is-light-scope .hh { align-items: center; font-size: var(--font-size-12); line-height: var(--font-line-height-18); }
+body.ver-6 .sf .dl.is-light-scope .hh span:first-child { display: inline-flex; align-items: center; gap: var(--space-4); color: var(--text-secondary); font-weight: 400; }
+body.ver-6 .sf .dl.is-light-scope .hh .dlogo { margin: 0; background-color: var(--comp-gnb-text-brand); }
+body.ver-6 .sf .dl.is-light-scope .hh span:last-child { color: var(--text-secondary); }
+body.ver-6 .sf .dl.is-light-scope .hh b { color: var(--status-safe-text); font-weight: 400; }
+body.ver-6 .sf .dl.is-light-scope .ti { font-size: var(--font-size-14); line-height: var(--font-line-height-22); font-weight: 700; word-break: keep-all; margin-top: calc(var(--space-4) * -1); }
+body.ver-6 .sf .dl.is-light-scope .cks { border: 0; border-radius: var(--radius-6); background-color: var(--bg-map-chip); overflow: hidden; }
+body.ver-6 .sf .dl.is-light-scope .c1x { padding: var(--space-4) 6px var(--space-4) 10px; min-height: 32px; border-bottom-color: var(--border-divider); }
+body.ver-6 .sf .dl.is-light-scope .c1x input { width: 18px; height: 18px; accent-color: var(--comp-gnb-brand); }
+body.ver-6 .sf .dl.is-light-scope .c1x b { font-size: var(--font-size-14); line-height: var(--font-line-height-22); font-weight: 400; color: var(--text-primary); }
+body.ver-6 .sf .dl.is-light-scope .c1x small { color: var(--text-tertiary); }
+body.ver-6 .sf .ma-check-tag { flex: none; padding: var(--space-2) var(--space-8); border-radius: var(--radius-4); background-color: var(--comp-gnb-brand); color: var(--color-gray-0); font-size: var(--font-size-13); line-height: var(--font-line-height-18); font-weight: 500; font-style: normal; }
+body.ver-6 .sf .dl.is-light-scope .mm { color: var(--text-tertiary); }
+body.ver-6 .sf .dl.is-light-scope .fd { min-height: 68px; padding: var(--space-12); border: 0; border-radius: var(--radius-4); background-color: color-mix(in srgb, var(--bg-map-chip) 50%, transparent); font-size: var(--font-size-14); line-height: var(--font-line-height-22); color: var(--text-primary); }
+body.ver-6 .sf .dl.is-light-scope .fd:focus { outline: var(--border-width-thin) solid var(--border-focus); }
