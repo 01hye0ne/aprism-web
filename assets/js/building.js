@@ -961,7 +961,7 @@
       head.appendChild(sv);
       card.appendChild(head);
       var map = el("span", "bld-mcard-map");
-      map.innerHTML = window.APRISM_MINI.svg({ floor: f, n: n, done: done, robot: !!(r && r.floor === f && r.st === "run"), marks: marks,
+      map.innerHTML = window.APRISM_MINI.svg({ mission: m, floor: f, n: n, done: done, robot: !!(r && r.floor === f && r.st === "run"), marks: marks,
         kind: r && r.n === 5 ? "wheel" : "spot", land: true, w: 230, label: m + " " + FNAME[f] + " 경로" });
       card.appendChild(map);
       card.addEventListener("click", function () { enter(f, m); });

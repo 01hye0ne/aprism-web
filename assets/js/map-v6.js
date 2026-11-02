@@ -5824,6 +5824,28 @@
 
   window.APRISM_ROUTE = {
     config: NAV,
+    // [11/02] 미니맵 경로 뽑기(tools) — 모든 로봇 길을 깔고, 도면 좌표(m)로 꺾인 점 · 웨이포인트 · 층 바닥 높이를 돌려준다
+    lanesAll: function () {
+      var out_eq = null;
+      Object.keys(lazyBots).forEach(function (k) { laneFor(k); });
+      var decks = {}; (floors || []).forEach(function (f) { var a = toPlan(f.box.min), b = toPlan(f.box.max); decks[f.id] = { deck: f.deck, X: [+Math.min(a.X, b.X).toFixed(2), +Math.max(a.X, b.X).toFixed(2)], Y: [+Math.min(a.Y, b.Y).toFixed(2), +Math.max(a.Y, b.Y).toFixed(2)] }; });
+      var eq = []; meshes.forEach(function (it) { if (it.key !== 'equipment' && it.key !== 'wall') { return; } var bb = new THREE.Box3().setFromObject(it.mesh), a = toPlan(bb.min), b = toPlan(bb.max); eq.push([it.floor, it.key, +Math.min(a.X, b.X).toFixed(1), +Math.min(a.Y, b.Y).toFixed(1), +Math.abs(b.X - a.X).toFixed(1), +Math.abs(b.Y - a.Y).toFixed(1)]); }); out_eq = eq;
+      var out = { box: modelBox ? { minX: 0, maxX: (modelBox.max.x - modelBox.min.x) * NAV.unit, minY: 0, maxY: (modelBox.max.z - modelBox.min.z) * NAV.unit } : null, decks: decks, lanes: {} };
+      Object.keys(lanes).forEach(function (id) {
+        var ln = lanes[id];
+        var P = function (v) { var q = toPlan(v); return [+q.X.toFixed(2), +q.Y.toFixed(2), +v.y.toFixed(2)]; };
+        out.lanes[id] = { name: ln.bot.name, floor: ln.floor || ln.bot.floor || null, at: ln.bot.at, ended: !!ln.bot.ended,
+          turns: (ln.turns || []).map(P), wps: (ln.wps || []).map(P), names: ln.plan && ln.plan.names ? ln.plan.names.slice(1) : null };
+      });
+      out.eq = out_eq;
+      // 층을 건너는 길(Robot 05 — B3 둘레 → 계단 → B4) — 길 위를 0.5m 간격으로 짚어 높이와 함께
+      if (trav && typeof where === "function") {
+        var cs = [], P2 = function (v) { var q = toPlan(v); return [+q.X.toFixed(2), +q.Y.toFixed(2), +v.y.toFixed(2)]; };
+        for (var sv = 0; sv <= trav.s3; sv += 0.5) { cs.push(P2(where(sv))); }
+        out.cross = { id: CROSS_ID, s1: trav.s1, s2: trav.s2, s3: trav.s3, at: trav.s, pts: cs };
+      }
+      return out;
+    },
     // 로봇별 도면 좌표(m)를 꺼낸다. 경로선 좌표의 Z 는 0 이다(그릴 때만 +lift).
     report: function () {
       var out = { unit: "1 UNIT = " + NAV.unit + " m", origin: "도면 좌측 하단 (0,0,0)", log: routeLog.slice(), robots: {} };

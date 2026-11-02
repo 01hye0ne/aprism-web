@@ -1,7 +1,8 @@
 /*
  * [11/02 v6] 층 평면 미니맵 — 안전진단(safety.js svg2)의 평면 · 순회 선을 다른 화면에서도 쓰려고 꺼낸 공용 그림.
  * 데이터(PLAN2 · WP2 · TOUR2)와 선 셈(tour2 · pos2 · cut2)은 safety.js 와 같은 값이다 — 평면이 바뀌면 둘 다 고친다.
- * 지금 쓰는 곳: 통합 순회(전체 미션) 층 펼침 아래 미션 카드(building.js renderFloorSum, v6).
+ * 지금 쓰는 곳: 통합 순회(전체 미션) 층 펼침 아래 미션 칩(building.js), 안전진단 지도(safety.js svg2 — routeL).
+ * 경로는 미션별 실제 길(mini-routes.js)이 있으면 그것, 없으면 층 공통 시안 선(tour2).
  *
  *   APRISM_MINI.svg({ floor:"B3", n:지점 수, done:지난 지점 수, robot:true|false(이 층에 로봇이 있나),
  *                     marks:{지점 순번(0부터): "crit"|"warn"}, kind:"spot"|"wheel", land:true(가로로 눕힘) })
@@ -27,8 +28,25 @@
     return {x:a[0] + (b[0] - a[0]) * t, y:a[1] + (b[1] - a[1]) * t, ang:Math.atan2(b[1] - a[1], b[0] - a[0])}; }
   function cut2(L, s0, s1){ if(s1 <= s0) return ''; const o = [pos2(L, s0)]; for(let i = 1; i < L.pts.length; i++) if(L.cum[i] > s0 && L.cum[i] < s1) o.push({x:L.pts[i][0], y:L.pts[i][1]}); o.push(pos2(L, s1)); return o.map(p => p.x.toFixed(1) + ',' + p.y.toFixed(1)).join(' '); }
 
+  /*
+   * [11/02] 미션별 실제 길 — 관제 지도가 깐 길(mini-routes.js, tools/export-mini-routes.mjs 로 뽑음)을 쓴다.
+   * 없거나 그 층에 길이 없으면 null(예전 층 공통 시안 선 tour2 로 그린다). 웨이포인트 수가 다르면 길 위 웨이포인트 구간에 고르게 다시 놓는다.
+   */
+  function routeL(mission, floor, n) {
+    var R = window.APRISM_MINI_ROUTES && window.APRISM_MINI_ROUTES[mission], f = R && R[floor];
+    if (!f || !f.pts || f.pts.length < 2) { return null; }
+    var pts = f.pts, cum = [0];
+    for (var i = 1; i < pts.length; i += 1) { cum.push(cum[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1])); }
+    var len = cum[cum.length - 1], sAt = f.sAt.slice();
+    if (n && sAt.length !== n) {
+      var a = sAt.length ? sAt[0] : len * 0.04, b = sAt.length ? sAt[sAt.length - 1] : len * 0.96;
+      sAt = Array.from({ length: n }, function (_, j) { return n === 1 ? (a + b) / 2 : a + (b - a) * j / (n - 1); });
+    }
+    return { pts: pts, cum: cum, len: len, sAt: sAt };
+  }
+
   function svg(o) {
-    var P = PLAN2[o.floor] || PLAN2.B4, L = tour2(o.floor in TOUR2 ? o.floor : "B4", Math.max(1, o.n));
+    var P = PLAN2[o.floor] || PLAN2.B4, L = (o.mission && routeL(o.mission, o.floor, Math.max(1, o.n))) || tour2(o.floor in TOUR2 ? o.floor : "B4", Math.max(1, o.n));
     var px = 888 / (o.w || 220), u = function (v) { return +(v * px).toFixed(1); };
     var done = Math.max(0, Math.min(o.n, o.done));
     var sCut = done <= 0 ? 0 : done >= o.n ? L.len : L.sAt[done - 1];
@@ -60,5 +78,5 @@
     return g + "</g></svg>";
   }
 
-  window.APRISM_MINI = { svg: svg, PLAN2: PLAN2, tour2: tour2 };
+  window.APRISM_MINI = { svg: svg, PLAN2: PLAN2, tour2: tour2, routeL: routeL };
 })();

@@ -343,7 +343,8 @@
   function svg2(i, ab, big, w, sel, lk){
     const m = M[i], ed = eData(i), sp = ed.sp, rows = ed.rows, pf = PLANOF[ab] || 'B4', P = PLAN2[pf];
     const list = sp.filter(p => flOf(m, p[0])===ab); if(m.fls) list.sort((p, q) => p[0] < q[0] ? -1 : 1);
-    const L = tour2(pf, list.length);
+    // [11/02] 미션별 실제 길(관제 지도와 같은 길 — mini-plan.js routeL · mini-routes.js). 없으면 층 공통 시안 선
+    const L = (V6 && window.APRISM_MINI && window.APRISM_MINI.routeL(m.mis, pf, list.length)) || tour2(pf, list.length);
     const px = big ? 888 / 560 : 888 / (w || 220), u = v => (v * px).toFixed(1);
     const stOf = w => rows.reduce((a, r) => { const c = r.c[w]; return c && RANK[c[0]] !== undefined && RANK[c[0]] > RANK[a] ? c[0] : a; }, 'ok');
     const ksOf = w => rows.filter(r => r.c[w] && r.c[w][0] !== 'plan').map(r => r.n).join(',');
