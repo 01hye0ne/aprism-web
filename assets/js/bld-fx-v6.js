@@ -1,5 +1,6 @@
 // 통합 순회 연출 실험 v6(11/02 디자이너) — 레퍼런스 oxigen.sa 에서 관제 화면에 쓸 만한 것만 골라 얹었다.
-// 실험 화면(screens/lab-bld-render-v6.html · <html data-fx-lab>)만 읽는다. 운영 화면(building-v6.html)은 그대로다.
+// 실험 화면(screens/lab-bld-render-v6.html · <html data-fx-lab> — 조절판)과 운영 전체 미션 화면(building-v6.html, 11/02 디자이너가 고른 값 반영)이 읽는다.
+// ?fx=off — 효과 없이 연다(전후 비교 · 느린 PC).
 // building.js 가 층을 다 쌓은 뒤 APRISM_BLD_FX.init 을 부르고, 매 프레임 step(덧칠) → render 를 부른다.
 // render 가 false 면 building.js 가 예전처럼 그린다 — 효과를 끄거나(B 키) 라이트 테마면 운영 화면과 같다.
 //
@@ -10,21 +11,21 @@
 //   3 후처리         AO(GTAO, 벽 밑동 그늘) · 블룸 · 비네트 — 관제 지도(map-fx-v6.js)와 같은 묶음.
 //   4 배경 · 안개     단색 바탕 대신 위는 어둡고 지평선 쪽이 은은히 밝은 그라데이션, 먼 쪽은 안개로 가라앉힌다.
 //   5 커서 빛        마우스를 올린 층 바닥에 옅은 빛 웅덩이가 커서를 따라온다(올린 층 강조를 부드럽게).
-// 기본 세기는 위험 · 주의 표식보다 선이 먼저 튀지 않을 만큼(윤곽선 0.75 · 블룸 0.45) — 첫 캡처(1.1 · 0.55)는 선이 표식보다 먼저 보였다.
 // 빼 둔 것 — 흔들림 · 색수차 · 스크롤 카메라. 관제 판독을 방해하고 위험 표식보다 장식이 먼저 보인다.
 (function () {
   "use strict";
 
+  // 값 — 11/02 디자이너가 실험 조절판에서 고른 값(커서 빛은 끔). 운영 전체 미션 화면(building-v6.html)도 이 값으로 그린다.
   var S = {
     on: true,
-    edges: true, edgeColor: "#9fd0ff", edgeAmt: 0.75, edgeNormal: 0.35, edgeDepth: 0.8, edgeWidth: 1,
-    scan: true, scanColor: "#5fb4ff", scanSec: 1.8, scanBand: 3.5, scanAmt: 1.4, scanIdle: 0,
+    edges: true, edgeColor: "#7ca0c0", edgeAmt: 0.2, edgeNormal: 0.42, edgeDepth: 0.2, edgeWidth: 0.75,
+    scan: true, scanColor: "#5fb4ff", scanSec: 2, scanBand: 2, scanAmt: 0.5, scanIdle: 0,
     ao: true, aoRadius: 4, aoAmt: 0.7,
     bloom: true, bloomAmt: 0.45, bloomRadius: 0.35, bloomTh: 0.6,
     vignette: 0.35,
     sky: true, skyTop: "#04070d", skyLow: "#0d1a2b", skyGlow: "#1d4f7a",
-    fog: true, fogColor: "#0a1220", fogAmt: 0.55,
-    cursor: true, cursorColor: "#8fc8ff", cursorAmt: 0.35, cursorSize: 26,
+    fog: true, fogColor: "#0a1220", fogAmt: 0.35,
+    cursor: false, cursorColor: "#8fc8ff", cursorAmt: 0.6, cursorSize: 26,
     res: 1.5
   };
   var LAB = document.documentElement.hasAttribute("data-fx-lab");
@@ -182,6 +183,7 @@
       });
     }
     ready = true;
+    window.APRISM_BLD_FX.ready = performance.now();   // 효과 준비 시각(로딩 측정용)
     badge();
   }
 
