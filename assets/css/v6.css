@@ -527,3 +527,19 @@ body.ver-6 .sf .jloc .jt::before { margin: 0 var(--space-4) 0 0; }
 /* [11/02 v6] 정보 넷 다시(발생위치 · 발생시간 · 조치 상태 · 다음 측정) — 위치 · 시각 한 줄은 상자로 돌아갔다. 요청 전은 할 일이라 주의 글색 */
 body.ver-6 .sf .jx .jtop { gap: var(--space-16); }
 body.ver-6 .sf .jinfo b.is-todo { color: var(--status-warning-text); }
+/*
+ * [11/02 v6] 판정 카드 2차 — Figma DS 1552:10188(디자이너).
+ *   1줄  배지 + 감지 이름(16/24 Bold)
+ *   2줄  무엇이(24/32 Bold fg/primary, 왼쪽) · 값(28/32 SemiBold 단계색, 오른쪽 끝) — 기준 글은 같은 줄 높이에서 표식 위
+ *   막대 12 · 2줄과 12
+ * Figma 는 기준 표식 하나(55% 미만) — 주의 · 위험 둘 다 두기로 한 것(11/02)을 따랐다. 조치 상태 "요청 전" 노란 글은 Figma 대로 뺐다.
+ */
+body.ver-6 .sf .jx .jtop { gap: var(--space-12); }
+body.ver-6 .sf .jx .jrow { gap: var(--space-12); }
+body.ver-6 .sf .jx .jk { font-size: var(--font-size-16); line-height: var(--font-line-height-24); font-weight: 700; color: var(--text-primary); }
+body.ver-6 .sf .jx .jmain { align-self: stretch; display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-16); margin-top: var(--space-4); }
+body.ver-6 .sf .jx .jmain h5 { font-size: var(--font-size-24); line-height: var(--font-line-height-32); font-weight: 700; }
+body.ver-6 .sf .jx .jn { font-size: 28px; line-height: 32px; font-weight: 600; margin: 0; }
+body.ver-6 .sf .jx .jtrk { align-self: stretch; }
+body.ver-6 .sf .jtrk .jm span { bottom: calc(100% + 8px); }
+body.ver-6 .sf .jx .jtop > .why1 { margin-top: calc(var(--space-4) * -1); }

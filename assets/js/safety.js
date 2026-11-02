@@ -90,7 +90,7 @@
   const COND = {'안전감지':null,'누출감지':[0,100,55,70,'%'],'온도감지':[18,90,40,55,' ℃'],'계기인식':null,'이상음향':[0,30,19,22.8,''],'부분방전':[0,10,8.6,9.23,'']};
   // [11/02 v6] 판정 막대에 위험 기준까지 세우니 v6 값(관제 알림 기준 주의 — 발전기 베어링 68.4 ℃ · 수배전반 9.41)이 위험 기준(55 ℃ · 9.23)을 넘어 판정과 어긋났다.
   //   시안 값이라 판정(관제 알림)을 그대로 두고 위험 기준을 올린다 — 온도 70 ℃(변압기 71.2 ℃ 위험은 그대로 위험), 부분방전 9.60.
-  if(V6){ COND['온도감지'] = [18, 90, 40, 70, ' ℃']; COND['부분방전'] = [0, 10, 8.6, 9.6, '']; }
+  if(V6){ COND['온도감지'] = [18, 90, 40, 70, ' ℃']; COND['부분방전'] = [0, 12, 8.6, 9.6, '']; }   // 부분방전 범위 0~12 — 위험 9.6 이 오른쪽 끝(값 자리)에 붙지 않게
   const SUG = {'안전감지':['작업자에게 즉시 착용을 안내하고 고소 작업을 멈춰야 함',[['작업자 즉시 착용 안내',1,'현장 작업자, 무전 2채널'],['고소 작업 일시 중지',1,'작업 감독자, 내선 2214'],['안전관리팀 전달',0,'안전관리팀, 업무 메신저']]],
     '누출감지':['구역 출입을 통제하고 설비팀에 밸브 확인을 요청해야 함',[['구역 출입 통제',1,'현장 작업자, 무전 2채널'],['설비팀 밸브 확인 요청',1,'설비팀, 내선 2310'],['현장 확인',0,'순회 근무자, 무전 1채널']]],
     '온도감지':['부하를 줄이고 점검을 요청해야 함',[['부하 감소 요청',1,'운전원, 내선 2201'],['설비 점검 요청',1,'설비팀, 내선 2310'],['현장 확인',0,'순회 근무자, 무전 1채널']]],
@@ -155,10 +155,17 @@
      * [11/02 v6] 판정 카드 — Figma DS 1469:8820. 머리 이름(이상 판정) · 왼쪽 단계 띠 없이 배지 → 제목 18 + 위치 · 시각 한 줄 → 값 36 + 막대(주의 · 위험 기준 표식).
      *   막대는 측정 범위(COND) 위에 값 채움, 주의 · 위험 기준 자리에 표식 둘(11/02 디자이너 — 둘 다 표시). 수치 막대가 없는 감지(안전 · 계기)는 값과 기준 글만.
      */
-    const jv = (() => { if(!isHit) return `<span class="why1">기준: ${STD[k]}</span>`;
-      if(cd && !isNaN(num)){ const [lo, hi, w2, c2, u] = cd, p = q => Math.max(0, Math.min(100, (q - lo) / (hi - lo) * 100)).toFixed(1);
-        return `<div class="jv"><b class="jn ${st}">${num}${u==='%' ? '%' : u}</b><div class="jtrk"><span class="f ${st}" style="width:${p(num)}%"></span><span class="jm w" style="left:${p(w2)}%"><span>주의 ${w2}${u}</span></span><span class="jm c" style="left:${p(c2)}%"><span>위험 ${c2}${u}</span></span></div></div>`; }
-      return `<div class="jv"><b class="jn ${st}">${SHORT[x[1]] || x[1]}</b><span class="why1">기준: ${STD[k]}</span></div>`; })();
+    /*
+     * [11/02 v6] 판정 카드 2차(Figma DS 1552:10188) — 1줄 배지 + 감지 이름, 2줄 무엇이(왼쪽 큰 글) · 얼마(오른쪽 끝 단계색), 그 아래 막대.
+     *   무엇이 = 판정 문구에서 값을 뺀 것(미세 누출 1곳 · 안전벨트 미착용). 문구가 값뿐이면(최고 68.4 ℃ · 이상 점수 9.41) 측정 이름(최고 온도 · 이상 점수)
+     */
+    const MLAB = {'안전감지':'미착용 인원','누출감지':'누출 확률','온도감지':'최고 온도','계기인식':'측정값','이상음향':'이상 점수','부분방전':'이상 점수'};
+    const jvalT = !isHit ? '' : cd && !isNaN(num) ? `${num}${cd[4]==='%' ? '%' : cd[4]}` : (SHORT[x[1]] || x[1]);
+    let jwhat = !isHit ? (st==='plan' ? '측정 전' : '정상 범위') : jvalT && x[1].includes(jvalT) ? x[1].replace(jvalT, '').trim() : x[1];
+    if(isHit && (!jwhat || jwhat==='최고')) jwhat = MLAB[k];
+    const jtrk = isHit && cd && !isNaN(num) ? (() => { const [lo, hi, w2, c2, u] = cd, p = q => Math.max(0, Math.min(100, (q - lo) / (hi - lo) * 100)).toFixed(1);
+      return `<div class="jtrk"><span class="f ${st}" style="width:${p(num)}%"></span><span class="jm w" style="left:${p(w2)}%"><span>주의 ${w2}${u}</span></span><span class="jm c" style="left:${p(c2)}%"><span>위험 ${c2}${u}</span></span></div>`; })() : '';
+    const jv = `<div class="jmain"><h5>${jwhat}</h5>${isHit ? `<b class="jn ${st}">${jvalT}</b>` : `<span class="why1">기준: ${STD[k]}</span>`}</div>${jtrk}${isHit && !jtrk ? `<span class="why1">기준: ${STD[k]}</span>` : ''}`;
     /*
      * [11/02] 정보 넷(디자이너) — 미션 · 로봇은 화면에 이미 있어(상단 탭 · 왼쪽 패널) 빼고, 이 화면 어디에도 없는 둘로 채운다.
      *   조치 상태  이 감지 하나에 누가 손댔나 — 요청 전 / HH:MM 요청됨([현장 조치 요청]을 누르면 바로 바뀐다). 왼쪽 패널 "요청 전 N건"은 미션 전체 수
@@ -167,9 +174,9 @@
     const tm = (x[3] || '').match(/(\d+):(\d+)/), mins = tm ? +tm[1] * 60 + +tm[2] : null;
     const nextM = st==='plan' ? '이번 순회 중' : mins === null ? '—' : mins < 14 * 60 ? '오늘 14:00' : '내일 09:00';
     const actS = !isHit ? (st==='plan' ? '—' : '필요 없음') : st==='done' || x[4] ? `${x[4] || '10:17'} 요청됨` : '요청 전';   // 요청 시각은 x[4](data-req 가 적는다)
-    const jinfo = [['발생위치', `${wp}${isHit ? ' ' + x[2].split(' ').slice(1).join(' ') : ''}`, ''], [isHit ? '발생시간' : '측정 시간', x[3] || '—', ''], ['조치 상태', actS, isHit && st !== 'done' && !x[4] ? 'is-todo' : ''], ['다음 측정', nextM, '']]
+    const jinfo = [['발생위치', `${wp}${isHit ? ' ' + x[2].split(' ').slice(1).join(' ') : ''}`, ''], [isHit ? '발생시간' : '측정 시간', x[3] || '—', ''], ['조치 상태', actS, ''], ['다음 측정', nextM, '']]
       .map(([l, v, c]) => `<div><span>${l}</span><b class="${c}" title="${v}">${v}</b></div>`).join('');
-    const judge = V6 ? `<div class="lvA s1 jx ${st}"><div class="jtop"><div class="jhd"><div class="jrow"><span class="pl ${st}">${WORD[st]}</span><h5>${k}, ${isHit ? x[1] : st==='plan' ? '측정 전' : '정상 범위 ' + x[1]}</h5></div></div>${jv}</div><div class="jinfo">${jinfo}</div></div>`
+    const judge = V6 ? `<div class="lvA s1 jx ${st}"><div class="jtop"><div class="jrow"><span class="pl ${st}">${WORD[st]}</span><span class="jk">${k}</span></div>${jv}</div><div class="jinfo">${jinfo}</div></div>`
       : `<div class="lvA s1 ${st}">${step('이상 판정')}<div class="tt"><span class="pl ${st}">${WORD[st]}</span><h5>${k}, ${isHit ? x[1] : st==='plan' ? '측정 전' : '정상 범위 ' + x[1]}</h5></div>${loc}${cond}</div>`;
     // [11/02 v6] 재발 여부 — Figma 처럼 네 줄을 다 보이고(줄 32 라 접을 만큼 길지 않다), 결론(처음 넘음 · 반복)은 머리 오른쪽 꼬리표로
     const histV6 = `<div class="sth"><b>재발 여부</b><span class="hfl ${rep3 ? 'is-rep' : ''}">${rep3 ? '반복' : isHit ? '처음 넘음' : '계속 정상 범위'}</span></div><div class="hist">${hist.map(hiRow).join('')}</div>`;
