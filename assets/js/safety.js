@@ -162,10 +162,19 @@
      * [11/02 v6] 판정 카드 2차(Figma DS 1552:10188) — 1줄 배지 + 감지 이름, 2줄 무엇이(왼쪽 큰 글) · 얼마(오른쪽 끝 단계색), 그 아래 막대.
      *   무엇이 = 판정 문구에서 값을 뺀 것(미세 누출 1곳 · 안전벨트 미착용). 문구가 값뿐이면(최고 68.4 ℃ · 이상 점수 9.41) 측정 이름(최고 온도 · 이상 점수)
      */
-    const MLAB = {'안전감지':'미착용 인원','누출감지':'누출 확률','온도감지':'최고 온도','계기인식':'측정값','이상음향':'이상 점수','부분방전':'이상 점수'};
-    const jvalT = !isHit ? '' : cd && !isNaN(num) ? `${num}${cd[4]==='%' ? '%' : cd[4]}` : (SHORT[x[1]] || x[1]);
-    let jwhat = !isHit ? (st==='plan' ? '측정 전' : '정상 범위') : jvalT && x[1].includes(jvalT) ? x[1].replace(jvalT, '').trim() : x[1];
-    if(isHit && (!jwhat || jwhat==='최고')) jwhat = MLAB[k];
+    /*
+     * [11/02] 결과 글 규칙 하나 — "측정 항목 + 값(단위)"(디자이너: 어떤 건 항목 + 단위, 어떤 건 장소, 어떤 건 항목만으로 읽혔다).
+     *   항목  무엇을 쟀나 — 감지마다 고정(최고 온도 · 누출 확률 · 이상 점수). 계기는 판정 글의 숫자 앞 말(압력 · 차압),
+     *         안전은 위반 항목(안전벨트 미착용 · 안전모 미착용). 위치 · 채널(CH1)은 정보 칸 발생위치가 맡는다.
+     *   값    숫자 + 단위를 붙여 단계색으로(48.6 ℃ · 62% · 0.86 MPa · 1명).
+     */
+    const MLAB = {'누출감지':'누출 확률','온도감지':'최고 온도','이상음향':'이상 점수','부분방전':'이상 점수'};
+    const numU = (x[1] || '').match(/(-?\d+(?:\.\d+)?)\s*(℃|%|MPa|kPa|Pa|bar|명|곳|건)?/);
+    const jvalT = !isHit ? '' : cd && !isNaN(num) ? `${num}${cd[4]==='%' ? '%' : cd[4]}` : k==='계기인식' && numU ? numU[1] + (numU[2] ? ' ' + numU[2] : '') : (SHORT[x[1]] || x[1]);
+    let jwhat = !isHit ? (st==='plan' ? '측정 전' : '정상 범위')
+      : MLAB[k] ? MLAB[k]
+      : k==='계기인식' ? ((x[1] || '').split(/\s*-?\d/)[0].trim() || '측정값')
+      : (x[1] || '').replace(jvalT, '').trim() || '미착용 인원';
     const jtrk = isHit && cd && !isNaN(num) ? (() => { const [lo, hi, w2, c2, u] = cd, p = q => Math.max(0, Math.min(100, (q - lo) / (hi - lo) * 100)).toFixed(1);
       return `<div class="jtrk"><span class="f ${st}" style="width:${p(num)}%"></span><span class="jm w" style="left:${p(w2)}%"><span>주의 ${w2}${u}</span></span><span class="jm c" style="left:${p(c2)}%"><span>위험 ${c2}${u}</span></span></div>`; })() : '';
     const jv = `<div class="jmain"><h5>${jwhat}</h5>${isHit ? `<b class="jn ${st}">${jvalT}</b>` : `<span class="why1">기준: ${STD[k]}</span>`}</div>${jtrk}${isHit && !jtrk ? `<span class="why1">기준: ${STD[k]}</span>` : ''}`;
