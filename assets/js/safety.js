@@ -126,11 +126,12 @@
      * 지난 회에도 넘었으면(반복) 예전처럼 네 줄을 다 보인다 — 반복일 때 판단이 달라진다(디자이너 10/30).
      * 연관 감지는 근거가 있을 때만 카드를 둔다(아래 dBc).
      */
-    const hiRow = ([t, val, s2, a], n) => `<div class="hi ${n===3 ? 'now' : ''}"><span class="t">${t}</span><span>${val}</span><span class="pl ${s2}">${WORD[s2]}</span><span class="hia ${a && a !== '조치 없음' ? 'on' : ''}">${a}</span></div>`;
+    const tSplit = t => { const i = t.lastIndexOf(' '); return i < 0 ? t : `<span class="hdt">${t.slice(0, i)}</span><span class="htm">${t.slice(i + 1)}</span>`; };   // 날짜 | 시각 — 시각이 줄마다 같은 선에
+    const hiRow = ([t, val, s2, a], n) => `<div class="hi ${n===3 ? 'now' : ''}"><span class="t">${V6 ? tSplit(t) : t}</span><span>${val}</span><span class="pl ${s2}">${WORD[s2]}</span><span class="hia ${a && a !== '조치 없음' ? 'on' : ''}">${a}</span></div>`;
     const rep3 = hist.slice(0, 3).some(h => h[2] !== 'ok');
     const histHtml = !V6 || rep3 ? `${V6 ? '<p class="hsum is-rep"><b>반복</b> 지난 순회에서도 기준을 넘었음</p>' : ''}<div class="hist">${hist.map(hiRow).join('')}</div>`
       : `<p class="hsum"><b>${isHit ? '처음 넘음' : '계속 정상 범위'}</b> 최근 3회(${hist[0][0]} ~ ${hist[2][0]}) 모두 정상 범위</p><div class="hist">${hiRow(hist[3], 3)}</div>
-        <details class="hmore"><summary>지난 3회 보기</summary><div class="hist">${hist.slice(0, 3).map(hiRow).join('')}</div></details>`;
+        <details class="hmore"><summary>지난 3회 보기<span class="i i-14" style="--i:var(--ic-chevron-down)" aria-hidden="true"></span></summary><div class="hist">${hist.slice(0, 3).map(hiRow).join('')}</div></details>`;
     const rel = K.filter(k2 => k2 !== k && m.r[k2] && (m.r[k2][0]==='crit' || m.r[k2][0]==='warn'));
     const sug = SG;
     const side = !isHit ? `<div class="donec"><b>${st==='plan' ? '아직 측정 전' : '조치 필요 없음'}</b><span>${st==='plan' ? '로봇이 도착하면 결과가 표시됨' : '정상 범위의 측정값'}</span></div>` : st==='done' ? `<div class="donec"><b>${x[4] || '10:17'} 현장 조치 요청됨</b><span>재측정에서 다시 넘으면 다시 표시</span></div>`
