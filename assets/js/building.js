@@ -52,6 +52,7 @@
   // v3(10/21) — 화면 사이 임시 값을 메인(screen.js · 미션 하나에 로봇 한 대, 10/20)과 맞춘다.
   // 정기 순회 점검은 B4 만 돌고, 층을 건너는 예시는 발전기실 설비 점검(Robot 05, B3 → B4)이다.
   var V3 = body.classList.contains("ver-3");
+  var V6 = body.classList.contains("ver-6");
   if (V3) {
     MISSION_FLOORS["정기 순회 점검"] = ["B4"];
     MISSION_FLOORS["발전기실 설비 점검"] = ["B3", "B4"];
@@ -1064,7 +1065,7 @@
   var hot = null;
   var busy = false;
   var tween = null;
-  var cam = { target: null, zoom: 1, user: 1 };
+  var cam = { target: null, zoom: 1, user: 1, pan: null };   // pan — 휠로 커서 쪽 확대할 때 옮긴 만큼(v6)
   var unit = 1;          // 화면 1px 의 월드 길이(zoom 1)
   var GAP = 0.78;        // 층 사이 틈 — 층 높이의 배수가 아니라 긴 변(100)에 대한 비율이다
 
@@ -1124,12 +1125,86 @@
     sun.position.set(60, 120, 30);
     scene.add(sun);
     cam.target = new THREE.Vector3();
+    cam.pan = new THREE.Vector3();
 
     new GLTFLoader().parse(b64ToBuffer(window.APRISM_MAP_GLB), "", function (gltf) {
       build(gltf.scene, merge);
     }, function (err) {
       loading.textContent = "3D 맵 파일을 불러오지 못했어요";
       if (window.console) { console.error(err); }
+    });
+  }
+
+  /*
+   * [11/02 v6] 벽이 맞닿는 자리의 모서리 선을 지운다 — 관제 지도(map-v6.js hideWallJoins)와 같은 방법(디자이너 "여기도 벽 겹친 라인 정리").
+   * 선이 다른 벽 상자와 겹치는 구간을 STEP 간격으로 나눠, 점마다 선과 수직인 네 대각 방향으로 EPS 만큼 비켜 벽 속인지 본다.
+   *   1 곳만 속 = 바깥 모서리(남김) · 2 곳 맞붙어 = 이어진 면 위 · 3 · 4 곳 = 맞닿아 꺾인 안쪽 / 묻힌 선(지움) · 2 곳 엇갈려(남김)
+   * 속 판정은 광선 여섯 줄 중 하나라도 처음 맞는 면이 뒷면이면 속(덩이가 겹쳐도 맞다).
+   */
+  function trimJoins(geos, egs) {
+    var EPS = 0.12, STEP = 0.1;
+    var dmat = new THREE.MeshBasicMaterial({ side: THREE.DoubleSide });
+    var list = geos.map(function (g) { var m = new THREE.Mesh(g, dmat); m.updateMatrixWorld(true); return m; });
+    var boxes = geos.map(function (g) { g.computeBoundingBox(); return g.boundingBox.clone().expandByScalar(EPS * 2); });
+    var rc = new THREE.Raycaster();
+    var DIRS = [[1, 0.013, 0.021], [-1, 0.017, -0.011], [0.019, 1, 0.012], [-0.014, -1, 0.018], [0.011, 0.016, 1], [-0.021, 0.012, -1]]
+      .map(function (d) { return new THREE.Vector3(d[0], d[1], d[2]).normalize(); });
+    function inside(pt) {
+      for (var i = 0; i < DIRS.length; i += 1) {
+        rc.set(pt, DIRS[i]);
+        var h = rc.intersectObjects(list, false)[0];
+        if (h && h.face && h.face.normal.dot(DIRS[i]) > 0) { return true; }
+      }
+      return false;
+    }
+    function clip(p0, p1, bx) {
+      var t0 = 0, t1 = 1, ax = ["x", "y", "z"];
+      for (var j = 0; j < 3; j += 1) {
+        var c = ax[j], dd = p1[c] - p0[c];
+        if (Math.abs(dd) < 1e-9) { if (p0[c] < bx.min[c] || p0[c] > bx.max[c]) { return null; } continue; }
+        var ta = (bx.min[c] - p0[c]) / dd, tb = (bx.max[c] - p0[c]) / dd;
+        if (ta > tb) { var tt = ta; ta = tb; tb = tt; }
+        t0 = Math.max(t0, ta); t1 = Math.min(t1, tb);
+        if (t0 > t1) { return null; }
+      }
+      return [t0, t1];
+    }
+    var a = new THREE.Vector3(), b = new THREE.Vector3(), d = new THREE.Vector3(), u = new THREE.Vector3(), v = new THREE.Vector3(),
+      mid = new THREE.Vector3(), pt = new THREE.Vector3(), UP = new THREE.Vector3(0, 1, 0), AX = new THREE.Vector3(1, 0, 0);
+    return egs.map(function (eg, wi) {
+      var pos = eg.getAttribute("position"), keep = [], cutAny = false;
+      for (var i = 0; i < pos.count; i += 2) {
+        a.fromBufferAttribute(pos, i); b.fromBufferAttribute(pos, i + 1);
+        var len = a.distanceTo(b);
+        var spans = [];
+        boxes.forEach(function (bx, bi) { if (bi === wi) { return; } var c = clip(a, b, bx); if (c) { spans.push(c); } });
+        if (!spans.length) { keep.push(a.x, a.y, a.z, b.x, b.y, b.z); continue; }
+        d.subVectors(b, a).normalize();
+        u.crossVectors(d, Math.abs(d.y) > 0.9 ? AX : UP).normalize();
+        v.crossVectors(d, u).normalize();
+        var n = Math.max(1, Math.ceil(len / STEP)), cut = [];
+        for (var k = 0; k < n; k += 1) {
+          var t = (k + 0.5) / n;
+          if (!spans.some(function (sp) { return t >= sp[0] && t <= sp[1]; })) { cut.push(false); continue; }
+          mid.lerpVectors(a, b, t);
+          var inn = [[1, 1], [1, -1], [-1, -1], [-1, 1]].map(function (q) {
+            pt.copy(mid).addScaledVector(u, q[0] * EPS).addScaledVector(v, q[1] * EPS);
+            return inside(pt);
+          });
+          var cnt = inn.filter(Boolean).length;
+          cut.push(cnt >= 3 || (cnt === 2 && (inn[0] === inn[1] || inn[1] === inn[2])));
+        }
+        var k0 = -1;
+        for (var k2 = 0; k2 <= n; k2 += 1) {
+          if (k2 < n && !cut[k2]) { if (k0 < 0) { k0 = k2; } continue; }
+          if (k0 >= 0) { pt.lerpVectors(a, b, k0 / n); mid.lerpVectors(a, b, k2 / n); keep.push(pt.x, pt.y, pt.z, mid.x, mid.y, mid.z); k0 = -1; }
+          if (k2 < n) { cutAny = true; }
+        }
+      }
+      if (!cutAny) { return eg; }
+      var out = new THREE.BufferGeometry();
+      out.setAttribute("position", new THREE.Float32BufferAttribute(keep, 3));
+      return out;
     });
   }
 
@@ -1165,6 +1240,7 @@
         edges[k].push(new THREE.EdgesGeometry(g, 28));
       });
 
+      if (V6 && parts.wall.length > 1) { edges.wall = trimJoins(parts.wall, edges.wall); }
       var holder = new THREE.Group();
       var mats = {}, lines = [], meshes = [];
       KINDS.forEach(function (k) {
@@ -1255,6 +1331,7 @@
 
   function layout(instant) {
     var targets = {};
+    if (cam.pan) { cam.pan.set(0, 0, 0); }
     if (mode === "all") {
       FLOORS.forEach(function (f) { targets[f] = { y: stackY(f), op: 1, solid: 0 }; });
       var top = stackY(FLOORS[0]) + F[FLOORS[0]].size.y;
@@ -1281,7 +1358,7 @@
   function ease(t) { return 1 - Math.pow(1 - t, 3); }
 
   var DIR = null;
-  var tmpA = null, tmpB = null;
+  var tmpA = null, tmpB = null, tmpC = null;
 
   function step(now) {
     var pal = PAL[isLight() ? "light" : "dark"];
@@ -1325,8 +1402,9 @@
       });
     });
     camera.zoom = cam.zoom * cam.user;
-    camera.position.copy(cam.target).addScaledVector(DIR, 1500);
-    camera.lookAt(cam.target);
+    tmpC.copy(cam.target).add(cam.pan);
+    camera.position.copy(tmpC).addScaledVector(DIR, 1500);
+    camera.lookAt(tmpC);
     camera.updateProjectionMatrix();
   }
 
@@ -1556,16 +1634,30 @@
   function zoomBy(k) {
     cam.user = Math.max(0.6, Math.min(3, cam.user * k));
   }
+  /*
+   * [11/02 v6] 휠은 커서 쪽으로 확대한다(디자이너 "커서를 올린 쪽으로 확대가 안 됨") — 커서 밑의 점이 확대 뒤에도 커서 밑에 남도록
+   * 판을 그만큼 옮긴다(cam.pan). 층 하나만 펼친 상태(V3 층 보기)에서도 휠이 먹는다. 버튼 [+][-] 은 예전대로 가운데 기준, [처음]은 옮긴 것도 되돌린다.
+   */
   hit.addEventListener("wheel", function (event) {
-    if (mode !== "all") { return; }
+    if (!V6) { if (mode !== "all") { return; } event.preventDefault(); zoomBy(Math.pow(1.0015, -event.deltaY)); return; }
+    if (!ready || busy || (mode !== "all" && !floorView)) { return; }
     event.preventDefault();
+    var vr = view.getBoundingClientRect();
+    var nx = (event.clientX - vr.left) / vr.width * 2 - 1, ny = -((event.clientY - vr.top) / vr.height) * 2 + 1;
+    var before = new THREE.Vector3(nx, ny, 0).unproject(camera);
+    var u0 = cam.user;
     zoomBy(Math.pow(1.0015, -event.deltaY));
+    if (cam.user === u0) { return; }
+    camera.zoom = cam.zoom * cam.user;
+    camera.updateProjectionMatrix();
+    var after = new THREE.Vector3(nx, ny, 0).unproject(camera);
+    cam.pan.add(before.sub(after));
   }, { passive: false });
   $$("[data-bld-zoom]").forEach(function (b) {
     b.addEventListener("click", function () { zoomBy(b.getAttribute("data-bld-zoom") === "in" ? 1.25 : 0.8); });
   });
   var home = $("[data-bld-home]");
-  if (home) { home.addEventListener("click", function () { cam.user = 1; }); }
+  if (home) { home.addEventListener("click", function () { cam.user = 1; if (cam.pan) { cam.pan.set(0, 0, 0); } }); }
 
   /*
    * 들어가기 — 다른 층은 위아래로 비켜 사라지고, 고른 층이 제 색으로 차며 다가온다.
@@ -1665,7 +1757,7 @@
   ]).then(function (mods) {
     var T = mods[0];
     DIR = new T.Vector3(1, 0.95, 1).normalize();
-    tmpA = new T.Color(); tmpB = new T.Color();
+    tmpA = new T.Color(); tmpC = new T.Vector3(); tmpB = new T.Color();
     proj = new T.Vector3();
     ray = new T.Raycaster(); ndc = new T.Vector2();
     start(mods);
