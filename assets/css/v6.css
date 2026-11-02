@@ -869,3 +869,9 @@ body.ver-6 .sf .msh2 .msh-go:hover { background-color: var(--bg-glass); }
 body.ver-6 .sf .msh2 .msh-go:hover .i { color: var(--text-secondary); }
 body.ver-6 .sf .msh2 .msh-go:active { background-color: var(--bg-selected); }
 body.ver-6 .sf .msh2 .msh-go:focus-visible { outline: var(--border-width-strong) solid var(--border-focus); outline-offset: 1px; }
+
+/*
+ * [11/03 v6] 로봇 카드 [자동복귀] [E-STOP] · 넘김 화살표가 안 눌리던 것 — v5 패널로 되돌릴 때 따라온 카드 z-index 1(v5.css, 바닥 띠 위로 올림)이
+ *   단추 판(.rc-side, z 없음)을 덮어 클릭을 카드가 가져갔다. 단추 판을 카드 위로 올린다(판 자체는 pointer-events:none 이라 카드 클릭은 그대로).
+ */
+body.ver-6 .robot-carousel .rc-side { z-index: 2; }
