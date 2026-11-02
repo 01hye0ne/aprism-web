@@ -60,6 +60,27 @@
       '안전감지':null, '누출감지':['crit','누출 확률 81%','WP-B04 급수 배관 분기부','09:21'],
       '온도감지':['warn','최고 41.8 ℃','WP-B09 급수 펌프 모터','10:09'], '계기인식':['ok','정상 범위','측정 3곳'], '이상음향':['ok','정상 범위','측정 4곳'], '부분방전':null}}
   ];
+  /*
+   * [10/30 v6] 위험 · 주의는 관제 알림 기준(디자이너) — 미션 판정을 관제 최신 알림(monitor.js WARNINGS · R01_MORE · ROUTE_ALERTS)과 1:1 로.
+   *   정기 순회 점검은 이미 같다. 전기실 열화상 점검 = 계기인식 위험(WP-02 HEPA 차압) · 주의(WP-04 N₂ 압력) 두 건, 나머지 정상.
+   *   발전기실 설비 점검 = 주의 넷 중 감지 6종에 드는 셋(부분방전 WP-06 · 온도 WP-02 · 계기 WP-13). 진동감지(WP-12)는 6종에 없어 카드가 없다.
+   *   완료한 미션 셋(야간 순회 · 공조 설비 순회 · 유틸리티 순회 — 관제 탭과 같은 여섯)도 넣는다. 알림이 없어 모두 정상 범위.
+   *   v5 화면은 그대로다.
+   */
+  const V6 = document.body.classList.contains('ver-6');
+  if(V6){
+    const ok = n => ['ok','정상 범위','측정 ' + n + '곳'];
+    BASE[1].r = {'안전감지':ok(3), '누출감지':ok(2), '온도감지':ok(3), '계기인식':['crit','차압 312 Pa','WP-02 HEPA Filter 차압계','09:44'], '이상음향':ok(2), '부분방전':ok(2)};
+    BASE[1].rs = {'계기인식':[['crit','차압 312 Pa','WP-02 HEPA Filter 차압계','09:44'], ['warn','압력 0.62 MPa','WP-04 N₂ 배관 압력계','10:15']]};
+    BASE[2].na = {'안전감지':'scope'};
+    BASE[2].r = {'안전감지':null, '누출감지':ok(4), '온도감지':['warn','최고 68.4 ℃','WP-02 발전기 베어링','10:03'], '계기인식':['warn','압력 7.9 bar','WP-13 공기 압축기 C-1','10:01'],
+      '이상음향':ok(4), '부분방전':['warn','이상 점수 9.41','WP-06 수배전반','10:09']};
+    LINKS[2] = [['부분방전', '온도감지', '같은 발전기 계통. WP-06 수배전반 방전과 WP-02 베어링 과열이 함께 나타날 수 있다', '보통']];
+    BASE.push(
+      {mis:'야간 순회 점검', fl:'지하 4층', ab:'B4', robot:'Robot 04', done:20, total:20, r:{'안전감지':ok(4),'누출감지':ok(5),'온도감지':ok(6),'계기인식':ok(4),'이상음향':ok(5),'부분방전':ok(3)}},
+      {mis:'공조 설비 순회', fl:'지하 3층', ab:'B3', robot:'Robot 07', done:20, total:20, r:{'안전감지':ok(3),'누출감지':ok(4),'온도감지':ok(6),'계기인식':ok(5),'이상음향':ok(6),'부분방전':ok(2)}},
+      {mis:'유틸리티 순회', fl:'지하 4층', ab:'B4', robot:'Robot 09', done:20, total:20, r:{'안전감지':ok(3),'누출감지':ok(6),'온도감지':ok(5),'계기인식':ok(6),'이상음향':ok(4),'부분방전':ok(3)}});
+  }
   const NEWR = [1, '온도감지', ['crit','최고 71.2 ℃','WP-104 변압기 TR-1','10:15']];
   const RANK = {crit:3, warn:2, done:1, ok:0};
   const WORD = {crit:'위험', warn:'주의', done:'요청됨', ok:'정상 범위', plan:'예정'};
@@ -134,8 +155,8 @@
   // 미션의 지점(시안용): 넘은 지점 + 나머지 측정 지점 + 예정 지점, 지점 번호 순
   function spotsOne(i){
     const m = M[i], fl = {};
-    K.forEach(k => { const x = m.r[k]; if(x && x[0] !== 'ok'){ const wp = x[2].split(' ')[0]; (fl[wp] = fl[wp] || {t:x[3], ks:{}}).ks[k] = x; } });
-    const any = Object.keys(fl)[0] || 'WP-001', pre = any.slice(0, -2);
+    K.forEach(k => { itemsOf(i, k).forEach(x => { if(x && x[0] !== 'ok'){ const wp = x[2].split(' ')[0]; (fl[wp] = fl[wp] || {t:x[3], ks:{}}).ks[k] = x; } }); });   // 한 감지에 여러 곳(rs)이면 모두
+    const any = Object.keys(fl)[0] || 'WP-01', pre = any.slice(0, -2);   // 넘은 곳이 없는 미션(완료 · 모두 정상)도 WP-01 꼴로
     const id = n => pre + String(n).padStart(2, '0');
     const meas = new Set(Object.keys(fl)); let n = 1;
     while(meas.size < m.done){ if(!fl[id(n)]) meas.add(id(n)); n++; }
@@ -155,6 +176,11 @@
   const SRC = {'안전감지':'영상','누출감지':'영상 + 열화상','온도감지':'열화상','계기인식':'영상','이상음향':'마이크','부분방전':'PD 센서'};
   const OKV = {'안전감지':'0명','누출감지':'9%','온도감지':'31.0','계기인식':'0.71','이상음향':'7.9','부분방전':'6.4'};
   const MEMO = {'1|온도감지':'10:15 새로 넘음, 직전 순회보다 +18.9 ℃','1|계기인식':'PG-A3 상한 초과, 계기 점검 필요','1|부분방전':'CH1만 주의, 같은 전기 계통 변압기 과열','2|누출감지':'지하 3층 순회 끝, 13:00 전까지 다시 못 잼. CCTV 사각 구간','2|온도감지':'지하 3층에서 측정, 평소보다 +6.3 ℃'};
+  if(V6){   // [10/30 v6] 관제 알림 값 — 표 칸 짧은 값 · 메모
+    Object.assign(SHORT, {'차압 312 Pa':'312', '압력 0.62 MPa':'0.62', '최고 68.4 ℃':'68.4', '압력 7.9 bar':'7.9', '이상 점수 9.41':'9.41'});
+    Object.assign(MEMO, {'1|계기인식':'HEPA 필터 차압이 교체 기준을 넘음, 최근 3회 잇달아 오름. WP-04 N₂ 압력도 정상 범위 아래',
+      '2|온도감지':'베어링 표면 68.4 ℃, 주변보다 31 ℃ 높음', '2|계기인식':'토출 압력이 정상 범위(8.2 ~ 8.8) 아래, 흡입 필터 막힘 가능성', '2|부분방전':'PRPD 패턴이 코로나 방전 유형과 같음'});
+  }
   function eData(i){
     if(i===0){ const m = M[0];
       const rows = E_ROWS0.map(r => { const x = m.r[r.n], c = Object.assign({}, r.c);
@@ -168,8 +194,9 @@
     const meas = sp.filter(x => !x[3]), now = m.done < m.total && meas.length ? meas[meas.length - 1][0] : '';
     const rows = K.map((k, ki) => { const x = m.r[k]; if(!x){ const why = naOf(i, k); return {n:k, src:SRC[k], s:'na', na:why, std:STD[k], memo:why==='sensor' ? m.robot + '에 센서가 달려 있지 않음' : '이 미션에서 판정하지 않음', c:{}}; }
       const c = {}, cnt = x[0]==='ok' ? (parseInt(x[2].replace(/\D/g, '')) || 3) : 3; let n = 0;
-      sp.forEach(([w, , , pl], si) => { const hit = x[0] !== 'ok' && x[2].startsWith(w);
-        if(hit){ c[w] = [x[0], SHORT[x[1]] || x[1]]; n++; return; }
+      const hits = itemsOf(i, k).filter(y => y && y[0] !== 'ok');
+      sp.forEach(([w, , , pl], si) => { const hx = hits.find(y => y[2].startsWith(w + ' '));
+        if(hx){ c[w] = [hx[0], SHORT[hx[1]] || hx[1]]; n++; return; }
         if((si + ki) % 2) return;
         if(pl){ c[w] = ['plan']; return; }
         if(n < cnt){ c[w] = ['ok', OKV[k]]; n++; } });
@@ -293,7 +320,7 @@
     const cnt = (w, n, t) => `<span class="sf-cnt ${w} ${n ? '' : 'zero'}" title="${t} 미션 ${n}개"><span class="l">${t}</span><b>${n}</b></span>`;   // 한 칸 — 단계 이름(왼쪽 위) + 숫자(오른쪽 아래). 기호는 목록 · 카드에 이미 많아 글로 쓴다(10/30)
     const sumD = M.reduce((a, m) => a + m.done, 0), sumT = M.reduce((a, m) => a + m.total, 0);
     // [10/30] 줄 꼴 — 제목 줄이 맨 위(썸네일 위까지 한 줄), 그 아래 썸네일 | 키-값. 고른 미션(제목 줄 + 테 안 정보 · 지도)과 제목 자리가 같아 깊이가 바뀌어도 줄이 흔들리지 않는다
-    const top = `<button type="button" class="sf-mrow sf-all ${scope==='all' ? 'on' : ''}" data-sc="all" aria-current="${scope==='all'}"><span class="sf-mt1"><b>미션 전체</b></span><span class="sf-mbody"><span class="sf-mmap sf-allsum" aria-hidden="true">${cnt('crit', nc, '위험')}${cnt('warn', nw0, '주의')}${cnt('ok', M.length - nc - nw0, '정상')}</span><span class="sf-meta">${kv('미션', M.length + '개')}${kv('측정', sumD + '/' + sumT + '곳')}${kv('요청 전', allN + '건')}</span></span></button>`;
+    const top = `<button type="button" class="sf-mrow sf-all ${scope==='all' ? 'on' : ''}" data-sc="all" aria-current="${scope==='all'}"><span class="sf-mt1"><b>${V6 ? '전체 미션' : '미션 전체'}</b></span><span class="sf-mbody"><span class="sf-mmap sf-allsum" aria-hidden="true">${cnt('crit', nc, '위험')}${cnt('warn', nw0, '주의')}${cnt('ok', M.length - nc - nw0, '정상')}</span><span class="sf-meta">${kv('미션', M.length + '개')}${kv('측정', sumD + '/' + sumT + '곳')}${kv('요청 전', allN + '건')}</span></span></button>`;
     const rows = M.map((m, i) => { const w = worst(i), h = hits(i), nw = i===1 && !newSeen, on = scope===i;
       const t1 = `<span class="sf-mt1"><i class="ixd ${w} ${nw ? 'blink' : ''}"></i><b>${m.mis}</b>${nw ? '<em class="nwm">새로</em>' : ''}</span>`;
       const meta = `<span class="sf-meta">${kv('층', flN(m))}${kv('측정', `${m.done}/${m.total}곳${m.done===m.total ? ', 순회 끝' : ''}`)}${kv('로봇', m.robot)}${kv('요청 전', h + '건')}</span>`;
@@ -306,7 +333,7 @@
         <div class="sf-monb">${meta}<div class="m2"><div class="m2b">${multi ? floorBar(i) : ''}<span class="sp"></span><a class="m2go" href="${mainUrl(i, cur)}" title="관제 3D 지도에서 이 미션과 층을 연다" aria-label="관제에서 보기">관제<span class="i i-14" style="--i:var(--ic-chevron-right)" aria-hidden="true"></span></a></div><div class="m2rot">${svg2(i, cur, false, 316, sel, lk)}</div></div></div></div>`; }).join('');
     return `${LEG}<div class="sf-mwrap"><div class="sf-mlist"><div class="sf-mwell">${top}${rows}</div></div><span class="sf-mthumb" aria-hidden="true"></span></div>`;   // 범례는 목록 위(10/30) — 기호를 먼저 읽고 목록으로
   }
-  const V6 = document.body.classList.contains("ver-6");   // [10/30] v6 는 v6 화면끼리
+  // [10/30] v6 는 v6 화면끼리 — V6 는 위(BASE 아래)에서 정한다
   const gnbMain = document.querySelector(V6 ? '.gnb-item[href^="./main-v6.html"]' : '.gnb-item[href^="./main-v5.html"]');
   const MAINV3 = V6 ? "./main-v6.html" : "./main-v5.html";   // [v5] 같은 판의 관제로
   function mainUrl(i, ab){ const m = M[i], q = new URLSearchParams({mission:m.mis, floor:PLANOF[ab] || ab}); const nw = nowOf(i); if(nw) q.set("wp", nw); return MAINV3 + "?" + q.toString(); }

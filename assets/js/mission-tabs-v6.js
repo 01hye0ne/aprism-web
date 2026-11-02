@@ -1,6 +1,6 @@
 /*
  * [10/30 v6] 상단 미션 탭 — 드롭다운(미션 고르기) 대신 윈도우 파일 탐색기처럼 탭을 늘어놓는다(디자이너).
- *   [통합 순회 현황] [미션 △] [미션 ⓧ] [미션] …
+ *   [전체 미션] [미션 △] [미션 ⓧ] [미션] …
  * 지금 보는 탭은 아래 면(content-surface, bg/cell)과 이어져 한 장처럼 보이고, 바닥 양옆이 바깥으로 둥글게 퍼진다.
  * 탭 이름 뒤 기호는 그 미션의 가장 높은 알림 단계(ⓧ 위험 · △ 주의) — 다른 미션에 무슨 일이 났는지 탭에서 바로 보인다.
  *
@@ -47,7 +47,8 @@
     bar.textContent = "";
     // 통합 순회 현황 — 관제에서는 그 화면으로 가는 링크, 통합 순회 현황에서는 지금 탭, 안전진단에서는 "미션 전체" 단추
     var isBtn = !!(overview && overview.tagName === "BUTTON");
-    var first = tab(isBtn ? "button" : onOverview ? "span" : "a", "통합 순회 현황", onOverview);
+    // [10/30] 첫 탭 이름 = "전체 미션"(디자이너 — 관제 · 통합 순회 현황 · 안전진단 통일)
+    var first = tab(isBtn ? "button" : onOverview ? "span" : "a", "전체 미션", onOverview);
     if (isBtn) { var ov = overview; first.addEventListener("click", function () { if (!first.classList.contains("is-on")) { ov.click(); } }); }
     else if (!onOverview && overview) { first.href = overview.getAttribute("href") || "building-v6.html"; }
     bar.appendChild(first);
@@ -55,7 +56,14 @@
     // 끌어서 바꾼 순서(저장된 이름 차례)를 먼저, 처음 보는 미션은 메뉴 차례대로 뒤에
     var saved = loadOrder();
     var items = Array.prototype.slice.call(menu.querySelectorAll(".scope-item")).filter(function (item) { return item.querySelector(".scope-name .t-label-2"); });
-    var at = function (item) { var i = saved.indexOf(item.querySelector(".scope-name .t-label-2").textContent); return i < 0 ? 1e3 + items.indexOf(item) : i; };
+    // 기본 차례는 수행중 → 대기 → 완료(관제 메뉴와 같다) — 안전진단 메뉴는 로봇 번호 차례라 여기서 맞춘다
+    var RUN = { run: 0, idle: 1, done: 2 };
+    var at = function (item) {
+      var i = saved.indexOf(item.querySelector(".scope-name .t-label-2").textContent);
+      if (i >= 0) { return i; }
+      var r = item.querySelector(".scope-run"), g = r ? RUN[r.getAttribute("data-run")] : 1;
+      return 1e3 + (g == null ? 1 : g) * 100 + items.indexOf(item);
+    };
     items.sort(function (a, b) { return at(a) - at(b); });
     items.forEach(function (item) {
       var nm = item.querySelector(".scope-name .t-label-2");
