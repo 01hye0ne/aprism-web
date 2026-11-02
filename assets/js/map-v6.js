@@ -1040,7 +1040,8 @@
    * 벽은 덩이마다 따로 모서리 선(EdgesGeometry)을 뽑는다. 두 벽이 T · ㄱ 자로 맞닿으면
    * 한쪽 벽의 끝 모서리가 다른 벽 면 위에 그대로 남아 세로줄 두 가닥 · 윗면 짧은 줄로 보였다.
    *
-   * 선마다 가운데에서 선과 수직인 네 방향(대각선)으로 살짝 비켜 찍어 벽 속인지 본다.
+   * 선이 다른 벽 상자와 겹치는 구간을 0.1 간격으로 나눠, 점마다 선과 수직인 네 방향(대각선)으로 살짝 비켜 찍어 벽 속인지 본다.
+   * 지울 칸만 잘라 내고 나머지는 이어 남긴다(긴 윗면 선이 바깥 모서리에서만 다른 벽 윗면을 지나가는 경우까지).
    *   1 곳만 벽 속   바깥 모서리 — 남긴다
    *   2 곳 맞붙어    이어진 한 면 위의 선(겹친 벽의 끝 모서리) — 지운다
    *   2 곳 엇갈려    두 벽이 모서리끼리 닿은 자리 — 남긴다
@@ -1056,7 +1057,24 @@
       .map(function (d) { return new THREE.Vector3(d[0], d[1], d[2]).normalize(); });
     var EPS = 0.12;
     var byFloor = {};
-    walls.forEach(function (w) { (byFloor[w.floor] = byFloor[w.floor] || []).push(w); w.mat.side = THREE.DoubleSide; });
+    var STEP = 0.1;
+    walls.forEach(function (w) {
+      (byFloor[w.floor] = byFloor[w.floor] || []).push(w); w.mat.side = THREE.DoubleSide;
+      w.mesh.geometry.computeBoundingBox(); w.box = w.mesh.geometry.boundingBox.clone().expandByScalar(EPS * 2);
+    });
+    // 선분 a→b 가 상자 안을 지나는 비율 구간 [t0, t1](슬랩 자르기). 안 지나면 null
+    function clip(p0, p1, bx) {
+      var t0 = 0, t1 = 1, ax = ["x", "y", "z"];
+      for (var j = 0; j < 3; j += 1) {
+        var c = ax[j], dd = p1[c] - p0[c];
+        if (Math.abs(dd) < 1e-9) { if (p0[c] < bx.min[c] || p0[c] > bx.max[c]) { return null; } continue; }
+        var ta = (bx.min[c] - p0[c]) / dd, tb = (bx.max[c] - p0[c]) / dd;
+        if (ta > tb) { var tt = ta; ta = tb; tb = tt; }
+        t0 = Math.max(t0, ta); t1 = Math.min(t1, tb);
+        if (t0 > t1) { return null; }
+      }
+      return [t0, t1];
+    }
     var nrm = new THREE.Vector3();
     function inside(pt, list) {
       for (var i = 0; i < DIRS.length; i += 1) {
@@ -1078,20 +1096,41 @@
         var lines = w.mesh.children.filter(function (c) { return c.isLineSegments; })[0];
         if (!lines) { return; }
         var pos = lines.geometry.getAttribute("position"), keep = [], dropped = 0;
+        // 선 전체가 아니라 다른 벽과 겹치는 구간만 잘게 나눠 본다 — 긴 윗면 선이 모서리에서만 다른 벽 윗면을 지나가는 경우(ㄱ 자 바깥 모서리)
+        var others = group.filter(function (o) { return o !== w; }).map(function (o) { return o.box; });
         for (var i = 0; i < pos.count; i += 2) {
           a.fromBufferAttribute(pos, i); b.fromBufferAttribute(pos, i + 1);
-          mid.addVectors(a, b).multiplyScalar(0.5);
+          var len = a.distanceTo(b);
           d.subVectors(b, a).normalize();
           u.crossVectors(d, Math.abs(d.y) > 0.9 ? AX : UP).normalize();
           v.crossVectors(d, u).normalize();
-          var inn = [[1, 1], [1, -1], [-1, -1], [-1, 1]].map(function (q) {
-            pt.copy(mid).addScaledVector(u, q[0] * EPS).addScaledVector(v, q[1] * EPS);
-            return inside(pt, list);
-          });
-          var n = inn.filter(Boolean).length;
-          var adj2 = n === 2 && (inn[0] === inn[1] || inn[1] === inn[2]);
-          if (n >= 3 || adj2) { dropped += 1; continue; }
-          keep.push(a.x, a.y, a.z, b.x, b.y, b.z);
+          var spans = [];
+          others.forEach(function (bx) { var c = clip(a, b, bx); if (c) { spans.push(c); } });
+          if (!spans.length) { keep.push(a.x, a.y, a.z, b.x, b.y, b.z); continue; }
+          // 잴 점: 겹치는 구간 안을 STEP 간격으로. 그 밖은 늘 남긴다
+          var n = Math.max(1, Math.ceil(len / STEP)), cut = [];
+          for (var k = 0; k < n; k += 1) {
+            var t = (k + 0.5) / n;
+            var near = spans.some(function (sp) { return t >= sp[0] && t <= sp[1]; });
+            if (!near) { cut.push(false); continue; }
+            mid.lerpVectors(a, b, t);
+            var inn = [[1, 1], [1, -1], [-1, -1], [-1, 1]].map(function (q) {
+              pt.copy(mid).addScaledVector(u, q[0] * EPS).addScaledVector(v, q[1] * EPS);
+              return inside(pt, list);
+            });
+            var cnt = inn.filter(Boolean).length;
+            cut.push(cnt >= 3 || (cnt === 2 && (inn[0] === inn[1] || inn[1] === inn[2])));
+          }
+          // 남길 칸끼리 이어 선분으로
+          var k0 = -1;
+          for (var k2 = 0; k2 <= n; k2 += 1) {
+            if (k2 < n && !cut[k2]) { if (k0 < 0) { k0 = k2; } continue; }
+            if (k0 >= 0) {
+              pt.lerpVectors(a, b, k0 / n); mid.lerpVectors(a, b, k2 / n);
+              keep.push(pt.x, pt.y, pt.z, mid.x, mid.y, mid.z); k0 = -1;
+            }
+            if (k2 < n) { dropped += 1; }
+          }
         }
         if (dropped) { lines.geometry.setAttribute("position", new THREE.Float32BufferAttribute(keep, 3)); }
       });
