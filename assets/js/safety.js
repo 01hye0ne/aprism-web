@@ -374,14 +374,25 @@
     if(big){ P.stairs.forEach(r => { g += `<rect class="stz" x="${r[0]}" y="${r[1]}" width="${r[2]}" height="${r[3]}" stroke-width=".6"/>`; });
       P.wall.forEach(r => { g += `<rect class="wl" x="${r[0]}" y="${r[1]}" width="${r[2]}" height="${r[3]}"/>`; }); }
     const sw = big ? 1 : 1.15;
-    g += `<polyline class="ra" points="${cut2(L, sCut, L.len)}" stroke-width="${u(1.4 * sw)}" stroke-dasharray="${u(1.5)} ${u(4)}" vector-effect="none"/>`;
-    // 6 진행 방향 꺾쇠 — 앞으로 갈 길(점선) 위에 간격을 두고. 지점 표식 근처는 비운다
-    if(rich){ const gapS = +u(34), marks = list.map((p, j) => pos2(L, L.sAt[j]));
-      for(let sv = sCut + gapS * .6; sv < L.len - gapS * .3; sv += gapS){ const q = pos2(L, sv);
+    /*
+     * [11/02 v6] 큰 지도(rich) 경로 = 관제 지도(map-v6 rrStyle · rrForm)와 같은 규칙(디자이너).
+     *   지나온 길  파란 동그란 점선(80%)        지금 구간(로봇 → 다음 지점)  진한 파란 실선
+     *   앞으로 갈 길  옅은 파랑 실선 띠(파랑 38% + 바닥) · 얇은 밝은 테
+     * 목록의 작은 지도(썸네일)는 예전 그대로(지나온 실선 · 앞길 점선) — 작아서 점이 안 읽힌다.
+     */
+    if(rich){ const ni = next ? list.indexOf(next) : -1, sNext = sR !== null && ni >= 0 ? Math.max(sCut, L.sAt[ni]) : sCut;
+      g += `<polyline class="ra6c" points="${cut2(L, sNext, L.len)}" stroke-width="${u(3.4 + 1.6)}"/><polyline class="ra6" points="${cut2(L, sNext, L.len)}" stroke-width="${u(3.4)}"/>`;
+      // 6 진행 방향 꺾쇠 — 앞으로 갈 길 띠 위에 간격을 두고. 지점 표식 근처는 비운다
+      { const gapS = +u(34), marks = list.map((p, j) => pos2(L, L.sAt[j]));
+        for(let sv = sNext + gapS * .6; sv < L.len - gapS * .3; sv += gapS){ const q = pos2(L, sv);
         if(marks.some(mq => Math.hypot(mq.x - q.x, mq.y - q.y) < +u(9))) continue;
         g += `<path class="dir" transform="translate(${q.x.toFixed(1)},${q.y.toFixed(1)}) rotate(${(q.ang * 180 / Math.PI).toFixed(1)})" d="M${u(-2.2)} ${u(-2.6)} ${u(1)} 0 ${u(-2.2)} ${u(2.6)}" stroke-width="${u(1.3)}"/>`; } }
-    if(rich) g += `<polyline class="rdc" points="${cut2(L, 0, sCut)}" stroke-width="${u(2.4 * sw + 2.4)}"/>`;
-    g += `<polyline class="rd" points="${cut2(L, 0, sCut)}" stroke-width="${u(2.4 * sw)}"/>`;
+      g += `<polyline class="rp6" points="${cut2(L, 0, sCut)}" stroke-width="${u(2.6)}" stroke-dasharray="0 ${u(5.2)}"/>`;
+      if(sNext > sCut) g += `<polyline class="rc6" points="${cut2(L, sCut, sNext)}" stroke-width="${u(3.4)}"/>`;
+    } else {
+      g += `<polyline class="ra" points="${cut2(L, sCut, L.len)}" stroke-width="${u(1.4 * sw)}" stroke-dasharray="${u(1.5)} ${u(4)}" vector-effect="none"/>`;
+      g += `<polyline class="rd" points="${cut2(L, 0, sCut)}" stroke-width="${u(2.4 * sw)}"/>`;
+    }
     if(sel && lk && lk.length){ const at2 = w2 => { const j = list.findIndex(p => p[0]===w2); return j < 0 ? null : pos2(L, L.sAt[j]); }, q0 = at2(sel);
       if(q0) lk.forEach(w2 => { const q1 = at2(w2); if(q1 && w2 !== sel) g += `<line x1="${q1.x.toFixed(1)}" y1="${q1.y.toFixed(1)}" x2="${q0.x.toFixed(1)}" y2="${q0.y.toFixed(1)}" class="lkl" stroke-width="${u(1.6)}" stroke-dasharray="${u(3)} ${u(2.5)}"/><circle class="lkc" cx="${q1.x.toFixed(1)}" cy="${q1.y.toFixed(1)}" r="${u(6)}" fill="none" stroke-width="${u(1.2)}"/>`; }); }
     list.forEach((p, j) => { const w = p[0], q = pos2(L, L.sAt[j]), s2 = p[3] ? 'plan' : stOf(w), isNext = next && next[0]===w && ab===nowF;
