@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<!-- 디지털 트윈 모듈 실험(11/02 디자이너) — 지하 4층 설비 덩이 하나(관제 지도에서 WP-08 옆 큰 덩이)를 걷어 내고,
+     현장 기계실 사진(보일러 · 제어반 · 펌프 · 압력 탱크 · 색 배관)을 로우폴리 모듈로 만들어 그 자리에 놓았다.
+     레퍼런스: Siemens Bifrost(로우폴리 · 단색 재질 · 받침 타일 · 강조색 하나 · 정보는 3D 밖 카드).
+     모듈은 assets/js/twin-modules.js(코드로 만든 형태). 운영 화면과 상관없다. -->
+<html lang="ko" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>디지털 트윈 모듈 실험 — APRISM</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/static/woff2/SUIT.css" />
+  <script type="importmap">
+  { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+                 "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/" } }
+  </script>
+  <link rel="stylesheet" href="../assets/css/tokens.css?v=b64812bd" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; overflow: hidden; background: #070a10; color: #f7f8fa; font-family: "SUIT", system-ui, sans-serif; }
+    #view { position: fixed; inset: 0; }
+    .hud { position: fixed; left: 20px; top: 20px; z-index: 2; display: flex; flex-direction: column; gap: 8px; max-width: 360px; }
+    .hud h1 { margin: 0; font-size: 18px; line-height: 26px; font-weight: 800; }
+    .hud p { margin: 0; font-size: 13px; line-height: 20px; color: #9ea8bb; }
+    .seg { display: flex; gap: 4px; margin-top: 4px; }
+    .seg button { font: 600 13px/18px "SUIT", sans-serif; padding: 6px 12px; border-radius: 999px; border: 1px solid #3a4250; background: #1a1f29; color: #c9d0dc; cursor: pointer; }
+    .seg button.on { background: #e4e8ef; color: #0b0e13; border-color: transparent; }
+    .legend { display: flex; flex-wrap: wrap; gap: 6px 12px; font-size: 12px; color: #9ea8bb; }
+    .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; }
+    .card { position: fixed; z-index: 3; width: 280px; padding: 12px; border-radius: 8px; background: #f7f8fa; color: #0b0e13; box-shadow: 0 12px 32px rgb(0 0 0 / 45%); pointer-events: none; opacity: 0; transform: translateY(4px); transition: opacity 140ms ease, transform 140ms ease; }
+    .card.on { opacity: 1; transform: none; }
+    .card .k { font-size: 12px; color: #63686f; }
+    .card b { display: block; font-size: 16px; line-height: 24px; margin: 2px 0 8px; }
+    .card dl { margin: 0; display: grid; grid-template-columns: 72px 1fr; gap: 4px 8px; font-size: 13px; }
+    .card dt { color: #63686f; } .card dd { margin: 0; font-weight: 600; }
+    .card .warn { color: #b27a00; }
+    .pin { position: fixed; z-index: 2; width: 22px; height: 20px; margin: -26px 0 0 -11px; pointer-events: none; }
+    .pin svg { display: block; width: 100%; height: 100%; filter: drop-shadow(0 2px 3px rgb(0 0 0 / 60%)); }
+    .loading { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); color: #9ea8bb; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <div id="view"></div>
+  <div class="loading" id="loading">3D 모델을 불러오는 중…</div>
+  <div class="hud">
+    <h1>디지털 트윈 모듈 실험 · 지하 4층 기계실</h1>
+    <p>관제 지도의 설비 덩이(WP-08 옆) 자리를 현장 사진의 설비 모듈로 바꿨어요. 모듈을 누르면 정보 카드가 떠요. 끌어서 돌리고 휠로 확대해요.</p>
+    <div class="seg" role="group" aria-label="보기">
+      <button type="button" data-view="room" class="on">기계실</button>
+      <button type="button" data-view="floor">지하 4층 전체</button>
+      <button type="button" data-view="before">바꾸기 전</button>
+    </div>
+    <div class="legend"><span><i style="background:#d9473f"></i>소화 배관</span><span><i style="background:#3a63b8"></i>급수 배관</span><span><i style="background:#e0b52a"></i>가스 배관</span><span><i style="background:#aeb6c2"></i>배기 연통</span></div>
+  </div>
+  <div class="card" id="card"><span class="k" data-k></span><b data-n></b><dl data-d></dl></div>
+
+  <script src="../assets/js/map-model.js?v=0f88c871"></script>
+  <script type="module" src="../assets/js/twin-lab.js?v=4cfd7d50"></script>
+</body>
+</html>
