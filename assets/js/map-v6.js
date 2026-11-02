@@ -1030,7 +1030,73 @@
         layLayer(top, "");
       }
     });
+    hideWallJoins();
     return model;
+  }
+
+  /*
+   * [11/02 v6] 벽이 만나는 자리의 모서리 선을 지운다(디자이너 "벽이 겹치는 라인은 안 보이게").
+   *
+   * 벽은 덩이마다 따로 모서리 선(EdgesGeometry)을 뽑는다. 두 벽이 T · ㄱ 자로 맞닿으면
+   * 한쪽 벽의 끝 모서리가 다른 벽 면 위에 그대로 남아 세로줄 두 가닥 · 윗면 짧은 줄로 보였다.
+   *
+   * 선마다 가운데에서 선과 수직인 네 방향(대각선)으로 살짝 비켜 찍어 벽 속인지 본다.
+   *   1 곳만 벽 속   바깥 모서리 — 남긴다
+   *   2 곳 맞붙어    이어진 한 면 위의 선(겹친 벽의 끝 모서리) — 지운다
+   *   2 곳 엇갈려    두 벽이 모서리끼리 닿은 자리 — 남긴다
+   *   3 · 4 곳       벽이 맞닿아 꺾이는 안쪽 / 벽 속에 묻힌 선 — 지운다
+   * 벽 속 판정은 광선 여섯 줄: 처음 맞는 면이 뒷면이면 속이다(덩이가 겹쳐도 맞는다 — 짝수 세기는 겹치면 틀린다).
+   * 같은 층의 벽끼리만 본다. 읽을 때 한 번만 한다.
+   */
+  function hideWallJoins() {
+    var walls = meshes.filter(function (m) { return m.key === "wall"; });
+    if (walls.length < 2) { return; }
+    var ray = new THREE.Raycaster();
+    var DIRS = [[1, 0.013, 0.021], [-1, 0.017, -0.011], [0.019, 1, 0.012], [-0.014, -1, 0.018], [0.011, 0.016, 1], [-0.021, 0.012, -1]]
+      .map(function (d) { return new THREE.Vector3(d[0], d[1], d[2]).normalize(); });
+    var EPS = 0.12;
+    var byFloor = {};
+    walls.forEach(function (w) { (byFloor[w.floor] = byFloor[w.floor] || []).push(w); w.mat.side = THREE.DoubleSide; });
+    var nrm = new THREE.Vector3();
+    function inside(pt, list) {
+      for (var i = 0; i < DIRS.length; i += 1) {
+        ray.set(pt, DIRS[i]);
+        var hit = ray.intersectObjects(list, false)[0];
+        if (hit && hit.face) {
+          nrm.copy(hit.face.normal);
+          if (nrm.dot(DIRS[i]) > 0) { return true; }
+        }
+      }
+      return false;
+    }
+    var a = new THREE.Vector3(), b = new THREE.Vector3(), mid = new THREE.Vector3(), d = new THREE.Vector3(),
+      u = new THREE.Vector3(), v = new THREE.Vector3(), pt = new THREE.Vector3(), UP = new THREE.Vector3(0, 1, 0), AX = new THREE.Vector3(1, 0, 0);
+    Object.keys(byFloor).forEach(function (fid) {
+      var group = byFloor[fid], list = group.map(function (w) { return w.mesh; });
+      list.forEach(function (m) { m.updateMatrixWorld(true); });
+      group.forEach(function (w) {
+        var lines = w.mesh.children.filter(function (c) { return c.isLineSegments; })[0];
+        if (!lines) { return; }
+        var pos = lines.geometry.getAttribute("position"), keep = [], dropped = 0;
+        for (var i = 0; i < pos.count; i += 2) {
+          a.fromBufferAttribute(pos, i); b.fromBufferAttribute(pos, i + 1);
+          mid.addVectors(a, b).multiplyScalar(0.5);
+          d.subVectors(b, a).normalize();
+          u.crossVectors(d, Math.abs(d.y) > 0.9 ? AX : UP).normalize();
+          v.crossVectors(d, u).normalize();
+          var inn = [[1, 1], [1, -1], [-1, -1], [-1, 1]].map(function (q) {
+            pt.copy(mid).addScaledVector(u, q[0] * EPS).addScaledVector(v, q[1] * EPS);
+            return inside(pt, list);
+          });
+          var n = inn.filter(Boolean).length;
+          var adj2 = n === 2 && (inn[0] === inn[1] || inn[1] === inn[2]);
+          if (n >= 3 || adj2) { dropped += 1; continue; }
+          keep.push(a.x, a.y, a.z, b.x, b.y, b.z);
+        }
+        if (dropped) { lines.geometry.setAttribute("position", new THREE.Float32BufferAttribute(keep, 3)); }
+      });
+    });
+    walls.forEach(function (w) { w.mat.side = THREE.FrontSide; });
   }
 
   /* ---------- 설비 고르기 ----------
