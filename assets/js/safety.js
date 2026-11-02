@@ -319,11 +319,13 @@
   let mapF = {}, mapT = null;
   // 지금 지점: 여러 층 미션은 순회 순서(층 순, 번호 순)의 마지막 측정 지점
   const nowOf = i => { const m = M[i], ed = eData(i); if(m.done >= m.total) return ''; if(!m.fls) return ed.now; const ms = ed.sp.filter(p => !p[3]).map(p => p[0]).sort(); return ms[ms.length - 1] || ''; };
-  // [11/02 v6] 위에서 본 로봇(머리 +x) — 그림자 · 다리 넷 · 몸통 · 머리 · 가는 방향 꺾쇠. 큰 지도(rich)에서 화살표 대신
-  const ROBOT_TOP = '<ellipse class="rsh" cx="1" cy="2.5" rx="13" ry="9" filter="url(#m2bl)"/>'
-    + '<rect class="rlg" x="-9" y="-9.5" width="4" height="4" rx="1.4"/><rect class="rlg" x="3" y="-9.5" width="4" height="4" rx="1.4"/><rect class="rlg" x="-9" y="5.5" width="4" height="4" rx="1.4"/><rect class="rlg" x="3" y="5.5" width="4" height="4" rx="1.4"/>'
-    + '<rect class="rbd" x="-11" y="-6.5" width="19" height="13" rx="4.5"/><rect class="rhd" x="7" y="-4" width="6" height="8" rx="2.5"/>'
-    + '<path class="rch" d="M-4.5-3.2 0.5 0-4.5 3.2" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>';
+  /*
+   * [11/02 v6] 큰 지도(rich)의 로봇 = 관제 지도 3D 로봇(robot-spot.js)을 위에서 렌더한 그림(디자이너 "3D 탑뷰로").
+   *   assets/img/safety/robot-top-spot.png · robot-top-wheel.png — 코가 위(-y). 지도에서는 가는 방향(+x)으로 90° 돌린다.
+   *   휠 로봇은 Robot 05(모베드). 바닥 그림자는 지도에서 따로 깐다.
+   */
+  const robotTop = (m, u) => { const kind = /Robot 05/.test(m.robot) ? 'wheel' : 'spot', S = +u(30), h = (S / 2).toFixed(1);
+    return `<ellipse class="rsh" cx="${u(1)}" cy="${u(1.5)}" rx="${u(13)}" ry="${u(8)}" filter="url(#m2bl)"/><image href="../assets/img/safety/robot-top-${kind}.png" x="-${h}" y="-${h}" width="${S}" height="${S}" transform="rotate(90)"/>`; };
   // 한 층 그림. big = 크게 보기(벽, 계단, 지점 번호, 방 이름까지)
   function svg2(i, ab, big, w, sel, lk){
     const m = M[i], ed = eData(i), sp = ed.sp, rows = ed.rows, pf = PLANOF[ab] || 'B4', P = PLAN2[pf];
@@ -345,7 +347,7 @@
      *   1 바닥 층위   로봇이 다니는 길(순회 경로 전체)을 넓은 한 단 밝은 면으로 깔고(도로), 설비는 그 위 덩이, 벽은 옅은 선
      *   2 경로 테      지나온 길 아래 어두운 테(casing)를 둘러 바닥 위에 뜨게 · 끝은 둥글게
      *   3 사진 말풍선  자세히 보기의 그 지점에 영상 확인 사진 썸네일 — 누르면 영상 카드로
-     *   4 로봇         화살표 대신 위에서 본 로봇 + 옅은 그림자, 가는 방향으로 돈다
+     *   4 로봇         화살표 대신 3D 로봇 탑뷰 그림(robotTop) + 옅은 그림자, 가는 방향으로 돈다
      * 목록의 작은 지도(썸네일)는 그대로 — 작아서 층위가 뭉갠다.
      */
     const rich = V6 && !big && (w || 220) >= 200;
@@ -373,7 +375,7 @@
       g += `<g class="wpm" data-w="${w}" data-ks="${ksOf(w)}" transform="translate(${q.x.toFixed(1)},${q.y.toFixed(1)})"><title>${w}, ${s2==='plan' ? '예정' : WORD[s2]}</title><circle r="${u(9)}" fill="transparent"/><circle class="hlr" r="${u(8)}" fill="none" stroke-width="${u(2.4)}"/>${sel && sel !== w ? `<text class="wpn hlr" x="${q.x > 420 ? -u(10) : u(10)}" text-anchor="${q.x > 420 ? 'end' : 'start'}" y="${u(4)}" font-size="${u(12)}" font-weight="800" stroke-width="${u(3)}">${w}</text>` : ''}${mk}${nm}</g>`; });
     if(sR !== null){ const q = pos2(L, sR);
       g += rich
-        ? `<g class="rbx" transform="translate(${q.x.toFixed(1)},${q.y.toFixed(1)}) rotate(${(q.ang * 180 / Math.PI).toFixed(1)}) scale(${(px * .78).toFixed(3)})"><title>${m.robot} 이동 중</title>${ROBOT_TOP}</g>`
+        ? `<g class="rbx" transform="translate(${q.x.toFixed(1)},${q.y.toFixed(1)}) rotate(${(q.ang * 180 / Math.PI).toFixed(1)})"><title>${m.robot} 이동 중</title>${robotTop(m, u)}</g>`
         : `<g transform="translate(${q.x.toFixed(1)},${q.y.toFixed(1)}) rotate(${(q.ang * 180 / Math.PI).toFixed(1)}) scale(${(px * (big ? 1 : .62)).toFixed(3)})"><title>${m.robot} 이동 중</title><path class="rbt" d="M10 0-7.5 8.5-3.6 0-7.5-8.5Z" stroke-width="1.6" stroke-linejoin="round"/></g>`; }
     // 사진 말풍선 — 자세히 보기에서 고른 지점(sel) 옆. 판 가운데 쪽으로 펴서 가장자리에 잘리지 않게
     if(rich && sel && dt && dt.mi===i){ const j = list.findIndex(p => p[0]===sel);
