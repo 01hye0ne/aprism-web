@@ -735,3 +735,20 @@ body.ver-6 .bld-sum.has-cards { left: 0; bottom: 0; right: calc(44px + var(--spa
 body.ver-6 .bld-mcards { padding-bottom: 0; }
 /* [11/02 v6] 층 펼침 요약의 층 이름("지하 3층")은 뺀다 — 층 선택(B3 켜짐) · Delta 첫 마디가 이미 말한다(디자이너) */
 body.ver-6 .bld-sum.has-cards .bld-sum-label { display: none; }
+/*
+ * [11/02 v6 2차] 미션 카드 → 한 줄 칩. 미니맵은 칩에 올리거나(hover) 키보드로 고르면(focus) 칩 바로 위에 뜬다.
+ *   칩: 높이 32 · bg/cell · radius pill 아닌 card(카드와 같은 모서리). 미니맵 판: 칩 폭 · bg/raised + 그림자 · 아래 8 띄움.
+ */
+body.ver-6 .bld-mcards { overflow: visible; flex-wrap: wrap; gap: var(--space-8); }
+body.ver-6 .bld-mcard { position: relative; width: auto; padding: 0; overflow: visible; }
+body.ver-6 .bld-mcard-head { min-height: 32px; padding: var(--space-4) var(--space-12); gap: var(--space-8); }
+body.ver-6 .bld-mcard-name { font-size: var(--font-size-13); line-height: var(--font-line-height-20); }
+body.ver-6 .bld-mcard-map {
+  position: absolute; left: 0; bottom: calc(100% + var(--space-8)); z-index: 5;
+  width: 246px; padding: var(--space-4); border-radius: var(--radius-card);
+  background-color: var(--bg-raised); box-shadow: 0 8px 24px rgb(0 0 0 / 45%);
+  opacity: 0; transform: translateY(4px); pointer-events: none; transition: opacity 140ms ease, transform 140ms ease;
+}
+body.ver-6 .bld-mcard-map .mini-plan { border-radius: var(--radius-4, 4px); background-color: var(--bg-map-chip); }
+body.ver-6 .bld-mcard:hover .bld-mcard-map, body.ver-6 .bld-mcard:focus-visible .bld-mcard-map { opacity: 1; transform: none; }
+:root[data-theme="light"] body.ver-6 .bld-mcard-map { box-shadow: 0 8px 24px rgb(16 24 40 / 18%); }
