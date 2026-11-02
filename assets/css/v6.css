@@ -773,3 +773,5 @@ body.ver-6 .sf .dl { view-transition-name: dx-act; }
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
 }
+/* [11/02 v6] 알림 목록 어디서 줄 끝 측정 채널(· CH1) — 지점 이름과 같은 흐린 글 */
+body.ver-6 .ah-where .ah-ch { margin-left: var(--space-4); color: var(--text-tertiary); white-space: nowrap; }

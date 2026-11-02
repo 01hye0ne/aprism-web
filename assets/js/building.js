@@ -332,13 +332,15 @@
     // 무슨 일(위험도 + 알림명 + 시각)이 첫 줄, 어디서(층 · 웨이포인트)가 둘째 줄 — 메인 v2.2 와 같다(10/19).
     var title = el("span", "ah-title t-label-2");
     title.appendChild(icon(a.sev === "critical" ? "error" : "warning"));
-    title.appendChild(el("span", null, a.title));
+    var A6 = V6 && window.APRISM_ALERT6, r6 = A6 && A6.of(a.title);
+    title.appendChild(el("span", null, A6 ? A6.title(a.title) : a.title));   // [11/02 v6] 제목 = 감지 · 측정 항목 + 값(alert-text-v6.js)
     title.appendChild(el("span", "ah-time t-caption num", a.time));
 
     var where = el("span", "ah-where t-caption");
     where.appendChild(el("span", "floor-tag num", a.floor));   // 층 꼬리표는 웨이포인트 이름 앞(10/19)
     var wp = /WP-\d+.*$/.exec(a.where);   // 위치는 웨이포인트만(10/19, 메인 v2.2 와 같다)
     where.appendChild(el("span", "ah-wp", wp ? wp[0] : a.where));
+    if (r6 && r6.ch) { where.appendChild(el("span", "ah-ch", "· " + r6.ch)); }
 
     // 어느 층 · 미션의 알림인지 — 미션을 고르기 전 화면이라 이 줄이 하나 더 붙는다.
     // 미션 줄은 글자 칩 대신 회색 아이콘으로 표시한다 — 칩은 값(층) 자리라서(10/19).

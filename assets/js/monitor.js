@@ -521,7 +521,9 @@
     // 화면의 Label/1(14/800)이 목록마다 깔려 "다 중요해 보이는" 것을 푸는 쪽이다.
     var title = el("span", "ah-title t-label-2");
     title.appendChild(icon(a.sev === "critical" ? "error" : "warning"));
-    title.appendChild(el("span", null, a.title));
+    var A6 = body.classList.contains("ver-6") && window.APRISM_ALERT6, r6 = A6 && A6.of(a.title);
+    title.appendChild(el("span", null, A6 ? A6.title(a.title) : a.title));   // [11/02 v6] 제목 = 감지 · 측정 항목 + 값(alert-text-v6.js)
+    if (r6 && r6.ch) { where.appendChild(el("span", "ah-ch", "· " + r6.ch)); }   // 측정 채널은 어디서 줄 끝으로
 
     if (scoped) {
       // v2.2 — 무슨 일(위험도 + 알림명)이 첫 줄, 어디서가 둘째 줄(10/19 디자이너). 타임라인 · 오늘 확인 완료처럼 이름이 먼저다.
@@ -885,6 +887,7 @@
     };
     var LAB6 = { "누출감지": "누출 확률", "온도감지": "최고 온도", "이상음향": "이상 점수", "부분방전": "이상 점수" };
     function maResult(a) {
+      var r6 = window.APRISM_ALERT6 && window.APRISM_ALERT6.of(a.title); if (r6) { return [r6.label, r6.value]; }   // [11/02] 목록과 같은 표(alert-text-v6.js)
       if (RES6[a.title]) { return RES6[a.title]; }
       var tail = String(a.title || "").split(" · ").slice(1).join(" · ");
       // 값은 마지막 숫자(+단위) — "CH1 이상 점수 9.05" · "냉각 펌프 P-2 48.6℃" 처럼 앞에 이름 속 숫자가 있다
@@ -905,7 +908,8 @@
       if (kind && body.classList.contains("ver-6")) {
         // [11/02 v6] 안전진단 상세와 같은 글 — 배지 옆 감지 이름, 제목은 "측정 항목 + 값(단계색)"
         var rs = maResult(a);
-        kind.textContent = a.detect || "";
+        var r6k = window.APRISM_ALERT6 && window.APRISM_ALERT6.of(a.title);
+        kind.textContent = (r6k && r6k.detect) || a.detect || "";
         if (rs) {
           title.textContent = "";
           title.appendChild(document.createTextNode(rs[0] + " "));
