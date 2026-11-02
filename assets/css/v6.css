@@ -329,3 +329,5 @@ body.ver-6 .robot-strip.is-carousel .robot-2d.is-mobed { margin-left: 0; positio
 /* [10/30] 가장자리 핀 머리 비키기(map-v6.js rrPinEdge) — --hx 만큼 옆으로, is-low 면 막대를 감추고 머리를 바닥 점 아래로 */
 body.ver-6 .rr-pin-head { left: calc(-10px * var(--pz, 1) + var(--hx, 0px)); }
 body.ver-6 .rr-pin.is-low::before { display: none; }
+/* [10/30] 안전진단 자세히 보기의 상단 경로 끝 감지 이름(› 안전감지) — 상단이 탭이 된 뒤로 탭 줄 옆에 글자만 떠 보였다. 본문 감지 탭이 같은 것을 말해 숨긴다 */
+body.ver-6 .status-bar-left .sf-crumb-k { display: none; }
