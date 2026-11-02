@@ -1279,6 +1279,7 @@
 
     // 로봇 · 알림 자리를 열린 바닥으로 옮긴다(벽 · 설비 안에 박히지 않게).
     seat();
+    if (V6) { make3dBots(); }
     layout(true);
     ready = true;
     loading.remove();
@@ -1540,6 +1541,61 @@
     node.classList.toggle("is-gone", op <= 0.5);   // 비켜 사라진 층의 표식 — 안의 누를 것(말풍선)도 같이 끈다
   }
 
+  /*
+   * [11/02 v6] 로봇 = 관제와 같은 3D 모델(robot-spot.js — SPOT · 휠 로봇 Robot 05)(디자이너).
+   *   화면에서 로봇이 충분히 클 때(층 하나를 펼쳤거나 1.25배 넘게 확대 — BOT_MIN_ZOOM)만 모델, 쌓인 전체 보기 그대로는 예전 점.
+   *   발밑 고리 = 상태색(수행중 파랑 · 대기 · 완료 회색 · 끊김 빨강) — 점이 하던 상태 말하기를 이어받는다. 번호표는 그대로.
+   *   움직임 — 복귀 중(moving) 걷기 · 수행중 서서 측정 · 완료 · 충전(도크) 앉기 · 대기 · 끊김 서기. 층(holder)에 달아 층과 함께 움직이고 비켜 사라진다.
+   */
+  var BOT_LEN = 4.5, BOT_MIN_ZOOM = 1.25, botT = 0;
+  var BOT_RING = { run: 0x3B82F6, idle: 0x9EA8BB, done: 0x9EA8BB, off: 0xFF383C };
+  function make3dBots() {
+    if (!window.APRISM_SPOT) { return; }
+    var ray3 = new THREE.Raycaster(), down = new THREE.Vector3(0, -1, 0);
+    // 로봇은 설비 · 벽에 가려지지 않는다(관제 지도와 같은 "로봇은 늘 맨 위") — 건물을 다 그린 뒤 깊이만 지우고(clearDepth) 로봇을 그린다.
+    // 보이지 않는 작은 판 하나가 그 순서를 잡는다: 로봇(renderOrder 1001~)보다 먼저(1000) 그려지며 깊이를 지운다.
+    var clr = new THREE.Mesh(new THREE.PlaneGeometry(0.001, 0.001), new THREE.MeshBasicMaterial({ colorWrite: false, depthWrite: false }));
+    clr.renderOrder = 1000; clr.frustumCulled = false; clr.raycast = function () {};
+    clr.onBeforeRender = function (rr) { rr.clearDepth(); };
+    scene.add(clr);
+    ROBOTS.forEach(function (r) {
+      var s = F[r.floor]; if (!s) { return; }
+      var kind = r.n === 5 ? "wheel" : "spot";
+      var bot = window.APRISM_SPOT(THREE, kind);
+      bot.group.scale.setScalar(BOT_LEN / 0.85);
+      var g = new THREE.Group();
+      var ring = new THREE.Mesh(new THREE.RingGeometry(BOT_LEN * 0.5, BOT_LEN * 0.62, 40).rotateX(-Math.PI / 2),
+        new THREE.MeshBasicMaterial({ color: BOT_RING[r.st] || 0x9EA8BB, transparent: true, opacity: 0.85, depthWrite: false }));
+      ring.renderOrder = 4; ring.raycast = function () {};
+      g.add(ring); g.add(bot.group);
+      g.traverse(function (o) { o.raycast = function () {}; if (o.isMesh) { o.renderOrder = o === ring ? 1001 : 1002; } });
+      // 바닥 윗면 높이 — 위에서 내려 쏴 처음 맞는 바닥판(층이 아직 제자리 0 일 때 잰다)
+      var p = surf(r.floor, r.uv, 500); ray3.set(p, down);
+      var hit = ray3.intersectObjects(s.meshes.filter(function (m) { return m.userData.kind === "floor"; }), false)[0];
+      r.botY = hit ? hit.point.y + 0.05 : 0.3;
+      // 가는 쪽(긴 변 v 방향)을 본다 — 모델 코는 로컬 -z
+      r.botYaw = s.size.z >= s.size.x ? Math.PI : -Math.PI / 2;
+      bot.group.rotation.y = r.botYaw;
+      s.holder.add(g);
+      r.bot = bot; r.botG = g; r.botRing = ring;
+    });
+  }
+  function place3dBots() {
+    var now = performance.now(), dt = botT ? Math.min(0.1, (now - botT) / 1000) : 0; botT = now;
+    // 크게 보일 때만 — 층 하나를 펼쳤거나(배율 1.5) 쌓인 전체 보기를 1.25배 넘게 확대했을 때. 쌓인 그대로(1)는 점
+    var big = cam.zoom * cam.user >= BOT_MIN_ZOOM;
+    ROBOTS.forEach(function (r) {
+      if (!r.bot) { return; }
+      var s = F[r.floor], show = big && s.op > 0.5;
+      r.botG.visible = show;
+      if (r.node) { r.node.classList.toggle("is-3d", show); }
+      if (!show) { return; }
+      var w = surf(r.floor, r.uv, 0);
+      r.botG.position.set(w.x, r.botY, w.z);
+      r.bot.update(dt, r.moving && !reduce ? "walk" : (r.st === "done" || r.dock) ? "sit" : "idle");
+    });
+  }
+
   function placeLabels() {
     if (!ready) { return; }
     // 표식 층은 지도 칸 안에 있다 — 창(.map-view) 기준 좌표에서 칸의 자리만큼 뺀다.
@@ -1559,6 +1615,7 @@
       if (r.moving && !reduce) { r.uv[1] = Math.min(0.86, r.uv[1] + 0.00003); }
       put(r.node, surf(r.floor, r.uv, F[r.floor].size.y * 0.15 + 1), F[r.floor].op);
     });
+    if (V6) { place3dBots(); }
   }
 
   /* ---------- 손 ---------- */
