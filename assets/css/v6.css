@@ -321,3 +321,8 @@ body.ver-6 .sf .ewrap .mx td, body.ver-6 .sf .mtbw .mtb td { border-bottom-color
 body.ver-6 .sf .ewrap .mx th.c-m { background-color: var(--bg-page); }
 /* [10/30] 관제 우측 로봇 카드 — 모베드(Robot 05)는 왼쪽 바퀴가 그림 틀(viewBox x 27) 밖으로 나가는데, 4족 기준으로 왼쪽에 당겨 둔 자리라 카드 왼 끝에서 잘렸다. 모베드만 12 오른쪽으로 */
 body.ver-6 .robot-strip.is-carousel .robot-2d.is-mobed { margin-left: calc(15.07 * 100cqw / 336 - 24px + 12px); }
+/* [10/30] 탭 높이 40 → 44 — 탭 윗선(16)을 오른쪽 칩(높이 28, 가운데)의 윗선과 맞춘다(디자이너). 바닥은 그대로 아래 판에 붙는다 */
+body.ver-6 .sb-tab { height: 44px; }
+/* [10/30] 모베드(휠 로봇)는 그림 칸 가운데로(디자이너) — 4족처럼 왼쪽에 당기지 않는다. 위의 +12 보정을 대신한다 */
+body.ver-6 .robot-strip.is-carousel .robot-thumb:has(.robot-2d.is-mobed) { justify-content: center; }
+body.ver-6 .robot-strip.is-carousel .robot-2d.is-mobed { margin-left: 0; position: relative; left: 5px; }   /* 그림 틀 안 모베드가 왼쪽으로 치우쳐 5 보정 — 카드 왼 끝 ~ 정보 칸 사이 가운데 */
