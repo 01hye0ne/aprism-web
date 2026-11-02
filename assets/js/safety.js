@@ -63,7 +63,7 @@
   /*
    * [10/30 v6] 위험 · 주의는 관제 알림 기준(디자이너) — 미션 판정을 관제 최신 알림(monitor.js WARNINGS · R01_MORE · ROUTE_ALERTS)과 1:1 로.
    *   정기 순회 점검은 이미 같다. 전기실 열화상 점검 = 계기인식 위험(WP-02 HEPA 차압) · 주의(WP-04 N₂ 압력) 두 건, 나머지 정상.
-   *   발전기실 설비 점검 = 주의 넷 중 감지 6종에 드는 셋(부분방전 WP-06 · 온도 WP-02 · 계기 WP-13). 진동감지(WP-12)는 6종에 없어 카드가 없다.
+   *   발전기실 설비 점검 = 주의 넷(부분방전 WP-06 · 온도 WP-02 · 계기 WP-13 · 이상음향 WP-12 — 관제의 "진동 상승"을 6종의 이상음향으로 바꿨다).
    *   완료한 미션 셋(야간 순회 · 공조 설비 순회 · 유틸리티 순회 — 관제 탭과 같은 여섯)도 넣는다. 알림이 없어 모두 정상 범위.
    *   v5 화면은 그대로다.
    */
@@ -74,7 +74,8 @@
     BASE[1].rs = {'계기인식':[['crit','차압 312 Pa','WP-02 HEPA Filter 차압계','09:44'], ['warn','압력 0.62 MPa','WP-04 N₂ 배관 압력계','10:15']]};
     BASE[2].na = {'안전감지':'scope'};
     BASE[2].r = {'안전감지':null, '누출감지':ok(4), '온도감지':['warn','최고 68.4 ℃','WP-02 발전기 베어링','10:03'], '계기인식':['warn','압력 7.9 bar','WP-13 공기 압축기 C-1','10:01'],
-      '이상음향':ok(4), '부분방전':['warn','이상 점수 9.41','WP-06 수배전반','10:09']};
+      '이상음향':['warn','이상 점수 21.6','WP-12 냉각 펌프 P-2','10:06'], '부분방전':['warn','이상 점수 9.41','WP-06 수배전반','10:09']};   // 이상음향 = 관제 "진동 상승"을 6종으로 옮긴 것(10/30)
+    MV['2|이상음향|warn'] = 'm2_sound_warn.jpg';
     LINKS[2] = [['부분방전', '온도감지', '같은 발전기 계통. WP-06 수배전반 방전과 WP-02 베어링 과열이 함께 나타날 수 있다', '보통']];
     BASE.push(
       {mis:'야간 순회 점검', fl:'지하 4층', ab:'B4', robot:'Robot 04', done:20, total:20, r:{'안전감지':ok(4),'누출감지':ok(5),'온도감지':ok(6),'계기인식':ok(4),'이상음향':ok(5),'부분방전':ok(3)}},
@@ -177,9 +178,9 @@
   const OKV = {'안전감지':'0명','누출감지':'9%','온도감지':'31.0','계기인식':'0.71','이상음향':'7.9','부분방전':'6.4'};
   const MEMO = {'1|온도감지':'10:15 새로 넘음, 직전 순회보다 +18.9 ℃','1|계기인식':'PG-A3 상한 초과, 계기 점검 필요','1|부분방전':'CH1만 주의, 같은 전기 계통 변압기 과열','2|누출감지':'지하 3층 순회 끝, 13:00 전까지 다시 못 잼. CCTV 사각 구간','2|온도감지':'지하 3층에서 측정, 평소보다 +6.3 ℃'};
   if(V6){   // [10/30 v6] 관제 알림 값 — 표 칸 짧은 값 · 메모
-    Object.assign(SHORT, {'차압 312 Pa':'312', '압력 0.62 MPa':'0.62', '최고 68.4 ℃':'68.4', '압력 7.9 bar':'7.9', '이상 점수 9.41':'9.41'});
+    Object.assign(SHORT, {'이상 점수 21.6':'21.6', '차압 312 Pa':'312', '압력 0.62 MPa':'0.62', '최고 68.4 ℃':'68.4', '압력 7.9 bar':'7.9', '이상 점수 9.41':'9.41'});
     Object.assign(MEMO, {'1|계기인식':'HEPA 필터 차압이 교체 기준을 넘음, 최근 3회 잇달아 오름. WP-04 N₂ 압력도 정상 범위 아래',
-      '2|온도감지':'베어링 표면 68.4 ℃, 주변보다 31 ℃ 높음', '2|계기인식':'토출 압력이 정상 범위(8.2 ~ 8.8) 아래, 흡입 필터 막힘 가능성', '2|부분방전':'PRPD 패턴이 코로나 방전 유형과 같음'});
+      '2|온도감지':'베어링 표면 68.4 ℃, 주변보다 31 ℃ 높음', '2|계기인식':'토출 압력이 정상 범위(8.2 ~ 8.8) 아래, 흡입 필터 막힘 가능성', '2|부분방전':'PRPD 패턴이 코로나 방전 유형과 같음', '2|이상음향':'저주파 대역 에너지 증가, 베어링 마모 패턴과 비슷'});
   }
   function eData(i){
     if(i===0){ const m = M[0];
@@ -360,7 +361,9 @@
     const its = itemsOf(i, k), dn = its.filter(it => it[4] && it !== its[0]);
     const extra = dn.length ? `<span class="req">${dn.map(wpOf).join(', ')} ${dn[0][4]} 현장 조치 요청됨</span>` : '';
     const html = cardC(k, [x[0], x[1], x[2], x[3], x[4]], extra, i);
-    return its.length > 1 ? html.replace(`<span class="nm">${k}</span>`, `<span class="nm">${k} ${its.length}개</span>`) : html;
+    // [10/30 v6] 단계가 섞이면 "위험 1 외 1곳" — 배지 숫자는 그 단계 수만, 나머지는 곳 수로(예전 "위험 2"는 위험이 둘로 읽혔다). ·뒤 = 같은 단계 수
+    const same = its.filter(it => it[0]===x[0]).length;
+    return its.length > 1 ? html.replace(`<span class="nm">${k}</span>`, `<span class="nm">${k} ${its.length}개${V6 ? '·' + same : ''}</span>`) : html;
   }
   function init(){ M = JSON.parse(JSON.stringify(BASE)); scope = 0; menu = false; fired = false; toasts = []; drawer = null; newSeen = true; M.forEach(sync); }
   init();
@@ -398,9 +401,10 @@
   // [10/30 GUI · Figma 1494:14581] 카드 꼴 — 미션 전체 · 미션 하나 같은 꼴(.cx). 건수는 단계 배지 안으로(위험 2), 위치 · 시각 두 줄, 현장 조치 요청은 시각 줄 오른쪽.
   // named: 감지 이름 줄을 남긴다(미션 하나 — 감지 열 머리가 없다). 미션 전체는 머리 줄이 감지 이름을 말해 뺀다
   function cardX(h, k, named){
-    let c = h.replace(/<span class="nm">([^<]*)<\/span>(<span class="pl ([a-z]+)">([^<]*)<\/span>)?/, (a, t, pl, st, w) => { const n = (t.match(/(\d+)개/) || [])[1];
+    let c = h.replace(/<span class="nm">([^<]*)<\/span>(<span class="pl ([a-z]+)">([^<]*)<\/span>)?/, (a, t, pl, st, w) => { const mm = t.match(/(\d+)개(?:·(\d+))?/) || [], n = mm[1], sm = mm[2];
+      const cnt = sm && +sm < +n ? ' ' + sm + ' 외 ' + (n - sm) + '곳' : n ? ' ' + n : '';   // v6 — 단계가 섞이면 "위험 1 외 1곳"
       // [10/30] 정상 카드는 배지를 뺀다 — 큰 제목이 같은 말(정상 범위)을 한다. 주의 · 위험 · 대상 아님 · 센서 없음은 그대로
-      return '<span class="nm"></span>' + (pl && st !== 'ok' ? `<span class="pl ${st}">${w}${n ? ' ' + n : ''}</span>` : ''); });
+      return '<span class="nm"></span>' + (pl && st !== 'ok' ? `<span class="pl ${st}">${w}${cnt}</span>` : ''); });
     if(named) c = c.replace('</div>', `</div><span class="knm">${k}</span>`);   // 첫 </div> = 배지 줄 끝
     return c.replace(/<span class="sm">([^<]*), (\d\d:\d\d)<\/span>/, '<span class="mt lc">$1</span><span class="mt tm">$2</span>')
       .replace(/<span class="mt tm">([^<]*)<\/span>(<span class="req">[^<]*<\/span>)?/, (q, t, r) => `<span class="mt trow"><span class="tm">${t}</span>${r || ''}</span>`);

@@ -128,6 +128,8 @@
     // 층은 알림이 난 웨이포인트의 층이다(로봇이 지금 선 층이 아니다 — 메인 v2.2 monitor.js 와 같다).
     a.mission = robotNo(a.robot).mission;
   });
+  // [10/30 v6] WP-12 진동 상승 → 이상음향(관제 monitor.js · 안전진단과 같다)
+  if (body.classList.contains("ver-6")) { ALERTS.forEach(function (al) { if (al.title === "진동 상승 · 냉각 펌프 P-2") { al.title = "이상음향 · 이상 점수 21.6"; } }); }
 
   var DONE = [
     { time: "10:29:10", title: "온도감지 · WP-03 펌프 하우징", how: "추이 관찰 · 다음 순회 재측정", who: "김현대" },
