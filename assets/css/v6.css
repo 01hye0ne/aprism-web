@@ -790,3 +790,9 @@ body.ver-6 .map-alert .ma-memo-row #ma-memo-label { font-size: var(--font-size-1
  *   옆 카드의 시각 줄(18 + 간격 4) 만큼 비워 사진 · 배지 · 제목 줄을 맞춘다.
  */
 body.ver-6 .sf .g6.cx .kd.na > .sm { margin-bottom: calc(var(--font-line-height-18) + var(--space-4)); }
+
+/*
+ * [11/02 v6] 상단 미션 탭 안 여백 16 → 12 — 탭 상자는 아래 면 왼쪽 변(76)에서 시작하는데 글자만 92 에서 시작해,
+ *   아래 패널 글(관제 · 최신 알림 = 면 + 12 = 88)과 4 어긋났다. 탭 글을 패널 글 세로선에 맞춘다.
+ */
+body.ver-6 .sb-tab { padding: 0 var(--space-12); }
