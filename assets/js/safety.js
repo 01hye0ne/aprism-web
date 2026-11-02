@@ -122,7 +122,10 @@
     const SG = (mi===0 && SUG0[k]) || SUG[k];
     const prevAct = (SG ? SG[1][0][0] : '현장 조치').replace(/ 요청$/, '') + ' 요청';
     const nowAct = !isHit ? (st==='plan' ? '' : '조치 없음') : st==='done' ? (x[4] || '10:17') + ' 현장 조치 요청됨' : '';
-    const hist = !isHit ? [['10/22 09:00','정상 범위','ok','조치 없음'],['10/22 14:00','정상 범위','ok','조치 없음'],['10/23 09:00','정상 범위','ok','조치 없음'],['오늘 ' + (x[3] || ''), st==='plan' ? '측정 전' : x[1], st, nowAct]] : [['10/22 09:00','정상 범위','ok','조치 없음'],['10/22 14:00','정상 범위','ok','조치 없음'],['10/23 09:00', st==='warn' ? '주의' : '정상 범위', st==='warn' ? 'warn' : 'ok', st==='warn' ? '09:14 ' + prevAct : '조치 없음'],['오늘 ' + x[3], SHORT[x[1]] || x[1], st, nowAct]];
+    // [11/02 v6] 지난 순회 날짜 — 상태바 시계(2026-08-26)보다 앞(예전 10/22 · 10/23 은 오늘보다 뒤였다)
+    const D6 = V6 ? ['08/24','08/24','08/25'] : ['10/22','10/22','10/23'];
+    const hist0 = !isHit ? [['10/22 09:00','정상 범위','ok','조치 없음'],['10/22 14:00','정상 범위','ok','조치 없음'],['10/23 09:00','정상 범위','ok','조치 없음'],['오늘 ' + (x[3] || ''), st==='plan' ? '측정 전' : x[1], st, nowAct]] : [['10/22 09:00','정상 범위','ok','조치 없음'],['10/22 14:00','정상 범위','ok','조치 없음'],['10/23 09:00', st==='warn' ? '주의' : '정상 범위', st==='warn' ? 'warn' : 'ok', st==='warn' ? '09:14 ' + prevAct : '조치 없음'],['오늘 ' + x[3], SHORT[x[1]] || x[1], st, nowAct]];
+    const hist = hist0.map((h, n) => n < 3 ? [h[0].replace(/^\d\d\/\d\d/, D6[n])].concat(h.slice(1)) : h);
     const again = '';
     /*
      * [10/30 v6] 재발 여부 — 지난 3회가 모두 정상이면(처음 넘음 · 정상) 한 줄 요약 + 오늘 줄, 지난 기록은 접는다.
@@ -546,6 +549,19 @@
   const hits = i => K.reduce((a, k) => a + itemsOf(i, k).filter(isOpen).length, 0);
   const worst = i => K.reduce((a, k) => { const x = M[i].r[k]; return x && RANK[x[0]] > RANK[a] ? x[0] : a; }, 'ok');
   const worstAll = () => M.reduce((a, m, i) => RANK[worst(i)] > RANK[a] ? worst(i) : a, 'ok');
+  /*
+   * [11/02 v6] 판정 결과 글 — 카드 · 상세 · 관제 알림이 같은 규칙("측정 항목 + 값", 세부 묘사는 따로). 상세(detail)와 같은 셈.
+   *   돌려줌 [항목, 값, 세부 묘사] — 값이 없으면 null
+   */
+  const MLAB6 = {'누출감지':'누출 확률','온도감지':'최고 온도','이상음향':'이상 점수','부분방전':'이상 점수'};
+  function res6(k, x){
+    if(!x || !x[1] || x[0]==='ok' || x[0]==='plan') return null;
+    const cd = COND[k], num = parseFloat(SHORT[x[1]] || x[1]), numU = (x[1] || '').match(/(-?\d+(?:\.\d+)?)\s*(℃|%|MPa|kPa|Pa|bar|명|곳|건)?/);
+    const val = cd && !isNaN(num) ? `${num}${cd[4]==='%' ? '%' : cd[4]}` : k==='계기인식' && numU ? numU[1] + (numU[2] ? ' ' + numU[2] : '') : (SHORT[x[1]] || x[1]);
+    const lab = MLAB6[k] || (k==='계기인식' ? ((x[1] || '').split(/\s*-?\d/)[0].trim() || '측정값') : (x[1] || '').replace(val, '').trim() || '미착용 인원');
+    const det = !x[1].includes(val) && x[1] !== lab ? x[1] : '';
+    return [lab, val, det];
+  }
   const KD_SEEN = new Set();
   function cardC(k, x, extra, mi){
     if(!x) return `<div class="kd ok" data-n="${k}"><div class="rw"><span class="nm">${k}</span></div><div class="big">재지 않음</div></div>`;
@@ -558,7 +574,7 @@
     const todo = V6 && s==='crit' && !rq, seenK = mi + '|' + k, fresh = todo && !KD_SEEN.has(seenK);
     if(todo) KD_SEEN.add(seenK);
     return `<div class="kd ${s} ${s==='done' ? 'dim' : ''}${todo ? ' is-todo' : ''}${fresh ? ' is-new' : ''}" data-n="${k}" tabindex="0" role="button"><div class="rw"><span class="nm">${k}</span><span class="pl ${s}">${WORD[s]}</span></div>
-      <div class="big">${sent}</div><span class="sm">${loc}, ${t}</span>${rq ? `<span class="req">${rq} 현장 조치 요청됨</span>` : ''}${extra || ''}<div class="md ${md[0]}">${md[1]}</div><span class="more">자세히 보기 →</span></div>`;
+      <div class="big">${(() => { const r6 = V6 && res6(k, x); return r6 ? `${r6[0]} ${r6[1]}${r6[2] ? `<span class="kdt">${r6[2]}</span>` : ''}` : sent; })()}</div><span class="sm">${loc}, ${t}</span>${rq ? `<span class="req">${rq} 현장 조치 요청됨</span>` : ''}${extra || ''}<div class="md ${md[0]}">${md[1]}</div><span class="more">자세히 보기 →</span></div>`;
   }
   function head(title, done, total, n){
     // [10/30] 'n건 현장 조치 요청 전'은 뺐다 — 왼쪽 목록의 '요청 전'(전체 · 고른 미션)과 같은 숫자다. 요청을 보내면 목록 값이 줄어 피드백이 된다

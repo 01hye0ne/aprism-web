@@ -866,6 +866,8 @@
 
     // 발생 일시 — 날짜는 상태 바 시계에서 읽는다. 이 화면은 하루를 통째로 흉내 내므로 둘이 같은 날이어야 한다.
     function stampOf(a) {
+      // [11/02 v6] 제목 아래 = 어디서 · 언제(목록 둘째 줄과 같은 차례) — "WP-07 고소 작업 발판 · 10:16:48". 날짜 · "발생"은 뺀다
+      if (body.classList.contains("ver-6")) { var wpm = /WP-\d+.*$/.exec(a.where || ""); return (wpm ? wpm[0] : (a.where || "")) + " · " + a.time; }
       var utc = $(".utc-clock .num");
       var day = (utc && (utc.textContent.match(/^\d{4}-\d{2}-\d{2}/) || [])[0]) || "";
       return (day ? day + " " : "") + a.time + " 발생";

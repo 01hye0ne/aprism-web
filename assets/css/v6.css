@@ -775,3 +775,5 @@ body.ver-6 .sf .dl { view-transition-name: dx-act; }
 }
 /* [11/02 v6] 알림 목록 어디서 줄 끝 측정 채널(· CH1) — 지점 이름과 같은 흐린 글 */
 body.ver-6 .ah-where .ah-ch { margin-left: var(--space-4); color: var(--text-tertiary); white-space: nowrap; }
+/* [11/02 v6] 안전진단 카드 결과 옆 세부 묘사(미세 누출 1곳) — 상세(.jdt)와 같은 흐린 글 */
+body.ver-6 .sf .kd .big .kdt { margin-left: var(--space-8); font-size: var(--font-size-14); font-weight: 500; color: var(--text-tertiary); }
