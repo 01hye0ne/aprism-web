@@ -723,3 +723,10 @@ body.ver-6 .mini-plan .mp-w { fill: var(--status-warning-icon); stroke: var(--bg
 body.ver-6 .mini-plan .mp-ok { fill: var(--text-tertiary); fill-opacity: .7; }
 body.ver-6 .mini-plan .mp-plan { fill: var(--bg-frame); stroke: var(--text-tertiary); stroke-opacity: .7; }
 body.ver-6 .mini-plan .mp-sh { fill: #000; opacity: .5; }
+
+/* [11/02 v6] 알림 팝오버 머리 — 안전진단 상세와 같은 위계: [배지] 감지 이름(14 Medium fg/secondary) → 제목 = 측정 항목 + 값(값만 단계색) */
+body.ver-6 .ma-top { display: flex; align-items: center; gap: var(--space-8); }
+body.ver-6 .ma-kind { color: var(--text-secondary); font-weight: 500; }
+body.ver-6 .ma-kind:empty { display: none; }
+body.ver-6 .ma-title .ma-val { font-weight: inherit; color: var(--status-warning-text); }
+body.ver-6 .map-alert.is-critical .ma-title .ma-val { color: var(--status-critical-text); }

@@ -869,11 +869,51 @@
 
     function syncConfirm() { confirm.disabled = !chosen().length; }
 
+    /*
+     * [11/02 v6] 알림 결과 → [측정 항목, 값] — 안전진단 상세(safety.js 판정 카드)와 같은 규칙.
+     *   항목: 누출 확률 · 최고 온도 · 이상 점수(음향 · 부분방전)는 고정, 계기는 숫자 앞 말(압력 · 차압), 안전은 위반 항목. 위치 · 채널(CH1)은 뺀다.
+     *   알림 문구에 값이 없는 것은 안전진단과 같은 값을 쓴다(RES6).
+     */
+    var RES6 = {
+      "누출감지 · 냉각수 배관 밸브": ["누출 확률", "62%"],
+      "이상음향 · 냉각 펌프 P-2": ["이상 점수", "20.4"],
+      "지하발전소 B3 터빈 2 NG 1건 발견": ["압력", "0.86 MPa"],
+      "지하발전소 터빈 2 NG 1건 발견": ["압력", "0.86 MPa"],
+      "차압 NG · HEPA Filter 차압계": ["차압", "312 Pa"],
+      "압력 편차 · N₂ 배관 압력계": ["압력", "0.62 MPa"],
+      "압력 편차 · 공기 압축기 C-1": ["압력", "7.9 bar"]
+    };
+    var LAB6 = { "누출감지": "누출 확률", "온도감지": "최고 온도", "이상음향": "이상 점수", "부분방전": "이상 점수" };
+    function maResult(a) {
+      if (RES6[a.title]) { return RES6[a.title]; }
+      var tail = String(a.title || "").split(" · ").slice(1).join(" · ");
+      // 값은 마지막 숫자(+단위) — "CH1 이상 점수 9.05" · "냉각 펌프 P-2 48.6℃" 처럼 앞에 이름 속 숫자가 있다
+      var all = tail.match(/(\d+(?:\.\d+)?)\s*(℃|%|MPa|kPa|Pa|bar|명|곳|건)?/g);
+      if (!all) { return null; }
+      var m = all[all.length - 1].match(/(\d+(?:\.\d+)?)\s*(℃|%|MPa|kPa|Pa|bar|명|곳|건)?/);
+      var val = m[1] + (m[2] ? (/^(%|명|곳|건)$/.test(m[2]) ? m[2] : " " + m[2]) : "");   // %·명·곳·건은 붙이고 ℃·압력 단위는 띄운다(안전진단과 같다)
+      var lab = LAB6[a.detect] || (a.detect === "계기인식" ? (tail.split(/\s*-?\d/)[0].trim() || "측정값") : tail.replace(m[0], "").trim());
+      return [lab, val];
+    }
+
     function fill(a) {
       box.classList.toggle("is-critical", a.sev === "critical");
       sev.textContent = a.sev === "critical" ? "위험" : "주의";
       title.textContent = a.title;
       title.title = a.title;
+      var kind = $("[data-ma-kind]", box);
+      if (kind && body.classList.contains("ver-6")) {
+        // [11/02 v6] 안전진단 상세와 같은 글 — 배지 옆 감지 이름, 제목은 "측정 항목 + 값(단계색)"
+        var rs = maResult(a);
+        kind.textContent = a.detect || "";
+        if (rs) {
+          title.textContent = "";
+          title.appendChild(document.createTextNode(rs[0] + " "));
+          var vb = document.createElement("b"); vb.className = "ma-val"; vb.textContent = rs[1];
+          title.appendChild(vb);
+          title.title = a.title;
+        }
+      }
       stamp.textContent = stampOf(a);
 
       $("[data-ma-wp]", box).textContent = a.wp || "";
