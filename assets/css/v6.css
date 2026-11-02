@@ -225,3 +225,15 @@ body.ver-6 .sb-tab.is-dragging {
 }
 body.ver-6 .sb-tab.is-dragging::after { opacity: 0; }   /* 떠 있는 동안은 발을 걷는다 */
 body.ver-6 .sb-tabs.is-sorting .sb-tab::before { opacity: 0; }
+
+/* [10/30 v6] 탭의 새 위험 표시 — 다른 미션에 새 위험이 들어오면(안전진단 시연) 이름 앞 빨간 점이 깜빡인다(예전 패널 목록 줄의 점 · "새로" 대신) */
+body.ver-6 .sb-tab-new {
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--status-critical-icon);
+  animation: sb-tab-blink 1s infinite;
+}
+@keyframes sb-tab-blink { 50% { opacity: 0.3; } }
+@media (prefers-reduced-motion: reduce) { body.ver-6 .sb-tab-new { animation: none; } }

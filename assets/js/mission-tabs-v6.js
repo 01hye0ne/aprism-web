@@ -83,6 +83,13 @@
         t.appendChild(ic);
         label += " · " + (sev === "critical" ? "위험" : "주의") + " 알림 있음";
       }
+      // 다른 미션에 새 위험(안전진단 시연 — 메뉴 줄의 data-new) — 탭 이름 앞 점이 깜빡이고 "새로"가 붙는다. 그 미션을 열면 사라진다
+      if (item.getAttribute("data-new")) {
+        t.classList.add("is-new");
+        var nd = document.createElement("i"); nd.className = "sb-tab-new"; nd.setAttribute("aria-hidden", "true");
+        t.insertBefore(nd, t.firstChild);
+        label += " · 새 위험";
+      }
       t.title = label;
       t.setAttribute("aria-label", label);
       t.setAttribute("data-mission", nm.textContent);

@@ -325,13 +325,23 @@
     const rows = M.map((m, i) => { const w = worst(i), h = hits(i), nw = i===1 && !newSeen, on = scope===i;
       const t1 = `<span class="sf-mt1"><i class="ixd ${w} ${nw ? 'blink' : ''}"></i><b>${m.mis}</b>${nw ? '<em class="nwm">새로</em>' : ''}</span>`;
       const meta = `<span class="sf-meta">${kv('층', flN(m))}${kv('측정', `${m.done}/${m.total}곳${m.done===m.total ? ', 순회 끝' : ''}`)}${kv('로봇', m.robot)}${kv('요청 전', h + '건')}</span>`;
+      if(!on && V6) return '';   // [10/30 v6] 다른 미션 줄은 상단 탭이 맡는다 — 패널은 고른 미션 하나(또는 전체 미션 요약)만
       if(!on) return `<button type="button" class="sf-mrow ${w}" data-sc="${i}">${t1}<span class="sf-mbody"><span class="sf-mmap">${svg2(i, viewF(i).robotF, false, 96)}</span>${meta}</span></button>`;
       const cur = dt && dt.wp ? flOf(m, dt.wp) : viewF(i).cur, sel = dt ? dt.wp : undefined, lk = dt ? dt.lk : undefined;
       // [10/30] 고른 미션 — 제목 줄(+ [관제에서 보기])은 테 밖, 테(border/default) 하나 안에 정보 + 지도. 면은 깔지 않는다.
       // 층 표시는 층이 여럿일 때만(고르는 단추) 지도 위에 남긴다
       const multi = !!(m.fls && m.fls.length > 1);
-      return `<div class="sf-mon ${w}"><div class="sf-monh"><button type="button" class="sf-mrow on" data-sc="${i}" aria-current="true">${t1}</button></div>
+      return `<div class="sf-mon ${w}"><div class="sf-monh">${V6 ? `<div class="sf-mrow on">${t1}</div>` : `<button type="button" class="sf-mrow on" data-sc="${i}" aria-current="true">${t1}</button>`}</div>
         <div class="sf-monb">${meta}<div class="m2"><div class="m2b">${multi ? floorBar(i) : ''}<span class="sp"></span><a class="m2go" href="${mainUrl(i, cur)}" title="관제 3D 지도에서 이 미션과 층을 연다" aria-label="관제에서 보기">관제<span class="i i-14" style="--i:var(--ic-chevron-right)" aria-hidden="true"></span></a></div><div class="m2rot">${svg2(i, cur, false, 316, sel, lk)}</div></div></div></div>`; }).join('');
+    /*
+     * [10/30 v6] 상단 미션 탭이 미션 고르기 · 단계 기호를 맡아 패널을 줄였다(디자이너). 패널 = 지금 보는 범위의 현황만.
+     *   전체 미션 — 단계별 미션 수 · 미션 · 측정 · 요청 전 합계(누를 것 없음). 미션 하나 — 그 미션의 진행 · 로봇 · 요청 전 + 지도 · 층 · [관제].
+     *   다른 미션의 새 위험 표시(점 깜빡임 · 새로)는 탭으로 옮겼다(crumb 의 data-new → mission-tabs-v6.js).
+     */
+    if(V6){
+      const head = scope==='all' ? top.replace(/^<button type="button"/, '<div').replace(' data-sc="all"', '').replace(/ aria-current="[^"]*"/, '').replace(/<\/button>$/, '</div>') : '';
+      return `${LEG}<div class="sf-mwrap is-one"><div class="sf-mlist"><div class="sf-mwell">${head}${rows}</div></div><span class="sf-mthumb" aria-hidden="true"></span></div>`;
+    }
     return `${LEG}<div class="sf-mwrap"><div class="sf-mlist"><div class="sf-mwell">${top}${rows}</div></div><span class="sf-mthumb" aria-hidden="true"></span></div>`;   // 범례는 목록 위(10/30) — 기호를 먼저 읽고 목록으로
   }
   // [10/30] v6 는 v6 화면끼리 — V6 는 위(BASE 아래)에서 정한다
@@ -393,7 +403,7 @@
     const ord = M.map((m, i) => i).sort((x, y) => parseInt(M[x].robot.replace(/\D+/g, '')) - parseInt(M[y].robot.replace(/\D+/g, '')));
     const items = head + ord.map(i => [M[i], i]).map(([m, i]) => { const w = worst(i), on = String(scope)===String(i), sv = SEV[w], run = m.done < m.total ? 'run' : 'done';
       const fls = (m.fls ? m.fls.map(f => f[0]) : [m.ab]).map(f => `<span class="floor-tag num">${f}</span>`).join('');
-      return `<button type="button" class="menu-item scope-item is-${run}" role="menuitemradio" aria-checked="${on}" data-sc="${i}"><span class="scope-run" data-run="${run}" title="${run==='run' ? '수행중' : '완료'}"></span><span class="scope-name"><span class="t-label-2">${m.mis}</span>${sv ? `<span class="i i-16 scope-sev" data-sev="${sv[0]}" style="--i:var(--ic-${sv[1]})" title="${sv[2]} 알림 있음"></span>` : ''}${i===1 && !newSeen ? '<em class="nwm">새 위험</em>' : ''}</span><span class="scope-floors">${fls}</span><span class="scope-robots num">${m.robot.replace(/\D+/g, '')}</span></button>`; }).join('');
+      return `<button type="button" class="menu-item scope-item is-${run}" role="menuitemradio" aria-checked="${on}" data-sc="${i}"${i===1 && !newSeen ? ' data-new="1"' : ''}><span class="scope-run" data-run="${run}" title="${run==='run' ? '수행중' : '완료'}"></span><span class="scope-name"><span class="t-label-2">${m.mis}</span>${sv ? `<span class="i i-16 scope-sev" data-sev="${sv[0]}" style="--i:var(--ic-${sv[1]})" title="${sv[2]} 알림 있음"></span>` : ''}${i===1 && !newSeen ? '<em class="nwm">새 위험</em>' : ''}</span><span class="scope-floors">${fls}</span><span class="scope-robots num">${m.robot.replace(/\D+/g, '')}</span></button>`; }).join('');
     return `<button type="button" class="sb-overview t-title-2 ${isAll ? 'is-on' : ''}" data-sc="all">통합 순회 현황</button><span class="status-bar-sep t-title-2" aria-hidden="true">›</span>
       <div class="scope-menu-box"><button type="button" class="scope-trigger" data-menu="1" aria-haspopup="true" aria-expanded="${menu}"><span class="t-title-2">${isAll ? '미션 고르기' : M[scope].mis}</span><span class="i i-16" style="--i:var(--ic-chevron-down)" aria-hidden="true"></span></button><div class="dropdown-menu scope-menu sf-scope" role="menu" aria-label="미션"${menu ? '' : ' hidden'}>${items}</div></div>${dt ? `<span class="status-bar-sep t-title-2" aria-hidden="true">›</span><span class="t-title-2 sf-crumb-k">${dt.k}</span>` : ''}`;
   }
