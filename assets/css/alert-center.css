@@ -1201,3 +1201,145 @@
 .ac-head-badges .ac-count-ic { width: 12px; height: 12px; }
 .ac-head-badges .badge-danger .ac-count-ic { color: var(--status-critical-icon); }
 .ac-head-badges .badge-warning .ac-count-ic { color: var(--status-warning-icon); }
+
+/* ==================================================================
+ * [11/02 v6] 알림 센터를 v6 관제 · 안전진단과 같은 말 · 같은 판으로(alert-center.js V6 · alert-center-data-v6.js).
+ * v6 화면(body.ver-6)에서만 — 예전 판은 위 규칙 그대로다.
+ *   1. 위치 = 층 꼬리표 + WP + 설비 이름(관제 최신 알림과 같다), 측정 채널(CH1)은 끝에 흐리게
+ *   2. 줄 버튼 [진단 상세] — 방패 + 글자라 칸을 넓힌다
+ *   3. 상세 머리 = [단계 배지] 감지 이름 → 측정 항목 + 값(값만 단계색) → 발생 일시(관제 팝오버 .ma-top · 안전진단 판정 카드와 같은 위계)
+ *   4. DELTA 조치 제안 = 관제 팝오버(monitor.css .ma-v3 .ma-delta)와 같은 반대색 판 · 체크리스트 · AI 추천 꼬리표 · 메모 칸.
+ *      이 화면은 monitor.css 를 싣지 않아 필요한 규칙만 옮겨 적었다. 팝오버는 바탕에 묻히는 아래 끝 그라데이션이 있지만 여기는 판이 칸 위에 놓여 한 면이다.
+ *   5. [진단 상세] 모핑 짝 — 머리(dx-head) · 사진(dx-shot) · DELTA 판(dx-act), 이름은 v6.css 안전진단 쪽과 같다
+ * ================================================================== */
+body.ver-6 .ac-c-place { width: 272px; }
+body.ver-6 .ac-c-act { width: 104px; }
+
+body.ver-6 .floor-tag {
+  flex: none;
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-4);
+  background-color: var(--bg-raised);
+  color: var(--text-secondary);
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-12);
+  line-height: var(--font-line-height-18);
+}
+/* 고른 줄은 면이 bg/raised 라 꼬리표가 묻힌다 — 안쪽 면(bg/inset)으로 */
+body.ver-6 .ac-row[aria-selected="true"] .floor-tag { background-color: var(--bg-inset); }
+body.ver-6 .ac-ch { flex: none; color: var(--text-tertiary); white-space: nowrap; }
+body.ver-6 .ac-d-place { color: var(--text-secondary); }
+
+body.ver-6 .ac-row .ac-report { gap: var(--space-4); text-decoration: none; }
+
+/* 3. 상세 머리 */
+body.ver-6 .ac-d6-head { gap: var(--space-8); }
+body.ver-6 .ac-d6-top { display: flex; align-items: center; gap: var(--space-8); }
+body.ver-6 .ac-d6-kind { color: var(--text-secondary); font-weight: 500; }
+body.ver-6 .ac-d6-title { margin: 0; }
+body.ver-6 .ac-d6-val { font-weight: inherit; color: var(--status-warning-text); }
+body.ver-6 .ac-d6-head.is-critical .ac-d6-val { color: var(--status-critical-text); }
+body.ver-6 .ac-d6-head .ac-record-age { margin: 0; }
+
+/* 4. DELTA 조치 제안 — 반대색 판(다크 화면에선 흰 판 .is-light-scope, 라이트 화면에선 짙은 판 .is-dark-scope) */
+body.ver-6 .ac-dl {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  padding: var(--space-12);
+  border-radius: 12px;
+  background-color: var(--bg-raised);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 18%), 0 10px 24px -10px rgb(0 0 0 / 45%);
+  color: var(--text-primary);
+}
+body.ver-6 .ac-dl-head { display: flex; justify-content: space-between; align-items: center; gap: var(--space-8); }
+/* 파랑은 체크 상자 하나만 — 제목 글은 회색, 앞 표식만 파랑(팝오버와 같다) */
+body.ver-6 .ac-dl-mark { display: inline-flex; align-items: center; gap: var(--space-4); color: var(--text-secondary); }
+body.ver-6 .ac-dl-mark .i { color: var(--comp-gnb-text-brand); }
+body.ver-6 .ac-dl-fp { color: var(--text-secondary); }
+body.ver-6 .ac-dl-fpv { color: var(--status-safe-text); }
+body.ver-6 .ac-dl-fpv.is-mid { color: var(--status-warning-text); }
+body.ver-6 .ac-dl-fpv.is-high { color: var(--status-critical-text); }
+body.ver-6 .ac-dl-lead {
+  margin: calc(var(--space-4) * -1) 0 0;
+  font-size: var(--font-size-14);
+  line-height: var(--font-line-height-22);
+  font-weight: 700;
+  word-break: keep-all;
+}
+body.ver-6 .ac-dl .ma-checks {
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius-6);
+  background-color: var(--bg-map-chip);
+  overflow: hidden;
+}
+body.ver-6 .ac-dl .ma-check {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  width: 100%;
+  min-height: 32px;
+  padding: var(--space-4) 6px var(--space-4) 10px;
+  border: 0;
+  border-bottom: var(--border-width-thin) solid var(--border-divider);
+  background: transparent;
+  color: var(--text-primary);
+  font: inherit;
+  font-size: var(--font-size-14);
+  line-height: var(--font-line-height-22);
+  text-align: left;
+  cursor: pointer;
+}
+body.ver-6 .ac-dl .ma-check:last-child { border-bottom: 0; }
+body.ver-6 .ac-dl .ma-check:focus-visible { outline: var(--border-width-strong) solid var(--border-focus); outline-offset: -2px; }
+body.ver-6 .ac-dl .ma-check-box {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  box-sizing: border-box;
+  border: var(--border-width-thin) solid var(--border-default);
+  border-radius: var(--radius-4);
+  background-color: var(--bg-panel);
+  color: var(--color-gray-0);
+}
+body.ver-6 .ac-dl .ma-check-box .i { width: 14px; height: 14px; opacity: 0; }
+body.ver-6 .ac-dl .ma-check[aria-checked="true"] .ma-check-box { border-color: transparent; background-color: var(--comp-gnb-brand); }
+body.ver-6 .ac-dl .ma-check[aria-checked="true"] .ma-check-box .i { opacity: 1; }
+body.ver-6 .ac-dl .ma-check-label { flex: 1 1 auto; min-width: 0; }
+body.ver-6 .ac-dl .ma-check-tag {
+  flex: none;
+  padding: var(--space-2) var(--space-8);
+  border-radius: var(--radius-4);
+  background-color: var(--comp-gnb-brand);
+  color: var(--color-gray-0);
+  font-size: var(--font-size-13);
+  line-height: var(--font-line-height-18);
+  font-weight: 500;
+}
+body.ver-6 .ac-dl-memo { display: flex; flex-direction: column; gap: var(--space-8); }
+body.ver-6 .ac-dl-memo > label { color: var(--text-tertiary); }
+body.ver-6 .ac-dl .ma-memo-field {
+  display: block;
+  width: 100%;
+  min-height: 68px;
+  box-sizing: border-box;
+  padding: var(--space-12);
+  border: 0;
+  border-radius: var(--radius-4);
+  background-color: color-mix(in srgb, var(--bg-map-chip) 50%, transparent);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: var(--font-size-14);
+  line-height: var(--font-line-height-22);
+  resize: vertical;
+}
+body.ver-6 .ac-dl .ma-memo-field::placeholder { color: var(--text-tertiary); }
+body.ver-6 .ac-dl .ma-memo-field:focus-visible { outline: var(--border-width-thin) solid var(--border-focus); }
+
+/* 5. [진단 상세] 모핑 짝 — 상세 칸에는 늘 알림 하나만 그려져 이름이 겹치지 않는다 */
+body.ver-6 .ac-d6-head { view-transition-name: dx-head; }
+body.ver-6 .ac-detail-contents .ac-d-snap { view-transition-name: dx-shot; }
+body.ver-6 .ac-dl { view-transition-name: dx-act; }

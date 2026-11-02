@@ -271,6 +271,47 @@
     ]
   };
 
+  /*
+   * [11/02 v6] v6 관제 · 안전진단과 같은 데이터(alert-center-data-v6.js)와 같은 글.
+   *   목록 제목  = "감지 · 측정 항목 + 값"(alert-text-v6.js — 관제 최신 알림 · 팝오버와 같은 표), 측정 채널(CH1)은 위치 줄 끝
+   *   위치       = 층 꼬리표 + WP + 설비 이름(관제 최신 알림과 같다)
+   *   상세 머리  = [단계 배지] 감지 이름 → 측정 항목 + 값(값만 단계색) → 발생 일시(관제 팝오버 · 안전진단 판정 카드와 같은 위계)
+   *   DELTA 판   = 팝오버와 같은 반대색 판 — 오탐 가능성 · 제안 한 줄 · 조치 체크리스트(AI 추천 미리 체크) · 메모
+   *   동작       = [진단 상세](안전진단 상세로, 고른 조치 · 메모를 넘긴다 — morph-v6.js) · [조치 요청]
+   *   줄 버튼    = [진단 상세] — 이 알림의 미션 · 감지로 안전진단 상세를 바로 연다
+   * 예전 판(v2.2 · v3 · v5)은 이 파일의 위 데이터와 아래 예전 그리기를 그대로 쓴다.
+   */
+  var V6 = document.body.classList.contains("ver-6") && !!window.APRISM_AC6;
+  if (V6) {
+    DAYS = window.APRISM_AC6.DAYS;
+    ALERTS = window.APRISM_AC6.ALERTS;
+    HANDOVER = window.APRISM_AC6.HANDOVER;
+  }
+
+  // 보이는 제목 · 측정 결과 — 관제와 같은 표(alert-text-v6.js)가 먼저, 표에 없는 지난 기록은 데이터의 res 로 적는다.
+  function of6(a) { return window.APRISM_ALERT6 ? window.APRISM_ALERT6.of(a.title) : null; }
+  function titleOf(a) {
+    if (!V6) { return a.title; }
+    var r = of6(a);
+    return r ? r.detect + " · " + r.label + " " + r.value : a.title;
+  }
+  function resOf(a) {
+    var r = of6(a);
+    return r ? [r.label, r.value] : (a.res || [a.title, ""]);
+  }
+  function chOf(a) { var r = of6(a); return (r && r.ch) || a.ch || ""; }
+  function safetyHref(a) {
+    var q = new URLSearchParams();
+    if (a.mission) { q.set("mission", a.mission); }
+    if (a.detect) { q.set("detect", a.detect); }
+    return "./safety-v6.html?" + q.toString();
+  }
+  // AI 추천은 미리 체크해 둔다(관제 팝오버와 같다) — 손대기 전에는 이 값이 고른 조치다.
+  function chosenOf(a) {
+    if (state.chosen[a.id]) { return state.chosen[a.id]; }
+    return V6 ? (a.acts || []).filter(function (c) { return c.delta; }).map(function (c) { return c.t; }) : [];
+  }
+
   // ==================================================================
   // 상태 — 고른 항목은 탭마다 따로 기억한다
   // (Figma 설명: "탭마다 마지막으로 선택한 항목을 따로 기억한다").
@@ -377,16 +418,25 @@
         '<span class="ac-c-sev" role="gridcell">' + icon(SEV_ICON[a.sev], 16) +
           '<span class="ac-sr">' + SEV_LABEL[a.sev] + '</span></span>' +
         '<span class="ac-c-time ac-mono" role="gridcell">' + esc(a.time) + '</span>' +
-        '<span class="ac-c-title t-label-1" role="gridcell">' + esc(a.title) + '</span>' +
-        '<span class="ac-c-place" role="gridcell">' +
-          '<span class="ac-wp ac-mono-label">' + esc(a.wp) + '</span>' +
-          '<span class="ac-place t-body-4">' + esc(a.place) + '</span>' +
-        '</span>' +
+        '<span class="ac-c-title t-label-1" role="gridcell">' + esc(titleOf(a)) + '</span>' +
+        '<span class="ac-c-place" role="gridcell">' + placeHtml(a, "ac-place") + '</span>' +
         '<span class="ac-c-mission t-caption" role="gridcell">' + esc(a.mission) + '</span>' +
         '<span class="ac-c-act" role="gridcell">' +
-          '<button type="button" class="btn btn-ghost is-xs" data-report>안전진단</button>' +
+          (V6
+            // [11/02 v6] 관제 최신 알림 줄과 같은 [진단 상세] — 이 알림의 미션 · 감지로 안전진단 상세를 바로 연다. 툴팁은 풀어 쓴다.
+            ? '<a class="btn btn-ghost is-xs ac-report" href="' + esc(safetyHref(a)) + '" title="안전진단에서 이 알림의 감지 결과 보기">' +
+                icon("--ic-shield", 16) + '<span>진단 상세</span></a>'
+            : '<button type="button" class="btn btn-ghost is-xs" data-report>안전진단</button>') +
         '</span>' +
       '</div>';
+  }
+
+  // 위치 조각 — v6 는 관제 최신 알림처럼 층 꼬리표 + WP + 설비 이름, 측정 채널은 끝에 흐리게.
+  function placeHtml(a, placeCls) {
+    return (V6 && a.floor ? '<span class="floor-tag">' + esc(a.floor) + '</span>' : "") +
+      '<span class="ac-wp ac-mono-label">' + esc(a.wp) + '</span>' +
+      '<span class="' + placeCls + ' t-body-4">' + esc(a.place) + '</span>' +
+      (V6 && chOf(a) ? '<span class="ac-ch t-body-4">· ' + esc(chOf(a)) + '</span>' : "");
   }
 
   /*
@@ -407,7 +457,7 @@
           '<span class="ac-sr">조치 완료</span></span>' +
         '<span class="ac-dc-time ac-mono" role="gridcell">' + esc(d.at) + '</span>' +
         '<span class="ac-dc-body" role="gridcell">' +
-          '<span class="ac-dc-title t-label-2">' + esc(a.title) + '</span>' +
+          '<span class="ac-dc-title t-label-2">' + esc(titleOf(a)) + '</span>' +
           '<span class="ac-dc-act t-caption">' + esc(d.picked.join(", ")) + '</span>' +
         '</span>' +
         '<span class="ac-dc-sev t-caption" role="gridcell">' +
@@ -552,7 +602,7 @@
         (visible().length ? "왼쪽 목록에서 알림을 고르세요." : "표시할 알림이 없습니다.") + '</p>';
       return;
     }
-    detail.innerHTML = a.done ? recordHtml(a) : openHtml(a);
+    detail.innerHTML = a.done ? (V6 ? recordHtml6(a) : recordHtml(a)) : (V6 ? openHtml6(a) : openHtml(a));
     if (!a.done) { wireDetail(a); }
     watchFade($(a.done ? ".ac-record" : ".ac-detail-contents", detail));
   }
@@ -737,28 +787,146 @@
     return '<div class="ac-info-row"><dt class="t-caption">' + label + '</dt><dd>' + value + '</dd></div>';
   }
 
+  /* ── [11/02 v6] 상세 판 — 관제 팝오버 · 안전진단 상세와 같은 머리 · 그림 · DELTA 판 ───── */
+  // 머리 — [단계 배지] 감지 이름 / 측정 항목 + 값(값만 단계색) / 아래 한 줄(발생 또는 조치)
+  function head6(a, prefix, under) {
+    var r = resOf(a);
+    return '<div class="ac-d-title-block ac-d6-head' + (a.sev === "critical" ? " is-critical" : "") + '">' +
+      '<div class="ac-d6-top">' + sevBadge(a, prefix) +
+        '<span class="ac-d6-kind t-label-2">' + esc(a.detect) + '</span></div>' +
+      '<h2 class="t-title-1 ac-d6-title">' + esc(r[0]) + (r[1] ? ' <b class="ac-d6-val">' + esc(r[1]) + '</b>' : "") + '</h2>' +
+      under +
+    '</div>';
+  }
+
+  function snap6(a, rows) {
+    return '<div class="ac-d-snap-meta">' +
+      '<figure class="ac-d-snap">' +
+        '<img src="../assets/img/' + esc(a.img) + '" alt="' + esc(titleOf(a)) + ' 검출 장면" />' +
+      '</figure>' +
+      '<dl class="ac-d-meta">' + rows + '</dl>' +
+    '</div>';
+  }
+
+  function meta6(a, withMap) {
+    return metaRow("미션", '<span class="t-body-4">' + esc(a.mission) + '</span>') +
+      metaRow("위치", placeHtml(a, "ac-d-place") +
+        (withMap ? '<a class="t-caption" href="./main-v6.html?' + esc(new URLSearchParams({ mission: a.mission, floor: a.floor }).toString()) + '">지도에서 보기</a>' : "")) +
+      metaRow("로봇", '<span class="ac-d-robot t-body-4">' + esc(a.robot) + '</span>');
+  }
+
+  function openHtml6(a) {
+    return '<div class="ac-detail-contents">' +
+        head6(a, "", '<p class="ac-d-age t-caption">' + esc(a.stamp) + ' 발생</p>') +
+        snap6(a, meta6(a, true)) +
+        delta6(a, chosenOf(a)) +
+      '</div>' +
+      '<div class="ac-actions">' +
+        '<span class="ac-head-spacer"></span>' +
+        '<p class="ac-draft t-caption" data-ac-draft' + (draft6(a) ? "" : " hidden") + '>임시저장된 상태</p>' +
+        // 관제 팝오버와 같은 두 버튼 — [진단 상세](보조 · 무채색)는 고른 조치 · 메모를 안전진단 상세로 넘긴다(morph-v6.js 가 [data-ma-more] 를 본다)
+        '<a class="btn btn-secondary is-md" href="' + esc(safetyHref(a)) + '" data-ma-more title="안전진단에서 이 알림의 감지 결과 보기" style="text-decoration:none">진단 상세</a>' +
+        '<button type="button" class="btn btn-accent is-md" data-ac-done' + (chosenOf(a).length ? "" : " disabled") + '>조치 요청</button>' +
+      '</div>';
+  }
+
+  /*
+   * DELTA 조치 제안 — 관제 팝오버(.ma-v3 .ma-delta)와 같은 반대색 판. 다크에선 흰 판(.is-light-scope), 라이트에선 짙은 판(.is-dark-scope).
+   * 체크리스트 줄 짜임(.ma-check)과 메모 칸(.ma-memo-field)은 팝오버와 같은 이름이다 — [진단 상세] 가 그대로 읽어 넘긴다.
+   * 알림 센터는 자리가 넉넉해 메모를 접지 않는다.
+   */
+  function delta6(a, chosen) {
+    var fp = a.fp || 0;
+    var rows = a.acts.slice().sort(function (x, y) { return (y.delta ? 1 : 0) - (x.delta ? 1 : 0); }).map(function (c) {
+      var on = chosen.indexOf(c.t) > -1;
+      return '<button type="button" class="ma-check" role="checkbox" data-act="' + esc(c.t) + '" aria-checked="' + (on ? "true" : "false") + '">' +
+        '<span class="ma-check-box"><span class="i" style="--i:var(--ic-check)" aria-hidden="true"></span></span>' +
+        '<span class="ma-check-label">' + esc(c.t) + '</span>' +
+        (c.delta ? '<span class="ma-check-tag">AI 추천</span>' : "") +
+      '</button>';
+    }).join("");
+    return '<section class="ac-dl is-light-scope is-dark-scope" aria-labelledby="ac-dl-label">' +
+      '<div class="ac-dl-head">' +
+        '<span class="ac-dl-mark">' + icon("--ic-delta", 16) + '<span class="t-caption" id="ac-dl-label">DELTA 조치 제안</span></span>' +
+        '<span class="ac-dl-fp t-caption">오탐 가능성 <span class="ac-dl-fpv' + (fp >= 40 ? " is-high" : fp >= 20 ? " is-mid" : "") + '">' +
+          esc(a.fpLabel || "") + '(' + fp + '%)</span></span>' +
+      '</div>' +
+      '<p class="ac-dl-lead">' + esc(a.lead) + '</p>' +
+      '<div class="ma-checks" role="group" aria-label="조치 내용">' + rows + '</div>' +
+      '<div class="ac-dl-memo">' +
+        '<label class="t-label-2" for="ac-memo">메모 (선택)</label>' +
+        '<textarea class="ma-memo-field" id="ac-memo" data-ac-memo data-ma-memo-field rows="2" maxlength="500" ' +
+          'placeholder="예) 현장 작업자 대피 확인, 안전 요원 배치 후 재가동 준비">' + esc(state.memo[a.id] || "") + '</textarea>' +
+      '</div>' +
+    '</section>';
+  }
+
+  // 임시저장 — 미리 체크된 AI 추천에서 손을 댔거나 메모를 쳤을 때만
+  function draft6(a) { return !!state.chosen[a.id] || !!state.memo[a.id]; }
+
+  /* 조치 완료 — 머리는 미확인과 같은 위계(원 등급 배지 · 감지 이름 / 측정 항목 + 값), 아래 줄이 조치 시각 · 담당 · 소요다. */
+  function recordHtml6(a) {
+    var d = a.done;
+    return '<div class="ac-record">' +
+      head6(a, "원 등급 ",
+        '<p class="ac-record-age">' +
+          '<span class="ac-record-at t-label-1">' + esc(DAYS[d.day].label) + ' ' + esc(d.at) + '</span>' +
+          '<span class="ac-record-by t-caption">조치 · ' + esc(d.by) + ' · ' + esc(d.took) + '</span>' +
+        '</p>') +
+      snap6(a,
+        metaRow("발생", '<span class="ac-mono">' + esc(a.stamp) + '</span>') +
+        meta6(a, false)) +
+
+      '<section class="ac-record-section">' +
+        '<h3 class="t-caption">조치 내용</h3>' +
+        '<div class="ac-chips">' +
+          d.picked.map(function (t) {
+            return '<span class="ac-chip-done t-label-2">' + esc(t) + '</span>';
+          }).join("") +
+        '</div>' +
+      '</section>' +
+
+      '<section class="ac-record-section">' +
+        '<h3 class="t-caption">메모</h3>' +
+        '<p class="ac-memo-box t-body-4' + (d.memo ? "" : " ac-memo-empty") + '">' +
+          (d.memo ? esc(d.memo) : "남긴 메모가 없습니다.") + '</p>' +
+      '</section>' +
+
+      '<section class="ac-record-section">' +
+        '<h3 class="t-caption">처리 정보</h3>' +
+        '<dl class="ac-info">' +
+          infoRow("담당", '<span class="t-body-4">' + esc(d.by) + '</span>') +
+          infoRow("소요", '<span class="t-body-4">' + esc(d.took) + '</span>') +
+          infoRow("DELTA", '<span class="ac-info-delta t-body-4">' + esc(d.delta) + '</span>') +
+        '</dl>' +
+      '</section>' +
+    '</div>';
+  }
+
   /*
    * 조치를 고르거나 메모를 칠 때 바뀌는 것은 둘뿐이다 — 임시저장 표시와 [조치 완료] 의 켜짐.
    * 그 둘만 손댄다. 판을 통째로 다시 그리면 상세 칸이 새 DOM 이 되면서 스크롤이 맨 위로 튀고
    * 누른 캡슐에서 포커스가 빠진다.
    */
   function syncActions(a) {
-    var chosen = state.chosen[a.id] || [];
+    var chosen = chosenOf(a);
     var draft = $("[data-ac-draft]", detail);
     var btn = $("[data-ac-done]", detail);
-    if (draft) { draft.hidden = !(chosen.length || state.memo[a.id]); }
+    if (draft) { draft.hidden = V6 ? !draft6(a) : !(chosen.length || state.memo[a.id]); }
     if (btn) { btn.disabled = !chosen.length; }
   }
 
   function wireDetail(a) {
     $$("[data-act]", detail).forEach(function (cap) {
+      // v6 는 체크리스트 줄(role=checkbox · aria-checked), 예전 판은 칩(aria-pressed)
+      var attr = cap.getAttribute("role") === "checkbox" ? "aria-checked" : "aria-pressed";
       cap.addEventListener("click", function () {
         var t = cap.getAttribute("data-act");
-        var cur = state.chosen[a.id] || [];
+        var cur = chosenOf(a).slice();
         var i = cur.indexOf(t);
         if (i > -1) { cur.splice(i, 1); } else { cur = cur.concat([t]); }
         state.chosen[a.id] = cur;
-        cap.setAttribute("aria-pressed", i > -1 ? "false" : "true");
+        cap.setAttribute(attr, i > -1 ? "false" : "true");
         syncActions(a);
       });
     });
@@ -774,7 +942,7 @@
     var btn = $("[data-ac-done]", detail);
     if (btn) {
       btn.addEventListener("click", function () {
-        var acts = (state.chosen[a.id] || []).slice();
+        var acts = chosenOf(a).slice();
         a.done = { day: "today", at: nowHM(), by: "홍길동", took: "방금",
                    picked: acts, memo: state.memo[a.id] || "", delta: deltaUse(a, acts) };
         delete state.chosen[a.id];
@@ -827,7 +995,8 @@
   function renderHandover() {
     slot.innerHTML = '<section class="ac-handover">' +
       '<div class="ac-handover-head">' +
-        '<span class="ac-handover-mark">' + icon("--ic-cpu", 16) +
+        // [11/02 v6] Delta 표식은 DELTA 조치 제안 판과 같은 Delta 로고(예전 판은 cpu)
+        '<span class="ac-handover-mark">' + icon(V6 ? "--ic-delta" : "--ic-cpu", 16) +
           '<span class="t-label-2">DELTA 인수인계 요약</span></span>' +
         '<span class="ac-handover-when t-caption">' + esc(HANDOVER.when) + '</span>' +
         '<span class="ac-head-spacer"></span>' +
