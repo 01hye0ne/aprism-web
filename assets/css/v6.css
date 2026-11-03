@@ -1248,3 +1248,102 @@ body.ver-6.sian .mp-stage[data-stage-show="precheck"] .mp-header { border-bottom
  */
 body.ver-6 .rr-pin.is-quiet { display: none; }
 body.ver-6 .rr-pin.is-hot:not([hidden]) { display: block; opacity: 1; z-index: 2; }   /* 다른 층 · 복귀 지점(hidden)은 그대로 숨김 */
+
+/*
+ * [11/03 v6] Delta 패널 색 — 아티팩트 "Delta v6 접힘 / 펼침 시안"(MSLqX8J1QBegmAtb1gBB8i) 12장 설정값(디자이너, 색만 · 크기 · 구조 · 움직임은 그대로).
+ *   다크  접힘 = 단계 그라데이션 판 + 1 px 테 + (위험) 붉은 번짐 · 펼침 = 위에서 단계색 → 아래 무채로 짙어지는 판 + 단계색 테
+ *   라이트 세 단계 모두 채움(회보라 → 단계색, oklab) · 흰 글. 펼침은 채움 테 + 머리 띠만 드러나고 안은 흰 판(#FAFAFA)
+ *   접힘 판 = .delta3-card(밖 .delta3 의 모서리 빛은 걷는다) · 펼침 판 = .delta3.is-open
+ */
+:root[data-delta][data-glow] body.ver-6.v2-2.v3 .delta3:not(.is-open) { background-image: none; }
+/* 다크 · 접힘 */
+:root[data-delta][data-glow] body.ver-6.v2-2.v3 .delta3:not(.is-open) .delta3-card {
+  background-image: linear-gradient(to bottom, var(--bg-cell), color-mix(in srgb, var(--bg-selected) 40%, transparent));
+  box-shadow: inset 0 2px 3px -1px rgb(255 255 255 / 14%);
+}
+:root[data-delta][data-glow] body.ver-6.v2-2.v3 .delta3.is-critical:not(.is-open) .delta3-card {
+  background-image: linear-gradient(to bottom, #5a2a2a, rgb(120 40 36 / 55%));
+  box-shadow: inset 0 2px 3px -1px rgb(255 255 255 / 14%), 0 0 0 1px rgb(255 90 82 / 35%), 0 0 18px rgb(255 90 82 / 25%);
+}
+:root[data-delta][data-glow] body.ver-6.v2-2.v3 .delta3.is-warning:not(.is-open) .delta3-card {
+  background-image: linear-gradient(to bottom, #4a3d22, rgb(110 84 30 / 50%));
+  box-shadow: inset 0 2px 3px -1px rgb(255 255 255 / 14%), 0 0 0 1px rgb(242 177 52 / 30%);
+}
+/* 다크 · 펼침 — 테는 자리를 안 먹게 안쪽 1 px 그림자로 */
+:root[data-delta][data-glow] body.ver-6.v2-2.v3 .delta3.is-open {
+  background-image: linear-gradient(180deg, rgb(62 63 65 / 94%), rgb(26 28 29 / 97%));
+  box-shadow: inset 0 0 0 1px var(--border-default), inset 0 1px 0 rgb(255 255 255 / 8%), 0 8px 24px rgb(0 0 0 / 45%);
+}
+:root[data-delta][data-glow] body.ver-6.v2-2.v3 .delta3.is-critical.is-open {
+  background-image: linear-gradient(180deg, rgb(70 10 11 / 94%) 0%, rgb(36 22 23 / 96%) 55%, rgb(26 28 29 / 97%) 100%);
+  box-shadow: inset 0 0 0 1px rgb(253 115 109 / 48%), inset 0 1px 0 rgb(255 255 255 / 8%), 0 8px 24px rgb(0 0 0 / 45%);
+}
+:root[data-delta][data-glow] body.ver-6.v2-2.v3 .delta3.is-warning.is-open {
+  background-image: linear-gradient(180deg, rgb(56 49 22 / 94%) 0%, rgb(34 32 24 / 96%) 55%, rgb(26 28 29 / 97%) 100%);
+  box-shadow: inset 0 0 0 1px rgb(238 218 107 / 40%), inset 0 1px 0 rgb(255 255 255 / 8%), 0 8px 24px rgb(0 0 0 / 45%);
+}
+
+/* 라이트 — 단계별 채움 값 */
+:root[data-theme="light"][data-delta][data-glow] body.ver-6.v2-2.v3 .delta3 {
+  --tone-c: linear-gradient(165deg, #7C7397 0%, #6F7DAE 34%, #4A7FD6 70%, #2F6FE0 100%);
+  --tone-e: linear-gradient(105deg, #6E6890 0%, #6F7DAE 38%, #4A7FD6 72%, #2F6FE0 100%);
+  --tone-in: rgb(130 175 255 / 28%); --tone-glow: rgb(47 111 224 / 26%); --tone-base: #4A7FD6;
+}
+:root[data-theme="light"][data-delta][data-glow] body.ver-6.v2-2.v3 .delta3.is-critical {
+  --tone-c: linear-gradient(165deg, #7C7397 0%, #B86A77 34%, #E2573B 70%, #EC4426 100%);
+  --tone-e: linear-gradient(105deg, #6E6890 0%, #B86A77 38%, #E2573B 72%, #EC4426 100%);
+  --tone-in: rgb(255 120 80 / 35%); --tone-glow: rgb(236 68 38 / 34%); --tone-base: #E2573B;
+}
+:root[data-theme="light"][data-delta][data-glow] body.ver-6.v2-2.v3 .delta3.is-warning {
+  --tone-c: linear-gradient(165deg, #7C7397 0%, #A68566 34%, #C88F1A 70%, #C08308 100%);
+  --tone-e: linear-gradient(105deg, #6E6890 0%, #A68566 38%, #C88F1A 72%, #C08308 100%);
+  --tone-in: rgb(255 200 90 / 30%); --tone-glow: rgb(200 140 20 / 30%); --tone-base: #C88F1A;
+}
+@supports (background: linear-gradient(in oklab 90deg, red, blue)) {
+  :root[data-theme="light"][data-delta][data-glow] body.ver-6.v2-2.v3 .delta3 {
+    --tone-c: linear-gradient(in oklab 165deg, #7C7397 0%, #6F7DAE 34%, #4A7FD6 70%, #2F6FE0 100%);
+    --tone-e: linear-gradient(in oklab 105deg, #6E6890 0%, #6F7DAE 38%, #4A7FD6 72%, #2F6FE0 100%);
+  }
+  :root[data-theme="light"][data-delta][data-glow] body.ver-6.v2-2.v3 .delta3.is-critical {
+    --tone-c: linear-gradient(in oklab 165deg, #7C7397 0%, #B86A77 34%, #E2573B 70%, #EC4426 100%);
+    --tone-e: linear-gradient(in oklab 105deg, #6E6890 0%, #B86A77 38%, #E2573B 72%, #EC4426 100%);
+  }
+  :root[data-theme="light"][data-delta][data-glow] body.ver-6.v2-2.v3 .delta3.is-warning {
+    --tone-c: linear-gradient(in oklab 165deg, #7C7397 0%, #A68566 34%, #C88F1A 70%, #C08308 100%);
+    --tone-e: linear-gradient(in oklab 105deg, #6E6890 0%, #A68566 38%, #C88F1A 72%, #C08308 100%);
+  }
+}
+/* 라이트 · 채움 위 글 = 흰색 — 접힘 판 전체 · 펼침 머리 띠. 글 토큰을 그 안에서만 바꿔 아이콘 · 표식(delta-dots)도 같이 희게 */
+:root[data-theme="light"][data-delta][data-glow] body.ver-6.v2-2.v3 .delta3:not(.is-open) .delta3-card,
+:root[data-theme="light"][data-delta][data-glow] body.ver-6.v2-2.v3 .delta3 .delta3-name {
+  color: #FFFFFF;
+  --text-primary: #FFFFFF; --text-secondary: rgb(255 255 255 / 86%); --text-tertiary: rgb(255 255 255 / 76%);
+  --status-critical-icon: #FFFFFF; --status-warning-icon: #FFFFFF; --status-critical-text: #FFFFFF; --status-warning-text: #FFFFFF;
+}
+/* 라이트 · 접힘 */
+:root[data-theme="light"][data-delta][data-glow] body.ver-6.v2-2.v3 .delta3:not(.is-open) .delta3-card {
+  background-color: var(--tone-base); background-image: var(--tone-c);
+  box-shadow: inset 0 2px 3px -1px rgb(255 255 255 / 35%), inset 0 0 20px 0 var(--tone-in), -24px -24px 80px -20px var(--tone-glow);
+}
+/* 라이트 · 펼침 — 채움 테 + 머리 띠, 안(.delta3-card)은 흰 판 */
+:root[data-theme="light"][data-delta][data-glow] body.ver-6.v2-2.v3 .delta3.is-open {
+  background-color: var(--tone-base); background-image: var(--tone-e);
+  box-shadow: inset 0 2px 3px -1px rgb(255 255 255 / 35%), 0 8px 24px rgb(11 14 19 / 14%);
+}
+:root[data-theme="light"][data-delta][data-glow] body.ver-6.v2-2.v3 .delta3.is-open .delta3-card {
+  margin: 0 6px 6px; border-radius: 6px; overflow: hidden;
+  background-color: #FAFAFA; background-image: none; box-shadow: inset 0 0 0 1px rgb(255 255 255 / 70%);
+}
+/* 위 채움 규칙이 예전 라이트 위험 규칙(.is-critical 이 붙어 한 단 더 셈 — 흰 → red/100 원형 · 세로)에 졌다 — 단계 클래스를 붙여 같은 셈으로 다시 건다 */
+:root[data-theme="light"][data-delta][data-glow] body.ver-6.v2-2.v3 .delta3.is-critical:not(.is-open) .delta3-card,
+:root[data-theme="light"][data-delta][data-glow] body.ver-6.v2-2.v3 .delta3.is-warning:not(.is-open) .delta3-card {
+  background-color: var(--tone-base); background-image: var(--tone-c);
+  box-shadow: inset 0 2px 3px -1px rgb(255 255 255 / 35%), inset 0 0 20px 0 var(--tone-in), -24px -24px 80px -20px var(--tone-glow);
+}
+:root[data-theme="light"][data-delta][data-glow] body.ver-6.v2-2.v3 .delta3.is-critical.is-open,
+:root[data-theme="light"][data-delta][data-glow] body.ver-6.v2-2.v3 .delta3.is-warning.is-open {
+  background-color: var(--tone-base); background-image: var(--tone-e);
+  box-shadow: inset 0 2px 3px -1px rgb(255 255 255 / 35%), 0 8px 24px rgb(11 14 19 / 14%);
+}
+/* 펼친 본문 밑 깔개(.delta3-body::before = bg/inset 회색)가 흰 판(#FAFAFA)을 덮었다 — 라이트 펼침에선 흰 판이 그대로 보이게 */
+:root[data-theme="light"][data-delta][data-glow] body.ver-6.v2-2.v3 .delta3.is-open .delta3-body::before { background-color: transparent; }
