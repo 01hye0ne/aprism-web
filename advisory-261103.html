@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>APRISM — [자문] 26.11.03</title>
-  <meta name="description" content="11.03 기준 v6 화면 — 미션 설정 · 통합 순회 현황 · 미션 관제 · 알림 센터 · 안전진단 · 보고서, 한 화면에 주제 하나" />
+  <meta name="description" content="11.03 기준 v6 화면 — 미션 설정 · 전체 미션 관제 · 미션 관제 · 알림 센터 · 안전진단 · 보고서, 한 화면에 주제 하나" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/static/woff2/SUIT.css" />
   <link rel="stylesheet" href="./assets/css/tokens.css?v=b64812bd" />
   <link rel="stylesheet" href="./assets/css/base.css?v=5ccd4bb3" />
@@ -181,7 +181,7 @@
         <p class="lead"><b>11.03 기준 v6 화면</b>을 흐름 순서대로 정리함. 미션을 만들고 → 관제하고 → 알림을 처리하고 → 진단 · 보고서로 남기는 순서.</p>
         <ol class="toc">
           <li><a href="#s1">미션 설정 · 사전 점검 <span>미션 만들기 · 로봇 상태 확인</span></a></li>
-          <li><a href="#s2">통합 순회 현황 <span>전체 미션 · 층 쌓아 보기</span></a></li>
+          <li><a href="#s2">전체 미션 관제 <span>모든 미션의 알림 · 층별 위치 · 로봇</span></a></li>
           <li><a href="#s3">미션 관제 <span>알림 · 3D 지도 · Delta · 로봇</span></a></li>
           <li><a href="#s4">알림 센터 <span>지난 미션까지 모아 처리</span></a></li>
           <li><a href="#s5">안전진단 <span>감지 6종 카드 · 표 · 자세히 보기</span></a></li>
@@ -214,13 +214,14 @@
     <section class="slide" id="s2" aria-labelledby="s2-title">
       <div class="txt">
         <p class="num">02</p>
-        <h2 id="s2-title">통합 순회 현황</h2>
-        <div class="blk now"><p class="k">무엇을 보나</p><p>상단 바 <b>[전체 미션]</b>. 진행 중인 모든 미션의 알림을 왼쪽에 모으고(<b>무슨 일 → 미션 → 어디서</b>), 지도는 <b>B3 · B4 층을 쌓아</b> 층마다 로봇 · 알림 위치를 표시. 오른쪽은 로봇 카드(수행중 · 끊김 · 완료 · 대기).</p></div>
-        <div class="blk"><p class="k">이어지는 동작</p><p>층을 누르면 그 층만 펼쳐지고, 미션 탭을 누르면 그 미션의 관제 화면으로 들어감.</p></div>
+        <h2 id="s2-title">전체 미션 관제</h2>
+        <div class="blk now"><p class="k">좌측 · 최신 알림</p><p>관제 장소에서 <b>진행 중인 모든 미션의 알림</b>을 한 목록에서 확인. 알림마다 <b>무슨 일 → 미션 → 어디서</b> 순으로 보여 줌.</p></div>
+        <div class="blk now"><p class="k">중앙 · 지도</p><p>관제 장소의 층을 쌓아 <b>층별 로봇 · 알림 위치</b>를 한눈에 표시.</p></div>
+        <div class="blk now"><p class="k">우측 · 로봇 현황</p><p>관제 장소에 배치된 <b>모든 로봇</b>의 상태 · 맡은 미션 · 진행도를 표시.</p></div>
         <p class="why">여러 층 · 여러 로봇이 동시에 돌 때, 어느 미션부터 봐야 할지 한 화면에서 고를 수 있어야 함.</p>
       </div>
       <figure class="pic">
-        <div class="frame"><img class="is-on" src="./assets/img/advisory-1103/02-building.webp?v=2" alt="통합 순회 현황 — 전체 미션 탭, 왼쪽 전체 알림 12건(위험 3 · 주의 9), 가운데 B3 · B4 두 층을 쌓은 3D 지도와 알림 위치, 오른쪽 로봇 현황 12대 연결 · 3대 수행중" loading="lazy" /></div>
+        <div class="frame"><img class="is-on" src="./assets/img/advisory-1103/02-building.webp?v=2" alt="전체 미션 관제 — 전체 미션 탭, 왼쪽 전체 알림 12건(위험 3 · 주의 9), 가운데 B3 · B4 두 층을 쌓은 3D 지도와 알림 위치, 오른쪽 로봇 현황 12대 연결 · 3대 수행중" loading="lazy" /></div>
       </figure>
     </section>
 
