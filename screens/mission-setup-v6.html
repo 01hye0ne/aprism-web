@@ -32,7 +32,7 @@
   <!-- v5 전용 규칙 — v4 는 10/29 부로 멈췄다. v5 에서 바꾸는 것은 여기(body.ver-5)에. -->
   <link rel="stylesheet" href="../assets/css/v5.css?v=aefc22b4" />
   <!-- v6 전용 규칙 — v5 는 10/30 부로 멈췄다. v6 에서 바꾸는 것은 여기(body.ver-6)에. -->
-  <link rel="stylesheet" href="../assets/css/v6.css?v=f521df48" />
+  <link rel="stylesheet" href="../assets/css/v6.css?v=c8d8573f" />
   <!-- [10/29] v5 지도(map-v6.js)가 그리는 설비 이름표 · 충전 스테이션 · 번호 핀 꼴 — 메인과 같다 -->
   <link rel="stylesheet" href="../assets/css/route-rules.css?v=6a34168a" />
   <style>
@@ -116,17 +116,19 @@
       <span class="status-bar-logo">
         <span class="i" style="--i:var(--ic-brand-mark)" role="img" aria-label="APRISM"></span>
       </span>
-      <!-- [11/03 v6] 상단 탭 — 미션 관제(main-v6, mission-tabs-v6.js 가 그리는 탭)와 같은 모양을 고정으로 둔다(디자이너).
-           지금 탭은 끝의 [새 미션](탭 = 이미 있는 미션의 창, 11/03 결정). 다른 탭 — 미션 설정: 설정 버리기 확인 뒤 그 미션 관제로, 사전 점검: "사전점검 진행중입니다." 토스트(setup-tabs-v6.js). 끌기는 없다. -->
+      <!-- [11/03 v6] 상단 탭 — 관제(main-v6)와 같은 미션 탭. 탭 = 이미 있는 미션의 창, 미션 설정 = 실행 전 미션의 설정(11/03 결정).
+           지금 탭 = 설정 중인 미션(?mission=, 없으면 주간 설비 점검 — setup-tabs-v6.js 가 고른다). 다른 탭 — 미션 설정: 그 미션의 지금 상태로(대기 → 그 미션 설정, 수행중 · 완료 → 관제,
+           입력을 바꿨으면 먼저 확인), 사전 점검: "사전점검 진행중입니다." 토스트. 끌기는 없다. -->
       <nav class="sb-tabs is-fixed" aria-label="보는 범위">
         <button type="button" class="sb-tab"><span class="sb-tab-name t-label-1">전체 미션</span></button>
         <button type="button" class="sb-tab" data-run="run" data-mission="정기 순회 점검"><span class="sb-tab-name t-label-1">정기 순회 점검</span><span class="i i-16 sb-tab-sev" data-sev="critical" aria-hidden="true" style="--i:var(--ic-error)"></span></button>
         <button type="button" class="sb-tab" data-run="run" data-mission="발전기실 설비 점검"><span class="sb-tab-name t-label-1">발전기실 설비 점검</span><span class="i i-16 sb-tab-sev" data-sev="warning" aria-hidden="true" style="--i:var(--ic-warning)"></span></button>
         <button type="button" class="sb-tab" data-run="run" data-mission="전기실 열화상 점검"><span class="sb-tab-name t-label-1">전기실 열화상 점검</span><span class="i i-16 sb-tab-sev" data-sev="critical" aria-hidden="true" style="--i:var(--ic-error)"></span></button>
+        <button type="button" class="sb-tab" data-run="idle" data-mission="소방 설비 점검"><span class="sb-tab-name t-label-1">소방 설비 점검</span></button>
+        <button type="button" class="sb-tab" data-run="idle" data-mission="주간 설비 점검"><span class="sb-tab-name t-label-1">주간 설비 점검</span></button>
         <button type="button" class="sb-tab" data-run="done" data-mission="야간 순회 점검"><span class="sb-tab-name t-label-1">야간 순회 점검</span></button>
         <button type="button" class="sb-tab" data-run="done" data-mission="공조 설비 순회"><span class="sb-tab-name t-label-1">공조 설비 순회</span></button>
         <button type="button" class="sb-tab" data-run="done" data-mission="유틸리티 순회"><span class="sb-tab-name t-label-1">유틸리티 순회</span></button>
-        <button type="button" class="sb-tab sb-tab-draft is-on" aria-current="page" data-new><span class="i i-16" style="--i:var(--ic-plus)" aria-hidden="true"></span><span class="sb-tab-name t-label-1">새 미션</span></button>
       </nav>
       </div>
 
@@ -233,8 +235,9 @@
             <div class="mp-scroll">
                               <div class="mp-form">
                                 <label class="field">
-                                  <span class="field-label">미션 이름 <span class="req" aria-hidden="true">*</span></span>
-                                  <input type="text" class="field-box" value="정기 순회 점검" aria-label="미션 이름" />
+                                  <!-- [11/03 v6] 미션 이름은 정해진 값(미션은 이미 만들어져 있다) — 읽기 전용. 값은 지금 탭(setup-tabs-v6.js) -->
+                                  <span class="field-label">미션 이름</span>
+                                  <input type="text" class="field-box is-readonly" value="주간 설비 점검" aria-label="미션 이름" readonly />
                                 </label>
 
                                 <div class="field">
@@ -1127,14 +1130,14 @@
        aria-labelledby="m-discard-title" aria-describedby="m-discard-desc">
     <div class="modal-head">
       <div class="modal-titles">
-        <h2 class="t-heading-3" id="m-discard-title">작성 중인 설정을 버릴까요?</h2>
+        <h2 class="t-heading-3" id="m-discard-title">바꾼 설정을 버릴까요?</h2>
       </div>
       <button type="button" class="icon-button modal-close" data-modal-dismiss aria-label="닫기">
         <span class="i i-16" style="--i:var(--ic-close)" aria-hidden="true"></span>
       </button>
     </div>
     <div class="modal-body" id="m-discard-desc">
-      <p class="t-body-2 modal-desc-1">새 미션 설정은 저장되지 않고 <span data-discard-to>미션</span> 화면으로 이동합니다.</p>
+      <p class="t-body-2 modal-desc-1">바꾼 설정은 저장되지 않고 <span data-discard-to>미션</span>(으)로 이동합니다.</p>
     </div>
     <div class="modal-foot">
       <button type="button" class="btn is-md btn-secondary" data-modal-dismiss>계속 작성</button>
@@ -1659,7 +1662,7 @@
 
 <script src="../assets/js/theme.js?v=c86093d9"></script>
 <script src="../assets/js/prism-orb.js?v=03386460"></script>
-<script src="../assets/js/screen.js?v=66faac92"></script>
+<script src="../assets/js/screen.js?v=7cb57235"></script>
 <script src="../assets/js/map-model.js?v=0f88c871"></script>
 <!-- [10/29] v5 지도(map-v6.js) — 라이트 단계 톤 지도 · 바닥 표식 · 바닥 띠 경로를 메인과 같게. map.js 는 v3 · v4 가 쓴다 -->
 <script src="../assets/js/map-fx-v6.js?v=05546ef0"></script>
@@ -1669,6 +1672,6 @@
 <!-- 미션 설정 — 점검항목 · 순서 · 로봇이 소요시간과 배터리를 움직인다. screen.js 뒤에 온다. -->
 <script src="../assets/js/mission-setup.js?v=d4fe220d"></script>
 <script src="../assets/js/grid-overlay.js?v=164e4f2a"></script>
-<script src="../assets/js/setup-tabs-v6.js?v=9db21e9c"></script>
+<script src="../assets/js/setup-tabs-v6.js?v=2ede13f9"></script>
 </body>
 </html>

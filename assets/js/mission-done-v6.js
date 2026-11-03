@@ -1,6 +1,8 @@
 /*
- * [11/03 v6] 관제 — 완료 미션을 고르면 진행 머리(순회 완료 100%) 밑에 [보고서 보기] [다시 실행]을 붙인다(디자이너).
- * 탭은 "이미 있는 미션의 창"이다(11/03 결정): 완료 미션은 끝난 상태로 보이고, 다시 돌리려면 [다시 실행] → 미션 설정(이름이 채워진 채).
+ * [11/03 v6] 관제 — 탭은 "이미 있는 미션의 창"이다(11/03 결정). 누르면 그 미션의 지금 상태:
+ *   대기   → 그 미션의 미션 설정으로 간다(미션은 다른 곳에서 이미 만들어져 있고, 설정은 실행 전 단계다)
+ *   완료   → 끝난 관제 + 진행 머리(순회 완료 100%) 밑에 [보고서 보기] [다시 실행](→ 그 미션의 미션 설정)
+ *   수행중 → 관제 그대로
  * 지금 탭(.sb-tab.is-on)의 data-run 으로 판단한다 — 탭 줄은 미션을 바꿀 때마다 다시 그려진다(mission-tabs-v6.js).
  * 두 단추 모두 무채색(Secondary) — 파랑은 상태 또는 단 하나의 주요 행동(색 위계 10/12).
  */
@@ -27,6 +29,18 @@
     box.hidden = !done;
     if (done) { again.href = "./mission-setup-v6.html?mission=" + encodeURIComponent(on.getAttribute("data-mission") || ""); }
   }
+
+  // 대기 미션 탭 — 관제로 바꾸지 않고(mission-tabs-v6.js 의 클릭보다 먼저 잡는다) 그 미션의 설정으로
+  // 끌어서 순서만 바꾼 뒤 오는 click 은 건너뛴다(눌린 자리에서 5 넘게 움직였으면 끌기)
+  var downX = 0;
+  left.addEventListener("pointerdown", function (event) { downX = event.clientX; }, true);
+  left.addEventListener("click", function (event) {
+    var tab = event.target.closest && event.target.closest(".sb-tab[data-run='idle']");
+    if (!tab || Math.abs(event.clientX - downX) > 5) { return; }
+    event.stopPropagation();
+    event.preventDefault();
+    window.location.href = "./mission-setup-v6.html?mission=" + encodeURIComponent(tab.getAttribute("data-mission") || "");
+  }, true);
 
   sync();
   new MutationObserver(sync).observe(left, { childList: true, subtree: true, attributes: true, attributeFilter: ["class"] });

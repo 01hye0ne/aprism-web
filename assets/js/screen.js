@@ -845,6 +845,20 @@ window.APRISM_TEXT = (function () {
     window.APRISM_ROBOT_FLOORS = ["B4", "B4", "B4", "B4", "B4", "B4", "B3", "B3", "B4", "B3", "B3", "B3"];
   }
 
+  /*
+   * [11/03 v6] 대기 미션 — 미션은 다른 곳(스케줄러 · 미션 관리)에서 이미 만들어져 있고, 미션 설정은 "실행 전 미션"을 설정하는 화면이다(디자이너).
+   * 탭에서 대기 미션을 누르면 그 미션의 설정으로 간다(mission-done-v6.js). 데모용 대기 미션 둘 — 이름은 임시(11/03).
+   *   Robot 03(대기 · 35%) → 소방 설비 점검 · Robot 08(대기 · 47%, "불러온 미션이 있고 시작 전") → 주간 설비 점검
+   */
+  if (document.body.classList.contains("ver-6")) {
+    ROBOTS[2].mission = "소방 설비 점검";
+    ROBOTS[7].mission = "주간 설비 점검";
+    if (window.APRISM_MISSION_FLOORS) {
+      window.APRISM_MISSION_FLOORS["소방 설비 점검"] = ["B4"];
+      window.APRISM_MISSION_FLOORS["주간 설비 점검"] = ["B3"];
+    }
+  }
+
   // 로봇마다 맡은 미션 이름(순번 = data-robot). 미션이 없으면 null.
   // v2.2 의 미션 범위(mission-scope.js) · 알림 묶기(monitor.js)가 읽는다.
   window.APRISM_ROBOT_MISSIONS = ROBOTS.map(function (r) {

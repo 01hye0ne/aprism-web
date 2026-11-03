@@ -1,12 +1,13 @@
 /*
  * [11/03 v6] 미션 설정 · 사전 점검 상단 탭(.sb-tabs.is-fixed) — 관제 탭과 같은 모양, 동작만 이 화면 몫이다(디자이너).
  *
- * 탭은 "이미 있는 미션의 창"이다(11/03 결정). 미션 설정은 새 미션을 만들 때만 나온다 — 끝의 [새 미션] 탭이 지금 탭이다.
- *   미션 설정(body[data-stage="setup"])   다른 탭을 누르면 "작성 중인 설정을 버릴까요?" 확인(모달 discard) 뒤 그 미션의 관제로 간다.
- *                                         [전체 미션]은 통합 순회 현황(building-v6)으로.
+ * 탭 = 이미 있는 미션의 창. 미션은 다른 곳(스케줄러 · 미션 관리)에서 만들어져 있고, 미션 설정은 "실행 전 미션"을 설정하는 단계다(11/03 결정).
+ *   지금 탭 = 설정 중인 미션 — ?mission= (관제의 대기 탭 · 완료 미션 [다시 실행]이 붙여 온다), 없으면 주간 설비 점검.
+ *   미션 이름 칸은 읽기 전용이고 지금 탭 이름이 들어간다.
+ *   미션 설정(body[data-stage="setup"])   다른 탭 = 그 미션의 지금 상태로 — 대기면 그 미션 설정, 수행중 · 완료면 관제, [전체 미션]은 통합 순회 현황.
+ *                                         입력을 바꿨으면 "바꾼 설정을 버릴까요?"(모달 discard)를 먼저 묻고, 안 바꿨으면 바로 간다.
  *   사전 점검(body[data-stage="precheck"]) 다른 탭을 누르면 "사전점검 진행중입니다." 토스트만 — 점검은 멈추지 않는다.
  * 한 화면 안에서 설정 → 점검으로 넘어가므로(sian.js) 누를 때마다 지금 단계를 읽는다.
- * 완료 미션의 [다시 실행](mission-done-v6.js)은 ?mission= 으로 들어온다 — 미션 이름 칸을 그 이름으로 채운다.
  */
 (function () {
   "use strict";
@@ -24,11 +25,33 @@
     window.addEventListener("resize", mark);
     mark();
   });
+
   var body = document.body;
+  var tabs = Array.prototype.slice.call(bar.querySelectorAll(".sb-tab"));
   var nameInput = document.querySelector("input[aria-label='미션 이름']");
 
-  var again = /[?&]mission=([^&#]+)/.exec(window.location.search);
-  if (again && nameInput) { nameInput.value = decodeURIComponent(again[1]); }
+  // 지금 탭 — 설정 중인 미션
+  function tabOf(name) { return tabs.filter(function (t) { return t.getAttribute("data-mission") === name; })[0]; }
+  var asked = /[?&]mission=([^&#]+)/.exec(window.location.search);
+  var current = asked ? decodeURIComponent(asked[1]) : "";
+  if (!tabOf(current)) { current = "주간 설비 점검"; }
+  var mine = tabOf(current);
+  if (mine) { mine.classList.add("is-on"); mine.setAttribute("aria-current", "page"); }
+  if (nameInput) { nameInput.value = current; }
+  // 관제로 넘어갈 때 이 미션을 연다(sian.js 가 body[data-monitor-href] 로 간다)
+  var monitor = body.getAttribute("data-monitor-href");
+  if (monitor) { body.setAttribute("data-monitor-href", monitor.split("?")[0] + "?mission=" + encodeURIComponent(current)); }
+
+  // 입력을 바꿨는가 — 폼 안 값이 바뀌거나, 고르기 · 점검항목 · 스위치를 눌렀으면
+  var dirty = false;
+  var form = document.querySelector("[data-stage-show='setup'] .mp-form");
+  if (form) {
+    form.addEventListener("input", function () { dirty = true; });
+    form.addEventListener("change", function () { dirty = true; });
+    form.addEventListener("click", function (event) {
+      if (event.target.closest && event.target.closest(".field-option, .check-row, .switch")) { dirty = true; }
+    });
+  }
 
   var toastTimer = 0;
   function toast(msg) {
@@ -45,11 +68,11 @@
     toastTimer = window.setTimeout(function () { t.remove(); }, 2600);
   }
 
-  // 설정 버리기 확인 — 모달은 screen.js 가 연다(숨은 [data-modal-open="discard"] 단추). 갈 곳 · 문구만 여기서 채운다.
-  function askDiscard(name, href) {
+  // 바꾼 설정 버리기 확인 — 모달은 screen.js 가 연다(숨은 [data-modal-open="discard"] 단추). 갈 곳 · 이름만 여기서 채운다.
+  function go(name, href) {
     var scrim = document.querySelector("[data-modal='discard']");
     var opener = document.querySelector("[data-discard-open]");
-    if (!scrim || !opener) { window.location.href = href; return; }
+    if (!dirty || !scrim || !opener) { window.location.href = href; return; }
     scrim.querySelector("[data-modal-confirm]").setAttribute("data-modal-confirm", href);
     scrim.querySelector("[data-discard-to]").textContent = name;
     opener.click();
@@ -62,7 +85,9 @@
     if (stage === "precheck") { toast("사전점검 진행중입니다."); return; }
     if (stage !== "setup") { return; }
     var mission = tab.getAttribute("data-mission");
-    if (mission) { askDiscard(mission + " 관제", "./main-v6.html?mission=" + encodeURIComponent(mission)); }
-    else { askDiscard("통합 순회 현황", "./building-v6.html"); }
+    if (!mission) { go("통합 순회 현황", "./building-v6.html"); return; }
+    var q = "?mission=" + encodeURIComponent(mission);
+    if (tab.getAttribute("data-run") === "idle") { go(mission + " 미션 설정", "./mission-setup-v6.html" + q); }
+    else { go(mission + " 관제", "./main-v6.html" + q); }
   });
 })();
