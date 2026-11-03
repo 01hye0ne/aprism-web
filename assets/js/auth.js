@@ -19,7 +19,7 @@
       gone = true;
       splash.classList.add("is-leaving");
       // 빠지는 동안만 기다렸다 넘어간다. 애니메이션이 꺼진 환경이면 곧바로 끝난다.
-      window.setTimeout(function () { location.href = "./login.html"; }, 240);
+      window.setTimeout(function () { location.href = (window.aprismHref || String)("./login.html"); }, 240);
     };
 
     if (hold > 0) {
@@ -77,7 +77,7 @@
       } catch (e) {
         // 사파리 프라이빗 모드처럼 막힌 곳에서는 그냥 넘어간다 — 규칙 3 이 통과로 잡힌다.
       }
-      location.href = landing();
+      location.href = (window.aprismHref || String)(landing());
     });
   }
 
@@ -176,7 +176,7 @@
     pwForm.addEventListener("submit", function (event) {
       event.preventDefault();
       if (submit.disabled) { return; }
-      location.href = landing();
+      location.href = (window.aprismHref || String)(landing());
     });
   }
 })();

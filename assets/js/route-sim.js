@@ -313,7 +313,7 @@
     var card = document.querySelector('.robot-strip .robot-card[aria-pressed="true"]') || document.querySelector(".robot-strip .robot-card");
     // Signal
     var sig = card && card.querySelectorAll(".robot-row .t-caption");
-    var sigTxt = null; if (sig) { Array.prototype.forEach.call(sig, function (n) { if (/^(Strong|Good|Weak|끊김)$/.test(n.textContent.trim())) { sigTxt = n; } }); }
+    var sigTxt = null; if (sig) { Array.prototype.forEach.call(sig, function (n) { if (/^(Strong|Good|Weak|Fair|끊김|Lost)$/.test(n.textContent.trim())) { sigTxt = n; } }); }
     if (sigTxt) {
       if (!sigTxt.hasAttribute("data-rr-orig")) { sigTxt.setAttribute("data-rr-orig", sigTxt.textContent); }
       sigTxt.textContent = m === "lost" ? "끊김" : sigTxt.getAttribute("data-rr-orig");

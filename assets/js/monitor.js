@@ -791,7 +791,7 @@
   var allBtn = $("[data-ah-all]");
   if (allBtn) {
     allBtn.addEventListener("click", function () {
-      var url = document.body.classList.contains("ver-6") ? "./alert-center-v6.html" : document.body.classList.contains("ver-5") ? "./alert-center-v5.html" : document.body.classList.contains("ver-3") ? "./alert-center-v3.html" : "./alert-center.html";
+      var url = (window.aprismHref || String)(document.body.classList.contains("ver-6") ? "./alert-center-v6.html" : document.body.classList.contains("ver-5") ? "./alert-center-v5.html" : document.body.classList.contains("ver-3") ? "./alert-center-v3.html" : "./alert-center.html");
       var name = "aprism-alert-center";
       if (!window.screen.isExtended || !window.getScreenDetails) {
         window.open(url, name);

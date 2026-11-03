@@ -140,7 +140,7 @@
     if (card.getAttribute("data-motion") === "walk") { return "walk"; }
     var badge = card.querySelector(".robot-row .badge");
     var text = badge ? badge.textContent.replace(/\s+/g, "") : "";
-    return text === "수행중" ? "walk" : "sit";
+    return text === "수행중" || text === "Running" ? "walk" : "sit";   // 영문판(*-en.html) 배지도
   }
 
   function sync() {

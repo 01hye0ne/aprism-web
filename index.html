@@ -298,6 +298,34 @@
       </article>
     </section>
 
+    <!-- 영문판(11/03) — 한글판(스플래시 · 로그인 · v6 일곱 장)을 tools/build-en.mjs 로 복사하고 화면 글자를 사전(tools/i18n/*.tsv)으로 바꾼다.
+         비밀번호 변경 강제는 뺐다. 한글판을 고친 뒤 node tools/build-en.mjs → python tools/stamp-assets.py. -->
+    <section class="screens" aria-labelledby="en-title">
+      <article class="screen-row">
+        <header class="screen-head">
+          <span class="screen-code">EN</span>
+          <a class="screen-title" id="en-title" href="./screens/main-v6-en.html">영문판 (English) · v6</a>
+        </header>
+        <ol class="ver-list">
+          <li class="ver-card is-latest">
+            <a class="ver-link" href="./screens/main-v6-en.html"><span class="ver-name">v6 EN</span><span class="ver-tag">자동 번역</span></a>
+            <span class="ver-date">2026.11.03</span>
+            <ul class="ver-pages">
+              <li><a href="./screens/splash-en.html"><span class="ver-no">CM-01</span>Splash</a></li>
+              <li><a href="./screens/login-en.html"><span class="ver-no">CM-02</span>Sign in</a></li>
+              <li><a href="./screens/mission-setup-v6-en.html"><span class="ver-no">1</span>Mission Setup</a></li>
+              <li><a href="./screens/mission-precheck-v6-en.html"><span class="ver-no">2</span>Pre-check</a></li>
+              <li><a href="./screens/building-v6-en.html"><span class="ver-no">3</span>Patrol Overview</a></li>
+              <li><a href="./screens/main-v6-en.html"><span class="ver-no">4</span>Mission Control</a></li>
+              <li class="is-sub"><a href="./screens/alert-center-v6-en.html"><span class="ver-no">4-1</span>Alert Center</a></li>
+              <li><a href="./screens/safety-v6-en.html"><span class="ver-no">SD</span>Safety Diagnosis</a></li>
+              <li><a href="./screens/report-v6-en.html"><span class="ver-no">RP</span>Reports</a></li>
+            </ul>
+          </li>
+        </ol>
+      </article>
+    </section>
+
     <!-- 내부 문서 — 디자인 시스템 검토 · 효과 시험. 클라이언트 확인용이 아니라 접어 둔다. -->
     <details class="internal">
       <summary>내부 문서</summary>

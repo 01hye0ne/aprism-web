@@ -1,0 +1,423 @@
+옥외 저장탱크 순찰(가스 농도 · 난간 개방) 묶음을 먼저 확인해 주세요	Check the outdoor storage tank patrol group (gas concentration · open railing) first
+알림 · 조치 내용	Alert · action taken
+원 등급 · 발생	Original severity · raised
+담당	Owner
+웨이포인트 · 위치	Waypoint · location
+동작	Actions
+조치 완료	Action done
+조건에 맞는 알림이 없습니다.	No alerts match the filter.
+왼쪽 목록에서 알림을 고르세요.	Pick an alert from the list on the left.
+표시할 알림이 없습니다.	No alerts to show.
+검출 장면	Detection frame
+(여러 개 선택 가능)	(select multiple)
+DELTA 추천	DELTA suggestion
+메모	Note
+(선택)	(optional)
+현장에 전달한 내용을 적어 주세요	Write what you passed on to the site
+교대 인수인계에 필요한 내용을 남깁니다. 최대 500자.	Leave notes for the shift handover. Up to 500 characters.
+임시저장된 상태	Draft saved
+원 등급	Original severity
+조치 ·	Action ·
+남긴 메모가 없습니다.	No notes left.
+처리 정보	Handling info
+소요	Took
+진단 상세	Diagnosis details
+조치 요청	Request action
+오탐 가능성	False-positive likelihood
+방금	Just now
+AI 추천을 쓰지 않음 (추천:	AI suggestion not used (suggested:⎵
+AI 추천 그대로 사용 (	Used AI suggestion as is (
+AI 추천 가운데 일부만 사용 (	Used part of AI suggestion (
+DELTA 인수인계 요약	DELTA handover summary
+초안 수정	Edit draft
+보고서에 넣기	Add to report
+미션 지도	Mission map
+안전진단 패널 접기	Collapse Safety Diagnosis panel
+감지 결과	Detection results
+v6 · 안전진단 — APRISM	v6 · Safety Diagnosis — APRISM
+같은 펌프 P-2. 베어링 이상음이 발열로 이어질 수 있다	Same pump P-2. Abnormal bearing noise can lead to heating
+높음	High
+같은 냉각수 계통. WP-05 펌프 온도가 오르면 WP-03 밸브 이음부 압력이 오른다	Same cooling line. When WP-05 pump temp rises, WP-03 valve joint pressure rises
+같은 펌프 전원. WP-06 수배전반 방전이 WP-05 펌프 모터 발열로 이어질 수 있다	Same pump power. WP-06 switchgear discharge can lead to WP-05 pump motor heating
+같은 급수 계통. WP-B09 펌프 모터 과열이 분기부 압력 변동으로 이어질 수 있다	Same water supply line. WP-B09 pump motor overheating can cause pressure swings at the branch
+WP-07 고소 작업 발판	WP-07 Elevated Work Platform
+누출 의심 1곳	1 suspected leak
+최고 48.6 ℃	Max 48.6 ℃
+WP-05 냉각 펌프 P-2	WP-05 Cooling Pump P-2
+이상 점수 20.4	Anomaly score 20.4
+WP-06 수배전반 MCC-1	WP-06 Switchgear MCC-1
+정상 범위	Normal range
+측정 3곳	3 spots measured
+측정 2곳	2 spots measured
+압력 0.84 MPa	Pressure 0.84 MPa
+WP-102 압력계 PG-A3	WP-102 Pressure Gauge PG-A3
+WP-103 수배전반	WP-103 Switchgear
+지하 3층, 지하 4층	B3F, B4F
+누출 의심도 81%	Leak likelihood 81%
+WP-B04 급수 배관 분기부	WP-B04 Water Supply Pipe Branch
+최고 41.8 ℃	Max 41.8 ℃
+WP-B09 급수 펌프 모터	WP-B09 Water Supply Pump Motor
+측정 4곳	4 spots measured
+측정	Measured
+차압 312 Pa	Diff. pressure 312 Pa
+압력 0.62 MPa	Pressure 0.62 MPa
+최고 68.4 ℃	Max 68.4 ℃
+WP-02 발전기 베어링	WP-02 Generator Bearing
+압력 7.9 bar	Pressure 7.9 bar
+WP-13 공기 압축기 C-1	WP-13 Air Compressor C-1
+이상 점수 21.6	Anomaly score 21.6
+WP-12 냉각 펌프 P-2	WP-12 Cooling Pump P-2
+이상 점수 9.41	Anomaly score 9.41
+같은 발전기 계통. WP-06 수배전반 방전과 WP-02 베어링 과열이 함께 나타날 수 있다	Same generator line. WP-06 switchgear discharge and WP-02 bearing overheating can appear together
+최고 71.2 ℃	Max 71.2 ℃
+WP-104 변압기 TR-1	WP-104 Transformer TR-1
+요청됨	Requested
+작업자에게 즉시 착용을 안내하고 고소 작업을 멈춰야 함	Tell the worker to put it on now and stop the elevated work
+현장 작업자, 무전 2채널	Site worker, radio ch. 2
+작업 감독자, 내선 2214	Work supervisor, ext. 2214
+안전관리팀, 업무 메신저	Safety team, work messenger
+구역 출입을 통제하고 설비팀에 밸브 확인을 요청해야 함	Restrict area access and ask facilities to check the valve
+설비팀, 내선 2310	Facilities team, ext. 2310
+순회 근무자, 무전 1채널	Patrol staff, radio ch. 1
+부하를 줄이고 점검을 요청해야 함	Reduce the load and request an inspection
+운전원, 내선 2201	Operator, ext. 2201
+계측팀에 계기 교정을 요청해야 함	Ask instrumentation to calibrate the gauge
+계기 교정 요청	Request gauge calibration
+계측팀, 내선 2420	Instrumentation team, ext. 2420
+운전원 수동 판독 요청	Request manual reading by operator
+진동 정밀 측정을 요청해야 함	Request a detailed vibration measurement
+절연 진단을 요청하고 전기팀에 알려야 함	Request insulation diagnosis and notify the electrical team
+전기팀, 내선 2405	Electrical team, ext. 2405
+전기팀, 업무 메신저	Electrical team, work messenger
+현장에 작업 중지를 요청해야 함	Ask the site to stop work
+현장 무전 연락, 작업 중지 요청	Radio site, request work stop
+로봇 정지, 현장 점검 요청	Stop robot, request site check
+원본	Original
+히트맵	Heatmap
+원본 크게 끄기	Close large original
+원본과 히트맵 크게	Enlarge original and heatmap
+원본 크게	Enlarge original
+기준:	Limit:
+위험 기준	Critical limit
+초과	⎵over
+주의 기준	Warning limit
+현장 조치	Site action
+요청	Request
+조치 없음	No action
+현장 조치 요청됨	Site action requested
+측정 전	Not measured
+지난 순회에서도 기준을 넘었음	Also over limit on the last patrol
+처음 넘음	First time over
+계속 정상 범위	Steady in normal range
+지난 3회 모두 정상 범위	Last 3 all in normal range
+아직 측정 전	Not measured yet
+조치 필요 없음	No action needed
+로봇이 도착하면 결과가 표시됨	Results appear when the robot arrives
+정상 범위의 측정값	Reading within normal range
+재측정에서 다시 넘으면 다시 표시	Shown again if a re-measure exceeds it
+현장 조치 요청	Request site action
+영향 후보	Possible effect
+원인 후보	Possible cause
+가능성	Likelihood
+연관 근거가 있는 감지 없음	No related detections with evidence
+연관 감지	Related detections
+DELTA가 같은 계통 정보와 함께 움직이는 감지 짝으로 고른 연관 후보다. 확정된 원인이 아니라 판단을 돕는 참고용 가설이다. 시안의 계통 정보는 예시 값이다.	Related candidates DELTA picked as detection pairs that move together on the same line. A reference hypothesis to aid judgment, not a confirmed cause. Line data in this mockup is sample data.
+미착용 인원	People without PPE
+250 Pa 미만	Under 250 Pa
+이번 순회 중	During this patrol
+오늘 14:00	Today 14:00
+내일 09:00	Tomorrow 09:00
+필요 없음	Not needed
+요청 전	Not requested
+발생위치	Location
+발생시간	Time raised
+측정 시간	Measured at
+조치 상태	Action status
+다음 측정	Next measurement
+이상 판정	Anomaly judgment
+측정 이력	Measurement history
+돌아가기	Back
+영상 확인	Video check
+시안용 예시 이미지(같은 감지의 사진)	Sample image for mockup (photo of the same detection)
+재발 여부	Recurrence
+조치 결정	Action decision
+미착용 0명	0 without PPE
+55% 미만	Under 55%
+40 ℃ 미만	Under 40 ℃
+19.0 미만	Under 19.0
+8.60 미만	Under 8.60
+안전모 미착용 1명	1 without helmet
+압력 편차 1건	1 pressure deviation
+영상	Video
+WP-07 고소 작업 발판 안전벨트 미착용	WP-07 Elevated Work Platform · no safety harness
+영상 + 열화상	Video + thermal
+같은 냉각수 계통 WP-05 온도, 음향도 기준 초과	Same cooling line: WP-05 temperature and acoustic also over limit
+평소 36.2 ℃ 대비 +12.4 ℃	+12.4 ℃ vs usual 36.2 ℃
+N₂ 배관 압력 상한 초과, 최근 3회 잇달아 오름	N₂ line pressure over upper limit, rising 3 readings in a row
+마이크	Microphone
+저주파 대역 에너지 증가, 베어링 마모 패턴과 비슷	Low-frequency energy rising, similar to bearing wear
+PD 센서	PD sensor
+CH1만 주의, CH2와 CH3은 정상 범위	Only CH1 warning; CH2 and CH3 in range
+10:15 새로 넘음, 직전 순회보다 +18.9 ℃	Newly over at 10:15, +18.9 ℃ vs previous patrol
+PG-A3 상한 초과, 계기 점검 필요	PG-A3 over upper limit, gauge check needed
+CH1만 주의, 같은 전기 계통 변압기 과열	Only CH1 warning; transformer overheating on the same electrical line
+지하 3층 순회 끝, 13:00 전까지 다시 못 잼. CCTV 사각 구간	B3F patrol done; can't re-measure before 13:00. CCTV blind spot
+지하 3층에서 측정, 평소보다 +6.3 ℃	Measured on B3F, +6.3 ℃ above usual
+HEPA 필터 차압이 교체 기준을 넘음, 최근 3회 잇달아 오름. WP-04 N₂ 압력도 정상 범위 아래	HEPA filter diff. pressure over replacement limit, rising 3 readings in a row. WP-04 N₂ pressure also below range
+베어링 표면 68.4 ℃, 주변보다 31 ℃ 높음	Bearing surface 68.4 ℃, 31 ℃ above ambient
+토출 압력이 정상 범위(8.2 ~ 8.8) 아래, 흡입 필터 막힘 가능성	Discharge pressure below range (8.2–8.8), possible clogged intake filter
+PRPD 패턴이 코로나 방전 유형과 같음	PRPD pattern matches corona discharge
+에 센서가 달려 있지 않음	⎵has no sensor fitted
+이 미션에서 판정하지 않음	Not judged on this mission
+모두 정상 범위	All in normal range
+판정	Judgment
+기준	Limit
+DELTA 메모	DELTA note
+미션, 층	Mission, floor
+지나 이동 중	⎵passed, moving
+, 순회 끝	, patrol done
+새로	New
+카드	Cards
+표	Table
+외	⎵+
+평면, 지점	Plan, points
+곳	⎵spots
+영상 확인으로	To video check
+영상 확인 보기	View video check
+미션 전체	Whole mission
+관제 3D 지도에서 이 미션과 층을 연다	Opens this mission and floor on the Control 3D map
+관제에서 보기	View in Control
+개 미션	⎵missions
+대상 아님	N/A
+센서 없음	No sensor
+작업 구역 출입구	Work area entrance
+배관 이음부	Pipe joint
+펌프 모터	Pump motor
+압력계	Pressure gauge
+펌프 베어링	Pump bearing
+인식	Recognition
+에	⎵
+센서가 달려 있지 않음	has no sensor fitted
+송출할 센서 없음	No sensor to stream
+센서를 단 로봇이 순회하면 표시	Shown when a robot with the sensor patrols
+판정하지 않음	Not judged
+는	⎵
+만 판정	⎵only
+재지 않음	Not measured
+자세히 보기 →	Details →
+라이브	Live
+새 위험	New critical
+미션 보기	View mission
+누르면 자세히 보기	Click for details
+시안용 예시 이미지(같은 감지의 사진), 누르면 자세히 보기	Sample image (photo of the same detection), click for details
+안전진단 패널 펼치기	Expand Safety Diagnosis panel
+보고서 목록	Report list
+보고서 목록 접기	Collapse report list
+이전 달	Previous month
+2026년 10월, 날짜로 찾기	October 2026, find by date
+다음 달	Next month
+v6 · 보고서 — APRISM	v6 · Reports — APRISM
+2026년 10월	October 2026
+최신순 정렬	Sort newest first
+{미션이름}	{Mission name}
+10월 22일 (목)	Thu, Oct 22
+10월 21일 (수)	Wed, Oct 21
+10월 16일 (금)	Fri, Oct 16
+10월 13일 (화)	Tue, Oct 13
+10월 12일 (월)	Mon, Oct 12
+최고	Max
+비정상	Abnormal
+판독 없음	No reading
+WP-02 표면 최고 134.8°C	WP-02 surface max 134.8°C
+냉각 계통 점검 요청	Request cooling system check
+홍길동 10:21	Alex Kim 10:21
+WP-02 표면 최고 106.8°C	WP-02 surface max 106.8°C
+홍길동 10:22	Alex Kim 10:22
+WP-03 표면 최고 99.2°C	WP-03 surface max 99.2°C
+WP-03 표면 최고 75.7°C	WP-03 surface max 75.7°C
+오탐으로 종료 (조명 반사)	Closed as false positive (light reflection)
+홍길동 10:23	Alex Kim 10:23
+WP-03 표면 최고 79.7°C	WP-03 surface max 79.7°C
+WP-04 표면 최고 80.8°C	WP-04 surface max 80.8°C
+홍길동 10:25	Alex Kim 10:25
+WP-05 표면 최고 98.8°C	WP-05 surface max 98.8°C
+WP-05 표면 최고 82.0°C	WP-05 surface max 82.0°C
+김현대 10:28	Jordan Lee 10:28
+WP-05 표면 최고 79.2°C	WP-05 surface max 79.2°C
+오탐으로 종료 (중복 감지)	Closed as false positive (duplicate detection)
+WP-06 안전모 미착용 1명	WP-06 1 without helmet
+현장 근무자에게 착용 지시	Told site worker to wear it
+홍길동 10:26	Alex Kim 10:26
+WP-10 표면 최고 70.8°C	WP-10 surface max 70.8°C
+순시 점검 결과 보고서	Patrol Inspection Report
+날짜 및 시간	Date and time
+2026.10.13 (화) 10:17 ~ 10:46	2026.10.13 (Tue) 10:17 – 10:46
+유형	Type
+수동	Manual
+순시점검결과보고서	PatrolInspectionReport
+위험 이벤트와 조치	Critical events and actions
+주의 이벤트와 조치	Warning events and actions
+이벤트 사진	Event photos
+게이지 판독 결과	Gauge reading results
+열화상 분석 결과	Thermal analysis results
+종합 소견	Overall findings
+로봇 관제 일일 보고서	Robot Control Daily Report
+날짜	Date
+2026.10.13 (화)	2026.10.13 (Tue)
+2건	2
+로봇관제일일보고서	RobotControlDailyReport
+특이 사항	Remarks
+로봇 관제 월간 보고서	Robot Control Monthly Report
+10월 월 보고서	October monthly report
+6건	6
+로봇관제월간보고서	RobotControlMonthlyReport
+설비별 추이	Trend by equipment
+비정상 감지 추이	Abnormal detection trend
+10.12 (월)	10.12 (Mon)
+10.13 (화)	10.13 (Tue)
+10.16 (금)	10.16 (Fri)
+10.21 (수)	10.21 (Wed)
+#1 Gov. Air Tank Pr. 7.2 kg/cm² (기준 74 ~ 76)	#1 Gov. Air Tank Pr. 7.2 kg/cm² (limit 74–76)
+21건	21
+134.85°C (10:17 미션)	134.85°C (10:17 mission)
+22건	22
+26건	26
+본 순시에서 위험 이벤트 11건이 감지되었다(온도감지 10건, 안전감지 1건). 게이지 판독 결과 비정상 231건이 확인되어 점검이 필요하다. 열화상 분석에서 고온 21건이 감지되었다(최고 134.85°C).	This patrol detected 11 critical events (10 temperature, 1 safety). Gauge reading found 231 abnormal values that need inspection. Thermal analysis detected 21 high-temperature spots (max 134.85°C).
+미션 2건 중 1건(08:02)은 중단 종료되었다. 알림 12건 중 11건을 처리했고 미조치 1건은 다음 근무자에게 인계한다. 열화상 고온 22건 중 21건이 10:17 미션에서 나왔다(최고 134.85°C).	1 of 2 missions (08:02) was aborted. 11 of 12 alerts were handled; the 1 open alert is handed to the next shift. 21 of 22 thermal high-temp spots came from the 10:17 mission (max 134.85°C).
+10월 1일부터 21일까지 미션 6건, 알림 23건(위험 14, 주의 9)이 발생했다. 미조치 2건은 온도감지 1건(10.13), 계기인식 1건(10.21)이다. 10.13 열화상 최고 134.85°C 구간은 재점검이 필요하다.	From Oct 1 to 21: 6 missions, 23 alerts (14 critical, 9 warnings). The 2 open alerts are 1 temperature (10.13) and 1 gauge (10.21). The 10.13 thermal section with max 134.85°C needs re-inspection.
+4일	4 days
+6건 (정상 완료 5, 중단 종료 1)	6 (5 completed, 1 aborted)
+2시간 14분	2 h 14 min
+23건 (위험 14, 주의 9)	23 (14 critical, 9 warnings)
+23건	23
+14건	14
+9건	9
+합계 위험 14건, 주의 9건	Total 14 critical, 9 warnings
+11월 2일 (월)	Mon, Nov 2
+11월 1일 (일)	Sun, Nov 1
+10.22 (목)	10.22 (Thu)
+10.31 (토)	10.31 (Sat)
+27건	27
+10월 한 달 동안 미션 9건, 알림 25건(위험 15, 주의 10)이 발생했다. 미조치 2건은 온도감지 1건(10.13), 계기인식 1건(10.21)이다. 10.13 열화상 최고 134.85°C 구간은 재점검이 필요하다.	October had 9 missions and 25 alerts (15 critical, 10 warnings). The 2 open alerts are 1 temperature (10.13) and 1 gauge (10.21). The 10.13 thermal section with max 134.85°C needs re-inspection.
+6일	6 days
+9건 (정상 완료 8, 중단 종료 1)	9 (8 completed, 1 aborted)
+4시간 1분	4 h 1 min
+25건 (위험 15, 주의 10)	25 (15 critical, 10 warnings)
+25건	25
+15건	15
+10건	10
+합계 위험 15건, 주의 10건	Total 15 critical, 10 warnings
+문서 번호	Document no.
+구분	Category
+오탐 종료	Closed as false positive
+미조치	Open
+합계	Total
+시각	Time
+감지 유형	Detection type
+위치와 현상	Location and finding
+사진	Photo
+사진 크게 보기	Enlarge photo
+감지 데이터	Detection data
+기본 정보	Basic info
+사업장	Site
+{사업장명}	{Site name}
+일시	Date/time
+근무자	Operator
+{관제사}	{Operator}
+{로봇 ID}	{Robot ID}
+미션 유형	Mission type
+완료 상태	Completion
+정상 완료	Completed
+점검 결과 요약	Inspection summary
+점검 구간	Inspection range
+WP-01 ~ WP-12 (12곳)	WP-01 – WP-12 (12 spots)
+소요 시간	Duration
+29분 0초	29 min 0 s
+11건 (위험 11, 주의 0)	11 (11 critical, 0 warnings)
+감지 유형별 처리 현황	Handling by detection type
+참고 사항	Notes
+AI 감지 원본 수치: 게이지 비정상 231건, 읽기 실패 1807건. 안전(PPE) 총 인원 802명, 안전모 위반 40건. 오디오 분석 1710건.	Raw AI detection counts: 231 abnormal gauges, 1807 read failures. Safety (PPE) 802 people total, 40 helmet violations. 1710 audio analyses.
+작성 일시	Written at
+작성자	Author
+점검일 수	Inspection days
+처리 결과 요약	Handling summary
+점검 시간	Inspection time
+일자별 결과	Results by day
+일자	Day
+일일 보고서	Daily report
+근무 시간	Shift hours
+{근무 시간}	{Shift hours}
+미션 수	Missions
+2건 (정상 완료 1, 중단 종료 1)	2 (1 completed, 1 aborted)
+41분	41 min
+12건 (위험 12, 주의 0)	12 (12 critical, 0 warnings)
+미션별 결과	Results by mission
+시작	Start
+자동	Auto
+중단 종료	Aborted
+1건	1
+29분	29 min
+이벤트와 조치	Events and actions
+이벤트 없음	No events
+최종 값	Final value
++ 특이 사항 입력	+ Add remarks
+WP-02 표면 최고 온도	WP-02 surface max temp
+기준 70°C 이하	Limit ≤ 70°C
+WP-10 표면 최고 온도	WP-10 surface max temp
+#1 Upper Guide BRG 냉각수 유량	#1 Upper Guide BRG cooling water flow
+기준 6 m³/h 이상	Limit ≥ 6 m³/h
+(기준 벗어남)	(out of limit)
+점검일별 측정값	Readings by inspection day
+건, 주의	, warnings⎵
+일별 위험, 주의 알림	Daily critical and warning alerts
+10월 일별 위험, 주의 알림 건수	October daily critical and warning alert counts
+점검하지 않은 날은 막대 없음.	No bar on days without inspection.
+고온감지	High temp
+소견	Findings
+문서 구성	Document contents
+DOCX 내려받기	Download DOCX
+PDF 내려받기	Download PDF
+쪽	⎵pp
+목차	Contents
+총	Total⎵
+자동 생성 2026.10.13 10:46	Auto-generated 2026.10.13 10:46
+자동 생성 2026.10.13 18:00	Auto-generated 2026.10.13 18:00
+생성	Generate
+PDF 약	PDF approx.⎵
+시안에서는 연결되지 않은 보고서예요	This report isn't linked in the mockup
+특이 사항 입력	Add remarks
+입력한 내용이 문서의 특이 사항 칸에 들어가요. 비워 두면 빈칸으로 나가요.	What you type goes into the Remarks field. Leave it empty to leave it blank.
+저장	Save
+특이 사항을 저장했어요	Remarks saved
+특이 사항을 비웠어요	Remarks cleared
+내려받을 문서 구성	Contents to download
+1쪽(기본 정보, 요약, 유형별 현황)은 항상 들어가요	Page 1 (basic info, summary, by type) is always included
+만드는 중	Generating
+내려받기 완료	Download complete
+열기	Open
+내려받은 파일 열기는 실제 서비스에서 동작해요	Opening downloaded files works in the real service
+중간 집계	Interim tally
+월 월 보고서	⎵monthly report
+시안에서는 10월만 연결돼요	Only October is linked in the mockup
+10월 월 보고서를 만들었어요	October monthly report created
+2026년	2026
+월	⎵month
+월, 날짜로 찾기	, find by date
+작성 중	In progress
+이 달의 보고서가 없어요 (시안 예시는 10월만)	No reports this month (mockup sample is October only)
+시안에서는 10월 13일 보고서 두 건과 월 보고서만 연결돼요	Only the two Oct 13 reports and the monthly report are linked in the mockup
+날짜로 찾기	Find by date
+일	Sun
+, 보고서 있음	, has reports
+, 아직 없음	, not yet
+, 보고서 없음	, no reports
+화	Tue
+수	Wed
+목	Thu
+금	Fri
+토	Sat
+보고서 있는 날	Days with reports
+시안 예시는 10월만	Mockup sample is October only
+보고서 목록 펴기	Expand report list
+보고서 메뉴에서 보기	View in Reports menu
+이벤트 사진 크게 보기	Enlarge event photo

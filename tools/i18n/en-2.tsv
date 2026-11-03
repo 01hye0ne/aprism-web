@@ -1,0 +1,392 @@
+지하발전소 B3 터빈 2 에서 NG 1건이 발견되었습니다.	1 NG was found on Turbine 2, underground plant B3.
+Spiral Casing Pr. 측정값 90 이 기준값 87 을 넘었습니다. 로봇을 멈추고 현장에 연락한 뒤 조치 내용을 입력해 주세요.	Spiral Casing Pr. reading 90 exceeded the limit of 87. Stop the robot, contact the site, then enter the action taken.
+로봇 정지	Stop Robot
+현장 연락	Contact Site
+조치 입력	Enter Action
+현재 지하발전소 B3 터빈2 NG 1건이 발견 되었습니다.	1 NG has been found on Turbine 2, underground plant B3.
+Spiral Casing Pr. 기준값 87 이하 측정값 90으로 3 정도 높습니다. 4% 미만으로 다음 검사에서 추이를 보겠습니다.	Spiral Casing Pr. reads 90 against a limit of 87 — about 3 over. That's under 4%, so we'll watch the trend at the next check.
+지하발전소 B3 터빈 2 에서 위험 알림이 발생했습니다.	A critical alert was raised on Turbine 2, underground plant B3.
+Spiral Casing Pr. 이 기준값을 크게 넘었습니다. 로봇을 멈추고 현장에 연락한 뒤 조치 내용을 입력해 주세요.	Spiral Casing Pr. is well over its limit. Stop the robot, contact the site, then enter the action taken.
+안전벨트 미착용 · WP-04	No safety harness · WP-04
+P2 작업자의 안전벨트가 검출되지 않았습니다 — 판정 기준 “미착용 1명 이상”을 충족했습니다.	No safety harness detected on worker P2 — meets the rule "1 or more without harness".
+10:32:14 KST · 3분 경과 · 담당 R-01 · WP-04 냉각수 배관 이음부	10:32:14 KST · 3 min ago · R-01 · WP-04 Cooling Water Pipe Joint
+P2 안전벨트 미착용	P2 no safety harness
+P1 · 헬멧 ✓ 안전벨트 ✓ 안전화 ✓	P1 · Helmet ✓ Harness ✓ Safety shoes ✓
+P2 · 헬멧 ✓ 안전벨트 ✗ 안전화 ✓	P2 · Helmet ✓ Harness ✗ Safety shoes ✓
+P2 작업자 · 안전벨트 미착용	Worker P2 · no safety harness
+P1은 헬멧 · 안전벨트 · 안전화 3종 모두 착용 · 검출 신뢰도 0.91 · 판정 기준 “미착용 1명 이상 →	P1 wears all 3 (helmet · harness · safety shoes) · detection confidence 0.91 · rule "1 or more without →
+WP-04 냉각수 배관 이음부	WP-04 Cooling Water Pipe Joint
+APRO 4F · R-01 미션 (12개 지점) · WP-04	APRO 4F · R-01 mission (12 points) · WP-04
+WP-03 펌프 하우징 · 12 m	WP-03 Pump Housing · 12 m
+10:31:47 정상 · 10:29:10 확인됨	10:31:47 normal · 10:29:10 confirmed
+부분방전 · WP-06	Partial discharge · WP-06
+이상 점수 9.41 — 임계 9.23을 초과했습니다. PRPD 패턴이 코로나 방전 유형과 일치합니다.	Anomaly score 9.41 — above the 9.23 threshold. The PRPD pattern matches corona discharge.
+10:31:44 KST · 4분 경과 · 담당 R-02 · WP-06 수배전반	10:31:44 KST · 4 min ago · R-02 · WP-06 Switchgear
+WP-06 부분방전 패턴	WP-06 partial discharge pattern
+PRPD 분류 · 41 ms	PRPD classification · 41 ms
+UHF 센서 · R-02 · 10:31:44	UHF sensor · R-02 · 10:31:44
+코로나 방전 · 이상 점수 9.41	Corona discharge · anomaly score 9.41
+수배전반 · 코로나 방전 의심	Switchgear · suspected corona discharge
+임계 9.23 초과 · 최근 3회 측정 상승 추세 · 판정 기준 “임계 초과 →	Above 9.23 threshold · rising over last 3 readings · rule "above threshold →
+WP-06 수배전반	WP-06 Switchgear
+APRO 4F · R-02 미션 (8개 지점) · WP-06	APRO 4F · R-02 mission (8 points) · WP-06
+WP-05 비상 발전기실 · 18 m	WP-05 Emergency Generator Room · 18 m
+10:24:02 정상 · 10:12:40 확인됨	10:24:02 normal · 10:12:40 confirmed
+온도감지 · WP-03 펌프 하우징	Temperature · WP-03 Pump Housing
+추이 관찰 · 다음 순회 재측정	Watching trend · re-measure next patrol
+통신 불안정 · Robot 02	Unstable connection · Robot 02
+재접속 확인 · 조치 불필요	Reconnected · no action needed
+진동감지 · WP-02 터빈1 베어링	Vibration · WP-02 Turbine 1 Bearing
+현장 점검 요청 · 이상 없음	Site check requested · no issues
+배터리 부족 · Robot 06	Low battery · Robot 06
+충전 도크 복귀 확인	Returned to charging dock
+원인 분석 중	Analyzing cause
+원인 분석 완료 · 후보 1건 확인	Cause analysis done · 1 candidate found
+Spiral Casing Pr. 기준값 87이하 측정값 90으로 3정도 높습니다. 4% 미만으로 다음 검사에서 추이를 보겠습니다.	Spiral Casing Pr. reads 90 against a limit of 87 — about 3 over. That's under 4%, so we'll watch the trend at the next check.
+조치 필요	Action required
+· 현재 위치	· current position
+비상정지 발동 · 로봇 구동 차단	Emergency stop · robot drive cut
+에 비상정지가 발동되었습니다.	: emergency stop engaged.
+모터 전원이 차단되었습니다. 현장 안전을 확인한 뒤 조치 내용을 입력하고 해제 절차를 진행하세요.	Motor power is cut. Confirm on-site safety, enter the action taken, then follow the release procedure.
+확인하기	Confirm
+건	⎵
+지금 ·	Now ·
+건너뜀	Skipped
+지도에서 보기	View on map
+순서 바꾸기. 위아래 화살표로 옮깁니다	Reorder. Use the up/down arrows to move
+끌어서 순서 바꾸기	Drag to reorder
+개	⎵
+점검항목을 1개 이상 골라 주세요	Pick at least 1 inspection item
+배터리가 모자라 시작할 수 없어요	Not enough battery to start
+현재	Now⎵
+고른 점검항목이 없어요.	No inspection items selected.
+수행 가능	Ready
+여유 부족	Tight
+수행 불가	Not possible
+%, 이 미션 예상 소모	%, this mission uses about⎵
+%, 복귀 예비	%, return reserve⎵
+복귀 예비	Return reserve⎵
+%를 남기려면 약	% — keeping that needs about⎵
+가 더 필요해요. 점검항목을 줄이거나 다른 로봇을 골라 주세요.	⎵more. Remove some items or pick another robot.
+끝나면 약	About⎵
+가 남아요. 복귀 예비	⎵left at the end. Close to the return reserve of⎵
+%에 가까워 여유가 적어요.	%, so the margin is thin.
+예상 소모 약	Uses about⎵
+, 끝나면 약	, with about⎵
+가 남아요.	⎵left at the end.
+사전점검 진행중입니다.	Pre-check in progress.
+통합 순회 현황	Patrol Overview
+ROBOT 01 확인중..	Checking ROBOT 01..
+v6 · 사전 점검 — APRISM	v6 · Pre-check — APRISM
+미션 고르기	Choose mission
+오늘 확인 완료 접기	Collapse today's confirmed
+Delta AI 요약	Delta AI summary
+Delta 창 열기	Open Delta
+Delta 에게 묻기 열기	Open Ask Delta
+Delta 창 닫기	Close Delta
+전체 층 배치도	All-floor layout
+로봇 현황	Robot status
+층으로 거르기	Filter by floor
+미션 단계로 거르기	Filter by mission stage
+v6 · 전체 층 현황 — APRISM	v6 · Patrol Overview — APRISM
+미션 선택	Select mission
+관제사 교대	Operator Handover
+최신 알림	Latest alerts
+전체보기	View all
+전체	All
+전체 미션 · 위험 우선	All missions · critical first
+오늘 확인 완료	Confirmed today
+0건	0
+위험 1건 포함 6건 누적	6 total, incl. 1 critical
+Delta와 대화	Chat with Delta
+순회 경로 지켜보는 중...	Watching the patrol route...
+위험 3건, 주의 9건이 있어요. 위험 미션부터 확인하세요.	3 critical, 9 warnings. Check the critical missions first.
+위험 1건부터 조치	Act on the 1 critical first
+주의 5건 묶어서 확인	Review 5 warnings together
+현장 점검 한꺼번에 요청	Request site checks in one go
+전체 건물	Whole building
+개 층	⎵floors
+층을 누르면 그 층만 펼쳐 보여요	Click a floor to expand it
+층별 3D 맵을 불러오는 중이에요	Loading the 3D floor maps
+12대 연결	12 connected
+계기인식	Gauge reading
+압력	Pressure
+지하발전소 터빈 2 NG 1건 발견	1 NG found · Turbine 2, underground plant
+터빈 2 NG 1건 발견	1 NG found · Turbine 2
+안전감지 · 안전벨트 미착용 1명	Safety · 1 without harness
+안전감지	Safety
+안전벨트 미착용	No safety harness
+1명	1 person
+누출감지 · 냉각수 배관 밸브	Leak · Cooling Water Pipe Valve
+누출감지	Leak
+누출 의심도	Leak likelihood
+이상음향 · 냉각 펌프 P-2	Acoustic · Cooling Pump P-2
+이상음향	Acoustic
+이상 점수	Anomaly score
+온도감지 · 냉각 펌프 P-2 48.6℃	Temperature · Cooling Pump P-2 48.6℃
+온도감지	Temperature
+최고 온도	Max temp
+부분방전 · CH1 이상 점수 9.05	Partial discharge · CH1 score 9.05
+부분방전	Partial discharge
+차압 NG · HEPA Filter 차압계	Diff. pressure NG · HEPA Filter Gauge
+차압	Diff. pressure
+압력 편차 · N₂ 배관 압력계	Pressure deviation · N₂ Line Gauge
+과열 · 발전기 베어링 68.4℃	Overheating · Generator Bearing 68.4℃
+이상음향 · 이상 점수 21.6	Acoustic · anomaly score 21.6
+진동 상승 · 냉각 펌프 P-2	Vibration rising · Cooling Pump P-2
+압력 편차 · 공기 압축기 C-1	Pressure deviation · Air Compressor C-1
+지하 3층	B3F
+지하 4층	B4F
+통신 끊김	Connection lost
+배전반실 열화상 점검	Switchboard Room Thermal Scan
+케미컬 공급 캐비닛 CDS-02 판독	Chemical Supply Cabinet CDS-02 Reading
+터빈 2 / Unit 03 · WP-04 N₂ 배관 압력계	Turbine 2 / Unit 03 · WP-04 N₂ Line Pressure Gauge
+APRO 4F · WP-03 냉각수 배관 밸브	APRO 4F · WP-03 Cooling Water Pipe Valve
+Robot 05 · WP-06 수배전반	Robot 05 · WP-06 Switchgear
+Robot 05 · WP-12 냉각 펌프 P-2	Robot 05 · WP-12 Cooling Pump P-2
+Robot 05 · WP-02 발전기 베어링	Robot 05 · WP-02 Generator Bearing
+Robot 05 · WP-13 공기 압축기 C-1	Robot 05 · WP-13 Air Compressor C-1
+Robot 11 · WP-02 HEPA Filter 차압계	Robot 11 · WP-02 HEPA Filter Differential Gauge
+Robot 11 · WP-04 N₂ 배관 압력계	Robot 11 · WP-04 N₂ Line Pressure Gauge
+열교환기로 이동 중	Moving to heat exchanger
+APRO 4F · WP-05 냉각 펌프 P-2	APRO 4F · WP-05 Cooling Pump P-2
+APRO 4F · WP-06 수배전반 MCC-1	APRO 4F · WP-06 Switchgear MCC-1
+APRO 4F · WP-07 고소 작업 발판	APRO 4F · WP-07 Elevated Work Platform
+소음 이상 · 변압기 TR-1	Abnormal noise · Transformer TR-1
+누유 흔적 · 유압 유닛 HU-2	Oil leak trace · Hydraulic Unit HU-2
+청소 후 재측정 · 정상	Re-measured after cleaning · normal
+온도감지 · 최고 온도 44.2 ℃	Temperature · max 44.2 ℃
+부분방전 · 이상 점수 8.92	Partial discharge · score 8.92
+이상음향 · 이상 점수 19.6	Acoustic · score 19.6
+온도감지 · 최고 온도 41.5 ℃	Temperature · max 41.5 ℃
+누출감지 · 누출 의심도 58%	Leak · likelihood 58%
+Robot 02 · 도크 도착 후 충전	Robot 02 · charging after docking
+Robot 07 · 공조 설비 순회 2회차 시작	Robot 07 · HVAC patrol round 2 started
+Robot 11 · 전기실 열화상 점검 끝	Robot 11 · electrical room thermal scan done
+, 주의	, Warning⎵
+이	⎵
+수행	Run
+위험 알림 있음	Has critical alerts
+주의 알림 있음	Has warnings
+안전진단 화면 준비 중	Safety Diagnosis screen in progress
+진단 상세	Diagnosis details
+공기 압축기 C-1	Air Compressor C-1
+냉각수 펌프 P-3	Cooling Water Pump P-3
+배전반실 열화상	Switchboard Room Thermal
+변압기 TR-2	Transformer TR-2
+끝	End
+· 마지막 위치	· last position
+· 도크	· dock
+대 연결	⎵connected
+대 수행중	⎵running
+로봇이 없어요	No robots
+운행 흐름 ·	Run flow ·
+예정된 일정이 없어요	Nothing scheduled
+으로 들어가기	⎵— enter
+· 이 미션은 지나지 않아요	· this mission doesn't pass here
+대 ·	⎵robots ·
+알림 없음	No alerts
+미션으로 들어가기	Enter mission
+경로	Route
+개 미션이 지나요	⎵missions pass here
+개 층을 지나요	⎵floors on route
+배정 없음	Unassigned
+있어요.	.
+중 층을 골라 주세요.	— pick a floor.
+알림이 없어요.	No alerts.
+은	⎵
+를 지나요.	⎵on its route.
+알림이	⎵alerts:⎵
+건(	⎵(
+) 들어와 있어요. 어느 층부터 볼까요?	). Which floor first?
+지금은 들어온 알림이 없어요. 보고 싶은 층을 골라 주세요.	No alerts right now. Pick a floor to look at.
+위험 알림	Critical alerts
+건, 주의 알림	, warnings⎵
+위험 미션부터 확인하세요.	Check the critical missions first.
+왼쪽 목록에서 확인하세요.	Check them in the list on the left.
+알림이 없어요. 순회는 정상이에요.	No alerts. The patrol is normal.
+에서 알림이	: alerts⎵
+) 들어와 있어요. 이 층을 지나는 미션은	). Missions on this floor:⎵
+개예요. 어느 미션부터 들어가 볼까요?	. Which one first?
+은 지금 조용해요. 이 층을 지나는 미션	⎵is quiet now. Missions on this floor:⎵
+개가 순회 중이에요. 궁금한 미션이 있으면 골라 주세요.	⎵patrolling. Pick one to look at.
+있어요. 미션을 골라 주세요.	. Pick a mission.
+알림이 없어요. 미션	No alerts. Missions:⎵
+개가 순회 중이에요.	⎵patrolling.
+오래된 순 · 위험 우선	Oldest · critical 1st
+이 미션이 지나는 층이에요. 층을 누르면 그 층의 미션 관제로 돌아가요	Floors on this mission's route. Click a floor to return to its mission control
+3D 맵 파일을 불러오지 못했어요	Couldn't load the 3D map file
+대	⎵
+건 지남	⎵passed
+알림	Alerts
+이 미션은 이 층을 지나지 않아요	This mission doesn't pass this floor
+누르면 이 층으로 들어가요	Click to enter this floor
+누르면 이 층만 펼쳐요	Click to expand this floor
+누르면 들어가요	Click to enter
+3D 맵을 표시할 수 없어요	Can't show the 3D map
+이 브라우저에서는 3D 맵을 표시할 수 없어요	This browser can't show the 3D map
+알림 있음	Has alerts
+· 새 위험	· new critical
+— 끌어서 순서 바꾸기	— drag to reorder
+Delta 창 너비	Delta panel width
+끌어서 너비 조절 · 두 번 눌러 처음 너비로	Drag to resize · double-click to reset
+오늘 확인 완료 펼치기	Expand today's confirmed
+답변 정리 중...	Preparing an answer...
+건 원인 분석 중...	⎵— analyzing causes...
+건 추세 비교 중...	⎵— comparing trends...
+건 살펴보는 중...	⎵— looking into it...
+을 지나지 않아요	⎵is not on the route
+로 돌아가기	Back to⎵
+계기 판독	Gauge reading
+온도	Temperature
+누출	Leak
+진동	Vibration
+기타	Other
+순회	Patrol
+근거 —	Basis —
+더보기	More
+위치 · 감지 · 로봇 정보	Location · detection · robot info
+조치 내용	Action taken
+메모 펼치기	Expand note
+예) 현장 작업자 대피 확인, 안전 요원 배치 후 재가동 준비	e.g. Confirmed worker evacuation; restart after safety staff are in place
+안전진단에서 이 알림의 감지 결과 보기	View this alert's detection in Safety Diagnosis
+v6 · 통합 관제 메인 — APRISM	v6 · Mission Control — APRISM
+정기 순회 진행 중	Routine patrol in progress
+크게 보기	Enlarge
+패널에 고정	Pin to panel
+위치	Location
+감지	Detection
+DELTA 조치 제안	DELTA suggested actions
+오탐 가능성	False-positive likelihood
+메모 (선택)	Note (optional)
+조치 요청	Request action
+되돌리기	Undo
+2대 배정	2 assigned
+1대 수행중	1 running
+전체 로봇 보기	View all robots
+현재 수행 중인 로봇	Robots currently running:⎵
+대가 있어 로그아웃할 수 없습니다.	, so you can't sign out.
+교대 중에 로봇 임무는 중단되지 않습니다.	Robot tasks keep running during handover.
+관제 팝오버에서 고름	Picked in control popover
+밸브 이음부에서 누출 패턴이 신뢰도 0.87 로 검출됐습니다. 임계 0.70 을 넘었고 연속 2프레임에서 나왔습니다.	A leak pattern was detected at the valve joint with confidence 0.87 — above the 0.70 threshold, in 2 consecutive frames.
+밸브 이음부 현장 점검을 요청하세요.	Request a site check of the valve joint.
+낮음	Low
+다음 순회 재측정	Re-measure next patrol
+추이 관찰	Watch trend
+이상 점수 9.41 로 임계 9.23 을 넘었습니다. PRPD 패턴이 코로나 방전 유형과 일치합니다.	Anomaly score 9.41 exceeded the 9.23 threshold. The PRPD pattern matches corona discharge.
+재진단을 예약해 PRPD 패턴을 다시 확인하세요.	Schedule a re-check to confirm the PRPD pattern.
+진동감지	Vibration
+진동 RMS 4.8 mm/s 로 주의 기준 4.5 를 넘었습니다. 최근 3회 측정에서 계속 오르고 있습니다.	Vibration RMS 4.8 mm/s exceeded the 4.5 warning limit and has risen over the last 3 readings.
+베어링 점검을 요청하세요.	Request a bearing inspection.
+베어링 점검 요청	Request bearing inspection
+베어링 표면 온도 68.4℃ 로 주의 기준 65℃ 를 넘었습니다. 주변 온도보다 31℃ 높습니다.	Bearing surface temp 68.4℃ exceeded the 65℃ warning limit — 31℃ above ambient.
+윤활 상태 점검을 요청하세요.	Request a lubrication check.
+윤활 상태 점검 요청	Request lubrication check
+열화상 재촬영	Retake thermal image
+토출 압력 7.9 bar 로 정상 범위(8.2~8.8) 아래입니다. 흡입 필터가 막혔을 가능성이 있습니다.	Discharge pressure 7.9 bar is below the normal range (8.2–8.8). The intake filter may be clogged.
+흡입 필터 점검을 요청하세요.	Request an intake filter check.
+필터 점검 요청	Request filter check
+Spiral Casing Pr. 측정값 90 이 기준값 87 을 넘었습니다. 최근 3회 측정이 잇달아 올라 NG 로 판정했습니다.	Spiral Casing Pr. reading 90 exceeded the limit of 87. Three consecutive rising readings → judged NG.
+현장에 무전으로 작업 중지를 요청하세요.	Radio the site to stop work.
+WP-04 압력계가 NG예요.	WP-04 gauge is NG.
+작업 중지부터 요청하세요.	Request a work stop first.
+현장 무전 연락 · 작업 중지 요청	Radio site · request work stop
+로봇 정지 · 현장 점검 요청	Stop robot · request site check
+재측정 후 판단	Decide after re-measure
+N₂ 배관 압력 0.86 MPa 로 정상 범위(0.60 ~ 0.80)를 넘었습니다. 최근 3회 측정이 잇달아 올라 NG 로 판정했습니다.	N₂ line pressure 0.86 MPa is above the normal range (0.60–0.80). Three consecutive rising readings → judged NG.
+밸브 이음부에서 누출 의심도 62% 로 기준 55% 를 넘었습니다. 연속 2프레임에서 나왔습니다.	Leak likelihood at the valve joint is 62%, above the 55% limit, in 2 consecutive frames.
+구역 출입을 통제하고 설비팀에 밸브 확인을 요청하세요.	Restrict access to the area and ask the facilities team to check the valve.
+구역 출입 통제	Restrict area access
+설비팀 밸브 확인 요청	Ask facilities to check valve
+현장 확인	Check on site
+이상 점수 20.4 로 기준 19.0 을 넘었습니다. 저주파 대역 에너지가 늘어 베어링 마모 패턴과 비슷합니다.	Anomaly score 20.4 exceeded the 19.0 limit. Rising low-frequency energy resembles a bearing wear pattern.
+진동 정밀 측정을 요청하세요.	Request a detailed vibration measurement.
+진동 정밀 측정 요청	Request detailed vibration test
+설비 정지 검토 요청	Request shutdown review
+펌프 하우징 최고 48.6℃ 로 기준 40℃ 를 넘었습니다. 평소 36.2℃ 보다 12.4℃ 높습니다.	Pump housing peaked at 48.6℃, above the 40℃ limit — 12.4℃ above its usual 36.2℃.
+부하를 줄이고 점검을 요청하세요.	Reduce the load and request an inspection.
+부하 감소 요청	Request load reduction
+설비 점검 요청	Request equipment inspection
+CH1 이상 점수 9.05 로 기준 8.60 을 넘었습니다. CH2 · CH3 은 정상 범위입니다.	CH1 anomaly score 9.05 exceeded the 8.60 limit. CH2 · CH3 are in range.
+절연 진단을 요청하세요.	Request an insulation diagnosis.
+절연 진단 요청	Request insulation diagnosis
+감시 강화	Increase monitoring
+고소 작업 발판에서 안전벨트를 매지 않은 작업자 1명이 신뢰도 0.91 로 검출됐습니다.	1 worker without a safety harness was detected on the elevated platform (confidence 0.91).
+작업자에게 즉시 착용을 안내하세요.	Tell the worker to put it on right away.
+WP-07 작업자가 안전벨트 미착용이에요.	A worker at WP-07 has no safety harness.
+즉시 착용부터 안내하세요.	Have them put it on first.
+작업자 즉시 착용 안내	Tell worker to wear it now
+고소 작업 일시 중지	Pause elevated work
+안전관리팀 전달	Notify safety team
+차압 312 Pa 로 교체 기준 250 Pa 를 넘었습니다. 최근 3회 측정이 잇달아 올라 NG 로 판정했습니다.	Differential pressure 312 Pa exceeded the 250 Pa replacement limit. Three consecutive rising readings → judged NG.
+필터 교체와 현장 점검을 요청하세요.	Request a filter replacement and site check.
+WP-02 차압계가 NG예요.	WP-02 differential gauge is NG.
+필터 교체부터 요청하세요.	Request a filter replacement first.
+필터 교체 요청	Request filter replacement
+압력 0.62 MPa 로 정상 범위(0.65~0.75) 아래입니다. 최근 2회 측정에서 조금씩 내려가고 있습니다.	Pressure 0.62 MPa is below the normal range (0.65–0.75) and has dipped over the last 2 readings.
+배관 연결부 누설 점검을 요청하세요.	Request a leak check of the pipe joints.
+누설 점검 요청	Request leak check
+N₂ 압력계	N₂ gauge
+기준 초과	Over limit
+현장 점검부터 요청하세요.	Request a site check first.
+최근 3회 측정 계속 오름	Rising over last 3 readings
+감압 밸브 설정 이상	Pressure-reducing valve setting off
+하류 밸브 닫힘	Downstream valve closed
+주변 온도 상승	Ambient temperature rise
+감압 밸브 설정부터 보는 게 가장 빨라요.	Checking the pressure-reducing valve setting is fastest.
+감압 밸브 설정값 확인(기준 0.80)	Check PRV setpoint (limit 0.80)
+하류 밸브 열림 확인	Confirm downstream valve is open
+계속 오르면 공급 밸브 잠금	If it keeps rising, close the supply valve
+냉각수 밸브	Cooling water valve
+수배전반	Switchgear
+냉각 펌프	Cooling pump
+진동 상승	Vibration rising
+발전기 베어링	Generator bearing
+과열	Overheating
+공기 압축기	Air compressor
+압력 낮음	Low pressure
+이상음	Abnormal sound
+작업 발판	Work platform
+벨트 미착용	No harness
+미착용	Not worn
+0명	0 people
+작업자 착용 안내	Tell worker to wear it
+연속 2프레임에서 검출	Detected in 2 consecutive frames
+고소 작업 중 벨트 미체결	Harness unbuckled during elevated work
+착용 안내 누락	Wear notice missed
+작업자 위치부터 확인하는 게 가장 빨라요.	Locating the worker is fastest.
+작업자 위치 확인	Locate worker
+벨트 착용 안내	Tell worker to wear harness
+착용 확인 뒤 작업 재개	Resume work after confirming
+HEPA 차압계	HEPA differential gauge
+필터 막힘	Filter clogged
+흡입구 이물질	Debris at intake
+팬 풍량 설정 변경	Fan airflow setting changed
+필터 오염 상태부터 보는 게 가장 빨라요.	Checking filter contamination is fastest.
+필터 오염 상태 확인	Check filter contamination
+흡입구 이물질 제거	Clear intake debris
+기준을 넘으면 필터 교체	Replace filter if over limit
+이상 점수 21.6 으로 기준 19.0 을 넘었습니다. 저주파 대역 에너지가 늘어 베어링 마모 패턴과 비슷합니다.	Anomaly score 21.6 exceeded the 19.0 limit. Rising low-frequency energy resembles a bearing wear pattern.
+· 주의	· Warning⎵
+건 관찰 중	⎵being watched
+확인할 알림이	Alerts to check:⎵
+건 있어요(	⎵(
+). 왼쪽 목록에서 하나씩 살펴봐 주세요.	). Go through them in the list on the left.
+건 종합 · 주의	⎵combined · Warning
+주의 알림이	Warnings:⎵
+건 쌓였습니다.	⎵piled up.
+여러 설비에서 이상징후가 겹칩니다. 개별 대응보다 전체 추세를 함께 보고 점검 순서를 정하는 것을 권합니다.	Anomalies overlap across several machines. Rather than handling each one, look at the overall trend and set an inspection order.
+건 종합 · 위험	⎵combined · Critical
+건을 포함해 알림이	⎵critical, alerts total⎵
+위험 알림부터 조치하고, 겹치는 주의 알림은 한꺼번에 점검 계획을 세우는 것을 권합니다.	Act on critical alerts first, then plan inspections for the overlapping warnings together.
+주의 알림	Warnings
+건 누적	⎵total
+건 포함	⎵included
+홍길동 님, Robot 01 과 정기 순회를 함께 보고 있어요. 지금까지는 특이사항이 없어요. 궁금한 게 있으면 편하게 물어보세요.	Alex, I'm watching the routine patrol with Robot 01. Nothing unusual so far. Ask me anything.
+건 들어와 있어요. 아직 묶어서 볼 만큼은 아니라서, 왼쪽 목록에서 하나씩 확인해 보시면 돼요. 어떤 알림인지 같이 볼까요?	⎵in. Not enough to group yet, so check them one by one on the left. Want to look at one together?
+건 쌓였어요. 여러 설비에서 비슷한 이상징후가 겹치고 있어서, 하나씩 보기보다 추세를 같이 보는 게 좋겠어요. 묶어서 한 번에 확인해 볼까요?	⎵piled up. Similar anomalies overlap across machines, so it's better to look at the trend than one by one. Review them together?
+위험 알림이	Critical alerts:⎵
+건 들어왔어요. 이것부터 먼저 보시는 게 좋겠어요.	. Better look at these first.
+겹치는 주의 알림	Overlapping warnings:⎵
+건은 묶어서 한 번에 확인해 볼까요?	— review them together?
+어떤 알림인지 바로 설명해 드릴까요?	Want me to explain the alert?

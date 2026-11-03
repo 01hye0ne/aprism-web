@@ -1,0 +1,386 @@
+# 영문판 번역 사전 — 한글<TAB>영문. tools/build-en.mjs 가 assets/js/i18n-en-dict.js 로 묶는다.
+# 문구 통째로 맞으면 그대로, 아니면 긴 조각부터 바꾼다. 조각을 이을 때 필요한 앞뒤 띄움은 ⎵ 로 적는다.
+APRISM 공장 환경점검 로봇 관제 시스템 진입 화면	APRISM factory inspection robot control system — entry screen
+스플래시 — APRISM	Splash — APRISM
+공장 환경점검 로봇 관제 시스템	Factory Inspection Robot Control System
+다크 모드로 바꾸기	Switch to dark mode
+라이트 모드로 바꾸기	Switch to light mode
+다크 모드	Dark mode
+라이트 모드	Light mode
+비밀번호 보기	Show password
+비밀번호 숨기기	Hide password
+APRISM 공장 환경점검 로봇 관제 시스템 로그인	APRISM factory inspection robot control system — sign in
+사번 또는 아이디를 입력하세요	Enter your employee no. or ID
+비밀번호를 입력하세요	Enter your password
+로그인 — APRISM	Sign in — APRISM
+로그인	Sign in
+등록된 계정으로 관제 시스템에 접속합니다.	Sign in to the control system with your registered account.
+아이디	ID
+비밀번호	Password
+자동 로그인	Keep me signed in
+계정 발급 · 잠금 해제 문의 : 설비운영팀 내선 2400	Account requests · unlocks: Facility Operations, ext. 2400
+ⓒ 2026 APRISM · 모든 접속 기록은 감사 로그에 저장됩니다.	ⓒ 2026 APRISM · All access is recorded in the audit log.
+보는 범위	View scope
+정기 순회 점검	Routine Patrol Inspection
+발전기실 설비 점검	Generator Room Inspection
+전기실 열화상 점검	Electrical Room Thermal Scan
+소방 설비 점검	Fire Safety Inspection
+주간 설비 점검	Weekly Facility Inspection
+야간 순회 점검	Night Patrol Inspection
+공조 설비 순회	HVAC Patrol
+유틸리티 순회	Utility Patrol
+계정	Account
+통신 상태	Connection status
+전역 내비게이션	Global navigation
+관제	Control
+관제 패널 접기	Collapse control panel
+미션 설정	Mission Setup
+미션 이름	Mission name
+대상 설비	Target equipment
+실행 로봇	Assigned robot
+스케줄러에 등록	Add to Scheduler
+사전 점검	Pre-check
+ROBOT 02 확인중..	Checking ROBOT 02..
+미션 모니터링	Mission Monitoring
+위험도로 거르기	Filter by severity
+무엇이든 물어보세요	Ask me anything
+Delta 에게 묻기	Ask Delta
+보내기	Send
+설비 배치도	Equipment layout
+층	Floor
+확대	Zoom in
+축소	Zoom out
+전체 보기	Fit to view
+탑뷰	Top view
+영상 리플레이	Video replay
+닫기	Close
+로봇 상태 보기	View robot status
+로봇 · 미션	Robots · Missions
+로봇 선택	Select robot
+이전 로봇	Previous robot
+다음 로봇	Next robot
+로봇 이름 · 상태로 검색	Search by robot name · status
+로봇 검색	Search robots
+로봇 목록	Robot list
+v6 · 미션 설정 — APRISM	v6 · Mission Setup — APRISM
+전체 미션	All missions
+홍길동	Alex Kim
+관제운영	Control Ops
+내 계정 정보	My account
+비밀번호 변경	Change password
+로그아웃	Sign out
+안전진단	Safety Diagnosis
+로봇	Robots
+스케줄러	Scheduler
+보고서	Reports
+계정관리	Accounts
+환경설정	Settings
+스케줄러 미설정 · 즉시 실행	No schedule · Run now
+터빈 2 / Unit 03	Turbine 2 / Unit 03
+터빈 1 / Unit 01	Turbine 1 / Unit 01
+터빈 3 / Unit 05	Turbine 3 / Unit 05
+ROBOT 01 · 배터리 96%	ROBOT 01 · Battery 96%
+ROBOT 02 · 배터리 31%	ROBOT 02 · Battery 31%
+ROBOT 03 · 배터리 91%	ROBOT 03 · Battery 91%
+점검항목	Inspection items
+순서 되돌리기	Reset order
+4개 선택	4 selected
+WP-01 FFU-01 토출구	WP-01 FFU-01 Outlet
+WP-02 HEPA Filter 차압계	WP-02 HEPA Filter Differential Gauge
+WP-03 냉각수 배관 밸브	WP-03 Cooling Water Pipe Valve
+WP-04 N₂ 배관 압력계	WP-04 N₂ Line Pressure Gauge
+예상 소요시간	Estimated duration
+약 1시간 12분	About 1 h 12 min
+배터리	Battery
+복귀 예비 20%	20% reserved for return
+현재 82%	Now 82%
+4개	4
+사전 점검 시작	Start Pre-check
+서버에서 자동 확인 중 · 미션 시작 대기	Server auto-check in progress · Waiting to start
+점검 항목	Inspection items
+확인중..	Checking..
+대기	Waiting
+점검이 끝나면 자동으로 시작합니다	Starts automatically when the check is done
+네 항목이 모두 정상일 때만 로봇이 기동합니다.	The robot starts only when all four items pass.
+취소	Cancel
+미션 시작	Start Mission
+알림 히스토리	Alert History
+조치 필요 0	Action required 0
+위험	Critical
+주의	Warning
+최근 24시간	Last 24 hours
+안녕하세요. 홍길동 님	Hello, Alex Kim
+Robot 01 이 정기 순회를 진행하고 있어요. 지금은 특이사항이 없습니다.	Robot 01 is on its routine patrol. Nothing unusual so far.
+Spiral Casing 압력 추이 보여줘	Show Spiral Casing pressure trend
+이 설비 최근 결함 3건	3 recent faults on this equipment
+재진단 예약해줘	Schedule a re-check
+정상	Normal
+상세보기	Details
+설비	Equipment
+상태	Status
+최근 점검	Last inspection
+담당 로봇	Assigned robot
+전체 미션명	All mission names
+11대 연결	11 connected
+3대 수행중	3 running
+로봇 더보기	More robots
+수행중	Running
+완료	Done
+끊김	Lost
+자동복귀	Auto Return
+현재 수행명	Current task
+LIVE · 카메라	LIVE · Camera
+현재 미션	Current mission
+마지막 통신	Last contact
+신호	Signal
+위치 (odom)	Position (odom)
+도킹 스테이션	Docking station
+수동조작	Manual control
+최근 이벤트	Recent events
+바꾼 설정을 버릴까요?	Discard your changes?
+바꾼 설정은 저장되지 않고	Your changes won't be saved, and you'll go to
+미션	Mission
+(으)로 이동합니다.	.
+계속 작성	Keep editing
+버리고 이동	Discard and leave
+로그아웃할까요?	Sign out?
+홍길동 · 관제운영	Alex Kim · Control Ops
+세션이 종료되고 로그인 화면으로 돌아갑니다.	Your session will end and you'll return to the sign-in screen.
+진행 중인 정기 순회 #248은 중단되지 않으며, 다시 로그인하면 이어서 관제할 수 있습니다.	Routine patrol #248 keeps running; sign in again to resume control.
+을	⎵
+중지하시겠습니까?	— stop it now?
+긴급중지시 로봇의 즉시 모터 전원이 차단됩니다. 미션 재개시 시스템 관리자의 로봇 자세 / 안전 점검 확인이 필요합니다.	An emergency stop cuts motor power immediately. Resuming the mission requires a system admin to check the robot's posture and safety.
+중지하기	Stop
+을 자동복귀 하시겠습니까?	— send it back to dock?
+확인 시 진행 중인 미션이 즉시 중단되고 로봇이 시작지점(도킹 스테이션)으로 복귀합니다. 복귀 중에는 자동복귀 버튼이 비활성화됩니다.	The current mission stops immediately and the robot returns to its start point (docking station). Auto Return is disabled while returning.
+자동복귀 시작	Start Auto Return
+연결된 로봇 11대 · 이름으로 검색해 선택합니다	11 robots connected · search by name to select
+찾는 이름이 없습니다.	No matching name.
+선택	Select
+요약 접기	Collapse summary
+요약 펼치기	Expand summary
+안녕하세요, 홍길동 님.	Hello, Alex Kim.
+인계된 알림 3건과 진행 예정인 미션 1건이 있어요. 먼저 살펴볼까요?	You have 3 handed-over alerts and 1 upcoming mission. Take a look first?
+인계 알림 3건 · 예정 미션 1건	3 handed-over alerts · 1 upcoming mission
+비상정지 발동 — 로봇 구동이 차단되었습니다	Emergency stop engaged — robot drive is cut
+현장 안전을 확인한 뒤 해제 절차를 진행하세요.	Confirm on-site safety, then follow the release procedure.
+비상정지 발동 · 해제 절차 필요	Emergency stop · release procedure required
+김현대	Jordan Lee
+· 관제운영	· Control Ops
+수행 중인 로봇이 있어 로그아웃할 수 없습니다 — 관제사 교대를 쓰세요	A robot is running, so you can't sign out — use Operator Handover
+사이트 패널 펼치기	Expand site panel
+사이트 패널 접기	Collapse site panel
+를	⎵
+지하 4층 정기 순회 점검	B4F Routine Patrol Inspection
+N₂ 배관 압력 점검	N₂ Line Pressure Check
+FFU-01 토출구	FFU-01 Outlet
+19분	19 min
+온도 61.8℃ · 진동 1.9 mm/s	Temp 61.8℃ · Vib 1.9 mm/s
+HEPA Filter 차압계	HEPA Filter Differential Gauge
+21분	21 min
+온도 74.2℃ · 진동 3.4 mm/s	Temp 74.2℃ · Vib 3.4 mm/s
+냉각수 배관 밸브	Cooling Water Pipe Valve
+16분	16 min
+온도 63.1℃ · 진동 2.0 mm/s	Temp 63.1℃ · Vib 2.0 mm/s
+N₂ 배관 압력계	N₂ Line Pressure Gauge
+N₂ 배관 압력계 판독	N₂ Line Pressure Gauge Reading
+압력 · 정상 범위 대비 편차	Pressure · deviation from normal range
+압력계 표시값을 자동 판독하고, 정상 운전범위 대비 압력 편차와 변화 추이를 확인합니다.	Reads the gauge automatically and checks pressure deviation from the normal operating range and its trend.
+배정된 미션 없음	No mission assigned
+복귀 중	Returning
+18분	18 min
+온도 58.9℃ · 진동 1.4 mm/s	Temp 58.9℃ · Vib 1.4 mm/s
+온도 91.6℃ · 진동 6.8 mm/s	Temp 91.6℃ · Vib 6.8 mm/s
+23분	23 min
+온도 72.0℃ · 진동 3.1 mm/s	Temp 72.0℃ · Vib 3.1 mm/s
+온도 60.4℃ · 진동 1.7 mm/s	Temp 60.4℃ · Vib 1.7 mm/s
+온도 59.2℃ · 진동 1.5 mm/s	Temp 59.2℃ · Vib 1.5 mm/s
+대기 중	Standby
+지하 4층 야간 순회 점검	B4F Night Patrol Inspection
+순회 완료	Patrol complete
+15분	15 min
+14분	14 min
+지하 3층 발전기실 설비 점검	B3F Generator Room Inspection
+발전기 베어링 진동 측정	Generator Bearing Vibration
+13분	13 min
+온도 68.4℃ · 진동 2.1 mm/s	Temp 68.4℃ · Vib 2.1 mm/s
+이상 점수 9.41 · PRPD 코로나	Anomaly score 9.41 · PRPD corona
+진동 4.8 mm/s · 상승 추세	Vib 4.8 mm/s · rising
+12분	12 min
+토출 7.9 bar · 정상 8.2~8.8	Discharge 7.9 bar · normal 8.2–8.8
+진동 스펙트럼을 모으는 중. 기준 대비 과대치를 찾습니다.	Collecting the vibration spectrum and looking for values above baseline.
+충전 중	Charging
+지하 3층 공조 설비 순회	B3F HVAC Patrol
+17분	17 min
+지하 4층 유틸리티 순회	B4F Utility Patrol
+지하 3층 전기실 열화상 점검	B3F Electrical Room Thermal Scan
+WP-08 케미컬 공급 캐비닛 CDS-02 판독	WP-08 Chemical Supply Cabinet CDS-02 Reading
+WP-04 로 이동 중	Moving to WP-04
+토출 풍속과 필터 표면 오염 여부를 확인한다.	Checks outlet air velocity and filter surface contamination.
+차압계 표시값을 자동으로 판독하고, 교체 기준 대비 차압 상승을 확인한다.	Reads the differential gauge automatically and checks pressure rise against the replacement threshold.
+밸브 개폐 상태와 연결부 누수 흔적을 확인한다.	Checks valve open/close state and signs of leaks at joints.
+압력계 표시값을 자동으로 판독하고, 정상 운전범위 대비 압력 편차와 변화 추이를 확인한다.	Reads the gauge automatically and checks pressure deviation from the normal operating range and its trend.
+CDA 메인 레귤레이터	CDA Main Regulator
+2차 압력 설정값과 실제 출력값의 차이를 확인한다.	Checks the gap between secondary pressure setpoint and actual output.
+배기 덕트 댐퍼	Exhaust Duct Damper
+댐퍼 개도 위치와 덕트 연결부 이격 여부를 확인한다.	Checks damper opening position and gaps at duct joints.
+PCW 공급 유량계	PCW Supply Flowmeter
+유량계 표시값을 판독하고, 설정 유량 대비 편차를 확인한다.	Reads the flowmeter and checks deviation from the set flow.
+케미컬 공급 캐비닛 CDS-02	Chemical Supply Cabinet CDS-02
+누액 센서 상태와 배관 연결부 온도를 열화상으로 확인하고, 캐비닛 내부 온도 편차를 점검한다.	Checks leak sensor status and pipe joint temperature by thermal imaging, and inspects temperature deviation inside the cabinet.
+FFU-02 토출구	FFU-02 Outlet
+클린룸 파티클 카운터	Cleanroom Particle Counter
+구역별 파티클 농도를 측정하고, 청정도 등급 기준 초과 여부를 확인한다.	Measures particle concentration by zone and checks for cleanliness class exceedance.
+UPW 공급 밸브	UPW Supply Valve
+밸브 개폐 상태와 비저항 표시값을 확인한다.	Checks valve state and resistivity reading.
+스크러버 배기 압력계	Scrubber Exhaust Pressure Gauge
+배기 압력을 판독하고, 정상 범위 대비 음압 유지 여부를 확인한다.	Reads exhaust pressure and checks that negative pressure stays in range.
+가스 캐비닛 GC-03	Gas Cabinet GC-03
+가스 누출 감지기 상태와 실린더 압력 잔량을 확인한다.	Checks gas leak detector status and remaining cylinder pressure.
+항온항습기 AHU-01	Air Handling Unit AHU-01
+공급 온도와 습도가 설정값을 유지하는지 확인한다.	Checks that supply temperature and humidity hold their setpoints.
+진공 펌프 VP-04	Vacuum Pump VP-04
+펌프 표면 온도와 이상 진동 여부를 확인한다.	Checks pump surface temperature and abnormal vibration.
+분전반 MCC-02	Distribution Panel MCC-02
+차단기 단자부 발열을 열화상으로 확인한다.	Checks breaker terminal heating by thermal imaging.
+비상 샤워기	Emergency Shower
+9분	9 min
+주변 적치물과 접근 동선 확보 상태를 확인한다.	Checks for obstructions and clear access paths.
+소화 설비 감지기	Fire Suppression Detector
+감지기 표시등 상태와 외관 손상 여부를 확인한다.	Checks detector indicator lights and external damage.
+FFU-03 토출구	FFU-03 Outlet
+도킹 스테이션 복귀	Return to Docking Station
+충전 위치로 복귀하고 점검 결과를 업로드한다.	Returns to the charging spot and uploads inspection results.
+배전반 발열 스캔	Switchboard Heat Scan
+배전반 발열을 훑습니다. 기준보다 높은 지점을 표시합니다.	Scans the switchboard for heat and marks spots above baseline.
+분	⎵min
+WP-08 로 이동 중	Moving to WP-08
+2분	2 min
+압력 0.86 MPa	Pressure 0.86 MPa
+냉각 펌프 P-2	Cooling Pump P-2
+이상 점수 20.4 · 최고 48.6℃	Anomaly score 20.4 · max 48.6℃
+수배전반 MCC-1	Switchgear MCC-1
+1분	1 min
+CH1 이상 점수 9.05	CH1 anomaly score 9.05
+고소 작업 발판	Elevated Work Platform
+안전벨트 미착용 1명	1 person without safety harness
+냉각수 열교환기 HX-1	Cooling Water Heat Exchanger HX-1
+열교환기 출구 온도 측정	Heat Exchanger Outlet Temperature
+온도 29.8℃ · 이상음향 8.2	Temp 29.8℃ · Acoustic anomaly 8.2
+온도 31.4℃ · 압력 0.71 MPa	Temp 31.4℃ · Pressure 0.71 MPa
+누출 의심도 62% · 온도 30.2℃	Leak likelihood 62% · Temp 30.2℃
+터빈 2 / Unit 01 · SPOT-DD-0206 · 192.168.10.59	Turbine 2 / Unit 01 · SPOT-DD-0206 · 192.168.10.59
+10:24:02 (방금)	10:24:02 (just now)
+터빈2 순회 미션 시작	Turbine 2 patrol mission started
+Spiral Casing 판독 완료	Spiral Casing reading complete
+도킹 해제 · 자율주행 전환	Undocked · switched to autonomous
+터빈 2 / Unit 03 · SPOT-DD-0209 · 192.168.10.62	Turbine 2 / Unit 03 · SPOT-DD-0209 · 192.168.10.62
+10:22:41 (2분 전)	10:22:41 (2 min ago)
+통신 불안정	Unstable connection
+RSSI −78dBm. 10:18부터 3회 재접속했습니다. 통신을 점검하기 전에는 새 미션을 배정할 수 없습니다.	RSSI −78 dBm. Reconnected 3 times since 10:18. No new missions can be assigned until the link is checked.
+재접속 3회 실패 · RSSI −78	3 reconnect attempts failed · RSSI −78
+신호 약함 감지 · 미션 일시정지	Weak signal detected · mission paused
+터빈 3 / Unit 02 · SPOT-DD-0211 · 192.168.10.64	Turbine 3 / Unit 02 · SPOT-DD-0211 · 192.168.10.64
+10:23:19 (1분 전)	10:23:19 (1 min ago)
+충전 시작 · 35%	Charging started · 35%
+도킹 완료	Docked
+터빈 1 / Unit 04 · SPOT-DD-0203 · 192.168.10.55	Turbine 1 / Unit 04 · SPOT-DD-0203 · 192.168.10.55
+10:23:47 (1분 전)	10:23:47 (1 min ago)
+순회 6구간 완료 · 이상 없음	Patrol segment 6 complete · no issues
+터빈1 순회 미션 시작	Turbine 1 patrol mission started
+터빈 3 / Unit 01 · SPOT-DD-0214 · 192.168.10.67	Turbine 3 / Unit 01 · SPOT-DD-0214 · 192.168.10.67
+10:24:05 (방금)	10:24:05 (just now)
+Generator Bearing 진동 수집 중	Collecting Generator Bearing vibration
+터빈3 순회 미션 시작	Turbine 3 patrol mission started
+터빈 4 / Unit 02 · SPOT-DD-0216 · 192.168.10.69	Turbine 4 / Unit 02 · SPOT-DD-0216 · 192.168.10.69
+10:21:58 (3분 전)	10:21:58 (3 min ago)
+배터리 부족	Low battery
+잔량 8%. 충전이 끝날 때까지 미션을 배정할 수 없습니다.	8% left. No missions can be assigned until charging finishes.
+저전압 경고 · 8%	Low-voltage warning · 8%
+충전 시작	Charging started
+긴급 복귀 · 도킹	Emergency return · docking
+터빈 1 / Unit 02 · SPOT-DD-0201 · 192.168.10.53	Turbine 1 / Unit 02 · SPOT-DD-0201 · 192.168.10.53
+10:23:52 (방금)	10:23:52 (just now)
+충전 96% · 대기 전환	Charged 96% · switched to standby
+순회 4구간 완료	Patrol segment 4 complete
+터빈 2 / Unit 05 · SPOT-DD-0210 · 192.168.10.63	Turbine 2 / Unit 05 · SPOT-DD-0210 · 192.168.10.63
+10:23:30 (1분 전)	10:23:30 (1 min ago)
+미션 배정 대기	Waiting for a mission
+자가 점검 통과	Self-check passed
+터빈 3 / Unit 04 · SPOT-DD-0215 · 192.168.10.68	Turbine 3 / Unit 04 · SPOT-DD-0215 · 192.168.10.68
+10:24:00 (방금)	10:24:00 (just now)
+순회 5구간 완료 · 이상 없음	Patrol segment 5 complete · no issues
+터빈 4 / Unit 05 · SPOT-DD-0218 · 192.168.10.71	Turbine 4 / Unit 05 · SPOT-DD-0218 · 192.168.10.71
+09:58:12 (26분 전)	09:58:12 (26 min ago)
+연결 끊김 · 응답 없음	Disconnected · no response
+재접속 5회 실패	5 reconnect attempts failed
+신호 약함 감지	Weak signal detected
+터빈 1 / Unit 01 · SPOT-DD-0200 · 192.168.10.52	Turbine 1 / Unit 01 · SPOT-DD-0200 · 192.168.10.52
+10:24:07 (방금)	10:24:07 (just now)
+Switchgear Room 열화상 촬영 중	Thermal imaging Switchgear Room
+터빈 4 / Unit 01 · SPOT-DD-0217 · 192.168.10.70	Turbine 4 / Unit 01 · SPOT-DD-0217 · 192.168.10.70
+10:23:41 (1분 전)	10:23:41 (1 min ago)
+충전 시작 · 55%	Charging started · 55%
+모든 지점 완료	All points done
+약	About⎵
+시간	⎵h
+남음	⎵left
+분 남음	⎵min left
+종료 예상	Est. finish
+측정 6항목 · 기준 이내	6 measurements · within limits
+측정 항목 확인 중	Checking measurements
+단계 중	⎵steps
+단계 완료	⎵steps done
+미션 수행 중	Mission in progress
+연결 끊김	Disconnected
+강함	Strong
+보통	Fair
+약함	Weak
+· 충전 중	· Charging
+· 충전 필요	· Needs charge
+비상정지 발동	Emergency stop engaged
+모터 전원이 차단되었습니다. 자세·안전 점검을 마친 뒤에 해제할 수 있습니다.	Motor power is cut. Release is possible after posture and safety checks.
+비상정지 발동 · 모터 전원 차단	Emergency stop · motor power cut
+자동복귀 중	Auto returning
+진행 중이던 미션을 중단하고 도킹 스테이션으로 복귀합니다. 복귀가 끝나면 대기 상태가 됩니다.	The current mission is stopped and the robot returns to the docking station. It goes to standby once back.
+자동복귀 시작 · 도킹 스테이션 이동	Auto Return started · heading to docking station
+개 선택	⎵selected
+없음	None
+지도	Map
+측정 중	Measuring
+예정	Upcoming
+아직 가지 않은 자리입니다.	Not visited yet.
+이동 중	Moving
+이동	Move
+구간	Segment
+웨이포인트	Waypoint
+출발 대기	Ready to depart
+복귀 완료	Returned
+출발 완료	Departed
+복귀 대기	Waiting to return
+도면 좌측 하단 (0,0,0)	Drawing origin, bottom-left (0,0,0)
+APRO 4F · WP-04 냉각수 배관 이음부	APRO 4F · WP-04 Cooling Water Pipe Joint
+누출감지 · 냉각수 배관 이음부	Leak detection · Cooling Water Pipe Joint
+조치 필요 · 현장 점검 대기	Action required · awaiting site check
+WP-04 냉각수 배관 이음부에서 누출 패턴이 감지되었습니다.	A leak pattern was detected at the WP-04 cooling water pipe joint.
+신뢰도 0.87 로 임계 0.70 을 넘었고 연속 2프레임에서 검출됐습니다. 현장 점검으로 누수 여부를 확인해 주세요.	Confidence 0.87 exceeded the 0.70 threshold in 2 consecutive frames. Please confirm the leak with a site check.
+현장 점검 요청	Request site check
+감지 영상 보기	View detection footage
+재측정 예약	Schedule re-measure
+APRO 4F · WP-06 수배전반	APRO 4F · WP-06 Switchgear
+부분방전 · 이상 점수 9.41	Partial discharge · anomaly score 9.41
+조치 필요 · 추이 관찰 중	Action required · watching trend
+WP-06 수배전반에서 부분방전 이상 점수가 올랐습니다.	The partial discharge anomaly score rose at WP-06 switchgear.
+이상 점수 9.41 로 임계 9.23 을 넘었습니다. PRPD 패턴이 코로나 방전 유형과 일치해 다음 순회에서 추이를 보겠습니다.	Anomaly score 9.41 exceeded the 9.23 threshold. The PRPD pattern matches corona discharge; we'll watch the trend on the next patrol.
+추이 보기	View trend
+PRPD 패턴 보기	View PRPD pattern
+재진단 예약	Schedule re-check
+Robot 02 · 터빈 2 / Unit 03	Robot 02 · Turbine 2 / Unit 03
+통신 불안정 · 재접속 3회 실패	Unstable connection · 3 reconnects failed
+조치 필요 · 신호 확인 중	Action required · checking signal
+Robot 02 의 통신이 불안정합니다.	Robot 02's connection is unstable.
+재접속을 3회 실패했고 신호가 −78 dBm 까지 떨어졌습니다. 로봇 위치를 확인하고 필요하면 자동복귀시켜 주세요.	3 reconnects failed and the signal dropped to −78 dBm. Check the robot's position and use Auto Return if needed.
+신호 추이 보기	View signal trend
+APRO 4F · 터빈 2 / Unit 03	APRO 4F · Turbine 2 / Unit 03
+지하발전소 B3 터빈 2 NG 1건 발견	Underground plant B3: 1 NG found on Turbine 2
+조치 필요 · 조치 입력 후 해제	Action required · clears after entering action

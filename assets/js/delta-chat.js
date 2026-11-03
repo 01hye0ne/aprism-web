@@ -202,7 +202,7 @@
     // 못 하는 일
     if (/보고서|메일|전송|보내/.test(q)) {
       return { lead: "보내기는 Delta가 할 수 없어요. 보고서 화면에서 보내 주세요.",
-        btns: [{ label: "보고서 화면으로", primary: true, act: function () { location.href = body.classList.contains("ver-6") ? "./report-v6.html" : "./report-v5.html"; } }] };
+        btns: [{ label: "보고서 화면으로", primary: true, act: function () { location.href = (window.aprismHref || String)(body.classList.contains("ver-6") ? "./report-v6.html" : "./report-v5.html"); } }] };
     }
     if (!top) { return { lead: "지금은 확인할 알림이 없어요.", btns: [] }; }
     /*
@@ -377,7 +377,7 @@
     }
     if (live) { LIVE.push(live); refreshLive(live); }
     if (CALM) { lead.textContent = r.lead; blocks.forEach(function (b) { m.appendChild(b); }); return m; }
-    var chars = Array.from(r.lead);
+    var chars = Array.from((window.APRISM_TR || String)(r.lead));   // 영문판 — 한 글자씩 치기 전에 통째로 옮긴다(조각이 번역되지 않게)
     chars.forEach(function (ch, i) { setTimeout(function () { lead.textContent += ch; scrollEnd(); }, i * 45); });
     blocks.forEach(function (b, i) {
       setTimeout(function () { grow(function () { m.appendChild(b); }); scrollEnd(); }, chars.length * 45 + 200 + i * 220);

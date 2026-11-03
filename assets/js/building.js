@@ -246,7 +246,7 @@
     keep.push("mission=" + encodeURIComponent(mission));
     // v3 — 층을 펼쳐 본 뒤 들어가면 그 층으로 연다(mission-scope.js 가 받는다).
     if (V3 && floor && MISSION_FLOORS[mission] && MISSION_FLOORS[mission].indexOf(floor) >= 0) { keep.push("floor=" + floor); }
-    return (document.body.classList.contains("ver-6") ? "main-v6.html?" : document.body.classList.contains("ver-5") ? "main-v5.html?" : document.body.classList.contains("ver-3") ? "main-v3.html?" : "main-v2-2.html?") + keep.join("&");
+    return (window.aprismHref || String)((document.body.classList.contains("ver-6") ? "main-v6.html?" : document.body.classList.contains("ver-5") ? "main-v5.html?" : document.body.classList.contains("ver-3") ? "main-v3.html?" : "main-v2-2.html?") + keep.join("&"));
   }
 
   /* ==================================================================
@@ -439,7 +439,7 @@
     b.addEventListener("click", function () { filter = b.getAttribute("data-ah-filter"); renderLeft(); });
   });
   var allBtn = $("[data-ah-all]");
-  if (allBtn) { allBtn.addEventListener("click", function () { location.href = document.body.classList.contains("ver-6") ? "alert-center-v6.html" : document.body.classList.contains("ver-5") ? "alert-center-v5.html" : document.body.classList.contains("ver-3") ? "alert-center-v3.html" : "alert-center.html"; }); }
+  if (allBtn) { allBtn.addEventListener("click", function () { location.href = (window.aprismHref || String)(document.body.classList.contains("ver-6") ? "alert-center-v6.html" : document.body.classList.contains("ver-5") ? "alert-center-v5.html" : document.body.classList.contains("ver-3") ? "alert-center-v3.html" : "alert-center.html"); }); }
 
   /* ==================================================================
    * 오른쪽 — 로봇 현황 · 운행 흐름 · 다음 일정

@@ -39,7 +39,7 @@
     if (!tab || Math.abs(event.clientX - downX) > 5) { return; }
     event.stopPropagation();
     event.preventDefault();
-    window.location.href = "./mission-setup-v6.html?mission=" + encodeURIComponent(tab.getAttribute("data-mission") || "");
+    window.location.href = (window.aprismHref || String)("./mission-setup-v6.html?mission=" + encodeURIComponent(tab.getAttribute("data-mission") || ""));
   }, true);
 
   sync();
