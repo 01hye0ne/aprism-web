@@ -199,6 +199,11 @@
     if (list.some(function (a) { return a.sev === "critical"; })) { return "critical"; }
     return list.length ? "warning" : null;
   }
+  // "위험 3건, 주의 9건이" — Delta 미니 판 문장(관제 미션 monitor.js 와 같은 말투)
+  function sevSay(list) {
+    var c = list.filter(function (a) { return a.sev === "critical"; }).length, w = list.length - c;
+    return (c ? "위험 " + c + "건" + (w ? ", 주의 " + w + "건" : "") : "주의 " + w + "건") + "이";
+  }
   function sevCount(list) {
     var c = list.filter(function (a) { return a.sev === "critical"; }).length;
     var w = list.length - c;
@@ -1065,7 +1070,9 @@
     if (scopeMission && !floorView) {
       var fl = MISSION_FLOORS[scopeMission];
       d.line1 = scopeMission;
-      d.line2 = scopeMission + "은 " + fl.join(" → ") + " 를 지나요. " +
+      // [11/03] Delta 미니 판은 세 줄 안 — 관제 미션(monitor.js)처럼 "건수 있어요. ~부터 확인하세요." 두 문장으로 줄였다
+      d.line2 = V6 ? (list.length ? sevSay(list) + " 있어요. " + fl.join(" → ") + " 중 층을 골라 주세요." : "알림이 없어요. " + fl.join(" → ") + " 중 층을 골라 주세요.")
+        : scopeMission + "은 " + fl.join(" → ") + " 를 지나요. " +
         (list.length ? "알림이 " + list.length + "건(" + sevCount(list) + ") 들어와 있어요. 어느 층부터 볼까요?" : "지금은 들어온 알림이 없어요. 보고 싶은 층을 골라 주세요.");
       return d;
     }
@@ -1074,15 +1081,19 @@
         d.line1 = deltaFirst.line1 || " ";
         // 건수는 목록에서 센다 — HTML 문장의 숫자가 알림 데이터와 어긋나지 않게(10/28, Robot 11 알림 두 건 추가)
         var nc = list.filter(function (a) { return a.sev === "critical"; }).length;
-        d.line2 = deltaFirst.line2.replace(/위험 알림 \d+건, 주의 알림 \d+건/, "위험 알림 " + nc + "건, 주의 알림 " + (list.length - nc) + "건");
+        if (!V6) { d.line2 = deltaFirst.line2.replace(/위험 알림 \d+건, 주의 알림 \d+건/, "위험 알림 " + nc + "건, 주의 알림 " + (list.length - nc) + "건"); }
+        else d.line2 = list.length ? sevSay(list) + " 있어요. " + (list.some(function (a) { return a.sev === "critical"; }) ? "위험 미션부터 확인하세요." : "왼쪽 목록에서 확인하세요.") : "알림이 없어요. 순회는 정상이에요.";
       }
       return d;
     }
     var ms = missionsOn(floorView);
     d.line1 = FNAME[floorView];
-    d.line2 = list.length
+    d.line2 = !V6 ? (list.length
       ? FNAME[floorView] + "에서 알림이 " + list.length + "건(" + sevCount(list) + ") 들어와 있어요. 이 층을 지나는 미션은 " + ms.length + "개예요. 어느 미션부터 들어가 볼까요?"
-      : FNAME[floorView] + "은 지금 조용해요. 이 층을 지나는 미션 " + ms.length + "개가 순회 중이에요. 궁금한 미션이 있으면 골라 주세요.";
+      : FNAME[floorView] + "은 지금 조용해요. 이 층을 지나는 미션 " + ms.length + "개가 순회 중이에요. 궁금한 미션이 있으면 골라 주세요.")
+      : list.length
+      ? sevSay(list) + " 있어요. 미션을 골라 주세요."   // 층 이름은 오른쪽 층 단추 · 지도가 말한다 — 두 줄 안
+      : "알림이 없어요. 미션 " + ms.length + "개가 순회 중이에요.";
     return d;
   }
 
