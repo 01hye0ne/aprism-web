@@ -1168,8 +1168,10 @@
    *   관제 지도처럼 흰 덩이 — 형태는 조명 · AO · 윤곽선이 말한다. 바닥만 한 끗 회색으로 덩이와 갈린다.
    */
   if (V6) {
-    PAL.light.face = { floor: 0xe6e9ee, wall: 0xf7f8fa, equipment: 0xffffff, stairs: 0xf0f1f5, other: 0xf7f8fa };
-    PAL.light.lift = { floor: 0.1, wall: 0.25, equipment: 0.25, stairs: 0.2, other: 0.2 };
+    // [11/03] 펼친 층 = 쌓인 판과 같은 면색 · 같은 자체 밝힘(ghost 0xeff1f4 · 0.63) — 다크처럼 전체 ↔ 층 오갈 때 건물 색이 안 바뀌게(디자이너)
+    var G = PAL.light.ghost, GL = PAL.light.ghostLift;
+    PAL.light.face = { floor: G, wall: G, equipment: G, stairs: G, other: G };
+    PAL.light.lift = { floor: GL, wall: GL, equipment: GL, stairs: GL, other: GL };
   }
   var KINDS = ["floor", "wall", "equipment", "stairs", "other"];
 
