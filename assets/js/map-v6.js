@@ -1995,7 +1995,7 @@
    * 라이트 표식 색 — 우측 목록 표식(라이트 상태 토큰)과 같은 값이다(10/19 · 위험 red/500 채도 기준).
    *   safe green/400 · caution yellow/600 · current blue/650. 위험 · 회색은 다크와 같다.
    */
-  var WP_TINT_LIGHT = { safe: 0x14c552, caution: 0xf2a900, current: 0x1778c2 };   // [11/03] 주의 0xe1ab13 → yellow-550 #F2A900(채도 올림, 회색 바닥에서 또렷하게)   // [11/03] 0x1d4ed8(보랏빛 남색, DS 밖) → blue-700 — 다크 · 라이트 파랑을 한 단계로(오른쪽 판 status/info 와 같다)   // [10/29] 지금 지점 = 갈 길 파랑(단계 톤)
+  var WP_TINT_LIGHT = { safe: 0x14c552, caution: 0xf2a900, current: 0x138deb };   // [11/03] 주의 0xe1ab13 → yellow-550 #F2A900(채도 올림, 회색 바닥에서 또렷하게)   // [11/03] 0x1d4ed8(보랏빛 남색, DS 밖) → blue-700 — 다크 · 라이트 파랑을 한 단계로(오른쪽 판 status/info 와 같다)   // [10/29] 지금 지점 = 갈 길 파랑(단계 톤)
   function wpTint(tone) {
     return (isLight() && WP_TINT_LIGHT[tone]) || WP_TINT[tone] || WP_TINT.upcoming;
   }
@@ -2866,7 +2866,7 @@
    * 지나온 길은 진한 회색, 로봇 표식은 거의 검정(라이트의 inverse)으로 뒤집는다. 갈 길(main)은 한 단 진하게.
    */
   var BOT_TINT_LIGHT = {
-    "수행중": { done: 0x4b5563, left: 0x1778c2, dot: 0x2b2f36, mark: 0x2b2f36 },   // [11/03] 갈 길 0x1d4ed8 → blue-700(DS) —   // [10/29] 갈 길 파랑 — 밝은 바닥 위에서 또렷하게 한 단 진하게(단계 톤)
+    "수행중": { done: 0x4b5563, left: 0x138deb, dot: 0x2b2f36, mark: 0x2b2f36 },   // [11/03] 갈 길 0x1d4ed8 → blue-700(DS) —   // [10/29] 갈 길 파랑 — 밝은 바닥 위에서 또렷하게 한 단 진하게(단계 톤)
     "완료":   { done: 0x1da67f, left: 0x34c759, dot: 0x1da67f },
     "대기":   { done: 0x5d6675, left: 0x8894aa, dot: 0x5d6675 },
     "끊김":   { done: 0x4e576a, left: 0x667085, dot: 0x4e576a }
@@ -3238,7 +3238,9 @@
    * 두 번 칠해져 그 자리만 진해졌다(구슬처럼 끊겨 보이는 선, 디자이너 지적). 바탕색과 미리 섞은 색을 불투명으로 칠한다.
    * 바탕은 화면에 찍힌 바닥색. 앞길은 그 밑의 바닥 홈 색과 섞는다(rrAhead).
    */
-  function rrUnder() { return isLight() ? 0x9ca3af : 0x181d28; }   // [10/29] 라이트 = 단계 톤 바닥(300)이 조명 받은 화소색   // 화면에 찍힌 바닥 화소색(조명 받은 뒤) — 라이트 · 다크
+  function rrUnder() { return isLight() ? 0xd3d9e1 : 0x181d28; }   // [11/03] 라이트 0x9ca3af → 0xd3d9e1 — 조명을 밝힌 뒤 바닥 화소가 이 색이다. 옛 값은 바닥보다 어두운 회색이라 길을 탁하게 섞었다   // [10/29] 라이트 = 단계 톤 바닥(300)이 조명 받은 화소색   // 화면에 찍힌 바닥 화소색(조명 받은 뒤) — 라이트 · 다크
+  // [11/03] 앞으로 갈 길 진하기 — 다크 RR.doneAlpha(0.38) 그대로, 라이트는 밝은 바닥과 섞여 파스텔이 되니 0.7(디자이너 "라이트도 쨍하게")
+  function rrAheadA() { return isLight() ? 0.7 : RR.doneAlpha; }
   function rrMix(color, op, under) { return new THREE.Color(color).lerp(new THREE.Color(under == null ? rrUnder() : under), 1 - op).getHex(); }
   function rrStyle(part, color, op, lw, under) {
     if (!part || !part.material) { return; }
@@ -3422,7 +3424,7 @@
       rrStyle(ln.parts[0], blue, 0.8, 2); rrStyle(ln.cur, RR_GRAY, m === "lost" ? 0.35 : 0.55, 4); rrStyle(ln.parts[1], RR_GRAY, 0.45, 4);   // [10/30 v6] 모양 바꿈 — 지나온 길 점선 · 앞길 실선(색 뜻은 그대로: 멈추면 앞길이 회색)
       show(ln.parts[1], true); show(ln.cur, true); show(ln.home, true); show(ln.comet, false); show(ln.fan, m === "pause");   // F — 일시정지는 회색 빔, 긴급정지 · 끊김은 끔
     } else {
-      rrStyle(ln.parts[0], blue, 0.8, 2); rrStyle(ln.cur, blue, 1, 4); rrStyle(ln.parts[1], blue, RR.doneAlpha, 4);   // [10/30 v6] 디자이너: 지나온 길 ⇄ 앞으로 갈 길 디자인을 바꾼다 — 지나온 길 = 동그란 점선(80%), 앞길 = 옅은 파랑 실선 띠(흰 테)   // [10/29] 지나온 길도 지금 길과 같은 굵기(3 → 4) — 바닥 띠가 된 뒤로 로봇 발밑 이음매에 굵기 차만큼 턱이 졌다. 둘은 색(옅은 파랑)으로 가른다
+      rrStyle(ln.parts[0], blue, 0.8, 2); rrStyle(ln.cur, blue, 1, 4); rrStyle(ln.parts[1], blue, rrAheadA(), 4);   // [10/30 v6] 디자이너: 지나온 길 ⇄ 앞으로 갈 길 디자인을 바꾼다 — 지나온 길 = 동그란 점선(80%), 앞길 = 옅은 파랑 실선 띠(흰 테)   // [10/29] 지나온 길도 지금 길과 같은 굵기(3 → 4) — 바닥 띠가 된 뒤로 로봇 발밑 이음매에 굵기 차만큼 턱이 졌다. 둘은 색(옅은 파랑)으로 가른다
       show(ln.parts[1], true); show(ln.cur, true); show(ln.home, true); show(ln.comet, m !== "inspect"); show(ln.fan, true);   // F 시야 빔은 로봇 표식의 일부 — 위험 감지 때도 그대로
     }
     rrAhead(ln, m);
@@ -5124,7 +5126,7 @@
     var blue = ln.bot.left;
     ln.segs.forEach(function (sg) {
       rrStyle(sg.done, blue, 0.8, 2); rrForm(sg.done, true);
-      rrStyle(sg.left, blue, RR.doneAlpha, 4); rrForm(sg.left, false);
+      rrStyle(sg.left, blue, rrAheadA(), 4); rrForm(sg.left, false);
     });
   }
   function crossLane() {

@@ -1030,3 +1030,6 @@ body.ver-6 {
   --status-info-bg: color-mix(in srgb, var(--color-aqua-500) 30%, #ffffff);
   --bg-selected: var(--color-aqua-50);
 }
+/* [11/03] 라이트도 다크만큼 쨍하게(디자이너) — 아이콘 · 지도 길 · 지금 지점 = aqua-600 #138DEB(채도 92 · 밝기 92, 바탕 #F0F1F5 위 3.1:1). 흰 글자가 얹히는 단추 · GNB 는 aqua-700 그대로(4.7:1), 글자는 aqua-800 */
+:root { --color-aqua-600: #138DEB; }
+:root[data-theme="light"] body.ver-6 { --status-info-icon: var(--color-aqua-600); }
