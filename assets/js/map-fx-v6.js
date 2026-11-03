@@ -11,7 +11,8 @@
 //   비네트       가장자리를 바탕보다 한 단 어둡게 — 시선이 가운데 지도로 모인다.
 //   그림자       해상도 · 번짐을 올린다.
 //
-// 2단계 실험 — AO 굽기(bake). 운영은 꺼 둠, 렌더 실험(screens/lab-map-render-v6.html)에서 켜 본다.
+// 2단계 — AO 굽기(bake). [11/03] 디자이너 결정으로 운영 AO 를 GTAO → 굽기로 바꿈(값 = 렌더 실험 screens/lab-map-render-v6.html 기본값).
+//   GTAO 는 조절판 "AO 방식"으로 다시 견줄 수 있다.
 //   지도를 세운 뒤 한 번만, 층마다 위에서 내려다본 높이 판을 그려 바닥 그늘(높이장 AO)을 계산해 텍스처로 굳힌다.
 //   면은 자기 자리(벽은 노멀 쪽으로 조금 비켜) 그늘을 읽고, 바닥에서 올라갈수록 옅게 한다.
 //   카메라와 상관없어 돌려도 그늘이 그대로이고, 매 프레임 계산(GTAO)이 없다. 블렌더 · UV 없이 된다.
@@ -32,13 +33,13 @@
     on: true,
     tone: "none", exposure: 0.9,   // AgX 는 경로 · 상태색의 채도를 크게 뺀다(10/29 캡처) — 톤 매핑은 끔
     env: true, envAmt: 0.1, rough: 0.8,
-    ao: true, aoRadius: 4.5, aoAmt: 0.6, aoDeep: 1, aoRest: true, aoView: 0,   // aoView 0 합친 화면 · 5 AO 만 · 3 노멀 판
+    ao: false, aoRadius: 4.5, aoAmt: 0.6, aoDeep: 1, aoRest: true, aoView: 0,   // aoView 0 합친 화면 · 5 AO 만 · 3 노멀 판
     bloom: true, bloomAmt: 0.4, bloomRadius: 0.15, bloomTh: 0.51,
     vignette: 0.3,   // 10/30 디자이너 0.25 → 0.3
     shadow: 2048, shadowSoft: 5,
     res: 1,   // 후처리 판 배율 — 1 이면 효과 없던 때(2)의 ¼ 픽셀
-    // AO 굽기(2단계 실험) — 운영은 끔
-    bake: false, bakeR: 1.6, bakeAmt: 1.4, bakeFade: 1.2, bakeDirect: 0.6, bakeOff: 0.12, bakeRes: 2048, bakeView: false
+    // AO 굽기 — 11/03 운영 AO(GTAO 대신)
+    bake: true, bakeR: 1.6, bakeAmt: 1.4, bakeFade: 1.2, bakeDirect: 0.6, bakeOff: 0.12, bakeRes: 2048, bakeView: false
   };
   var TONES = { "없음": "none", "AgX": "AgX", "ACES": "ACES" };
   var LAB = document.documentElement.hasAttribute("data-fx-lab");
@@ -519,17 +520,17 @@
     f.add(S, "envAmt", 0, 1.5, 0.05).name("환경광 세기").onChange(sync);
     f.add(S, "rough", 0.2, 1, 0.05).name("거칠기").onChange(sync);
 
-    f = gui.addFolder("AO (모서리 그늘)");
-    f.add(S, "ao").name("켜기").onChange(sync);
+    f = gui.addFolder("GTAO (11/03 전 운영 · 지금 꺼짐)");
+    f.add(S, "ao").name("켜기").onChange(sync).listen();
     f.add(S, "aoRadius", 1, 20, 0.5).name("반경 (모델 %)").onChange(sync);
     f.add(S, "aoDeep", 1, 4, 0.1).name("진하기").onChange(sync);
     f.add(S, "aoAmt", 0, 2, 0.05).name("세기").onChange(sync);
     f.add(S, "aoRest").name("돌리는 동안 쉬기").onChange(sync);
     f.add(S, "aoView", { "합친 화면": 0, "AO 만 보기": 5, "AO 날것": 4, "노멀 판": 3, "깊이 판": 2 }).name("보기").onChange(function (v) { S.aoView = +v; sync(); });
 
-    f = gui.addFolder("AO 굽기 (2단계 실험)");
+    f = gui.addFolder("AO 굽기 (운영)");
     var mode = { v: S.bake ? (S.ao ? "both" : "bake") : (S.ao ? "gtao" : "none") };
-    f.add(mode, "v", { "GTAO (지금 운영)": "gtao", "굽기": "bake", "둘 다": "both", "없음": "none" }).name("AO 방식").onChange(function (v) {
+    f.add(mode, "v", { "GTAO (11/03 전 운영)": "gtao", "굽기 (운영)": "bake", "둘 다": "both", "없음": "none" }).name("AO 방식").onChange(function (v) {
       S.ao = v === "gtao" || v === "both"; S.bake = v === "bake" || v === "both"; sync();
     });
     f.add(S, "bakeR", 0.4, 4, 0.1).name("반경 (m) · 다시 굽기").onFinishChange(sync);
