@@ -1163,6 +1163,14 @@
       lift: { floor: 0, wall: 0.08, equipment: 0.06, stairs: 0.07, other: 0.06 }
     }
   };
+  /*
+   * [11/03 v6 라이트] 층 하나를 펼치면(solid) 벽 · 설비가 청회색(#9AA5B6)으로 칠해져 쌓인 판(흰 덩이) · 관제 지도(흰 설비)와 달랐다(디자이너).
+   *   관제 지도처럼 흰 덩이 — 형태는 조명 · AO · 윤곽선이 말한다. 바닥만 한 끗 회색으로 덩이와 갈린다.
+   */
+  if (V6) {
+    PAL.light.face = { floor: 0xe6e9ee, wall: 0xf7f8fa, equipment: 0xffffff, stairs: 0xf0f1f5, other: 0xf7f8fa };
+    PAL.light.lift = { floor: 0.1, wall: 0.25, equipment: 0.25, stairs: 0.2, other: 0.2 };
+  }
   var KINDS = ["floor", "wall", "equipment", "stairs", "other"];
 
   function kindOf(node) {
