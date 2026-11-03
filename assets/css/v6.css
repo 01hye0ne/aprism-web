@@ -908,3 +908,16 @@ body.ver-6 .robot-strip.is-carousel { background-color: var(--bg-well); }
 body.ver-6 .robot-strip.is-carousel::after { box-shadow: var(--shadow-well); }
 /* 라이트 로봇 판 바닥 띠 — 우물이 gray/300 이 되며 띠(gray/300)와 같아졌다, 한 단 진하게(gray/300 ~ 400 사이) */
 :root[data-theme="light"] body.ver-6 .robot-strip.is-carousel::before { background-color: color-mix(in srgb, var(--color-gray-400) 45%, var(--color-gray-300)); }
+
+/*
+ * [11/03 v6 라이트] 화면에서 가장 밝은 것이 Delta 여야 하는데 지도를 감싸는 판(content-surface · 지금 탭 = bg/frame #FFFFFF)이 더 밝았다(의견).
+ *   bg/frame 을 한 단 내린다 — gray/100 #F0F1F5(Figma 디자인 시스템 bg/frame Light 도 gray/50 → gray/100 으로 맞춤). Delta 면(흰 70% → red/100)과 흰 카드(bg/raised)가 판 위로 떠 보인다. 다크는 그대로.
+ */
+:root[data-theme="light"] body.ver-6 { --bg-frame: var(--color-gray-100); }
+/* 같은 까닭으로 Delta 위험 면의 첫 단(흰 70%)을 불투명 흰으로 — 70% 는 뒤 지도(회색)가 비쳐 판보다 어두웠다(화면 잰 값 229 < 판 242). red/100 · #FFD4D6 단계는 Figma 1563:10565 그대로 */
+:root[data-theme="light"][data-delta][data-glow] body.ver-6.v2-2.v3 .delta3.is-critical:not(.is-open) .delta3-card {
+  background-image: radial-gradient(circle 270px at 100% 100%, #ffffff 0%, var(--color-red-100) 81.7%, #ffd4d6 100%);
+}
+:root[data-theme="light"][data-delta][data-glow] body.ver-6.v2-2.v3 .delta3.is-critical.is-open {
+  background-image: linear-gradient(to top, #ffffff 0%, var(--color-red-100) 81.7%, #ffd4d6 100%);
+}
