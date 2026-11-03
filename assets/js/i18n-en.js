@@ -21,6 +21,7 @@
   // 숫자가 끼는 문구 — 사전 통째 맞추기가 안 될 때 차례로 건다.
   var RX = [
     // 문장째 — JS 가 숫자를 끼워 만드는 것
+    [/^(\d+\.) (.+)$/, function (m, n, rest) { return n + " " + core(rest); }],   // 목차처럼 번호가 붙은 문구는 번호를 떼고 맞춘다
     [/^위험 (\d+)건 포함 (\d+)건 누적$/, "$2 total, incl. $1 critical"],
     [/^위험 (\d+)건부터 조치$/, "Act on the $1 critical first"],
     [/^주의 (\d+)건 묶어서 확인$/, "Review $1 warnings together"],
@@ -173,6 +174,14 @@
     var orig = window[fn];
     if (orig) { window[fn] = function (msg) { var a = Array.prototype.slice.call(arguments); a[0] = tr(String(msg)); return orig.apply(window, a); }; }
   });
+
+  // 줄임표로 잘린 글(i18n-en.css)은 마우스를 올리면 전체를 보여 준다.
+  document.addEventListener("mouseover", function (e) {
+    var el = e.target;
+    if (el.nodeType === 1 && !el.hasAttribute("title") && el.scrollWidth > el.clientWidth + 1 && getComputedStyle(el).textOverflow === "ellipsis") {
+      el.setAttribute("title", el.textContent.trim());
+    }
+  }, true);
 
   // 다 읽힌 뒤 한 번 더 훑고 화면을 연다(처음 몇 프레임에 한글이 비치지 않게).
   function ready() {

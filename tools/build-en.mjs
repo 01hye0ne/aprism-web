@@ -19,6 +19,7 @@ const LINK = new RegExp(`((?:href|data-goto|data-monitor-href|data-modal-confirm
 const HEAD = `
   <!-- 영문판 — tools/build-en.mjs 가 한글판에서 만든 파일이다. 여기를 고치지 말고 한글판을 고친 뒤 다시 만든다. -->
   <style>html:not(.i18n-ready) body { visibility: hidden; }</style>
+  <link rel="stylesheet" href="../assets/css/i18n-en.css" />
   <script src="../assets/js/i18n-en-dict.js"></script>
   <script src="../assets/js/i18n-en.js"></script>`;
 
