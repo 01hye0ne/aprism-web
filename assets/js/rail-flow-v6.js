@@ -12,6 +12,12 @@
     raf = 0;
     tl = tl || document.querySelector("[data-timeline]");
     if (!tl) { return; }
+    // [11/03] 지나온 길 점선 위상 — 칸 선 · 칸 머리 · 표식 자리가 따로 점선을 시작해 경계마다 간격이 어긋났다. 목록 맨 위에서 6 마다 오게 맞춘다
+    var hb = tl.getBoundingClientRect();
+    tl.querySelectorAll(".timeline-item.is-done .rail-stub, .timeline-item.is-done .rail-line, .timeline-item.is-done .rail-mark").forEach(function (el) {
+      var y = el.getBoundingClientRect().top - hb.top + tl.scrollTop;
+      el.style.setProperty("--dy", (-(((y % 6) + 6) % 6)).toFixed(2) + "px");
+    });
     var run = tl.querySelector(".timeline-item.is-running"), prev = run && run.previousElementSibling;
     var a = prev && (prev.querySelector(".rail-mark") || prev.querySelector(".rail-capsule"));
     var b = run && run.querySelector(".rail-mark");

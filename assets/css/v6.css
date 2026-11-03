@@ -1101,7 +1101,7 @@ body.ver-6 { --rail-ahead: color-mix(in srgb, var(--color-gray-700) 80%, var(--c
 body.ver-6 {
   --rail-past: color-mix(in srgb, var(--color-gray-700) 70%, var(--color-gray-900));
   --rail-ahead: color-mix(in srgb, var(--status-info-icon) 38%, var(--color-gray-900));
-  --rail-dots: repeating-linear-gradient(to bottom, var(--status-info-icon) 0 2px, transparent 2px 6px) center / 2px 100% no-repeat;
+  --rail-dots: linear-gradient(to bottom, var(--status-info-icon) 0 2px, transparent 2px) center var(--dy, 0px) / 2px 6px repeat-y;   /* [11/03] 6 마다 한 칸 · --dy = 목록 맨 위 기준 위상(rail-flow-v6.js) — 칸마다 따로 시작해 경계에서 간격이 어긋났다 */
   --rail-glow: 0 0 8px 0 color-mix(in srgb, var(--status-info-icon) 65%, transparent);
 }
 :root[data-theme="light"] body.ver-6 {
@@ -1118,7 +1118,7 @@ body.ver-6 {
 :root[data-theme] body.ver-6.v2-2 [data-timeline] .timeline-item.is-done:has(+ .timeline-item.is-running) .rail-mark {
   background: linear-gradient(to bottom, transparent 50%, var(--status-info-icon) 50%) center / 10px 100% no-repeat,
               var(--rail-dots), linear-gradient(var(--rail-past), var(--rail-past)) center / 10px 50% no-repeat;
-  background-position: center, center top, center top;
+  background-position: center, center var(--dy, 0px), center top;
 }
 /* 앞으로 갈 길 — 굵은 옅은 아쿠아 */
 :root[data-theme] body.ver-6.v2-2 [data-timeline] .timeline-item.is-running .rail-line,
@@ -1156,3 +1156,7 @@ body.ver-6 .sf .jtrk .jm { top: 0; width: 2px; height: 100%; margin-left: -1px; 
 body.ver-6 .sf .jtrk .jm.w span,
 body.ver-6 .sf .jtrk .jm.c span { left: 50%; right: auto; transform: translateX(-50%); bottom: calc(100% + 6px); }
 :root[data-theme="dark"] body.ver-6 .sf .jtrk .jm { background-color: var(--color-gray-950); }   /* 다크는 밝은 홈이 노란 채움에서 묻혔다 — 거의 검정이 채움 · 빈 칸 모두에서 보인다 */
+/* --rail-dots 안의 var(--dy) 는 body 에서 풀려(0) 칸마다 위상이 안 먹었다 — 점선 겹의 위치를 요소에서 다시 준다 */
+:root[data-theme] body.ver-6.v2-2 [data-timeline] .timeline-item.is-done .rail-stub,
+:root[data-theme] body.ver-6.v2-2 [data-timeline] .timeline-item.is-done:not(:has(+ .timeline-item.is-running)) .rail-line { background-position: center var(--dy, 0px), 0 0; }
+:root[data-theme] body.ver-6.v2-2 [data-timeline] .timeline-item.is-done:not(:has(+ .timeline-item.is-running)) .rail-mark { background-position: center var(--dy, 0px), center; }
