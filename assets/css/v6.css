@@ -1047,3 +1047,13 @@ body.ver-6 {
   box-shadow: none;
 }
 :root[data-theme="light"] body.ver-6 .sf .cx .kd:hover:not(.na) { box-shadow: 0 2px 8px rgb(16 24 40 / 8%); }
+
+/*
+ * [11/03 v6] 웨이포인트 레일 — 지금 가는 칸 머리(rail-stub)가 라이트에서 흰 줄로 끊기던 것(디자이너).
+ *   라이트 레일을 흰 면으로 칠하는 규칙(monitor.css :root[data-theme=light] .v2-2 .rail-stub)이 "지금 가는 길" 파랑까지 덮었다.
+ *   지금 가는 길 · 지나온 점 · 지금 표식은 아쿠아(status/info/icon — 다크 aqua-500 · 라이트 aqua-600, 지도 길과 같은 색)로.
+ */
+:root[data-theme] body.ver-6 [data-timeline] .timeline-item.is-done:has(+ .timeline-item.is-running) .rail-line,
+:root[data-theme] body.ver-6 [data-timeline] .timeline-item.is-running .rail-stub { background-color: var(--status-info-icon); }
+body.ver-6.v2-2 [data-timeline] .timeline-item.is-done:not([data-wp-alert]) .rail-dot { background-color: var(--status-info-icon); }
+body.ver-6.v2-2 [data-timeline] .timeline-item.is-running:not([data-wp-alert]) .rail-mark { color: var(--status-info-icon); }
