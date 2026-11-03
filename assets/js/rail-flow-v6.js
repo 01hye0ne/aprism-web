@@ -19,7 +19,8 @@
     if (!a || !b) { flow.hidden = true; return; }
     if (flow.parentNode !== tl) { tl.appendChild(flow); }
     var host = tl.getBoundingClientRect(), ra = a.getBoundingClientRect(), rb = b.getBoundingClientRect();
-    var top = ra.top + ra.height / 2 - host.top + tl.scrollTop, bottom = (run.querySelector(".rail-dot") || b).getBoundingClientRect().top - host.top + tl.scrollTop;   // 고리 윗변에서 끝 — 고리 안으로 빛이 새지 않게
+    var pd = prev.querySelector(".rail-dot"), top = (pd ? pd.getBoundingClientRect().bottom : ra.top + ra.height / 2) - host.top + tl.scrollTop,   // [11/03] 지나온 표식(세모 · 점) 아랫변에서 시작 — 빛이 표식 위로 지나지 않게
+      bottom = (run.querySelector(".rail-dot") || b).getBoundingClientRect().top - host.top + tl.scrollTop;   // 고리 윗변에서 끝 — 고리 안으로 빛이 새지 않게
     var cx = rb.left + rb.width / 2 - host.left + tl.scrollLeft;
     flow.hidden = false;
     flow.style.top = top + "px";
