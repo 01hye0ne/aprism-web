@@ -245,7 +245,8 @@
     pool.visible = false;
     U.uScanAmt.value = 0;
     // 선 도형 — 셰이더 윤곽선을 쓰면 끈다(겹친 벽 줄 · 이중선이 사라진다)
-    ctx.FLOORS.forEach(function (f) { var s = ctx.F[f]; if (s) { s.lines.forEach(function (ls) { ls.visible = !(on && S.edges); }); } });
+    // [11/03] 라이트는 계단 선 도형을 남긴다 — 계단 디딤판은 얇아 셰이더 윤곽선(안쪽 꺾임 40% · 깊이 문턱 0.8)으로는 거의 안 그려졌다(디자이너)
+    ctx.FLOORS.forEach(function (f) { var s = ctx.F[f]; if (s) { s.lines.forEach(function (ls) { ls.visible = !(on && S.edges) || (light && ls.userData.kind === "stairs"); }); } });
     if (!on) { return; }
 
     // 층 범위
