@@ -13,6 +13,17 @@
 
   var bar = document.querySelector(".sb-tabs.is-fixed");
   if (!bar) { return; }
+
+  // 폼 스크롤 — 판(우물)을 걷어 "더 있다"를 그림자가 못 하니, 스크롤되면 위쪽 · 아래가 잘려 있으면 아래쪽에 선을 긋는다(v6.css)
+  Array.prototype.forEach.call(document.querySelectorAll(".mp-stage .mp-scroll"), function (sc) {
+    var mark = function () {
+      sc.classList.toggle("is-scrolled", sc.scrollTop > 0);
+      sc.classList.toggle("has-more", sc.scrollTop + sc.clientHeight < sc.scrollHeight - 1);   // 아래가 잘려 있으면 아래쪽 선
+    };
+    sc.addEventListener("scroll", mark, { passive: true });
+    window.addEventListener("resize", mark);
+    mark();
+  });
   var body = document.body;
   var nameInput = document.querySelector("input[aria-label='미션 이름']");
 
