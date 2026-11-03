@@ -895,3 +895,16 @@ body.ver-6 .robot-carousel .rc-side { z-index: 2; }
  *   흰 카드 위 회색 칸이 탁해 보였다. v6 라이트에서만 — v5 는 멈춤.
  */
 :root[data-theme="light"] body.ver-6 { --bg-map-chip: var(--color-gray-200); }
+
+/*
+ * [11/03 v6] 관제 오른쪽 판 — 안쪽 우물(로봇 판 · 웨이포인트 목록)용 토큰 둘.
+ *   --bg-well     우물 면. 다크 = bg/map-chip 그대로, 라이트 = gray/300 #D1D5DE — map-chip 을 gray/200 으로 밝힌 뒤(안전진단) 바깥 판(gray/100 유리)과 거의 같아져 갈리지 않았다.
+ *   --shadow-well 우물 위에서 떨어지는 안쪽 그림자. 다크 = Figma 1054:20549 inset 0 10 8 / 25% 그대로, 라이트 = 0 4 6 / 8% — 밝은 면에서 25% 는 다크보다 세 보였다.
+ */
+body.ver-6 { --bg-well: var(--bg-map-chip); --shadow-well: inset 0 10px 8px 0 rgb(0 0 0 / 25%); }
+:root[data-theme="light"] body.ver-6 { --bg-well: var(--color-gray-300); --shadow-well: inset 0 4px 6px 0 rgb(16 24 40 / 8%); }
+body.ver-6 .timeline { background-color: var(--bg-well); box-shadow: var(--shadow-well); }
+body.ver-6 .robot-strip.is-carousel { background-color: var(--bg-well); }
+body.ver-6 .robot-strip.is-carousel::after { box-shadow: var(--shadow-well); }
+/* 라이트 로봇 판 바닥 띠 — 우물이 gray/300 이 되며 띠(gray/300)와 같아졌다, 한 단 진하게(gray/300 ~ 400 사이) */
+:root[data-theme="light"] body.ver-6 .robot-strip.is-carousel::before { background-color: color-mix(in srgb, var(--color-gray-400) 45%, var(--color-gray-300)); }
