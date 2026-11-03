@@ -954,3 +954,10 @@ body.ver-6 .robot-strip.is-carousel::after { box-shadow: var(--shadow-well); }
 
 /* [11/03 v6 라이트] 지도 조작 단추 판 · 층 단추 판 = 오른쪽 판과 같은 면(map-glass-bg, gray/100 80%) — 흰 92%(bg/glass)라 옆 판보다 밝게 떴다 */
 :root[data-theme="light"] body.ver-6.v2-2 .map-tools-box { background-color: color-mix(in srgb, var(--color-gray-100) 80%, transparent); }   /* 오른쪽 판만 --map-glass-bg 를 gray/100 80% 로 바꿔 둔 값(monitor.css)과 같게 */
+
+/*
+ * [11/03 v6 라이트] 주의 색 채도 올림(디자이너 — 회색 바탕에서 묻혔다). status/warning/icon yellow-600 #E1AB13(HSV 44° · 92% · 88%, 탁한 황토)
+ *   → yellow-550 #F2A900(42° · 100% · 95%). 밝기(휘도)는 거의 같고 채도만 올려 회색 위에서 색으로 갈린다. 지도 핀 · 레일 세모(map-v6.js)도 같은 값. 다크는 그대로.
+ */
+:root { --color-yellow-550: #F2A900; }
+:root[data-theme="light"] body.ver-6 { --status-warning-icon: var(--color-yellow-550); }

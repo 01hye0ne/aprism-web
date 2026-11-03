@@ -1995,7 +1995,7 @@
    * 라이트 표식 색 — 우측 목록 표식(라이트 상태 토큰)과 같은 값이다(10/19 · 위험 red/500 채도 기준).
    *   safe green/400 · caution yellow/600 · current blue/650. 위험 · 회색은 다크와 같다.
    */
-  var WP_TINT_LIGHT = { safe: 0x14c552, caution: 0xe1ab13, current: 0x3b79d5 };   // [11/03] 0x1d4ed8(보랏빛 남색, DS 밖) → blue-700 — 다크 · 라이트 파랑을 한 단계로(오른쪽 판 status/info 와 같다)   // [10/29] 지금 지점 = 갈 길 파랑(단계 톤)
+  var WP_TINT_LIGHT = { safe: 0x14c552, caution: 0xf2a900, current: 0x3b79d5 };   // [11/03] 주의 0xe1ab13 → yellow-550 #F2A900(채도 올림, 회색 바닥에서 또렷하게)   // [11/03] 0x1d4ed8(보랏빛 남색, DS 밖) → blue-700 — 다크 · 라이트 파랑을 한 단계로(오른쪽 판 status/info 와 같다)   // [10/29] 지금 지점 = 갈 길 파랑(단계 톤)
   function wpTint(tone) {
     return (isLight() && WP_TINT_LIGHT[tone]) || WP_TINT[tone] || WP_TINT.upcoming;
   }
@@ -3662,7 +3662,7 @@
     if (!on) { return; }
     var light = isLight(), blue = "#" + new THREE.Color(onLane.bot ? onLane.bot.left : 0x89b9ed).getHexString();
     // [10/29] 라이트 핀 = 단계 톤(판 50 · 테 950 24% · 글자 700 · 예정 600)
-    var C = { up: light ? "#63686F" : "#8894AA", bg: light ? "#F2F4F5" : "#0A0F18", cau: light ? "#E1AB13" : "#FFCC00", dan: "#FF383C", gray: "#9EA8BB" };
+    var C = { up: light ? "#63686F" : "#8894AA", bg: light ? "#F2F4F5" : "#0A0F18", cau: light ? "#F2A900" : "#FFCC00", dan: "#FF383C", gray: "#9EA8BB" };
     var key = wpSpots.map(function (w) { return w.id + w.info.tone + (w.buried ? "b" : "") + (w.off ? "x" : ""); }).join(",") + rrM(onLane) + light + blue;
     // 지점 목록은 시점이 바뀔 때마다 새로 깔린다(layWaypoints) — 새 목록에 핀이 안 붙어 있으면 다시 만든다(예전엔 처음 자리에 멈춰 있었다)
     if (key !== rrPinKey || wpSpots.some(function (w) { return !w.pinEl; })) {
