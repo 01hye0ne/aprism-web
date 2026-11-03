@@ -25,6 +25,12 @@
     // Delta 두 줄 — 줄마다 따로 온다(1줄 굵게 · 2줄 옅게). 근거 줄은 한 줄로 짧게.
     [/^위험 (\d+)건, 주의 (\d+)건이 있어요\.$/, "$1 critical, $2 caution alerts."],
     [/^위험 (\d+)건이 있어요\.$/, "$1 critical alerts."],
+    [/^지금 미션에서 (\d+)건, 다른 미션에서 (\d+)건의 확인해야 할 (주의|위험) 단계 알림이 있어요\.$/, function (m, a, b, sev) { return a + " " + (sev === "위험" ? "critical" : "caution") + " alerts to check in this mission, " + b + " in other missions."; }],
+    [/^지금 미션에서 (\d+)건의 확인해야 할 (주의|위험) 단계 알림이 있어요\.$/, function (m, a, sev) { return a + " " + (sev === "위험" ? "critical" : "caution") + " alerts to check in this mission."; }],
+    [/^다른 미션에 (주의|위험) 단계 알림이 있어요!$/, function (m, sev) { return "There are " + (sev === "위험" ? "critical" : "caution") + " alerts in another mission!"; }],
+    [/^먼저 확인하는 것을 추천드릴게요\.$/, "I'd suggest checking it first."],
+    [/^알림 (\d+)건 관찰 중$/, "Watching $1 alerts"],
+    [/^(주의|위험) 알림 (\d+)건 누적$/, function (m, sev, n) { return n + " " + (sev === "위험" ? "critical" : "caution") + " alerts total"; }],
     [/^(.+?)부터 확인하세요\.$/, function (m, x) { return "Check the " + core(x) + " first."; }],
     [/^이 미션 위험 (\d+)$/, "$1 critical here"],
     [/^다른 미션 위험 (\d+)$/, "$1 in other missions"],
