@@ -1160,3 +1160,7 @@ body.ver-6 .sf .jtrk .jm.c span { left: 50%; right: auto; transform: translateX(
 :root[data-theme] body.ver-6.v2-2 [data-timeline] .timeline-item.is-done .rail-stub,
 :root[data-theme] body.ver-6.v2-2 [data-timeline] .timeline-item.is-done:not(:has(+ .timeline-item.is-running)) .rail-line { background-position: center var(--dy, 0px), 0 0; }
 :root[data-theme] body.ver-6.v2-2 [data-timeline] .timeline-item.is-done:not(:has(+ .timeline-item.is-running)) .rail-mark { background-position: center var(--dy, 0px), center; }
+
+/* [11/03 v6] 미션 설정 · 사전 점검 좌측 패널 420 → 340 — 미션 모니터링(monitor.css --lp-w 340)과 같은 너비(탭끼리 열 너비 통일, 10/29 결정 연장) */
+body.ver-6.sian .context-panel:not(.is-collapsed) { flex-basis: 340px; }
+body.ver-6.sian .lp-body { width: 340px; }
