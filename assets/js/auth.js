@@ -62,7 +62,8 @@
   function landing() {
     var running = "0";
     try { running = window.sessionStorage.getItem("aprism.running") || "0"; } catch (e) { running = "0"; }
-    return running === "1" ? "./dashboard-home.html" : "./mission-setup.html";
+    // [11/03] v6 화면으로 — 돌고 있으면 v6 관제(main-v6), 아니면 v6 미션 설정
+    return running === "1" ? "./main-v6.html" : "./mission-setup-v6.html";
   }
   var form = document.querySelector("[data-login-form]");
   if (form) {
