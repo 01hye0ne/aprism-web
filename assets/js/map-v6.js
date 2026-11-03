@@ -1428,13 +1428,18 @@
   function floorGrid(box, atY) {
     var size = box.getSize(new THREE.Vector3());
     var wide = Math.max(size.x, size.z);
-    var reach = wide * 2.1;
-    // 눈금 한 칸을 건물 너비의 열둘로. 촘촘하면 무늬가 되고 성기면 자가 안 된다.
-    var cells = Math.max(6, Math.round(reach / (wide / 12)));
-
+    /*
+     * [11/03] 눈금 한 칸 = 10 m 고정(디자이너 2안 — 예전엔 건물 너비 ÷ 12 라 ≈10.08 m, 건물마다 달랐다).
+     *   1 UNIT = NAV.unit m(지금 1). 선은 도면 원점(건물 왼쪽 아래 = plan 0, 0)에서 10 m 마다 지난다.
+     *   기둥 중심선과는 무관한 거리 자 — 도면 기둥선은 CAD · 로봇 지도 좌표를 받으면 따로(확인 필요).
+     */
+    var cell = 10 / ((typeof NAV !== "undefined" && NAV.unit) || 1);
+    var cells = Math.ceil(wide * 2.1 / cell / 2) * 2;   // 짝수 — 가운데 선이 원점 격자에 걸리게
+    var reach = cells * cell;
     var grid = new THREE.GridHelper(reach, cells, GRID, GRID);
     var base = (atY === undefined ? box.min.y : atY);
-    grid.position.set(box.min.x + size.x / 2, base - wide * 0.004, box.min.z + size.z / 2);
+    var cxg = box.min.x + Math.round(size.x / 2 / cell) * cell, czg = box.max.z - Math.round(size.z / 2 / cell) * cell;
+    grid.position.set(cxg, base - wide * 0.004, czg);
     grid.material.transparent = true;
     grid.material.opacity = 0.3;
     grid.material.depthWrite = false;
