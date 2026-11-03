@@ -875,3 +875,17 @@ body.ver-6 .sf .msh2 .msh-go:focus-visible { outline: var(--border-width-strong)
  *   단추 판(.rc-side, z 없음)을 덮어 클릭을 카드가 가져갔다. 단추 판을 카드 위로 올린다(판 자체는 pointer-events:none 이라 카드 클릭은 그대로).
  */
 body.ver-6 .robot-carousel .rc-side { z-index: 2; }
+
+/*
+ * [11/03 v6 라이트] 안전진단 카드가 바탕에 묻히던 것 — 바탕(.sf-main)과 카드 아래쪽 그라데이션 끝 · 상세 카드(.lvA · .lvB)가 모두 bg/cell(#E8EBEF) 한 색이었다.
+ *   라이트에서만 카드 = 흰 면(bg/raised) + 옅은 테(n-150) + 얕은 그림자, 바탕은 그대로 회색. 카드 안 칸(사진 판 · 정보 칸 · 이력 줄)은 회색이라 흰 카드 위에서 갈린다.
+ */
+:root[data-theme="light"] body.ver-6 .sf .cx .kd,
+:root[data-theme="light"] body.ver-6 .sf .lvA,
+:root[data-theme="light"] body.ver-6 .sf .lvB {
+  background: var(--bg-raised);
+  border: var(--border-width-thin) solid var(--v5-n-150, #E0E2E6);
+  box-shadow: 0 1px 2px rgb(16 24 40 / 6%);
+}
+:root[data-theme="light"] body.ver-6 .sf .cx .kd.na { background: color-mix(in srgb, var(--bg-raised) 60%, transparent); box-shadow: none; border-style: dashed; }
+:root[data-theme="light"] body.ver-6 .sf .cx .kd:hover:not(.na) { box-shadow: 0 4px 12px rgb(16 24 40 / 10%); }
