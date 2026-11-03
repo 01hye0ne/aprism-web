@@ -35,6 +35,7 @@
    */
   var SL = {
     edgeColor: "#959aa1", edgeAmt: 1, edgeWidth: 1, edgeDepth: 0.8,   // [11/03] 선 #565b61 → #959aa1(v5 n-450, 한 톤 밝은 회색 — 디자이너 "너무 세다")   // 깊이 문턱 0.2 는 비스듬한 바닥의 깊이 기울기까지 선으로 읽어 흰 바닥 전체가 회색(207)이 됐다 — 라이트는 물들이니 드러난다 scanColor: "#3b79d5", scanAmt: 0.35, fog: false,   // 선은 예전 라이트 선(진한 회색)만큼 또렷하게, 안개는 끔(바탕색 안개가 흰 바닥을 회색으로 지웠다)
+    inner: 0.4,   // [11/03] 안쪽 꺾임 선 세기(실루엣 대비) — 같은 색이라 벽 두께 두 줄이 거슬렸다(디자이너)
     aoAmt: 0.7 * 0.55, bloom: false, vignette: 0,   // 비네트는 흰 바닥을 회색으로 가라앉혀 뺐다
     skyTop: "#d6dae1", skyLow: "#d6dae1", skyGlow: "#d6dae1", fogColor: "#d6dae1"
   };
@@ -122,26 +123,26 @@
         tDiffuse: { value: null }, tNormal: { value: null }, tDepth: { value: null },
         texel: { value: new T.Vector2(1, 1) }, color: { value: new T.Color(S.edgeColor) }, amt: { value: S.edgeAmt },
         nTh: { value: S.edgeNormal }, dTh: { value: S.edgeDepth }, dSpan: { value: 8000 }, wid: { value: S.edgeWidth },
-        front: { value: -1e4 }, band: { value: S.scanBand }, scanAmt: { value: 0 }, mixMode: { value: 0 },
+        front: { value: -1e4 }, band: { value: S.scanBand }, scanAmt: { value: 0 }, mixMode: { value: 0 }, inner: { value: 1 },
         camInvProj: { value: new T.Matrix4() }, camInvView: { value: new T.Matrix4() }
       },
       vertexShader: "varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }",
       fragmentShader: [
         "uniform sampler2D tDiffuse; uniform sampler2D tNormal; uniform sampler2D tDepth;",
         "uniform vec2 texel; uniform vec3 color; uniform float amt; uniform float nTh; uniform float dTh; uniform float dSpan; uniform float wid;",
-        "uniform float front; uniform float band; uniform float scanAmt; uniform float mixMode; uniform mat4 camInvProj; uniform mat4 camInvView;",
+        "uniform float front; uniform float band; uniform float scanAmt; uniform float mixMode; uniform float inner; uniform mat4 camInvProj; uniform mat4 camInvView;",
         "varying vec2 vUv;",
         "vec4 nAt(vec2 uv){ return texture2D(tNormal, uv); }",
         "float dAt(vec2 uv){ return texture2D(tDepth, uv).r; }",
         "void main(){",
         "  vec4 base = texture2D(tDiffuse, vUv);",
         "  vec4 n0 = nAt(vUv); float d0 = dAt(vUv);",
-        "  float e = 0.0;",
+        "  float e = 0.0; float es = 0.0;",   // es = 덩이 바깥 테두리(실루엣)만
         "  vec2 o[4]; o[0] = vec2(texel.x * wid, 0.0); o[1] = vec2(-texel.x * wid, 0.0); o[2] = vec2(0.0, texel.y * wid); o[3] = vec2(0.0, -texel.y * wid);",
         "  for (int i = 0; i < 4; i++) {",
         "    vec4 n = nAt(vUv + o[i]); float d = dAt(vUv + o[i]);",
         "    if (n.a < 0.5 && n0.a < 0.5) continue;",
-        "    if (n.a < 0.5 || n0.a < 0.5) { e = max(e, 1.0); continue; }",            // 덩이 바깥 테두리(실루엣)
+        "    if (n.a < 0.5 || n0.a < 0.5) { e = max(e, 1.0); es = 1.0; continue; }",            // 덩이 바깥 테두리(실루엣)
         "    e = max(e, smoothstep(nTh, nTh + 0.25, distance(n.rgb, n0.rgb)));",      // 면이 꺾이는 곳
         "    e = max(e, smoothstep(dTh, dTh * 2.0, abs(d - d0) * dSpan));",           // 앞뒤로 떨어진 곳
         "  }",
@@ -153,7 +154,9 @@
         "    k += s * scanAmt * 2.5;",
         "  }",
         // 다크 = 빛을 더한다(블룸을 탄다) · 라이트(mixMode 1) = 선 색으로 물들인다
-        "  gl_FragColor = mixMode > 0.5 ? vec4(mix(base.rgb, color, clamp(e * amt * k, 0.0, 1.0)), base.a) : vec4(base.rgb + color * e * amt * k, base.a);",
+        // 라이트 — 안쪽 꺾임 선(벽 윗면 두 줄 · 모서리)은 inner 배로 옅게, 실루엣은 그대로(다크가 빛 세기 차로 저절로 갈리던 것을 따라 한다)
+        "  float w = max(es, e * inner);",
+        "  gl_FragColor = mixMode > 0.5 ? vec4(mix(base.rgb, color, clamp(w * amt * k, 0.0, 1.0)), base.a) : vec4(base.rgb + color * e * amt * k, base.a);",
         "}"
       ].join("\n")
     });
@@ -291,6 +294,7 @@
     if (!active()) { return false; }
     var S = C();
     P.edge.uniforms.mixMode.value = ctx.isLight() ? 1 : 0;
+    P.edge.uniforms.inner.value = ctx.isLight() ? SL.inner : 1;
     var r = ctx.renderer, v = r.getSize(new T.Vector2()), pr = Math.min(r.getPixelRatio(), S.res);
     if (v.x !== size.w || v.y !== size.h || pr !== size.pr) {
       size = { w: v.x, h: v.y, pr: pr };
