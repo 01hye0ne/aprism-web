@@ -16,6 +16,11 @@ body.ver-5 .map-bot .map-bot-halo { display: none !important; }
  */
 /* 앉으면 접힌 다리 끝이 칸 오른쪽으로 11 쯤 나온다 — 칸 옆 여백(16) 안이라 자르지 않는다. */
 body.ver-5 .robot-strip.is-carousel .robot-thumb { overflow: visible; }
+/*
+ * [11/03] 첫 로딩에 예전 흰 로봇개(HTML 에 남은 SVG .robot-dog)가 잠깐 보였다 — robot-2d.js 는 문서 끝에서 돌며 칸을 2D 로 갈아 끼운다.
+ * 갈아 끼우기 전까지 예전 그림은 숨긴다(자리는 지켜 판 높이가 흔들리지 않게).
+ */
+body.ver-5 .robot-strip.is-carousel .robot-thumb > .robot-dog { visibility: hidden; }
 
 /*
  * 크기 · 자리는 Figma Mission-in progress-2(828:15313)의 Robot-grahpics 인스턴스(원본의 202/164 배)를 따른다.
