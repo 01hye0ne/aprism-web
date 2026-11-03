@@ -1091,3 +1091,40 @@ body.ver-6 { --rail-ahead: color-mix(in srgb, var(--color-gray-700) 80%, var(--c
 :root[data-theme] body.ver-6.v2-2 [data-timeline] .timeline-item:last-child .rail-line { border-radius: 0 0 5px 5px; }
 :root[data-theme] body.ver-6.v2-2 [data-timeline] .timeline-item.is-done:not([data-wp-alert]) .rail-dot { width: 4px; height: 4px; border: 0; background-color: var(--rail-pin); }
 :root[data-theme] body.ver-6.v2-2 [data-timeline] .timeline-item.is-pending:not([data-wp-alert]) .rail-dot { width: 4px; height: 4px; border: 0; background-color: var(--rail-pin-ahead); }
+
+/*
+ * [11/03 v6] 웨이포인트 레일 = 지도 길과 같은 말(디자이너 2차). 굵기 10 은 그대로.
+ *   지나온 길    옅은 띠 + 가운데 아쿠아 점선(지도 지나온 길 = 점선)
+ *   지금 가는 길  굵은 아쿠아 + 빛(바깥 번짐 · 흐르는 빛줄기는 route-rules)
+ *   앞으로 갈 길  굵은 옅은 아쿠아(지도 앞길 — 다크 38% · 라이트 70%, 바탕과 미리 섞은 불투명)
+ */
+body.ver-6 {
+  --rail-past: color-mix(in srgb, var(--color-gray-700) 70%, var(--color-gray-900));
+  --rail-ahead: color-mix(in srgb, var(--status-info-icon) 38%, var(--color-gray-900));
+  --rail-dots: repeating-linear-gradient(to bottom, var(--status-info-icon) 0 2px, transparent 2px 6px) center / 2px 100% no-repeat;
+  --rail-glow: 0 0 8px 0 color-mix(in srgb, var(--status-info-icon) 65%, transparent);
+}
+:root[data-theme="light"] body.ver-6 {
+  --rail-past: color-mix(in srgb, var(--bg-raised) 55%, var(--color-gray-300));
+  --rail-ahead: color-mix(in srgb, var(--status-info-icon) 70%, var(--color-gray-300));
+}
+/* 지나온 길 — 띠 + 점선(칸 선 · 칸 머리 · 표식 자리 모두) */
+:root[data-theme] body.ver-6.v2-2 [data-timeline] .timeline-item.is-done .rail-stub,
+:root[data-theme] body.ver-6.v2-2 [data-timeline] .timeline-item.is-done:not(:has(+ .timeline-item.is-running)) .rail-line { background: var(--rail-dots), var(--rail-past); }
+:root[data-theme] body.ver-6.v2-2 [data-timeline] .timeline-item.is-done:not(:has(+ .timeline-item.is-running)) .rail-mark { background: var(--rail-dots), linear-gradient(var(--rail-past), var(--rail-past)) center / 10px 100% no-repeat; }
+/* 지금 가는 길 — 굵은 아쿠아 + 빛 */
+:root[data-theme] body.ver-6.v2-2 [data-timeline] .timeline-item.is-done:has(+ .timeline-item.is-running) .rail-line,
+:root[data-theme] body.ver-6.v2-2 [data-timeline] .timeline-item.is-running .rail-stub { background-color: var(--status-info-icon); box-shadow: var(--rail-glow); }
+:root[data-theme] body.ver-6.v2-2 [data-timeline] .timeline-item.is-done:has(+ .timeline-item.is-running) .rail-mark {
+  background: linear-gradient(to bottom, transparent 50%, var(--status-info-icon) 50%) center / 10px 100% no-repeat,
+              var(--rail-dots), linear-gradient(var(--rail-past), var(--rail-past)) center / 10px 50% no-repeat;
+  background-position: center, center top, center top;
+}
+/* 앞으로 갈 길 — 굵은 옅은 아쿠아 */
+:root[data-theme] body.ver-6.v2-2 [data-timeline] .timeline-item.is-running .rail-line,
+:root[data-theme] body.ver-6.v2-2 [data-timeline] .timeline-item.is-pending .rail-stub,
+:root[data-theme] body.ver-6.v2-2 [data-timeline] .timeline-item.is-pending .rail-line { background-color: var(--rail-ahead); box-shadow: none; }
+:root[data-theme] body.ver-6.v2-2 [data-timeline] .timeline-item.is-running .rail-mark { background: linear-gradient(to bottom, var(--status-info-icon) 50%, var(--rail-ahead) 50%) center / 10px 100% no-repeat; }
+/* 점 — 지나온 정상 지점은 아쿠아 점(지도와 같다), 앞으로 갈 지점은 옅은 띠 안 흰 점 */
+:root[data-theme] body.ver-6.v2-2 [data-timeline] .timeline-item.is-done:not([data-wp-alert]) .rail-dot { width: 6px; height: 6px; background-color: var(--status-info-icon); }
+:root[data-theme] body.ver-6.v2-2 [data-timeline] .timeline-item.is-pending:not([data-wp-alert]) .rail-dot { width: 4px; height: 4px; background-color: color-mix(in srgb, #ffffff 85%, transparent); }
