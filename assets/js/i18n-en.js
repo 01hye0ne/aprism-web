@@ -22,6 +22,12 @@
   var RX = [
     // 문장째 — JS 가 숫자를 끼워 만드는 것
     [/^(\d+\.) (.+)$/, function (m, n, rest) { return n + " " + core(rest); }],   // 목차처럼 번호가 붙은 문구는 번호를 떼고 맞춘다
+    // Delta 두 줄 — 줄마다 따로 온다(1줄 굵게 · 2줄 옅게). 근거 줄은 한 줄로 짧게.
+    [/^위험 (\d+)건, 주의 (\d+)건이 있어요\.$/, "$1 critical, $2 caution alerts."],
+    [/^위험 (\d+)건이 있어요\.$/, "$1 critical alerts."],
+    [/^(.+?)부터 확인하세요\.$/, function (m, x) { return "Check the " + core(x) + " first."; }],
+    [/^이 미션 위험 (\d+)$/, "$1 critical here"],
+    [/^다른 미션 위험 (\d+)$/, "$1 in other missions"],
     [/^위험 (\d+)건 포함 (\d+)건 누적$/, "$2 total, incl. $1 critical"],
     [/^위험 (\d+)건부터 조치$/, "Act on the $1 critical first"],
     [/^주의 (\d+)건 묶어서 확인$/, "Review $1 warnings together"],
@@ -112,7 +118,8 @@
     if (hit !== undefined) { return hit; }
     // 앞뒤 공백은 그대로 둔다(인라인 글자 사이 띄움).
     var m = /^(\s*)([\s\S]*?)(\s*)$/.exec(s);
-    var out = m[1] + core(m[2]) + m[3];
+    // 줄바꿈이 든 문구(Delta 두 줄)는 줄마다 따로 옮긴다 — core() 가 공백을 하나로 합쳐 두 줄이 한 문단이 되는 것을 막는다.
+    var out = m[1] + (m[2].indexOf("\n") >= 0 ? m[2].split("\n").map(core).join("\n") : core(m[2])) + m[3];
     cache.set(s, out);
     return out;
   }

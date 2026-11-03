@@ -352,7 +352,7 @@
         var oc = all.filter(function (a) { return a.sev === sev && !inMine(a); }).length;
         if (sev === "critical") {
           say = { l: ["위험 " + j.crit + "건" + (j.warn ? ", 주의 " + j.warn + "건" : "") + "이 있어요.", (first.eq || first.title) + "부터 확인하세요."],
-            clue: ["이 미션 위험 " + mc, oc ? "다른 미션 위험 " + oc : ""].filter(Boolean).join(", "),
+            clue: ["이 미션 위험 " + mc, oc ? "다른 미션 위험 " + oc : ""].filter(Boolean).join(" · "),
             scope: oc ? sev : "", yes: "처리 순서 보기", act: "order", open: "처리 순서 알려 줘" };
         } else {
           // 주의만 있을 때 — 한 문장(굵은 1줄 없이), 근거 줄에 먼저 볼 설비(10/30 디자이너 문구)

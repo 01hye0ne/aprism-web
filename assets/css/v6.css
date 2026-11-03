@@ -1347,3 +1347,10 @@ body.ver-6 .rr-pin.is-hot:not([hidden]) { display: block; opacity: 1; z-index: 2
 }
 /* 펼친 본문 밑 깔개(.delta3-body::before = bg/inset 회색)가 흰 판(#FAFAFA)을 덮었다 — 라이트 펼침에선 흰 판이 그대로 보이게 */
 :root[data-theme="light"][data-delta][data-glow] body.ver-6.v2-2.v3 .delta3.is-open .delta3-body::before { background-color: transparent; }
+
+/* Delta 두 줄 — 1줄(.dl1)은 또렷한 흰색 굵게, 2줄(.dl2)은 한 단 옅은 회색 보통 굵기(10/31 디자이너 시안). 두 줄이 같은 색이면 위계가 안 보인다. */
+body.ver-5[data-delta-copy="brief"] .delta3 .ai-line-2 .dl1 { color: var(--text-primary); text-transform: uppercase; }
+body.ver-5[data-delta-copy="brief"] .delta3 .ai-line-2 .dl2 {
+  color: color-mix(in srgb, var(--text-primary) 55%, transparent);
+  font-weight: var(--font-weight-regular);
+}
