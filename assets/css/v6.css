@@ -889,3 +889,9 @@ body.ver-6 .robot-carousel .rc-side { z-index: 2; }
 }
 :root[data-theme="light"] body.ver-6 .sf .cx .kd.na { background: color-mix(in srgb, var(--bg-raised) 60%, transparent); box-shadow: none; border-style: dashed; }
 :root[data-theme="light"] body.ver-6 .sf .cx .kd:hover:not(.na) { box-shadow: 0 4px 12px rgb(16 24 40 / 10%); }
+
+/*
+ * [11/03 v6 라이트] bg/map-chip #D5D7DB(v5 n-200, 무채 회색) → #E3E7ED — 더 밝은 쿨그레이(디자이너). 안전진단 미니맵 판 · 판정 정보 칸 등
+ *   흰 카드 위 회색 칸이 탁해 보였다. v6 라이트에서만 — v5 는 멈춤.
+ */
+:root[data-theme="light"] body.ver-6 { --bg-map-chip: #E3E7ED; }
