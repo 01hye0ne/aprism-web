@@ -970,3 +970,6 @@ body.ver-6 .robot-strip.is-carousel::after { box-shadow: var(--shadow-well); }
 :root[data-theme="light"] body.ver-6 .right-panel { --comp-button-secondary-bg-default: var(--color-gray-100); }
 :root[data-theme="light"] body.ver-6 .right-panel .robot-strip.is-carousel .robot-row,
 :root[data-theme="light"] body.ver-6 .right-panel .timeline .timeline-item:not(.is-running) .step-card { background-color: var(--color-gray-100); }
+
+/* [11/03 v6 라이트] 지도 바깥 빈 자리(comp/map/bg) v5 n-400 #A4A9B0 → 가장 바깥 바탕과 같은 #DCDFE6(디자이너). 3D 배경은 map-fx-v6 가 이 색을 읽는다 — THREE.Color 가 color-mix 결과(color(srgb …))를 못 읽어 16진수로 둔다 */
+:root[data-theme="light"] body.ver-6 { --v5-map-bg: #DCDFE6; }
