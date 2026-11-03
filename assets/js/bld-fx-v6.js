@@ -28,11 +28,22 @@
     cursor: false, cursorColor: "#8fc8ff", cursorAmt: 0.6, cursorSize: 26,
     res: 1.5
   };
+  /*
+   * [11/03] 라이트 값(디자이너 "다크처럼 효과") — 다크 값 S 위에 덮어 쓴다. 밝은 바탕이라
+   *   윤곽선 · 스캔은 빛을 더하는 대신 그 색으로 물들이고(mix — 더하면 흰 면에서 안 보인다), 블룸은 끄고(뿌옇게 번진다), 비네트는 약하게,
+   *   하늘 · 안개는 지금 전체 미션 라이트 바탕 #D6DAE1 한 색(디자이너 — 그라데이션 없이 이 색으로 통일). AO 는 관제 지도 라이트처럼 55%.
+   */
+  var SL = {
+    edgeColor: "#565b61", edgeAmt: 1, edgeWidth: 1, edgeDepth: 0.8,   // 깊이 문턱 0.2 는 비스듬한 바닥의 깊이 기울기까지 선으로 읽어 흰 바닥 전체가 회색(207)이 됐다 — 라이트는 물들이니 드러난다 scanColor: "#3b79d5", scanAmt: 0.35, fog: false,   // 선은 예전 라이트 선(진한 회색)만큼 또렷하게, 안개는 끔(바탕색 안개가 흰 바닥을 회색으로 지웠다)
+    aoAmt: 0.7 * 0.55, bloom: false, vignette: 0,   // 비네트는 흰 바닥을 회색으로 가라앉혀 뺐다
+    skyTop: "#d6dae1", skyLow: "#d6dae1", skyGlow: "#d6dae1", fogColor: "#d6dae1"
+  };
+  function C() { return ctx && ctx.isLight() ? Object.assign({}, S, SL) : S; }
   var LAB = document.documentElement.hasAttribute("data-fx-lab");
   if (/[?&]fx=off/.test(window.location.search)) { S.on = false; }
 
   var ctx = null, T = null, composer = null, P = {}, ready = false;
-  var nrt = null, nMat = null, skyTex = null, fog = null, pool = null, ray = null, ndc = null;
+  var nrt = null, nMat = null, skyTex = null, skyTexL = null, fog = null, pool = null, ray = null, ndc = null;
   var U = null;                       // 스캔 유니폼(층 재질이 함께 본다)
   var scanT0 = -1, scanLo = 0, scanHi = 0, stSig = "", warm = 0;
   var cur = { on: 0, want: 0, p: null, f: null };
@@ -60,7 +71,7 @@
   function tex(cv) { var t = new T.CanvasTexture(cv); t.colorSpace = T.SRGBColorSpace; return t; }
 
   // 하늘 — 위는 바탕보다 어둡고, 아래(지평선)로 갈수록 은은히 밝아진다. 가운데 아래에 청색 빛 한 덩이.
-  function skyArt() {
+  function skyArt(S) {
     var W = 64, H = 512, cv = pad(W, H), g = cv.getContext("2d");
     var lin = g.createLinearGradient(0, 0, 0, H);
     lin.addColorStop(0, S.skyTop); lin.addColorStop(0.55, S.skyTop); lin.addColorStop(1, S.skyLow);
@@ -111,14 +122,14 @@
         tDiffuse: { value: null }, tNormal: { value: null }, tDepth: { value: null },
         texel: { value: new T.Vector2(1, 1) }, color: { value: new T.Color(S.edgeColor) }, amt: { value: S.edgeAmt },
         nTh: { value: S.edgeNormal }, dTh: { value: S.edgeDepth }, dSpan: { value: 8000 }, wid: { value: S.edgeWidth },
-        front: { value: -1e4 }, band: { value: S.scanBand }, scanAmt: { value: 0 },
+        front: { value: -1e4 }, band: { value: S.scanBand }, scanAmt: { value: 0 }, mixMode: { value: 0 },
         camInvProj: { value: new T.Matrix4() }, camInvView: { value: new T.Matrix4() }
       },
       vertexShader: "varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }",
       fragmentShader: [
         "uniform sampler2D tDiffuse; uniform sampler2D tNormal; uniform sampler2D tDepth;",
         "uniform vec2 texel; uniform vec3 color; uniform float amt; uniform float nTh; uniform float dTh; uniform float dSpan; uniform float wid;",
-        "uniform float front; uniform float band; uniform float scanAmt; uniform mat4 camInvProj; uniform mat4 camInvView;",
+        "uniform float front; uniform float band; uniform float scanAmt; uniform float mixMode; uniform mat4 camInvProj; uniform mat4 camInvView;",
         "varying vec2 vUv;",
         "vec4 nAt(vec2 uv){ return texture2D(tNormal, uv); }",
         "float dAt(vec2 uv){ return texture2D(tDepth, uv).r; }",
@@ -141,7 +152,8 @@
         "    float s = smoothstep(front - band, front, wp.y) * (1.0 - smoothstep(front, front + 0.6, wp.y));",
         "    k += s * scanAmt * 2.5;",
         "  }",
-        "  gl_FragColor = vec4(base.rgb + color * e * amt * k, base.a);",
+        // 다크 = 빛을 더한다(블룸을 탄다) · 라이트(mixMode 1) = 선 색으로 물들인다
+        "  gl_FragColor = mixMode > 0.5 ? vec4(mix(base.rgb, color, clamp(e * amt * k, 0.0, 1.0)), base.a) : vec4(base.rgb + color * e * amt * k, base.a);",
         "}"
       ].join("\n")
     });
@@ -158,14 +170,14 @@
     composer.addPass(P.vig);
 
     // 2 스캔 — 층 재질에 띠를 심는다. 유니폼은 하나를 같이 본다.
-    U = { uScanFront: { value: -1e4 }, uScanBand: { value: S.scanBand }, uScanCol: { value: new T.Color(S.scanColor) }, uScanAmt: { value: 0 } };
+    U = { uScanFront: { value: -1e4 }, uScanBand: { value: S.scanBand }, uScanCol: { value: new T.Color(S.scanColor) }, uScanAmt: { value: 0 }, uScanMix: { value: 0 } };
     ctx.FLOORS.forEach(function (f) {
       var s = ctx.F[f]; if (!s) { return; }
       Object.keys(s.mats).forEach(function (k) { patchScan(s.mats[k]); });
     });
 
     // 4 배경 · 안개
-    skyTex = skyArt();
+    skyTex = skyArt(S); skyTexL = skyArt(Object.assign({}, S, SL));
     fog = new T.Fog(S.fogColor, 1500, 1700);
 
     // 5 커서 빛
@@ -191,11 +203,12 @@
     mat.onBeforeCompile = function (sh) {
       Object.keys(U).forEach(function (k) { sh.uniforms[k] = U[k]; });
       sh.vertexShader = "varying float vScanY;\n" + sh.vertexShader.replace("#include <project_vertex>", "#include <project_vertex>\n  vScanY = (modelMatrix * vec4(transformed, 1.0)).y;");
-      sh.fragmentShader = "uniform float uScanFront; uniform float uScanBand; uniform vec3 uScanCol; uniform float uScanAmt; varying float vScanY;\n" +
+      sh.fragmentShader = "uniform float uScanFront; uniform float uScanBand; uniform vec3 uScanCol; uniform float uScanAmt; uniform float uScanMix; varying float vScanY;\n" +
         sh.fragmentShader.replace("#include <dithering_fragment>",
           "  float sb = smoothstep(uScanFront - uScanBand, uScanFront, vScanY) * (1.0 - smoothstep(uScanFront, uScanFront + 0.6, vScanY));\n" +
           "  float below = 1.0 - smoothstep(uScanFront - uScanBand * 3.0, uScanFront - uScanBand, vScanY);\n" +
-          "  gl_FragColor.rgb += uScanCol * (sb * 0.9 + (1.0 - below) * 0.06) * uScanAmt;\n" +
+          "  float sk = (sb * 0.9 + (1.0 - below) * 0.06) * uScanAmt;\n" +
+          "  gl_FragColor.rgb = uScanMix > 0.5 ? mix(gl_FragColor.rgb, uScanCol, clamp(sb * 0.9 * uScanAmt, 0.0, 1.0)) : gl_FragColor.rgb + uScanCol * sk;\n" +
           "#include <dithering_fragment>");
     };
     mat.customProgramCacheKey = function () { return "bld-fx-v6-scan"; };
@@ -216,14 +229,15 @@
     if (!cur.target) { cur.target = h.point.clone(); }
   }
 
-  function active() { return ready && S.on && !ctx.isLight(); }
+  function active() { return ready && S.on; }   // [11/03] 라이트도 켠다(값은 C() 가 SL 로 바꾼다)
 
   /* ---------- 매 프레임 ---------- */
 
   function step(now) {
     if (!ready) { return; }
-    var on = active();
-    ctx.scene.background = on && S.sky ? skyTex : null;
+    var on = active(), S = C(), light = ctx.isLight();
+    U.uScanMix.value = light ? 1 : 0;
+    ctx.scene.background = on && S.sky ? (light ? skyTexL : skyTex) : null;
     ctx.scene.fog = on && S.fog ? fog : null;
     pool.visible = false;
     U.uScanAmt.value = 0;
@@ -275,6 +289,8 @@
 
   function render() {
     if (!active()) { return false; }
+    var S = C();
+    P.edge.uniforms.mixMode.value = ctx.isLight() ? 1 : 0;
     var r = ctx.renderer, v = r.getSize(new T.Vector2()), pr = Math.min(r.getPixelRatio(), S.res);
     if (v.x !== size.w || v.y !== size.h || pr !== size.pr) {
       size = { w: v.x, h: v.y, pr: pr };
@@ -326,7 +342,7 @@
   function badge() {
     if (!LAB) { return; }
     if (!tag) { tag = document.createElement("div"); tag.className = "lab-fx-tag"; document.body.appendChild(tag); }
-    tag.textContent = (S.on ? (ctx.isLight() ? "라이트 — 연출은 다크만" : "연출 켜짐" + (fps.v ? " · " + fps.v + " fps" : "")) : "연출 꺼짐 · 운영 화면과 같음") + "  ·  B 로 전환";
+    tag.textContent = (S.on ? (ctx.isLight() ? "라이트 연출" : "연출 켜짐" + (fps.v ? " · " + fps.v + " fps" : "")) : "연출 꺼짐 · 운영 화면과 같음") + "  ·  B 로 전환";
     tag.classList.toggle("is-off", !S.on);
   }
   function panel(GUI) {
