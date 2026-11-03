@@ -961,3 +961,12 @@ body.ver-6 .robot-strip.is-carousel::after { box-shadow: var(--shadow-well); }
  */
 :root { --color-yellow-550: #F2A900; }
 :root[data-theme="light"] body.ver-6 { --status-warning-icon: var(--color-yellow-550); }
+
+/*
+ * [11/03 v6 라이트] 오른쪽 판 안 흰 칸(자동복귀 단추 · 로봇 상태 세 줄 · 웨이포인트 카드) = 바깥 판보다 "살짝" 밝게 — 흰(bg/raised · 단추 흰)이라 너무 떴다.
+ *   gray/100 #F0F1F5 — 바깥 판은 gray/100 80% 유리라 뒤 지도가 비쳐 화면에서 #E1E3E7(225)로 보인다. 칸은 불투명 240 = 한 단 밝음(gray/50 247 은 거의 흰).
+ *   지금 가는 카드(어두운 면) · E-STOP 은 그대로.
+ */
+:root[data-theme="light"] body.ver-6 .right-panel { --comp-button-secondary-bg-default: var(--color-gray-100); }
+:root[data-theme="light"] body.ver-6 .right-panel .robot-strip.is-carousel .robot-row,
+:root[data-theme="light"] body.ver-6 .right-panel .timeline .timeline-item:not(.is-running) .step-card { background-color: var(--color-gray-100); }
