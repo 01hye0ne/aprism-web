@@ -223,7 +223,7 @@
     // 두께는 반경보다 커야 한다 — 작으면 표본이 다 "너무 멀다"로 버려져 그늘이 하나도 안 생긴다(10/29 AO 판이 온통 흰색).
     var aoR = ctx.span * S.aoRadius / 100;
     P.ao.updateGtaoMaterial({ radius: aoR, distanceExponent: 1, thickness: aoR * 3, scale: S.aoDeep, samples: 8 });   // scale = 그늘을 몇 제곱하나 — 클수록 진하다
-    P.ao.blendIntensity = S.aoAmt;
+    P.ao.blendIntensity = S.aoAmt * (light ? 0.55 : 1);   // [11/03] 라이트는 AO 그늘을 55% 로 — 밝은 바탕에서 건물 그림자 톤이 셌다(디자이너)
     P.bloom.enabled = S.bloom && !light;
     P.bloom.strength = S.bloomAmt;
     P.bloom.radius = S.bloomRadius;
