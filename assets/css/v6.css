@@ -1143,3 +1143,7 @@ body.ver-6 [data-timeline].rr-flow .rail-flow::before {
 /* 지금 칸 고리 · 지나온 점 · 세모가 빛 위로 */
 body.ver-6 [data-timeline] .timeline-item .rail-dot { position: relative; z-index: 2; }   /* 띠(표식 자리)는 빛 아래, 점 · 고리 · 세모만 빛 위 */
 @media (prefers-reduced-motion: reduce) { body.ver-6 [data-timeline] .rail-flow::before { animation: none; display: none; } }
+
+/* [11/03 v6 라이트] 주의 글자 살짝 어둡게(디자이너) — status/warning/text #C28E0E(흰 위 2.9:1) → yellow-700t #A87800(3.9:1, 큰 글자 · 굵은 글 기준 3:1 넘음). 색상은 그대로 · 밝기만 내림 */
+:root { --color-yellow-750: #A87800; }
+:root[data-theme="light"] body.ver-6 { --status-warning-text: var(--color-yellow-750); }
