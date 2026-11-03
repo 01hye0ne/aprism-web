@@ -1492,7 +1492,7 @@
         var base = ls.userData.kind === "floor" ? 0.35 : 0.8;
         ls.material.color.setHex(pal.edge).lerp(tmpB.setHex(pal.hotEdge), s.hot);
         ls.material.opacity = (base - (base - 0.4) * s.solid) * s.op * dim;
-        if (V6 && ls.userData.kind === "stairs" && isLight()) { ls.material.opacity = 0.85 * s.op * dim; }   // [11/03] 라이트 계단 선은 펼쳐도 옅어지지 않게(흰 덩이 위에서 디딤판이 사라졌다)
+        if (V6 && ls.userData.kind === "stairs" && isLight()) { ls.material.color.setHex(0x959aa1); ls.material.opacity = 0.45 * s.op * dim; }   // [11/03] 라이트 계단 선 = 다른 윤곽선과 같은 회색 #959aa1 · 45%(디자이너 1안 — 진한 청회색 85% 는 디딤판이 검은 덩이로 튀었다). 펼쳐도 같은 세기   // [11/03] 라이트 계단 선은 펼쳐도 옅어지지 않게(흰 덩이 위에서 디딤판이 사라졌다)
       });
     });
     camera.zoom = cam.zoom * cam.user;
