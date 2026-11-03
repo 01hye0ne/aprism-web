@@ -1995,7 +1995,7 @@
    * 라이트 표식 색 — 우측 목록 표식(라이트 상태 토큰)과 같은 값이다(10/19 · 위험 red/500 채도 기준).
    *   safe green/400 · caution yellow/600 · current blue/650. 위험 · 회색은 다크와 같다.
    */
-  var WP_TINT_LIGHT = { safe: 0x14c552, caution: 0xe1ab13, current: 0x1d4ed8 };   // [10/29] 지금 지점 = 갈 길 파랑(단계 톤)
+  var WP_TINT_LIGHT = { safe: 0x14c552, caution: 0xe1ab13, current: 0x3b79d5 };   // [11/03] 0x1d4ed8(보랏빛 남색, DS 밖) → blue-700 — 다크 · 라이트 파랑을 한 단계로(오른쪽 판 status/info 와 같다)   // [10/29] 지금 지점 = 갈 길 파랑(단계 톤)
   function wpTint(tone) {
     return (isLight() && WP_TINT_LIGHT[tone]) || WP_TINT[tone] || WP_TINT.upcoming;
   }
@@ -2866,7 +2866,7 @@
    * 지나온 길은 진한 회색, 로봇 표식은 거의 검정(라이트의 inverse)으로 뒤집는다. 갈 길(main)은 한 단 진하게.
    */
   var BOT_TINT_LIGHT = {
-    "수행중": { done: 0x4b5563, left: 0x1d4ed8, dot: 0x2b2f36, mark: 0x2b2f36 },   // [10/29] 갈 길 파랑 — 밝은 바닥 위에서 또렷하게 한 단 진하게(단계 톤)
+    "수행중": { done: 0x4b5563, left: 0x3b79d5, dot: 0x2b2f36, mark: 0x2b2f36 },   // [11/03] 갈 길 0x1d4ed8 → blue-700(DS) —   // [10/29] 갈 길 파랑 — 밝은 바닥 위에서 또렷하게 한 단 진하게(단계 톤)
     "완료":   { done: 0x1da67f, left: 0x34c759, dot: 0x1da67f },
     "대기":   { done: 0x5d6675, left: 0x8894aa, dot: 0x5d6675 },
     "끊김":   { done: 0x4e576a, left: 0x667085, dot: 0x4e576a }

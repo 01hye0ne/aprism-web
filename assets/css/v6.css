@@ -928,3 +928,15 @@ body.ver-6 .robot-strip.is-carousel::after { box-shadow: var(--shadow-well); }
  *   안쪽 상자(bg/inset — 최신 알림 목록 판 등)   #F2F4F5(v5 n-50) → gray/200 — 판(gray/100)보다 밝아 층이 거꾸로였다
  */
 :root[data-theme="light"] body.ver-6 { --bg-page: var(--color-gray-200); --comp-gnb-bg: var(--color-gray-200); --bg-inset: var(--color-gray-200); }
+
+/*
+ * [11/03 v6 라이트] 파랑을 다크와 같은 blue 단계로(디자이너 — 다크 · 라이트 색감 차가 컸다).
+ *   라이트에만 채도 높은 파랑이 섞여 있었다: status/info/icon blue-650 #0D8DF9 · status/info/text #1B64DE(v5) · GNB 고른 메뉴 #1D6CF0(v5) · comp/gnb/brand blue-600(다크보다 옅음).
+ *   → 아이콘 · GNB = blue-700 #3B79D5(다크 gnb · 버튼과 같은 값, 흰 위 ≈ 4.4:1), 글자 = blue-800 #3265C3(흰 위 ≈ 5.6:1).
+ */
+:root[data-theme="light"] body.ver-6 {
+  --status-info-icon: var(--color-blue-700);
+  --status-info-text: var(--color-blue-800);
+  --comp-gnb-brand: var(--color-blue-700);
+  --v5-gnb-brand: var(--color-blue-700);
+}
