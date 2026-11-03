@@ -99,6 +99,15 @@
       t.addEventListener("keydown", keyMove);
       bar.appendChild(t);
     });
+
+    // [11/03] 맨 끝 [+] — 새 미션(미션 설정). 탭은 이미 있는 미션의 창이고, 새 미션의 입구는 여기 하나다(디자이너)
+    var add = document.createElement("a");
+    add.className = "sb-tab sb-tab-add";
+    add.href = "mission-setup-v6.html";
+    add.title = "새 미션";
+    add.setAttribute("aria-label", "새 미션");
+    add.innerHTML = '<span class="i i-16" style="--i:var(--ic-plus)" aria-hidden="true"></span>';
+    bar.appendChild(add);
   }
 
   /*

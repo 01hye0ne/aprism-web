@@ -1,9 +1,12 @@
 /*
  * [11/03 v6] 미션 설정 · 사전 점검 상단 탭(.sb-tabs.is-fixed) — 관제 탭과 같은 모양, 동작만 이 화면 몫이다(디자이너).
- *   미션 설정(body[data-stage="setup"])  미션 탭을 누르면 그 탭이 고른 탭이 되고, 미션 이름 입력칸이 탭 이름으로 바뀐다.
- *                                        [전체 미션]은 미션이 아니라서 누르지 않는다.
- *   사전 점검(body[data-stage="precheck"]) 지금 탭 말고 다른 탭을 누르면 "사전점검 진행중입니다." 토스트만 띄운다.
+ *
+ * 탭은 "이미 있는 미션의 창"이다(11/03 결정). 미션 설정은 새 미션을 만들 때만 나온다 — 끝의 [새 미션] 탭이 지금 탭이다.
+ *   미션 설정(body[data-stage="setup"])   다른 탭을 누르면 "작성 중인 설정을 버릴까요?" 확인(모달 discard) 뒤 그 미션의 관제로 간다.
+ *                                         [전체 미션]은 통합 순회 현황(building-v6)으로.
+ *   사전 점검(body[data-stage="precheck"]) 다른 탭을 누르면 "사전점검 진행중입니다." 토스트만 — 점검은 멈추지 않는다.
  * 한 화면 안에서 설정 → 점검으로 넘어가므로(sian.js) 누를 때마다 지금 단계를 읽는다.
+ * 완료 미션의 [다시 실행](mission-done-v6.js)은 ?mission= 으로 들어온다 — 미션 이름 칸을 그 이름으로 채운다.
  */
 (function () {
   "use strict";
@@ -11,7 +14,10 @@
   var bar = document.querySelector(".sb-tabs.is-fixed");
   if (!bar) { return; }
   var body = document.body;
-  var nameInput = document.querySelector("[data-stage-show='setup'] .field-box, input[aria-label='미션 이름']");
+  var nameInput = document.querySelector("input[aria-label='미션 이름']");
+
+  var again = /[?&]mission=([^&#]+)/.exec(window.location.search);
+  if (again && nameInput) { nameInput.value = decodeURIComponent(again[1]); }
 
   var toastTimer = 0;
   function toast(msg) {
@@ -28,12 +34,14 @@
     toastTimer = window.setTimeout(function () { t.remove(); }, 2600);
   }
 
-  function pick(tab) {
-    Array.prototype.forEach.call(bar.querySelectorAll(".sb-tab"), function (t) {
-      var on = t === tab;
-      t.classList.toggle("is-on", on);
-      if (on) { t.setAttribute("aria-current", "page"); } else { t.removeAttribute("aria-current"); }
-    });
+  // 설정 버리기 확인 — 모달은 screen.js 가 연다(숨은 [data-modal-open="discard"] 단추). 갈 곳 · 문구만 여기서 채운다.
+  function askDiscard(name, href) {
+    var scrim = document.querySelector("[data-modal='discard']");
+    var opener = document.querySelector("[data-discard-open]");
+    if (!scrim || !opener) { window.location.href = href; return; }
+    scrim.querySelector("[data-modal-confirm]").setAttribute("data-modal-confirm", href);
+    scrim.querySelector("[data-discard-to]").textContent = name;
+    opener.click();
   }
 
   bar.addEventListener("click", function (event) {
@@ -43,12 +51,7 @@
     if (stage === "precheck") { toast("사전점검 진행중입니다."); return; }
     if (stage !== "setup") { return; }
     var mission = tab.getAttribute("data-mission");
-    if (!mission) { return; }
-    pick(tab);
-    if (nameInput) {
-      nameInput.value = mission;
-      nameInput.dispatchEvent(new Event("input", { bubbles: true }));
-      nameInput.dispatchEvent(new Event("change", { bubbles: true }));
-    }
+    if (mission) { askDiscard(mission + " 관제", "./main-v6.html?mission=" + encodeURIComponent(mission)); }
+    else { askDiscard("통합 순회 현황", "./building-v6.html"); }
   });
 })();

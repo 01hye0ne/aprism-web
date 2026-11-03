@@ -1166,7 +1166,6 @@ body.ver-6.sian .context-panel:not(.is-collapsed) { flex-basis: 340px; }
 body.ver-6.sian .lp-body { width: 340px; }
 
 /* [11/03 v6] 미션 설정 · 사전 점검 상단 탭 — 관제와 같은 탭(setup-tabs-v6.js). 미션 설정에서 [전체 미션]은 누르지 않는다(미션 이름이 아니다) */
-body.ver-6.sian[data-stage="setup"] .sb-tabs.is-fixed .sb-tab:not([data-mission]) { pointer-events: none; }
 /* 사전 점검 중 다른 탭 — 토스트는 상단 바 바로 아래 가운데(지도 위) */
 body.ver-6 > .toast.sb-toast { position: fixed; top: 64px; bottom: auto; z-index: 1000; min-height: 32px; padding-right: var(--space-16); }
 
@@ -1191,3 +1190,11 @@ body.ver-6.sian .precheck-list { background-color: var(--bg-well); box-shadow: v
 
 :root[data-theme="light"] body.ver-6 .switch:not([aria-checked="true"]) { background-color: var(--color-gray-400); }
 :root[data-theme="light"] body.ver-6 .switch:not([aria-checked="true"]) .knob { background-color: #ffffff; box-shadow: 0 1px 2px rgb(16 24 40 / 20%); }
+
+/* [11/03 v6] 탭 = 이미 있는 미션의 창(디자이너 결정) — 관제 끝 [+] 새 미션 · 미션 설정의 [새 미션] 탭 · 완료 미션 [보고서 보기] [다시 실행] */
+body.ver-6 .sb-tab-add { padding: 0 var(--space-12); color: var(--text-secondary); }
+body.ver-6 .sb-tab-add:hover { color: var(--text-primary); }
+body.ver-6 .sb-tab-draft { flex: none; gap: var(--space-4); }   /* .sb-tab-new 는 '새 위험' 깜빡이 점이 쓴다 */
+body.ver-6 .md-actions { display: flex; gap: var(--space-8); margin-top: var(--space-12); }
+body.ver-6 .md-actions[hidden] { display: none; }
+body.ver-6 .md-actions .btn { flex: 1 1 0; gap: var(--space-4); text-decoration: none; }
