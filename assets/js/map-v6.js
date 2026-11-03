@@ -1987,7 +1987,7 @@
     safe: 0x34c759,       // safe/300
     caution: 0xffcc00,    // warning/500
     danger: 0xff383c,     // danger/500
-    current: 0x89b9ed,    // main/400
+    current: 0x4db2ff,    // [11/03] aqua-500(파랑 → 아쿠아, 흰기 뺌) — 이전 main/400 0x89b9ed
     upcoming: 0x8894aa,   // gray/450 언저리 — 아직 아무 일도 없었다는 뜻이다
     skipped: 0x4e576a     // gray/600 — 미션 설정에서 꺼 둔 자리. 있지만 이번엔 안 간다
   };
@@ -1995,7 +1995,7 @@
    * 라이트 표식 색 — 우측 목록 표식(라이트 상태 토큰)과 같은 값이다(10/19 · 위험 red/500 채도 기준).
    *   safe green/400 · caution yellow/600 · current blue/650. 위험 · 회색은 다크와 같다.
    */
-  var WP_TINT_LIGHT = { safe: 0x14c552, caution: 0xf2a900, current: 0x3b79d5 };   // [11/03] 주의 0xe1ab13 → yellow-550 #F2A900(채도 올림, 회색 바닥에서 또렷하게)   // [11/03] 0x1d4ed8(보랏빛 남색, DS 밖) → blue-700 — 다크 · 라이트 파랑을 한 단계로(오른쪽 판 status/info 와 같다)   // [10/29] 지금 지점 = 갈 길 파랑(단계 톤)
+  var WP_TINT_LIGHT = { safe: 0x14c552, caution: 0xf2a900, current: 0x1778c2 };   // [11/03] 주의 0xe1ab13 → yellow-550 #F2A900(채도 올림, 회색 바닥에서 또렷하게)   // [11/03] 0x1d4ed8(보랏빛 남색, DS 밖) → blue-700 — 다크 · 라이트 파랑을 한 단계로(오른쪽 판 status/info 와 같다)   // [10/29] 지금 지점 = 갈 길 파랑(단계 톤)
   function wpTint(tone) {
     return (isLight() && WP_TINT_LIGHT[tone]) || WP_TINT[tone] || WP_TINT.upcoming;
   }
@@ -2855,7 +2855,7 @@
      * 대기 로봇도 회색이라 지나온 길과 톤이 겹치는데, 수행 중인 로봇은 흰 표식과
      * 파란 앞길이 함께 서 있어 멀리서도 갈린다.
      */
-    "수행중": { done: 0x9ea8bb, left: 0x89b9ed, dot: 0xffffff, mark: 0xf7f8fa },
+    "수행중": { done: 0x9ea8bb, left: 0x4db2ff, dot: 0xffffff, mark: 0xf7f8fa },   // [11/03] 갈 길 aqua-500
     "완료":   { done: 0x34c759, left: 0x1da67f, dot: 0x72f494 },
     "대기":   { done: 0x8894aa, left: 0x5d6675, dot: 0xaeb8c8 },
     "끊김":   { done: 0x667085, left: 0x4e576a, dot: 0x8894aa }
@@ -2866,7 +2866,7 @@
    * 지나온 길은 진한 회색, 로봇 표식은 거의 검정(라이트의 inverse)으로 뒤집는다. 갈 길(main)은 한 단 진하게.
    */
   var BOT_TINT_LIGHT = {
-    "수행중": { done: 0x4b5563, left: 0x3b79d5, dot: 0x2b2f36, mark: 0x2b2f36 },   // [11/03] 갈 길 0x1d4ed8 → blue-700(DS) —   // [10/29] 갈 길 파랑 — 밝은 바닥 위에서 또렷하게 한 단 진하게(단계 톤)
+    "수행중": { done: 0x4b5563, left: 0x1778c2, dot: 0x2b2f36, mark: 0x2b2f36 },   // [11/03] 갈 길 0x1d4ed8 → blue-700(DS) —   // [10/29] 갈 길 파랑 — 밝은 바닥 위에서 또렷하게 한 단 진하게(단계 톤)
     "완료":   { done: 0x1da67f, left: 0x34c759, dot: 0x1da67f },
     "대기":   { done: 0x5d6675, left: 0x8894aa, dot: 0x5d6675 },
     "끊김":   { done: 0x4e576a, left: 0x667085, dot: 0x4e576a }
@@ -3660,7 +3660,7 @@
     rrPinBox.setAttribute("data-past", RR.pastNo);   // [10/22 실험] 지나온 지점 번호
     if (camera) { var cdv = new THREE.Vector3(); camera.getWorldDirection(cdv); rrPinBox.style.setProperty("--tilt", Math.max(0.25, Math.abs(cdv.y)).toFixed(3)); }   // P2 — 바닥에 눕힌 만큼 납작하게
     if (!on) { return; }
-    var light = isLight(), blue = "#" + new THREE.Color(onLane.bot ? onLane.bot.left : 0x89b9ed).getHexString();
+    var light = isLight(), blue = "#" + new THREE.Color(onLane.bot ? onLane.bot.left : 0x4db2ff).getHexString();
     // [10/29] 라이트 핀 = 단계 톤(판 50 · 테 950 24% · 글자 700 · 예정 600)
     var C = { up: light ? "#63686F" : "#8894AA", bg: light ? "#F2F4F5" : "#0A0F18", cau: light ? "#F2A900" : "#FFCC00", dan: "#FF383C", gray: "#9EA8BB" };
     var key = wpSpots.map(function (w) { return w.id + w.info.tone + (w.buried ? "b" : "") + (w.off ? "x" : ""); }).join(",") + rrM(onLane) + light + blue;
