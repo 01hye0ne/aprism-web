@@ -1057,3 +1057,37 @@ body.ver-6 {
 :root[data-theme] body.ver-6 [data-timeline] .timeline-item.is-running .rail-stub { background-color: var(--status-info-icon); }
 body.ver-6.v2-2 [data-timeline] .timeline-item.is-done:not([data-wp-alert]) .rail-dot { background-color: var(--status-info-icon); }
 body.ver-6.v2-2 [data-timeline] .timeline-item.is-running:not([data-wp-alert]) .rail-mark { color: var(--status-info-icon); }
+
+/*
+ * [11/03 v6] 웨이포인트 레일 — 지점 점이 길 "안"에 박힌 꼴(디자이너 레퍼런스: 버스 노선 앱). 선 4 → 10, 점 4(선 안 가운데).
+ *   지나온 길 = 지금 트랙색(다크 gray/700 · 라이트 흰), 지금 가는 길 = 아쿠아(위 규칙), 앞으로 갈 길 = 트랙색 45%(점선 대신 옅은 실선 — 굵은 점선은 끊겨 보인다).
+ *   점은 트랙보다 한 단 진한 색 — 아쿠아 위에서도 보인다. 지금 지점 고리(16) · 주의/위험 세모는 그대로 트랙 위에 얹힌다(레퍼런스의 버스 표식처럼).
+ */
+body.ver-6 { --rail-track: var(--color-gray-700); --rail-pin: var(--color-gray-950); --rail-pin-ahead: var(--color-gray-500); }
+:root[data-theme="light"] body.ver-6 { --rail-track: var(--bg-raised); --rail-pin: var(--color-gray-500); --rail-pin-ahead: var(--color-gray-400); }
+:root[data-theme] body.ver-6.v2-2 [data-timeline] .timeline-item .rail-stub,
+:root[data-theme] body.ver-6.v2-2 [data-timeline] .timeline-item .rail-line { width: 10px; border-radius: 0; }
+:root[data-theme] body.ver-6.v2-2 [data-timeline] .timeline-item.is-done:not(:has(+ .timeline-item.is-running)) .rail-line,
+:root[data-theme] body.ver-6.v2-2 [data-timeline] .timeline-item.is-done .rail-stub { background-color: var(--rail-track); }
+:root[data-theme] body.ver-6.v2-2 [data-timeline] .timeline-item.is-running .rail-line,
+:root[data-theme] body.ver-6.v2-2 [data-timeline] .timeline-item.is-pending .rail-stub,
+:root[data-theme] body.ver-6.v2-2 [data-timeline] .timeline-item.is-pending .rail-line {
+  background-color: var(--rail-ahead);
+  background-image: none; -webkit-mask-image: none; mask-image: none;
+}
+/* 고리 · 점 자리(rail-mark 24)에는 선이 없어 굵은 길이 칸마다 끊겼다 — 표식 뒤에 10 띠를 깐다. 지금 지점은 위 아쿠아 · 아래 앞길 */
+body.ver-6 { --rail-ahead: color-mix(in srgb, var(--color-gray-700) 80%, var(--color-gray-900)); }   /* 불투명 — 반투명이면 칸 경계 1px 겹침이 진한 줄로 남았다. 다크 우물은 반투명이라 섞지 않고 원색끼리 */
+:root[data-theme="light"] body.ver-6 { --rail-ahead: color-mix(in srgb, var(--bg-raised) 55%, var(--color-gray-300)); }   /* 불투명 — 반투명이면 칸 경계 1px 겹침이 진한 줄로 남았다 */
+:root[data-theme] body.ver-6.v2-2 [data-timeline] .timeline-item .rail-mark { background: linear-gradient(to right, transparent 7px, var(--rail-band) 7px, var(--rail-band) 17px, transparent 17px); }
+:root[data-theme] body.ver-6.v2-2 [data-timeline] .timeline-item.is-done { --rail-band: var(--rail-track); }
+:root[data-theme] body.ver-6.v2-2 [data-timeline] .timeline-item.is-done:has(+ .timeline-item.is-running) .rail-mark {
+  background: linear-gradient(to bottom, var(--rail-track) 50%, var(--status-info-icon) 50%) 7px 0 / 10px 100% no-repeat;
+}
+:root[data-theme] body.ver-6.v2-2 [data-timeline] .timeline-item.is-pending { --rail-band: var(--rail-ahead); }
+:root[data-theme] body.ver-6.v2-2 [data-timeline] .timeline-item.is-running .rail-mark {
+  background: linear-gradient(to bottom, var(--status-info-icon) 50%, var(--rail-ahead) 50%) 7px 0 / 10px 100% no-repeat;
+}
+:root[data-theme] body.ver-6.v2-2 [data-timeline] .timeline-item:first-child .rail-stub { border-radius: 5px 5px 0 0; }
+:root[data-theme] body.ver-6.v2-2 [data-timeline] .timeline-item:last-child .rail-line { border-radius: 0 0 5px 5px; }
+:root[data-theme] body.ver-6.v2-2 [data-timeline] .timeline-item.is-done:not([data-wp-alert]) .rail-dot { width: 4px; height: 4px; border: 0; background-color: var(--rail-pin); }
+:root[data-theme] body.ver-6.v2-2 [data-timeline] .timeline-item.is-pending:not([data-wp-alert]) .rail-dot { width: 4px; height: 4px; border: 0; background-color: var(--rail-pin-ahead); }
