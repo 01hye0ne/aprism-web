@@ -32,7 +32,7 @@
   <!-- v5 전용 규칙 — v4 는 10/29 부로 멈췄다. v5 에서 바꾸는 것은 여기(body.ver-5)에. -->
   <link rel="stylesheet" href="../assets/css/v5.css?v=aefc22b4" />
   <!-- v6 전용 규칙 — v5 는 10/30 부로 멈췄다. v6 에서 바꾸는 것은 여기(body.ver-6)에. -->
-  <link rel="stylesheet" href="../assets/css/v6.css?v=ed4534f3" />
+  <link rel="stylesheet" href="../assets/css/v6.css?v=ab84bd2f" />
   <!-- [10/29] v5 지도(map-v6.js)가 그리는 설비 이름표 · 충전 스테이션 · 번호 핀 꼴 — 메인과 같다 -->
   <link rel="stylesheet" href="../assets/css/route-rules.css?v=6a34168a" />
   <style>
@@ -117,15 +117,15 @@
         <span class="i" style="--i:var(--ic-brand-mark)" role="img" aria-label="APRISM"></span>
       </span>
       <!-- [11/03 v6] 상단 탭 — 미션 관제(main-v6, mission-tabs-v6.js 가 그리는 탭)와 같은 모양을 고정으로 둔다(디자이너).
-           미션을 짜는 중이라 "정기 순회 점검" 탭에 고정 — 누르거나 끌어도 바뀌지 않는다(.sb-tabs.is-fixed). -->
+           처음엔 "정기 순회 점검" 탭. 누르면 — 미션 설정: 미션 이름이 탭 이름으로, 사전 점검: "사전점검 진행중입니다." 토스트(setup-tabs-v6.js). 끌기는 없다. -->
       <nav class="sb-tabs is-fixed" aria-label="보는 범위">
-        <span class="sb-tab"><span class="sb-tab-name t-label-1">전체 미션</span></span>
-        <span class="sb-tab is-on" aria-current="page" data-run="run" data-mission="정기 순회 점검"><span class="sb-tab-name t-label-1">정기 순회 점검</span><span class="i i-16 sb-tab-sev" data-sev="critical" aria-hidden="true" style="--i:var(--ic-error)"></span></span>
-        <span class="sb-tab" data-run="run" data-mission="발전기실 설비 점검"><span class="sb-tab-name t-label-1">발전기실 설비 점검</span><span class="i i-16 sb-tab-sev" data-sev="warning" aria-hidden="true" style="--i:var(--ic-warning)"></span></span>
-        <span class="sb-tab" data-run="run" data-mission="전기실 열화상 점검"><span class="sb-tab-name t-label-1">전기실 열화상 점검</span><span class="i i-16 sb-tab-sev" data-sev="critical" aria-hidden="true" style="--i:var(--ic-error)"></span></span>
-        <span class="sb-tab" data-run="done" data-mission="야간 순회 점검"><span class="sb-tab-name t-label-1">야간 순회 점검</span></span>
-        <span class="sb-tab" data-run="done" data-mission="공조 설비 순회"><span class="sb-tab-name t-label-1">공조 설비 순회</span></span>
-        <span class="sb-tab" data-run="done" data-mission="유틸리티 순회"><span class="sb-tab-name t-label-1">유틸리티 순회</span></span>
+        <button type="button" class="sb-tab"><span class="sb-tab-name t-label-1">전체 미션</span></button>
+        <button type="button" class="sb-tab is-on" aria-current="page" data-run="run" data-mission="정기 순회 점검"><span class="sb-tab-name t-label-1">정기 순회 점검</span><span class="i i-16 sb-tab-sev" data-sev="critical" aria-hidden="true" style="--i:var(--ic-error)"></span></button>
+        <button type="button" class="sb-tab" data-run="run" data-mission="발전기실 설비 점검"><span class="sb-tab-name t-label-1">발전기실 설비 점검</span><span class="i i-16 sb-tab-sev" data-sev="warning" aria-hidden="true" style="--i:var(--ic-warning)"></span></button>
+        <button type="button" class="sb-tab" data-run="run" data-mission="전기실 열화상 점검"><span class="sb-tab-name t-label-1">전기실 열화상 점검</span><span class="i i-16 sb-tab-sev" data-sev="critical" aria-hidden="true" style="--i:var(--ic-error)"></span></button>
+        <button type="button" class="sb-tab" data-run="done" data-mission="야간 순회 점검"><span class="sb-tab-name t-label-1">야간 순회 점검</span></button>
+        <button type="button" class="sb-tab" data-run="done" data-mission="공조 설비 순회"><span class="sb-tab-name t-label-1">공조 설비 순회</span></button>
+        <button type="button" class="sb-tab" data-run="done" data-mission="유틸리티 순회"><span class="sb-tab-name t-label-1">유틸리티 순회</span></button>
       </nav>
       </div>
 
@@ -1645,5 +1645,6 @@
 <!-- 미션 설정 — 점검항목 · 순서 · 로봇이 소요시간과 배터리를 움직인다. screen.js 뒤에 온다. -->
 <script src="../assets/js/mission-setup.js?v=d4fe220d"></script>
 <script src="../assets/js/grid-overlay.js?v=164e4f2a"></script>
+<script src="../assets/js/setup-tabs-v6.js?v=d9dbe5b9"></script>
 </body>
 </html>
