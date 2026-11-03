@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="dark" class="js">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>APRISM — [자문] 26.11.03</title>
+  <meta name="description" content="11.03 기준 v6 화면 — 미션 설정 · 통합 순회 현황 · 미션 관제 · 알림 센터 · 안전진단 · 보고서, 한 화면에 주제 하나" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/static/woff2/SUIT.css" />
+  <link rel="stylesheet" href="./assets/css/tokens.css?v=b64812bd" />
+  <link rel="stylesheet" href="./assets/css/base.css?v=5ccd4bb3" />
+  <style>
+    /*
+     * 발표형 한 장 — 화면 높이 하나에 주제 하나. 넓은 화면에서는 휠 · 방향키 한 번에 한 장씩
+     * 천천히 미끄러지고(아래 스크립트), 들어온 장의 글과 그림이 차례로 떠오른다.
+     * 왼쪽 글 · 오른쪽 화면. 화면은 주제에 해당하는 부분만 잘라 2배로 찍은 것이고,
+     * 위 단추로 같은 화면의 다른 상태를 바꿔 본다. 값은 토큰만 쓴다.
+     * 10.30 판(advisory-261030.html)을 복제했지만 이번 판은 시안 비교 없이 v6(파일 *-v6.html) 화면만 흐름 순서로 담는다 — 그림은 advisory-1103/.
+     */
+    body { margin: 0; background-color: var(--bg-page); }
+
+    .back {
+      position: fixed; top: var(--space-16); right: var(--space-16); z-index: 3;
+      padding: var(--space-4) var(--space-12);
+      border: var(--border-width-thin) solid var(--border-default); border-radius: var(--radius-pill);
+      background-color: var(--bg-panel); color: var(--text-secondary);
+      font-size: var(--font-size-12); text-decoration: none;
+    }
+    .back:hover { color: var(--text-primary); border-color: var(--border-strong); }
+
+    /* 페이지네이션 — 1~6장에서 왼쪽 아래. 표지(00)에서는 숨긴다. ‹ 01 … 06 › */
+    .pager {
+      position: fixed; left: var(--space-48); bottom: var(--space-16); z-index: 3;
+      display: flex; align-items: center; gap: var(--space-2, 2px);
+      padding: var(--space-4);
+      border: var(--border-width-thin) solid var(--border-divider); border-radius: var(--radius-pill);
+      background-color: var(--bg-panel);
+      font-size: var(--font-size-12); font-variant-numeric: tabular-nums;
+      transition: opacity 300ms ease;
+    }
+    .pager[hidden] { display: flex; opacity: 0; pointer-events: none; }
+    .pager button {
+      min-width: 28px; height: 28px; padding: 0 var(--space-4);
+      border: 0; border-radius: var(--radius-pill);
+      background: transparent; color: var(--text-tertiary);
+      font: inherit; cursor: pointer;
+    }
+    .pager button:hover:not(:disabled) { color: var(--text-primary); background-color: var(--bg-cell); }
+    .pager button[aria-current="page"] { background-color: var(--bg-inverse); color: var(--text-on-inverse); font-weight: 700; }
+    .pager button:disabled { opacity: 0.35; cursor: default; }
+    .pager .arw { font-size: var(--font-size-16); line-height: 1; }
+
+    .slide {
+      box-sizing: border-box;
+      height: 100vh; height: 100dvh;
+      display: grid;
+      grid-template-columns: minmax(320px, 30%) minmax(0, 1fr);
+      gap: var(--space-40);
+      padding: var(--space-48) var(--space-48) var(--space-40);
+      border-bottom: var(--border-width-thin) solid var(--border-divider);
+    }
+
+    /* 왼쪽 글 */
+    .txt { display: flex; flex-direction: column; justify-content: center; min-width: 0; }
+    .num { margin: 0; color: var(--text-tertiary); font-size: var(--font-size-13); font-weight: 600; font-variant-numeric: tabular-nums; letter-spacing: 0.04em; }
+    .txt h2 { margin: var(--space-8) 0 var(--space-32); color: var(--text-primary); font-size: var(--font-size-32); line-height: var(--font-line-height-40); word-break: keep-all; }
+    .blk { margin: 0 0 var(--space-20); }
+    .blk .k { margin: 0 0 var(--space-4); color: var(--text-tertiary); font-size: var(--font-size-12); font-weight: 600; }
+    .blk p:last-child { margin: 0; color: var(--text-secondary); font-size: var(--font-size-14); line-height: var(--font-line-height-22); word-break: keep-all; }
+    .blk.now p:last-child { color: var(--text-primary); font-size: var(--font-size-16); line-height: var(--font-line-height-26); }
+    .blk.now b { color: var(--text-primary); }
+    .why {
+      margin: var(--space-8) 0 0; padding: var(--space-12) var(--space-16);
+      border-left: 3px solid var(--border-strong); background-color: var(--bg-panel);
+      border-radius: 0 var(--radius-card) var(--radius-card) 0;
+      color: var(--text-secondary); font-size: var(--font-size-13); line-height: var(--font-line-height-20); word-break: keep-all;
+    }
+    .nw { white-space: nowrap; }
+    .why::before { content: "왜 "; color: var(--text-primary); font-weight: 700; }
+
+    /* 오른쪽 화면 */
+    .pic { display: flex; flex-direction: column; justify-content: center; min-width: 0; min-height: 0; margin: 0; }
+    .tabs { display: flex; flex-wrap: wrap; gap: var(--space-4); margin: 0 0 var(--space-12); padding: 0; list-style: none; }
+    .tabs button {
+      padding: var(--space-4) var(--space-12);
+      border: var(--border-width-thin) solid var(--border-default); border-radius: var(--radius-pill);
+      background: transparent; color: var(--text-tertiary);
+      font: inherit; font-size: var(--font-size-13); cursor: pointer;
+    }
+    .tabs button:hover { color: var(--text-primary); }
+    .tabs button[aria-pressed="true"] { background-color: var(--bg-inverse); border-color: var(--bg-inverse); color: var(--text-on-inverse); font-weight: 600; }
+    /* 그림을 한 칸에 겹쳐 둔다 — 칸 높이는 가장 큰 그림, 화면 높이를 넘지 않는다 */
+    .frame { display: grid; min-height: 0; }
+    .frame img {
+      grid-area: 1 / 1; width: 100%; height: auto; max-height: calc(100dvh - 176px);
+      object-fit: contain; object-position: left top;
+      border-radius: var(--radius-card);
+      opacity: 0; transition: opacity 420ms ease;
+    }
+    .frame img.is-on { opacity: 1; }
+    /* 나란히 보기 — 단추 없이 셋을 한 번에(세로로 긴 목록 · 오른쪽 칸) */
+    .frame.is-row { grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: var(--space-16); align-items: start; }
+    .frame.is-col { grid-auto-flow: row; gap: var(--space-12); justify-items: start; }
+    .frame.is-row > div, .frame.is-col > div { min-width: 0; }
+    .frame.is-row img, .frame.is-col img { grid-area: auto; opacity: 1; display: block; }
+    .frame.is-row img { max-height: calc(100dvh - 200px); width: auto; max-width: 100%; }
+    .frame.is-col img { max-height: calc((100dvh - 260px) / 3); width: auto; max-width: 100%; }
+    .frame .lbl { margin: 0 0 var(--space-8); color: var(--text-tertiary); font-size: var(--font-size-13); font-weight: 600; }
+    .frame .lbl.is-now { color: var(--text-primary); }
+    .cap { margin: var(--space-8) 0 0; color: var(--text-tertiary); font-size: var(--font-size-12); }
+
+    /* 제안 장 — 왼쪽 1 · 2 · 3 칸이 오른쪽 그림 단추를 겸한다 */
+    .opts { display: flex; flex-direction: column; gap: var(--space-8); margin: 0; padding: 0; list-style: none; }
+    .opts button {
+      display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: var(--space-4) var(--space-12); width: 100%;
+      padding: var(--space-12) var(--space-16); text-align: left;
+      border: var(--border-width-thin) solid var(--border-divider); border-radius: var(--radius-card);
+      background: transparent; color: var(--text-tertiary); font: inherit; cursor: pointer;
+      transition: background-color 300ms ease, border-color 300ms ease, color 300ms ease;
+    }
+    .opts button:hover { border-color: var(--border-default); }
+    .opts button[aria-pressed="true"] { background-color: var(--bg-panel); border-color: var(--border-strong); color: var(--text-secondary); }
+    .opts .key {
+      grid-row: span 2; display: grid; place-items: center; width: 28px; height: 28px;
+      border-radius: var(--radius-pill); background-color: var(--bg-cell); color: var(--text-secondary);
+      font-size: var(--font-size-13); font-weight: 700;
+    }
+    .opts button[aria-pressed="true"] .key { background-color: var(--bg-inverse); color: var(--text-on-inverse); }
+    .opts .t { color: var(--text-secondary); font-size: var(--font-size-14); font-weight: 700; }
+    .opts button[aria-pressed="true"] .t { color: var(--text-primary); }
+    .opts .d { font-size: var(--font-size-13); line-height: var(--font-line-height-20); word-break: keep-all; }
+    .pic.no-tabs .tabs { display: none; }
+
+    /* 표지 */
+    .cover .txt h1 { margin: var(--space-8) 0 var(--space-16); color: var(--text-primary); font-size: var(--font-size-40); line-height: var(--font-line-height-48); word-break: keep-all; }
+    .cover .lead { margin: 0 0 var(--space-32); color: var(--text-secondary); font-size: var(--font-size-16); line-height: var(--font-line-height-26); word-break: keep-all; }
+    .cover .lead b { color: var(--text-primary); }
+    .toc { margin: 0; padding: 0; list-style: none; counter-reset: t; }
+    .toc li { counter-increment: t; border-top: var(--border-width-thin) solid var(--border-divider); }
+    .toc a { display: flex; gap: var(--space-12); padding: var(--space-8) 0; color: var(--text-secondary); font-size: var(--font-size-14); text-decoration: none; }
+    .toc a::before { content: counter(t, decimal-leading-zero); color: var(--text-tertiary); font-variant-numeric: tabular-nums; }
+    .toc a:hover { color: var(--text-primary); }
+    .toc a span { color: var(--text-tertiary); }
+
+    /* 들어오는 장 — 글은 위에서부터 차례로, 그림은 조금 늦게 떠오른다 */
+    .js .slide .txt > *, .js .slide .pic {
+      opacity: 0; transform: translateY(20px);
+      transition: opacity 800ms cubic-bezier(0.22, 0.61, 0.36, 1), transform 1000ms cubic-bezier(0.22, 0.61, 0.36, 1);
+    }
+    .js .slide.is-in .txt > *, .js .slide.is-in .pic { opacity: 1; transform: none; }
+    .js .slide.is-in .txt > :nth-child(2) { transition-delay: 80ms; }
+    .js .slide.is-in .txt > :nth-child(3) { transition-delay: 160ms; }
+    .js .slide.is-in .txt > :nth-child(4) { transition-delay: 240ms; }
+    .js .slide.is-in .txt > :nth-child(5) { transition-delay: 320ms; }
+    .js .slide.is-in .pic { transition-delay: 200ms; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .frame img, .js .slide .txt > *, .js .slide .pic { transition: none; transform: none; }
+    }
+
+    /* 좁은 화면 — 장 높이를 풀고 위아래로 쌓는다 */
+    @media (max-width: 900px) {
+      .slide { height: auto; grid-template-columns: minmax(0, 1fr); gap: var(--space-20); padding: var(--space-48) var(--space-16) var(--space-32); }
+      .frame img { display: none; max-height: none; opacity: 1; }
+      .frame.is-row { grid-auto-flow: row; }
+      .frame.is-row img, .frame.is-col img { display: block; width: 100%; max-height: none; }
+      .frame img.is-on { display: block; }
+      .pager { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <a href="./index.html" class="back">목록으로</a>
+  <nav class="pager" aria-label="페이지" data-pager hidden></nav>
+
+  <main>
+    <!-- 표지 -->
+    <section class="slide cover" id="s0" aria-labelledby="s0-title">
+      <div class="txt">
+        <p class="num">APRISM V6</p>
+        <h1 id="s0-title">[자문] 26.11.03</h1>
+        <p class="lead"><b>11.03 기준 v6 화면</b>을 흐름 순서대로 정리함. 미션을 만들고 → 관제하고 → 알림을 처리하고 → 진단 · 보고서로 남기는 순서.</p>
+        <ol class="toc">
+          <li><a href="#s1">미션 설정 · 사전 점검 <span>미션 만들기 · 로봇 상태 확인</span></a></li>
+          <li><a href="#s2">통합 순회 현황 <span>전체 미션 · 층 쌓아 보기</span></a></li>
+          <li><a href="#s3">미션 관제 <span>알림 · 3D 지도 · Delta · 로봇</span></a></li>
+          <li><a href="#s4">알림 센터 <span>지난 미션까지 모아 처리</span></a></li>
+          <li><a href="#s5">안전진단 <span>감지 6종 카드 · 표 · 자세히 보기</span></a></li>
+          <li><a href="#s6">보고서 <span>미션 · 일일 · 월 보고서</span></a></li>
+        </ol>
+      </div>
+      <figure class="pic">
+        <div class="frame"><img class="is-on" src="./assets/img/advisory-1103/03-main.webp" alt="v6 미션 관제 — 상단 바 미션 탭, 왼쪽 최신 알림과 오늘 확인 완료, 지도 왼쪽 위 Delta, 3D 지도 위 웨이포인트와 로봇, 오른쪽 로봇 패널과 웨이포인트 레일" /></div>
+        <figcaption class="cap">v6 미션 관제 · 위험 알림이 있는 정기 순회 점검(11.03)</figcaption>
+      </figure>
+    </section>
+
+    <section class="slide" id="s1" aria-labelledby="s1-title">
+      <div class="txt">
+        <p class="num">01</p>
+        <h2 id="s1-title">미션 설정 · 사전 점검</h2>
+        <div class="blk now"><p class="k">미션 설정</p><p>미션 이름 · 대상 설비 · <b>실행 로봇 한 대</b> · 점검항목을 고르면 지도에 <b>경로와 순서 번호</b>가 바로 그려짐. 아래에 <b>예상 소요시간</b>과 <b>배터리 예측</b>(복귀 예비 20% · 끝나면 남는 양)을 보여 줌.</p></div>
+        <div class="blk now"><p class="k">사전 점검</p><p>Manager · Spot · Battery · Mission 네 항목을 서버가 자동 확인. <b>모두 정상일 때만</b> 로봇이 기동하고, 끝나면 자동으로 미션이 시작됨.</p></div>
+        <p class="why">출발 전에 "끝까지 갈 수 있는가"를 숫자로 보여 주면 중간 복귀 같은 일을 미리 막음.</p>
+      </div>
+      <figure class="pic">
+        <div class="tabs" role="group" aria-label="화면 고르기"></div>
+        <div class="frame">
+          <img data-tab="미션 설정" data-default src="./assets/img/advisory-1103/01-setup.webp" alt="미션 설정 — 미션 이름, 대상 설비, 실행 로봇, 점검항목 4개 선택, 예상 소요시간 약 1시간 12분, 배터리 막대(복귀 예비 20%, 현재 96%), 지도에 경로 1~4" loading="lazy" />
+          <img data-tab="사전 점검" src="./assets/img/advisory-1103/01-precheck.webp" alt="사전 점검 — Manager 확인중, Spot · Battery · Mission 대기, 점검이 끝나면 자동으로 시작한다는 안내, 취소 · 미션 시작" loading="lazy" />
+        </div>
+      </figure>
+    </section>
+
+    <section class="slide" id="s2" aria-labelledby="s2-title">
+      <div class="txt">
+        <p class="num">02</p>
+        <h2 id="s2-title">통합 순회 현황</h2>
+        <div class="blk now"><p class="k">무엇을 보나</p><p>상단 바 <b>[전체 미션]</b>. 진행 중인 모든 미션의 알림을 왼쪽에 모으고(<b>무슨 일 → 미션 → 어디서</b>), 지도는 <b>B3 · B4 층을 쌓아</b> 층마다 로봇 · 알림 위치를 표시. 오른쪽은 로봇 카드(수행중 · 끊김 · 완료 · 대기).</p></div>
+        <div class="blk"><p class="k">이어지는 동작</p><p>층을 누르면 그 층만 펼쳐지고, 미션 탭을 누르면 그 미션의 관제 화면으로 들어감.</p></div>
+        <p class="why">여러 층 · 여러 로봇이 동시에 돌 때, 어느 미션부터 봐야 할지 한 화면에서 고를 수 있어야 함.</p>
+      </div>
+      <figure class="pic">
+        <div class="frame"><img class="is-on" src="./assets/img/advisory-1103/02-building.webp" alt="통합 순회 현황 — 전체 미션 탭, 왼쪽 전체 알림 12건(위험 3 · 주의 9), 가운데 B3 · B4 두 층을 쌓은 3D 지도와 알림 위치, 오른쪽 로봇 현황 12대 연결 · 3대 수행중" loading="lazy" /></div>
+      </figure>
+    </section>
+
+    <section class="slide" id="s3" aria-labelledby="s3-title">
+      <div class="txt">
+        <p class="num">03</p>
+        <h2 id="s3-title">미션 관제</h2>
+        <div class="blk now"><p class="k">한 화면 = 미션 하나</p><p>왼쪽 <b>최신 알림</b>(위험 우선)과 <b>오늘 확인 완료</b>(접기 가능). 가운데 <b>3D 지도</b> — 경로 띠는 지나온 길 · 지금 가는 길 · 앞길로 나뉘고, 위험 · 주의 지점은 번호 깃발. 오른쪽은 <b>배정된 로봇 한 대</b>(자동복귀 · <span class="nw">E-STOP</span>)와 웨이포인트 레일.</p></div>
+        <div class="blk now"><p class="k">Delta</p><p>전체 알림을 종합해 <b>한 줄 판단 + 다음 행동</b>을 말함. 펼치면 대화창과 조치 단추. <b>위험</b>일 때만 가장자리가 붉게 빛남.</p></div>
+        <p class="why">관제자는 "이번 순회"를 지켜봄. 알림을 누르면 지도 위 팝오버에서 바로 조치하고, 근거는 안전진단으로 한 번에 넘어감.</p>
+      </div>
+      <figure class="pic">
+        <div class="tabs" role="group" aria-label="화면 고르기"></div>
+        <div class="frame">
+          <img data-tab="관제" data-default src="./assets/img/advisory-1103/03-main.webp" alt="미션 관제 — 최신 알림 6건(위험 2 · 주의 4), 오늘 확인 완료 5건, Delta 위젯, 3D 지도와 번호 깃발, 로봇 01 패널과 웨이포인트 레일" loading="lazy" />
+          <img data-tab="Delta 펼침" src="./assets/img/advisory-1103/03-delta.webp" alt="Delta 펼침 — 지도 높이 창에 종합 판단 문장, 위험 3건부터 조치 · 주의 9건 묶어서 확인 단추" loading="lazy" />
+          <img data-tab="라이트" src="./assets/img/advisory-1103/03-light.webp" alt="미션 관제 라이트 테마 — 같은 배치, 흰 설비 · 옅은 회색 지도 바탕" loading="lazy" />
+        </div>
+      </figure>
+    </section>
+
+    <section class="slide" id="s4" aria-labelledby="s4-title">
+      <div class="txt">
+        <p class="num">04</p>
+        <h2 id="s4-title">알림 센터</h2>
+        <div class="blk now"><p class="k">무엇을 하나</p><p>최신 알림의 <b>[전체보기]</b>로 열림. 끝난 미션까지 포함해 <b>미확인 · 조치 요청됨</b> 두 탭으로 모으고, 미션 · 등급 · 기간 · 정렬로 거름. 오른쪽에 사진(모자이크) · 위치 · <b>DELTA 조치 제안</b>(오탐 가능성 함께), 아래 <b>[진단 상세] · [조치 요청]</b>.</p></div>
+        <p class="why">관제 화면은 지금 미션에 집중하고, 밀린 알림은 여기서 한꺼번에 처리함.</p>
+      </div>
+      <figure class="pic">
+        <div class="frame"><img class="is-on" src="./assets/img/advisory-1103/04-alert-center.webp" alt="알림 센터 — 미확인 12건, 미션 · 등급 · 기간 · 정렬 필터, 왼쪽 알림 표, 오른쪽 안전벨트 미착용 1명 상세, 사진, DELTA 조치 제안, 진단 상세 · 조치 요청" loading="lazy" /></div>
+      </figure>
+    </section>
+
+    <section class="slide" id="s5" aria-labelledby="s5-title">
+      <div class="txt">
+        <p class="num">05</p>
+        <h2 id="s5-title">안전진단</h2>
+        <div class="blk now"><p class="k">감지 6종</p><p>안전 · 누출 · 온도 · 계기 · 이상음향 · 부분방전. <b>카드</b>는 감지별 최신 판정과 사진, <b>표</b>는 웨이포인트별 측정값과 <b>DELTA 메모</b>. 왼쪽 미니맵에 경로 · 판정 위치.</p></div>
+        <div class="blk now"><p class="k">자세히 보기</p><p>판정 · 기준 · 발생 위치 · 조치 상태 · <b>측정 이력</b>과 영상. 오른쪽에서 <b>AI 추천 조치</b>를 고르고 메모를 붙여 <b>[현장 조치 요청]</b>.</p></div>
+        <p class="why">관제에서 본 알림의 근거(값 · 기준 · 재발 여부)를 한 화면에서 확인하고 바로 현장에 넘김.</p>
+      </div>
+      <figure class="pic">
+        <div class="tabs" role="group" aria-label="화면 고르기"></div>
+        <div class="frame">
+          <img data-tab="카드" data-default src="./assets/img/advisory-1103/05-safety-card.webp" alt="안전진단 카드 — 감지 6종 카드, 안전감지 · 계기인식 위험, 나머지 주의, 왼쪽 B4 미니맵" loading="lazy" />
+          <img data-tab="표" src="./assets/img/advisory-1103/05-safety-table.webp" alt="안전진단 표 — 감지 6종 행, WP-01~05 측정값 열, 판정 · 기준, 오른쪽 DELTA 메모" loading="lazy" />
+          <img data-tab="자세히 보기" src="./assets/img/advisory-1103/05-safety-detail.webp" alt="안전진단 자세히 보기 — 안전벨트 미착용 1명, 발생위치 · 시간 · 조치 상태 · 다음 측정, 영상 확인, 측정 이력, DELTA 조치 제안 체크리스트, 현장 조치 요청" loading="lazy" />
+        </div>
+      </figure>
+    </section>
+
+    <section class="slide" id="s6" aria-labelledby="s6-title">
+      <div class="txt">
+        <p class="num">06</p>
+        <h2 id="s6-title">보고서</h2>
+        <div class="blk now"><p class="k">무엇을 하나</p><p>왼쪽에 <b>월 · 일 · 미션</b> 보고서가 날짜별로 쌓이고, 가운데 목차, 오른쪽에 관제 양식 문서. <b>PDF · DOCX</b>로 내려받고, 월 보고서에는 <b>특이 사항</b>을 직접 적어 넣음.</p></div>
+        <div class="blk"><p class="k">문서 구성</p><p>기본 정보 → 점검 결과 요약 → 감지 유형별 처리 현황 → 위험 · 주의 이벤트와 조치 → 종합 소견. 실제 순시 점검 보고서 양식을 따름.</p></div>
+        <p class="why">관제에서 처리한 내용이 그대로 제출용 문서가 되어야 이중 작업이 없음.</p>
+      </div>
+      <figure class="pic">
+        <div class="tabs" role="group" aria-label="화면 고르기"></div>
+        <div class="frame">
+          <img data-tab="미션 보고서" data-default src="./assets/img/advisory-1103/06-report-mission.webp" alt="미션 보고서 — 순시 점검 결과 보고서, 목차 8항목, 기본 정보 · 점검 결과 요약 · 감지 유형별 처리 현황 표" loading="lazy" />
+          <img data-tab="월 보고서" src="./assets/img/advisory-1103/06-report-month.webp" alt="월 보고서 — 로봇 관제 월간 보고서 10월, 목차 9항목, 기본 정보 · 처리 결과 요약 · 일자별 결과 표, 특이 사항 입력" loading="lazy" />
+        </div>
+      </figure>
+    </section>
+  </main>
+
+  <script src="./assets/js/theme.js?v=c86093d9"></script>
+  <script>
+    (function () {
+      "use strict";
+      // 장마다 단추를 그림 수만큼 만든다. 기본은 data-default, 없으면 첫 그림.
+      // 나란히 보기 칸은 그림마다 이름표를 단다
+      Array.prototype.forEach.call(document.querySelectorAll(".frame.is-row, .frame.is-col"), function (f) {
+        Array.prototype.slice.call(f.querySelectorAll("img[data-tab]")).forEach(function (img) {
+          var box = document.createElement("div");
+          var lbl = document.createElement("p");
+          lbl.className = "lbl";
+          lbl.textContent = img.getAttribute("data-tab");
+          f.insertBefore(box, img);
+          box.appendChild(lbl);
+          box.appendChild(img);
+        });
+      });
+
+      Array.prototype.forEach.call(document.querySelectorAll(".slide .pic"), function (pic) {
+        var tabs = pic.querySelector(".tabs");
+        var imgs = Array.prototype.slice.call(pic.querySelectorAll(".frame img[data-tab]"));
+        if (!tabs || !imgs.length) { return; }
+        var start = imgs.filter(function (i) { return i.hasAttribute("data-default"); })[0] ||
+          imgs[0];
+        var btns = imgs.map(function (img) {
+          var b = document.createElement("button");
+          b.type = "button";
+          b.textContent = img.getAttribute("data-tab");
+          b.addEventListener("click", function () { show(img); });
+          tabs.appendChild(b);
+          return b;
+        });
+        function show(img) {
+          imgs.forEach(function (i, n) {
+            var on = i === img;
+            if (on && i.hasAttribute("data-anim") && i.getAttribute("data-started")) {
+              i.src = i.getAttribute("src").split("#")[0] + "#" + Date.now();
+            }
+            if (on) { i.setAttribute("data-started", "1"); }
+            i.classList.toggle("is-on", on);
+            btns[n].setAttribute("aria-pressed", on ? "true" : "false");
+          });
+          // 제안 장 — 왼쪽 칸 표시를 그림과 맞춘다
+          var key = img.getAttribute("data-key");
+          if (key) {
+            Array.prototype.forEach.call(pic.parentNode.querySelectorAll("[data-opt]"), function (b) {
+              b.setAttribute("aria-pressed", b.getAttribute("data-opt") === key ? "true" : "false");
+            });
+          }
+        }
+        show(start);
+        // 제안 장 — 왼쪽 칸을 누르면 그 그림으로
+        Array.prototype.forEach.call(pic.parentNode.querySelectorAll("[data-opt]"), function (b) {
+          b.addEventListener("click", function () {
+            var img = imgs.filter(function (i) { return i.getAttribute("data-key") === b.getAttribute("data-opt"); })[0];
+            if (img) { show(img); }
+          });
+        });
+      });
+
+      // 장 넘기기 — 넓은 화면에서는 휠 · 방향키 · 목차를 한 장씩, 천천히 미끄러지게 옮긴다.
+      // 브라우저 기본 부드러운 스크롤은 빠르고 속도를 못 바꿔서, 직접 1.1초 ease-in-out 으로 옮긴다.
+      var slides = Array.prototype.slice.call(document.querySelectorAll(".slide"));
+      var pager = document.querySelector("[data-pager]");
+      // 페이지 단추 — ‹ · 01 ~ 06 · ›. 표지는 목차가 있으니 넣지 않는다.
+      var prevB = document.createElement("button");
+      prevB.type = "button"; prevB.className = "arw"; prevB.textContent = "‹"; prevB.setAttribute("aria-label", "이전 장");
+      prevB.addEventListener("click", function () { go(cur - 1); });
+      pager.appendChild(prevB);
+      var pageBtns = slides.slice(1).map(function (sl, k) {
+        var b = document.createElement("button");
+        b.type = "button"; b.textContent = (k + 1 < 10 ? "0" : "") + (k + 1);
+        var h = sl.querySelector("h2");
+        b.setAttribute("aria-label", (k + 1) + "장" + (h ? " · " + h.textContent : ""));
+        b.addEventListener("click", function () { go(k + 1); });
+        pager.appendChild(b);
+        return b;
+      });
+      var nextB = document.createElement("button");
+      nextB.type = "button"; nextB.className = "arw"; nextB.textContent = "›"; nextB.setAttribute("aria-label", "다음 장");
+      nextB.addEventListener("click", function () { go(cur + 1); });
+      pager.appendChild(nextB);
+      var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      var wide = window.matchMedia("(min-width: 901px)");
+      var DUR = reduce ? 0 : 1100;
+      var cur = 0, busy = false, lockUntil = 0;
+
+      function mark(n) {
+        cur = n;
+        pager.hidden = n === 0;
+        pageBtns.forEach(function (b, k) {
+          if (k + 1 === n) { b.setAttribute("aria-current", "page"); } else { b.removeAttribute("aria-current"); }
+        });
+        prevB.disabled = n <= 1;
+        nextB.disabled = n >= slides.length - 1;
+        slides.forEach(function (s, k) { if (k === n) { s.classList.add("is-in"); } });
+      }
+      function ease(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
+      function go(n) {
+        n = Math.max(0, Math.min(slides.length - 1, n));
+        var from = window.scrollY, to = slides[n].offsetTop;
+        mark(n);
+        // 움직이는 그림이 있는 장은 들어올 때 처음부터 다시 튼다
+        var anim = slides[n].querySelector("img[data-anim].is-on");
+        if (anim) { anim.src = anim.getAttribute("src").split("#")[0] + "#" + Date.now(); }
+        if (history.replaceState) { history.replaceState(null, "", "#" + slides[n].id); }
+        if (!DUR || Math.abs(to - from) < 2) { window.scrollTo(0, to); return; }
+        busy = true;
+        var t0 = performance.now();
+        (function step(t) {
+          var k = Math.min(1, (t - t0) / DUR);
+          window.scrollTo(0, from + (to - from) * ease(k));
+          if (k < 1) { requestAnimationFrame(step); }
+          else { busy = false; lockUntil = performance.now() + 450; }   // 트랙패드 관성 휠을 흘려 보낸다
+        })(t0);
+      }
+
+      // 손으로 끌거나 좁은 화면에서는 보이는 장을 따라간다
+      if ("IntersectionObserver" in window) {
+        var io = new IntersectionObserver(function (es) {
+          es.forEach(function (e) {
+            if (!e.isIntersecting) { return; }
+            e.target.classList.add("is-in");
+            if (!busy && e.intersectionRatio >= 0.55) { mark(slides.indexOf(e.target)); }
+          });
+        }, { threshold: [0.2, 0.55] });
+        slides.forEach(function (s) { io.observe(s); });
+      } else {
+        slides.forEach(function (s) { s.classList.add("is-in"); });
+      }
+
+      window.addEventListener("wheel", function (e) {
+        if (!wide.matches || e.ctrlKey) { return; }
+        e.preventDefault();
+        if (busy || performance.now() < lockUntil || Math.abs(e.deltaY) < 8) { return; }
+        go(cur + (e.deltaY > 0 ? 1 : -1));
+      }, { passive: false });
+
+      document.addEventListener("keydown", function (e) {
+        if (!wide.matches) { return; }
+        if (e.target.closest && e.target.closest("input, textarea, button")) { if (e.key === " ") { return; } }
+        var step = { ArrowDown: 1, ArrowRight: 1, PageDown: 1, " ": 1, ArrowUp: -1, ArrowLeft: -1, PageUp: -1 }[e.key];
+        if (e.key === "Home") { e.preventDefault(); go(0); return; }
+        if (e.key === "End") { e.preventDefault(); go(slides.length - 1); return; }
+        if (!step) { return; }
+        e.preventDefault();
+        if (!busy) { go(cur + (e.shiftKey && e.key === " " ? -1 : step)); }
+      });
+
+      Array.prototype.forEach.call(document.querySelectorAll('a[href^="#s"]'), function (a) {
+        a.addEventListener("click", function (e) {
+          var t = document.getElementById(a.getAttribute("href").slice(1));
+          if (!t || !wide.matches) { return; }
+          e.preventDefault();
+          go(slides.indexOf(t));
+        });
+      });
+
+      // 창 크기가 바뀌면 지금 장 맨 위에 다시 맞춘다
+      window.addEventListener("resize", function () { if (wide.matches && !busy) { window.scrollTo(0, slides[cur].offsetTop); } });
+
+      // 주소의 #s3 처럼 장을 집어 열면 그 장에서 시작한다
+      var first = slides.indexOf(document.getElementById((location.hash || "").slice(1)));
+      if (first > 0) { window.scrollTo(0, slides[first].offsetTop); mark(first); } else { mark(0); }
+    })();
+  </script>
+</body>
+</html>
