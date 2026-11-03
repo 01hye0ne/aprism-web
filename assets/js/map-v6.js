@@ -191,7 +191,7 @@
    */
   var LIGHT = {
     face: { floor: 0xbfc4cc, wall: 0xdfe2e6, equipment: 0xe1e4e8, stairs: 0xd8dbdf, other: 0xdfe2e6 },
-    edge: 0x868c93, ghost: 0xf2f4f5, grid: 0xa4a9b0,
+    edge: 0x868c93, ghost: 0xf2f4f5, grid: 0xc4c9d1,   // [11/03] 격자 0xa4a9b0 → 0xc4c9d1 — 바탕(#D6DAE1)보다 살짝만 어둡게(투명도 0.5 와 겹쳐 화면에선 바탕 -9 정도), 눈에 덜 띄게
     pickFace: 0xcfe0ff, pickLine: 0x1d5fd6, hoverLine: 0x5b6577
   };
   var LIGHT_LIFT = 0.18;
