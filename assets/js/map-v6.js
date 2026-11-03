@@ -3719,11 +3719,16 @@
    */
   function rrPinEdge(w, pz) {
     var el = w.pinEl, q = onCanvas(w.spot), W = hit.clientWidth, H = hit.clientHeight, m = 4;
-    el.style.removeProperty("--hx"); el.style.removeProperty("--stem"); el.classList.remove("is-low");
-    if (q.x < 0 || q.x > W || q.y < 0 || q.y > H) { return; }
-    var s = 20 * pz, st = (el.classList.contains("is-buried") ? 44 : 20) * pz, dx = 0;
-    if (q.x - s / 2 < m) { dx = m - (q.x - s / 2); } else if (q.x + s / 2 > W - m) { dx = (W - m) - (q.x + s / 2); }
-    if (dx) { el.style.setProperty("--hx", dx.toFixed(1) + "px"); }
+    el.style.removeProperty("--hx"); el.style.removeProperty("--stem"); el.classList.remove("is-low"); el.style.removeProperty("opacity");
+    var s = 20 * pz, st = (el.classList.contains("is-buried") ? 44 : 20) * pz;
+    if (q.x < 0 || q.x > W) { el.style.opacity = "0"; return; }   // 바닥 점이 좌우 밖 — 머리만 걸쳐 잘려 보이지 않게
+    if (q.y < 0 || q.y > H) { return; }
+    /*
+     * [11/03] 좌우 가장자리 — 머리만 안쪽으로 비키면(--hx) 막대와 머리가 어긋나 핀이 깨져 보였다(디자이너).
+     *   머리는 막대 위 그대로 두고, 가장자리에 다가가는 만큼 핀 전체를 흐리게 한다(머리 반이 넘치면 0).
+     */
+    var over = Math.max(m - (q.x - s / 2), (q.x + s / 2) - (W - m), 0);
+    if (over > 0) { el.style.opacity = Math.max(0, 1 - over / (s / 2)).toFixed(2); }
     var top = q.y - st - s + 2 * pz;
     if (top < m) {
       var ns = q.y - m - s + 2 * pz;   // 머리 윗선이 m 에 오는 막대 길이
