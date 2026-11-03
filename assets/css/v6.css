@@ -951,6 +951,7 @@ body.ver-6 .robot-strip.is-carousel::after { box-shadow: var(--shadow-well); }
   --comp-gnb-bg: color-mix(in srgb, var(--color-gray-300) 25%, var(--color-gray-200));
 }
 :root[data-theme="light"] body.ver-6 .ah-item.is-critical { background-color: transparent; }
+:root[data-theme="light"] body.ver-6 .ah-item.is-critical:hover { background-color: var(--state-hover); }   /* 위 규칙이 :hover 를 덮어 호버가 안 바뀌었다 — 주의 줄과 같은 호버 */
 
 /* [11/03 v6 라이트] 지도 조작 단추 판 · 층 단추 판 = 오른쪽 판과 같은 면(map-glass-bg, gray/100 80%) — 흰 92%(bg/glass)라 옆 판보다 밝게 떴다 */
 :root[data-theme="light"] body.ver-6.v2-2 .map-tools-box { background-color: color-mix(in srgb, var(--color-gray-100) 80%, transparent); }   /* 오른쪽 판만 --map-glass-bg 를 gray/100 80% 로 바꿔 둔 값(monitor.css)과 같게 */
