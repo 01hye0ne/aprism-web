@@ -1128,3 +1128,18 @@ body.ver-6 {
 /* 점 — 지나온 정상 지점은 아쿠아 점(지도와 같다), 앞으로 갈 지점은 옅은 띠 안 흰 점 */
 :root[data-theme] body.ver-6.v2-2 [data-timeline] .timeline-item.is-done:not([data-wp-alert]) .rail-dot { width: 6px; height: 6px; background-color: var(--status-info-icon); }
 :root[data-theme] body.ver-6.v2-2 [data-timeline] .timeline-item.is-pending:not([data-wp-alert]) .rail-dot { width: 4px; height: 4px; background-color: color-mix(in srgb, #ffffff 85%, transparent); }
+
+/* [11/03 v6] 지금 가는 길 빛줄기 — 칸마다 따로 흐르던 것을 끄고, 지나온 점 ~ 지금 고리를 덮는 판 하나(rail-flow-v6.js)에서 한 번에 흐른다 */
+body.ver-6 [data-timeline] .timeline-item.is-done:has(+ .timeline-item.is-running) .rail-line,
+body.ver-6 [data-timeline] .timeline-item.is-running .rail-stub { background-image: none !important; animation: none !important; }
+body.ver-6 [data-timeline] .rail-flow { position: absolute; z-index: 1; width: 10px; pointer-events: none; overflow: hidden; }
+body.ver-6 [data-timeline] .rail-flow[hidden] { display: none; }
+body.ver-6 [data-timeline].rr-flow .rail-flow::before {
+  content: ""; position: absolute; left: 0; right: 0; top: -48px; height: 48px;
+  background: linear-gradient(to bottom, rgb(255 255 255 / 0), rgb(255 255 255 / 85%) 70%, rgb(255 255 255 / 0));
+  animation: rail-flow-run 1.6s linear infinite;
+}
+@keyframes rail-flow-run { to { transform: translateY(calc(var(--h, 60px) + 48px)); } }
+/* 지금 칸 고리 · 지나온 점 · 세모가 빛 위로 */
+body.ver-6 [data-timeline] .timeline-item .rail-dot { position: relative; z-index: 2; }   /* 띠(표식 자리)는 빛 아래, 점 · 고리 · 세모만 빛 위 */
+@media (prefers-reduced-motion: reduce) { body.ver-6 [data-timeline] .rail-flow::before { animation: none; display: none; } }
