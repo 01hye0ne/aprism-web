@@ -726,6 +726,7 @@
     }
     var p = local(event);
     var mark = wpAt(p.x, p.y);
+    rrHot(mark ? mark.id : null);
     var on = mark ? null : pickAt(p.x, p.y);
     // 계단도 누를 수 있다 — 손 모양으로만 알린다(계단은 고르는 것이 아니라 지나가는 곳이다).
     hit.classList.toggle("is-picking", !!(mark || on || (!on && stairTo(p.x, p.y))));
@@ -739,6 +740,7 @@
 
   hit.addEventListener("pointerleave", function () {
     hit.classList.remove("is-picking");
+    rrHot(null);
     hovered = null;
     drawOutline(hoverPens, null);
     frame();
@@ -3679,7 +3681,8 @@
         var col = cau ? C.cau : dan ? C.dan : past ? (rrM(onLane) === "done" ? C.gray : blue) : next ? blue : C.up;
         var solid = past || cau || dan || next;
         var el = document.createElement("div");
-        el.className = "rr-pin" + (w.buried ? " is-buried" : "") + (past ? " is-past" : "") + (next ? " is-next" : "") + (cau || dan ? " is-alert" : "");   // [10/28] 알림 지점 — 번호를 비켜 바닥 세모가 보이게(route-rules.css)
+        el.className = "rr-pin" + (w.buried ? " is-buried" : "") + (past ? " is-past is-quiet" : "") + (next ? " is-next" : "") + (cau || dan ? " is-alert" : "") + (w.id === rrHotId ? " is-hot" : "");   // [10/28] 알림 지점 — 번호를 비켜 바닥 세모가 보이게(route-rules.css)
+        // [11/03] is-quiet — 문제없이 지나온 지점은 번호를 감춘다(바닥 점은 남는다). 위험 · 주의 · 건너뜀만 번호. 지도 점 · 우측 레일 줄에 손이 닿으면(is-hot) 잠깐 보인다(디자이너)
         el.style.setProperty("--pin", col);
         var head = document.createElement("span");
         head.className = "rr-pin-head";
@@ -3701,7 +3704,12 @@
       if (!w.pinEl || w.off) { return; }
       var vis = !w.floor || w.floor === floorNow;
       w.pinEl.hidden = !vis;
-      if (vis) { put(w.pinEl, w.spot); rrPinEdge(w, pz); if (RR.thin === "on") { var q = onCanvas(w.spot); cand.push({ w: w, x: q.x, y: q.y, p: rrPinRank(w, lastNo) }); } else { w.pinEl.classList.remove("is-thin"); } }
+      if (vis) {
+        put(w.pinEl, w.spot); rrPinEdge(w, pz);
+        var quiet = w.pinEl.classList.contains("is-quiet"), hot = w.id === rrHotId;
+        // [11/03] 감춘 번호(지나온 정상 지점)는 솎기 다툼에 넣지 않는다 — 안 보이는 번호가 다른 번호를 밀어내지 않게. 손 닿은 번호는 늘 이긴다
+        if (RR.thin === "on" && (!quiet || hot)) { var q = onCanvas(w.spot); cand.push({ w: w, x: q.x, y: q.y, p: hot ? -1 : rrPinRank(w, lastNo) }); } else { w.pinEl.classList.remove("is-thin"); }
+      }
     });
     // [10/22 실험] 번호 솎기 — 화면에서 겹치는 번호는 중요한 순서대로 하나만 남긴다. 다음 지점 > 위험 · 주의 > 마지막 > 10의 배수 > 5의 배수 > 나머지 > 지나온 지점.
     // 확대하면 지점 사이가 벌어져 모두 보이고, 축소하면 몇 개만 남는다. 숨긴 번호 자리에는 바닥 점(고리)이 그대로 있다
@@ -3736,6 +3744,31 @@
       el.style.setProperty("--stem", ns.toFixed(1) + "px");
     }
   }
+  /*
+   * [11/03] 손 닿은 지점 — 지도 위 점(wpAt) · 우측 레일 줄([data-waypoint])에 마우스가 오면 그 지점 번호를 보인다.
+   * 문제없이 지나온 지점은 번호를 감추므로(is-quiet), 번호가 필요할 때 찾는 길이다.
+   */
+  var rrHotId = null;
+  function rrHot(id) {
+    id = id || null;
+    if (id === rrHotId) { return; }
+    rrHotId = id;
+    wpSpots.forEach(function (w) { if (w.pinEl) { w.pinEl.classList.toggle("is-hot", w.id === id); } });
+    frame();
+  }
+  document.addEventListener("pointerover", function (event) {
+    var row = event.target.closest && event.target.closest("[data-timeline] [data-waypoint]");
+    if (row) { rrHot(row.getAttribute("data-waypoint")); }
+  });
+  document.addEventListener("pointerout", function (event) {
+    var row = event.target.closest && event.target.closest("[data-timeline] [data-waypoint]");
+    if (row && !(event.relatedTarget && row.contains(event.relatedTarget))) { rrHot(null); }
+  });
+  document.addEventListener("focusin", function (event) {
+    var row = event.target.closest && event.target.closest("[data-timeline] [data-waypoint]");
+    rrHot(row ? row.getAttribute("data-waypoint") : null);
+  });
+
   function rrPinRank(w, lastNo) {
     var t = w.info.tone;
     if (/current|next|active|running/.test(t)) { return 0; }
