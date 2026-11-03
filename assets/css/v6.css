@@ -1164,3 +1164,6 @@ body.ver-6 .sf .jtrk .jm.c span { left: 50%; right: auto; transform: translateX(
 /* [11/03 v6] 미션 설정 · 사전 점검 좌측 패널 420 → 340 — 미션 모니터링(monitor.css --lp-w 340)과 같은 너비(탭끼리 열 너비 통일, 10/29 결정 연장) */
 body.ver-6.sian .context-panel:not(.is-collapsed) { flex-basis: 340px; }
 body.ver-6.sian .lp-body { width: 340px; }
+
+/* [11/03 v6] 미션 설정 · 사전 점검 상단 탭 — 관제와 같은 탭을 "정기 순회 점검"에 고정(누름 · 끌기 · 호버 없음) */
+body.ver-6 .sb-tabs.is-fixed .sb-tab { pointer-events: none; }
