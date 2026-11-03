@@ -139,6 +139,12 @@
     { time: "09:47:15", title: "온도감지 · WP-03 펌프 하우징", how: "현장 점검 요청 · 이상 없음", who: "홍길동" },
     { time: "09:30:08", title: "누유 흔적 · 유압 유닛 HU-2", how: "청소 후 재측정 · 정상", who: "김현대" }
   ];
+  // [11/03 v6] 오늘 확인 완료도 관제 미션(monitor.js DONE6)과 같은 기록 — 감지 6종 · "감지 · 측정 항목 + 값", 처리 줄 끝에 지점 번호, 첫 기록 10:19(시계 10:20 앞)
+  if (V6) {
+    [["온도감지 · 최고 온도 44.2 ℃", "WP-03"], ["부분방전 · 이상 점수 8.92", "WP-11"], ["이상음향 · 이상 점수 19.6", "WP-02"], ["온도감지 · 최고 온도 41.5 ℃", "WP-03"], ["누출감지 · 누출 의심도 58%", "WP-09"]]
+      .forEach(function (x, i) { DONE[i].title = x[0]; DONE[i].wp = x[1]; });
+    DONE[0].time = "10:19:10";
+  }
 
   /*
    * 운행 흐름 — 06:00 ~ 14:00(분). 미션이 있는 로봇만 줄을 갖는다.
@@ -383,7 +389,7 @@
     head.appendChild(el("span", "t-caption num", d.time));
     var how = el("span", "done-how t-caption");
     how.appendChild(icon("check"));
-    how.appendChild(el("span", null, d.how));
+    how.appendChild(el("span", null, d.how + (V6 && d.wp ? " · " + d.wp : "")));
     how.appendChild(el("span", null, d.who));
     node.appendChild(head);
     node.appendChild(how);
