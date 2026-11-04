@@ -3681,8 +3681,9 @@
         var col = cau ? C.cau : dan ? C.dan : past ? (rrM(onLane) === "done" ? C.gray : blue) : next ? blue : C.up;
         var solid = past || cau || dan || next;
         var el = document.createElement("div");
-        el.className = "rr-pin" + (w.buried ? " is-buried" : "") + (past ? " is-past is-quiet" : "") + (next ? " is-next" : "") + (cau || dan ? " is-alert" : "") + (w.id === rrHotId ? " is-hot" : "");   // [10/28] 알림 지점 — 번호를 비켜 바닥 세모가 보이게(route-rules.css)
-        // [11/03] is-quiet — 문제없이 지나온 지점은 번호를 감춘다(바닥 점은 남는다). 위험 · 주의 · 건너뜀만 번호. 지도 점 · 우측 레일 줄에 손이 닿으면(is-hot) 잠깐 보인다(디자이너)
+        var quiet = !cau && !dan && t !== "skipped" && !document.body.classList.contains("sian");
+        el.className = "rr-pin" + (w.buried ? " is-buried" : "") + (past ? " is-past" : "") + (next ? " is-next" : "") + (quiet ? " is-quiet" : "") + (cau || dan ? " is-alert" : "") + (w.id === rrHotId ? " is-hot" : "");   // [10/28] 알림 지점 — 번호를 비켜 바닥 세모가 보이게(route-rules.css)
+        // [11/04] is-quiet — 관제 기본은 문제 지점(위험 · 주의 · 건너뜀)만 번호. 지나온 · 지금 · 앞으로 갈 지점은 감추고(바닥 점은 남는다) 우측 레일 줄 · 지도 점에 손이 닿으면(is-hot) 보인다(디자이너). 미션 설정 · 사전 점검(.sian)은 점검 순서라 그대로 다 보인다
         el.style.setProperty("--pin", col);
         var head = document.createElement("span");
         head.className = "rr-pin-head";
@@ -3707,8 +3708,8 @@
       if (vis) {
         put(w.pinEl, w.spot); rrPinEdge(w, pz);
         var quiet = w.pinEl.classList.contains("is-quiet"), hot = w.id === rrHotId;
-        // [11/03] 감춘 번호(지나온 정상 지점)는 솎기 다툼에 넣지 않는다 — 안 보이는 번호가 다른 번호를 밀어내지 않게. 손 닿은 번호는 늘 이긴다
-        if (RR.thin === "on" && (!quiet || hot)) { var q = onCanvas(w.spot); cand.push({ w: w, x: q.x, y: q.y, p: hot ? -1 : rrPinRank(w, lastNo) }); } else { w.pinEl.classList.remove("is-thin"); }
+        // [11/04] 위험 · 주의는 솎지 않는다 — 축소해도 늘 보인다. 감춘 번호는 다툼에 넣지 않고, 손 닿은 번호는 늘 이긴다
+        if (RR.thin === "on" && !w.pinEl.classList.contains("is-alert") && (!quiet || hot)) { var q = onCanvas(w.spot); cand.push({ w: w, x: q.x, y: q.y, p: hot ? -1 : rrPinRank(w, lastNo) }); } else { w.pinEl.classList.remove("is-thin"); }
       }
     });
     // [10/22 실험] 번호 솎기 — 화면에서 겹치는 번호는 중요한 순서대로 하나만 남긴다. 다음 지점 > 위험 · 주의 > 마지막 > 10의 배수 > 5의 배수 > 나머지 > 지나온 지점.
@@ -3746,7 +3747,7 @@
   }
   /*
    * [11/03] 손 닿은 지점 — 지도 위 점(wpAt) · 우측 레일 줄([data-waypoint])에 마우스가 오면 그 지점 번호를 보인다.
-   * 문제없이 지나온 지점은 번호를 감추므로(is-quiet), 번호가 필요할 때 찾는 길이다.
+   * 관제 기본은 문제 지점만 번호를 보이므로(is-quiet), 다른 번호가 필요할 때 찾는 길이다.
    */
   var rrHotId = null;
   function rrHot(id) {
