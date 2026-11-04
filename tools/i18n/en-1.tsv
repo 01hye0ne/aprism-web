@@ -21,12 +21,12 @@ APRISM 공장 환경점검 로봇 관제 시스템 로그인	APRISM factory insp
 계정 발급 · 잠금 해제 문의 : 설비운영팀 내선 2400	Account requests · unlocks: Facility Operations, ext. 2400
 ⓒ 2026 APRISM · 모든 접속 기록은 감사 로그에 저장됩니다.	ⓒ 2026 APRISM · All access is recorded in the audit log.
 보는 범위	View scope
-정기 순회 점검	Routine Patrol Inspection
-발전기실 설비 점검	Generator Room Inspection
-전기실 열화상 점검	Electrical Room Thermal Scan
-소방 설비 점검	Fire Safety Inspection
-주간 설비 점검	Weekly Facility Inspection
-야간 순회 점검	Night Patrol Inspection
+정기 순회 점검	Routine Patrol
+발전기실 설비 점검	Generator Room
+전기실 열화상 점검	Electrical Thermal
+소방 설비 점검	Fire Safety
+주간 설비 점검	Weekly Check
+야간 순회 점검	Night Patrol
 공조 설비 순회	HVAC Patrol
 유틸리티 순회	Utility Patrol
 계정	Account
@@ -69,7 +69,7 @@ v6 · 미션 설정 — APRISM	v6 · Mission Setup — APRISM
 내 계정 정보	My account
 비밀번호 변경	Change password
 로그아웃	Sign out
-안전진단	Safety Diagnosis
+안전진단	Safety
 로봇	Robots
 스케줄러	Scheduler
 보고서	Reports
@@ -264,7 +264,7 @@ WP-08 로 이동 중	Moving to WP-08
 CH1 이상 점수 9.05	CH1 anomaly score 9.05
 고소 작업 발판	Elevated Work Platform
 안전벨트 미착용 1명	1 person without safety harness
-냉각수 열교환기 HX-1	Cooling Water Heat Exchanger HX-1
+냉각수 열교환기 HX-1	Heat Exchanger HX-1
 열교환기 출구 온도 측정	Heat Exchanger Outlet Temperature
 온도 29.8℃ · 이상음향 8.2	Temp 29.8℃ · Acoustic anomaly 8.2
 온도 31.4℃ · 압력 0.71 MPa	Temp 31.4℃ · Pressure 0.71 MPa

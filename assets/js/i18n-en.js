@@ -23,6 +23,12 @@
     // 문장째 — JS 가 숫자를 끼워 만드는 것
     [/^(\d+\.) (.+)$/, function (m, n, rest) { return n + " " + core(rest); }],   // 목차처럼 번호가 붙은 문구는 번호를 떼고 맞춘다
     [/^위험 (\d+)건 포함 (\d+)건 누적$/, "$2 total, incl. $1 critical"],
+    // Delta 주의 단계 — 위험 단계("3 critical, 9 warnings. …")와 같은 꼴로: 건수 먼저, 어디에 몇 건은 뒤에
+    [/^지금 미션에서 (\d+)건, 다른 미션에서 (\d+)건의 확인해야 할 주의 단계 알림이 있어요\.$/, function (m, a, b) { return (+a + +b) + " warnings. " + a + " in this mission, " + b + " in others."; }],
+    [/^지금 미션에서 (\d+)건의 확인해야 할 주의 단계 알림이 있어요\.$/, "$1 warnings in this mission."],
+    [/^이 미션 위험 (\d+), 다른 미션 위험 (\d+)$/, "Critical: $1 here, $2 elsewhere"],
+    [/^이 미션 위험 (\d+)$/, "Critical: $1 here"],
+    [/^주의 알림 (\d+)건 누적$/, "$1 warnings in total"],
     [/^위험 (\d+)건부터 조치$/, "Act on the $1 critical first"],
     [/^주의 (\d+)건 묶어서 확인$/, "Review $1 warnings together"],
     [/^위험 (\d+)건, 주의 (\d+)건이 있어요\. 위험 미션부터 확인하세요\.$/, "$1 critical, $2 warnings. Check the critical missions first."],
@@ -136,6 +142,11 @@
       var u = el.getAttribute(URL_ATTRS[j]);
       if (u && u.indexOf(".html") > 0) { var h = href(u); if (h !== u) { el.setAttribute(URL_ATTRS[j], h); } }
     }
+    // 검출 장면 그림은 라벨이 그림에 박혀 있다 — 영어 라벨 판(img/alert-en, 같은 파일 이름)으로.
+    if (el.nodeName === "IMG") {
+      var s = el.getAttribute("src");
+      if (s && s.indexOf("/img/alert/") >= 0) { el.setAttribute("src", s.replace("/img/alert/", "/img/alert-en/")); }
+    }
     if ((el.nodeName === "INPUT" || el.nodeName === "TEXTAREA") && el.type !== "password" && HAN.test(el.value)) {
       // 미리 채워 둔 값(읽기 전용 미션 이름 등)만 — 사람이 친 값은 건드리지 않는다.
       if (el.value === el.defaultValue || el.readOnly) { el.value = tr(el.value); el.defaultValue = el.value; }
@@ -160,7 +171,7 @@
       else { for (var j = 0; j < r.addedNodes.length; j++) { walk(r.addedNodes[j]); } }
     }
   });
-  mo.observe(document.documentElement, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ATTRS.concat(URL_ATTRS) });
+  mo.observe(document.documentElement, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ATTRS.concat(URL_ATTRS, ["src"]) });
 
   // 캔버스 글자(로봇 모습 등)도
   var C2 = window.CanvasRenderingContext2D && CanvasRenderingContext2D.prototype;
