@@ -256,8 +256,8 @@ v6 · 통합 관제 메인 — APRISM	v6 · Mission Control — APRISM
 패널에 고정	Pin to panel
 위치	Location
 감지	Detection
-DELTA 조치 제안	DELTA suggested actions
-오탐 가능성	False-positive likelihood
+DELTA 조치 제안	DELTA suggestions
+오탐 가능성	False-positive risk
 메모 (선택)	Note (optional)
 조치 요청	Request action
 되돌리기	Undo
