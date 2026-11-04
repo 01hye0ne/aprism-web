@@ -5,7 +5,7 @@
  */
 .account-chip .t-label-2,
 .utc-clock .num,
-.gnb-item > span,
+.gnb-item > span:last-child,
 .delta3-clue-txt,
 .step-title,
 .hist .hi > span,
@@ -25,7 +25,7 @@
 /* 인라인 span 은 폭이 없어 줄임표가 안 생긴다. 한글판 규칙(body.ver-3.v2-2.v3 …)이 더 세서 !important */
 .account-chip .t-label-2,
 .utc-clock .num,
-.gnb-item > span,
+.gnb-item > span:last-child,
 .delta3-clue-txt,
 .hist .hi > span,
 .inline-notice .title,
