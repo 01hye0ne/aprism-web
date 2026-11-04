@@ -833,7 +833,7 @@ window.APRISM_EN = {"APRISM 공장 환경점검 로봇 관제 시스템 진입 �
 "측정값":"Reading",
 "— 검출 장면":"— detection frame",
 "퍼센트":"percent",
-"AI 추천":"AI suggestion",
+"AI 추천":"AI pick",
 "고정 풀기":"Unpin",
 "메모 접기":"Collapse note",
 "— 라이브 뷰":"— live view",
