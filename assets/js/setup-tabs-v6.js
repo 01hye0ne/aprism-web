@@ -2,7 +2,7 @@
  * [11/03 v6] 미션 설정 · 사전 점검 상단 탭(.sb-tabs.is-fixed) — 관제 탭과 같은 모양, 동작만 이 화면 몫이다(디자이너).
  *
  * 탭 = 이미 있는 미션의 창. 미션은 다른 곳(스케줄러 · 미션 관리)에서 만들어져 있고, 미션 설정은 "실행 전 미션"을 설정하는 단계다(11/03 결정).
- *   지금 탭 = 설정 중인 미션 — ?mission= (관제의 대기 탭 · 완료 미션 [다시 실행]이 붙여 온다), 없으면 주간 설비 점검.
+ *   지금 탭 = 설정 중인 미션 — ?mission= (관제의 대기 탭 · 완료 미션 [다시 실행]이 붙여 온다), 없으면 정기 순회 점검.
  *   미션 이름 칸은 읽기 전용이고 지금 탭 이름이 들어간다.
  *   미션 설정(body[data-stage="setup"])   다른 탭 = 그 미션의 지금 상태로 — 대기면 그 미션 설정, 수행중 · 완료면 관제, [전체 미션]은 통합 순회 현황.
  *                                         입력을 바꿨으면 "바꾼 설정을 버릴까요?"(모달 discard)를 먼저 묻고, 안 바꿨으면 바로 간다.
@@ -34,9 +34,11 @@
   function tabOf(name) { return tabs.filter(function (t) { return t.getAttribute("data-mission") === name; })[0]; }
   var asked = /[?&]mission=([^&#]+)/.exec(window.location.search);
   var current = asked ? decodeURIComponent(asked[1]) : "";
-  if (!tabOf(current)) { current = "주간 설비 점검"; }
+  if (!tabOf(current)) { current = "정기 순회 점검"; }
   var mine = tabOf(current);
   if (mine) { mine.classList.add("is-on"); mine.setAttribute("aria-current", "page"); }
+  // 설정 중인 미션은 아직 돌기 전이다 — 수행중 탭(정기 순회 점검)을 열어도 알림 기호는 뺀다
+  if (mine) { Array.prototype.forEach.call(mine.querySelectorAll(".sb-tab-sev"), function (s) { s.remove(); }); }
   if (nameInput) { nameInput.value = current; }
   // 관제로 넘어갈 때 이 미션을 연다(sian.js 가 body[data-monitor-href] 로 간다)
   var monitor = body.getAttribute("data-monitor-href");
