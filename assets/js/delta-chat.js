@@ -24,6 +24,7 @@
 
   var thread = null;
   var busy = false;
+  var V6 = null;   // [11/04 v6] 펼침 답 구조(delta-answer-v6.js) — 아래 APRISM_DELTA 앞에서 잇는다
 
   // 입력 칸을 설명 칸(대화 칸) 안 아래로 옮긴다 — 상자 하나 안에서 1px 선으로만 나뉜다(10/13 디자이너, 네모 안의 네모를 없앤다).
   bodyBox.appendChild(box);
@@ -55,9 +56,9 @@
       thread = el("div", "dc-thread");
       thread.setAttribute("role", "log");
       thread.setAttribute("aria-live", "polite");
-      // 접힘 두 줄이 대화의 첫 말로 남는다(v5 는 줄마다 감싸 data-raw 에 원문이 있다)
-      thread.appendChild(aiMsg((first.getAttribute("data-raw") || first.textContent).replace(/\n/g, " "), []));
-      bodyBox.insertBefore(thread, box);
+      // 접힘 두 줄이 대화의 첫 말로 남는다(v5 는 줄마다 감싸 data-raw 에 원문이 있다). [11/04 v6] 첫 말은 "현재 관제 요약" 블록이다(delta-answer-v6.js)
+      if (!V6) { thread.appendChild(aiMsg((first.getAttribute("data-raw") || first.textContent).replace(/\n/g, " "), [])); }
+      bodyBox.insertBefore(thread, V6 ? V6.anchor : box);
       win.classList.add("is-chat");
     });
     hint();
@@ -434,11 +435,13 @@
   function ask(text) {
     text = (text || "").trim();
     if (!text || busy) { return; }
+    if (V6 && V6.skip(text)) { return; }
     start();
     add(el("div", "dc-msg is-me", text));
     busy = true;
     sync();
     win.classList.add("is-thinking");
+    if (V6) { V6.read(); V6.busy(); }
     var wait = el("div", "dc-msg is-ai is-wait");
     wait.appendChild(V5 ? typingMark() : el("span", "dc-typing"));
     add(wait);
@@ -447,6 +450,7 @@
       win.classList.remove("is-thinking");
       busy = false;
       sync();
+      if (V6) { V6.settle(); if (V6.answer(text)) { return; } }
       if (V5) { add(aiMsgV5(replyV5(text))); return; }
       var r = reply(text);
       add(aiMsg(r.text, r.chips));
@@ -461,7 +465,7 @@
     normal: "현장이나 로봇 상황을 물어보세요"
   };
   function hint() {
-    input.placeholder = thread ? "이어서 물어보세요" : (HINT[body.getAttribute("data-level")] || HINT.normal);
+    input.placeholder = V6 ? "원인, 조치, 위치, 처리 순서를 물어보세요" : thread ? "이어서 물어보세요" : (HINT[body.getAttribute("data-level")] || HINT.normal);
   }
   hint();
 
@@ -503,7 +507,19 @@
     pending.push([me, text, btn]);
     if (thread || win.classList.contains("is-open")) { flush(); }
   }
-  new MutationObserver(function () { if (win.classList.contains("is-open")) { flush(); } }).observe(win, { attributes: true, attributeFilter: ["class"] });
+  new MutationObserver(function () {
+    if (!win.classList.contains("is-open")) { return; }
+    if (V6) { start(); V6.first(); }
+    flush();
+  }).observe(win, { attributes: true, attributeFilter: ["class"] });
+
+  if (body.classList.contains("ver-6") && window.APRISM_DELTA_V6) {
+    V6 = window.APRISM_DELTA_V6({
+      el: el, win: win, body: bodyBox, box: box, add: add, ask: ask, alerts: alerts, label: label, hhmm: hhmm, batchim: batchim, norm: norm,
+      robotName: robotName, nowHM: nowHM, openA: openA, thread: function () { return thread; }
+    });
+    hint();
+  }
 
   window.APRISM_DELTA = { ask: ask, log: log };
 
@@ -536,6 +552,7 @@
     thread.remove();
     LIVE.length = 0;
     thread = null;
+    if (V6) { V6.reset(); }
     win.classList.remove("is-chat");
     hint();
   });
