@@ -83,12 +83,11 @@
      *   waypoint 번호 표식은 접힘에서만 쓴다 — 펼친 Delta 는 예전 글("B4 4번 지점") 그대로(11/05 디자이너). 표식이 없으면(다른 화면) 예전 글.
      */
     function tok() { return window.APRISM_DELTA_TOKEN || null; }
-    // 층 + [M번호 미션]
+    // [M번호 미션] — 층(B4)은 쓰지 않는다(11/05 디자이너, 펼친 Delta)
     function missionNode(a) {
       var T = tok(), name = A().missionOf ? A().missionOf(a) : "";
       if (!T || !name) { return document.createTextNode(missionLine(a)); }
       var f = document.createDocumentFragment();
-      if (a.floor) { f.appendChild(document.createTextNode(a.floor + " ")); }
       f.appendChild(T.mission(name));
       return f;
     }
