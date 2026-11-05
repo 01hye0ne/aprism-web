@@ -1716,7 +1716,7 @@ window.APRISM_EN = {"APRISM 공장 환경점검 로봇 관제 시스템 진입 �
 "먼저 확인할 항목은 그대로":"First item is still ",
 "분석 중":"Analyzing",
 "분석":" analyzed",
-"원인, 조치, 위치, 처리 순서를 물어보세요":"Ask about cause, action, location or order",
+"원인, 조치, 위치, 처리 순서를 물어보세요":"Ask about cause, fix, location, order",
 "원인이 뭐야?":"What's the cause?",
 "어떻게 조치해?":"What should I do?",
 "왜 이걸 먼저 봐야 해?":"Why check this first?",
