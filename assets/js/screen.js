@@ -1783,7 +1783,7 @@ window.APRISM_TEXT = (function () {
         if (tag) { tag.textContent = "완료"; }
         if (startBtn) { startBtn.disabled = false; }
         window.setTimeout(function () {
-          // [11/03] 화면이 적어 둔 관제 주소(body[data-monitor-href] — v6 사전 점검은 main-v6)를 먼저 따른다. 없으면 예전 그대로
+          // [11/03] 화면이 적어 둔 관제 주소(body[data-monitor-href] — v6 사전 점검은 control-v6)를 먼저 따른다. 없으면 예전 그대로
           window.location.href = document.body.getAttribute("data-monitor-href") || "dashboard-home.html";
         }, 1600);
         return;

@@ -14,7 +14,7 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 export const PAGES = ['splash', 'login', 'mission-setup-v6', 'mission-precheck-v6', 'building-v6', 'main-v6', 'alert-center-v6', 'safety-v6', 'report-v6'];
-const LINK = new RegExp(`((?:href|data-goto|data-monitor-href|data-modal-confirm|action)="(?:\\./)?)(${PAGES.join('|')})\\.html(?=[?#"])`, 'g');
+const LINK = new RegExp(`((?:href|data-goto|data-monitor-href|data-modal-confirm|action)="(?:\\./)?)(${[...PAGES, 'control-v6'].join('|')})\\.html(?=[?#"])`, 'g');
 
 const HEAD = `
   <!-- 영문판 — tools/build-en.mjs 가 한글판에서 만든 파일이다. 여기를 고치지 말고 한글판을 고친 뒤 다시 만든다. -->

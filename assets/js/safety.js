@@ -512,7 +512,7 @@
     return `${LEG}<div class="sf-mwrap"><div class="sf-mlist"><div class="sf-mwell">${top}${rows}</div></div><span class="sf-mthumb" aria-hidden="true"></span></div>`;   // 범례는 목록 위(10/30) — 기호를 먼저 읽고 목록으로
   }
   // [10/30] v6 는 v6 화면끼리 — V6 는 위(BASE 아래)에서 정한다
-  const gnbMain = document.querySelector(V6 ? '.gnb-item[href^="./main-v6.html"]' : '.gnb-item[href^="./main-v5.html"]');
+  const gnbMain = document.querySelector(V6 ? '.gnb-item[href*="control-v6"]' : '.gnb-item[href^="./main-v5.html"]');
   const MAINV3 = V6 ? "./main-v6.html" : "./main-v5.html";   // [v5] 같은 판의 관제로
   function mainUrl(i, ab){ const m = M[i], q = new URLSearchParams({mission:m.mis, floor:PLANOF[ab] || ab}); const nw = nowOf(i); if(nw) q.set("wp", nw); return MAINV3 + "?" + q.toString(); }
   function pickF(i, f){ const {robotF} = viewF(i); mapF[i] = f; clearTimeout(mapT);
@@ -688,7 +688,9 @@
     scope = sc0;
     bindThumb();
     // [10/30] GNB [관제] — 미션 전체를 보고 있으면 통합 순회 현황, 미션 하나면 그 미션의 관제(관제에서 보기와 같은 주소)
-    if(gnbMain) gnbMain.href = scope==='all' ? (V6 ? './building-v6.html' : './building-v5.html') : mainUrl(scope, viewF(scope).cur);
+    // [11/05] v6 는 관제 껍데기(control-v6)로 — 탭을 오갈 때 페이지를 새로 열지 않는다
+    if(gnbMain && V6) gnbMain.href = (window.aprismHref || String)('./control-v6.html' + (scope==='all' ? '?view=building' : '?mission=' + encodeURIComponent(M[scope].mis) + '&floor=' + (PLANOF[viewF(scope).cur] || viewF(scope).cur)));
+    else if(gnbMain) gnbMain.href = scope==='all' ? './building-v5.html' : mainUrl(scope, viewF(scope).cur);
     requestAnimationFrame(() => v.querySelectorAll('canvas[data-spec3]').forEach(spec3));
   }
   /*

@@ -88,7 +88,7 @@
   ].concat(window.APRISM_EN_RX || []);
   var HAN = /[가-힣]/;
   var DEBUG = /[?&]i18n=debug/.test(location.search);
-  var EN_PAGES = /(^|\/)(splash|login|mission-setup-v6|mission-precheck-v6|building-v6|main-v6|alert-center-v6|safety-v6|report-v6)\.html(?=$|[?#])/;
+  var EN_PAGES = /(^|\/)(splash|login|mission-setup-v6|mission-precheck-v6|building-v6|main-v6|control-v6|alert-center-v6|safety-v6|report-v6)\.html(?=$|[?#])/;
   var ATTRS = ["title", "aria-label", "placeholder", "alt", "aria-valuetext", "aria-roledescription", "aria-description"];
   var URL_ATTRS = ["href", "data-goto", "data-monitor-href", "data-modal-confirm", "action"];
 
