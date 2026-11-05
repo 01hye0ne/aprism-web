@@ -80,7 +80,7 @@
     function missionLine(a) { return [a.floor, A().missionOf ? A().missionOf(a) : ""].filter(Boolean).join(" "); }
     /*
      * [11/05 v6] 미션 표식 — 접힘과 같은 모양(v3-panel.js APRISM_DELTA_TOKEN, 문형표 5). 미션 [M번호 이름](괄호만 회색).
-     *   waypoint 번호 표식은 접힘에서만 쓴다 — 펼친 Delta 는 예전 글("B4 4번 지점") 그대로(11/05 디자이너). 표식이 없으면(다른 화면) 예전 글.
+     *   waypoint 번호 표식은 접힘에서만 쓴다 — 펼친 Delta 에는 넣지 않는다(11/05 디자이너). 표식이 없으면(다른 화면) 예전 글.
      */
     function tok() { return window.APRISM_DELTA_TOKEN || null; }
     // [M번호 미션] — 층(B4)은 쓰지 않는다(11/05 디자이너, 펼친 Delta)
