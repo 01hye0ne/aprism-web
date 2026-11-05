@@ -23,8 +23,9 @@
     // 문장째 — JS 가 숫자를 끼워 만드는 것
     [/^(\d+\.) (.+)$/, function (m, n, rest) { return n + " " + core(rest); }],   // 목차처럼 번호가 붙은 문구는 번호를 떼고 맞춘다
     // Delta 접힌 위젯 — 두 줄이 줄마다 따로 온다(v3-panel.js lines()). main 문장 꼴 그대로 줄 단위로 채운다(한글 남던 것)
-    [/^위험 (\d+)건, 주의 (\d+)건이 있어요\.$/, "$1 critical, $2 warnings."],
-    [/^위험 (\d+)건이 있어요\.$/, "$1 critical."],
+    // 숫자와 낱말 사이는 줄바꿈 안 함( ) — "9 / WARNINGS" 로 갈라지지 않게
+    [/^위험 (\d+)건, 주의 (\d+)건이 있어요\.$/, function (m, c, w) { return c + " critical, " + w + " warnings."; }],
+    [/^위험 (\d+)건이 있어요\.$/, function (m, c) { return c + " critical."; }],
     // [11/05 v6] 미션 이동 답 단추 · 3번째 줄(하는 일) — monitor.js · v3-panel.js
     [/^미션 이동하기$/, "Go to mission"],
     [/^위험 (\d+)건 원인 분석 중\.\.\.$/, "Analyzing $1 critical alerts..."],
