@@ -812,6 +812,28 @@
     });
   });
 
+  /*
+   * [11/05 v6] 전체 미션 최신 알림을 누르고 들어오면 그 알림의 팝오버까지 연다(디자이너).
+   * 주소 ?alert=시각&wp=WP-nn, 관제 껍데기는 APRISM_OPEN_ALERT 를 부른다. 두 화면의 알림 데이터가 따로라 시각으로 찾고, 없으면 지점으로 찾는다.
+   * 미션이 바뀌고 지도 번호가 깔린 뒤라야 쪽지가 제자리를 찾으므로 그때까지 기다린다.
+   */
+  window.APRISM_OPEN_ALERT = function (mission, time, wp) {
+    var tries = 0;
+    (function go() {
+      var d = window.APRISM_DELTA_ALERTS;
+      if ((!d || d.mission !== mission || !document.querySelector(".rr-pin")) && tries++ < 50) { setTimeout(go, 200); return; }
+      var list = (d && d.mine) || [];
+      var a = list.filter(function (x) { return x.time === time; })[0] || list.filter(function (x) { return x.wp === wp; })[0];
+      if (!a) { return; }
+      if (filter !== "all") { var f = filters.filter(function (b) { return b.getAttribute("data-ah-filter") === "all"; })[0]; if (f) { f.click(); } }
+      if (picked !== a) { note.open(a); }
+    })();
+  };
+  var askedAlert = /[?&]alert=([^&#]+)/.exec(location.search), askedMission = /[?&]mission=([^&#]+)/.exec(location.search);
+  if (askedAlert && askedMission) {
+    window.APRISM_OPEN_ALERT(decodeURIComponent(askedMission[1].replace(/\+/g, " ")), decodeURIComponent(askedAlert[1]), (/[?&]wp=(WP-\d+)/.exec(location.search) || [])[1]);
+  }
+
   // 미션 고르기에 미션마다 가장 높은 알림 단계를 알린다 — 다른 미션의 위험이 메뉴에 점으로 찍힌다.
   function tellLevels(all) {
     var lv = {};

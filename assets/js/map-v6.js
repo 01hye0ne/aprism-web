@@ -821,7 +821,7 @@
       var at = Math.min(1, (now - began) / glideMs);
       put(at);
       if (at < 1) { window.requestAnimationFrame(step); }
-      else { trip = null; }
+      else { trip = null; placeWp(); }
     })();
 
     /*
@@ -2673,6 +2673,8 @@
    * 다른 웨이포인트로 옮겨 가거나 고른 것을 놓으면 닫고 aprism:map-alert 로 알린다.
    */
   var alertBox = document.querySelector("[data-map-alert]");
+  var alertSide = "";     // [11/05] 옆으로 세운 쪽 — "r" 점 오른쪽 · "l" 왼쪽(placeAlert)
+  var alertAim = false;   // 쪽지를 열고 카메라가 점을 찾아가는 중
 
   function alertOn() {
     return !!(alertBox && !alertBox.hidden && chosenWp && alertBox.getAttribute("data-wp") === chosenWp);
@@ -2710,6 +2712,7 @@
   function placeWp() {
     if (!camera) { return; }
     var showAlert = alertOn();
+    if (!showAlert) { alertSide = ""; }
     if (!showAlert && (!wpBox || wpBox.hidden)) { return; }
     var found = wpSpots.filter(function (w) { return w.id === chosenWp; })[0];
     if (!found) { return; }
@@ -2736,21 +2739,60 @@
    * 위에 설 자리가 없으면 아래로 뒤집는다.
    */
   function placeAlert(x, y, W, H) {
-    var half = alertBox.offsetWidth / 2;
-    var tall = alertBox.offsetHeight + 16;
+    var w = alertBox.offsetWidth, h = alertBox.offsetHeight;
+    var half = w / 2;
+    var tall = h + 16;
+    /*
+     * [11/05] 피할 자리 — 오른쪽 지도 도구 · 왼쪽 위 Delta · 아래 시뮬레이션 막대. 도구 · 막대는 칸 끝을 줄이고, Delta · 막대와 겹치면 옆으로 세운다.
+     */
+    var box = hit.getBoundingClientRect();
+    var toolsEl = document.querySelector(".map-canvas > .map-tools"), deltaEl = document.querySelector(".delta3");
+    var right = toolsEl && toolsEl.offsetParent ? toolsEl.getBoundingClientRect().left - box.left - 8 : W - 8;
+    var dr = deltaEl && deltaEl.getClientRects().length ? deltaEl.getBoundingClientRect() : null;
+    var simEl = document.querySelector(".rsim"), sr = simEl && simEl.getClientRects().length ? simEl.getBoundingClientRect() : null;
+    var floorY = sr ? Math.min(H - 8, sr.top - box.top - 8) : H - 8;
+    var dL = dr ? dr.left - box.left : 0, dR = dr ? dr.right - box.left : 0, dT = dr ? dr.top - box.top : 0, dB = dr ? dr.bottom - box.top : 0;
     var below = y - tall < 8 && y + tall <= H - 8;
-    alertBox.classList.toggle("is-below", below);
-    var cx = Math.min(W - half - 8, Math.max(half + 8, x));
-    var tail = Math.max(-(half - 16), Math.min(half - 16, x - cx));
+    var cx = Math.min(right - half, Math.max(half + 8, x));
+    var tail = Math.max(-(half - 24), Math.min(half - 24, x - cx));   // 꼬리 폭 24 가 둥근 모서리에 걸리지 않게
     /*
      * 세로도 칸 안쪽 8 로 양끝을 묶는다. 웨이포인트가 칸 밖으로 벗어나 있으면(점이 화면 밖이거나
      * 카메라가 아직 못 따라왔을 때) y 가 음수이거나 H 를 넘는데, 한쪽만 막아 두어
      * 쪽지 머리(배지 · 제목 · 버튼)가 윗변에 잘리거나 바닥 버튼이 아랫변 밖으로 나갔다.
      * 기준점이 뒤집기에 따라 다르다 — 아래로 뒤집으면 윗변 = cy + 16, 위에 세우면 아랫변 = cy - 16.
-     * 꼬리는 --tail 과 달리 세로로는 따라가지 않는다. 점에서 멀어져도 쪽지가 온전한 쪽이 낫다.
      */
     var cy = below ? Math.max(-8, Math.min(y, H - tall - 8))
                    : Math.min(H + 8, Math.max(tall + 8, y));
+    /*
+     * [11/05] 옆으로 세우기 — 쪽지가 지도 칸 절반보다 커서, 축소하면 점 위에도 아래에도 설 자리가 없어 꼬리가 빈 곳을 가리켰다.
+     * 그때나 Delta 와 겹칠 때 점의 넓은 쪽 옆에 세운다. 축소하는 동안 튀지 않게 한번 옆이면 닫을 때까지 옆이다.
+     * 카메라가 점을 찾아가는 동안(alertAim · trip · floorBusy)은 판단하지 않는다 — 가는 도중의 자리로 굳어 버린다.
+     */
+    var top = below ? cy + 16 : cy - tall, lft = cx - half;
+    var fits = y - tall >= 8 || y + tall <= floorY;
+    var onDelta = !!dr && lft < dR && lft + w > dL && top < dB && top + h > dT;
+    var onSim = !!sr && lft < sr.right - box.left && lft + w > sr.left - box.left && top + h > sr.top - box.top;
+    var edge = dr ? dR + 8 : 8;
+    if (!alertSide && !alertAim && !trip && !floorBusy && !alertBox.classList.contains("is-docked") && (!fits || onDelta || onSim)) {
+      alertSide = right - (x + 16) >= (x - 16) - edge ? "r" : "l";
+    }
+    alertBox.classList.toggle("is-side-r", alertSide === "r");
+    alertBox.classList.toggle("is-side-l", alertSide === "l");
+    if (alertSide) {
+      alertBox.classList.remove("is-below");
+      var want = alertSide === "r" ? x + 16 : x - 16;
+      var sx = alertSide === "r" ? Math.max(edge, Math.min(want, right - w)) : Math.min(right, Math.max(want, edge + w));
+      var sy = Math.max(h / 2 + 8, Math.min(floorY - h / 2, y));
+      var ty = Math.max(-(h / 2 - 24), Math.min(h / 2 - 24, y - sy));
+      // 점이 화면 밖이거나 쪽지가 밀려 꼬리가 닿지 않으면 꼬리를 숨긴다 — 빈 곳을 가리키는 것보다 낫다
+      alertBox.classList.toggle("is-no-tail", x < 0 || x > W || y < 0 || y > H || Math.abs(sx - want) > 1 || Math.abs(y - sy - ty) > 1);
+      alertBox.style.setProperty("--x", snapPx(sx));
+      alertBox.style.setProperty("--y", snapPx(sy));
+      alertBox.style.setProperty("--tail-y", snapPx(ty));
+      return;
+    }
+    alertBox.classList.toggle("is-no-tail", x < 0 || x > W || y < 0 || y > H);
+    alertBox.classList.toggle("is-below", below);
     alertBox.style.setProperty("--x", snapPx(cx));
     alertBox.style.setProperty("--y", snapPx(cy));
     alertBox.style.setProperty("--tail", snapPx(tail));
@@ -2775,6 +2817,8 @@
    */
   function chooseWaypoint(id, from) {
     chosenWp = id || null;
+    alertSide = "";
+    alertAim = !!(chosenWp && from === "panel");
     haloWaypoint();
     tellWaypoint();
 
@@ -2786,6 +2830,7 @@
           setFocusWorld(found.spot);     // 고른 웨이포인트가 기준이다
           glide(yaw, pitch, z, aimAt(found.spot, z));
           placeWp();
+          window.setTimeout(function () { alertAim = false; placeWp(); }, 380);
         };
         // 다른 층의 웨이포인트(알림)면 그 층으로 먼저 옮긴 뒤 다가간다(v2.2 · 10/19).
         if (found.floor && found.floor !== floorNow) {
@@ -3681,9 +3726,9 @@
         var col = cau ? C.cau : dan ? C.dan : past ? (rrM(onLane) === "done" ? C.gray : blue) : next ? blue : C.up;
         var solid = past || cau || dan || next;
         var el = document.createElement("div");
-        var quiet = !cau && !dan && t !== "skipped" && !document.body.classList.contains("sian");
+        var quiet = !cau && !dan && !next && t !== "skipped" && !document.body.classList.contains("sian");
         el.className = "rr-pin" + (w.buried ? " is-buried" : "") + (past ? " is-past" : "") + (next ? " is-next" : "") + (quiet ? " is-quiet" : "") + (cau || dan ? " is-alert" : "") + (w.id === rrHotId ? " is-hot" : "");   // [10/28] 알림 지점 — 번호를 비켜 바닥 세모가 보이게(route-rules.css)
-        // [11/04] is-quiet — 관제 기본은 문제 지점(위험 · 주의 · 건너뜀)만 번호. 지나온 · 지금 · 앞으로 갈 지점은 감추고(바닥 점은 남는다) 우측 레일 줄 · 지도 점에 손이 닿으면(is-hot) 보인다(디자이너). 미션 설정 · 사전 점검(.sian)은 점검 순서라 그대로 다 보인다
+        // [11/04 · 11/05] is-quiet — 관제 기본은 문제 지점(위험 · 주의 · 건너뜀)과 지금 지점만 번호. 지나온 · 앞으로 갈 지점은 감추고(바닥 점은 남는다) 우측 레일 줄 · 지도 점에 손이 닿으면(is-hot) 보인다(디자이너). 미션 설정 · 사전 점검(.sian)은 점검 순서라 그대로 다 보인다
         el.style.setProperty("--pin", col);
         var head = document.createElement("span");
         head.className = "rr-pin-head";

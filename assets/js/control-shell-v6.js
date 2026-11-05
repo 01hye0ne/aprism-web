@@ -38,13 +38,15 @@
   function toMain(url) {
     var m = (/[?&]mission=([^&#]+)/.exec(url) || [])[1];
     var f = (/[?&]floor=(B\d+)/.exec(url) || [])[1];
+    var al = (/[?&]alert=([^&#]+)/.exec(url) || [])[1], wp = (/[?&]wp=(WP-\d+)/.exec(url) || [])[1];   // 전체 미션 알림에서 왔으면 팝오버까지
     var name = m ? decodeURIComponent(m.replace(/\+/g, " ")) : null;
     var w = main.contentWindow;
     if (name && w && w.APRISM_SCOPE_TO) {
       w.APRISM_SCOPE_TO(name);
       if (f) { var b = w.document.querySelector('[data-map-floor="' + f + '"]'); if (b && !b.classList.contains("is-on")) { b.click(); } }
+      if (al && w.APRISM_OPEN_ALERT) { w.APRISM_OPEN_ALERT(name, decodeURIComponent(al), wp); }
     } else if (name) {
-      main.src = src(MAIN, ["mission=" + m].concat(f ? ["floor=" + f] : []));
+      main.src = src(MAIN, ["mission=" + m].concat(f ? ["floor=" + f] : [], al ? ["alert=" + al, "wp=" + wp] : []));
     }
     show("main");
     setUrl(m ? ["mission=" + m].concat(f ? ["floor=" + f] : []) : []);

@@ -359,12 +359,15 @@
     where.appendChild(el("span", "floor-tag num", a.floor));   // 층 꼬리표는 웨이포인트 이름 앞(10/19)
     var wp = /WP-\d+.*$/.exec(a.where);   // 위치는 웨이포인트만(10/19, 메인 v2.2 와 같다)
     where.appendChild(el("span", "ah-wp", wp ? wp[0] : a.where));
-    if (r6 && r6.ch) { where.appendChild(el("span", "ah-ch", "· " + r6.ch)); }
+    // [11/05] 측정 채널(CH1)은 목록 줄에서 뺐다 — 관제 최신 알림(monitor.js)과 같다. 채널은 상세가 말한다
 
     // 어느 층 · 미션의 알림인지 — 미션을 고르기 전 화면이라 이 줄이 하나 더 붙는다.
     // 미션 줄은 글자 칩 대신 회색 아이콘으로 표시한다 — 칩은 값(층) 자리라서(10/19).
     var scope = el("span", "ah-scope t-caption");
     if (!V3) { scope.appendChild(icon("way")); }   // v3(10/21 디자이너) — 미션 줄 아이콘은 뺀다. 둘째 줄 자리가 미션임을 말한다.
+    // [11/05] 상단 탭과 같은 미션 번호 — 번호 표는 mission-tabs-v6.js 가 이 파일 뒤에 읽혀 aprism:mission-no 때 다시 그린다
+    var mno = window.APRISM_MISSION_NO && window.APRISM_MISSION_NO(a.mission);
+    if (mno) { scope.appendChild(el("span", "ah-no", mno)); }
     scope.appendChild(el("span", null, a.mission));
 
     node.appendChild(title);
@@ -372,15 +375,26 @@
     if (V3) { node.appendChild(scope); node.appendChild(where); } else { node.appendChild(where); node.appendChild(scope); }
     node.addEventListener("mouseenter", function () { setHot(a.floor, null, true); });
     node.addEventListener("mouseleave", function () { setHot(null); });
-    node.addEventListener("click", function () { enter(a.floor, a.mission); });
+    node.addEventListener("click", function () { enter(a.floor, a.mission, V6 ? a : null); });   // [11/05 v6] 그 알림의 팝오버까지 연다
 
     // [안전진단] — 메인 v2.2 목록과 같은 자리 · 모양(monitor.js). 화면은 아직 없다.
     var row = el("div", "ah-row");
     row.setAttribute("role", "listitem");
     node.removeAttribute("role");
-    var go = el("button", "btn btn-ghost is-xs ah-report");
-    go.type = "button";
-    go.title = "안전진단 화면 준비 중";
+    // [11/05 v6] 진단 상세 — 관제 목록(monitor.js)과 같은 주소로 그 미션의 그 감지 자세히 보기를 연다
+    var go;
+    if (V6) {
+      go = el("a", "btn btn-ghost is-xs ah-report");
+      var dq = new URLSearchParams({ mission: a.mission });
+      var det = a.detect || (r6 && r6.detect);
+      if (det) { dq.set("detect", det); }
+      go.href = (window.aprismHref || String)("./safety-v6.html?" + dq.toString());
+      go.title = "안전진단에서 이 알림의 감지 결과 보기";
+    } else {
+      go = el("button", "btn btn-ghost is-xs ah-report");
+      go.type = "button";
+      go.title = "안전진단 화면 준비 중";
+    }
     go.setAttribute("aria-label", (document.body.classList.contains("ver-6") ? "진단 상세" : "안전진단"));   // [10/30 v6] 이름 통일 "진단 상세"
     go.appendChild(icon("shield"));
     go.appendChild(el("span", "ah-report-label", (document.body.classList.contains("ver-6") ? "진단 상세" : "안전진단")));
@@ -974,6 +988,9 @@
       card.type = "button";
       card.setAttribute("aria-label", m + " 미션으로 들어가기");
       var head = el("span", "bld-mcard-head");
+      // [11/05] 상단 탭과 같은 미션 번호(mission-tabs-v6.js)
+      var no = window.APRISM_MISSION_NO && window.APRISM_MISSION_NO(m);
+      if (no) { head.appendChild(el("span", "t-label-1 sb-tab-no", no)); }
       head.appendChild(el("span", "t-label-1 bld-mcard-name", m));
       if (r && r.st !== "run") { head.appendChild(el("span", "t-caption bld-mcard-st", r.st === "done" ? "완료" : "대기")); }
       var sv = el("span", "t-caption bld-sev");
@@ -1127,6 +1144,7 @@
   renderSum();
   // [11/05 논의] 정렬 글(.ah-order)을 [오래된 순 | 최신 순] 고르기로 — 미션 범위 글을 채운 뒤에 바꾼다
   if (window.APRISM_AH_SORT) { window.APRISM_AH_SORT.mount(function () { renderLeft(); }); }
+  document.addEventListener("aprism:mission-no", function () { renderLeft(); });
 
   /* ==================================================================
    * 3D — 층을 쌓는다
@@ -1768,14 +1786,15 @@
    * 들어가기 — 다른 층은 위아래로 비켜 사라지고, 고른 층이 제 색으로 차며 다가온다.
    * 다 오면 메인 v2.2 가 그 미션으로 열린다. 상태바도 그 사이 "전체 건물 › 지하 N층" 으로 바뀐다.
    */
-  function enter(f, mission) {
+  function enter(f, mission, alert) {
     if (busy) { return; }
     closeMenu();
     // [11/05 v6] 대기 미션은 관제 대신 그 미션의 설정으로 — 관제 탭(mission-done-v6.js)과 같다
     if (V6 && mission && stateOf(mission) === "idle") { location.href = (window.aprismHref || String)("mission-setup-v6.html?mission=" + encodeURIComponent(mission)); return; }
     // [11/05 v6] 관제 껍데기(control-v6.html) 안이면 크롬 탭처럼 바로 바꾼다 — 층이 다가오는 연출은 건너뛴다(건물 판이 그 모양으로 남지 않게)
-    if (window.APRISM_SHELL) { window.APRISM_SHELL.open(mainUrl(mission, f)); return; }
-    if (!ready) { location.href = mainUrl(mission, f); return; }
+    var to = mainUrl(mission, f) + (alert ? "&alert=" + encodeURIComponent(alert.time) + "&wp=" + ((/WP-\d+/.exec(alert.where || "") || [""])[0]) : "");
+    if (window.APRISM_SHELL) { window.APRISM_SHELL.open(to); return; }
+    if (!ready) { location.href = to; return; }
     setHot(null);
     busy = true;
     mode = "one";
@@ -1788,7 +1807,7 @@
     // 예전엔 이름 줄에 미션을 붙이고 칩은 "통합 순회 현황" 그대로라 두 미션이 함께 보였다.
     if (trigger) { trigger.querySelector(".t-title-2").textContent = mission; }
     $$("[data-bld-floor]").forEach(function (b) { b.classList.toggle("is-on", b.getAttribute("data-bld-floor") === f); });
-    setTimeout(function () { location.href = mainUrl(mission, f); }, reduce ? 0 : 760);
+    setTimeout(function () { location.href = to; }, reduce ? 0 : 760);
   }
 
   /*
