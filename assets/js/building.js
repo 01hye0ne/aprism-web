@@ -375,7 +375,7 @@
     if (V3) { node.appendChild(scope); node.appendChild(where); } else { node.appendChild(where); node.appendChild(scope); }
     node.addEventListener("mouseenter", function () { setHot(a.floor, null, true); });
     node.addEventListener("mouseleave", function () { setHot(null); });
-    node.addEventListener("click", function () { enter(a.floor, a.mission); });
+    node.addEventListener("click", function () { enter(a.floor, a.mission, V6 ? a : null); });   // [11/05 v6] 그 알림의 팝오버까지 연다
 
     // [안전진단] — 메인 v2.2 목록과 같은 자리 · 모양(monitor.js). 화면은 아직 없다.
     var row = el("div", "ah-row");
@@ -1775,14 +1775,15 @@
    * 들어가기 — 다른 층은 위아래로 비켜 사라지고, 고른 층이 제 색으로 차며 다가온다.
    * 다 오면 메인 v2.2 가 그 미션으로 열린다. 상태바도 그 사이 "전체 건물 › 지하 N층" 으로 바뀐다.
    */
-  function enter(f, mission) {
+  function enter(f, mission, alert) {
     if (busy) { return; }
     closeMenu();
     // [11/05 v6] 대기 미션은 관제 대신 그 미션의 설정으로 — 관제 탭(mission-done-v6.js)과 같다
     if (V6 && mission && stateOf(mission) === "idle") { location.href = (window.aprismHref || String)("mission-setup-v6.html?mission=" + encodeURIComponent(mission)); return; }
     // [11/05 v6] 관제 껍데기(control-v6.html) 안이면 크롬 탭처럼 바로 바꾼다 — 층이 다가오는 연출은 건너뛴다(건물 판이 그 모양으로 남지 않게)
-    if (window.APRISM_SHELL) { window.APRISM_SHELL.open(mainUrl(mission, f)); return; }
-    if (!ready) { location.href = mainUrl(mission, f); return; }
+    var to = mainUrl(mission, f) + (alert ? "&alert=" + encodeURIComponent(alert.time) + "&wp=" + ((/WP-\d+/.exec(alert.where || "") || [""])[0]) : "");
+    if (window.APRISM_SHELL) { window.APRISM_SHELL.open(to); return; }
+    if (!ready) { location.href = to; return; }
     setHot(null);
     busy = true;
     mode = "one";
@@ -1795,7 +1796,7 @@
     // 예전엔 이름 줄에 미션을 붙이고 칩은 "통합 순회 현황" 그대로라 두 미션이 함께 보였다.
     if (trigger) { trigger.querySelector(".t-title-2").textContent = mission; }
     $$("[data-bld-floor]").forEach(function (b) { b.classList.toggle("is-on", b.getAttribute("data-bld-floor") === f); });
-    setTimeout(function () { location.href = mainUrl(mission, f); }, reduce ? 0 : 760);
+    setTimeout(function () { location.href = to; }, reduce ? 0 : 760);
   }
 
   /*
