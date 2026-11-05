@@ -39,6 +39,7 @@
   function mno(name) { var i = MNO.indexOf(name); return i >= 0 ? i : MNO_EN.indexOf(name); }
   // 탭 밖에서 같은 번호를 쓰는 곳(전체 미션 층 카드 · building.js)이 읽는다
   window.APRISM_MISSION_NO = function (name) { var i = mno(name); return i >= 0 ? "M" + (i + 1) : ""; };
+  document.dispatchEvent(new Event("aprism:mission-no"));
 
   function tab(tag, name, on) {
     var t = document.createElement(tag);

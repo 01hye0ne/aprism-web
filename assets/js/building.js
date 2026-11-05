@@ -365,6 +365,9 @@
     // 미션 줄은 글자 칩 대신 회색 아이콘으로 표시한다 — 칩은 값(층) 자리라서(10/19).
     var scope = el("span", "ah-scope t-caption");
     if (!V3) { scope.appendChild(icon("way")); }   // v3(10/21 디자이너) — 미션 줄 아이콘은 뺀다. 둘째 줄 자리가 미션임을 말한다.
+    // [11/05] 상단 탭과 같은 미션 번호 — 번호 표는 mission-tabs-v6.js 가 이 파일 뒤에 읽혀 aprism:mission-no 때 다시 그린다
+    var mno = window.APRISM_MISSION_NO && window.APRISM_MISSION_NO(a.mission);
+    if (mno) { scope.appendChild(el("span", "ah-no", mno)); }
     scope.appendChild(el("span", null, a.mission));
 
     node.appendChild(title);
@@ -1130,6 +1133,7 @@
   renderSum();
   // [11/05 논의] 정렬 글(.ah-order)을 [오래된 순 | 최신 순] 고르기로 — 미션 범위 글을 채운 뒤에 바꾼다
   if (window.APRISM_AH_SORT) { window.APRISM_AH_SORT.mount(function () { renderLeft(); }); }
+  document.addEventListener("aprism:mission-no", function () { renderLeft(); });
 
   /* ==================================================================
    * 3D — 층을 쌓는다
