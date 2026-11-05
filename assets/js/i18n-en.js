@@ -31,7 +31,6 @@
     [/^주의 (\d+)건 추세 비교 중\.\.\.$/, "Comparing trends of $1 warnings..."],
     [/^알림 (\d+)건 살펴보는 중\.\.\.$/, "Reviewing $1 alerts..."],
     [/^답변 정리 중\.\.\.$/, "Writing an answer..."],
-    [/^, (\d{1,2}:\d{2}) 감지$/, ", detected $1"],   // 펼친 Delta 위치 줄 — waypoint 번호 표식 뒤(delta-answer-v6.js loc)
     [/^(.+?)(?:부터|이|가)? ?확인하세요\.$/, function (m, x) { return "Check " + core(x) + " first."; }],
     [/^이 미션 위험 (\d+), 다른 미션 위험 (\d+)$/, "$1 critical here, $2 in other missions"],
     [/^이 미션 위험 (\d+)$/, "$1 critical here"],

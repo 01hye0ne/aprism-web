@@ -1575,6 +1575,3 @@ html:not([lang="en"]) body.ver-6[data-delta-copy="brief"] .delta3 .ai-line-2 .dl
   color: color-mix(in srgb, var(--text-primary) 55%, transparent);
   font-weight: var(--font-weight-regular);
 }
-
-/* [11/05 v6] 라이트 화면 펼친 Delta(흰 판) — waypoint 번호 표식은 옅은 회색 원 */
-:root[data-theme="light"] body.ver-6 .delta3.is-open .dc6 .dl-wp { background-color: rgb(11 14 19 / 8%); color: #31363B; }
