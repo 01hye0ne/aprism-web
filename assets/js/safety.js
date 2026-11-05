@@ -150,7 +150,7 @@
     const rest = rel.filter(k2 => !lks.some(l => l.k2===k2));
     // [11/02 v6] 연관 감지 줄 — 한 줄에 다섯 덩어리가 이어져 어색했다(디자이너). 덩어리를 둘로 가른다:
     //   왼쪽 = 그 감지(단계 배지 · 감지 이름 + 지점 · 값), 오른쪽 = 이 판정과의 관계(원인/영향 후보 · 가능성). 근거 문장은 아래 줄
-    const lkRow = V6 ? (l => `<button type="button" class="rlx lk" data-dk="${l.k2}" data-dw="${l.w2}" data-rel="1"><span class="rlt"><span class="rlw"><span class="pl ${l.y[0]}">${WORD[l.y[0]]}</span><b>${l.k2}</b><span class="rwp">${l.w2}</span><span class="rv">${SHORT[l.y[1]] || l.y[1]}</span></span><span class="rlr"><em class="rr r0">${l.role}</em><small class="lp">가능성 ${l.p}</small></span></span><span class="rwhy">${l.why}</span></button>`)
+    const lkRow = V6 ? (l => `<button type="button" class="rlx lk" data-dk="${l.k2}" data-dw="${l.w2}" data-rel="1"><span class="rlt"><span class="rlw"><span class="pl ${l.y[0]}">${WORD[l.y[0]]}</span><b>${l.k2}</b><span class="rwv"><span class="rwp">${l.w2}</span><span class="rv">${SHORT[l.y[1]] || l.y[1]}</span></span></span><span class="rlr"><em class="rr r0">${l.role}</em><small class="lp">가능성 ${l.p}</small></span></span><span class="rwhy">${l.why}</span></button>`)
       : (l => `<button type="button" class="rlx lk" data-dk="${l.k2}" data-dw="${l.w2}" data-rel="1"><span class="rlt"><span class="pl ${l.y[0]}">${WORD[l.y[0]]}</span><b>${l.k2}</b><span>${l.w2}</span><em class="rr r0">${l.role}</em><small class="lp">가능성 ${l.p}</small><span class="t">${SHORT[l.y[1]] || l.y[1]}</span></span><span class="rwhy">${l.why}</span></button>`);
     const restRow = k2 => { const y = m.r[k2], w2 = y[2].split(' ')[0]; return `<button type="button" class="rlx" data-dk="${k2}" data-dw="${w2}" data-rel="1"><span class="pl ${y[0]}">${WORD[y[0]]}</span><b>${k2}</b><span>${w2}</span><span class="t">${SHORT[y[1]] || y[1]}</span></button>`; };
     const relB = (lks.length ? `<div class="rl b">${lks.map(lkRow).join('')}</div>` : '<span class="why1">연관 근거가 있는 감지 없음</span>');
@@ -449,7 +449,7 @@
   function floorBar(i, big){ const {fls, robotF, cur} = viewF(i);
     if(fls.length < 2) return `<span class="m2f"><span>${fls[0]}</span></span>`;
     return `<span class="m2f" role="group" aria-label="층">${fls.map(f => `<button type="button" data-mf="${f}" data-mi="${i}" class="${f===cur ? 'on' : ''}" aria-pressed="${f===cur}">${f}${f===robotF ? '<i title="로봇 있는 층"></i>' : ''}</button>`).join('')}</span>`; }
-  const LEG = '<div class="mlg"><i class="c"></i>위험 <i class="w"></i>주의 <i class="o"></i>정상 범위 <i class="p"></i>예정 <svg viewBox="-9 -9 20 18" width="11" height="10"><path class="rbt" d="M10 0-7.5 8.5-3.6 0-7.5-8.5Z" stroke="none"/></svg>로봇</div>';
+  const LEG = '<div class="mlg"><span class="mli"><i class="c"></i>위험</span> <span class="mli"><i class="w"></i>주의</span> <span class="mli"><i class="o"></i>정상 범위</span> <span class="mli"><i class="p"></i>예정</span> <span class="mli"><svg viewBox="-9 -9 20 18" width="11" height="10"><path class="rbt" d="M10 0-7.5 8.5-3.6 0-7.5-8.5Z" stroke="none"/></svg>로봇</span></div>';
   // [11/02 v6] 범례 로봇도 지도와 같은 3D 탑뷰 그림(코가 오른쪽)
   //   그림은 그 미션 로봇과 같게(휠 로봇 Robot 05 면 모베드) — 지도의 robotTop 과 같은 규칙
   const robotKind = m => /Robot 05/.test(m.robot) ? 'wheel' : 'spot';

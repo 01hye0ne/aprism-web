@@ -21,18 +21,18 @@ APRISM 공장 환경점검 로봇 관제 시스템 로그인	APRISM factory insp
 계정 발급 · 잠금 해제 문의 : 설비운영팀 내선 2400	Account requests · unlocks: Facility Operations, ext. 2400
 ⓒ 2026 APRISM · 모든 접속 기록은 감사 로그에 저장됩니다.	ⓒ 2026 APRISM · All access is recorded in the audit log.
 보는 범위	View scope
-정기 순회 점검	Routine Patrol Inspection
-발전기실 설비 점검	Generator Room Inspection
-전기실 열화상 점검	Electrical Room Thermal Scan
+정기 순회 점검	Routine Patrol
+발전기실 설비 점검	Generator Room Check
+전기실 열화상 점검	Electrical Room Thermal
 소방 설비 점검	Fire Safety Inspection
 주간 설비 점검	Weekly Facility Inspection
-야간 순회 점검	Night Patrol Inspection
+야간 순회 점검	Night Patrol
 공조 설비 순회	HVAC Patrol
 유틸리티 순회	Utility Patrol
 계정	Account
 통신 상태	Connection status
 전역 내비게이션	Global navigation
-관제	Control
+관제	Monitor
 관제 패널 접기	Collapse control panel
 미션 설정	Mission Setup
 미션 이름	Mission name
@@ -69,8 +69,8 @@ v6 · 미션 설정 — APRISM	v6 · Mission Setup — APRISM
 내 계정 정보	My account
 비밀번호 변경	Change password
 로그아웃	Sign out
-안전진단	Safety Diagnosis
-로봇	Robots
+안전진단	Safety
+로봇	Robot
 스케줄러	Scheduler
 보고서	Reports
 계정관리	Accounts
@@ -264,7 +264,7 @@ WP-08 로 이동 중	Moving to WP-08
 CH1 이상 점수 9.05	CH1 anomaly score 9.05
 고소 작업 발판	Elevated Work Platform
 안전벨트 미착용 1명	1 person without safety harness
-냉각수 열교환기 HX-1	Cooling Water Heat Exchanger HX-1
+냉각수 열교환기 HX-1	Heat Exchanger HX-1
 열교환기 출구 온도 측정	Heat Exchanger Outlet Temperature
 온도 29.8℃ · 이상음향 8.2	Temp 29.8℃ · Acoustic anomaly 8.2
 온도 31.4℃ · 압력 0.71 MPa	Temp 31.4℃ · Pressure 0.71 MPa
@@ -384,3 +384,5 @@ Robot 02 의 통신이 불안정합니다.	Robot 02's connection is unstable.
 APRO 4F · 터빈 2 / Unit 03	APRO 4F · Turbine 2 / Unit 03
 지하발전소 B3 터빈 2 NG 1건 발견	Underground plant B3: 1 NG found on Turbine 2
 조치 필요 · 조치 입력 후 해제	Action required · clears after entering action
+로봇 있는 층	Floors with robots
+연관 감지 설명	About related detections
