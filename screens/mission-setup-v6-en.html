@@ -9,7 +9,7 @@
   <style>html:not(.i18n-ready) body { visibility: hidden; }</style>
   <link rel="stylesheet" href="../assets/css/i18n-en.css?v=0e532bc0" />
   <script src="../assets/js/i18n-en-dict.js?v=b68c0dce"></script>
-  <script src="../assets/js/i18n-en.js?v=4d2b0639"></script>
+  <script src="../assets/js/i18n-en.js?v=475416e5"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>v6 · 미션 설정 — APRISM</title>
   <meta name="description" content="APRISM 통합 관제 메인 · 미션 설정 — v2.2 플로우의 첫 단계. 끝나면 v2.2 통합 관제 메인으로 넘어간다" />
@@ -125,7 +125,7 @@
            지금 탭 = 설정 중인 미션(?mission=, 없으면 정기 순회 점검 — setup-tabs-v6.js 가 고른다). 다른 탭 — 미션 설정: 그 미션의 지금 상태로(대기 → 그 미션 설정, 수행중 · 완료 → 관제,
            입력을 바꿨으면 먼저 확인), 사전 점검: "사전점검 진행중입니다." 토스트. 끌기는 없다. -->
       <nav class="sb-tabs is-fixed" aria-label="보는 범위">
-        <button type="button" class="sb-tab"><span class="sb-tab-name t-label-1">전체 미션</span></button>
+        <button type="button" class="sb-tab"><span class="sb-tab-name t-label-1" data-en="All">전체 미션</span></button>
         <button type="button" class="sb-tab" data-run="run" data-mission="정기 순회 점검"><span class="sb-tab-no t-label-1">M1</span><span class="sb-tab-name t-label-1">정기 순회 점검</span><span class="i i-16 sb-tab-sev" data-sev="critical" aria-hidden="true" style="--i:var(--ic-error)"></span></button>
         <button type="button" class="sb-tab" data-run="run" data-mission="발전기실 설비 점검"><span class="sb-tab-no t-label-1">M2</span><span class="sb-tab-name t-label-1">발전기실 설비 점검</span><span class="i i-16 sb-tab-sev" data-sev="warning" aria-hidden="true" style="--i:var(--ic-warning)"></span></button>
         <button type="button" class="sb-tab" data-run="run" data-mission="전기실 열화상 점검"><span class="sb-tab-no t-label-1">M3</span><span class="sb-tab-name t-label-1">전기실 열화상 점검</span><span class="i i-16 sb-tab-sev" data-sev="critical" aria-hidden="true" style="--i:var(--ic-error)"></span></button>

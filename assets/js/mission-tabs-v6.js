@@ -64,6 +64,7 @@
     var isBtn = !!(overview && overview.tagName === "BUTTON");
     // [10/30] 첫 탭 이름 = "전체 미션"(디자이너 — 관제 · 통합 순회 현황 · 안전진단 통일)
     var first = tab(isBtn ? "button" : onOverview ? "span" : "a", "전체 미션", onOverview);
+    first.querySelector(".sb-tab-name").setAttribute("data-en", "All");   // [11/05] 영문판 첫 탭은 All
     if (isBtn) { var ov = overview; first.addEventListener("click", function () { if (!first.classList.contains("is-on")) { ov.click(); } }); }
     else if (!onOverview && overview) { first.href = overview.getAttribute("href") || "building-v6.html"; }
     bar.appendChild(first);

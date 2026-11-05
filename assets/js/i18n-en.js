@@ -145,6 +145,9 @@
   function doText(n) {
     if (skip(n.parentNode)) { return; }
     var v = n.nodeValue;
+    // [11/05] 자리마다 영어가 다른 문구 — 부모의 data-en 을 쓴다(상단 첫 탭 전체 미션 → All, 다른 곳은 All missions 그대로)
+    var p = n.parentNode;
+    if (p && p.nodeType === 1 && p.hasAttribute("data-en") && HAN.test(v)) { var e = p.getAttribute("data-en"); if (e !== v) { n.nodeValue = e; } return; }
     // 한글 없는 글도 가운뎃점은 쉼표로(JS 가 영어 조각 사이에 · 를 끼우는 곳)
     var t = nodot(HAN.test(v) ? tr(v) : v);
     if (t !== v) { n.nodeValue = t; }
