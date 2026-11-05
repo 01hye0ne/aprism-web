@@ -42,9 +42,32 @@ git push -u origin edit/delta-wording
 ```
 
 GitHub 저장소에 뜨는 **Compare & pull request** 버튼을 눌러 `main` 으로 PR 을 엽니다.
-PR 설명에는 바뀐 화면과 이유를 짧게 적습니다.
+PR 설명에는 바뀐 화면과 이유를 짧게 적습니다. 설명 칸에는 양식(`.github/pull_request_template.md`)이 미리 채워집니다.
 
-### 5. 확인 뒤 합치기
+### 5. 미리보기 (Preview)
+
+PR 을 열 때 바뀐 화면을 바로 열어 볼 수 있는 링크를 **미리보기** 칸에 적습니다.
+GitHub Pages 는 main 만 보여 주므로, 브랜치 화면은 아래 주소로 엽니다.
+
+```
+https://raw.githack.com/01hye0ne/aprism-web/브랜치이름/screens/화면.html
+```
+
+예: `https://raw.githack.com/01hye0ne/aprism-web/edit/delta-wording/screens/safety-v6.html`
+
+- push 할 때마다 같은 링크에 새 내용이 반영됩니다. 몇 분 늦게 바뀔 수 있습니다.
+- 비교용으로 main 화면(`https://01hye0ne.github.io/aprism-web/screens/화면.html`)도 함께 적습니다.
+
+push 전에 내 컴퓨터에서 먼저 보려면 저장소 폴더에서 아래를 실행합니다.
+
+```
+node tools/serve.mjs screens/safety-v6.html
+```
+
+`http://localhost:5180/screens/safety-v6.html` 이 열립니다. 캐시를 끄고 띄우므로 고친 CSS·JS 가 새로고침만으로 바로 보입니다.
+다른 브랜치를 보려면 `git checkout 브랜치이름` 뒤 새로고침합니다.
+
+### 6. 확인 뒤 합치기
 
 검토가 끝나면 **Merge pull request** 로 합치고, **Delete branch** 로 브랜치를 지웁니다.
 
