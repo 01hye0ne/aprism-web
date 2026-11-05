@@ -96,8 +96,10 @@
     if (brief) { lines(); }
   }
   // 두 줄을 줄마다 감싼다 — 1줄 굵게. 넘치면 넘친 낱말만 다음 줄로(자르지 않는다, v5.css).
-  // [11/05 v6 한글판] 문형에 미션 이름(say.names)이 있으면 [이름]으로 감싼다 — 이름은 문장 그대로, 괄호만 회색(.dl-br). 지시어 대신 이름을 쓰되 글줄과 구분(문형표 5).
-  //   지점(say.wp)은 그 줄 맨 앞에 경로 목록 번호 모양(.dl-wp)으로 — 설비와 사이 2px.
+  // [11/05 v6 한글판] 문형에 미션 이름(say.names)이 있으면 [M번호 이름]으로 감싼다 — 번호 · 이름은 문장 그대로, 괄호만 회색(.dl-br).
+  //   번호는 상단 미션 탭의 번호(M1 …)라 탭과 바로 짝지어진다. 지시어 대신 이름을 쓰되 글줄과 구분(문형표 5).
+  //   waypoint 번호(say.wp)는 그 줄 맨 앞에 경로 목록 번호 모양(.dl-wp)으로 — waypoint 이름과 사이 2px.
+  //   waypoint 이름(say.wpName)은 흰색 굵게(.dl-wp-name), 나머지 2줄은 회색.
   //   한 문장 문형(주의만)도 이름을 칠하려고 감싼다. 이때는 1줄 굵게(.dl1)를 붙이지 않는다.
   function lines() {
     var p = win.querySelector(".delta3-body > .ai-line-2");
@@ -106,6 +108,7 @@
     var raw = p.textContent, multi = raw.indexOf("\n") >= 0;
     var wp = KO && s && s.wp ? s.wp : null;
     if (p.querySelector(".dl-m, .dl-wp")) { return; }
+    var wpName = KO && s && s.wpName ? s.wpName : null;
     var paint = names && names.some(function (n) { return raw.indexOf(n) >= 0; });
     if (!multi && !paint && !wp) { return; }
     var t = raw.split("\n");
@@ -118,12 +121,31 @@
         var w = document.createElement("span");
         w.className = "dl-wp";
         w.textContent = wp.n;
-        w.setAttribute("aria-label", wp.n + "번 지점");
+        w.setAttribute("aria-label", "waypoint " + wp.n);
         e.appendChild(w);
       }
-      fill(e, x, names);
+      if (wpName && i === 1 && x.indexOf(wpName) === 0) {
+        var q = document.createElement("span");
+        q.className = "dl-wp-name";
+        q.textContent = wpName;
+        e.appendChild(q);
+        fill(e, x.slice(wpName.length), names);
+      } else {
+        fill(e, x, names);
+      }
       p.appendChild(e);
     });
+  }
+  // 상단 미션 탭의 번호(M1 …) — 탭 순서를 끌어 바꾸면 번호도 따라 바뀐다
+  function missionNo(name) {
+    var tabs = document.querySelectorAll(".sb-tab[data-mission]");
+    for (var i = 0; i < tabs.length; i++) {
+      if (tabs[i].getAttribute("data-mission") === name) {
+        var no = tabs[i].querySelector(".sb-tab-no");
+        return no ? no.textContent.trim() : "";
+      }
+    }
+    return "";
   }
   function fill(e, x, names) {
     var at = 0;
@@ -134,7 +156,8 @@
       if (hit.i > at) { e.appendChild(document.createTextNode(x.slice(at, hit.i))); }
       var m = document.createElement("span");
       m.className = "dl-m";
-      [["dl-br", "["], [null, hit.n], ["dl-br", "]"]].forEach(function (k) {
+      var no = missionNo(hit.n);
+      [["dl-br", "["], [null, (no ? no + " " : "") + hit.n], ["dl-br", "]"]].forEach(function (k) {
         var c = document.createElement("span");
         if (k[0]) { c.className = k[0]; }
         c.textContent = k[1];
