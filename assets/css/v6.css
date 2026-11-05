@@ -1012,10 +1012,15 @@ body.ver-6 .robot-strip.is-carousel::after { box-shadow: var(--shadow-well); }
 body.ver-6 .map-canvas > .map-tools { z-index: 5; }
 body.ver-6 .map-canvas > .map-alert { z-index: 6; }
 /* [11/05] 쪽지를 점 옆에 세운다(map-v6.js placeAlert) — 꼬리도 옆으로 돌려 점을 가리키고, 세로는 --tail-y 로 따라간다 */
+/* 꼬리 24×14 — 지점과의 틈 16 안에서 가장 크게. 14×8 은 어두운 지도에서 안 보였다 */
+body.ver-6 .map-alert::after, body.ver-6 .map-alert::before { width: 24px; height: 14px; }
+/* 면을 80% 유리로 두면 지도 색에 묻힌다 — 불투명으로 하고, 팝오버 테두리와 같은 선을 면 위에 얹어 또렷하게 */
+body.ver-6 .map-alert.ma-v3::after { background-color: var(--ma-sink); }
+body.ver-6 .map-alert.ma-v3::before { z-index: 1; background-color: var(--border-strong); }
 body.ver-6 .map-alert.is-side-r { transform: translate(0, -50%); }
 body.ver-6 .map-alert.is-side-l { transform: translate(-100%, -50%); }
-body.ver-6 .map-alert.is-side-r::after, body.ver-6 .map-alert.is-side-r::before { left: -4px; right: auto; top: calc(50% + var(--tail-y, 0px)); bottom: auto; transform: translate(-50%, -50%) rotate(90deg); }
-body.ver-6 .map-alert.is-side-l::after, body.ver-6 .map-alert.is-side-l::before { left: calc(100% + 4px); right: auto; top: calc(50% + var(--tail-y, 0px)); bottom: auto; transform: translate(-50%, -50%) rotate(-90deg); }
+body.ver-6 .map-alert.is-side-r::after, body.ver-6 .map-alert.is-side-r::before { left: -7px; right: auto; top: calc(50% + var(--tail-y, 0px)); bottom: auto; transform: translate(-50%, -50%) rotate(90deg); }
+body.ver-6 .map-alert.is-side-l::after, body.ver-6 .map-alert.is-side-l::before { left: calc(100% + 7px); right: auto; top: calc(50% + var(--tail-y, 0px)); bottom: auto; transform: translate(-50%, -50%) rotate(-90deg); }
 body.ver-6 .map-alert.is-no-tail::after, body.ver-6 .map-alert.is-no-tail::before { display: none; }
 
 /*
