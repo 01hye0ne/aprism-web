@@ -10,6 +10,8 @@
  */
 (function () {
   "use strict";
+  // [11/05 한글판] 지시어(이 미션 · 다른 미션) 대신 미션 이름 — 라이팅 시스템 5 · 9. 영문판(html lang="en")은 예전 문구 그대로
+  var KO = document.documentElement.lang !== "en";
 
   var body = document.body;
   if (!body.classList.contains("v2-2")) { return; }
@@ -130,7 +132,7 @@
     }
     if (/로봇|robot|배터리|위치/i.test(q)) {
       return {
-        text: "이 미션에는 Robot 01 한 대가 배정돼 있어요. 지금 WP-04 를 점검 중이고 배터리는 78% 입니다.",
+        text: (KO && alerts().mission ? alerts().mission + " 미션에는" : "이 미션에는") + " Robot 01 한 대가 배정돼 있어요. 지금 WP-04 를 점검 중이고 배터리는 78% 입니다.",
         chips: [{ label: "Robot 01 다음 지점은?" }]
       };
     }
@@ -264,20 +266,27 @@
       var hereC = crits.filter(function (a) { return A.mine.indexOf(a) >= 0; });
       if (hereC.length) {
         step += 1;
-        orows.push({ grp: step + ". 이 미션 위험: " + floorOf(A.mission, A.mine) + " " + A.mission, list: hereC });
+        orows.push({ grp: step + (KO ? ". 위험: " : ". 이 미션 위험: ") + floorOf(A.mission, A.mine) + " " + A.mission, list: hereC });
         hereC.forEach(function (a) { orows.push({ a: a }); });
       }
       var byC = {};
       crits.filter(function (a) { return A.mine.indexOf(a) < 0; }).forEach(function (a) { var m = A.missionOf(a) || "기타"; (byC[m] = byC[m] || []).push(a); });
       Object.keys(byC).forEach(function (m) {
         step += 1;
-        orows.push({ grp: step + ". 다른 미션 위험: " + floorOf(m, byC[m]) + " " + m, list: byC[m] });
+        orows.push({ grp: step + (KO ? ". 위험: " : ". 다른 미션 위험: ") + floorOf(m, byC[m]) + " " + m, list: byC[m] });
         byC[m].forEach(function (a) { orows.push({ a: a }); });
       });
       if (warns.length) {
         step += 1;
         var wHere = warns.filter(function (a) { return A.mine.indexOf(a) >= 0; }).length;
-        orows.push({ grp: step + ". 주의 " + warns.length + "건(이 미션 " + wHere + ", 다른 미션 " + (warns.length - wHere) + ")" });
+        if (KO) {
+          // 미션마다 건수 — 보는 미션 먼저(처리 순서 그대로)
+          var wPer = {}, wNames = [];
+          warns.forEach(function (a) { var m = A.missionOf(a) || "기타"; if (!(m in wPer)) { wPer[m] = 0; wNames.push(m); } wPer[m]++; });
+          orows.push({ grp: step + ". 주의 " + warns.length + "건(" + wNames.map(function (m) { return m + " " + wPer[m]; }).join(", ") + ")" });
+        } else {
+          orows.push({ grp: step + ". 주의 " + warns.length + "건(이 미션 " + wHere + ", 다른 미션 " + (warns.length - wHere) + ")" });
+        }
         orows.push({ go: "주의 " + warns.length + "건 묶어 보기", act: function () { ask("주의 묶어서 확인"); } });
       }
       // cur — 버튼이 가리키는 알림. 조치 완료가 오면 refreshLive 가 다음 알림으로 옮긴다(라이팅 시스템 10).
@@ -298,10 +307,10 @@
       rows.push({ grp: title });
       list.forEach(function (a) { if (shown < 3) { rows.push({ a: a }); seen.push(a); shown += 1; } });
     }
-    group("이 미션: " + floorOf(A.mission, A.mine) + " " + A.mission, mine);
+    group((KO ? "" : "이 미션: ") + floorOf(A.mission, A.mine) + " " + A.mission, mine);
     var byM = {};
     rest.forEach(function (a) { var m = A.missionOf(a) || "기타"; (byM[m] = byM[m] || []).push(a); });
-    Object.keys(byM).forEach(function (m) { group("다른 미션: " + floorOf(m, byM[m]) + " " + m, byM[m]); });
+    Object.keys(byM).forEach(function (m) { group((KO ? "" : "다른 미션: ") + floorOf(m, byM[m]) + " " + m, byM[m]); });
     // 넘친 알림은 다른 곳으로 보내지 않고 대화 안에서 펼친다(라이팅 시스템 5 · 8 — "목록"이 어디인지 모른다)
     if (pool.length > shown) { rows.push({ more: (pool.length - shown) + "건 더 보기", moreRows: pool.filter(function (a) { return seen.indexOf(a) < 0; }) }); }
     var first = mine[0] || rest[0] || top;
