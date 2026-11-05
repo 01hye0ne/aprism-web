@@ -39,6 +39,21 @@
     fold.addEventListener("click", function () { setFold(!box.classList.contains("is-folded")); });
   })();
 
+  (function () {   // [11/05] 델타 시뮬레이션 — 접기 화살표 옆. 주의 또는 기본 판에서 시작해 2초 뒤 위험 알림 1건이 새로 들어온다(monitor.js 가 받는다)
+    if (!document.body.classList.contains("v2")) { return; }
+    var g = document.createElement("span");
+    g.className = "rsim-dsim";
+    g.setAttribute("role", "group");
+    g.setAttribute("aria-label", "델타 시뮬레이션");
+    g.innerHTML = '<span>델타</span><button type="button" data-dsim="warning">주의 → 위험 1건</button><button type="button" data-dsim="normal">기본 → 위험 1건</button>';
+    box.querySelector(".rsim-chips").appendChild(g);
+    g.addEventListener("click", function (e) {
+      var b = e.target.closest("[data-dsim]"); if (!b) { return; }
+      Array.prototype.forEach.call(g.querySelectorAll("[data-dsim]"), function (x) { x.setAttribute("aria-pressed", String(x === b)); });
+      document.dispatchEvent(new CustomEvent("aprism:delta-sim", { detail: { from: b.getAttribute("data-dsim"), after: 2000 } }));
+    });
+  })();
+
   var api = null, range = box.querySelector("input"), pct = box.querySelector(".rsim-pct"), play = box.querySelector(".rsim-play");
   var mode = "run", playing = false, dwell = null, last = 0, modeAt = performance.now(), touched = false;
   var SPEED_SEC = 70;   // 한 바퀴 시간
