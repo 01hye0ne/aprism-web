@@ -974,6 +974,9 @@
       card.type = "button";
       card.setAttribute("aria-label", m + " 미션으로 들어가기");
       var head = el("span", "bld-mcard-head");
+      // [11/05] 상단 탭과 같은 미션 번호(mission-tabs-v6.js)
+      var no = window.APRISM_MISSION_NO && window.APRISM_MISSION_NO(m);
+      if (no) { head.appendChild(el("span", "t-label-1 sb-tab-no", no)); }
       head.appendChild(el("span", "t-label-1 bld-mcard-name", m));
       if (r && r.st !== "run") { head.appendChild(el("span", "t-caption bld-mcard-st", r.st === "done" ? "완료" : "대기")); }
       var sv = el("span", "t-caption bld-sev");

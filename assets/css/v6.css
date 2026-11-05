@@ -746,6 +746,7 @@ body.ver-6 .bld-mcards { overflow: visible; flex-wrap: wrap; gap: var(--space-8)
 body.ver-6 .bld-mcard { position: relative; width: auto; padding: 0; overflow: visible; }
 body.ver-6 .bld-mcard-head { min-height: 32px; padding: var(--space-4) var(--space-12); gap: var(--space-8); }
 body.ver-6 .bld-mcard-name { font-size: var(--font-size-13); line-height: var(--font-line-height-20); }
+body.ver-6 .bld-mcard .sb-tab-no { font-size: var(--font-size-13); line-height: var(--font-line-height-20); margin-right: calc(var(--space-4) * -1); }   /* [11/05] 탭과 같은 번호 — 이름 글자 크기에 맞추고 이름에 붙인다 */
 body.ver-6 .bld-mcard-map {
   position: absolute; left: 0; bottom: calc(100% + var(--space-8)); z-index: 5;
   width: 246px; padding: var(--space-4); border-radius: var(--radius-card);
