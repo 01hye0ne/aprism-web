@@ -14,9 +14,11 @@
   var AXES = [
     { k: "m", t: "미션", opts: [["0", "글자 그대로"], ["a", "A 회색"], ["ab", "A 회색 굵게"], ["b", "B 굵게"], ["c", "C 층 칩 + 굵게"], ["t", "6-1 토큰"], ["tn", "6-2 접힘 번호만"]] },
     { k: "w", t: "지점", opts: [["0", "글자 그대로"], ["w1", "W1 경로 번호"], ["w2", "W2 핀 + 번호"], ["w3", "W3 핀 축소"], ["w4", "W4 지점 꼬리표"], ["wp", "핀 머리(단계 색)"]] },
-    { k: "x", t: "접힘 2줄", opts: [["eq", "설비 이름"], ["ph", "현상"], ["eqph", "설비 + 현상"]] }
+    { k: "x", t: "접힘 2줄", opts: [["eq", "설비 이름"], ["ph", "현상"], ["eqph", "설비 + 현상"]] },
+    { k: "g", t: "지점과 설비 사이", opts: [["6", "띄어쓰기(약 6px)"], ["4", "4px"], ["3", "3px"], ["2", "2px"]] },
+    { k: "e", t: "설비 이름 글", opts: [["0", "그대로"], ["g", "회색"], ["b", "굵게"], ["gb", "회색 굵게"], ["w", "흰색 굵게"]] }
   ];
-  var pick = { m: "0", w: "0", x: "eq" };
+  var pick = { m: "0", w: "w1", x: "eq", g: "6", e: "0" };
   try { var saved = JSON.parse(localStorage.getItem(KEY) || "null"); if (saved) { Object.assign(pick, saved); } } catch (e) { /* 저장 안 됨 — 기본값 */ }
   function save() { try { localStorage.setItem(KEY, JSON.stringify(pick)); } catch (e) { /* 무시 */ } }
 
@@ -36,7 +38,11 @@
     ":root[data-theme='light'] .lab-chip .no { color: rgb(22 25 29 / 50%); }",
     ".lab-floor { display: inline-grid; place-items: center; height: 20px; padding: 0 5px; margin-right: 4px; border-radius: 4px; background: rgb(58 66 82 / 90%); color: #C9D0DC; font-size: 13px; font-weight: 600; vertical-align: 1px; }",
     ":root[data-theme='light'] .lab-floor { background: #E8EBF0; color: #5B6470; }",
-    ".lab-w1 { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: rgb(10 15 24 / 45%); color: #C9D0DC; font-size: 13px; font-weight: 800; vertical-align: -1px; }",
+    ".lab-eq-g { color: color-mix(in srgb, var(--text-primary) 60%, transparent); }",
+    ".lab-eq-b { font-weight: 800; }",
+    ".lab-eq-gb { color: color-mix(in srgb, var(--text-primary) 60%, transparent); font-weight: 800; }",
+    ".lab-eq-w { color: var(--text-primary); font-weight: 800; }",
+    ".lab-w1 { display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box; width: 22px; height: 22px; padding-bottom: 0.5px; border-radius: 50%; background: rgb(10 15 24 / 45%); color: #C9D0DC; font-size: 13px; line-height: 1; font-weight: 800; font-variant-numeric: tabular-nums; vertical-align: baseline; margin: 0 1px; }",
     ".lab-w2 { display: inline-flex; align-items: center; gap: 3px; height: 22px; padding: 0 6px 0 5px; border-radius: 6px; background: rgb(44 52 67 / 85%); color: #F7F8FA; font-size: 14px; font-weight: 800; vertical-align: 1px; }",
     ".lab-w2 svg { width: 10px; height: 13px; fill: #9EA8BB; }",
     ":root[data-theme='light'] .lab-w2 { background: #E8EBF0; color: #16191D; }",
@@ -155,8 +161,11 @@
     if (!m) { return; }
     var tgt = pick.x === "ph" ? first.phen || m[1] : pick.x === "eqph" ? (first.eq || m[1]) + " " + (first.phen || "") : m[1];
     var n = /\d+/.exec(first.wp || ""), w = n ? wpHTML(+n[0], first.sev) : null;
+    // 지점과 설비 사이 — 띄어쓰기 대신 지점 표식 오른쪽 여백으로 잰다(6 = 띄어쓰기 그대로)
+    if (w && pick.g !== "6") { w = w.replace('<span data-lab class="', '<span data-lab style="margin-right:' + pick.g + 'px" class="'); }
+    var eqCls = pick.e !== "0" ? ' class="lab-eq-' + pick.e + '"' : "";
     dl2.setAttribute("data-lab-line", dl2.textContent);
-    dl2.innerHTML = (w ? w + " " : "") + '<span data-lab>' + esc(tgt.trim()) + "부터 확인하세요.</span>";
+    dl2.innerHTML = (w ? w + (pick.g === "6" ? " " : "") : "") + "<span data-lab><span" + eqCls + ">" + esc(tgt.trim()) + "</span>부터 확인하세요.</span>";
   }
 
   // 고른 값을 바꾸면 원래 글로 되돌린 뒤 다시 입힌다
