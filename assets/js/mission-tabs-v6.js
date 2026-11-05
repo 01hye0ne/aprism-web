@@ -150,6 +150,8 @@
     var names = Array.prototype.map.call(bar.querySelectorAll(".sb-tab[data-mission]"), function (t) { return t.getAttribute("data-mission"); });
     try { localStorage.setItem(KEY, JSON.stringify(names)); } catch (e) { /* 저장 못 하면 이번 화면에서만 */ }
   }
+  // [11/05] 관제 껍데기(control-v6)는 두 화면을 함께 띄워 둔다 — 한쪽에서 순서를 바꾸면 다른 쪽 탭 줄도 다시 그린다
+  window.addEventListener("storage", function (event) { if (event.key === KEY) { build(); } });
   var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var drag = null, justDragged = false, pending = false;
 
