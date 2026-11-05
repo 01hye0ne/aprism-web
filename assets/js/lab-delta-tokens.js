@@ -15,7 +15,6 @@
     { k: "m", t: "미션", opts: [["0", "글자 그대로"], ["q", "따옴표"], ["h", "1줄 제목으로"], ["a", "A 회색"], ["ab", "A 회색 굵게"], ["b", "B 굵게"], ["c", "C 층 칩 + 굵게"], ["t", "6-1 토큰"], ["tn", "6-2 접힘 번호만"]] },
     { k: "w", t: "지점", opts: [["0", "글자 그대로"], ["w1", "W1 경로 번호"], ["w2", "W2 핀 + 번호"], ["w3", "W3 핀 축소"], ["w4", "W4 지점 꼬리표"], ["wp", "핀 머리(단계 색)"]] },
     { k: "x", t: "접힘 2줄", opts: [["eq", "설비 이름"], ["ph", "현상"], ["eqph", "설비 + 현상"]] },
-    { k: "l2", t: "2줄 기본 글색", opts: [["g", "회색 55%(시안, 영문판)"], ["w", "흰색(지금 한글판)"]] },
     { k: "mg", t: "미션 회색 밝기(지금 코드 60%)", opts: [["60", "60%"], ["70", "70%"], ["75", "75%"], ["80", "80%"], ["88", "88%"]] },
     { k: "g", t: "지점과 설비 사이", opts: [["6", "띄어쓰기(약 6px)"], ["4", "4px"], ["3", "3px"], ["2", "2px"]] },
     { k: "e", t: "설비 이름 글", opts: [["0", "그대로"], ["g", "회색"], ["b", "굵게"], ["gb", "회색 굵게"], ["w", "흰색 굵게"], ["r", "설비 그대로, 나머지 회색"], ["rw", "설비 흰색, 나머지 회색"]] }
@@ -31,8 +30,6 @@
   css.textContent = [
     ".lab-m-a { color: color-mix(in srgb, var(--text-primary) var(--lab-mg, 60%), transparent); }",
     ".lab-m-ab { color: color-mix(in srgb, var(--text-primary) var(--lab-mg, 60%), transparent); font-weight: 800; }",
-    // 2줄 기본 회색 — 10/31 디자이너 시안(영문판 i18n-en.css 와 같은 값)
-    "body.lab-l2g .delta3 .ai-line-2 .dl2 { color: color-mix(in srgb, var(--text-primary) 55%, transparent); font-weight: var(--font-weight-regular); }",
     // 실제 코드의 미션 회색(v6.css .dl-m)도 같은 값으로 덮어 본다
     "body.lab-on .delta3 .ai-line-2 .dl-m.lab-h { color: var(--text-primary) !important; }",
     // 회색(A)이 아닌 안을 고르면 코드의 미션 회색을 끈다
@@ -199,7 +196,6 @@
   var busy = false;
   function paint() {
     body.classList.add("lab-on");
-    body.classList.toggle("lab-l2g", pick.l2 !== "w");
     body.classList.toggle("lab-mnone", pick.m !== "a" && pick.m !== "ab");
     body.style.setProperty("--lab-mg", (pick.mg || "60") + "%");
     if (busy) { return; }
