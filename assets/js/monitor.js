@@ -514,9 +514,10 @@
 
   function items() {
     var base = (SETS[level] || SETS.critical)().filter(function (a) { return resolved.indexOf(a) < 0; });
-    // "오래된 순 · 위험 우선 정렬" — 위험이 먼저, 같은 단계 안에서는 오래된 것이 위다.
+    // 위험이 먼저, 같은 단계 안에서는 고른 시간 순서([오래된 순 | 최신 순], ah-sort.js — 기본 오래된 순)
+    var SORT = window.APRISM_AH_SORT;
     return extra.concat(base).sort(function (a, b) {
-      return (RANK[a.sev] - RANK[b.sev]) || (a.time < b.time ? -1 : a.time > b.time ? 1 : 0);
+      return (RANK[a.sev] - RANK[b.sev]) || (SORT ? SORT.time(a, b) : (a.time < b.time ? -1 : a.time > b.time ? 1 : 0));
     });
   }
 
@@ -551,7 +552,8 @@
     title.appendChild(icon(a.sev === "critical" ? "error" : "warning"));
     var A6 = body.classList.contains("ver-6") && window.APRISM_ALERT6, r6 = A6 && A6.of(a.title);
     title.appendChild(el("span", null, A6 ? A6.title(a.title) : a.title));   // [11/02 v6] 제목 = 감지 · 측정 항목 + 값(alert-text-v6.js)
-    if (r6 && r6.ch) { where.appendChild(el("span", "ah-ch", "· " + r6.ch)); }   // 측정 채널은 어디서 줄 끝으로
+    // [11/05 논의] 측정 채널(CH1)은 목록 줄에서 뺐다 — 6종 중 부분방전만 있어 이 줄만 낯선 꼬리가 붙고, 목록에선 뜻이 안 읽힌다.
+    //   채널은 상세(쪽지 요약 "CH1 … CH2 · CH3 은 정상", 안전진단 메모)가 말한다. 예전: where 끝에 "· " + r6.ch
 
     if (scoped) {
       // v2.2 — 무슨 일(위험도 + 알림명)이 첫 줄, 어디서가 둘째 줄(10/19 디자이너). 타임라인 · 오늘 확인 완료처럼 이름이 먼저다.
@@ -628,6 +630,9 @@
    * 새 관제사가 목록을 한 번이라도 건드리면 평소 문구로 돌아간다 — 인사는 한 번이면 된다.
    */
   var handover = null;
+
+  // [11/05 논의] 거르기 줄 오른쪽 정렬 글을 [오래된 순 | 최신 순] 고르기로(ah-sort.js). 바꾸면 목록을 다시 그린다.
+  if (window.APRISM_AH_SORT) { window.APRISM_AH_SORT.mount(function () { render(); }); }
 
   document.addEventListener("aprism:shift", function (event) {
     handover = (event.detail && event.detail.name) || "";

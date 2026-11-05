@@ -399,8 +399,9 @@
   function renderLeft() {
     var list = $("[data-ah-list]");
     if (!list) { return; }
+    var SORT = window.APRISM_AH_SORT;   // 위험이 먼저, 같은 단계 안은 고른 시간 순서(ah-sort.js)
     var all = (floorView ? alertsOn(floorView) : ALERTS).slice().sort(function (a, b) {
-      return (RANK[a.sev] - RANK[b.sev]) || (a.time < b.time ? -1 : a.time > b.time ? 1 : 0);
+      return (RANK[a.sev] - RANK[b.sev]) || (SORT ? SORT.time(a, b) : (a.time < b.time ? -1 : a.time > b.time ? 1 : 0));
     });
     var shown = all.filter(function (a) { return filter === "all" || a.sev === filter; });
     list.textContent = "";
@@ -1116,6 +1117,8 @@
   renderLeft();
   renderRight();
   renderSum();
+  // [11/05 논의] 정렬 글(.ah-order)을 [오래된 순 | 최신 순] 고르기로 — 미션 범위 글을 채운 뒤에 바꾼다
+  if (window.APRISM_AH_SORT) { window.APRISM_AH_SORT.mount(function () { renderLeft(); }); }
 
   /* ==================================================================
    * 3D — 층을 쌓는다

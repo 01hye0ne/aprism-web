@@ -1493,3 +1493,65 @@ body.ver-6 .dc6-jump[hidden] { display: none; }
 @media (prefers-reduced-motion: reduce) {
   body.ver-6 .dc-msg.dc6.is-old, body.ver-6 .dc6-toggle-r .i { transition: none; }
 }
+
+/*
+ * [11/05 논의] AI 추천 꼬리표 → 칩 — 한글판 · 영문판 공통
+ *   지금 꼬리표는 파란 면이라 누르는 버튼([조치 요청])과 같은 꼴로 읽혀 클릭 혼동을 준다(누를 수 없는 표시).
+ *   버튼과 같은 꼴(모서리 4 · 13px · 높이 22)에 면 · 테 색만 다르게 — 브랜드 옅은 면 14% + 브랜드 테 1px + 브랜드 글자.
+ *   범위: 관제 알림 쪽지 · 안전진단 DELTA 제안 판 · 알림 센터 상세.
+ */
+body.ver-6 .ma-check-tag,
+body.ver-6 .sf .ma-check-tag,
+body.ver-6 .ac-dl .ma-check-tag {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 var(--space-8);
+  border: 1px solid var(--comp-gnb-brand);
+  border-radius: var(--radius-4);
+  background-color: color-mix(in srgb, var(--comp-gnb-brand) 14%, transparent);
+  color: var(--comp-gnb-brand);
+  font-size: var(--font-size-13);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/*
+ * [11/05 논의] 라이트 모드 관제 — 할 일은 흰색, 끝난 것은 회색(한글판 · 영문판 공통)
+ *   최신 알림과 오늘 확인 완료(Confirmed today)가 같은 회색이라 구분되지 않았다.
+ *   최신 알림 줄 · 우측 앞으로 갈 지점 카드를 흰색으로. 오늘 확인 완료 · 지나온 지점은 회색 그대로, 지금 지점은 원래 진한 카드.
+ *   줄 없는 빈 바탕은 상자 회색 그대로, 호버 · 고른 줄은 원래 상태색. 관제 · 전체 미션(통합 순회 현황) 둘 다.
+ */
+:root[data-theme="light"] body.ver-6 .context-panel .ah-sec:not(.done-sec) .ah-item { background-color: var(--color-gray-0); }
+:root[data-theme="light"] body.ver-6 .context-panel .ah-sec:not(.done-sec) .ah-item:hover { background-color: var(--state-hover); }
+:root[data-theme="light"] body.ver-6 .context-panel .ah-sec:not(.done-sec) .ah-item[aria-pressed="true"] { background-color: var(--bg-selected); }
+:root[data-theme="light"] body.ver-6 .right-panel .timeline .timeline-item.is-pending:not(.is-running) .step-card { background-color: var(--color-gray-0); }
+
+/*
+ * [11/05 논의] 라이트 모드 알림 센터 목록 — 관제 최신 알림 줄과 같은 값(한글판 · 영문판 공통)
+ *   기본 = 흰색(위험 줄의 옅은 빨강 면도 흰색 — 단계는 왼쪽 띠 · 아이콘이 말한다), 호버 = state-hover, 고른 줄 = bg-selected.
+ *   예전엔 고른 줄이 흰색(bg-raised)이라 기본 줄과 뒤바뀌어 보였다.
+ */
+:root[data-theme="light"] body.ver-6 .ac-row,
+:root[data-theme="light"] body.ver-6 .ac-row[data-sev="critical"] { background-color: var(--color-gray-0); }
+:root[data-theme="light"] body.ver-6 .ac-row:hover { background-color: var(--state-hover); }
+:root[data-theme="light"] body.ver-6 .ac-row[aria-selected="true"],
+:root[data-theme="light"] body.ver-6 .ac-row[aria-selected="true"]:hover { background-color: var(--bg-selected); }
+
+/*
+ * [11/05 논의] 라이트 모드 드롭다운 · 입력칸 테 — 다크용 gray/650(#3F485C)이 그대로 쓰여 너무 진했다.
+ *   라이트에서는 gray/400(#AFB7C8)으로 — comp/input/border(#667085)는 #3F485C 와 차이가 작아 그대로 보였고, 보조 버튼 테(#D1D5DE)는 칸 바탕(#E0E3E9) 위에서 안 보였다. 초점 · 열림 테는 원래대로(border-focus).
+ */
+:root[data-theme="light"] body.ver-6 .field-box:not(.is-readonly) { border-color: var(--color-gray-400); }
+:root[data-theme="light"] body.ver-6 .field-box:focus-visible,
+:root[data-theme="light"] body.ver-6 .field-select[data-open] .field-box { border-color: var(--border-focus); }
+
+/*
+ * [11/05 논의] 최신 알림 정렬 바꾸기 [⇅ 오래된 순] ↔ [⇅ 최신 순] — 예전 고를 수 없던 "오래된 순 · 위험 우선" 자리(ah-sort.js).
+ *   단추 하나, 지금 순서를 말하고 누르면 반대로. 글 단추(면 · 테 없음), text/secondary → 호버 text/primary.
+ *   아이콘 --ic-sort 는 assets/icons/outline/icon-sort.svg 와 같다(inline-icons-outline.py 를 다시 돌리면 icons-outline.css 로 옮겨도 된다).
+ */
+body.ver-6 { --ic-sort: url("data:image/svg+xml,%3Csvg width=%2224%22 height=%2224%22 viewBox=%220 0 24 24%22 fill=%22none%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cpath d=%22M8 19V5M8 5L4.5 8.5M8 5L11.5 8.5%22 stroke=%22%23000%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22/%3E%3Cpath d=%22M16 5V19M16 19L12.5 15.5M16 19L19.5 15.5%22 stroke=%22%23000%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22/%3E%3C/svg%3E"); }
+body.ver-6 .ah-sort-btn { display: inline-flex; align-items: center; gap: var(--space-4); padding: 0; border: 0; background: none; font-family: inherit; color: var(--text-secondary); cursor: pointer; white-space: nowrap; }
+body.ver-6 .ah-sort-btn:hover { color: var(--text-primary); }
+body.ver-6 .ah-sort-btn:focus-visible { outline: var(--border-width-strong) solid var(--border-focus); outline-offset: 2px; border-radius: var(--radius-4); }
