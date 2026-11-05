@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<!--
+  [11/05 v6] 관제 껍데기 — 크롬 탭처럼(디자이너). 전체 미션(building-v6)과 미션 관제(main-v6)를 처음부터 둘 다 띄워 두고,
+  상단 탭을 누르면 페이지를 새로 열지 않고 보이는 화면만 바꾼다. 미션끼리는 main-v6 안에서 이미 바로 바뀐다(mission-scope.js).
+  두 화면은 각자 그대로 돈다 — 껍데기는 화면 사이로 가는 길만 가로챈다(Navigation API).
+    building-v6 ↔ main-v6   보이는 화면만 바꾼다(main 은 APRISM_SCOPE_TO 로 미션을 맞춘다)
+    그 밖의 화면(안전진단 · 알림 센터 …)   껍데기째 그 화면으로 간다
+  주소: ?view=building | ?mission=<이름>[&floor=B4] — 새로고침해도 보던 화면으로 연다.
+-->
+<html lang="ko" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>v6 · 관제 — APRISM</title>
+  <style>
+    html, body { margin: 0; height: 100%; background: #0b0d12; overflow: hidden; }
+    iframe { position: fixed; inset: 0; width: 100%; height: 100%; border: 0; }
+    iframe:not(.is-on) { visibility: hidden; pointer-events: none; }
+  </style>
+</head>
+<body>
+<iframe id="v-building" title="전체 미션"></iframe>
+<iframe id="v-main" title="미션 관제"></iframe>
+<script>
+(function () {
+  "use strict";
+  var q = location.search;
+  // 보기 설정(테마 등)은 두 화면에 그대로 넘긴다
+  var keep = (q.match(/[?&](theme|palette|delta|glow|lang)=[\w-]+/g) || []).map(function (s) { return s.slice(1); });
+  function src(page, extra) { var a = keep.concat(extra || []); return page + (a.length ? "?" + a.join("&") : ""); }
+  var bld = document.getElementById("v-building"), main = document.getElementById("v-main");
+  var mission = (/[?&]mission=([^&#]+)/.exec(q) || [])[1];
+  var floor = (/[?&]floor=(B\d+)/.exec(q) || [])[1];
+  var startMain = !!mission && !/[?&]view=building/.test(q);
+  bld.src = src("building-v6.html");
+  main.src = src("main-v6.html", mission ? ["mission=" + mission].concat(floor ? ["floor=" + floor] : []) : []);
+
+  function show(which) {
+    bld.classList.toggle("is-on", which === "building");
+    main.classList.toggle("is-on", which === "main");
+    var on = which === "building" ? bld : main;
+    try { document.title = on.contentDocument.title; on.contentWindow.focus(); } catch (e) { /* 아직 안 열림 */ }
+    // 숨어 있던 동안 크기가 안 바뀌었어도 3D 판이 제 크기를 다시 재게 한다
+    try { on.contentWindow.dispatchEvent(new Event("resize")); } catch (e) { /* 아직 안 열림 */ }
+  }
+  function setUrl(extra) { history.replaceState(null, "", "control-v6.html?" + keep.concat(extra).join("&")); }
+
+  function toMain(url) {
+    var m = (/[?&]mission=([^&#]+)/.exec(url) || [])[1];
+    var f = (/[?&]floor=(B\d+)/.exec(url) || [])[1];
+    var name = m ? decodeURIComponent(m.replace(/\+/g, " ")) : null;
+    var w = main.contentWindow;
+    if (name && w && w.APRISM_SCOPE_TO) {
+      w.APRISM_SCOPE_TO(name);
+      if (f) { var b = w.document.querySelector('[data-map-floor="' + f + '"]'); if (b && !b.classList.contains("is-on")) { b.click(); } }
+    } else if (name) {
+      main.src = src("main-v6.html", ["mission=" + m].concat(f ? ["floor=" + f] : []));
+    }
+    show("main");
+    setUrl(m ? ["mission=" + m].concat(f ? ["floor=" + f] : []) : []);
+  }
+  function toBuilding() { show("building"); setUrl(["view=building"]); }
+
+  // 화면이 다른 화면으로 가려는 길을 가로챈다. 두 관제 화면 사이면 보이는 것만 바꾸고, 그 밖이면 껍데기째 간다.
+  function guard(frame) {
+    var w = frame.contentWindow;
+    w.APRISM_SHELL = { open: function (url) { route(new URL(url, w.location.href).href); } };
+    if (!w.navigation) { return; }
+    w.navigation.addEventListener("navigate", function (e) {
+      if (!e.cancelable || e.hashChange || e.downloadRequest) { return; }
+      var to = e.destination.url;
+      if (to.split("#")[0] === w.location.href.split("#")[0]) { return; }
+      e.preventDefault();
+      route(to);
+    });
+  }
+  function route(to) {
+    var path = new URL(to).pathname;
+    if (/\/main-v6\.html$/.test(path)) { toMain(to); }
+    else if (/\/building-v6\.html$/.test(path)) { toBuilding(); }
+    else { location.href = to; }
+  }
+  bld.addEventListener("load", function () { guard(bld); });
+  main.addEventListener("load", function () {
+    guard(main);
+    // 미션끼리는 main-v6 안에서 바뀐다 — 지금 탭이 바뀌면 주소도 따라 바꿔 새로고침해도 그 미션으로 연다
+    var d = main.contentDocument, last = "";
+    new MutationObserver(function () {
+      var on = d.querySelector(".sb-tab.is-on[data-mission]");
+      var m = on && on.getAttribute("data-mission");
+      if (!m || m === last || !main.classList.contains("is-on")) { return; }
+      last = m;
+      setUrl(["mission=" + encodeURIComponent(m)]);
+    }).observe(d.body, { childList: true, subtree: true, attributes: true, attributeFilter: ["class"] });
+  });
+  // 첫 화면은 곧바로 보인다 — 다른 하나는 뒤에서 미리 열려 기다린다
+  show(startMain ? "main" : "building");
+})();
+</script>
+</body>
+</html>
