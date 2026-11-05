@@ -1558,8 +1558,15 @@ body.ver-6 .ah-sort-btn { display: inline-flex; align-items: center; gap: var(--
 body.ver-6 .ah-sort-btn:hover { color: var(--text-primary); }
 body.ver-6 .ah-sort-btn:focus-visible { outline: var(--border-width-strong) solid var(--border-focus); outline-offset: 2px; border-radius: var(--radius-4); }
 
-/* [11/05 v6 한글판] Delta 접힘 문장 속 미션 이름은 회색 글(문형표 5 "A 회색" 확정) — 굵기는 문장 따라. v3-panel.js 가 .dl-m 으로 감싼다 */
-html:not([lang="en"]) body.ver-6 .delta3 .ai-line-2 .dl-m { color: color-mix(in srgb, var(--text-primary) 60%, transparent); }
+/* [11/05 v6 한글판] Delta 접힘 문장 속 미션 이름은 [이름] — 이름은 문장 그대로, 괄호만 회색(문형표 5 확정). v3-panel.js 가 .dl-m · .dl-br 로 감싼다 */
+html:not([lang="en"]) body.ver-6 .delta3 .ai-line-2 .dl-br { color: color-mix(in srgb, var(--text-primary) 55%, transparent); font-weight: var(--font-weight-regular); }
+/* 지점 — 경로 목록 번호 모양(W1). 숫자 바닥선 = 문장 바닥선, 설비와 사이 2px */
+html:not([lang="en"]) body.ver-6 .delta3 .ai-line-2 .dl-wp {
+  display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box;
+  width: 22px; height: 22px; padding-bottom: 0.5px; margin-right: 2px; border-radius: 50%;
+  background-color: rgb(10 15 24 / 45%); color: #C9D0DC;
+  font-size: 13px; line-height: 1; font-weight: 800; font-variant-numeric: tabular-nums; vertical-align: baseline;
+}
 
 /* [11/05 v6 한글판] Delta 접힘 2줄은 회색 고정 — 10/31 디자이너 시안(영문판 i18n-en.css 와 같은 값). 1줄 흰색 굵게, 2줄 한 단 옅은 회색 보통 굵기 */
 html:not([lang="en"]) body.ver-6[data-delta-copy="brief"] .delta3 .ai-line-2 .dl2 {

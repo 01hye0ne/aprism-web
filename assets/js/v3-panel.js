@@ -96,21 +96,31 @@
     if (brief) { lines(); }
   }
   // 두 줄을 줄마다 감싼다 — 1줄 굵게. 넘치면 넘친 낱말만 다음 줄로(자르지 않는다, v5.css).
-  // [11/05 v6 한글판] 문형에 미션 이름(say.names)이 있으면 그 이름만 회색 글(.dl-m)로 — 지시어 대신 이름을 쓰되 글줄과 구분(문형표 5).
+  // [11/05 v6 한글판] 문형에 미션 이름(say.names)이 있으면 [이름]으로 감싼다 — 이름은 문장 그대로, 괄호만 회색(.dl-br). 지시어 대신 이름을 쓰되 글줄과 구분(문형표 5).
+  //   지점(say.wp)은 그 줄 맨 앞에 경로 목록 번호 모양(.dl-wp)으로 — 설비와 사이 2px.
   //   한 문장 문형(주의만)도 이름을 칠하려고 감싼다. 이때는 1줄 굵게(.dl1)를 붙이지 않는다.
   function lines() {
     var p = win.querySelector(".delta3-body > .ai-line-2");
     if (!p) { return; }
     var s = said(), names = KO && s && s.names ? s.names : null;
     var raw = p.textContent, multi = raw.indexOf("\n") >= 0;
-    var paint = names && !p.querySelector(".dl-m") && names.some(function (n) { return raw.indexOf(n) >= 0; });
-    if (!multi && !paint) { return; }
+    var wp = KO && s && s.wp ? s.wp : null;
+    if (p.querySelector(".dl-m, .dl-wp")) { return; }
+    var paint = names && names.some(function (n) { return raw.indexOf(n) >= 0; });
+    if (!multi && !paint && !wp) { return; }
     var t = raw.split("\n");
     p.setAttribute("data-raw", t.join("\n"));
     p.textContent = "";
     t.forEach(function (x, i) {
       var e = document.createElement("span");
       e.className = "dl" + (multi ? " dl" + (i + 1) : "");
+      if (wp && wp.line === i) {
+        var w = document.createElement("span");
+        w.className = "dl-wp";
+        w.textContent = wp.n;
+        w.setAttribute("aria-label", wp.n + "번 지점");
+        e.appendChild(w);
+      }
       fill(e, x, names);
       p.appendChild(e);
     });
@@ -124,7 +134,12 @@
       if (hit.i > at) { e.appendChild(document.createTextNode(x.slice(at, hit.i))); }
       var m = document.createElement("span");
       m.className = "dl-m";
-      m.textContent = hit.n;
+      [["dl-br", "["], [null, hit.n], ["dl-br", "]"]].forEach(function (k) {
+        var c = document.createElement("span");
+        if (k[0]) { c.className = k[0]; }
+        c.textContent = k[1];
+        m.appendChild(c);
+      });
       e.appendChild(m);
       at = hit.i + hit.n.length;
     }

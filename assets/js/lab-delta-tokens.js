@@ -12,7 +12,7 @@
 
   var KEY = "aprism-lab-delta";
   var AXES = [
-    { k: "m", t: "미션", opts: [["0", "글자 그대로"], ["mn", "번호 + 이름"], ["mng", "번호 회색 + 이름"], ["mnb", "[번호] + 이름"], ["sq", "[ ] 대괄호"], ["sqg", "[ ] 괄호만 회색"], ["q", "따옴표"], ["h", "1줄 제목으로"], ["a", "A 회색"], ["ab", "A 회색 굵게"], ["b", "B 굵게"], ["c", "C 층 칩 + 굵게"], ["t", "6-1 토큰"], ["tn", "6-2 접힘 번호만"]] },
+    { k: "m", t: "미션", opts: [["0", "글자 그대로"], ["mn", "번호 + 이름"], ["mng", "번호 회색 + 이름"], ["mnb", "[번호] + 이름"], ["mnsq", "[번호 이름] 괄호 회색"], ["mnsq2", "[번호 이름] 괄호 · 번호 회색"], ["sq", "[ ] 대괄호"], ["sqg", "[ ] 괄호만 회색"], ["q", "따옴표"], ["h", "1줄 제목으로"], ["a", "A 회색"], ["ab", "A 회색 굵게"], ["b", "B 굵게"], ["c", "C 층 칩 + 굵게"], ["t", "6-1 토큰"], ["tn", "6-2 접힘 번호만"]] },
     { k: "mg", t: "미션 회색 밝기(지금 코드 60%)", opts: [["60", "60%"], ["70", "70%"], ["75", "75%"], ["80", "80%"], ["88", "88%"]] },
     { k: "g", t: "지점과 설비 사이", opts: [["6", "띄어쓰기(약 6px)"], ["4", "4px"], ["3", "3px"], ["2", "2px"]] },
     { k: "e", t: "설비 이름 글", opts: [["0", "그대로"], ["g", "회색"], ["b", "굵게"], ["gb", "회색 굵게"], ["w", "흰색 굵게"], ["r", "설비 그대로, 나머지 회색"], ["rw", "설비 흰색, 나머지 회색"]] }
@@ -34,6 +34,8 @@
     "body.lab-on .delta3 .ai-line-2 .dl-m.lab-h { color: var(--text-primary) !important; }",
     // 회색(A)이 아닌 안을 고르면 코드의 미션 회색을 끈다
     "body.lab-on.lab-mnone .delta3 .ai-line-2 .dl-m { color: inherit !important; }",
+    // 실험 안을 고르면 코드의 [ ] 괄호(.dl-br)는 숨기고 고른 모양만 보인다
+    "body.lab-on.lab-mpick .delta3 .ai-line-2 .dl-br { display: none; }",
     "body.lab-on:not(.lab-mnone) .delta3 .ai-line-2 .dl-m:not(.lab-h) { color: color-mix(in srgb, var(--text-primary) var(--lab-mg, 60%), transparent) !important; }",
     ".lab-m-b, body.lab-mb .delta3 .ai-line-2 .dl-m { font-weight: 800 !important; }",
     "body.lab-mb .delta3 .ai-line-2 .dl1 { font-weight: var(--font-weight-regular) !important; }",
@@ -101,6 +103,8 @@
       case "mn": return '<span data-lab>' + esc(m.no) + " " + name + "</span>";
       case "mng": return '<span data-lab><span class="lab-br">' + esc(m.no) + "</span> " + name + "</span>";
       case "mnb": return '<span data-lab><span class="lab-br">[' + esc(m.no) + "]</span> " + name + "</span>";
+      case "mnsq": return '<span data-lab><span class="lab-br">[</span>' + esc(m.no) + " " + name + '<span class="lab-br">]</span></span>';
+      case "mnsq2": return '<span data-lab><span class="lab-br">[</span><span class="lab-br">' + esc(m.no) + "</span> " + name + '<span class="lab-br">]</span></span>';
       case "sq": return '<span data-lab>[' + name + "]</span>";
       case "sqg": return '<span data-lab><span class="lab-br">[</span>' + name + '<span class="lab-br">]</span></span>';
       case "q": return '<span data-lab>‘' + name + "’</span>";
@@ -203,6 +207,7 @@
   function paint() {
     body.classList.add("lab-on");
     body.classList.toggle("lab-mnone", pick.m !== "a" && pick.m !== "ab");
+    body.classList.toggle("lab-mpick", pick.m !== "0");
     body.style.setProperty("--lab-mg", (pick.mg || "60") + "%");
     if (busy) { return; }
     busy = true;
