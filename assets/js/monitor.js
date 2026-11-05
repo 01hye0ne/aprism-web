@@ -496,9 +496,10 @@
 
   function items() {
     var base = (SETS[level] || SETS.critical)().filter(function (a) { return resolved.indexOf(a) < 0; });
-    // "오래된 순 · 위험 우선 정렬" — 위험이 먼저, 같은 단계 안에서는 오래된 것이 위다.
+    // 위험이 먼저, 같은 단계 안에서는 고른 시간 순서([오래된 순 | 최신 순], ah-sort.js — 기본 오래된 순)
+    var SORT = window.APRISM_AH_SORT;
     return extra.concat(base).sort(function (a, b) {
-      return (RANK[a.sev] - RANK[b.sev]) || (a.time < b.time ? -1 : a.time > b.time ? 1 : 0);
+      return (RANK[a.sev] - RANK[b.sev]) || (SORT ? SORT.time(a, b) : (a.time < b.time ? -1 : a.time > b.time ? 1 : 0));
     });
   }
 
@@ -611,6 +612,9 @@
    * 새 관제사가 목록을 한 번이라도 건드리면 평소 문구로 돌아간다 — 인사는 한 번이면 된다.
    */
   var handover = null;
+
+  // [11/05 논의] 거르기 줄 오른쪽 정렬 글을 [오래된 순 | 최신 순] 고르기로(ah-sort.js). 바꾸면 목록을 다시 그린다.
+  if (window.APRISM_AH_SORT) { window.APRISM_AH_SORT.mount(function () { render(); }); }
 
   document.addEventListener("aprism:shift", function (event) {
     handover = (event.detail && event.detail.name) || "";
