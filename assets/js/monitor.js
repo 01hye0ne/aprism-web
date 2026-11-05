@@ -329,11 +329,11 @@
     return slot ? slot.textContent.trim() : "관제사";
   }
   /*
-   * [11/05 한글판] 접힌 위젯에 지시어(이 미션 · 다음 미션 · 다른 미션 · 지금 미션)를 쓰지 않는다 — 미션 이름을 적는다(디자이너).
+   * [11/05 v6 한글판] 접힌 위젯에 지시어(이 미션 · 다음 미션 · 다른 미션 · 지금 미션)를 쓰지 않는다 — 미션 이름을 적는다(디자이너).
    *   근거 줄은 문형 대신 하는 일("위험 N건 원인 분석 중..." · "순회 경로 지켜보는 중...", v3-panel.js say()).
    *   영문판(html lang="en")은 이번 수정에서 바뀌지 않게 예전 문형 그대로 둔다.
    */
-  var KO = document.documentElement.lang !== "en";
+  var KO = document.documentElement.lang !== "en" && body.classList.contains("ver-6");   // v6 한글판만
   COPY.brief = function (j) {
     var copy = COPY.keyword(j);
     var all = j.all || [], mine = j.mine || all;

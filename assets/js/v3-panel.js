@@ -60,8 +60,8 @@
   var plusLabel = plus && plus.querySelector(".delta3-plus-label");
   var brief = body.getAttribute("data-delta-copy") === "brief";
   function said() { return brief ? window.APRISM_DELTA_SAY : null; }
-  // [11/05 한글판] 근거 줄은 문형의 범위(미션 지시어)가 아니라 하는 일(say())만 — 영문판은 예전 그대로
-  var KO = document.documentElement.lang !== "en";
+  // [11/05 v6 한글판] 근거 줄은 문형의 범위(미션 지시어)가 아니라 하는 일(say())만 — 영문판은 예전 그대로
+  var KO = document.documentElement.lang !== "en" && body.classList.contains("ver-6");   // v6 한글판만
   // [10/30 라이팅 시스템 6] 답 단추 오른쪽 대화 단추(말풍선 24) — 누르면 대화 창을 편다. 질문 없는 문형은 "Delta와 대화" 하나라 숨긴다.
   var talk = null;
   if (brief && plus) {
