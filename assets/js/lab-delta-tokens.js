@@ -12,7 +12,7 @@
 
   var KEY = "aprism-lab-delta";
   var AXES = [
-    { k: "m", t: "미션", opts: [["0", "글자 그대로"], ["a", "A 회색"], ["ab", "A 회색 굵게"], ["b", "B 굵게"], ["c", "C 층 칩 + 굵게"], ["t", "6-1 토큰"], ["tn", "6-2 접힘 번호만"]] },
+    { k: "m", t: "미션", opts: [["0", "글자 그대로"], ["q", "따옴표"], ["h", "1줄 제목으로"], ["a", "A 회색"], ["ab", "A 회색 굵게"], ["b", "B 굵게"], ["c", "C 층 칩 + 굵게"], ["t", "6-1 토큰"], ["tn", "6-2 접힘 번호만"]] },
     { k: "w", t: "지점", opts: [["0", "글자 그대로"], ["w1", "W1 경로 번호"], ["w2", "W2 핀 + 번호"], ["w3", "W3 핀 축소"], ["w4", "W4 지점 꼬리표"], ["wp", "핀 머리(단계 색)"]] },
     { k: "x", t: "접힘 2줄", opts: [["eq", "설비 이름"], ["ph", "현상"], ["eqph", "설비 + 현상"]] },
     { k: "l2", t: "2줄 기본 글색", opts: [["g", "회색 55%(시안, 영문판)"], ["w", "흰색(지금 한글판)"]] },
@@ -34,9 +34,12 @@
     // 2줄 기본 회색 — 10/31 디자이너 시안(영문판 i18n-en.css 와 같은 값)
     "body.lab-l2g .delta3 .ai-line-2 .dl2 { color: color-mix(in srgb, var(--text-primary) 55%, transparent); font-weight: var(--font-weight-regular); }",
     // 실제 코드의 미션 회색(v6.css .dl-m)도 같은 값으로 덮어 본다
-    "body.lab-on .delta3 .ai-line-2 .dl-m { color: color-mix(in srgb, var(--text-primary) var(--lab-mg, 60%), transparent); }",
-    ".lab-m-b { font-weight: 800; }",
-    "body.lab-mb .delta3 .ai-line-2 .dl1 { font-weight: var(--font-weight-regular); }",
+    "body.lab-on .delta3 .ai-line-2 .dl-m.lab-h { color: var(--text-primary) !important; }",
+    // 회색(A)이 아닌 안을 고르면 코드의 미션 회색을 끈다
+    "body.lab-on.lab-mnone .delta3 .ai-line-2 .dl-m { color: inherit !important; }",
+    "body.lab-on:not(.lab-mnone) .delta3 .ai-line-2 .dl-m:not(.lab-h) { color: color-mix(in srgb, var(--text-primary) var(--lab-mg, 60%), transparent) !important; }",
+    ".lab-m-b, body.lab-mb .delta3 .ai-line-2 .dl-m { font-weight: 800 !important; }",
+    "body.lab-mb .delta3 .ai-line-2 .dl1 { font-weight: var(--font-weight-regular) !important; }",
     ".lab-m-c, .lab-m-t { font-weight: 800; }",
     ".lab-chip { display: inline-flex; align-items: center; gap: 4px; padding: 0 6px; border-radius: 6px; background: rgb(44 52 67 / 85%); color: #F7F8FA; font-size: 14px; line-height: 22px; font-weight: 800; white-space: nowrap; vertical-align: 1px; }",
     ":root[data-theme='light'] .lab-chip { background: #E8EBF0; color: #16191D; }",
@@ -97,6 +100,7 @@
   function missionHTML(m, floor, collapsed) {
     var name = esc(m.name);
     switch (pick.m) {
+      case "q": return '<span data-lab>‘' + name + "’</span>";
       case "a": return '<span data-lab class="lab-m-a">' + name + "</span>";
       case "ab": return '<span data-lab class="lab-m-ab">' + name + "</span>";
       case "b": return '<span data-lab class="lab-m-b">' + name + "</span>";
@@ -176,6 +180,17 @@
     dl2.innerHTML = (w ? w + (pick.g === "6" ? " " : "") : "") + "<span data-lab><span" + eqCls + ">" + esc(tgt.trim()) + "</span>" + (pick.e === "r" || pick.e === "rw" ? "<span class=\"lab-rest-g\">부터 확인하세요.</span>" : "부터 확인하세요.") + "</span>";
   }
 
+  // [미션 1줄 제목] "{미션}에 위험 단계 알림이 있어요!" → 1줄 "{미션}", 2줄 "위험 단계 알림이 있어요. 먼저 확인하세요."
+  function headline(line) {
+    var d1 = line.querySelector(".dl1"), d2 = line.querySelector(".dl2");
+    if (!d1 || d1.hasAttribute("data-lab-line")) { return; }
+    var m = /^(.+?)에 (위험|주의) 단계 알림이 있어요!$/.exec(d1.textContent.trim());
+    if (!m) { return; }
+    d1.setAttribute("data-lab-line", d1.textContent);
+    // .dl-m 을 남겨 두어야 v3-panel.js 가 줄을 다시 감싸지 않는다 — 색은 1줄 그대로(흰색 굵게)
+    d1.innerHTML = '<span class="dl-m lab-h">' + esc(m[1]) + "</span>";
+    if (d2) { d2.setAttribute("data-lab-line", d2.textContent); d2.textContent = m[2] + " 단계 알림이 있어요. 먼저 확인하세요."; }
+  }
   // 고른 값을 바꾸면 원래 글로 되돌린 뒤 다시 입힌다
   function restore() {
     Array.prototype.forEach.call(document.querySelectorAll("[data-lab-line]"), function (e) { e.textContent = e.getAttribute("data-lab-line"); e.removeAttribute("data-lab-line"); });
@@ -185,12 +200,14 @@
   function paint() {
     body.classList.add("lab-on");
     body.classList.toggle("lab-l2g", pick.l2 !== "w");
+    body.classList.toggle("lab-mnone", pick.m !== "a" && pick.m !== "ab");
     body.style.setProperty("--lab-mg", (pick.mg || "60") + "%");
     if (busy) { return; }
     busy = true;
     body.classList.toggle("lab-mb", pick.m === "b");
     var line = document.querySelector(".delta3 .ai-line-2");
-    if (line) { line2(); walk(line, !document.querySelector(".delta3.is-open")); }
+    if (line && pick.m === "h") { headline(line); }
+    if (line) { line2(); if (pick.m !== "h") { walk(line, !document.querySelector(".delta3.is-open")); } }
     Array.prototype.forEach.call(document.querySelectorAll(".delta3 .dc-msg"), function (m) { walk(m, false); });
     busy = false;
   }
