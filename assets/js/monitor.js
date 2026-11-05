@@ -533,7 +533,8 @@
     title.appendChild(icon(a.sev === "critical" ? "error" : "warning"));
     var A6 = body.classList.contains("ver-6") && window.APRISM_ALERT6, r6 = A6 && A6.of(a.title);
     title.appendChild(el("span", null, A6 ? A6.title(a.title) : a.title));   // [11/02 v6] 제목 = 감지 · 측정 항목 + 값(alert-text-v6.js)
-    if (r6 && r6.ch) { where.appendChild(el("span", "ah-ch", "· " + r6.ch)); }   // 측정 채널은 어디서 줄 끝으로
+    // [11/05 논의] 측정 채널(CH1)은 목록 줄에서 뺐다 — 6종 중 부분방전만 있어 이 줄만 낯선 꼬리가 붙고, 목록에선 뜻이 안 읽힌다.
+    //   채널은 상세(쪽지 요약 "CH1 … CH2 · CH3 은 정상", 안전진단 메모)가 말한다. 예전: where 끝에 "· " + r6.ch
 
     if (scoped) {
       // v2.2 — 무슨 일(위험도 + 알림명)이 첫 줄, 어디서가 둘째 줄(10/19 디자이너). 타임라인 · 오늘 확인 완료처럼 이름이 먼저다.
