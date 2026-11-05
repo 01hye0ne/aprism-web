@@ -12,7 +12,7 @@
 
   var KEY = "aprism-lab-delta";
   var AXES = [
-    { k: "m", t: "미션", opts: [["0", "글자 그대로"], ["q", "따옴표"], ["h", "1줄 제목으로"], ["a", "A 회색"], ["ab", "A 회색 굵게"], ["b", "B 굵게"], ["c", "C 층 칩 + 굵게"], ["t", "6-1 토큰"], ["tn", "6-2 접힘 번호만"]] },
+    { k: "m", t: "미션", opts: [["0", "글자 그대로"], ["sq", "[ ] 대괄호"], ["sqg", "[ ] 괄호만 회색"], ["q", "따옴표"], ["h", "1줄 제목으로"], ["a", "A 회색"], ["ab", "A 회색 굵게"], ["b", "B 굵게"], ["c", "C 층 칩 + 굵게"], ["t", "6-1 토큰"], ["tn", "6-2 접힘 번호만"]] },
     { k: "mg", t: "미션 회색 밝기(지금 코드 60%)", opts: [["60", "60%"], ["70", "70%"], ["75", "75%"], ["80", "80%"], ["88", "88%"]] },
     { k: "g", t: "지점과 설비 사이", opts: [["6", "띄어쓰기(약 6px)"], ["4", "4px"], ["3", "3px"], ["2", "2px"]] },
     { k: "e", t: "설비 이름 글", opts: [["0", "그대로"], ["g", "회색"], ["b", "굵게"], ["gb", "회색 굵게"], ["w", "흰색 굵게"], ["r", "설비 그대로, 나머지 회색"], ["rw", "설비 흰색, 나머지 회색"]] }
@@ -44,6 +44,7 @@
     ":root[data-theme='light'] .lab-chip .no { color: rgb(22 25 29 / 50%); }",
     ".lab-floor { display: inline-grid; place-items: center; height: 20px; padding: 0 5px; margin-right: 4px; border-radius: 4px; background: rgb(58 66 82 / 90%); color: #C9D0DC; font-size: 13px; font-weight: 600; vertical-align: 1px; }",
     ":root[data-theme='light'] .lab-floor { background: #E8EBF0; color: #5B6470; }",
+    ".lab-br { color: color-mix(in srgb, var(--text-primary) 55%, transparent); font-weight: var(--font-weight-regular); }",
     ".lab-eq-g { color: color-mix(in srgb, var(--text-primary) 60%, transparent); }",
     ".lab-eq-b { font-weight: 800; }",
     ".lab-eq-gb { color: color-mix(in srgb, var(--text-primary) 60%, transparent); font-weight: 800; }",
@@ -97,6 +98,8 @@
   function missionHTML(m, floor, collapsed) {
     var name = esc(m.name);
     switch (pick.m) {
+      case "sq": return '<span data-lab>[' + name + "]</span>";
+      case "sqg": return '<span data-lab><span class="lab-br">[</span>' + name + '<span class="lab-br">]</span></span>';
       case "q": return '<span data-lab>‘' + name + "’</span>";
       case "a": return '<span data-lab class="lab-m-a">' + name + "</span>";
       case "ab": return '<span data-lab class="lab-m-ab">' + name + "</span>";
