@@ -1490,3 +1490,15 @@ body.ver-6 .dc6-jump[hidden] { display: none; }
 @media (prefers-reduced-motion: reduce) {
   body.ver-6 .dc-msg.dc6.is-old, body.ver-6 .dc6-toggle-r .i { transition: none; }
 }
+
+
+/*
+ * [11/05 논의] 라이트 모드 관제 — 할 일은 흰색, 끝난 것은 회색(한글판 · 영문판 공통)
+ *   최신 알림과 오늘 확인 완료(Confirmed today)가 같은 회색이라 구분되지 않았다.
+ *   최신 알림 줄 · 우측 앞으로 갈 지점 카드를 흰색으로. 오늘 확인 완료 · 지나온 지점은 회색 그대로, 지금 지점은 원래 진한 카드.
+ *   줄 없는 빈 바탕은 상자 회색 그대로, 호버 · 고른 줄은 원래 상태색. 관제 · 전체 미션(통합 순회 현황) 둘 다.
+ */
+:root[data-theme="light"] body.ver-6 .context-panel .ah-sec:not(.done-sec) .ah-item { background-color: var(--color-gray-0); }
+:root[data-theme="light"] body.ver-6 .context-panel .ah-sec:not(.done-sec) .ah-item:hover { background-color: var(--state-hover); }
+:root[data-theme="light"] body.ver-6 .context-panel .ah-sec:not(.done-sec) .ah-item[aria-pressed="true"] { background-color: var(--bg-selected); }
+:root[data-theme="light"] body.ver-6 .right-panel .timeline .timeline-item.is-pending:not(.is-running) .step-card { background-color: var(--color-gray-0); }
