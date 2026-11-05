@@ -431,12 +431,12 @@
       '</div>';
   }
 
-  // 위치 조각 — v6 는 관제 최신 알림처럼 층 꼬리표 + WP + 설비 이름, 측정 채널은 끝에 흐리게.
+  // 위치 조각 — v6 는 관제 최신 알림처럼 층 꼬리표 + WP + 설비 이름.
+  //   [11/05 논의] 측정 채널(CH1)은 목록 줄에서 뺐다(관제 최신 알림과 같게) — 채널은 상세가 말한다. 예전: 끝에 '· ' + chOf(a)
   function placeHtml(a, placeCls) {
     return (V6 && a.floor ? '<span class="floor-tag">' + esc(a.floor) + '</span>' : "") +
       '<span class="ac-wp ac-mono-label">' + esc(a.wp) + '</span>' +
-      '<span class="' + placeCls + ' t-body-4">' + esc(a.place) + '</span>' +
-      (V6 && chOf(a) ? '<span class="ac-ch t-body-4">· ' + esc(chOf(a)) + '</span>' : "");
+      '<span class="' + placeCls + ' t-body-4">' + esc(a.place) + '</span>';
   }
 
   /*
