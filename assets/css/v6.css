@@ -1608,14 +1608,7 @@ body.ver-6 [data-md-again] { display: none !important; }   /* 미션 완료 — 
 /* [11/05] 번호 핀 — 측정을 마친 정상 지점은 초록으로 뿅 떴다 사라진다(map-v6.js rrOk) */
 body.ver-6 .rr-pin.is-ok { animation: rr-ok-pop 1.4s ease-out forwards; }
 @keyframes rr-ok-pop { 0% { opacity: 0; transform: scale(.6); } 15% { opacity: 1; transform: scale(1.15); } 30% { transform: scale(1); } 70% { opacity: 1; } 100% { opacity: 0; } }
-/* [11/05] 측정 중 핀 — 머리 둘레 고리가 1.8초에 한 바퀴 차오른다(로봇 아래 회전 호와 같은 박자). 이동 중 다음 지점은 흰 판 + 파란 테 */
-@property --rr-p { syntax: "<percentage>"; inherits: false; initial-value: 0%; }
-body.ver-6 .rr-pin-ring { position: absolute; inset: calc(-6px * var(--pz, 1)); border-radius: 50%; pointer-events: none;
-  background: conic-gradient(var(--pin) var(--rr-p), rgb(255 255 255 / 22%) 0);
-  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2.5px)); mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2.5px));
-  animation: rr-measure 1.8s linear infinite; }
-@keyframes rr-measure { to { --rr-p: 100%; } }
-@media (prefers-reduced-motion: reduce) { body.ver-6 .rr-pin-ring { animation: none; --rr-p: 100%; } body.ver-6 .rr-pin.is-ok { animation-duration: .01s; } }
+@media (prefers-reduced-motion: reduce) { body.ver-6 .rr-pin.is-ok { animation-duration: .01s; } }
 /* [11/05] 통신 끊김 — 카드 왼쪽 선을 빼고, 우측 패널 로봇 걸음을 멈추고, 진행 막대는 직전 값 그대로 회색 */
 body.ver-6:has(.map-bot[data-rr="lost"]) .robot-strip .robot-card[aria-pressed="true"] .robot-thumb * { animation-play-state: paused !important; }
 body.ver-6:has(.map-bot[data-rr="lost"]) .progress-bar .progress-fill { background-color: var(--color-gray-450, #9ea8bb); }

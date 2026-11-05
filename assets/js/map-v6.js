@@ -3864,7 +3864,7 @@
         var solid = past || cau || dan || next;
         var el = document.createElement("div");
         var ok = past && !was && rrOk[w.id] > now;   // 측정 끝, 정상 — 초록으로 잠깐
-        var measuring = next && rrM(onLane) === "inspect";   // [11/05] 측정 중은 채운 파랑 + 둘레 고리가 차오름, 이동 중 다음 지점은 빈 파랑(흰 판)
+        var measuring = next && rrM(onLane) === "inspect";   // [11/05] 측정 중은 채운 파랑, 이동 중 다음 지점은 빈 파랑(흰 판)
         var quiet = !cau && !dan && !next && !was && !ok && t !== "skipped" && !document.body.classList.contains("sian");
         el.className = "rr-pin" + (w.buried ? " is-buried" : "") + (past ? " is-past" : "") + (next ? " is-next" : "") + (quiet ? " is-quiet" : "") + (cau || dan ? " is-alert" : "") + (w.id === rrHotId ? " is-hot" : "") + (ok ? " is-ok" : "") + (measuring ? " is-measuring" : "");   // [10/28] 알림 지점 — 번호를 비켜 바닥 세모가 보이게(route-rules.css)
         // [11/04 · 11/05] is-quiet — 관제 기본은 문제 지점(위험 · 주의 · 건너뜀)과 지금 지점만 번호. 지나온 · 앞으로 갈 지점은 감추고(바닥 점은 남는다) 우측 레일 줄 · 지도 점에 손이 닿으면(is-hot) 보인다(디자이너). 미션 설정 · 사전 점검(.sian)은 점검 순서라 그대로 다 보인다
@@ -3875,7 +3875,7 @@
         // [10/22] 구분 또렷하게 — 다음: 길색 채움 + 흰 숫자 + 흰 테, 지난 정상: 어두운 판 + 길색 숫자(옅게), 예정: 어두운 판 + 밝은 회색 숫자, 주의 · 위험: 채움
         if (ok) { head.style.background = "#34C759"; head.style.borderColor = C.bg; head.style.color = "#0A0F18"; el.style.animationDelay = -Math.round(now - (rrOk[w.id] - RR_OK_MS)) + "ms"; }   // 이동 중엔 핀이 자주 새로 깔린다 — 처음부터 다시 돌지 않고 이어서
         else if (was) { head.style.background = col; head.style.borderColor = C.bg; head.style.color = "#0A0F18"; }
-        else if (measuring) { head.style.background = col; head.style.borderColor = "#FFFFFF"; head.style.color = "#FFFFFF"; var ring = document.createElement("span"); ring.className = "rr-pin-ring"; head.appendChild(ring); }
+        else if (measuring) { head.style.background = col; head.style.borderColor = "#FFFFFF"; head.style.color = "#FFFFFF"; }
         else if (next) { head.style.background = "#FFFFFF"; head.style.borderColor = col; head.style.color = col; }
         else if (past) { head.style.background = C.bg; head.style.borderColor = col; head.style.color = col; }
         else if (cau || dan) { head.style.background = col; head.style.borderColor = C.bg; head.style.color = cau ? "#1A1300" : "#FFFFFF"; }
