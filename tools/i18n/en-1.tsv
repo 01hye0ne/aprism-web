@@ -368,7 +368,7 @@ WP-04 냉각수 배관 이음부에서 누출 패턴이 감지되었습니다.	A
 감지 영상 보기	View detection footage
 재측정 예약	Schedule re-measure
 APRO 4F · WP-06 수배전반	APRO 4F · WP-06 Switchgear
-부분방전 · 이상 점수 9.41	Partial discharge · anomaly score 9.41
+부분방전 · 이상 점수 9.41	Partial discharge · score 9.41
 조치 필요 · 추이 관찰 중	Action required · watching trend
 WP-06 수배전반에서 부분방전 이상 점수가 올랐습니다.	The partial discharge anomaly score rose at WP-06 switchgear.
 이상 점수 9.41 로 임계 9.23 을 넘었습니다. PRPD 패턴이 코로나 방전 유형과 일치해 다음 순회에서 추이를 보겠습니다.	Anomaly score 9.41 exceeded the 9.23 threshold. The PRPD pattern matches corona discharge; we'll watch the trend on the next patrol.
