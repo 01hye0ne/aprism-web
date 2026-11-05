@@ -2797,7 +2797,7 @@
     var dL = dr ? dr.left - box.left : 0, dR = dr ? dr.right - box.left : 0, dT = dr ? dr.top - box.top : 0, dB = dr ? dr.bottom - box.top : 0;
     var below = y - tall < 8 && y + tall <= H - 8;
     var cx = Math.min(right - half, Math.max(half + 8, x));
-    var tail = Math.max(-(half - 16), Math.min(half - 16, x - cx));
+    var tail = Math.max(-(half - 24), Math.min(half - 24, x - cx));   // 꼬리 폭 24 가 둥근 모서리에 걸리지 않게
     /*
      * 세로도 칸 안쪽 8 로 양끝을 묶는다. 웨이포인트가 칸 밖으로 벗어나 있으면(점이 화면 밖이거나
      * 카메라가 아직 못 따라왔을 때) y 가 음수이거나 H 를 넘는데, 한쪽만 막아 두어
@@ -2826,7 +2826,7 @@
       var want = alertSide === "r" ? x + 16 : x - 16;
       var sx = alertSide === "r" ? Math.max(edge, Math.min(want, right - w)) : Math.min(right, Math.max(want, edge + w));
       var sy = Math.max(h / 2 + 8, Math.min(floorY - h / 2, y));
-      var ty = Math.max(-(h / 2 - 16), Math.min(h / 2 - 16, y - sy));
+      var ty = Math.max(-(h / 2 - 24), Math.min(h / 2 - 24, y - sy));
       // 점이 화면 밖이거나 쪽지가 밀려 꼬리가 닿지 않으면 꼬리를 숨긴다 — 빈 곳을 가리키는 것보다 낫다
       alertBox.classList.toggle("is-no-tail", x < 0 || x > W || y < 0 || y > H || Math.abs(sx - want) > 1 || Math.abs(y - sy - ty) > 1);
       alertBox.style.setProperty("--x", snapPx(sx));
