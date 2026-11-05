@@ -2058,6 +2058,7 @@
         tone: item.getAttribute("data-wp-alert") ||
           (kind === "completed" ? (item.getAttribute("data-wp-result") || "safe") : kind),
         name: title ? title.textContent : "",
+        was: item.hasAttribute("data-wp-cleared"),   // [11/05] 해결한 알림이 있던 지점 — 번호를 회색으로 남긴다(rrPins)
         // 측정 요약은 목록에 그리지 않는다. 값만 속성에 있고, 보여 주는 곳은 지도 쪽지다.
         read: item.getAttribute("data-wp-read") || "",
         // 시각 · 소요 — v2.2 타임라인은 지난 칸의 시각을 감추므로 쪽지가 말한다(10/19).
@@ -2162,6 +2163,7 @@
       var buried = !tri && rrHidden(spot, true);   // [10/22] 설비에 가려진 지점 — 고리는 숨기고 핀만 높이 세운다
       wpSpots.push({ id: info.id, spot: spot, info: info, floor: fl, no: i + 1, occ: occ, off: homing, buried: buried });
       if (homing || buried) { return; }
+      if (tri && rrM(onLane) === "alert" && info.id === rrAlertId) { return; }   // [11/05] 위험 감지 중 그 지점은 세모 대신 바닥 빨간 고리(alertRing)
       if (RR.pins !== "P0" && /upcoming|current|next|active|running/.test(info.tone)) { return; }   // [10/22 실험] 바닥 번호가 지점 고리를 대신한다
       var key = fl + "|" + info.tone + (occ ? "|o" : "");
       (bucket[key] = bucket[key] || []).push(spot);
@@ -2470,41 +2472,49 @@
    *   그림은 시안의 05 기립완료: 빗금 원판 + 겹친 원 넷(보조선) + 옅은 3방위 호(30%) + 갈 방향(앞) 호만 그린 점멸(2.4초 · 35↔100%).
    *   상태 — 걷기(이동 · 위험 감지 · 자동복귀)는 앞 호 점멸, 서기(측정 · 일시정지)는 앞 호를 켠 채 멈춤, 완료는 01 대기(링 12%),
    *   긴급정지 · 끊김은 끈다 — 초록 빛이 "괜찮다"로 읽히면 안 된다. 휠 로봇(Robot 05)은 시안 밖이라 뺀다.
+   * [11/05 디자이너] 빗금 원판 · 테 · 겹친 원 넷 · 앞 부채꼴 빛을 걷고 호만 남긴다. 호는 흰색으로 그려 상태색을 입힌다(HALO_TINT) —
+   *   위험 감지 빨강, 자동복귀 회색. 지점 측정은 파란 눈금(.rr-ring, v6.css 가 숨김) 대신 앞 호가 시계방향으로 돈다.
    */
   var HALO_R = 0.77, HALO_G = "#3BE07A", HALO_GX = 0x3BE07A;
+  var HALO_TINT = { alert: 0xff383c, estop: 0xff383c, "return": 0x9ea8bb, pause: 0xffb020 };   // [11/05] 긴급정지도 빨강, 일시정지 노랑(주의 세모 #ffcc00 보다 주황 쪽)
+  var HALO_PAUSE = 0xffb020;   // 그 밖은 초록(HALO_GX). 빨강 = danger/500, 회색 = 복귀 회색(RR_GRAY)
+  var HALO_SPIN = 1800;   // 측정 중 앞 호 한 바퀴(ms)
   var halo = null;
   function haloArt(light) {
     // 시안 SVG 를 캔버스에 그대로 옮긴다. 한 칸 = 시안 1단위 × k. 둘레 여유는 겹친 원(1.03R)과 빛 번짐 몫.
     var R = 120, half = R * 1.22, k = 2, n = Math.round(half * 2 * k);
     function pad() { var c = document.createElement("canvas"); c.width = c.height = n; var g = c.getContext("2d"); g.setTransform(k, 0, 0, k, half * k, half * k); return { c: c, g: g }; }
-    var line = light ? "rgba(70,80,96,.45)" : "#3A4652", hatch = light ? "rgba(70,80,96,.28)" : "#2E3842";
     function arcPath(g, a, halfDeg, r) { g.beginPath(); g.arc(0, 0, r, (a - halfDeg) * Math.PI / 180, (a + halfDeg) * Math.PI / 180); }
 
     var base = pad(), g = base.g;
-    g.save(); g.beginPath(); g.arc(0, 0, R, 0, Math.PI * 2); g.clip();   // 빗금 원판(시안 패턴 hD — 8단위 · 45도)
-    g.strokeStyle = hatch; g.lineWidth = 2;
-    for (var x = -R * 2; x <= R * 2; x += 8 * Math.SQRT2) { g.beginPath(); g.moveTo(x - R, -R); g.lineTo(x + R, R); g.stroke(); }
-    g.restore();
-    g.strokeStyle = line; g.lineWidth = 1.5;
-    g.beginPath(); g.arc(0, 0, R, 0, Math.PI * 2); g.stroke();
-    g.globalAlpha = 0.5;   // 겹친 원 넷 — 시안은 바닥색으로 칠해 빗금을 덮는다. 바닥이 투명하니 선만 남긴다
-    [-90, 0, 90, 180].forEach(function (a) { var t = a * Math.PI / 180; g.beginPath(); g.arc(Math.cos(t) * R * 0.53, Math.sin(t) * R * 0.53, R * 0.5, 0, Math.PI * 2); g.stroke(); });
-    g.globalAlpha = 0.3; g.strokeStyle = HALO_G; g.lineWidth = 12; g.lineCap = "round";   // 옅은 3방위 호(좌 · 우 · 뒤)
+    // [11/05] 빗금 원판 · 테 · 겹친 원 넷은 걷었다 — 호만 남긴다. 흰색으로 그려 재질색(상태색)을 입힌다
+    g.globalAlpha = 0.3; g.strokeStyle = "#fff"; g.lineWidth = 12; g.lineCap = "round";   // 옅은 3방위 호(좌 · 우 · 뒤)
     [-90, 90, 180].forEach(function (a) { arcPath(g, a, 32, R - 10); g.stroke(); });
 
     var ring = pad(); g = ring.g;   // 01 대기 — 어두운 트랙 위에 링 12%
     g.lineWidth = 12; g.strokeStyle = light ? "rgba(23,128,74,.25)" : "#1F3328"; g.beginPath(); g.arc(0, 0, R, 0, Math.PI * 2); g.stroke();
     g.globalAlpha = 0.12; g.strokeStyle = HALO_G; g.beginPath(); g.arc(0, 0, R, 0, Math.PI * 2); g.stroke();
 
-    var front = pad(); g = front.g;   // 갈 방향(앞 = +x) — 부채꼴 빛 + 호
-    // 빛이 퍼지는 부채꼴(시안 라이팅 A 주변감지의 wA — 가운데 0 → 링 55%). 링 밖으로는 시야 빔(초록)이 이어받는다.
-    var wash = g.createRadialGradient(0, 0, R * 0.15, 0, 0, R);
-    wash.addColorStop(0, "rgba(59,224,122,0)"); wash.addColorStop(1, "rgba(59,224,122,.55)");
-    g.fillStyle = wash; g.beginPath(); g.moveTo(0, 0); g.arc(0, 0, R, -44 * Math.PI / 180, 44 * Math.PI / 180); g.closePath(); g.fill();
-    g.strokeStyle = HALO_G; g.lineWidth = 14; g.lineCap = "round"; g.shadowColor = HALO_G; g.shadowBlur = 12 * k;   // 호 — 굵기 14 · 반각 44도 · 번짐 12(시안 8에서 한 단 키워 앞을 강조)
+    var front = pad(); g = front.g;   // 갈 방향(앞 = +x) — 호만([11/05] 부채꼴 빛은 걷었다)
+    g.strokeStyle = "#fff"; g.lineWidth = 14; g.lineCap = "round"; g.shadowColor = "#fff"; g.shadowBlur = 12 * k;   // 호 — 굵기 14 · 반각 44도 · 번짐 12(시안 8에서 한 단 키워 앞을 강조)
     arcPath(g, 0, 44, R - 10); g.stroke();
 
-    return { base: base.c, ring: ring.c, front: front.c, size: half / R };
+    // [11/05 디자이너] 평소(이동 · 위험 감지 · 자동복귀 · 긴급정지) — 원 두 줄. 안쪽 굵은 빛 고리 + 바깥 가는 고리. 호(base · front)는 측정 중에만
+    var duo = pad(); g = duo.g;
+    g.strokeStyle = "#fff";
+    g.globalAlpha = 0.45; g.lineWidth = 3; g.beginPath(); g.arc(0, 0, R, 0, Math.PI * 2); g.stroke();   // 바깥 가는 고리
+    g.globalAlpha = 1; g.lineWidth = 10; g.shadowColor = "#fff"; g.shadowBlur = 10 * k;   // 안쪽 굵은 고리 — 빛 번짐
+    g.beginPath(); g.arc(0, 0, R * 0.72, 0, Math.PI * 2); g.stroke();
+
+    // [11/05 디자이너] 일시정지 — 두 줄을 앞뒤로 끊는다(옆 두 토막). 멈춤 배지(▮▮)는 로봇 위 .rr-pause-go(v6.css)
+    var brk = pad(); g = brk.g;
+    g.strokeStyle = "#fff"; g.lineCap = "round";
+    [90, -90].forEach(function (a) {
+      g.globalAlpha = 0.45; g.lineWidth = 3; g.shadowBlur = 0; arcPath(g, a, 58, R); g.stroke();
+      g.globalAlpha = 1; g.lineWidth = 10; g.shadowColor = "#fff"; g.shadowBlur = 10 * k; arcPath(g, a, 58, R * 0.72); g.stroke();
+    });
+
+    return { base: base.c, ring: ring.c, front: front.c, duo: duo.c, brk: brk.c, size: half / R };
   }
   function haloLayer(cv, order) {
     var tex = new THREE.CanvasTexture(cv); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 4;
@@ -2520,21 +2530,27 @@
     if (!halo || halo.light !== light) {
       if (halo) { scene.remove(halo.g); halo.g.traverse(function (o) { if (o.material) { o.material.map.dispose(); o.material.dispose(); o.geometry.dispose(); } }); }
       var art = haloArt(light);
-      halo = { light: light, size: art.size, g: new THREE.Group(), base: haloLayer(art.base, 1), ring: haloLayer(art.ring, 1), front: haloLayer(art.front, 2) };
-      halo.g.add(halo.base, halo.ring, halo.front);
+      halo = { light: light, size: art.size, g: new THREE.Group(), base: haloLayer(art.base, 1), ring: haloLayer(art.ring, 1), front: haloLayer(art.front, 2), duo: haloLayer(art.duo, 2), brk: haloLayer(art.brk, 2) };
+      halo.g.add(halo.base, halo.ring, halo.front, halo.duo, halo.brk);
       halo.g.visible = false;
       scene.add(halo.g);
     }
     var st = (botBox && botBox.getAttribute("data-rr")) || "run";
     var show = !!(onLane && botBox && !botBox.hidden && botBox.style.visibility !== "hidden" && !botBox.hasAttribute("data-rr-docked"))
-      && robotKind(onLane.id) === "spot" && st !== "estop" && st !== "lost";
+      && robotKind(onLane.id) === "spot" && st !== "lost";   // [11/05] 긴급정지는 빨간 두 줄, 일시정지는 노란 끊긴 두 줄
     halo.g.visible = show;
     if (!show) { return; }
-    var wait = st === "done";
-    halo.base.visible = halo.front.visible = !wait;
+    var wait = st === "done", scan = st === "inspect", hold = st === "pause";
+    halo.base.visible = halo.front.visible = scan;
+    halo.duo.visible = !wait && !scan && !hold;
+    halo.brk.visible = hold;
     halo.ring.visible = wait;
-    var walk = DOG_MOTION[st] === "walk";
-    halo.front.material.opacity = walk ? 0.35 + 0.65 * (0.5 - 0.5 * Math.cos(performance.now() / 2400 * Math.PI * 2)) : 1;
+    var walk = DOG_MOTION[st] === "walk", now = performance.now();
+    var tint = HALO_TINT[st] || HALO_GX;
+    halo.base.material.color.setHex(tint); halo.front.material.color.setHex(tint); halo.duo.material.color.setHex(tint); halo.brk.material.color.setHex(tint);
+    halo.duo.material.opacity = walk ? 0.55 + 0.45 * (0.5 - 0.5 * Math.cos(now / 2400 * Math.PI * 2)) : 1;   // 걷는 동안 두 줄이 천천히 숨 쉰다
+    // 측정 중 — 앞 호가 시계방향으로 돈다(위에서 볼 때 시계방향 = y 축 음의 회전). 다른 상태는 앞을 본다
+    halo.front.rotation.y = st === "inspect" && !rrReduce ? -((now % HALO_SPIN) / HALO_SPIN) * Math.PI * 2 : 0;
     var sz = DOG_PX * baseSize / (view.clientHeight || 1);   // rrDog 와 같은 배율
     halo.g.position.set(onLane.here.x, onLane.here.y + span * 0.0006, onLane.here.z);
     halo.g.scale.setScalar(sz * HALO_R * halo.size * 2);
@@ -2544,7 +2560,7 @@
 
   function rrDog() {
     if (!THREE || !renderer || !camera || !window.APRISM_SPOT) { return; }
-    var show = !!(onLane && botBox && !botBox.hidden && botBox.style.visibility !== "hidden" && !botBox.hasAttribute("data-rr-docked"));
+    var show = !!(onLane && botBox && !botBox.hidden && botBox.style.visibility !== "hidden");   // [11/05] 도커 안에서도 3D 로봇은 도커 위에 선다
     if (!show) { if (dog3) { dog3.turn.visible = false; } return; }
     if (!dog3) {
       var sc = new THREE.Scene();
@@ -2570,10 +2586,22 @@
     var sz = DOG_PX * baseSize / (view.clientHeight || 1);   // 배율 1 에서 화면 약 46px — 월드 크기로 붙박아 확대하면 커진다
     g.scale.setScalar(sz);
     var st = (botBox && botBox.getAttribute("data-rr")) || "run";
-    dog3.motion = DOG_MOTION[st] || "idle";
+    // [11/05] 통신 끊김은 자세를 바꾸지 않는다 — 끊기기 직전 자세에서 멈춘 채 옅어지기만 한다(dogGhost)
+    dog3.freeze = st === "lost";
+    if (!dog3.freeze) { dog3.motion = DOG_MOTION[st] || "idle"; }
     var ac = renderer.autoClear;
     renderer.autoClear = false;
     renderer.clearDepth();
+    // [11/05] 통신 끊김 — 마지막으로 받은 자리라 본체를 옅게(DOG_GHOST). 색은 그대로 둔다.
+    //   깊이만 먼저 쓰고(colorWrite 끔) 앞면만 옅게 칠한다 — 그냥 반투명이면 다리 · 몸 안쪽이 비쳐 겹쳐 보인다.
+    var ghost = st === "lost";
+    dogGhost(dog3.cur.group, ghost);
+    if (ghost) {
+      if (!dog3.depth) { dog3.depth = new THREE.MeshBasicMaterial({ colorWrite: false }); }
+      dog3.scene.overrideMaterial = dog3.depth;
+      renderer.render(dog3.scene, camera);
+      dog3.scene.overrideMaterial = null;
+    }
     renderer.render(dog3.scene, camera);
     renderer.autoClear = ac;
     // 걸음 · 앉기를 돌린다 — 지도는 필요할 때만 다시 그리므로, 로봇이 보이는 동안 따로 박자를 낸다
@@ -2583,10 +2611,25 @@
         if (!dog3.turn.visible || document.hidden) { dog3.last = 0; return; }
         var dt = dog3.last ? Math.min(0.1, (t - dog3.last) / 1000) : 0;
         dog3.last = t;
-        dog3.cur.update(dt, dog3.motion);
+        if (!dog3.freeze) { dog3.cur.update(dt, dog3.motion); }
         frameTick(t);
       });
     }
+  }
+
+  var DOG_GHOST = 0.4;
+  function dogGhost(root, on) {
+    if (root.userData.ghost === on) { return; }
+    root.userData.ghost = on;
+    root.traverse(function (o) {
+      if (!o.material) { return; }
+      (Array.isArray(o.material) ? o.material : [o.material]).forEach(function (m) {
+        if (!m.userData.solid) { m.userData.solid = { t: m.transparent, o: m.opacity }; }
+        m.transparent = on || m.userData.solid.t;
+        m.opacity = m.userData.solid.o * (on ? DOG_GHOST : 1);
+        m.needsUpdate = true;
+      });
+    });
   }
 
   function placeBot() {
@@ -3508,10 +3551,14 @@
       ln.fan.add(ln.fanEdge);
     }
     // [10/29] Spot 은 시야 빔도 바닥 투사(라이팅 A)의 초록 — 파랑 빔과 초록 호가 앞쪽에서 겹쳤다(디자이너). 앞 호에서 빔으로 빛이 퍼져 나간다.
-    var fanHex = robotKind(ln.id) === "spot" ? HALO_GX : (m === "pause" ? RR_GRAY : m === "return" ? rrNeutral() : blue);
+    var fanHex = robotKind(ln.id) === "spot" ? (m === "alert" ? 0xff383c : m === "pause" ? HALO_PAUSE : m === "return" ? HALO_TINT["return"] : HALO_GX) : (m === "pause" ? RR_GRAY : m === "return" ? rrNeutral() : blue);
     if (ln.fanEdge) { var fo = rrGhostMats.filter(function (o) { return o.fan === ln.fan; })[0]; if (fo) { fo.p.color.setHex(fanHex); } }
-    if (ln.fan && ln.fan.material) { ln.fan.material.color.setHex(fanHex); ln.fan.material.opacity = robotKind(ln.id) === "spot" ? (m === "pause" ? 0.3 : 0.55) : 0.9; }   // F 시야 빔 — 로봇색 부채꼴. Spot 초록은 진해서 0.9 면 칠한 면이 된다 — 0.55(일시정지 0.3)로 빛처럼
-    if (botBox) { botBox.setAttribute("data-rr", m); }
+    if (ln.fan && ln.fan.material) { ln.fan.material.color.setHex(fanHex); ln.fan.material.opacity = robotKind(ln.id) === "spot" ? (m === "pause" ? 0.45 : 0.55) : 0.9; }   // F 시야 빔 — 로봇색 부채꼴. Spot 초록은 진해서 0.9 면 칠한 면이 된다 — 0.55(일시정지 0.3)로 빛처럼
+    if (botBox) {
+      var was = botBox.getAttribute("data-rr");
+      botBox.setAttribute("data-rr", m);
+      if (was !== m && (was === "done" || m === "done")) { setTimeout(function () { document.dispatchEvent(new CustomEvent("aprism:rr-mode", { detail: { mode: m } })); }, 0); }   // [11/05] 미션 완료 들고 날 때 Delta 를 다시 그리게(monitor.js)
+    }
     var cl = rrChevLayer();
     if (cl) { cl.style.display = m === "return" && on ? "" : "none"; if (m !== "return") { cl.textContent = ""; } }
   }
@@ -3535,15 +3582,19 @@
     var r = hit.getBoundingClientRect();
     layer.setAttribute("viewBox", "0 0 " + Math.max(1, r.width) + " " + Math.max(1, r.height));
     layer.textContent = "";
-    var ppx = perPixel(), gap = ppx * 40 * RR.k, off = rrReduce ? gap * 0.3 : ((t / 1000) * ppx * 24 * RR.k) % gap;   // 화면 기준 간격 · 느린 행진
-    var sc = 0.75 * RR.k / 1.9 * 1.3, col = isLight() ? "#eef0f3" : "#0a0f18";
-    for (var d = off + gap * 0.3; d < drawn - gap * 0.2; d += gap) {
-      var m = A - d, P = onCanvas(alongRoute(ln.turns, ln.mile, m)), Q = onCanvas(alongRoute(ln.turns, ln.mile, Math.max(0, m - span * 0.004)));
-      var ang = Math.atan2(Q.y - P.y, Q.x - P.x) * 180 / Math.PI;
+    // [11/05 디자이너] 꺾쇠 대신 우측 복귀 카드의 행진 점선(.rr-homebar — 8 칸 · 6 쉼, 0.9초에 28px)과 같은 점선이 충전 스테이션 쪽으로 흐른다
+    var ppx = perPixel(), z = 1.3, dash = ppx * 8 * z, period = ppx * 14 * z;
+    var off = rrReduce ? 0 : ((t / 1000) * ppx * 31 * z) % period;
+    var col = isLight() ? "#eef0f3" : "#0a0f18", wdt = (3 * z).toFixed(1);
+    for (var d = off; d < drawn - dash * 0.5; d += period) {
+      var m0 = A - d, m1 = Math.max(A - drawn, m0 - dash), pts = [];
+      for (var q = 0; q <= 3; q += 1) { var P = onCanvas(alongRoute(ln.turns, ln.mile, m0 + (m1 - m0) * q / 3)); pts.push(P.x.toFixed(1) + " " + P.y.toFixed(1)); }
       var path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-      path.setAttribute("d", "M-3.5 -4.5 L2 0 L-3.5 4.5");
-      path.setAttribute("transform", "translate(" + P.x.toFixed(1) + " " + P.y.toFixed(1) + ") rotate(" + ang.toFixed(1) + ") scale(" + sc.toFixed(2) + ")");
+      path.setAttribute("d", "M" + pts.join(" L"));
       path.setAttribute("stroke", col);
+      path.setAttribute("stroke-width", wdt);
+      path.setAttribute("stroke-linecap", "butt");
+      path.setAttribute("opacity", "0.7");
       layer.appendChild(path);
     }
   }
@@ -3620,6 +3671,81 @@
     if (runItem && runItem !== rrRunning) { rrRunning = runItem; try { runItem.scrollIntoView({ block: "center", behavior: rrReduce ? "auto" : "smooth" }); } catch (err) { /* 오래된 브라우저 */ } }
     layWaypoints();
   }
+  /*
+   * [11/05] 델타 시뮬레이션(route-sim.js 의 "기본 → 위험 1건" · "주의 → 위험 1건")을 지도와 잇는다.
+   *   누르면 로봇이 위험이 날 지점(알림 지점 WP-04 가 이 길에 있으면 거기, 없으면 바로 앞 지점)에 서서 측정 중이 되고,
+   *   2초 뒤 위험 알림이 들어오는 순간(monitor.js aprism:delta-sim-alert) 지도를 위험 감지로 돌린다 —
+   *   측정 중 → 위험 감지, 로봇 빨강 · 그 지점 빨강(우측 레일 · 지도 고리) · 엣지 글로우 · 최신 알림 1건 · Delta 가 한꺼번에 바뀐다.
+   *   알림은 지금 보는 로봇 · 그 지점으로 고쳐 쓴다(다른 지점이면 장소 이름도 그 지점 것으로).
+   */
+  /*
+   * [11/05 디자이너] 지점 목록 접기 — 모든 상태에 공통. 목록 상자([data-timeline]) 머리줄 [지점 n곳] 단추로 접고 편다.
+   *   미션 완료로 들어오면 접고, 다른 상태로 나가면 편다. 접히면 우측 패널 바탕도 같이 줄어든다(v6.css .rr-wp-closed).
+   *   상태 카드(통신 끊김 · 미션 완료, route-sim.js .rr-banner)는 목록 앞이 아니라 진행 막대 영역(.mission-header) 맨 위에 놓는다.
+   */
+  var wpTog = null;
+  function wpPlace() {
+    var rail = document.querySelector(".right-panel [data-timeline]");
+    if (!rail || !wpTog) { return; }
+    var host = rail.parentNode, head = host.querySelector(".mission-header");
+    Array.prototype.forEach.call(host.children, function (n) { if (n.classList.contains("rr-banner") && head) { head.insertBefore(n, head.firstChild); } });
+    if (wpTog.nextElementSibling !== rail) { host.insertBefore(wpTog, rail); }
+  }
+  function wpToggleSync() {
+    var rail = document.querySelector(".right-panel [data-timeline]");
+    if (!rail) { return; }
+    if (!wpTog) {
+      wpTog = document.createElement("button");
+      wpTog.type = "button";
+      wpTog.className = "rr-wp-toggle";
+      wpTog.addEventListener("click", function () {
+        wpTog.setAttribute("aria-expanded", String(!document.body.classList.toggle("rr-wp-closed")));
+      });
+      new MutationObserver(wpPlace).observe(rail.parentNode, { childList: true });
+    }
+    wpPlace();
+    wpTog.textContent = "지점 " + rail.querySelectorAll(".timeline-item[data-waypoint]").length + "곳";
+    wpTog.setAttribute("aria-expanded", String(!document.body.classList.contains("rr-wp-closed")));
+  }
+  document.addEventListener("aprism:rr-mode", function (event) {
+    document.body.classList.toggle("rr-wp-closed", !!(event.detail && event.detail.mode === "done"));
+    wpToggleSync();
+  });
+  document.addEventListener("aprism:mission", function () { setTimeout(wpToggleSync, 0); });
+  setTimeout(wpToggleSync, 0);
+
+  var simWp = null;
+  function rsimPress(m) { var b = document.querySelector(".rsim-chips [data-m='" + m + "']"); if (b) { b.click(); } }
+  document.addEventListener("aprism:delta-sim", function () {
+    var api = window.APRISM_RR;
+    simWp = null;
+    if (!api || !api.ready() || !onLane || !document.querySelector(".rsim.is-ready")) { return; }   // 움직임 시뮬레이션이 자리를 잡기 전에는 건드리지 않는다
+    var miles = api.stops(), s = api.get();
+    var at = wpSpots.map(function (w) { return w.id; }).indexOf(CRIT_WP);
+    if (at < 0 || miles[at] === undefined) { at = miles.findIndex(function (x) { return x > s + 1e-6; }); }
+    if (at < 0) { at = 0; }
+    simWp = wpSpots[at] || null;
+    if (miles[at] !== undefined) { api.set(miles[at] - api.total() * 0.0005); }
+    rsimPress("inspect");   // 가장 가까운 앞 지점(= 그 지점)에 서서 잰다
+  });
+  var CRIT_WP = "WP-04";
+  document.addEventListener("aprism:delta-sim-alert", function (event) {
+    var a = event.detail && event.detail.alert;
+    if (!a || !simWp || !window.APRISM_RR || !window.APRISM_RR.ready()) { return; }
+    var card = document.querySelector(".robot-strip .robot-card[aria-pressed='true'][data-robot]");
+    if (card) { a.robot = Number(card.getAttribute("data-robot")); }
+    if (a.wp !== simWp.id) {
+      var head = String(a.where || "").split(/WP-\d+/)[0];
+      a.where = head + simWp.id + " " + ((simWp.info && simWp.info.name) || "");
+      a.wp = simWp.id;
+    }
+    a.floor = simWp.floor || (onLane && onLane.floor) || a.floor;
+    setTimeout(function () {   // 목록이 먼저 그려진 뒤(알림 → 지점 빨강) 지도를 돌린다
+      rsimPress("alert");
+      // [11/05 디자이너] 위험 감지에서 멈춘다 — 예전엔 aprism:rsim-play 로 다음 지점까지 걸었다(route-sim.js 의 듣는 쪽은 남겨 둠)
+    }, 0);
+  });
+
   window.APRISM_RR = {
     ready: function () { return !!(onLane && onLane.rr); },
     debugOffset: function () { var ln = onLane; if (!ln) { return null; } var mk = rrMask(ln), on = mk.w.filter(function (x) { return x > 0.5; }).length, first = mk.w.findIndex(function (x) { return x > 0.5; }); return { n: mk.w.length, on: on, from: Math.round(first * mk.st), total: Math.round(ln.total), off: +(span * 0.011).toFixed(2), span: Math.round(span) }; },
@@ -3661,6 +3787,7 @@
   /* 충전 스테이션(시안) — 평소 회색, 자동복귀 중엔 복귀 도로색으로 맥동, 미션 완료(충전 중)면 초록으로 채움 */
   var rrDockBox = null, rrPulse = null, rrAlertId = null, rrNumBox = null, rrNumKey = "";
   var rrPinBox = null, rrPinKey = "", rrBadge = {}, rrFadeSig = "", rrFadeT = 0;
+  var rrOk = {}, rrToneWas = {}, RR_OK_MS = 1400;   // [11/05] 측정을 마친 정상 지점 — 번호가 초록으로 뿅 떴다 사라진다(rrPins)
   /* [10/22] 설비 이름 상시 노출 — 멀리 보면(축소) 숨기고, 일정 배율 이상 다가가면 설비 윗면 가운데에 이름이 뜬다 */
   var RR_LABEL_ZOOM = 1.35, rrLabBox = null, rrLabKey = "";
   function rrLabels() {
@@ -3717,24 +3844,39 @@
     var light = isLight(), blue = "#" + new THREE.Color(onLane.bot ? onLane.bot.left : 0x4db2ff).getHexString();
     // [10/29] 라이트 핀 = 단계 톤(판 50 · 테 950 24% · 글자 700 · 예정 600)
     var C = { up: light ? "#63686F" : "#8894AA", bg: light ? "#F2F4F5" : "#0A0F18", cau: light ? "#F2A900" : "#FFCC00", dan: "#FF383C", gray: "#9EA8BB" };
-    var key = wpSpots.map(function (w) { return w.id + w.info.tone + (w.buried ? "b" : "") + (w.off ? "x" : ""); }).join(",") + rrM(onLane) + light + blue;
+    var now = performance.now();
+    wpSpots.forEach(function (w) {   // 지금 지점(측정 중) → 지나온 정상이 된 순간을 잡는다
+      var prev = rrToneWas[w.id];
+      if (prev && /current|next|active/.test(prev) && w.info.tone === "safe" && !w.info.was && rrM(onLane) !== "done") {
+        rrOk[w.id] = now + RR_OK_MS;
+        setTimeout(function () { rrPinKey = ""; frame(); }, RR_OK_MS + 50);   // 끝나면 다시 감춘다(is-quiet)
+      }
+      rrToneWas[w.id] = w.info.tone;
+    });
+    var key = wpSpots.map(function (w) { return w.id + w.info.tone + (w.info.was ? "w" : "") + (rrOk[w.id] > now ? "k" : "") + (w.buried ? "b" : "") + (w.off ? "x" : ""); }).join(",") + rrM(onLane) + light + blue;
     // 지점 목록은 시점이 바뀔 때마다 새로 깔린다(layWaypoints) — 새 목록에 핀이 안 붙어 있으면 다시 만든다(예전엔 처음 자리에 멈춰 있었다)
     if (key !== rrPinKey || wpSpots.some(function (w) { return !w.pinEl; })) {
       rrPinKey = key; rrPinBox.textContent = "";
       wpSpots.forEach(function (w) {
         var t = w.info.tone, next = t === "current" || t === "next" || t === "active", past = t === "safe", cau = t === "caution", dan = t === "danger";
-        var col = cau ? C.cau : dan ? C.dan : past ? (rrM(onLane) === "done" ? C.gray : blue) : next ? blue : C.up;
+        var was = !!w.info.was && !cau && !dan && !next;   // [11/05 디자이너] 해결한 위험 · 주의 지점 — 회색으로 채워 "문제가 있던 곳"만 남긴다
+        var col = was ? C.gray : cau ? C.cau : dan ? C.dan : past ? (rrM(onLane) === "done" ? C.gray : blue) : next ? blue : C.up;
         var solid = past || cau || dan || next;
         var el = document.createElement("div");
-        var quiet = !cau && !dan && !next && t !== "skipped" && !document.body.classList.contains("sian");
-        el.className = "rr-pin" + (w.buried ? " is-buried" : "") + (past ? " is-past" : "") + (next ? " is-next" : "") + (quiet ? " is-quiet" : "") + (cau || dan ? " is-alert" : "") + (w.id === rrHotId ? " is-hot" : "");   // [10/28] 알림 지점 — 번호를 비켜 바닥 세모가 보이게(route-rules.css)
+        var ok = past && !was && rrOk[w.id] > now;   // 측정 끝, 정상 — 초록으로 잠깐
+        var measuring = next && rrM(onLane) === "inspect";   // [11/05] 측정 중은 채운 파랑, 이동 중 다음 지점은 빈 파랑(흰 판)
+        var quiet = !cau && !dan && !next && !was && !ok && t !== "skipped" && !document.body.classList.contains("sian");
+        el.className = "rr-pin" + (w.buried ? " is-buried" : "") + (past ? " is-past" : "") + (next ? " is-next" : "") + (quiet ? " is-quiet" : "") + (cau || dan ? " is-alert" : "") + (w.id === rrHotId ? " is-hot" : "") + (ok ? " is-ok" : "") + (measuring ? " is-measuring" : "");   // [10/28] 알림 지점 — 번호를 비켜 바닥 세모가 보이게(route-rules.css)
         // [11/04 · 11/05] is-quiet — 관제 기본은 문제 지점(위험 · 주의 · 건너뜀)과 지금 지점만 번호. 지나온 · 앞으로 갈 지점은 감추고(바닥 점은 남는다) 우측 레일 줄 · 지도 점에 손이 닿으면(is-hot) 보인다(디자이너). 미션 설정 · 사전 점검(.sian)은 점검 순서라 그대로 다 보인다
         el.style.setProperty("--pin", col);
         var head = document.createElement("span");
         head.className = "rr-pin-head";
         head.setAttribute("data-n", String(w.no));
         // [10/22] 구분 또렷하게 — 다음: 길색 채움 + 흰 숫자 + 흰 테, 지난 정상: 어두운 판 + 길색 숫자(옅게), 예정: 어두운 판 + 밝은 회색 숫자, 주의 · 위험: 채움
-        if (next) { head.style.background = col; head.style.borderColor = "#FFFFFF"; head.style.color = "#FFFFFF"; }
+        if (ok) { head.style.background = "#34C759"; head.style.borderColor = C.bg; head.style.color = "#0A0F18"; el.style.animationDelay = -Math.round(now - (rrOk[w.id] - RR_OK_MS)) + "ms"; }   // 이동 중엔 핀이 자주 새로 깔린다 — 처음부터 다시 돌지 않고 이어서
+        else if (was) { head.style.background = col; head.style.borderColor = C.bg; head.style.color = "#0A0F18"; }
+        else if (measuring) { head.style.background = col; head.style.borderColor = "#FFFFFF"; head.style.color = "#FFFFFF"; }
+        else if (next) { head.style.background = "#FFFFFF"; head.style.borderColor = col; head.style.color = col; }
         else if (past) { head.style.background = C.bg; head.style.borderColor = col; head.style.color = col; }
         else if (cau || dan) { head.style.background = col; head.style.borderColor = C.bg; head.style.color = cau ? "#1A1300" : "#FFFFFF"; }
         else { head.style.background = C.bg; head.style.borderColor = light ? "rgb(11 14 19 / 24%)" : "#AFB7C8"; head.style.color = light ? "#494E54" : "#E4E8EF"; }
@@ -3863,8 +4005,45 @@
     }
     var w = rrAlertId && wpSpots.filter(function (x) { return x.id === rrAlertId; })[0];
     var show = !!w && RRS.mode === "alert" && (!w.floor || w.floor === floorNow) && !!(onLane && onLane.parts[0] && onLane.parts[0].visible);
-    rrPulse.hidden = !show;
-    if (show) { put(rrPulse, w.spot); }
+    rrPulse.hidden = true;   // [11/05] 화면을 보는 세모 맥동 대신 바닥 빨간 고리(alertRing)
+    alertRing(show ? w.spot : null);
+  }
+
+  /*
+   * [11/05 디자이너] 위험 감지 — 위험을 찾은 지점 바닥에 빨간 고리(가는 테 + 안쪽 옅은 빛)가 숨 쉰다. 로봇 둘레 두 줄 · 시야 빔도 빨강.
+   *   그 지점의 세모는 이 동안 걷는다(layWaypoints) — 고리 안이 비어 번호 핀만 남는다.
+   */
+  var alertRingG = null;
+  function alertRingArt() {
+    var n = 256, R = 100, c = document.createElement("canvas"); c.width = c.height = n;
+    var g = c.getContext("2d"); g.translate(n / 2, n / 2);
+    var wash = g.createRadialGradient(0, 0, R * 0.2, 0, 0, R);
+    wash.addColorStop(0, "rgba(255,56,60,0)"); wash.addColorStop(1, "rgba(255,56,60,.22)");
+    g.fillStyle = wash; g.beginPath(); g.arc(0, 0, R, 0, Math.PI * 2); g.fill();
+    g.strokeStyle = "#ff383c"; g.lineWidth = 6; g.shadowColor = "#ff383c"; g.shadowBlur = 16;
+    g.beginPath(); g.arc(0, 0, R, 0, Math.PI * 2); g.stroke();
+    return { c: c, size: (n / 2) / R };
+  }
+  function alertRing(spot) {
+    if (!THREE || !scene) { return; }
+    if (!alertRingG) {
+      var art = alertRingArt(), tex = new THREE.CanvasTexture(art.c);
+      tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 4;
+      var geo = new THREE.PlaneGeometry(1, 1); geo.rotateX(-Math.PI / 2);
+      var mesh = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, depthTest: false }));
+      mesh.renderOrder = 898;
+      mesh.visible = false;
+      scene.add(mesh);
+      alertRingG = { mesh: mesh, size: art.size };
+    }
+    var mesh = alertRingG.mesh;
+    mesh.visible = !!spot;
+    if (!spot) { return; }
+    var sz = DOG_PX * baseSize / (view.clientHeight || 1);   // 로봇 둘레 고리와 같은 배율
+    mesh.position.set(spot.x, spot.y + span * 0.0005, spot.z);
+    mesh.scale.setScalar(sz * HALO_R * 0.8 * alertRingG.size * 2);
+    mesh.material.opacity = rrReduce ? 1 : 0.55 + 0.45 * (0.5 - 0.5 * Math.cos(performance.now() / 1600 * Math.PI * 2));
+    // 다시 그리기는 걷는 로봇(rrDog 박자)이 낸다 — 위험 감지는 걷는 상태다
   }
   function rrDock() {
     var ln = onLane;
@@ -3888,6 +4067,62 @@
     rrDockBox.classList.toggle("is-docked", inDock);
     if (botBox) { if (inDock) { botBox.setAttribute("data-rr-docked", "1"); } else { botBox.removeAttribute("data-rr-docked"); } }
     put(rrDockBox, ln.dock);
+    dockPad(ln, inDock);
+  }
+
+  /*
+   * [11/05 디자이너] 도커 — 바닥에 눕힌 초록 둥근 네모 + "DOCK" 글자. 화면을 보는 회색 네모(.rr-dock)는 v6.css 가 숨긴다.
+   *   로봇 둘레 고리와 같은 배율(sz)로 키우고, 글자는 로봇이 나가는 쪽을 따라 읽힌다(화면에서 거꾸로 서면 뒤집는다).
+   *   로봇이 도커 안에 있어도 3D 로봇은 도커 위에 그대로 선다(rrDog) — 바닥 고리만 걷는다(rrHalo).
+   */
+  var dockPadG = null;
+  function dockPadArt(light) {
+    var n = 256, c = document.createElement("canvas"); c.width = c.height = n;
+    var g = c.getContext("2d"), m = 24, w = n - m * 2, r = 34, ink = "#fff";   // 흰색으로 그려 재질색을 입힌다(초록 · 회색)
+    g.beginPath();
+    g.moveTo(m + r, m); g.arcTo(m + w, m, m + w, m + w, r); g.arcTo(m + w, m + w, m, m + w, r); g.arcTo(m, m + w, m, m, r); g.arcTo(m, m, m + w, m, r); g.closePath();
+    g.fillStyle = light ? "rgba(255,255,255,.35)" : "rgba(12,16,22,.78)"; g.fill();
+    g.shadowColor = ink; g.shadowBlur = 18; g.lineWidth = 7; g.strokeStyle = ink; g.stroke();
+    g.shadowBlur = 8; g.fillStyle = ink; g.textAlign = "center"; g.textBaseline = "middle";
+    g.font = "italic 800 52px SUIT, 'SUIT Variable', sans-serif";
+    g.fillText("DOCK", n / 2, n / 2 + 2);
+    return c;
+  }
+  // [11/05 디자이너] 초록은 로봇이 도커 안에 있을 때(출발 전 · 미션 완료)만. 미션 도중엔 회색
+  var DOCK_ON = { dark: 0x3be07a, light: 0x1fa35a }, DOCK_OFF = { dark: 0x9ea8bb, light: 0x8a94a6 };
+  function dockPad(ln, inDock) {
+    if (!THREE || !scene) { return; }
+    var light = isLight();
+    if (!dockPadG || dockPadG.light !== light) {
+      if (dockPadG) { scene.remove(dockPadG.mesh); dockPadG.mesh.material.map.dispose(); dockPadG.mesh.material.dispose(); dockPadG.mesh.geometry.dispose(); }
+      var cv = dockPadArt(light), tex = new THREE.CanvasTexture(cv);
+      tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 4;
+      var geo = new THREE.PlaneGeometry(1, 1); geo.rotateX(-Math.PI / 2);
+      var mesh = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, depthTest: false }));
+      mesh.renderOrder = 899;   // 로봇 둘레 고리(900~) 밑
+      mesh.visible = false;
+      scene.add(mesh);
+      dockPadG = { light: light, mesh: mesh };
+      // 글꼴이 늦게 오면 한 번 더 그린다
+      if (document.fonts && document.fonts.ready) { document.fonts.ready.then(function () { if (dockPadG && dockPadG.mesh === mesh) { tex.image = dockPadArt(light); tex.needsUpdate = true; frame(); } }); }
+    }
+    var mesh = dockPadG.mesh;
+    var show = !!(ln && ln.dock) && !rrDockBox.hidden;
+    mesh.material.color.setHex((inDock ? DOCK_ON : DOCK_OFF)[light ? "light" : "dark"]);
+    mesh.visible = show;
+    if (!show) { return; }
+    var sz = DOG_PX * baseSize / (view.clientHeight || 1);   // rrDog · rrHalo 와 같은 배율
+    mesh.position.set(ln.dock.x, ln.dock.y + span * 0.0005, ln.dock.z);
+    mesh.scale.setScalar(sz * HALO_R * 1.35);
+    // 글자 방향 — 도커에서 나가는 첫 토막. 화면에서 오른쪽으로 읽히게 맞춘다
+    var nx = ln.turns && ln.turns[1] ? ln.turns[1] : null;
+    var dx = nx ? nx.x - ln.dock.x : 1, dz = nx ? nx.z - ln.dock.z : 0;
+    if (dx * dx + dz * dz < 1e-10) { dx = 1; dz = 0; }
+    if (camera) {
+      var a = ln.dock.clone().project(camera), b = ln.dock.clone().add(new THREE.Vector3(dx, 0, dz).normalize()).project(camera);
+      if (b.x < a.x) { dx = -dx; dz = -dz; }
+    }
+    mesh.rotation.y = Math.atan2(-dz, dx);
   }
 
   var WALK_SECONDS = 14;   // 한 구간(WP-n → n+1)을 걷는 데 드는 시간 — 화면에서 걸음이 보일 만큼

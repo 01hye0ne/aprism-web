@@ -18,7 +18,7 @@
   box.innerHTML = '<div class="rsim-chips" role="group" aria-label="상태">' +
     MODES.map(function (m) { return '<button type="button" data-m="' + m[0] + '" aria-pressed="' + (m[0] === "run") + '">' + m[1] + "</button>"; }).join("") +
     '</div><div class="rsim-bar"><button type="button" class="rsim-play">재생</button>' +
-    '<input type="range" min="0" max="1000" value="0" aria-label="미션 진행도"><span class="rsim-pct">0%</span><span class="rsim-lanes" hidden></span><span class="rsim-lanes rsim-x" role="group" aria-label="지점 수"><span>지점</span><button type="button" data-wpn="20" aria-pressed="true">20개</button><button type="button" data-wpn="60" aria-pressed="false">60개</button></span></div>' +
+    '<input type="range" min="0" max="1000" value="0" aria-label="미션 진행도"><span class="rsim-pct">0%</span><span class="rsim-lanes" hidden></span></div>' +
     '<p class="rsim-wait">지도 모델을 불러오는 중</p>';
   document.body.appendChild(box);
 
@@ -37,6 +37,21 @@
     var saved = false; try { saved = localStorage.getItem("rsim-folded") === "1"; } catch (e) { }
     setFold(saved);
     fold.addEventListener("click", function () { setFold(!box.classList.contains("is-folded")); });
+  })();
+
+  (function () {   // [11/05] 델타 시뮬레이션 — 접기 화살표 옆. 주의 또는 기본 판에서 시작해 2초 뒤 위험 알림 1건이 새로 들어온다(monitor.js 가 받는다)
+    if (!document.body.classList.contains("v2")) { return; }
+    var g = document.createElement("span");
+    g.className = "rsim-dsim";
+    g.setAttribute("role", "group");
+    g.setAttribute("aria-label", "델타 시뮬레이션");
+    g.innerHTML = '<span>델타</span><button type="button" data-dsim="warning">주의 → 위험 1건</button><button type="button" data-dsim="normal">기본 → 위험 1건</button>';
+    box.querySelector(".rsim-chips").appendChild(g);
+    g.addEventListener("click", function (e) {
+      var b = e.target.closest("[data-dsim]"); if (!b) { return; }
+      Array.prototype.forEach.call(g.querySelectorAll("[data-dsim]"), function (x) { x.setAttribute("aria-pressed", String(x === b)); });
+      document.dispatchEvent(new CustomEvent("aprism:delta-sim", { detail: { from: b.getAttribute("data-dsim"), after: 2000 } }));
+    });
   })();
 
   var api = null, range = box.querySelector("input"), pct = box.querySelector(".rsim-pct"), play = box.querySelector(".rsim-play");
@@ -68,15 +83,8 @@
   }
   function resume() { stop(); setMode("run"); api.set(api.get() + api.total() * 0.0005); show(); }
 
-  (function () {   // [10/22 실험] 지점 수 — 고르면 다시 연다
-    var cur = "20"; try { cur = localStorage.getItem("rr-wp-total") === "60" ? "60" : "20"; } catch (e) { }
-    Array.prototype.forEach.call(box.querySelectorAll("[data-wpn]"), function (x) { x.setAttribute("aria-pressed", String(x.getAttribute("data-wpn") === cur)); });
-    box.addEventListener("click", function (e) {
-      var b = e.target.closest("[data-wpn]"); if (!b || b.getAttribute("data-wpn") === cur) { return; }
-      try { localStorage.setItem("rr-wp-total", b.getAttribute("data-wpn")); } catch (er) { }
-      location.reload();
-    });
-  })();
+  // [11/05] 지점 수(20개, 60개) 고르기 뺌 — 예전에 60개를 골라 둔 브라우저도 다음에 열 때 20개로 돌아온다
+  try { localStorage.removeItem("rr-wp-total"); } catch (e) { }
   box.addEventListener("click", function (e) {   // [10/22 실험] 앞길 선, 번호 표현
     var b = e.target.closest("[data-ahead], [data-pv], [data-past], [data-flow], [data-thin]"); if (!b || !api) { return; }
     var k = b.hasAttribute("data-ahead") ? "data-ahead" : b.hasAttribute("data-pv") ? "data-pv" : b.hasAttribute("data-flow") ? "data-flow" : b.hasAttribute("data-thin") ? "data-thin" : "data-past";
@@ -112,6 +120,11 @@
     if (mode === "done" || api.get() >= api.total() - 1e-6) { press("run"); api.mode("run"); api.set(0); }
     else if (mode !== "run" && mode !== "return") { press("run"); api.mode("run"); }
     playing = true; last = 0; play.textContent = "멈춤";
+  });
+  // [11/05] 지금 상태 그대로 재생 — 델타 시뮬레이션(map-v6.js)이 위험 감지인 채로 로봇을 걷게 한다. 다음 지점에 닿으면 평소대로 측정 → 이동
+  document.addEventListener("aprism:rsim-play", function () {
+    if (!api || playing) { return; }
+    playing = true; last = 0; dwell = null; play.textContent = "멈춤";
   });
 
   /* ---------- 지도 — 측정 눈금 6칸(로봇 둘레) ---------- */
@@ -193,6 +206,7 @@
   function syncProgress() {
     var rail = document.querySelector("[data-timeline]");
     if (!rail) { return; }
+    if (mode === "lost" && document.body.classList.contains("ver-6")) { return; }   // [11/05 v6] 통신 끊김 — 진행 막대는 끊기기 직전 그대로(회색은 v6.css)
     var items = rail.querySelectorAll(".timeline-item[data-waypoint]"), done = rail.querySelectorAll(".timeline-item[data-waypoint].is-done").length;
     var run = rail.querySelector(".timeline-item[data-waypoint].is-running .step-title");
     var key = done + "/" + items.length + "|" + (run ? run.textContent : "");
@@ -251,6 +265,13 @@
   /* ---------- 로봇 카드 상태 · 버튼 · 진행 막대 글 ---------- */
   var BADGE = { run: ["수행중", "badge-info"], alert: ["수행중", "badge-info"], inspect: ["측정 중", "badge-info"], pause: ["일시정지", "badge-idle"],
     estop: ["긴급정지", "badge-danger"], "return": ["자동복귀", "badge-info"], lost: ["끊김", "badge-danger"], done: ["완료", "badge-normal"] };
+  // [11/05 v6] 미션 완료 아랫줄 — 첫 지점 시작 시각부터 완료 14:15 까지(시연 값)
+  function spent() {
+    var first = document.querySelector("[data-timeline] .timeline-item[data-wp-time]"), t = first && /(\d{1,2}):(\d{2})/.exec(first.getAttribute("data-wp-time"));
+    var min = t ? Math.max(1, 14 * 60 + 15 - (Number(t[1]) * 60 + Number(t[2]))) : 0;
+    if (!min) { return "-"; }
+    return min < 60 ? min + "분" : Math.floor(min / 60) + "시간" + (min % 60 ? " " + (min % 60) + "분" : "");
+  }
   var LEFTTXT = { pause: "일시정지 중, 남은 시간 멈춤", estop: "긴급정지로 멈춤", "return": "미션 중단, 충전 스테이션으로 복귀 중", lost: "통신이 돌아오면 다시 계산", done: "미션 완료" };
   var badgeMode = null;
   function robotCard(m) {
@@ -266,7 +287,8 @@
     var left = document.querySelector("[data-progress-left]");
     if (left) {
       if (!left.hasAttribute("data-rr-orig")) { left.setAttribute("data-rr-orig", left.textContent); }
-      left.textContent = LEFTTXT[m] || left.getAttribute("data-rr-orig");
+      var v6 = document.body.classList.contains("ver-6");
+      left.textContent = (v6 && m === "lost" ? "마지막 통신 11:16:42" : v6 && m === "done" ? "미션 완료, " + spent() + " 소요" : LEFTTXT[m]) || left.getAttribute("data-rr-orig");   // [11/05 v6] 통신 끊김은 남은 시간 자리에 마지막 통신 시각
     }
     var rec = document.querySelector("[data-recall-button]"), es = document.querySelector('.rc-actions [data-modal-open="estop"]');
     if (rec) { rec.classList.toggle("rr-on", m === "return"); }
@@ -333,11 +355,15 @@
     if (!ban) { ban = el("div", "rr-banner"); host.insertBefore(ban, rail); }
     if (m === "lost") {
       ban.className = "rr-banner is-lost";
-      ban.innerHTML = "<b>통신 끊김</b><span>마지막 통신 11:16:42, 2분 전. 아래 목록은 그 시점 기준이다.</span>";
+      ban.innerHTML = document.body.classList.contains("ver-6") ? "<b>통신 끊김</b>" : "<b>통신 끊김</b><span>마지막 통신 11:16:42, 2분 전. 아래 목록은 그 시점 기준이다.</span>";   // [11/05 v6] 이름만 — 시각은 진행 막대 아랫줄
     } else {
       var all = rail.querySelectorAll(".timeline-item[data-waypoint]").length, bad = rail.querySelectorAll(".timeline-item[data-wp-alert]").length;
       ban.className = "rr-banner is-done";
-      ban.innerHTML = "<b>미션 완료 14:15</b><span>" + all + "곳 중 이상 " + bad + "곳</span>";
+      ban.innerHTML = document.body.classList.contains("ver-6")
+        // [11/05 v6] 이름 + 오른쪽 [보고서 보러가기]. 소요 시간은 진행 막대 아랫줄(spent)
+        ? '<div class="rr-done-head"><div class="rr-done-txt"><b>미션 완료</b></div>' +
+          '<a class="btn is-xs btn-secondary" href="./report-v6.html" data-rr-report>보고서 보러가기</a></div>'
+        : "<b>미션 완료 14:15</b><span>" + all + "곳 중 이상 " + bad + "곳</span>";
     }
   }
 

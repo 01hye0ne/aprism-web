@@ -345,6 +345,9 @@
         clue: "인계 알림 " + j.total + "건", yes: "네, 보여 주세요", act: "shift" };
     } else if (es) {
       say = { l: es.brief, clue: "구동 차단됨" };
+    } else if (body.classList.contains("ver-6") && $(".robot-strip .robot-card[aria-pressed='true'] .badge-normal")) {
+      // [11/05 v6] 보는 미션이 끝나면 알림이 남아 있어도 완료 인사 — Delta 는 파랑(calm), 엣지 글로우는 알림 단계 그대로(tellAi)
+      say = { l: ["미션 완료.", "다음 미션 전에 잠깐 스트레칭 어떠세요?"], clue: "수고하셨습니다.", calm: true };
     } else if (j.total) {
       // 처리 순서의 첫 알림이 어디 있는지로 가른다 — 다른 미션 알림이 더 높은 등급일 때만 옮기자고 묻는다(10/30 디자이너)
       var ord = handleOrder(all, mine), first = ord[0];
@@ -413,6 +416,9 @@
     copy.say = say;
     return copy;
   };
+
+  // [11/05 v6] 움직임 시뮬레이션이 상태를 바꾸면(map-v6.js) 다시 그린다 — 미션 완료 인사가 들고 난다
+  document.addEventListener("aprism:rr-mode", function () { render(); });
 
   // 받침 따라 이/가 — "Robot 01이", "Robot 05가"
   function josa(word) {
@@ -535,6 +541,7 @@
   var filter = "all";
   var picked = null;       // 고른 알림(객체) — 지도에 쪽지가 열려 있는 알림
   var resolved = [];       // 확인 처리한 알림 — 목록에서 빠지고 오늘 확인 완료로 간다
+  var cleared = [];        // [11/05] 확인 처리한 알림 전부(화면에서 생긴 것 포함) — 지도 번호를 회색으로 남긴다(markWaypoints)
 
   function items() {
     var base = (SETS[level] || SETS.critical)().filter(function (a) { return resolved.indexOf(a) < 0; });
@@ -679,9 +686,10 @@
     window.APRISM_DELTA_SAY = copy.say || null;
     // 테두리와 Delta 가 같은 색을 입는다 — 목록 최고 단계와 종합 판단 중 높은 쪽.
     var tone = TONE[j.level] > TONE[top] ? j.level : top;
+    var calm = !!(copy.say && copy.say.calm);   // [11/05 v6] 미션 완료 인사 — Delta 만 파랑, 테두리는 알림 단계
     document.dispatchEvent(new CustomEvent("aprism:severity", {
       detail: {
-        level: tone === "normal" ? null : tone,
+        level: tone === "normal" || calm ? null : tone,
         glow: tone === "normal" ? null : tone,
         line1: copy.line1,
         line2: copy.line2,
@@ -776,8 +784,11 @@
       if (a.robot !== robot || !a.wp) { return; }
       if (!hits[a.wp] || TONE[a.sev] > TONE[hits[a.wp]]) { hits[a.wp] = a.sev; }
     });
+    var was = {};   // [11/05] 해결한 알림이 있던 지점 — 지도 번호가 회색으로 남는다(map-v6.js)
+    cleared.forEach(function (a) { if (a.robot === robot && a.wp) { was[a.wp] = true; } });
     $$("[data-waypoint]", rail).forEach(function (node) {
       var sev = hits[node.getAttribute("data-waypoint")];
+      if (!sev && was[node.getAttribute("data-waypoint")]) { node.setAttribute("data-wp-cleared", ""); } else { node.removeAttribute("data-wp-cleared"); }
       if (sev) { node.setAttribute("data-wp-alert", WP_ALERT[sev]); } else { node.removeAttribute("data-wp-alert"); }
       var done = node.getAttribute("data-wp-state") === "completed";
       if (done) { node.setAttribute("data-wp-result", sev ? WP_ALERT[sev] : "safe"); }
@@ -887,6 +898,32 @@
       brief: [name + josa(name) + " 멈췄어요.", "현장 안전부터 확인하세요."], estop: true };
     extra.unshift(a);
     render();
+  });
+
+  /*
+   * [11/05] 델타 시뮬레이션(route-sim.js 접기 화살표 옆) — 주의 판(#warning) 또는 기본 판(#normal)으로 되돌린 뒤
+   * detail.after 밀리초 뒤 위험 알림 1건(N₂ 압력계 기준 초과)이 지금 시각으로 새로 들어온다. 주소의 #… 는 건드리지 않는다.
+   */
+  var simTimer = null;
+  document.addEventListener("aprism:delta-sim", function (event) {
+    var d = event.detail || {};
+    clearTimeout(simTimer);
+    level = SETS[d.from] ? d.from : "warning";
+    extra = [];
+    resolved = []; cleared = [];
+    DONE = DONE_BASE.slice();
+    note.close();
+    document.dispatchEvent(new CustomEvent("aprism:monitor-reset"));
+    render();
+    simTimer = setTimeout(function () {
+      var a = {};
+      Object.keys(CRITICAL).forEach(function (k) { a[k] = CRITICAL[k]; });
+      a.time = clock();
+      // [11/05] 듣는 화면(map-v6.js)이 알림을 지도에 맞춘다 — 지금 보는 로봇 · 막 지나온 지점으로 고쳐 쓰고 지도를 위험 감지로 돌린다
+      document.dispatchEvent(new CustomEvent("aprism:delta-sim-alert", { detail: { alert: a } }));
+      extra.unshift(a);
+      render();
+    }, d.after || 2000);
   });
 
   // ==================================================================
@@ -1319,6 +1356,7 @@
       // fresh 를 내리는 일은 render() 한 곳이 맡는다 — 두 곳에서 손대면 어느 쪽이 늦는지에 따라 달라진다.
       DONE.unshift(rec);
       if (extra.indexOf(a) >= 0) { extra.splice(extra.indexOf(a), 1); } else { resolved.push(a); }
+      cleared.push(a);
       lastDone = { a: a, rec: rec };
       render();
       showToast(a);
@@ -1467,7 +1505,7 @@
     var base = body.getAttribute("data-monitor-default");
     level = SETS[h] ? h : (SETS[base] ? base : "critical");
     extra = [];
-    resolved = [];
+    resolved = []; cleared = [];
     DONE = DONE_BASE.slice();
     note.close();
     document.dispatchEvent(new CustomEvent("aprism:monitor-reset"));

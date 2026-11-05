@@ -44,6 +44,8 @@
 
   function say() {
     if (win.classList.contains("is-thinking")) { return "답변 정리 중..."; }
+    var sd = window.APRISM_DELTA_SAY;
+    if (sd && sd.calm) { return sd.clue; }   // [11/05 v6] 미션 완료 인사 — "수고하셨습니다."
     var level = body.getAttribute("data-level");
     var total = count("total");
     if (level === "critical") { return "위험 " + count("critical") + "건 원인 분석 중..."; }

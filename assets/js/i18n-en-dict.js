@@ -1727,4 +1727,9 @@ window.APRISM_EN = {"APRISM 공장 환경점검 로봇 관제 시스템 진입 �
 "다른 위험도 알려줘":"Show other risks",
 "위치 알려줘":"Where is it?",
 "뭐부터 처리해?":"What should I handle first?",
-"번 지점":" point"};
+"번 지점":" point",
+"미션 완료.":"Mission complete.",
+"다음 미션 전에 잠깐 스트레칭 어떠세요?":"Perhaps a little stretch before your next mission?",
+"수고하셨습니다.":"Thank you for your time.",
+"마지막 통신 11:16:42":"Last contact 11:16:42",
+"보고서 보러가기":"View report"};
