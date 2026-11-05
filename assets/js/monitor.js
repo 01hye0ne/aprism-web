@@ -328,6 +328,12 @@
     var slot = document.querySelector(".account-chip .t-label-2");
     return slot ? slot.textContent.trim() : "관제사";
   }
+  /*
+   * [11/05 한글판] 접힌 위젯에 지시어(이 미션 · 다음 미션 · 다른 미션 · 지금 미션)를 쓰지 않는다 — 미션 이름을 적는다(디자이너).
+   *   근거 줄은 문형 대신 하는 일("위험 N건 원인 분석 중..." · "순회 경로 지켜보는 중...", v3-panel.js say()).
+   *   영문판(html lang="en")은 이번 수정에서 바뀌지 않게 예전 문형 그대로 둔다.
+   */
+  var KO = document.documentElement.lang !== "en";
   COPY.brief = function (j) {
     var copy = COPY.keyword(j);
     var all = j.all || [], mine = j.mine || all;
@@ -347,6 +353,7 @@
         var om = missionOf(first);
         say = { l: ["다른 미션에 " + word + " 단계 알림이 있어요!", "먼저 확인하는 것을 추천드릴게요."],
           clue: om, scope: sev, yes: word + " 단계 미션으로 이동하기", act: { go: om } };
+        if (KO && om) { say.l[0] = om + "에 " + word + " 단계 알림이 있어요!"; say.yes = om + euro(om) + " 이동하기"; }
       } else {
         var mc = all.filter(function (a) { return a.sev === sev && inMine(a); }).length;
         var oc = all.filter(function (a) { return a.sev === sev && !inMine(a); }).length;
@@ -358,6 +365,17 @@
           // 주의만 있을 때 — 한 문장(굵은 1줄 없이), 근거 줄에 먼저 볼 설비(10/30 디자이너 문구)
           say = { l: ["지금 미션에서 " + mc + "건" + (oc ? ", 다른 미션에서 " + oc + "건" : "") + "의 확인해야 할 주의 단계 알림이 있어요."],
             clue: "먼저: " + (first.eq || first.title), yes: "처리 순서 보기", act: "order", open: "처리 순서 알려 줘" };
+          if (KO) {
+            // 보는 미션 먼저, 나머지는 처리 순서에 처음 나온 차례로 — "정기 순회 점검에 2건, 설비 집중 점검에 1건"
+            var per = {}, names = [];
+            ord.forEach(function (a) {
+              if (a.sev !== sev) { return; }
+              var n = missionOf(a) || "미션 밖";
+              if (!(n in per)) { per[n] = 0; names.push(n); }
+              per[n]++;
+            });
+            say.l = ["확인해야 할 주의 단계 알림이 " + names.map(function (n) { return n + "에 " + per[n] + "건"; }).join(", ") + " 있어요."];
+          }
         }
       }
     } else {

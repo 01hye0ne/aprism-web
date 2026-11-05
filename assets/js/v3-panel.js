@@ -60,6 +60,8 @@
   var plusLabel = plus && plus.querySelector(".delta3-plus-label");
   var brief = body.getAttribute("data-delta-copy") === "brief";
   function said() { return brief ? window.APRISM_DELTA_SAY : null; }
+  // [11/05 한글판] 근거 줄은 문형의 범위(미션 지시어)가 아니라 하는 일(say())만 — 영문판은 예전 그대로
+  var KO = document.documentElement.lang !== "en";
   // [10/30 라이팅 시스템 6] 답 단추 오른쪽 대화 단추(말풍선 24) — 누르면 대화 창을 편다. 질문 없는 문형은 "Delta와 대화" 하나라 숨긴다.
   var talk = null;
   if (brief && plus) {
@@ -77,13 +79,13 @@
   function update() {
     var s = said();
     var scope = window.APRISM_DELTA_SCOPE;
-    var t = s && !win.classList.contains("is-thinking") ? (s.clue || "") : say();
+    var t = s && !KO && !win.classList.contains("is-thinking") ? (s.clue || "") : say();
     if (!s && scope && !win.classList.contains("is-thinking")) { t = scope + " " + t; }
     if (out.textContent !== t) { out.textContent = t; }
     if (clue) {
-      clue.classList.toggle("is-said", !!s);
-      clue.classList.toggle("is-scope", !!(s && s.scope));
-      clue.setAttribute("data-scope", s && s.scope ? s.scope : "");
+      clue.classList.toggle("is-said", !!s && !KO);
+      clue.classList.toggle("is-scope", !!(s && s.scope) && !KO);
+      clue.setAttribute("data-scope", s && s.scope && !KO ? s.scope : "");
     }
     if (plusLabel && brief) {
       var yes = s && s.yes ? s.yes : "Delta와 대화";
