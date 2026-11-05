@@ -12,7 +12,7 @@
 
   var KEY = "aprism-lab-delta";
   var AXES = [
-    { k: "m", t: "미션", opts: [["0", "글자 그대로"], ["sq", "[ ] 대괄호"], ["sqg", "[ ] 괄호만 회색"], ["q", "따옴표"], ["h", "1줄 제목으로"], ["a", "A 회색"], ["ab", "A 회색 굵게"], ["b", "B 굵게"], ["c", "C 층 칩 + 굵게"], ["t", "6-1 토큰"], ["tn", "6-2 접힘 번호만"]] },
+    { k: "m", t: "미션", opts: [["0", "글자 그대로"], ["mn", "번호 + 이름"], ["mng", "번호 회색 + 이름"], ["mnb", "[번호] + 이름"], ["sq", "[ ] 대괄호"], ["sqg", "[ ] 괄호만 회색"], ["q", "따옴표"], ["h", "1줄 제목으로"], ["a", "A 회색"], ["ab", "A 회색 굵게"], ["b", "B 굵게"], ["c", "C 층 칩 + 굵게"], ["t", "6-1 토큰"], ["tn", "6-2 접힘 번호만"]] },
     { k: "mg", t: "미션 회색 밝기(지금 코드 60%)", opts: [["60", "60%"], ["70", "70%"], ["75", "75%"], ["80", "80%"], ["88", "88%"]] },
     { k: "g", t: "지점과 설비 사이", opts: [["6", "띄어쓰기(약 6px)"], ["4", "4px"], ["3", "3px"], ["2", "2px"]] },
     { k: "e", t: "설비 이름 글", opts: [["0", "그대로"], ["g", "회색"], ["b", "굵게"], ["gb", "회색 굵게"], ["w", "흰색 굵게"], ["r", "설비 그대로, 나머지 회색"], ["rw", "설비 흰색, 나머지 회색"]] }
@@ -98,6 +98,9 @@
   function missionHTML(m, floor, collapsed) {
     var name = esc(m.name);
     switch (pick.m) {
+      case "mn": return '<span data-lab>' + esc(m.no) + " " + name + "</span>";
+      case "mng": return '<span data-lab><span class="lab-br">' + esc(m.no) + "</span> " + name + "</span>";
+      case "mnb": return '<span data-lab><span class="lab-br">[' + esc(m.no) + "]</span> " + name + "</span>";
       case "sq": return '<span data-lab>[' + name + "]</span>";
       case "sqg": return '<span data-lab><span class="lab-br">[</span>' + name + '<span class="lab-br">]</span></span>';
       case "q": return '<span data-lab>‘' + name + "’</span>";
