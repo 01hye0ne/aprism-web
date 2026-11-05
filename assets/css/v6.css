@@ -139,9 +139,8 @@ body.ver-6 .sb-tab {
 }
 body.ver-6 .sb-tab-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 body.ver-6 .sb-tab-sev { flex: none; }
-/* [11/05] 미션 번호 M1 … — 이름보다 한 단계 옅게, 숫자 폭은 고르게 */
-body.ver-6 .sb-tab-no { flex: none; color: var(--text-tertiary); font-variant-numeric: tabular-nums; }
-body.ver-6 .sb-tab.is-on .sb-tab-no { color: var(--text-secondary); }
+/* [11/05] 미션 번호 M1 … — 그 탭 이름 색에서 한 톤 낮게(라이트는 밝게) 해 이름과 갈린다. 숫자 폭은 고르게 */
+body.ver-6 .sb-tab-no { flex: none; color: color-mix(in srgb, currentColor 55%, transparent); font-variant-numeric: tabular-nums; }
 body.ver-6 .sb-tab-sev[data-sev="critical"] { color: var(--status-critical-icon); }
 body.ver-6 .sb-tab-sev[data-sev="warning"] { color: var(--status-warning-icon); }
 /* 탭 사이 세로 선 — 지금 탭 · 올린 탭 양옆은 지운다 */
