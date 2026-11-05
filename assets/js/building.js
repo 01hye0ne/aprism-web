@@ -359,7 +359,7 @@
     where.appendChild(el("span", "floor-tag num", a.floor));   // 층 꼬리표는 웨이포인트 이름 앞(10/19)
     var wp = /WP-\d+.*$/.exec(a.where);   // 위치는 웨이포인트만(10/19, 메인 v2.2 와 같다)
     where.appendChild(el("span", "ah-wp", wp ? wp[0] : a.where));
-    if (r6 && r6.ch) { where.appendChild(el("span", "ah-ch", "· " + r6.ch)); }
+    // [11/05] 측정 채널(CH1)은 목록 줄에서 뺐다 — 관제 최신 알림(monitor.js)과 같다. 채널은 상세가 말한다
 
     // 어느 층 · 미션의 알림인지 — 미션을 고르기 전 화면이라 이 줄이 하나 더 붙는다.
     // 미션 줄은 글자 칩 대신 회색 아이콘으로 표시한다 — 칩은 값(층) 자리라서(10/19).
