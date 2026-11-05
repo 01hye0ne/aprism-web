@@ -3678,30 +3678,41 @@
    *   측정 중 → 위험 감지, 로봇 빨강 · 그 지점 빨강(우측 레일 · 지도 고리) · 엣지 글로우 · 최신 알림 1건 · Delta 가 한꺼번에 바뀐다.
    *   알림은 지금 보는 로봇 · 그 지점으로 고쳐 쓴다(다른 지점이면 장소 이름도 그 지점 것으로).
    */
-  /* [11/05 디자이너] 미션 완료 — 카드 아랫줄 [지점 n곳] 단추(route-sim.js .rr-done-toggle)로 지점 목록을 펼치고 접는다. 처음엔 접힘 */
-  //   단추는 지점 목록 상자([data-timeline])의 머리 — 바로 위에 붙여 같은 폭 · 같은 바탕으로 한 상자처럼 보인다(v6.css)
-  var doneTog = null;
-  function doneToggleSync() {
+  /*
+   * [11/05 디자이너] 지점 목록 접기 — 모든 상태에 공통. 목록 상자([data-timeline]) 머리줄 [지점 n곳] 단추로 접고 편다.
+   *   미션 완료로 들어오면 접고, 다른 상태로 나가면 편다. 접히면 우측 패널 바탕도 같이 줄어든다(v6.css .rr-wp-closed).
+   *   상태 카드(통신 끊김 · 미션 완료, route-sim.js .rr-banner)는 목록 앞이 아니라 진행 막대 영역(.mission-header) 맨 위에 놓는다.
+   */
+  var wpTog = null;
+  function wpPlace() {
+    var rail = document.querySelector(".right-panel [data-timeline]");
+    if (!rail || !wpTog) { return; }
+    var host = rail.parentNode, head = host.querySelector(".mission-header");
+    Array.prototype.forEach.call(host.children, function (n) { if (n.classList.contains("rr-banner") && head) { head.insertBefore(n, head.firstChild); } });
+    if (wpTog.nextElementSibling !== rail) { host.insertBefore(wpTog, rail); }
+  }
+  function wpToggleSync() {
     var rail = document.querySelector(".right-panel [data-timeline]");
     if (!rail) { return; }
-    if (!doneTog) {
-      doneTog = document.createElement("button");
-      doneTog.type = "button";
-      doneTog.className = "rr-done-toggle";
-      doneTog.addEventListener("click", function () {
-        doneTog.setAttribute("aria-expanded", String(document.body.classList.toggle("rr-wp-open")));
+    if (!wpTog) {
+      wpTog = document.createElement("button");
+      wpTog.type = "button";
+      wpTog.className = "rr-wp-toggle";
+      wpTog.addEventListener("click", function () {
+        wpTog.setAttribute("aria-expanded", String(!document.body.classList.toggle("rr-wp-closed")));
       });
+      new MutationObserver(wpPlace).observe(rail.parentNode, { childList: true });
     }
-    if (doneTog.nextElementSibling !== rail) { rail.parentNode.insertBefore(doneTog, rail); }
-    if (!doneTog.watch) {   // route-sim 이 카드(.rr-banner)를 목록 바로 앞에 끼우므로, 단추가 늘 목록 바로 위에 오게 다시 놓는다
-      doneTog.watch = new MutationObserver(function () { if (doneTog.nextElementSibling !== rail && rail.parentNode) { rail.parentNode.insertBefore(doneTog, rail); } });
-      doneTog.watch.observe(rail.parentNode, { childList: true });
-    }
-    doneTog.textContent = "지점 " + rail.querySelectorAll(".timeline-item[data-waypoint]").length + "곳";
-    doneTog.setAttribute("aria-expanded", String(document.body.classList.contains("rr-wp-open")));
+    wpPlace();
+    wpTog.textContent = "지점 " + rail.querySelectorAll(".timeline-item[data-waypoint]").length + "곳";
+    wpTog.setAttribute("aria-expanded", String(!document.body.classList.contains("rr-wp-closed")));
   }
-  document.addEventListener("aprism:rr-mode", function () { document.body.classList.remove("rr-wp-open"); doneToggleSync(); });
-  document.addEventListener("aprism:mission", function () { setTimeout(doneToggleSync, 0); });
+  document.addEventListener("aprism:rr-mode", function (event) {
+    document.body.classList.toggle("rr-wp-closed", !!(event.detail && event.detail.mode === "done"));
+    wpToggleSync();
+  });
+  document.addEventListener("aprism:mission", function () { setTimeout(wpToggleSync, 0); });
+  setTimeout(wpToggleSync, 0);
 
   var simWp = null;
   function rsimPress(m) { var b = document.querySelector(".rsim-chips [data-m='" + m + "']"); if (b) { b.click(); } }
