@@ -32,6 +32,10 @@
   // [11/05] 미션 번호 — 탭 이름 앞에 M1, M2 … 를 붙인다(디자이너). 탭을 끌어 순서를 바꿔도 번호는 미션을 따라간다.
   //   번호는 처음 펼친 탭 차례(수행중 → 대기 → 완료) 그대로 고정한다.
   var MNO = ["정기 순회 점검", "발전기실 설비 점검", "전기실 열화상 점검", "소방 설비 점검", "주간 설비 점검", "야간 순회 점검", "공조 설비 순회", "유틸리티 순회"];
+  //   영문판은 번역기가 이름을 먼저 영어로 바꿔 두므로 사전(APRISM_EN)으로 영어 이름도 같은 번호에 잇는다
+  var EN = window.APRISM_EN || {};
+  var MNO_EN = MNO.map(function (k) { return EN[k]; });
+  function mno(name) { var i = MNO.indexOf(name); return i >= 0 ? i : MNO_EN.indexOf(name); }
 
   function tab(tag, name, on) {
     var t = document.createElement(tag);
@@ -41,7 +45,7 @@
     var n = document.createElement("span");
     n.className = "sb-tab-name t-label-1";
     n.textContent = name;
-    var no = MNO.indexOf(name);
+    var no = mno(name);
     if (no >= 0) {
       var m = document.createElement("span");
       m.className = "sb-tab-no t-label-1";
@@ -85,7 +89,7 @@
       var sevEl = item.querySelector(".scope-sev");
       var sev = sevEl && sevEl.getAttribute("data-sev");
       var label = nm.textContent;
-      if (MNO.indexOf(label) >= 0) { label = "M" + (MNO.indexOf(label) + 1) + " " + label; }
+      if (mno(label) >= 0) { label = "M" + (mno(label) + 1) + " " + label; }
       if (sev) {
         var ic = document.createElement("span");
         ic.className = "i i-16 sb-tab-sev";

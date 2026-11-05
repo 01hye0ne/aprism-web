@@ -77,6 +77,9 @@ html[lang="en"] body.ver-6 .sb-tabs::-webkit-scrollbar { display: none; }
 html[lang="en"] body.ver-6 .sb-tab { flex: 0 0 auto; max-width: none; padding: 0 var(--space-10, 10px); }
 html[lang="en"] body.ver-6 .sb-tab-name { overflow: visible; text-overflow: clip; font-size: var(--font-size-13); }
 html[lang="en"] body.ver-6 .status-bar-right { flex: none; }
+/* [11/05] 미션 번호(M1 …)가 붙은 만큼 탭 안 여백 · 번호와 이름 사이를 줄여 8개를 한 줄에 */
+html[lang="en"] body.ver-6 .sb-tab { padding: 0 var(--space-6, 6px); gap: var(--space-4, 4px); }
+html[lang="en"] body.ver-6 .sb-tab-no { font-size: var(--font-size-13); }
 /* 감지 탭 줄 — 낱말을 꺾지 않고 글 폭만큼 자리를 주며, 모자라면 줄째 내려간다 */
 html[lang="en"] .sf .tbs { display: flex; flex-wrap: wrap; }
 html[lang="en"] .sf .tb { flex: 1 1 auto; white-space: nowrap; }
