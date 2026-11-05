@@ -1769,7 +1769,7 @@
     if (busy) { return; }
     closeMenu();
     // [11/05 v6] 대기 미션은 관제 대신 그 미션의 설정으로 — 관제 탭(mission-done-v6.js)과 같다
-    if (V6 && mission && stateOf(mission) === "idle") { location.href = "mission-setup-v6.html?mission=" + encodeURIComponent(mission); return; }
+    if (V6 && mission && stateOf(mission) === "idle") { location.href = (window.aprismHref || String)("mission-setup-v6.html?mission=" + encodeURIComponent(mission)); return; }
     // [11/05 v6] 관제 껍데기(control-v6.html) 안이면 크롬 탭처럼 바로 바꾼다 — 층이 다가오는 연출은 건너뛴다(건물 판이 그 모양으로 남지 않게)
     if (window.APRISM_SHELL) { window.APRISM_SHELL.open(mainUrl(mission, f)); return; }
     if (!ready) { location.href = mainUrl(mission, f); return; }
