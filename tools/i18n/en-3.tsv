@@ -446,3 +446,7 @@ AI 추천 그대로 사용 (현장 확인 · 작업 중지 요청)	Used AI sugge
 오늘 6건 조치 · 위험 3건 · 평균 6분	6 actions today · 3 critical · avg 6 min
 보호구 미착용 3회 (B3 작업구역 · T-3 계단). 작업 전 안내가 필요해 보여요	PPE missing 3 times (B3 work area · T-3 stairs). A pre-work briefing looks needed
 미확인 위험 3건: WP-07 2건 · WP-02. 탱크 T-3 외벽 균열은 어제부터 남아 있어요	3 unconfirmed critical: WP-07 ×2 · WP-02. The tank T-3 wall crack has been open since yesterday
+오래된 순	Oldest
+최신 순	Newest
+위험 알림이 먼저, 같은 단계 안에서 시간 순서. 누르면 순서를 바꾼다	Critical first, then by time within each level. Click to reverse
+정렬 바꾸기	Change sort order
