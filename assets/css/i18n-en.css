@@ -113,3 +113,8 @@ html[lang="en"] .sf .c1x { display: flex; flex-wrap: wrap; align-items: center; 
 html[lang="en"] .sf .c1x > span { flex: 1 1 auto; min-width: max-content; }
 html[lang="en"] .sf .c1x b, html[lang="en"] .sf .c1x small { white-space: nowrap; }
 html[lang="en"] .sf .c1x .ma-check-tag, html[lang="en"] .sf .c1x .badge { margin-left: auto; }
+/* [11/05] 전체 미션 층 카드 한 줄 — 영어가 길어 이름이 잘리므로 알림 없는 카드는 No alerts 글자를 빼고 점만 둔다 */
+@media (min-width: 1800px) {
+  html[lang="en"] body.ver-6 .bld-mcard .bld-sev:not([data-sev]) { font-size: 0; gap: 0; }
+  html[lang="en"] body.ver-6 .bld-mcard-head { padding: var(--space-4) 6px; gap: var(--space-4); }
+}

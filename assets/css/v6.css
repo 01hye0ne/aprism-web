@@ -750,6 +750,13 @@ body.ver-6 .bld-mcard { position: relative; width: auto; padding: 0; overflow: v
 body.ver-6 .bld-mcard-head { min-height: 32px; padding: var(--space-4) var(--space-12); gap: var(--space-8); }
 body.ver-6 .bld-mcard-name { font-size: var(--font-size-13); line-height: var(--font-line-height-20); }
 body.ver-6 .bld-mcard .sb-tab-no { font-size: var(--font-size-13); line-height: var(--font-line-height-20); margin-right: calc(var(--space-4) * -1); }   /* [11/05] 탭과 같은 번호 — 이름 글자 크기에 맞추고 이름에 붙인다 */
+/* [11/05] 층 카드는 한 줄로 — 안 여백을 좁히고, 그래도 길면 이름이 줄임표로 줄어든다. 좁은 화면은 이름이 다 잘리므로 예전처럼 두 줄 */
+@media (min-width: 1800px) {
+  body.ver-6 .bld-mcards { flex-wrap: nowrap; }
+  body.ver-6 .bld-mcard { flex: 0 1 auto; min-width: 0; }
+  body.ver-6 .bld-mcard-head { padding: var(--space-4) var(--space-8); gap: var(--space-6, 6px); }
+  body.ver-6 .bld-mcard .sb-tab-no { margin-right: 0; }
+}
 body.ver-6 .bld-mcard-map {
   position: absolute; left: 0; bottom: calc(100% + var(--space-8)); z-index: 5;
   width: 246px; padding: var(--space-4); border-radius: var(--radius-card);
