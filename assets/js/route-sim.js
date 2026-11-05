@@ -121,6 +121,11 @@
     else if (mode !== "run" && mode !== "return") { press("run"); api.mode("run"); }
     playing = true; last = 0; play.textContent = "멈춤";
   });
+  // [11/05] 지금 상태 그대로 재생 — 델타 시뮬레이션(map-v6.js)이 위험 감지인 채로 로봇을 걷게 한다. 다음 지점에 닿으면 평소대로 측정 → 이동
+  document.addEventListener("aprism:rsim-play", function () {
+    if (!api || playing) { return; }
+    playing = true; last = 0; dwell = null; play.textContent = "멈춤";
+  });
 
   /* ---------- 지도 — 측정 눈금 6칸(로봇 둘레) ---------- */
   var NS = "http://www.w3.org/2000/svg";
@@ -201,6 +206,7 @@
   function syncProgress() {
     var rail = document.querySelector("[data-timeline]");
     if (!rail) { return; }
+    if (mode === "lost" && document.body.classList.contains("ver-6")) { return; }   // [11/05 v6] 통신 끊김 — 진행 막대는 끊기기 직전 그대로(회색은 v6.css)
     var items = rail.querySelectorAll(".timeline-item[data-waypoint]"), done = rail.querySelectorAll(".timeline-item[data-waypoint].is-done").length;
     var run = rail.querySelector(".timeline-item[data-waypoint].is-running .step-title");
     var key = done + "/" + items.length + "|" + (run ? run.textContent : "");
@@ -274,7 +280,7 @@
     var left = document.querySelector("[data-progress-left]");
     if (left) {
       if (!left.hasAttribute("data-rr-orig")) { left.setAttribute("data-rr-orig", left.textContent); }
-      left.textContent = LEFTTXT[m] || left.getAttribute("data-rr-orig");
+      left.textContent = (m === "lost" && document.body.classList.contains("ver-6") ? null : LEFTTXT[m]) || left.getAttribute("data-rr-orig");   // [11/05 v6] 통신 끊김은 안내 글 없이 원래 글 그대로
     }
     var rec = document.querySelector("[data-recall-button]"), es = document.querySelector('.rc-actions [data-modal-open="estop"]');
     if (rec) { rec.classList.toggle("rr-on", m === "return"); }
@@ -341,11 +347,15 @@
     if (!ban) { ban = el("div", "rr-banner"); host.insertBefore(ban, rail); }
     if (m === "lost") {
       ban.className = "rr-banner is-lost";
-      ban.innerHTML = "<b>통신 끊김</b><span>마지막 통신 11:16:42, 2분 전. 아래 목록은 그 시점 기준이다.</span>";
+      ban.innerHTML = "<b>통신 끊김</b><span>" + (document.body.classList.contains("ver-6") ? "마지막 통신 11:16:42" : "마지막 통신 11:16:42, 2분 전. 아래 목록은 그 시점 기준이다.") + "</span>";   // [11/05 v6] 시각만
     } else {
       var all = rail.querySelectorAll(".timeline-item[data-waypoint]").length, bad = rail.querySelectorAll(".timeline-item[data-wp-alert]").length;
       ban.className = "rr-banner is-done";
-      ban.innerHTML = "<b>미션 완료 14:15</b><span>" + all + "곳 중 이상 " + bad + "곳</span>";
+      ban.innerHTML = document.body.classList.contains("ver-6")
+        // [11/05 v6] 통신 끊김과 같은 두 줄 + 오른쪽 [보고서 보러가기], 아랫줄은 지점 목록 펼침 단추(map-v6.js doneToggle)
+        ? '<div class="rr-done-head"><div class="rr-done-txt"><b>미션 완료</b><span>완료 14:15, ' + all + "곳 중 이상 " + bad + "곳</span></div>" +
+          '<a class="btn is-xs btn-secondary" href="./report-v6.html" data-rr-report>보고서 보러가기</a></div>'
+        : "<b>미션 완료 14:15</b><span>" + all + "곳 중 이상 " + bad + "곳</span>";
     }
   }
 
