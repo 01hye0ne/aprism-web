@@ -3681,9 +3681,9 @@
         var col = cau ? C.cau : dan ? C.dan : past ? (rrM(onLane) === "done" ? C.gray : blue) : next ? blue : C.up;
         var solid = past || cau || dan || next;
         var el = document.createElement("div");
-        var quiet = !cau && !dan && t !== "skipped" && !document.body.classList.contains("sian");
+        var quiet = !cau && !dan && !next && t !== "skipped" && !document.body.classList.contains("sian");
         el.className = "rr-pin" + (w.buried ? " is-buried" : "") + (past ? " is-past" : "") + (next ? " is-next" : "") + (quiet ? " is-quiet" : "") + (cau || dan ? " is-alert" : "") + (w.id === rrHotId ? " is-hot" : "");   // [10/28] 알림 지점 — 번호를 비켜 바닥 세모가 보이게(route-rules.css)
-        // [11/04] is-quiet — 관제 기본은 문제 지점(위험 · 주의 · 건너뜀)만 번호. 지나온 · 지금 · 앞으로 갈 지점은 감추고(바닥 점은 남는다) 우측 레일 줄 · 지도 점에 손이 닿으면(is-hot) 보인다(디자이너). 미션 설정 · 사전 점검(.sian)은 점검 순서라 그대로 다 보인다
+        // [11/04 · 11/05] is-quiet — 관제 기본은 문제 지점(위험 · 주의 · 건너뜀)과 지금 지점만 번호. 지나온 · 앞으로 갈 지점은 감추고(바닥 점은 남는다) 우측 레일 줄 · 지도 점에 손이 닿으면(is-hot) 보인다(디자이너). 미션 설정 · 사전 점검(.sian)은 점검 순서라 그대로 다 보인다
         el.style.setProperty("--pin", col);
         var head = document.createElement("span");
         head.className = "rr-pin-head";
