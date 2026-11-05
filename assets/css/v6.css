@@ -126,6 +126,7 @@ body.ver-6 .sb-tab {
   height: 40px;
   display: inline-flex;
   align-items: center;
+  justify-content: center;   /* [11/05] 탭이 최소 폭(72px)보다 짧은 글(영문 All)일 때 가운데로 */
   gap: var(--space-6, 6px);
   padding: 0 var(--space-16);
   border: 0;
