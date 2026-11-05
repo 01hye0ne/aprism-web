@@ -163,7 +163,7 @@
     if (el.nodeName === "IMG") {
       var src = el.getAttribute("src");
       if (src && src.indexOf("/img/alert/") >= 0) { el.setAttribute("src", src.replace("/img/alert/", "/img/alert-en/")); }
-      else if (src && /\/img\/safety\/safety_crit\.jpg/.test(src)) { el.setAttribute("src", src.replace("/img/safety/", "/img/safety-en/")); }
+      else if (src && /\/img\/safety\/(safety_crit\.jpg|(m1_)?pd_(crit|warn|ok)\.png)/.test(src)) { el.setAttribute("src", src.replace("/img/safety/", "/img/safety-en/")); }   // 부분방전 그래프 축 글자(Phase · Amplitude)
     }
     if ((el.nodeName === "INPUT" || el.nodeName === "TEXTAREA") && el.type !== "password" && HAN.test(el.value)) {
       // 미리 채워 둔 값(읽기 전용 미션 이름 등)만 — 사람이 친 값은 건드리지 않는다.
