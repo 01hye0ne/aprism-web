@@ -22,18 +22,18 @@
   var RX = [
     // 문장째 — JS 가 숫자를 끼워 만드는 것
     [/^(\d+\.) (.+)$/, function (m, n, rest) { return n + " " + core(rest); }],   // 목차처럼 번호가 붙은 문구는 번호를 떼고 맞춘다
-    // Delta 두 줄 — 줄마다 따로 온다(1줄 굵게 · 2줄 옅게). 근거 줄은 한 줄로 짧게.
-    [/^위험 (\d+)건, 주의 (\d+)건이 있어요\.$/, "$1 critical, $2 caution alerts."],
-    [/^위험 (\d+)건이 있어요\.$/, "$1 critical alerts."],
-    [/^지금 미션에서 (\d+)건, 다른 미션에서 (\d+)건의 확인해야 할 (주의|위험) 단계 알림이 있어요\.$/, function (m, a, b, sev) { return a + " " + (sev === "위험" ? "critical" : "caution") + " alerts to check in this mission, " + b + " in other missions."; }],
-    [/^지금 미션에서 (\d+)건의 확인해야 할 (주의|위험) 단계 알림이 있어요\.$/, function (m, a, sev) { return a + " " + (sev === "위험" ? "critical" : "caution") + " alerts to check in this mission."; }],
-    [/^다른 미션에 (주의|위험) 단계 알림이 있어요!$/, function (m, sev) { return "There are " + (sev === "위험" ? "critical" : "caution") + " alerts in another mission!"; }],
-    [/^먼저 확인하는 것을 추천드릴게요\.$/, "I'd suggest checking it first."],
-    [/^알림 (\d+)건 관찰 중$/, "Watching $1 alerts"],
-    [/^(주의|위험) 알림 (\d+)건 누적$/, function (m, sev, n) { return n + " " + (sev === "위험" ? "critical" : "caution") + " alerts total"; }],
-    [/^(.+?)부터 확인하세요\.$/, function (m, x) { return "Check the " + core(x) + " first."; }],
+    // Delta 접힌 위젯 — 두 줄이 줄마다 따로 온다(v3-panel.js lines()). main 문장 꼴 그대로 줄 단위로 채운다(한글 남던 것)
+    [/^위험 (\d+)건, 주의 (\d+)건이 있어요\.$/, "$1 critical, $2 warnings."],
+    [/^위험 (\d+)건이 있어요\.$/, "$1 critical."],
+    [/^(.+?)(?:부터|이|가)? ?확인하세요\.$/, function (m, x) { return "Check " + core(x) + " first."; }],
+    [/^이 미션 위험 (\d+), 다른 미션 위험 (\d+)$/, "$1 critical here, $2 in other missions"],
     [/^이 미션 위험 (\d+)$/, "$1 critical here"],
-    [/^다른 미션 위험 (\d+)$/, "$1 in other missions"],
+    [/^(주의|위험) 알림 (\d+)건 누적$/, function (m, sev, n) { return n + (sev === "위험" ? " critical" : " warnings") + " in total"; }],
+    // 안전진단 — 감지 종류 안내 문장(계기는 사전 조각으로 두면 다른 낱말을 깨서 여기서만 옮긴다)
+    [/^(.+?)는? ((?:누출|온도|계기|이상음향|부분방전)[^만]*)만 판정$/, function (m, mis, list) {
+      var N = { "계기": "Gauge reading" };
+      return core(mis) + " judges only " + list.split(", ").map(function (x) { return N[x] || core(x); }).join(", ").toLowerCase();
+    }],
     [/^위험 (\d+)건 포함 (\d+)건 누적$/, "$2 total, incl. $1 critical"],
     [/^위험 (\d+)건부터 조치$/, "Act on the $1 critical first"],
     [/^주의 (\d+)건 묶어서 확인$/, "Review $1 warnings together"],
@@ -51,6 +51,11 @@
     [/^위험 (\d+)건, 주의 (\d+)건이 있어요\. (.+?)(?:부터|이|가)? ?확인하세요\.$/, "$1 critical, $2 warnings. Check $3 first."],
     [/^위험 (\d+)건, 주의 (\d+)건이에요\. 이 순서로 보세요\.$/, "$1 critical, $2 warnings. Go in this order."],
     [/^(\d+)\. 주의 (\d+)건\(이 미션 (\d+), 다른 미션 (\d+)\)$/, "$1. Warnings $2 (this mission $3, other missions $4)"],
+    [/^지금 미션에서 (\d+)건, 다른 미션에서 (\d+)건의 확인해야 할 주의 단계 알림이 있어요\.$/, "Warnings to check: $1 in this mission, $2 in other missions."],
+    [/^지금 미션에서 (\d+)건의 확인해야 할 주의 단계 알림이 있어요\.$/, "Warnings to check: $1 in this mission."],
+    [/^위험 (\d+)건부터 보여 드릴까요\?$/, "Start with the $1 critical?"],
+    [/^알림 (\d+)건부터 보여 드릴까요\?$/, "Start with the $1 alerts?"],
+    [/^어서오세요 (.+?) ?님$/, "Welcome, $1"],
     [/^주의 (\d+)건 묶어 보기$/, "View $1 warnings together"],
     [/^가장 급한 것은 (.+?)(?:이에요|예요)\.$/, "Most urgent: $1."],
     [/^(.+) — 검출 장면$/, "$1 — detection frame"],
@@ -126,10 +131,13 @@
     var m = /^(\s*)([\s\S]*?)(\s*)$/.exec(s);
     // 줄바꿈이 든 문구(Delta 두 줄)는 줄마다 따로 옮긴다 — core() 가 공백을 하나로 합쳐 두 줄이 한 문단이 되는 것을 막는다.
     var out = m[1] + (m[2].indexOf("\n") >= 0 ? m[2].split("\n").map(core).join("\n") : core(m[2])) + m[3];
+    out = nodot(out);
     cache.set(s, out);
     return out;
   }
   window.APRISM_TR = tr;
+  // 영문 화면은 가운뎃점(·)을 쓰지 않는다 — 쉼표로 바꾼다.
+  function nodot(s) { return s && s.indexOf("·") >= 0 ? s.replace(/\s*·\s*/g, ", ") : s; }
 
   function skip(el) {
     return el && (el.nodeName === "SCRIPT" || el.nodeName === "STYLE" || el.isContentEditable);
@@ -137,7 +145,9 @@
   function doText(n) {
     if (skip(n.parentNode)) { return; }
     var v = n.nodeValue;
-    if (HAN.test(v)) { var t = tr(v); if (t !== v) { n.nodeValue = t; } }
+    // 한글 없는 글도 가운뎃점은 쉼표로(JS 가 영어 조각 사이에 · 를 끼우는 곳)
+    var t = nodot(HAN.test(v) ? tr(v) : v);
+    if (t !== v) { n.nodeValue = t; }
   }
   function doAttrs(el) {
     for (var i = 0; i < ATTRS.length; i++) {
@@ -148,6 +158,12 @@
     for (var j = 0; j < URL_ATTRS.length; j++) {
       var u = el.getAttribute(URL_ATTRS[j]);
       if (u && u.indexOf(".html") > 0) { var h = href(u); if (h !== u) { el.setAttribute(URL_ATTRS[j], h); } }
+    }
+    // 검출 장면 그림은 라벨이 그림에 박혀 있다 — 영어 라벨 판(img/alert-en · img/safety-en, 같은 파일 이름)으로.
+    if (el.nodeName === "IMG") {
+      var src = el.getAttribute("src");
+      if (src && src.indexOf("/img/alert/") >= 0) { el.setAttribute("src", src.replace("/img/alert/", "/img/alert-en/")); }
+      else if (src && /\/img\/safety\/(safety_crit\.jpg|(m1_)?pd_(crit|warn|ok)\.png)/.test(src)) { el.setAttribute("src", src.replace("/img/safety/", "/img/safety-en/")); }   // 부분방전 그래프 축 글자(Phase · Amplitude)
     }
     if ((el.nodeName === "INPUT" || el.nodeName === "TEXTAREA") && el.type !== "password" && HAN.test(el.value)) {
       // 미리 채워 둔 값(읽기 전용 미션 이름 등)만 — 사람이 친 값은 건드리지 않는다.
@@ -173,7 +189,7 @@
       else { for (var j = 0; j < r.addedNodes.length; j++) { walk(r.addedNodes[j]); } }
     }
   });
-  mo.observe(document.documentElement, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ATTRS.concat(URL_ATTRS) });
+  mo.observe(document.documentElement, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ATTRS.concat(URL_ATTRS, ["src"]) });
 
   // 캔버스 글자(로봇 모습 등)도
   var C2 = window.CanvasRenderingContext2D && CanvasRenderingContext2D.prototype;

@@ -79,11 +79,7 @@
     var scope = window.APRISM_DELTA_SCOPE;
     var t = s && !win.classList.contains("is-thinking") ? (s.clue || "") : say();
     if (!s && scope && !win.classList.contains("is-thinking")) { t = scope + " " + t; }
-    // 가운뎃점(·)은 화면에 찍지 않는다 — 조각으로 나눠 간격만 둔다(text-parts.css). 조각이 되면 textContent 가 달라지므로 원문을 따로 기억한다.
-    if (out.getAttribute("data-t") !== t) {
-      out.setAttribute("data-t", t);
-      if (window.APRISM_TEXT) { window.APRISM_TEXT.fill(out, t); } else { out.textContent = t; }
-    }
+    if (out.textContent !== t) { out.textContent = t; }
     if (clue) {
       clue.classList.toggle("is-said", !!s);
       clue.classList.toggle("is-scope", !!(s && s.scope));

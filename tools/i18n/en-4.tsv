@@ -23,7 +23,7 @@ DELTA 추천	DELTA suggestion
 소요	Took
 진단 상세	Diagnosis details
 조치 요청	Request action
-오탐 가능성	False-positive likelihood
+오탐 가능성	False alarm
 방금	Just now
 AI 추천을 쓰지 않음 (추천:	AI suggestion not used (suggested:⎵
 AI 추천 그대로 사용 (	Used AI suggestion as is (
@@ -46,7 +46,7 @@ WP-07 고소 작업 발판	WP-07 Elevated Work Platform
 WP-05 냉각 펌프 P-2	WP-05 Cooling Pump P-2
 이상 점수 20.4	Anomaly score 20.4
 WP-06 수배전반 MCC-1	WP-06 Switchgear MCC-1
-정상 범위	Normal range
+정상 범위	Normal
 측정 3곳	3 spots measured
 측정 2곳	2 spots measured
 압력 0.84 MPa	Pressure 0.84 MPa

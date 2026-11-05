@@ -1242,7 +1242,7 @@ body.ver-6.sian .precheck-list > .precheck-row:last-child { border-bottom: 0; }
 body.ver-6.sian .mp-stage[data-stage-show="precheck"] .mp-header { border-bottom: 0; }
 
 /*
- * [11/03 v6] 지나온 길 번호 — 문제없이 지나온 지점(is-quiet)은 번호를 감추고 위험 · 주의 · 건너뜀만 남긴다(디자이너).
+ * [11/04 v6] 지도 번호 — 관제 기본은 문제 지점(위험 · 주의 · 건너뜀)만, 나머지(is-quiet)는 감춘다(디자이너).
  *   예전엔 화면에서 겹치면 솎아(is-thin) 3D · 탑뷰 · 확대마다 보이는 번호가 달랐다 — 이제 기준이 "문제 여부"라 어디서 봐도 같다.
  *   지도 점 · 우측 레일 줄에 손이 닿으면(is-hot) 그 번호만 잠깐 보인다(솎기보다 앞선다).
  */
@@ -1331,7 +1331,7 @@ body.ver-6 .rr-pin.is-hot:not([hidden]) { display: block; opacity: 1; z-index: 2
   box-shadow: inset 0 2px 3px -1px rgb(255 255 255 / 35%), 0 8px 24px rgb(11 14 19 / 14%);
 }
 :root[data-theme="light"][data-delta][data-glow] body.ver-6.v2-2.v3 .delta3.is-open .delta3-card {
-  margin: 0 6px 6px; border-radius: 6px; overflow: hidden;
+  width: calc(100% - 12px); margin: 0 6px 6px; border-radius: 6px; overflow: hidden;   /* [11/04] 폭을 줄이지 않아 오른쪽 테가 가려졌다 */
   background-color: #FAFAFA; background-image: none; box-shadow: inset 0 0 0 1px rgb(255 255 255 / 70%);
 }
 /* 위 채움 규칙이 예전 라이트 위험 규칙(.is-critical 이 붙어 한 단 더 셈 — 흰 → red/100 원형 · 세로)에 졌다 — 단계 클래스를 붙여 같은 셈으로 다시 건다 */
@@ -1348,9 +1348,145 @@ body.ver-6 .rr-pin.is-hot:not([hidden]) { display: block; opacity: 1; z-index: 2
 /* 펼친 본문 밑 깔개(.delta3-body::before = bg/inset 회색)가 흰 판(#FAFAFA)을 덮었다 — 라이트 펼침에선 흰 판이 그대로 보이게 */
 :root[data-theme="light"][data-delta][data-glow] body.ver-6.v2-2.v3 .delta3.is-open .delta3-body::before { background-color: transparent; }
 
-/* Delta 두 줄 — 1줄(.dl1)은 또렷한 흰색 굵게, 2줄(.dl2)은 한 단 옅은 회색 보통 굵기(10/31 디자이너 시안). 두 줄이 같은 색이면 위계가 안 보인다. */
-body.ver-5[data-delta-copy="brief"] .delta3 .ai-line-2 .dl1 { color: var(--text-primary); text-transform: uppercase; }
-body.ver-5[data-delta-copy="brief"] .delta3 .ai-line-2 .dl2 {
-  color: color-mix(in srgb, var(--text-primary) 55%, transparent);
-  font-weight: var(--font-weight-regular);
+/*
+ * [11/04 v6] Delta 접힘 글 · 단추 색 — 아티팩트 "Delta v6 접힘 / 펼침 시안"에서 11/03 에 빠진 값.
+ *   다크 다른 미션 근거 줄 = 등급 색보다 옅은 글(#FFB4AE · #FFD27A), 라이트 채움 위 답 단추 = 흰 40% 테 + 흰 18% 면(답 26% · 올림 34%)
+ */
+:root[data-delta][data-glow] body.ver-6.v2-2.v3 .delta3-clue.is-scope[data-scope="critical"] .delta3-clue-txt { color: #FFB4AE; }
+:root[data-delta][data-glow] body.ver-6.v2-2.v3 .delta3-clue.is-scope[data-scope="warning"] .delta3-clue-txt { color: #FFD27A; }
+:root[data-theme="light"][data-delta][data-glow] body.ver-6.v2-2.v3 .delta3-clue.is-scope .delta3-clue-txt { color: #FFFFFF; }
+:root[data-delta][data-glow] body.ver-6.v2-2.v3 .delta3:not(.is-open) .delta3-plus.is-answer:hover { background-color: rgb(255 255 255 / 26%); }
+:root[data-delta][data-glow] body.ver-6.v2-2.v3 .delta3 .delta3-talk:hover { background-color: rgb(255 255 255 / 24%); }
+:root[data-theme="light"][data-delta][data-glow] body.ver-6.v2-2.v3 .delta3:not(.is-open) .delta3-plus,
+:root[data-theme="light"][data-delta][data-glow] body.ver-6.v2-2.v3 .delta3 .delta3-talk {
+  border-color: rgb(255 255 255 / 40%); background-color: rgb(255 255 255 / 18%);
+}
+:root[data-theme="light"][data-delta][data-glow] body.ver-6.v2-2.v3 .delta3:not(.is-open) .delta3-plus.is-answer { background-color: rgb(255 255 255 / 26%); }
+:root[data-theme="light"][data-delta][data-glow] body.ver-6.v2-2.v3 .delta3:not(.is-open) .delta3-plus:hover,
+:root[data-theme="light"][data-delta][data-glow] body.ver-6.v2-2.v3 .delta3 .delta3-talk:hover { background-color: rgb(255 255 255 / 34%); }
+
+/*
+ * [11/04 v6] Delta 펼침 답 구조(delta-answer-v6.js) — 같은 시안의 블록 문법. 크기 · 색은 시안 값, 글색은 토큰.
+ *   겹침 면은 다크 = 흰 겹침, 라이트 = 시안의 무채 단(#F2F4F5 · 어두운 겹침)
+ */
+body.ver-6 .delta3 {
+  --dc6-face: rgb(255 255 255 / 7%); --dc6-edge: rgb(255 255 255 / 8%); --dc6-hover: rgb(255 255 255 / 5%); --dc6-next: rgb(255 255 255 / 6%);
+  --dc6-why: rgb(255 255 255 / 5%); --dc6-btn-edge: rgb(255 255 255 / 22%); --dc6-btn: rgb(255 255 255 / 6%); --dc6-btn-hover: rgb(255 255 255 / 14%);
+  --dc6-pri: #F6F8FB; --dc6-pri-fg: #0B0E13; --dc6-pri-hover: #FFFFFF; --dc6-q-edge: rgb(255 255 255 / 18%);
+}
+:root[data-theme="light"] body.ver-6 .delta3 {
+  --dc6-face: #F2F4F5; --dc6-edge: rgb(11 14 19 / 6%); --dc6-hover: rgb(11 14 19 / 4%); --dc6-next: rgb(11 14 19 / 5%);
+  --dc6-why: #FFFFFF; --dc6-btn-edge: rgb(11 14 19 / 14%); --dc6-btn: #FFFFFF; --dc6-btn-hover: #F2F4F5;
+  --dc6-pri: #31363B; --dc6-pri-fg: #FFFFFF; --dc6-pri-hover: #3D4247; --dc6-q-edge: rgb(11 14 19 / 12%);
+}
+body.ver-6 .dc-msg.dc6 { display: grid; gap: 10px; min-width: 0; word-break: keep-all; overflow-wrap: anywhere; }
+body.ver-6 .dc-msg.dc6 p { margin: 0; max-width: none; word-break: keep-all; overflow-wrap: anywhere; }
+body.ver-6 .dc6-h { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+body.ver-6 .dc6-h h4 { margin: 0; min-width: 0; font-size: 15px; line-height: 22px; font-weight: 800; color: var(--text-primary); }
+body.ver-6 .dc6-h span { flex: none; font-size: 12px; line-height: 16px; color: var(--text-secondary); }
+body.ver-6 .dc-msg.dc6 .dc6-p { font-size: 14px; line-height: 21px; color: var(--text-primary); }
+body.ver-6 .dc-msg.dc6 .dc6-p.is-strong { font-weight: 700; }
+body.ver-6 .dc6-sev { font-weight: 800; }
+body.ver-6 .dc6-sev.is-critical { color: var(--status-critical-text); }
+body.ver-6 .dc6-sev.is-warning { color: var(--status-warning-text); }
+/* 카드 */
+body.ver-6 .dc6-card { display: grid; gap: 8px; min-width: 0; padding: 12px; border: 1px solid var(--dc6-edge); border-radius: 8px; background-color: var(--dc6-face); }
+body.ver-6 .dc6-card.is-done { opacity: 0.7; }
+body.ver-6 .dc6-card.is-done .dc6-eq { text-decoration: line-through; }
+body.ver-6 .dc-msg.dc6 .dc6-need { display: flex; align-items: center; gap: 6px; font-size: 13px; line-height: 18px; font-weight: 800; }
+body.ver-6 .dc-msg.dc6 .dc6-need.is-critical { color: var(--status-critical-text); }
+body.ver-6 .dc-msg.dc6 .dc6-need.is-warning { color: var(--status-warning-text); }
+body.ver-6 .dc6-need.is-critical .dc6-diag, body.ver-6 .dc6-row.is-critical .dc6-diag { color: var(--status-critical-icon); }
+body.ver-6 .dc6-need.is-warning .dc6-diag, body.ver-6 .dc6-row.is-warning .dc6-diag { color: var(--status-warning-icon); }
+body.ver-6 .dc6-diag { flex: none; }
+body.ver-6 .dc-msg.dc6 .dc6-eq { font-size: 16px; line-height: 24px; font-weight: 800; color: var(--text-primary); }
+body.ver-6 .dc-msg.dc6 .dc6-desc { font-size: 14px; line-height: 21px; color: var(--text-primary); }
+body.ver-6 .dc6-why { display: grid; gap: 2px; padding: 8px 10px; border-radius: 6px; background-color: var(--dc6-why); }
+body.ver-6 .dc6-why-l { font-size: 12px; line-height: 16px; font-weight: 700; color: var(--text-secondary); }
+body.ver-6 .dc6-why ul, body.ver-6 .dc6-sec ul, body.ver-6 .dc6-sec ol, body.ver-6 .dc6-ul { margin: 0; padding-left: 16px; display: grid; gap: 1px; font-size: 13px; line-height: 19px; color: var(--text-primary); }
+body.ver-6 .dc-msg.dc6 .dc6-loc { display: flex; align-items: center; gap: 4px; font-size: 12px; line-height: 16px; color: var(--text-tertiary); }
+body.ver-6 .dc-msg.dc6 .dc6-done { font-size: 13px; line-height: 18px; font-weight: 700; color: var(--status-safe-text, var(--text-secondary)); }
+body.ver-6 .dc-msg.dc6 .dc6-done[hidden] { display: none; }
+body.ver-6 .dc-msg.dc6 .dc6-rule { font-size: 12px; line-height: 16px; color: var(--text-tertiary); }
+/* 단추 — 채운 단추는 답마다 하나 */
+body.ver-6 .dc6-btns { display: grid; grid-template-columns: 1fr auto; gap: 8px; margin-top: 2px; }
+body.ver-6 .dc6-btn {
+  height: 34px; padding: 0 14px; border: 1px solid var(--dc6-btn-edge); border-radius: 999px; background-color: var(--dc6-btn);
+  font: inherit; font-size: 13px; font-weight: 700; color: var(--text-primary); white-space: nowrap; cursor: pointer;
+}
+body.ver-6 .dc6-btn:hover { background-color: var(--dc6-btn-hover); }
+body.ver-6 .dc6-btn.is-pri { border-color: transparent; background-color: var(--dc6-pri); color: var(--dc6-pri-fg); }
+body.ver-6 .dc6-btn.is-pri:hover { background-color: var(--dc6-pri-hover); }
+body.ver-6 .dc6-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+body.ver-6 .dc6-btn:focus-visible, body.ver-6 .dc6-row:focus-visible, body.ver-6 .dc6-q:focus-visible, body.ver-6 .dc6-toggle:focus-visible, body.ver-6 .dc6-jump:focus-visible { outline: 2px solid var(--border-focus, currentColor); outline-offset: 2px; }
+/* 다음 확인 항목 */
+body.ver-6 .dc6-sub { display: flex; justify-content: space-between; align-items: baseline; margin-top: 4px; font-size: 13px; line-height: 18px; font-weight: 700; color: var(--text-secondary); }
+body.ver-6 .dc6-sub span:last-child { font-size: 12px; font-weight: 500; color: var(--text-tertiary); }
+body.ver-6 .dc6-list { display: grid; min-width: 0; }
+body.ver-6 .dc6-list[hidden] { display: none; }
+body.ver-6 .dc6-row { display: flex; align-items: center; gap: 10px; width: 100%; min-width: 0; padding: 10px 2px; border: 0; border-bottom: 1px solid var(--dc6-edge); border-radius: 0; background: none; font: inherit; text-align: left; color: var(--text-primary); cursor: pointer; }
+body.ver-6 .dc6-row:last-child { border-bottom: 0; }
+body.ver-6 .dc6-row:hover { background-color: var(--dc6-hover); }
+body.ver-6 .dc6-row.is-next { background-color: var(--dc6-next); }
+body.ver-6 .dc6-row-x { flex: 1; min-width: 0; display: grid; gap: 1px; }
+body.ver-6 .dc6-row-t { display: flex; align-items: center; gap: 6px; font-size: 14px; line-height: 20px; font-weight: 700; }
+body.ver-6 .dc6-row-s { font-size: 12px; line-height: 16px; color: var(--text-tertiary); }
+body.ver-6 .dc6-row-c { flex: none; color: var(--text-tertiary); }
+body.ver-6 .dc6-tag { flex: none; padding: 0 6px; border-radius: 4px; background-color: var(--dc6-pri); font-size: 11px; line-height: 16px; font-weight: 700; color: var(--dc6-pri-fg); }
+body.ver-6 .dc6-row.is-done .dc6-row-t > span { font-weight: 500; text-decoration: line-through; color: var(--text-secondary); }
+body.ver-6 .dc6-row.is-done .dc6-diag { color: var(--text-tertiary); }
+body.ver-6 .dc6-toggle { display: flex; align-items: center; justify-content: space-between; width: 100%; margin-top: 4px; padding: 8px 2px; border: 0; border-top: 1px solid var(--dc6-edge); background: none; font: inherit; font-size: 13px; line-height: 18px; font-weight: 700; text-align: left; color: var(--text-secondary); cursor: pointer; }
+body.ver-6 .dc6-toggle:hover { color: var(--text-primary); }
+body.ver-6 .dc6-toggle-r { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 500; color: var(--text-tertiary); }
+body.ver-6 .dc6-toggle-r .i { transition: transform 0.2s ease-out; }
+body.ver-6 .dc6-toggle[aria-expanded="true"] .dc6-toggle-r .i { transform: rotate(180deg); }
+/* 원인 분석 */
+body.ver-6 .dc6-sec { display: grid; gap: 4px; }
+body.ver-6 .dc6-sec h5 { display: flex; align-items: center; gap: 6px; margin: 0; font-size: 12px; line-height: 16px; font-weight: 700; color: var(--text-secondary); }
+body.ver-6 .dc-msg.dc6 .dc6-sec p { font-size: 13px; line-height: 19px; color: var(--text-primary); }
+body.ver-6 .dc6-fact, body.ver-6 .dc6-est { padding: 0 5px; border: 1px solid; border-radius: 4px; font-size: 11px; line-height: 16px; font-weight: 700; }
+body.ver-6 .dc6-fact { border-color: var(--status-safe-border, currentColor); background-color: var(--status-safe-bg, transparent); color: var(--status-safe-text, var(--text-secondary)); }
+body.ver-6 .dc6-est { border-style: dashed; border-color: var(--text-tertiary); color: var(--text-secondary); }
+body.ver-6 .dc6-gap { padding: 6px 8px; border: 1px solid var(--status-warning-border, currentColor); border-radius: 6px; background-color: var(--status-warning-bg, transparent); font-size: 13px; line-height: 18px; color: var(--status-warning-text); }
+/* 추천 조치 */
+body.ver-6 .dc-msg.dc6 .dc6-sim, body.ver-6 .dc6-confirm .dc6-sim { font-size: 12px; line-height: 16px; color: var(--status-warning-text); }
+body.ver-6 .dc6-acts { display: grid; gap: 4px; }
+body.ver-6 .dc6-act { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 6px; background-color: var(--dc6-why); cursor: pointer; }
+body.ver-6 .dc6-act input { flex: none; width: 16px; height: 16px; margin: 0; accent-color: var(--color-blue-500, currentColor); }
+body.ver-6 .dc6-act-t { flex: 1; min-width: 0; font-size: 14px; line-height: 20px; color: var(--text-primary); }
+body.ver-6 .dc6-st { flex: none; padding: 0 6px; border: 1px dashed var(--text-tertiary); border-radius: 4px; font-size: 11px; line-height: 18px; font-weight: 700; white-space: nowrap; color: var(--text-secondary); }
+body.ver-6 .dc6-st[data-st="pending"] { border-style: solid; border-color: var(--status-warning-border, currentColor); color: var(--status-warning-text); }
+body.ver-6 .dc6-st[data-st="requested"], body.ver-6 .dc6-st[data-st="progress"] { border-style: solid; border-color: var(--status-info-border, currentColor); color: var(--status-info-text, var(--text-primary)); }
+body.ver-6 .dc6-confirm { display: grid; gap: 8px; padding: 8px 10px; border: 1px solid var(--status-warning-border, currentColor); border-radius: 6px; background-color: var(--dc6-why); font-size: 13px; line-height: 18px; color: var(--text-primary); }
+body.ver-6 .dc6-dl { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; margin: 0; font-size: 13px; line-height: 18px; color: var(--text-primary); }
+body.ver-6 .dc6-dl dt { color: var(--text-tertiary); }
+body.ver-6 .dc6-dl dd { margin: 0; }
+/* 이렇게 물어보세요 */
+body.ver-6 .dc6-sugg { flex: none; display: grid; gap: 6px; padding: 10px 12px 8px; border-top: 1px solid var(--dc6-edge); }
+body.ver-6 .dc6-sugg[hidden] { display: none; }
+body.ver-6 .delta3:not(.is-open) .dc6-sugg { display: none; }
+body.ver-6 .dc6-sugg-l { font-size: 12px; line-height: 16px; font-weight: 700; color: var(--text-secondary); }
+body.ver-6 .dc6-qs { display: flex; flex-wrap: wrap; gap: 6px; }
+body.ver-6 .dc6-q { padding: 3px 10px; border: 1px solid var(--dc6-q-edge); border-radius: 999px; background-color: var(--dc6-btn); font: inherit; font-size: 13px; line-height: 18px; color: var(--text-primary); cursor: pointer; }
+body.ver-6 .dc6-q:hover { background-color: var(--dc6-btn-hover); }
+/* 분석 시각 — 머리에 한 번만 */
+body.ver-6 .dc6-at { margin-left: 8px; font-size: 12px; line-height: 16px; font-weight: 400; color: var(--text-secondary); white-space: nowrap; }
+body.ver-6 .delta3:not(.is-open) .dc6-at { display: none; }
+/* 새 알림 */
+body.ver-6 .dc6-unread { display: flex; align-items: center; gap: 8px; font-size: 12px; line-height: 16px; font-weight: 800; color: var(--status-critical-text); }
+body.ver-6 .dc6-unread::before, body.ver-6 .dc6-unread::after { content: ""; flex: 1; height: 1px; background-color: var(--status-critical-icon); opacity: 0.6; }
+body.ver-6 .dc-msg.dc6.dc6-new { position: relative; padding-left: 12px; }
+body.ver-6 .dc-msg.dc6.dc6-new::before { content: ""; position: absolute; left: 0; top: 2px; bottom: 2px; width: 3px; border-radius: 2px; background-color: var(--status-critical-icon); }
+body.ver-6 .dc-msg.dc6.dc6-new.is-warning::before { background-color: var(--status-warning-icon); }
+body.ver-6 .dc6-new.is-critical .dc6-h h4 { color: var(--status-critical-text); }
+body.ver-6 .dc6-new.is-warning .dc6-h h4 { color: var(--status-warning-text); }
+body.ver-6 .dc-msg.dc6.is-old { opacity: 0.45; transition: opacity 0.25s ease-out; }
+body.ver-6 .dc-msg.dc6.is-old:hover, body.ver-6 .dc-msg.dc6.is-old:focus-within { opacity: 1; }
+body.ver-6 .dc6-jump-at { position: relative; flex: none; height: 0; z-index: 2; }
+body.ver-6 .delta3:not(.is-open) .dc6-jump-at { display: none; }
+body.ver-6 .dc6-jump { position: absolute; left: 50%; bottom: 10px; transform: translateX(-50%); height: 30px; padding: 0 12px; border: 0; border-radius: 999px; background-color: var(--status-critical-icon); box-shadow: 0 6px 16px rgb(0 0 0 / 35%); font: inherit; font-size: 13px; font-weight: 700; color: #FFFFFF; white-space: nowrap; cursor: pointer; }
+body.ver-6 .dc6-jump.is-warning { background-color: var(--status-warning-icon); color: #1A1C1D; }
+body.ver-6 .dc6-jump[hidden] { display: none; }
+@media (prefers-reduced-motion: reduce) {
+  body.ver-6 .dc-msg.dc6.is-old, body.ver-6 .dc6-toggle-r .i { transition: none; }
 }
