@@ -381,9 +381,20 @@
     var row = el("div", "ah-row");
     row.setAttribute("role", "listitem");
     node.removeAttribute("role");
-    var go = el("button", "btn btn-ghost is-xs ah-report");
-    go.type = "button";
-    go.title = "안전진단 화면 준비 중";
+    // [11/05 v6] 진단 상세 — 관제 목록(monitor.js)과 같은 주소로 그 미션의 그 감지 자세히 보기를 연다
+    var go;
+    if (V6) {
+      go = el("a", "btn btn-ghost is-xs ah-report");
+      var dq = new URLSearchParams({ mission: a.mission });
+      var det = a.detect || (r6 && r6.detect);
+      if (det) { dq.set("detect", det); }
+      go.href = (window.aprismHref || String)("./safety-v6.html?" + dq.toString());
+      go.title = "안전진단에서 이 알림의 감지 결과 보기";
+    } else {
+      go = el("button", "btn btn-ghost is-xs ah-report");
+      go.type = "button";
+      go.title = "안전진단 화면 준비 중";
+    }
     go.setAttribute("aria-label", (document.body.classList.contains("ver-6") ? "진단 상세" : "안전진단"));   // [10/30 v6] 이름 통일 "진단 상세"
     go.appendChild(icon("shield"));
     go.appendChild(el("span", "ah-report-label", (document.body.classList.contains("ver-6") ? "진단 상세" : "안전진단")));
