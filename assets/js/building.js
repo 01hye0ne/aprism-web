@@ -85,6 +85,14 @@
     { n: 12, floor: "B3", st: "idle", mission: null,                          now: "충전 중",               bat: 55, chg: true, sig: 3, uv: [0.10, 0.80], dock: true }
   ];  // v5(10/30) — Robot 01 진행을 미션 관제 · 안전진단(7/20)과 맞춘다. 멈춘 판(v3 · v4)은 그대로 3/20.
   if (body.classList.contains("ver-5")) { ROBOTS[0].done = 7; }
+  // [11/05 v6] 데모 대기 미션 둘 — 관제(screen.js 11/03)와 같게. 두 화면의 상단 탭 줄이 같아야 탭을 오가도 탭 줄이 그대로다
+  if (V6) {
+    ROBOTS[2].mission = "소방 설비 점검";
+    ROBOTS[7].mission = "주간 설비 점검";
+    MISSION_FLOORS["소방 설비 점검"] = ["B4"];
+    MISSION_FLOORS["주간 설비 점검"] = ["B3"];
+    MISSION_LIST = Object.keys(MISSION_FLOORS);
+  }
 
   // v4(10/28) — Robot 11 은 미션 관제의 웨이포인트 20칸 더미와 같게 7칸 마치고 8번 진행 중
   if (V3) { ROBOTS.forEach(function (r) { if (r.n === 11) { r.now = "케미컬 공급 캐비닛 CDS-02 판독"; r.done = 7; } }); }
@@ -1763,6 +1771,10 @@
   function enter(f, mission) {
     if (busy) { return; }
     closeMenu();
+    // [11/05 v6] 대기 미션은 관제 대신 그 미션의 설정으로 — 관제 탭(mission-done-v6.js)과 같다
+    if (V6 && mission && stateOf(mission) === "idle") { location.href = (window.aprismHref || String)("mission-setup-v6.html?mission=" + encodeURIComponent(mission)); return; }
+    // [11/05 v6] 관제 껍데기(control-v6.html) 안이면 크롬 탭처럼 바로 바꾼다 — 층이 다가오는 연출은 건너뛴다(건물 판이 그 모양으로 남지 않게)
+    if (window.APRISM_SHELL) { window.APRISM_SHELL.open(mainUrl(mission, f)); return; }
     if (!ready) { location.href = mainUrl(mission, f); return; }
     setHot(null);
     busy = true;
