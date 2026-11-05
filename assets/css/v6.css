@@ -1523,3 +1523,14 @@ body.ver-6 .ac-dl .ma-check-tag {
 :root[data-theme="light"] body.ver-6 .context-panel .ah-sec:not(.done-sec) .ah-item:hover { background-color: var(--state-hover); }
 :root[data-theme="light"] body.ver-6 .context-panel .ah-sec:not(.done-sec) .ah-item[aria-pressed="true"] { background-color: var(--bg-selected); }
 :root[data-theme="light"] body.ver-6 .right-panel .timeline .timeline-item.is-pending:not(.is-running) .step-card { background-color: var(--color-gray-0); }
+
+/*
+ * [11/05 논의] 라이트 모드 알림 센터 목록 — 관제 최신 알림 줄과 같은 값(한글판 · 영문판 공통)
+ *   기본 = 흰색(위험 줄의 옅은 빨강 면도 흰색 — 단계는 왼쪽 띠 · 아이콘이 말한다), 호버 = state-hover, 고른 줄 = bg-selected.
+ *   예전엔 고른 줄이 흰색(bg-raised)이라 기본 줄과 뒤바뀌어 보였다.
+ */
+:root[data-theme="light"] body.ver-6 .ac-row,
+:root[data-theme="light"] body.ver-6 .ac-row[data-sev="critical"] { background-color: var(--color-gray-0); }
+:root[data-theme="light"] body.ver-6 .ac-row:hover { background-color: var(--state-hover); }
+:root[data-theme="light"] body.ver-6 .ac-row[aria-selected="true"],
+:root[data-theme="light"] body.ver-6 .ac-row[aria-selected="true"]:hover { background-color: var(--bg-selected); }
