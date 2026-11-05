@@ -1510,11 +1510,13 @@ body.ver-6 .ac-dl .ma-check-tag {
   border: 1px solid var(--comp-gnb-brand);
   border-radius: var(--radius-4);
   background-color: color-mix(in srgb, var(--comp-gnb-brand) 14%, transparent);
-  color: var(--comp-gnb-brand);
+  color: var(--status-info-text);
   font-size: var(--font-size-13);
   font-weight: 500;
   white-space: nowrap;
 }
+/* 칩은 반대색 판 위에 있다. 라이트 화면의 어두운 판은 상태 글자로 9:1 이 나오는데, 다크 화면의 흰 판은 3.7:1 이라 글자만 더 진하게(13px 글자 4.5:1) */
+:root[data-theme="dark"] body.ver-6 .is-light-scope .ma-check-tag { color: color-mix(in srgb, var(--color-aqua-800) 85%, #000000); }
 
 /*
  * [11/05 논의] 라이트 모드 관제 — 할 일은 흰색, 끝난 것은 회색(한글판 · 영문판 공통)

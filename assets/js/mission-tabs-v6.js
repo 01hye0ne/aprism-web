@@ -35,6 +35,7 @@
   //   영문판은 번역기가 이름을 먼저 영어로 바꿔 두므로 사전(APRISM_EN)으로 영어 이름도 같은 번호에 잇는다
   var EN = window.APRISM_EN || {};
   var MNO_EN = MNO.map(function (k) { return EN[k]; });
+  var IDLE = ["소방 설비 점검", "주간 설비 점검"];   // 데모 대기 미션(screen.js ver-6 블록과 같다)
   function mno(name) { var i = MNO.indexOf(name); return i >= 0 ? i : MNO_EN.indexOf(name); }
 
   function tab(tag, name, on) {
@@ -116,6 +117,24 @@
       t.addEventListener("keydown", keyMove);
       bar.appendChild(t);
     });
+
+    // [11/05] 상단 탭 줄은 어느 화면이나 같다(디자이너) — 메뉴에 대기 미션이 없는 화면(전체 미션 · 안전진단)도 M4 · M5 를 두고, 누르면 관제 탭처럼 그 미션 설정으로
+    IDLE.forEach(function (name) {
+      if (bar.querySelector(".sb-tab[data-mission='" + name + "'], .sb-tab[data-mission='" + EN[name] + "']")) { return; }
+      var t = tab("button", name, false);
+      t.setAttribute("data-run", "idle");
+      t.setAttribute("data-mission", name);
+      t.title = "M" + (mno(name) + 1) + " " + name + " — 끌어서 순서 바꾸기";
+      t.addEventListener("click", function () { if (justDragged) { return; } window.location.href = (window.aprismHref || String)("./mission-setup-v6.html?mission=" + encodeURIComponent(name)); });
+      t.addEventListener("pointerdown", startDrag);
+      t.addEventListener("keydown", keyMove);
+      bar.insertBefore(t, bar.querySelector(".sb-tab[data-run='done']"));
+    });
+    // 끌어서 바꾼 순서가 있으면 채워 넣은 탭까지 그 차례로
+    if (saved.length) {
+      var pos = function (t) { var i = saved.indexOf(t.getAttribute("data-mission")); return i >= 0 ? i : 1e3; };
+      missionTabs().map(function (t, i) { return [pos(t), i, t]; }).sort(function (a, b) { return a[0] - b[0] || a[1] - b[1]; }).forEach(function (e) { bar.appendChild(e[2]); });
+    }
 
   }
 

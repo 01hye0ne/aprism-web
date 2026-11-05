@@ -28,18 +28,24 @@
 
   var body = document.body;
   var tabs = Array.prototype.slice.call(bar.querySelectorAll(".sb-tab"));
-  var nameInput = document.querySelector("input[aria-label='미션 이름']");
+  var nameInput = document.querySelector("input.field-box.is-readonly");   // 영문판은 aria-label 이 번역돼 있어 꼴로 찾는다
 
   // 지금 탭 — 설정 중인 미션
-  function tabOf(name) { return tabs.filter(function (t) { return t.getAttribute("data-mission") === name; })[0]; }
+  // 영문판 관제는 번역된 이름을 ?mission= 로 붙여 오므로 사전(APRISM_EN)으로도 찾는다
+  var EN = window.APRISM_EN || {};
+  function tabOf(name) { return tabs.filter(function (t) { var k = t.getAttribute("data-mission"); return k === name || EN[k] === name; })[0]; }
   var asked = /[?&]mission=([^&#]+)/.exec(window.location.search);
   var current = asked ? decodeURIComponent(asked[1]) : "";
-  if (!tabOf(current)) { current = "정기 순회 점검"; }
-  var mine = tabOf(current);
+  var mine = tabOf(current) || tabOf("정기 순회 점검");
+  current = mine ? mine.getAttribute("data-mission") : "정기 순회 점검";
   if (mine) { mine.classList.add("is-on"); mine.setAttribute("aria-current", "page"); }
   // 설정 중인 미션은 아직 돌기 전이다 — 수행중 탭(정기 순회 점검)을 열어도 알림 기호는 뺀다
   if (mine) { Array.prototype.forEach.call(mine.querySelectorAll(".sb-tab-sev"), function (s) { s.remove(); }); }
-  if (nameInput) { nameInput.value = current; }
+  // 영문판은 번역기가 칸 값을 먼저 쓰므로 값 · 속성을 둘 다, 번역한 이름으로 넣는다
+  if (nameInput) {
+    nameInput.value = window.APRISM_TR ? window.APRISM_TR(current) : current;
+    nameInput.setAttribute("value", nameInput.value);
+  }
   // 관제로 넘어갈 때 이 미션을 연다(sian.js 가 body[data-monitor-href] 로 간다)
   var monitor = body.getAttribute("data-monitor-href");
   if (monitor) { body.setAttribute("data-monitor-href", monitor.split("?")[0] + "?mission=" + encodeURIComponent(current)); }
