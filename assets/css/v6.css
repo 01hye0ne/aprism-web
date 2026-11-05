@@ -1557,3 +1557,6 @@ body.ver-6 { --ic-sort: url("data:image/svg+xml,%3Csvg width=%2224%22 height=%22
 body.ver-6 .ah-sort-btn { display: inline-flex; align-items: center; gap: var(--space-4); padding: 0; border: 0; background: none; font-family: inherit; color: var(--text-secondary); cursor: pointer; white-space: nowrap; }
 body.ver-6 .ah-sort-btn:hover { color: var(--text-primary); }
 body.ver-6 .ah-sort-btn:focus-visible { outline: var(--border-width-strong) solid var(--border-focus); outline-offset: 2px; border-radius: var(--radius-4); }
+
+/* [11/05 v6 한글판] Delta 접힘 문장 속 미션 이름은 회색 글(문형표 5 "A 회색" 확정) — 굵기는 문장 따라. v3-panel.js 가 .dl-m 으로 감싼다 */
+html:not([lang="en"]) body.ver-6 .delta3 .ai-line-2 .dl-m { color: color-mix(in srgb, var(--text-primary) 60%, transparent); }

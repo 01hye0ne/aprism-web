@@ -96,18 +96,39 @@
     if (brief) { lines(); }
   }
   // 두 줄을 줄마다 감싼다 — 1줄 굵게. 넘치면 넘친 낱말만 다음 줄로(자르지 않는다, v5.css).
+  // [11/05 v6 한글판] 문형에 미션 이름(say.names)이 있으면 그 이름만 회색 글(.dl-m)로 — 지시어 대신 이름을 쓰되 글줄과 구분(문형표 5).
+  //   한 문장 문형(주의만)도 이름을 칠하려고 감싼다. 이때는 1줄 굵게(.dl1)를 붙이지 않는다.
   function lines() {
     var p = win.querySelector(".delta3-body > .ai-line-2");
-    if (!p || p.textContent.indexOf("\n") < 0) { return; }
-    var t = p.textContent.split("\n");
+    if (!p) { return; }
+    var s = said(), names = KO && s && s.names ? s.names : null;
+    var raw = p.textContent, multi = raw.indexOf("\n") >= 0;
+    var paint = names && !p.querySelector(".dl-m") && names.some(function (n) { return raw.indexOf(n) >= 0; });
+    if (!multi && !paint) { return; }
+    var t = raw.split("\n");
     p.setAttribute("data-raw", t.join("\n"));
     p.textContent = "";
     t.forEach(function (x, i) {
       var e = document.createElement("span");
-      e.className = "dl dl" + (i + 1);
-      e.textContent = x;
+      e.className = "dl" + (multi ? " dl" + (i + 1) : "");
+      fill(e, x, names);
       p.appendChild(e);
     });
+  }
+  function fill(e, x, names) {
+    var at = 0;
+    while (names) {
+      var hit = null;
+      names.forEach(function (n) { var i = x.indexOf(n, at); if (i >= 0 && (!hit || i < hit.i)) { hit = { i: i, n: n }; } });
+      if (!hit) { break; }
+      if (hit.i > at) { e.appendChild(document.createTextNode(x.slice(at, hit.i))); }
+      var m = document.createElement("span");
+      m.className = "dl-m";
+      m.textContent = hit.n;
+      e.appendChild(m);
+      at = hit.i + hit.n.length;
+    }
+    if (at < x.length) { e.appendChild(document.createTextNode(x.slice(at))); }
   }
   // 접힌 위젯의 답 단추는 창을 열지 않고 그 일을 한다(펼친 창에서는 원래대로 닫기 단추).
   //   답 단추가 선 동안 대화는 카드 글 칸을 눌러 연다.

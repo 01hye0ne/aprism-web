@@ -353,7 +353,8 @@
         var om = missionOf(first);
         say = { l: ["다른 미션에 " + word + " 단계 알림이 있어요!", "먼저 확인하는 것을 추천드릴게요."],
           clue: om, scope: sev, yes: word + " 단계 미션으로 이동하기", act: { go: om } };
-        if (KO && om) { say.l[0] = om + "에 " + word + " 단계 알림이 있어요!"; say.yes = om + euro(om) + " 이동하기"; }
+        // 단추는 "미션 이동하기" — 미션 이름은 바로 위 1줄에 있다(이름을 넣으면 단추가 너무 길다, 11/05). names: 회색으로 칠할 미션 이름(v3-panel.js)
+        if (KO && om) { say.l[0] = om + "에 " + word + " 단계 알림이 있어요!"; say.yes = "미션 이동하기"; say.names = [om]; }
       } else {
         var mc = all.filter(function (a) { return a.sev === sev && inMine(a); }).length;
         var oc = all.filter(function (a) { return a.sev === sev && !inMine(a); }).length;
@@ -375,6 +376,7 @@
               per[n]++;
             });
             say.l = ["확인해야 할 주의 단계 알림이 " + names.map(function (n) { return n + "에 " + per[n] + "건"; }).join(", ") + " 있어요."];
+            say.names = names;
           }
         }
       }
