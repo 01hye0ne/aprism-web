@@ -865,6 +865,30 @@
     render();
   });
 
+  /*
+   * [11/05] 델타 시뮬레이션(route-sim.js 접기 화살표 옆) — 주의 판(#warning) 또는 기본 판(#normal)으로 되돌린 뒤
+   * detail.after 밀리초 뒤 위험 알림 1건(N₂ 압력계 기준 초과)이 지금 시각으로 새로 들어온다. 주소의 #… 는 건드리지 않는다.
+   */
+  var simTimer = null;
+  document.addEventListener("aprism:delta-sim", function (event) {
+    var d = event.detail || {};
+    clearTimeout(simTimer);
+    level = SETS[d.from] ? d.from : "warning";
+    extra = [];
+    resolved = [];
+    DONE = DONE_BASE.slice();
+    note.close();
+    document.dispatchEvent(new CustomEvent("aprism:monitor-reset"));
+    render();
+    simTimer = setTimeout(function () {
+      var a = {};
+      Object.keys(CRITICAL).forEach(function (k) { a[k] = CRITICAL[k]; });
+      a.time = clock();
+      extra.unshift(a);
+      render();
+    }, d.after || 2000);
+  });
+
   // ==================================================================
   // 알림 쪽지 — Figma Messages(948:31737)
   //

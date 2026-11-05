@@ -18,7 +18,7 @@
   box.innerHTML = '<div class="rsim-chips" role="group" aria-label="상태">' +
     MODES.map(function (m) { return '<button type="button" data-m="' + m[0] + '" aria-pressed="' + (m[0] === "run") + '">' + m[1] + "</button>"; }).join("") +
     '</div><div class="rsim-bar"><button type="button" class="rsim-play">재생</button>' +
-    '<input type="range" min="0" max="1000" value="0" aria-label="미션 진행도"><span class="rsim-pct">0%</span><span class="rsim-lanes" hidden></span><span class="rsim-lanes rsim-x" role="group" aria-label="지점 수"><span>지점</span><button type="button" data-wpn="20" aria-pressed="true">20개</button><button type="button" data-wpn="60" aria-pressed="false">60개</button></span></div>' +
+    '<input type="range" min="0" max="1000" value="0" aria-label="미션 진행도"><span class="rsim-pct">0%</span><span class="rsim-lanes" hidden></span></div>' +
     '<p class="rsim-wait">지도 모델을 불러오는 중</p>';
   document.body.appendChild(box);
 
@@ -37,6 +37,21 @@
     var saved = false; try { saved = localStorage.getItem("rsim-folded") === "1"; } catch (e) { }
     setFold(saved);
     fold.addEventListener("click", function () { setFold(!box.classList.contains("is-folded")); });
+  })();
+
+  (function () {   // [11/05] 델타 시뮬레이션 — 접기 화살표 옆. 주의 또는 기본 판에서 시작해 2초 뒤 위험 알림 1건이 새로 들어온다(monitor.js 가 받는다)
+    if (!document.body.classList.contains("v2")) { return; }
+    var g = document.createElement("span");
+    g.className = "rsim-dsim";
+    g.setAttribute("role", "group");
+    g.setAttribute("aria-label", "델타 시뮬레이션");
+    g.innerHTML = '<span>델타</span><button type="button" data-dsim="warning">주의 → 위험 1건</button><button type="button" data-dsim="normal">기본 → 위험 1건</button>';
+    box.querySelector(".rsim-chips").appendChild(g);
+    g.addEventListener("click", function (e) {
+      var b = e.target.closest("[data-dsim]"); if (!b) { return; }
+      Array.prototype.forEach.call(g.querySelectorAll("[data-dsim]"), function (x) { x.setAttribute("aria-pressed", String(x === b)); });
+      document.dispatchEvent(new CustomEvent("aprism:delta-sim", { detail: { from: b.getAttribute("data-dsim"), after: 2000 } }));
+    });
   })();
 
   var api = null, range = box.querySelector("input"), pct = box.querySelector(".rsim-pct"), play = box.querySelector(".rsim-play");
@@ -68,15 +83,8 @@
   }
   function resume() { stop(); setMode("run"); api.set(api.get() + api.total() * 0.0005); show(); }
 
-  (function () {   // [10/22 실험] 지점 수 — 고르면 다시 연다
-    var cur = "20"; try { cur = localStorage.getItem("rr-wp-total") === "60" ? "60" : "20"; } catch (e) { }
-    Array.prototype.forEach.call(box.querySelectorAll("[data-wpn]"), function (x) { x.setAttribute("aria-pressed", String(x.getAttribute("data-wpn") === cur)); });
-    box.addEventListener("click", function (e) {
-      var b = e.target.closest("[data-wpn]"); if (!b || b.getAttribute("data-wpn") === cur) { return; }
-      try { localStorage.setItem("rr-wp-total", b.getAttribute("data-wpn")); } catch (er) { }
-      location.reload();
-    });
-  })();
+  // [11/05] 지점 수(20개, 60개) 고르기 뺌 — 예전에 60개를 골라 둔 브라우저도 다음에 열 때 20개로 돌아온다
+  try { localStorage.removeItem("rr-wp-total"); } catch (e) { }
   box.addEventListener("click", function (e) {   // [10/22 실험] 앞길 선, 번호 표현
     var b = e.target.closest("[data-ahead], [data-pv], [data-past], [data-flow], [data-thin]"); if (!b || !api) { return; }
     var k = b.hasAttribute("data-ahead") ? "data-ahead" : b.hasAttribute("data-pv") ? "data-pv" : b.hasAttribute("data-flow") ? "data-flow" : b.hasAttribute("data-thin") ? "data-thin" : "data-past";
