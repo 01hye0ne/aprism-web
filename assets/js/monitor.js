@@ -329,11 +329,12 @@
     return slot ? slot.textContent.trim() : "관제사";
   }
   /*
-   * [11/05 v6 한글판] 접힌 위젯에 지시어(이 미션 · 다음 미션 · 다른 미션 · 지금 미션)를 쓰지 않는다 — 미션 이름을 적는다(디자이너).
+   * [11/05 v6] 접힌 위젯에 지시어(이 미션 · 다음 미션 · 다른 미션 · 지금 미션)를 쓰지 않는다 — 미션 이름을 적는다(디자이너, 문형표 5).
    *   근거 줄은 문형 대신 하는 일("위험 N건 원인 분석 중..." · "순회 경로 지켜보는 중...", v3-panel.js say()).
-   *   영문판(html lang="en")은 이번 수정에서 바뀌지 않게 예전 문형 그대로 둔다.
+   *   미션 · waypoint 가 끼는 문형은 조각(parts)으로도 준다 — { m: 미션 } [M번호 이름], { wp: 번호 } waypoint 번호, { wpName: 이름 } waypoint 이름.
+   *   한글판(ko) · 영문판(en)은 말 차례가 달라 조각을 따로 둔다. 영문판의 한글 조각(미션 · waypoint 이름)은 i18n-en.js 가 사전으로 옮긴다.
    */
-  var KO = document.documentElement.lang !== "en" && body.classList.contains("ver-6");   // v6 한글판만
+  var V6 = body.classList.contains("ver-6");
   COPY.brief = function (j) {
     var copy = COPY.keyword(j);
     var all = j.all || [], mine = j.mine || all;
@@ -353,8 +354,15 @@
         var om = missionOf(first);
         say = { l: ["다른 미션에 " + word + " 단계 알림이 있어요!", "먼저 확인하는 것을 추천드릴게요."],
           clue: om, scope: sev, yes: word + " 단계 미션으로 이동하기", act: { go: om } };
-        // 단추는 "미션 이동하기" — 미션 이름은 바로 위 1줄에 있다(이름을 넣으면 단추가 너무 길다, 11/05). names: 회색으로 칠할 미션 이름(v3-panel.js)
-        if (KO && om) { say.l[0] = om + "에 " + word + " 단계 알림이 있어요!"; say.yes = "미션 이동하기"; say.names = [om]; }
+        // 단추는 "미션 이동하기" — 미션 이름은 바로 위 1줄에 있다(이름을 넣으면 단추가 너무 길다, 11/05)
+        if (V6 && om) {
+          say.l[0] = om + "에 " + word + " 단계 알림이 있어요!";
+          say.yes = "미션 이동하기";
+          say.parts = {
+            ko: [[{ m: om }, "에 " + word + " 단계 알림이 있어요!"], [say.l[1]]],
+            en: [[{ m: om }, " has " + (sev === "critical" ? "critical" : "warning") + "-level alerts!"], [say.l[1]]]
+          };
+        }
       } else {
         var mc = all.filter(function (a) { return a.sev === sev && inMine(a); }).length;
         var oc = all.filter(function (a) { return a.sev === sev && !inMine(a); }).length;
@@ -362,15 +370,20 @@
           say = { l: ["위험 " + j.crit + "건" + (j.warn ? ", 주의 " + j.warn + "건" : "") + "이 있어요.", (first.eq || first.title) + "부터 확인하세요."],
             clue: ["이 미션 위험 " + mc, oc ? "다른 미션 위험 " + oc : ""].filter(Boolean).join(", "),
             scope: oc ? sev : "", yes: "처리 순서 보기", act: "order", open: "처리 순서 알려 줘" };
-          // [11/05 v6 한글판] 2줄 waypoint 이름 앞에 waypoint 번호(W1 경로 목록 번호 모양, v3-panel.js) — 문형표 5
-          var wpn = /\d+/.exec(first.wp || "");
-          if (KO && wpn) { say.wp = { line: 1, n: parseInt(wpn[0], 10) }; }
-          if (KO) { say.wpName = first.eq || first.title; }   // 2줄 waypoint 이름만 흰색 굵게(나머지는 2줄 회색) — v3-panel.js
+          // [11/05 v6] 2줄 = {waypoint 번호}{waypoint 이름}부터 확인하세요. 번호는 경로 목록 번호 모양, 이름만 흰색 굵게(나머지는 2줄 회색) — 문형표 5
+          if (V6) {
+            var wpn = /\d+/.exec(first.wp || ""), wpName = first.eq || first.title;
+            var wpTok = wpn ? [{ wp: parseInt(wpn[0], 10) }] : [];
+            say.parts = {
+              ko: [[say.l[0]], wpTok.concat([{ wpName: wpName }, "부터 확인하세요."])],
+              en: [[say.l[0]], ["Check "].concat(wpTok, [{ wpName: wpName }, " first."])]
+            };
+          }
         } else {
           // 주의만 있을 때 — 한 문장(굵은 1줄 없이), 근거 줄에 먼저 볼 설비(10/30 디자이너 문구)
           say = { l: ["지금 미션에서 " + mc + "건" + (oc ? ", 다른 미션에서 " + oc + "건" : "") + "의 확인해야 할 주의 단계 알림이 있어요."],
             clue: "먼저: " + (first.eq || first.title), yes: "처리 순서 보기", act: "order", open: "처리 순서 알려 줘" };
-          if (KO) {
+          if (V6) {
             // 보는 미션 먼저, 나머지는 처리 순서에 처음 나온 차례로 — "정기 순회 점검에 2건, 설비 집중 점검에 1건"
             var per = {}, names = [];
             ord.forEach(function (a) {
@@ -380,7 +393,12 @@
               per[n]++;
             });
             say.l = ["확인해야 할 주의 단계 알림이 " + names.map(function (n) { return n + "에 " + per[n] + "건"; }).join(", ") + " 있어요."];
-            say.names = names;
+            var ko = ["확인해야 할 주의 단계 알림이 "], en = ["Warnings to check: "];
+            names.forEach(function (n, i) {
+              ko.push({ m: n }, "에 " + per[n] + "건" + (i < names.length - 1 ? ", " : " 있어요."));
+              en.push({ m: n }, " " + per[n] + (i < names.length - 1 ? ", " : "."));
+            });
+            say.parts = { ko: [ko], en: [en] };
           }
         }
       }

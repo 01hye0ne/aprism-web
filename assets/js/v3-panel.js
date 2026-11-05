@@ -60,8 +60,9 @@
   var plusLabel = plus && plus.querySelector(".delta3-plus-label");
   var brief = body.getAttribute("data-delta-copy") === "brief";
   function said() { return brief ? window.APRISM_DELTA_SAY : null; }
-  // [11/05 v6 한글판] 근거 줄은 문형의 범위(미션 지시어)가 아니라 하는 일(say())만 — 영문판은 예전 그대로
-  var KO = document.documentElement.lang !== "en" && body.classList.contains("ver-6");   // v6 한글판만
+  // [11/05 v6] 근거 줄은 문형의 범위(미션 지시어)가 아니라 하는 일(say())만 — 한글판 · 영문판 같다
+  var V6 = body.classList.contains("ver-6");
+  var EN = document.documentElement.lang === "en";
   // [10/30 라이팅 시스템 6] 답 단추 오른쪽 대화 단추(말풍선 24) — 누르면 대화 창을 편다. 질문 없는 문형은 "Delta와 대화" 하나라 숨긴다.
   var talk = null;
   if (brief && plus) {
@@ -75,17 +76,51 @@
     talk.addEventListener("click", function () { opening = true; plus.click(); opening = false; });
   }
 
+  /*
+   * [11/05 v6] 문장 속 미션 · waypoint 표식 — 접힘(여기)과 펼친 Delta(delta-answer-v6.js)가 같은 모양을 쓴다(문형표 5).
+   *   미션 [M번호 이름]: 번호 · 이름은 문장 그대로, 괄호만 회색(.dl-br). 번호는 상단 미션 탭(M1 …)에서 읽는다 — 탭 순서를 바꾸면 따라 바뀐다.
+   *   waypoint 번호: 경로 목록 번호 모양(.dl-wp, 22px 원). 뒤 waypoint 이름과 사이 2px.
+   */
+  var T = window.APRISM_DELTA_TOKEN = {
+    no: function (name) {
+      var tabs = document.querySelectorAll(".sb-tab[data-mission]");
+      for (var i = 0; i < tabs.length; i++) {
+        var dm = tabs[i].getAttribute("data-mission");   // 영문판은 탭 속성도 영어로 바뀐다(i18n-en.js) — 사전으로 맞춰 본다
+        if (dm === name || (window.APRISM_EN && dm === window.APRISM_EN[name])) { var no = tabs[i].querySelector(".sb-tab-no"); return no ? no.textContent.trim() : ""; }
+      }
+      return "";
+    },
+    mission: function (name) {
+      var m = document.createElement("span"), no = T.no(name);
+      m.className = "dl-m";
+      // 번호와 이름은 따로 둔다 — 영문판 번역기가 이름 칸만 옮기게
+      [["dl-br", "["], ["dl-no", no ? no + " " : ""], [null, name], ["dl-br", "]"]].forEach(function (k) {
+        var c = document.createElement("span");
+        if (k[0]) { c.className = k[0]; }
+        c.textContent = k[1];
+        m.appendChild(c);
+      });
+      return m;
+    },
+    wp: function (n) {
+      var w = document.createElement("span");
+      w.className = "dl-wp";
+      w.textContent = n;
+      w.setAttribute("aria-label", "waypoint " + n);
+      return w;
+    }
+  };
   // 통합 순회 현황에서 층을 펼쳐 보면 그 층이 범위다(building.js 의 APRISM_DELTA_SCOPE).
   function update() {
     var s = said();
     var scope = window.APRISM_DELTA_SCOPE;
-    var t = s && !KO && !win.classList.contains("is-thinking") ? (s.clue || "") : say();
+    var t = s && !V6 && !win.classList.contains("is-thinking") ? (s.clue || "") : say();
     if (!s && scope && !win.classList.contains("is-thinking")) { t = scope + " " + t; }
     if (out.textContent !== t) { out.textContent = t; }
     if (clue) {
-      clue.classList.toggle("is-said", !!s && !KO);
-      clue.classList.toggle("is-scope", !!(s && s.scope) && !KO);
-      clue.setAttribute("data-scope", s && s.scope && !KO ? s.scope : "");
+      clue.classList.toggle("is-said", !!s && !V6);
+      clue.classList.toggle("is-scope", !!(s && s.scope) && !V6);
+      clue.setAttribute("data-scope", s && s.scope && !V6 ? s.scope : "");
     }
     if (plusLabel && brief) {
       var yes = s && s.yes ? s.yes : "Delta와 대화";
@@ -96,77 +131,46 @@
     if (brief) { lines(); }
   }
   // 두 줄을 줄마다 감싼다 — 1줄 굵게. 넘치면 넘친 낱말만 다음 줄로(자르지 않는다, v5.css).
-  // [11/05 v6 한글판] 문형에 미션 이름(say.names)이 있으면 [M번호 이름]으로 감싼다 — 번호 · 이름은 문장 그대로, 괄호만 회색(.dl-br).
-  //   번호는 상단 미션 탭의 번호(M1 …)라 탭과 바로 짝지어진다. 지시어 대신 이름을 쓰되 글줄과 구분(문형표 5).
-  //   waypoint 번호(say.wp)는 그 줄 맨 앞에 경로 목록 번호 모양(.dl-wp)으로 — waypoint 이름과 사이 2px.
-  //   waypoint 이름(say.wpName)은 흰색 굵게(.dl-wp-name), 나머지 2줄은 회색.
-  //   한 문장 문형(주의만)도 이름을 칠하려고 감싼다. 이때는 1줄 굵게(.dl1)를 붙이지 않는다.
+  // [11/05 v6] 문형에 조각(say.parts)이 있으면 그것으로 그린다 — 한글판 · 영문판이 말 차례가 달라 조각을 따로 받는다(monitor.js).
+  //   한 줄짜리 문형(주의만)은 1줄 굵게(.dl1)를 붙이지 않는다.
   function lines() {
     var p = win.querySelector(".delta3-body > .ai-line-2");
     if (!p) { return; }
-    var s = said(), names = KO && s && s.names ? s.names : null;
-    var raw = p.textContent, multi = raw.indexOf("\n") >= 0;
-    var wp = KO && s && s.wp ? s.wp : null;
-    if (p.querySelector(".dl-m, .dl-wp")) { return; }
-    var wpName = KO && s && s.wpName ? s.wpName : null;
-    var paint = names && names.some(function (n) { return raw.indexOf(n) >= 0; });
-    if (!multi && !paint && !wp) { return; }
-    var t = raw.split("\n");
+    var s = said(), P = V6 && s && s.parts ? s.parts[EN ? "en" : "ko"] : null;
+    if (P) {
+      var key = JSON.stringify(P);
+      if (p.getAttribute("data-parts") === key && p.querySelector(".dl")) { return; }
+      p.setAttribute("data-parts", key);
+      p.setAttribute("data-raw", (s.l || []).join("\n"));
+      p.textContent = "";
+      P.forEach(function (ln, i) {
+        var e = document.createElement("span");
+        e.className = "dl" + (P.length > 1 ? " dl" + (i + 1) : "");
+        ln.forEach(function (x) { e.appendChild(part(x)); });
+        p.appendChild(e);
+      });
+      return;
+    }
+    p.removeAttribute("data-parts");
+    if (p.textContent.indexOf("\n") < 0) { return; }
+    var t = p.textContent.split("\n");
     p.setAttribute("data-raw", t.join("\n"));
     p.textContent = "";
     t.forEach(function (x, i) {
       var e = document.createElement("span");
-      e.className = "dl" + (multi ? " dl" + (i + 1) : "");
-      if (wp && wp.line === i) {
-        var w = document.createElement("span");
-        w.className = "dl-wp";
-        w.textContent = wp.n;
-        w.setAttribute("aria-label", "waypoint " + wp.n);
-        e.appendChild(w);
-      }
-      if (wpName && i === 1 && x.indexOf(wpName) === 0) {
-        var q = document.createElement("span");
-        q.className = "dl-wp-name";
-        q.textContent = wpName;
-        e.appendChild(q);
-        fill(e, x.slice(wpName.length), names);
-      } else {
-        fill(e, x, names);
-      }
+      e.className = "dl dl" + (i + 1);
+      e.textContent = x;
       p.appendChild(e);
     });
   }
-  // 상단 미션 탭의 번호(M1 …) — 탭 순서를 끌어 바꾸면 번호도 따라 바뀐다
-  function missionNo(name) {
-    var tabs = document.querySelectorAll(".sb-tab[data-mission]");
-    for (var i = 0; i < tabs.length; i++) {
-      if (tabs[i].getAttribute("data-mission") === name) {
-        var no = tabs[i].querySelector(".sb-tab-no");
-        return no ? no.textContent.trim() : "";
-      }
-    }
-    return "";
-  }
-  function fill(e, x, names) {
-    var at = 0;
-    while (names) {
-      var hit = null;
-      names.forEach(function (n) { var i = x.indexOf(n, at); if (i >= 0 && (!hit || i < hit.i)) { hit = { i: i, n: n }; } });
-      if (!hit) { break; }
-      if (hit.i > at) { e.appendChild(document.createTextNode(x.slice(at, hit.i))); }
-      var m = document.createElement("span");
-      m.className = "dl-m";
-      var no = missionNo(hit.n);
-      [["dl-br", "["], [null, (no ? no + " " : "") + hit.n], ["dl-br", "]"]].forEach(function (k) {
-        var c = document.createElement("span");
-        if (k[0]) { c.className = k[0]; }
-        c.textContent = k[1];
-        m.appendChild(c);
-      });
-      e.appendChild(m);
-      at = hit.i + hit.n.length;
-    }
-    if (at < x.length) { e.appendChild(document.createTextNode(x.slice(at))); }
+  function part(x) {
+    if (typeof x === "string") { return document.createTextNode(x); }
+    if (x.m) { return T.mission(x.m); }
+    if (x.wp) { return T.wp(x.wp); }
+    var n = document.createElement("span");
+    n.className = "dl-wp-name";
+    n.textContent = x.wpName;
+    return n;
   }
   // 접힌 위젯의 답 단추는 창을 열지 않고 그 일을 한다(펼친 창에서는 원래대로 닫기 단추).
   //   답 단추가 선 동안 대화는 카드 글 칸을 눌러 연다.

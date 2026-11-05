@@ -1558,12 +1558,12 @@ body.ver-6 .ah-sort-btn { display: inline-flex; align-items: center; gap: var(--
 body.ver-6 .ah-sort-btn:hover { color: var(--text-primary); }
 body.ver-6 .ah-sort-btn:focus-visible { outline: var(--border-width-strong) solid var(--border-focus); outline-offset: 2px; border-radius: var(--radius-4); }
 
-/* [11/05 v6 한글판] Delta 접힘 문장 속 미션은 [M번호 이름] — 번호 · 이름은 문장 그대로, 괄호만 회색(문형표 5 확정). v3-panel.js 가 .dl-m · .dl-br 로 감싼다.
+/* [11/05 v6] Delta 문장 속 미션은(접힘 · 펼침, 한글판 · 영문판) [M번호 이름] — 번호 · 이름은 문장 그대로, 괄호만 회색(문형표 5 확정). v3-panel.js 가 .dl-m · .dl-br 로 감싼다.
    2줄(회색) 속 waypoint 이름(.dl-wp-name)만 흰색 굵게 — 할 일의 대상이 먼저 읽히게 */
-html:not([lang="en"]) body.ver-6 .delta3 .ai-line-2 .dl-wp-name { color: var(--text-primary); font-weight: var(--font-weight-bold); }
-html:not([lang="en"]) body.ver-6 .delta3 .ai-line-2 .dl-br { color: color-mix(in srgb, var(--text-primary) 55%, transparent); font-weight: var(--font-weight-regular); }
+body.ver-6 .delta3 .dl-wp-name { color: var(--text-primary); font-weight: var(--font-weight-bold); }
+body.ver-6 .delta3 .dl-br { color: color-mix(in srgb, var(--text-primary) 55%, transparent); font-weight: var(--font-weight-regular); }
 /* waypoint 번호 — 경로 목록 번호 모양(W1). 숫자 바닥선 = 문장 바닥선, waypoint 이름과 사이 2px */
-html:not([lang="en"]) body.ver-6 .delta3 .ai-line-2 .dl-wp {
+body.ver-6 .delta3 .dl-wp {
   display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box;
   width: 22px; height: 22px; padding-bottom: 0.5px; margin-right: 2px; border-radius: 50%;
   background-color: rgb(10 15 24 / 45%); color: #C9D0DC;
@@ -1575,3 +1575,6 @@ html:not([lang="en"]) body.ver-6[data-delta-copy="brief"] .delta3 .ai-line-2 .dl
   color: color-mix(in srgb, var(--text-primary) 55%, transparent);
   font-weight: var(--font-weight-regular);
 }
+
+/* [11/05 v6] 라이트 화면 펼친 Delta(흰 판) — waypoint 번호 표식은 옅은 회색 원 */
+:root[data-theme="light"] body.ver-6 .delta3.is-open .dc6 .dl-wp { background-color: rgb(11 14 19 / 8%); color: #31363B; }

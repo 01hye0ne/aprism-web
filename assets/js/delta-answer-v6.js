@@ -78,6 +78,28 @@
     function label(a) { return c.label(a); }
     function mine(a) { return (A().mine || []).indexOf(a) >= 0; }
     function missionLine(a) { return [a.floor, A().missionOf ? A().missionOf(a) : ""].filter(Boolean).join(" "); }
+    /*
+     * [11/05 v6] 미션 · waypoint 표식 — 접힘과 같은 모양(v3-panel.js APRISM_DELTA_TOKEN, 문형표 5).
+     *   미션 [M번호 이름](괄호만 회색), waypoint 번호는 경로 목록 번호 모양. 표식이 없으면(다른 화면) 예전 글로 둔다.
+     */
+    function tok() { return window.APRISM_DELTA_TOKEN || null; }
+    function wpN(a) { var m = /\d+/.exec(a.wp || ""); return m ? parseInt(m[0], 10) : 0; }
+    // 층 + [M번호 미션]
+    function missionNode(a) {
+      var T = tok(), name = A().missionOf ? A().missionOf(a) : "";
+      if (!T || !name) { return document.createTextNode(missionLine(a)); }
+      var f = document.createDocumentFragment();
+      if (a.floor) { f.appendChild(document.createTextNode(a.floor + " ")); }
+      f.appendChild(T.mission(name));
+      return f;
+    }
+    // waypoint 번호 + 글
+    function withWp(a, cls, text) {
+      var p = el("p", cls), T = tok(), n = wpN(a);
+      if (T && n) { p.appendChild(T.wp(n)); }
+      p.appendChild(document.createTextNode(text));
+      return p;
+    }
     function needLine(a) {
       var w = (a.btn || "").replace(/\s*(요청|예약)$/, "");
       if (!w) { return a.sev === "critical" ? "바로 확인이 필요해요" : "확인이 필요해요"; }
@@ -154,7 +176,7 @@
         var gone = !isOpenAlert(r.a);
         if (gone && !r.at) { r.at = c.nowHM(); }
         r.node.classList.toggle("is-done", gone);
-        r.sub.textContent = gone ? r.at + " 처리" : r.meta;
+        if (gone) { r.sub.textContent = r.at + " 처리"; } else if (!r.sub.querySelector(".dl-m")) { r.sub.textContent = ""; r.sub.appendChild(missionNode(r.a)); }
         var tag = r.node.querySelector(".dc6-tag");
         if (tag) { tag.remove(); }
         r.node.classList.remove("is-next");
@@ -172,10 +194,13 @@
       b.appendChild(diag(a));
       var x = el("span", "dc6-row-x");
       var t = el("span", "dc6-row-t");
+      var T = tok(), n = wpN(a);
+      if (T && n) { t.appendChild(T.wp(n)); }
       t.appendChild(el("span", null, label(a)));
       x.appendChild(t);
       var meta = missionLine(a);
-      var sub = el("span", "dc6-row-s", meta);
+      var sub = el("span", "dc6-row-s");
+      sub.appendChild(missionNode(a));
       x.appendChild(sub);
       b.appendChild(x);
       b.appendChild(icon("chevron-right", "dc6-row-c"));
@@ -206,7 +231,13 @@
     function loc(a) {
       var p = el("p", "dc6-loc");
       p.appendChild(icon("map-pin"));
-      p.appendChild(el("span", null, place(a) + ", " + c.hhmm(a.time) + " 감지"));
+      var T = tok(), n = wpN(a), sp = el("span");
+      if (T && n) {
+        sp.appendChild(document.createTextNode(a.floor ? a.floor + " " : ""));
+        sp.appendChild(T.wp(n));
+        sp.appendChild(document.createTextNode(", " + c.hhmm(a.time) + " 감지"));
+      } else { sp.textContent = place(a) + ", " + c.hhmm(a.time) + " 감지"; }
+      p.appendChild(sp);
       return p;
     }
     function card(m, a, ord) {
@@ -215,7 +246,7 @@
       top.appendChild(diag(a));
       top.appendChild(el("span", null, needLine(a)));
       d.appendChild(top);
-      d.appendChild(el("p", "dc6-eq", label(a)));
+      d.appendChild(withWp(a, "dc6-eq", label(a)));
       if (a.sum) { d.appendChild(el("p", "dc6-desc", a.sum)); }
       var why = el("div", "dc6-why");
       why.appendChild(el("span", "dc6-why-l", "먼저 보는 이유"));
@@ -395,10 +426,12 @@
       var d = el("div", "dc6-card");
       d.appendChild(el("p", "dc6-eq", a.eq || a.title));
       var dl = el("dl", "dc6-dl");
-      [["미션", missionLine(a)], ["지점", wpNo(a)], ["측정", c.robotName(a) + ", " + c.hhmm(a.time)]].forEach(function (r) {
+      [["미션", missionLine(a), missionNode(a)], ["지점", wpNo(a), withWp(a, "dc6-dd-wp", " " + (a.eq || ""))], ["측정", c.robotName(a) + ", " + c.hhmm(a.time)]].forEach(function (r) {
         if (!r[1]) { return; }
         dl.appendChild(el("dt", null, r[0]));
-        dl.appendChild(el("dd", null, r[1]));
+        var dd = el("dd", null, r[2] ? null : r[1]);
+        if (r[2] && tok()) { dd.appendChild(r[2]); } else if (r[2]) { dd.textContent = r[1]; }
+        dl.appendChild(dd);
       });
       d.appendChild(dl);
       d.appendChild(btnRow(btn("위치 보기", "is-pri", open(a)), btn("상세 확인", "", open(a))));

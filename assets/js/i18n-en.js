@@ -25,6 +25,13 @@
     // Delta 접힌 위젯 — 두 줄이 줄마다 따로 온다(v3-panel.js lines()). main 문장 꼴 그대로 줄 단위로 채운다(한글 남던 것)
     [/^위험 (\d+)건, 주의 (\d+)건이 있어요\.$/, "$1 critical, $2 warnings."],
     [/^위험 (\d+)건이 있어요\.$/, "$1 critical."],
+    // [11/05 v6] 미션 이동 답 단추 · 3번째 줄(하는 일) — monitor.js · v3-panel.js
+    [/^미션 이동하기$/, "Go to mission"],
+    [/^위험 (\d+)건 원인 분석 중\.\.\.$/, "Analyzing $1 critical alerts..."],
+    [/^주의 (\d+)건 추세 비교 중\.\.\.$/, "Comparing trends of $1 warnings..."],
+    [/^알림 (\d+)건 살펴보는 중\.\.\.$/, "Reviewing $1 alerts..."],
+    [/^답변 정리 중\.\.\.$/, "Writing an answer..."],
+    [/^, (\d{1,2}:\d{2}) 감지$/, ", detected $1"],   // 펼친 Delta 위치 줄 — waypoint 번호 표식 뒤(delta-answer-v6.js loc)
     [/^(.+?)(?:부터|이|가)? ?확인하세요\.$/, function (m, x) { return "Check " + core(x) + " first."; }],
     [/^이 미션 위험 (\d+), 다른 미션 위험 (\d+)$/, "$1 critical here, $2 in other missions"],
     [/^이 미션 위험 (\d+)$/, "$1 critical here"],
