@@ -1490,3 +1490,25 @@ body.ver-6 .dc6-jump[hidden] { display: none; }
 @media (prefers-reduced-motion: reduce) {
   body.ver-6 .dc-msg.dc6.is-old, body.ver-6 .dc6-toggle-r .i { transition: none; }
 }
+
+/*
+ * [11/05 논의] AI 추천 꼬리표 → 칩 — 한글판 · 영문판 공통
+ *   지금 꼬리표는 파란 면이라 누르는 버튼([조치 요청])과 같은 꼴로 읽혀 클릭 혼동을 준다(누를 수 없는 표시).
+ *   버튼과 같은 꼴(모서리 4 · 13px · 높이 22)에 면 · 테 색만 다르게 — 브랜드 옅은 면 14% + 브랜드 테 1px + 브랜드 글자.
+ *   범위: 관제 알림 쪽지 · 안전진단 DELTA 제안 판 · 알림 센터 상세.
+ */
+body.ver-6 .ma-check-tag,
+body.ver-6 .sf .ma-check-tag,
+body.ver-6 .ac-dl .ma-check-tag {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 var(--space-8);
+  border: 1px solid var(--comp-gnb-brand);
+  border-radius: var(--radius-4);
+  background-color: color-mix(in srgb, var(--comp-gnb-brand) 14%, transparent);
+  color: var(--comp-gnb-brand);
+  font-size: var(--font-size-13);
+  font-weight: 500;
+  white-space: nowrap;
+}
