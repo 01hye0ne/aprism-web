@@ -1534,3 +1534,11 @@ body.ver-6 .ac-dl .ma-check-tag {
 :root[data-theme="light"] body.ver-6 .ac-row:hover { background-color: var(--state-hover); }
 :root[data-theme="light"] body.ver-6 .ac-row[aria-selected="true"],
 :root[data-theme="light"] body.ver-6 .ac-row[aria-selected="true"]:hover { background-color: var(--bg-selected); }
+
+/*
+ * [11/05 논의] 라이트 모드 드롭다운 · 입력칸 테 — 다크용 gray/650(#3F485C)이 그대로 쓰여 너무 진했다.
+ *   라이트에서는 gray/400(#AFB7C8)으로 — comp/input/border(#667085)는 #3F485C 와 차이가 작아 그대로 보였고, 보조 버튼 테(#D1D5DE)는 칸 바탕(#E0E3E9) 위에서 안 보였다. 초점 · 열림 테는 원래대로(border-focus).
+ */
+:root[data-theme="light"] body.ver-6 .field-box:not(.is-readonly) { border-color: var(--color-gray-400); }
+:root[data-theme="light"] body.ver-6 .field-box:focus-visible,
+:root[data-theme="light"] body.ver-6 .field-select[data-open] .field-box { border-color: var(--border-focus); }
