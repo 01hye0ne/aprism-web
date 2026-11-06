@@ -1828,3 +1828,16 @@ body.ver-6 .has-point .rr-pin:not(.is-point) { opacity: .35 !important; transiti
 body.ver-6 .ma-stamp.ma-stamp6 { gap: 0; }
 body.ver-6 .ma-stamp6 .ma-st-place::before { content: ""; display: inline-block; width: 8px; height: 1px; margin-right: var(--space-4); vertical-align: middle; position: relative; top: -1px; background-color: currentColor; }   /* 이름 칸은 블록 그대로 — 길면 말줄임. middle 은 x 높이 기준이라 원 중심보다 1px 아래 → 올림 */
 
+/*
+ * [11/06 v6] 펼친 Delta 여백 — 위계마다 한 값(디자이너). 예전엔 대화 12 · 추천 질문 16 · 입력 칸 4 · 목록 줄 14 로 제각각이었다.
+ *   판 안쪽(1단): 좌우 16 — 블록 제목, 문장, 카드, 목록 줄, 주의 토글, 내 질문, 추천 질문, 입력 칸이 같은 선
+ *   카드 안쪽(2단): 12, 카드 안 상자(3단, 먼저 보는 이유): 10 · 12
+ *   위아래: 답과 답 사이 20, 한 답 안 칸 사이 10
+ *   대화 칸 오른쪽은 스크롤 자리(8)가 있어 안쪽 여백은 4 만 더한다(8 + 4 + 판 4 = 16)
+ */
+body.ver-6 .delta3.is-open.is-chat .dc-thread { padding: 12px 4px 16px 12px; gap: 20px; }
+body.ver-6 .delta3 .dc-msg.dc6 { gap: 10px; }
+body.ver-6 .dc6-row { padding-left: 0; padding-right: 0; }
+body.ver-6 .dc6-toggle { padding-left: 0; padding-right: 0; }
+body.ver-6 .dc6-why { padding: 10px 12px; }
+:root[data-theme][data-delta][data-glow] body.ver-6.v2-2.v3 .delta3.is-open .delta3-body > .ai-input, body.ver-6.v2-2.v3 .delta3.is-open .delta3-body > .ai-input { margin-left: 12px; margin-right: 12px; margin-bottom: 12px; }
