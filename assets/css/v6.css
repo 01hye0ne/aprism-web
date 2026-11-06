@@ -1809,3 +1809,14 @@ body.ver-6 .ma-stamp6 { gap: var(--space-4); }
 body.ver-6 .ma-stamp6 .mbt-pin.is-plain { width: 16px; height: 16px; border-width: 1px; background: transparent; border-color: currentColor; color: inherit; }
 body.ver-6 .ma-stamp6 .mbt-pin::after { font-size: 10px; font-weight: 700; }
 body.ver-6 .ma-stamp6 .ma-st-time { margin-left: auto; padding-left: var(--space-8); }
+
+/*
+ * [11/06 디자이너] 알림 줄 호버 → 지도 지점 짚기(map-v6.js rrHot · is-point) — 핀 머리가 1.3배로 커지고 단계색(--pin) 고리가 퍼진다.
+ *   다른 핀 위로 올라오게 z 를 올린다. 움직임 줄이기 설정이면 고리는 퍼지지 않고 머물러 있다
+ */
+body.ver-6 .rr-pin.is-point { z-index: 4; }
+body.ver-6 .rr-pin.is-point .rr-pin-head { transform: scale(1.4); transform-origin: 50% 100%; transition: transform .16s ease-out; animation: rr-point 1.2s ease-out infinite; }
+@keyframes rr-point { 0% { box-shadow: 0 0 0 2px #FFFFFF, 0 0 0 2px color-mix(in srgb, var(--pin) 80%, transparent); } 100% { box-shadow: 0 0 0 2px #FFFFFF, 0 0 0 14px color-mix(in srgb, var(--pin) 0%, transparent); } }
+/* 짚는 동안 다른 핀은 한 발 물러난다 — "이 위치"만 남게 */
+body.ver-6 .has-point .rr-pin:not(.is-point) { opacity: .35 !important; transition: opacity .16s; }
+@media (prefers-reduced-motion: reduce) { body.ver-6 .rr-pin.is-point .rr-pin-head { animation: none; box-shadow: 0 0 0 2px #FFFFFF, 0 0 0 5px color-mix(in srgb, var(--pin) 45%, transparent); } }

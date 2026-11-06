@@ -3959,7 +3959,7 @@
         var ok = past && !was && rrOk[w.id] > now;   // 측정 끝, 정상 — 초록으로 잠깐
         var measuring = next && rrM(onLane) === "inspect";   // [11/05] 측정 중은 채운 파랑, 이동 중 다음 지점은 빈 파랑(흰 판)
         var quiet = !cau && !dan && !next && !was && !ok && t !== "skipped" && !document.body.classList.contains("sian");
-        el.className = "rr-pin" + (w.buried ? " is-buried" : "") + (past ? " is-past" : "") + (next ? " is-next" : "") + (quiet ? " is-quiet" : "") + (cau || dan ? " is-alert" : "") + (w.id === rrHotId ? " is-hot" : "") + (ok ? " is-ok" : "") + (measuring ? " is-measuring" : "");   // [10/28] 알림 지점 — 번호를 비켜 바닥 세모가 보이게(route-rules.css)
+        el.className = "rr-pin" + (w.buried ? " is-buried" : "") + (past ? " is-past" : "") + (next ? " is-next" : "") + (quiet ? " is-quiet" : "") + (cau || dan ? " is-alert" : "") + (w.id === rrHotId ? " is-hot" + (rrHotPoint ? " is-point" : "") : "") + (ok ? " is-ok" : "") + (measuring ? " is-measuring" : "");   // [10/28] 알림 지점 — 번호를 비켜 바닥 세모가 보이게(route-rules.css)
         // [11/04 · 11/05] is-quiet — 관제 기본은 문제 지점(위험 · 주의 · 건너뜀)과 지금 지점만 번호. 지나온 · 앞으로 갈 지점은 감추고(바닥 점은 남는다) 우측 레일 줄 · 지도 점에 손이 닿으면(is-hot) 보인다(디자이너). 미션 설정 · 사전 점검(.sian)은 점검 순서라 그대로 다 보인다
         el.style.setProperty("--pin", col);
         var head = document.createElement("span");
@@ -4029,14 +4029,27 @@
    * [11/03] 손 닿은 지점 — 지도 위 점(wpAt) · 우측 레일 줄([data-waypoint])에 마우스가 오면 그 지점 번호를 보인다.
    * 관제 기본은 문제 지점만 번호를 보이므로(is-quiet), 다른 번호가 필요할 때 찾는 길이다.
    */
-  var rrHotId = null;
-  function rrHot(id) {
-    id = id || null;
-    if (id === rrHotId) { return; }
-    rrHotId = id;
-    wpSpots.forEach(function (w) { if (w.pinEl) { w.pinEl.classList.toggle("is-hot", w.id === id); } });
+  var rrHotId = null, rrHotPoint = false;
+  function rrHot(id, point) {
+    id = id || null; point = !!(id && point);
+    if (id === rrHotId && point === rrHotPoint) { return; }
+    rrHotId = id; rrHotPoint = point;
+    wpSpots.forEach(function (w) { if (w.pinEl) { w.pinEl.classList.toggle("is-hot", w.id === id); w.pinEl.classList.toggle("is-point", point && w.id === id); } });
+    if (rrPinBox) { rrPinBox.classList.toggle("has-point", point && wpSpots.some(function (w) { return w.id === id && w.pinEl && !w.pinEl.hidden; })); }   // 다른 핀은 흐리게
     frame();
   }
+  /*
+   * [11/06 디자이너] 왼쪽 최신 알림 줄에 손이 닿으면 지도에서 그 지점을 짚는다 — "호버한 알림이 이 위치다".
+   *   번호가 숨은 지점이면 보이고(is-hot), 핀 머리가 커지며 고리가 퍼진다(is-point, v6.css). 손이 떠나면 돌아간다
+   */
+  document.addEventListener("pointerover", function (event) {
+    var it = event.target.closest && event.target.closest(".ah-item[data-wp]");
+    if (it) { rrHot(it.getAttribute("data-wp"), true); }
+  });
+  document.addEventListener("pointerout", function (event) {
+    var it = event.target.closest && event.target.closest(".ah-item[data-wp]");
+    if (it && !(event.relatedTarget && it.contains(event.relatedTarget))) { rrHot(null); }
+  });
   document.addEventListener("pointerover", function (event) {
     var row = event.target.closest && event.target.closest("[data-timeline] [data-waypoint]");
     if (row) { rrHot(row.getAttribute("data-waypoint")); }

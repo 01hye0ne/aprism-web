@@ -569,6 +569,7 @@
     node.type = "button";
     node.setAttribute("role", "listitem");
     node.setAttribute("aria-pressed", a === picked ? "true" : "false");
+    if (a.wp) { node.setAttribute("data-wp", a.wp); }   // [11/06] 지도가 호버한 알림의 지점을 짚는다(map-v6.js rrHot)
 
     var where = el("span", "ah-where t-caption");
     // v2.2 — 위치 줄 앞 표적 아이콘은 뺐다(10/19 디자이너). 층 꼬리표가 이미 "위치" 신호다.
