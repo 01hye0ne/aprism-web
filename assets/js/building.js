@@ -1598,7 +1598,18 @@
       txt.appendChild(name);
       var sub = el("span", "t-caption bld-ftag-sub");
       sub.appendChild(document.createTextNode("로봇 " + robotsOn(f).length + "대"));
-      if (list.length) {
+      // [11/06 v6] 위험 · 주의를 따로 — 단계마다 제 점 + 제 색 글자
+      if (V6) {
+        [["critical", "위험"], ["warning", "주의"]].forEach(function (k) {
+          var n = list.filter(function (a) { return a.sev === k[0]; }).length;
+          if (!n) { return; }
+          var one = el("span", "bld-sev");
+          one.setAttribute("data-sev", k[0]);
+          one.appendChild(el("span", "bld-sev-dot"));
+          one.appendChild(document.createTextNode(k[1] + " " + n));
+          sub.appendChild(one);
+        });
+      } else if (list.length) {
         var sev = el("span", "bld-sev");
         sev.setAttribute("data-sev", topSev(list));
         sev.appendChild(el("span", "bld-sev-dot"));

@@ -65,6 +65,7 @@
     [/^어서오세요 (.+?) ?님$/, "Welcome, $1"],
     [/^(\d.*) 소요$/, function (m, t) { return "Took " + core(t); }],
     [/^지점 (\d+)곳$/, "$1 waypoints"],
+    [/^로봇 (\d+)대$/, "$1 robots"],
     [/^주의 (\d+)건 묶어 보기$/, "View $1 warnings together"],
     [/^가장 급한 것은 (.+?)(?:이에요|예요)\.$/, "Most urgent: $1."],
     [/^(.+) — 검출 장면$/, "$1 — detection frame"],
