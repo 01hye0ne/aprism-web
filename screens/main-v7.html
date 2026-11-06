@@ -39,7 +39,7 @@
   <link rel="stylesheet" href="../assets/css/v5.css?v=aefc22b4" />
   <!-- v6 전용 규칙 — v5 는 10/30 부로 멈췄다. v6 에서 바꾸는 것은 여기(body.ver-6)에. -->
   <link rel="stylesheet" href="../assets/css/v6.css?v=45f0aa35" />
-  <link rel="stylesheet" href="../assets/css/v7.css?v=1130f3ba" />
+  <link rel="stylesheet" href="../assets/css/v7.css?v=aab84aa5" />
   <!-- 지도 경로 표현 규칙(10/28 반영, 지도 경로 표현 전달서 1022) — 경로 네 구간 · 흐름 빛 · 번호 핀 · 시야 빔 로봇 · 충전 스테이션 · 아래 상태 시뮬레이션 막대 -->
   <link rel="stylesheet" href="../assets/css/route-rules.css?v=bd91ee52" />
   <style>
@@ -253,14 +253,12 @@
              · 알림마다 [보고서]
            Figma 에 아직 없는 판이다. 크기 · 색은 기존 패널 부품을 그대로 썼다.
            목록은 assets/js/monitor.js 가 알림 단계(정상 · 주의 · 위험)에 맞춰 채운다. -->
-      <aside class="context-panel" id="site-panel" aria-label="알림">
+      <aside class="context-panel" id="site-panel" aria-label="관제">
 
         <div class="panel-head">
-          <!-- [11/06 디자이너 v7] 패널 머리줄 자체가 [알림 센터 ›] 단추 — 두 목록(미확인 · 오늘 확인된)의 위 층이 곧 알림 센터. 따로 있던 이름(알림)과 링크를 하나로.
-               누르는 곳은 글 덩이만(오른쪽 끝 접기 단추와 떨어지게) -->
-          <button type="button" class="panel-ah-all panel-head-link t-label-1" data-ah-all aria-label="알림 센터 열기">알림 센터<span class="i i-16" style="--i:var(--ic-chevron-right)" aria-hidden="true"></span></button>
+          <p class="t-overline section-label">관제</p>
           <button type="button" data-panel-toggle
-                  aria-expanded="true" aria-controls="site-panel" aria-label="알림 패널 접기">
+                  aria-expanded="true" aria-controls="site-panel" aria-label="관제 패널 접기">
             <span class="i i-20" style="--i:var(--ic-panel-left)"></span>
           </button>
         </div>
@@ -269,8 +267,11 @@
           <div class="ah-head">
             <!-- 제목은 아래 "오늘 확인 완료" 와 같은 Title/2 다 — 같은 패널의 형제 칸이다(v2.2 위계 정리).
                  제목 줄은 이름 + 이동만. 정렬 안내는 목록을 다루는 거르기 줄로 내려갔다. -->
-            <!-- [11/06 디자이너 v7] "최신 알림" → "미확인 알림" — 알림 센터 탭 이름(미확인 알림 / 확인된 알림)과 같은 말 -->
-            <h2 class="t-title-2" id="ah-title">미확인 알림</h2>
+            <!-- [11/06 디자이너 v7] "최신 알림" → "미조치 알림" — 알림 센터 탭 이름(미조치 알림 / 조치 요청된 알림)과 같은 말, 버튼 [조치 요청]과 같은 "조치" -->
+            <h2 class="t-title-2" id="ah-title">미조치 알림</h2>
+            <!-- [11/06 디자이너 v7] [알림 센터 ›]는 알림 목록 바로 위 — 패널 머리줄(관제)은 GNB 자리라 알림 링크만 떠 보였다.
+                 이름이 가는 곳(알림 센터 = 미조치 · 조치 요청된 두 탭)이라 "이 목록만의 전체"로 읽히지 않는다. 누르면 미조치 탭으로 연다 -->
+            <button type="button" class="btn btn-ghost is-xs ah-all" data-ah-all>알림 센터<span class="i i-16" style="--i:var(--ic-chevron-right)" aria-hidden="true"></span></button>
           </div>
 
           <!-- 처리 필요 — 거르기(Button Small · 고른 것 Accent) · 정렬 · 목록 -->
@@ -293,11 +294,12 @@
           <section class="ah-sec done-sec" aria-labelledby="done-title" data-done-sec>
             <div class="done-head" data-done-head>
               <!-- [11/06 디자이너] 머리를 예전 배치로 — 이름 · 건수(점) · 오른쪽 끝 접기. [전체보기]는 위 최신 알림 하나만.
-                   이름은 위 "최신 알림"보다 한 단 낮게(t-label-1 · 14) — 주로 보는 목록은 위, 이쪽은 기록 -->
-              <h3 class="t-label-1" id="done-title">오늘 확인된 알림</h3>
+                   이름은 위 "미조치 알림"과 같은 위계(t-title-2 · 16) — 알림 센터 탭(미조치 알림 / 조치 요청된 알림)과 같은 이름 · 형제. 위 층은 패널 머리줄(관제 …… 알림 센터 ›).
+                   [11/06] "조치" 로 통일(버튼 [조치 요청]과 같은 말) — "완료"는 현장 결과가 돌아오는 다음 단계 몫이라 쓰지 않는다. 범위(오늘)는 제목 대신 건수 앞에(v7.css) -->
+              <h3 class="t-title-2" id="done-title">조치 요청된 알림</h3>
               <span class="badge done-count t-caption"><span class="badge-dot"></span><span class="num" data-done-count>0건</span></span>
               <button type="button" class="done-fold" data-done-fold
-                      aria-expanded="true" aria-controls="done-box" aria-label="오늘 확인된 알림 접기">
+                      aria-expanded="true" aria-controls="done-box" aria-label="조치 요청된 알림 접기">
                 <span class="i i-16" aria-hidden="true" style="--i:var(--ic-chevron-down)"></span>
               </button>
             </div>
@@ -385,7 +387,7 @@
                 <span class="ai-delta-mark delta3-orb" aria-hidden="true"><i></i></span>
                 <b>Delta</b>
               </span>
-              <button type="button" class="delta3-close" data-delta3-close aria-label="Delta 창 닫기">
+              <button type="button" class="delta3-close" data-delta3-close aria-label="Delta 접기">
                 <span class="i i-16" aria-hidden="true"></span>
               </button>
             </div>
@@ -1774,11 +1776,11 @@
 <script src="../assets/js/delta-form.js?v=42bb62ab"></script>
 <script src="../assets/js/theme.js?v=c86093d9"></script>
 <script src="../assets/js/prism-orb.js?v=03386460"></script>
-<script src="../assets/js/screen.js?v=1bc825ef"></script>
+<script src="../assets/js/screen.js?v=5b665a8c"></script>
 <script src="../assets/js/map-model.js?v=0f88c871"></script>
 <!-- v5 전용 지도(map-v3.js 를 10/29 에 복제) -->
 <script src="../assets/js/map-fx-v6.js?v=05546ef0"></script>
-<script src="../assets/js/map-v6.js?v=5cae13f9"></script>
+<script src="../assets/js/map-v6.js?v=a4c62814"></script>
 <!-- 지도 위 3D 로봇(SPOT · 휠 로봇) — 10/29 디자이너 "SPOT 로봇 360 시안". 예전 로봇개(robot-stage.js)는 v5 에서 안 쓴다. -->
 <script src="../assets/js/robot-spot.js?v=2a3061e4"></script>
 <script src="../assets/js/robot-2d.js?v=dd759e17"></script>
@@ -1798,6 +1800,6 @@
 <script src="../assets/js/grid-overlay.js?v=164e4f2a"></script>
 <script src="../assets/js/v3-panel.js?v=9f5054be"></script>
 <!-- 상태 8개(이동 중 · 측정 중 · 위험 감지 · 일시정지 · 긴급정지 · 자동복귀 · 통신 끊김 · 미션 완료) · 재생 · 진행 막대 -->
-<script src="../assets/js/route-sim.js?v=83190bfb"></script>
+<script src="../assets/js/route-sim.js?v=137ac3e6"></script>
 </body>
 </html>

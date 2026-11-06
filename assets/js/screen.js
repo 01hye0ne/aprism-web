@@ -1172,6 +1172,21 @@ window.APRISM_TEXT = (function () {
     return span + " · " + hh + ":" + mm + " 종료 예상";
   }
 
+  // [11/06 v7] 목록 상자(굴러가는 가장 가까운 부모)를 지금 카드의 바로 앞 카드가 맨 위에 오게 — 그리기 직후라 다음 그림 틀에서 잰다
+  function railToRunning(timeline) {
+    requestAnimationFrame(function () {
+      var item = timeline.querySelector(".timeline-item.is-running");
+      if (!item) { return; }
+      var box = item.parentNode;
+      while (box && box !== document.body) { var oy = getComputedStyle(box).overflowY; if ((oy === "auto" || oy === "scroll") && box.scrollHeight > box.clientHeight) { break; } box = box.parentNode; }
+      if (!box || box === document.body) { return; }
+      var prev = item.previousElementSibling;
+      while (prev && !(prev.matches && prev.matches(".timeline-item:not(.rr-hide)"))) { prev = prev.previousElementSibling; }
+      var top = (prev || item).getBoundingClientRect().top - box.getBoundingClientRect().top + box.scrollTop - (parseFloat(getComputedStyle(box).paddingTop) || 0);
+      box.scrollTop = Math.max(0, top);
+    });
+  }
+
   function stepNode(step, index) {
     var meta = STATE[step.state];
 
@@ -1306,6 +1321,9 @@ window.APRISM_TEXT = (function () {
         timeline.appendChild(stepNode(step, i));
       });
       timeline.scrollTop = 0;
+      // [11/06 디자이너 v7] 미션(상단 탭)을 바꿔 목록을 새로 그려도 지금 카드를 위쪽에 — 바로 앞(지나온) 카드가 맨 위, 그 아래 지금 카드.
+      //   지도 쪽(map-v6.js rrRailTo)과 같은 규칙. 바꿀 때는 굴리는 움직임 없이 바로 그 자리
+      if (document.body.classList.contains("ver-7")) { railToRunning(timeline); }
       phaseRails(timeline);
 
       /*

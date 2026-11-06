@@ -581,7 +581,9 @@
         if (pe) { pe.textContent = Math.round(fr * 100) + "%"; }
       } else if (mode === "run" || mode === "alert") {
         var s = api.get(), next = api.stops().filter(function (x) { return x > s + 1e-6; })[0], eta = card.querySelector('[data-rr="eta"]');
-        if (eta) { eta.textContent = next === undefined ? "" : "도착 약 " + Math.max(1, Math.round((next - s) / (api.total() / SPEED_SEC))) + "초"; }
+        var etaSec = next === undefined ? 0 : Math.max(1, Math.round((next - s) / (api.total() / SPEED_SEC)));
+        // [11/06 디자이너 v7] "도착 약 n초" → "약 n초 남음" — 마지막 카드 [도착] 꼬리표와 말이 겹치지 않게, 진행 줄 "약 1시간 57분 남음"과 같은 말투. v6 는 그대로
+        if (eta) { eta.textContent = next === undefined ? "" : document.body.classList.contains("ver-7") ? "약 " + etaSec + "초 남음" : "도착 약 " + etaSec + "초"; }
       } else if (mode === "pause") {
         var held = 84 + e / 1000, he = card.querySelector('[data-rr="held"]'), au = card.querySelector('[data-rr="auto"]');
         if (he) { he.textContent = mmss(held); }

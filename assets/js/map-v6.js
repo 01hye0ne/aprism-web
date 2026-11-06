@@ -3839,9 +3839,26 @@
       lastDone.setAttribute("data-wp-alert", "danger"); lastDone.setAttribute("data-rr-alert", "1");
     }
     rrAlertId = m === "alert" ? lastSpot : null;
-    if (runItem && runItem !== rrRunning) { rrRunning = runItem; try { runItem.scrollIntoView({ block: "center", behavior: rrReduce ? "auto" : "smooth" }); } catch (err) { /* 오래된 브라우저 */ } }
+    if (runItem && runItem !== rrRunning) { rrRunning = runItem; try { rrRailTo(runItem); } catch (err) { /* 오래된 브라우저 */ } }
     layWaypoints();
   }
+  /*
+   * 우측 지점 목록을 지금 지점으로 — v6 은 지금 카드를 가운데로.
+   * [11/06 디자이너 v7] 지금 카드를 위쪽에 — 바로 앞(지나온) 카드가 맨 위, 그 아래 지금 카드("이전 카드 아래에 현재 카드").
+   *   목록 상자만 굴린다(scrollIntoView 는 바깥 화면까지 움직일 수 있다). 첫 지점이면 앞 카드가 없어 지금 카드가 맨 위
+   */
+  function rrRailTo(item) {
+    var behavior = rrReduce ? "auto" : "smooth";
+    if (!document.body.classList.contains("ver-7")) { item.scrollIntoView({ block: "center", behavior: behavior }); return; }
+    var box = item.parentNode;
+    while (box && box !== document.body) { var oy = getComputedStyle(box).overflowY; if ((oy === "auto" || oy === "scroll") && box.scrollHeight > box.clientHeight) { break; } box = box.parentNode; }
+    if (!box || box === document.body) { item.scrollIntoView({ block: "start", behavior: behavior }); return; }
+    var prev = item.previousElementSibling;
+    while (prev && !(prev.matches && prev.matches(".timeline-item:not(.rr-hide)"))) { prev = prev.previousElementSibling; }
+    var top = (prev || item).getBoundingClientRect().top - box.getBoundingClientRect().top + box.scrollTop - (parseFloat(getComputedStyle(box).paddingTop) || 0);
+    box.scrollTo({ top: Math.max(0, top), behavior: behavior });
+  }
+
   /*
    * [11/05] 델타 시뮬레이션(route-sim.js 의 "기본 → 위험 1건" · "주의 → 위험 1건")을 지도와 잇는다.
    *   누르면 로봇이 위험이 날 지점(알림 지점 WP-04 가 이 길에 있으면 거기, 없으면 바로 앞 지점)에 서서 측정 중이 되고,
