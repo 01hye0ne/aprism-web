@@ -3777,6 +3777,7 @@
       frame();
     },
     mode: function (m) { if (m !== RRS.mode) { RRS.at = performance.now(); } RRS.mode = m; this.set(this.get()); },
+    ended: function () { return !!(onLane && onLane.bot && onLane.bot.ended); },   // [11/06] 데이터상 이미 끝난 미션의 로봇인가(시뮬레이션 완료와 다르다)
     stops: function () {
       var ln = onLane;
       if (!ln) { return []; }

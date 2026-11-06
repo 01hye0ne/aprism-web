@@ -277,7 +277,7 @@
   var LEFTTXT = { pause: "일시정지 중, 남은 시간 멈춤", estop: "긴급정지로 멈춤", "return": "미션 중단, 충전 스테이션으로 복귀 중", lost: "통신이 돌아오면 다시 계산", done: "미션 완료" };
   var badgeMode = null;
   // [11/06 v6] 완료 미션 탭(M6 ~ M8)은 시뮬레이션과 상관없이 미션 완료로 보인다 — 시뮬레이션의 미션 완료와 같은 표시
-  function doneMode(m) { return document.body.classList.contains("ver-6") && document.querySelector(".sb-tab.is-on[data-run='done']") ? "done" : m; }
+  function doneMode(m) { return api && api.ended && api.ended() ? "done" : m; }
   function robotCard(m) {
     m = doneMode(m);
     var on = document.querySelector(".sb-tab.is-on"), key = m + "|" + (on ? on.getAttribute("data-mission") : "");   // 완료 미션끼리 옮겨도 아랫줄을 새로 쓴다
