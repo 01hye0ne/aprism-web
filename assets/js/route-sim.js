@@ -276,9 +276,13 @@
   }
   var LEFTTXT = { pause: "일시정지 중, 남은 시간 멈춤", estop: "긴급정지로 멈춤", "return": "미션 중단, 충전 스테이션으로 복귀 중", lost: "통신이 돌아오면 다시 계산", done: "미션 완료" };
   var badgeMode = null;
+  // [11/06 v6] 완료 미션 탭(M6 ~ M8)은 시뮬레이션과 상관없이 미션 완료로 보인다 — 시뮬레이션의 미션 완료와 같은 표시
+  function doneMode(m) { return document.body.classList.contains("ver-6") && document.querySelector(".sb-tab.is-on[data-run='done']") ? "done" : m; }
   function robotCard(m) {
-    if (m === badgeMode) { return; }
-    badgeMode = m;
+    m = doneMode(m);
+    var on = document.querySelector(".sb-tab.is-on"), key = m + "|" + (on ? on.getAttribute("data-mission") : "");   // 완료 미션끼리 옮겨도 아랫줄을 새로 쓴다
+    if (key === badgeMode) { return; }
+    badgeMode = key;
     var badge = document.querySelector('.robot-strip .robot-card[aria-pressed="true"] .robot-lists .badge');
     if (badge) {
       if (!badge.hasAttribute("data-rr-orig")) { badge.setAttribute("data-rr-orig", badge.className); }
@@ -315,17 +319,18 @@
   var endKey = "";
   function endGuard() {
     var st = api.stops(), last = st.length ? st[st.length - 1] : api.total();
-    var home = (mode === "run" || mode === "alert") && api.get() > last + api.total() * 0.003;
-    var off = home || mode === "done" || mode === "return";
-    var key = off + "|" + home + "|" + mode;
+    var dm = doneMode(mode);
+    var home = (mode === "run" || mode === "alert") && dm !== "done" && api.get() > last + api.total() * 0.003;
+    var off = home || dm === "done" || mode === "return";
+    var key = off + "|" + home + "|" + dm;
     if (key === endKey) { return; }
     endKey = key;
     var rec = document.querySelector("[data-recall-button]"), chip = box.querySelector('[data-m="return"]');
     if (rec) {
       rec.disabled = off && mode !== "return";
-      rec.title = home ? "마지막 지점을 지나 충전 스테이션으로 가는 중이에요" : mode === "done" ? "미션이 끝났어요" : "";
+      rec.title = home ? "마지막 지점을 지나 충전 스테이션으로 가는 중이에요" : dm === "done" ? "미션이 끝났어요" : "";
     }
-    if (chip) { chip.disabled = home || mode === "done"; chip.title = chip.disabled ? "마지막 지점 뒤에서는 자동복귀가 의미 없어요" : ""; }
+    if (chip) { chip.disabled = home || dm === "done"; chip.title = chip.disabled ? "마지막 지점 뒤에서는 자동복귀가 의미 없어요" : ""; }
     var left = document.querySelector("[data-progress-left]");
     if (left && home) { left.textContent = "점검 끝, 충전 스테이션으로 이동 중"; }
     else { badgeMode = null; }   // 다시 앞쪽으로 오면 robotCard 가 원래 글로 되돌린다
@@ -353,6 +358,7 @@
     rail.classList.toggle("rr-estop", m === "estop");
     rail.classList.toggle("rr-frozen", m === "lost");
     // 목록 위 띠
+    m = doneMode(m);
     var host = rail.parentNode, ban = host && host.querySelector(".rr-banner");
     var v6 = document.body.classList.contains("ver-6");
     var want = v6 ? !!STATE6[m] : m === "lost" || m === "done";
