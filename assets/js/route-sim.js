@@ -285,7 +285,7 @@
     badgeMode = key;
     var badge = document.querySelector('.robot-strip .robot-card[aria-pressed="true"] .robot-lists .badge');
     if (badge) {
-      if (!badge.hasAttribute("data-rr-orig")) { badge.setAttribute("data-rr-orig", badge.className); }
+      if (!badge.hasAttribute("data-rr-orig")) { badge.setAttribute("data-rr-orig", badge.className); badge.setAttribute("data-rr-html", badge.innerHTML); }
       var b = BADGE[m] || BADGE.run;
       badge.className = "badge " + b[1] + " t-caption";
       badge.innerHTML = '<span class="badge-dot"></span>' + b[0];
@@ -496,7 +496,25 @@
   }
 
   function mmss(sec) { sec = Math.max(0, Math.floor(sec)); return Math.floor(sec / 60) + ":" + String(sec % 60).padStart(2, "0"); }
+  // [11/06 v6] 시뮬레이션 상태는 화면에 하나라, 미션(로봇)을 바꾸면 이동 중으로 되돌린다 — 앞 미션의 상태가 다음 미션에 묻어가지 않게
+  var simRobot;
+  function simReset() {
+    if (!api || !document.body.classList.contains("ver-6")) { return; }
+    var card = document.querySelector('.robot-strip .robot-card[aria-pressed="true"]'), id = card ? card.getAttribute("data-robot") : null;
+    if (id === simRobot) { return; }
+    var first = simRobot === undefined;
+    simRobot = id;
+    if (first) { return; }
+    if (playing) { stop(); }
+    if (touched) { press("run"); if (api.reset) { api.reset(); } else { api.mode("run"); } }
+    // 앞 로봇 카드의 시뮬레이션 배지를 되돌린다 — 일시정지로 남으면 그 미션이 대기로 읽혀 탭이 미션 설정으로 간다
+    Array.prototype.forEach.call(document.querySelectorAll('.robot-strip .robot-card:not([aria-pressed="true"]) .badge[data-rr-orig]'), function (b) {
+      b.className = b.getAttribute("data-rr-orig"); b.innerHTML = b.getAttribute("data-rr-html") || b.innerHTML;
+      b.removeAttribute("data-rr-orig"); b.removeAttribute("data-rr-html");
+    });
+  }
   function decorate(t) {
+    simReset();
     if (!api || !touched) { return; }
     var e = t - modeAt;
     // 지도 측정 눈금

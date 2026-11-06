@@ -3325,6 +3325,7 @@
    *   return 자동복귀 · lost 통신 끊김 · done 미션 완료
    */
   var RRS = { mode: "run", s: null, lane: null, at: 0 };
+  var rrMoved = [];   // 시뮬레이션이 옮긴 길
   function rrNeutral() { return isLight() ? 0x2b3445 : 0xe4e8ef; }   // 복귀 도로색(시안 --rt-return)
   var RR_GRAY = 0x9ea8bb, RR_NEUTRAL = 0xe4e8ef;
   // [10/29 v5] 시안 1022 기준 — 앞으로 갈 길은 로봇색 동그란 점선(2/6, 80%), 번호는 막대 핀(지나온 지점도 옅게). 위 RR 의 ahead "A" · pins "P0" · pastNo "on".
@@ -3768,6 +3769,8 @@
       if (!ln || !ln.rr) { return; }
       if (ln.bot.ended) { rrApply(ln); frame(); return; }   // [10/30 v6] 완료한 미션은 시뮬레이션이 옮기지 않는다
       ln.walk = null;   // 시연용 걸음은 멈춘다 — 이제 시뮬레이션이 자리를 정한다
+      if (ln.rrHome === undefined) { ln.rrHome = ln.rr.s; }   // [11/06] 되돌릴 데이터 자리(reset) — 처음 값 하나만 기억한다
+      if (rrMoved.indexOf(ln) < 0) { rrMoved.push(ln); }
       RRS.lane = ln.id;
       RRS.s = Math.max(0, Math.min(ln.total, s));
       rrPlace(ln, RRS.s, RRS.mode === "return" ? -1 : 1);
@@ -3777,6 +3780,23 @@
       frame();
     },
     mode: function (m) { if (m !== RRS.mode) { RRS.at = performance.now(); } RRS.mode = m; this.set(this.get()); },
+    // [11/06] 미션을 바꾸면 시뮬레이션을 처음으로 — 상태 · 옮긴 자리를 버리고 그 미션의 데이터 자리로 돌아간다
+    reset: function () {
+      RRS.mode = "run"; RRS.s = null; RRS.lane = null; RRS.at = performance.now();
+      rrMoved.splice(0).forEach(function (ln) { ln.rr.s = ln.rrHome; rrPlace(ln, ln.rr.s, 1); });
+      // 로봇 카드가 바뀐 직후라 지도가 아직 앞 미션일 수 있다 — 새 미션으로 넘어간 뒤 한 번 더 맞춘다
+      function settle() {
+        if (onLane) { rrApply(onLane); }
+        // 시뮬레이션 길이 없는 로봇(Robot 05)은 rrApply 가 지나가므로 완료 표시를 여기서 푼다
+        if (botBox && botBox.getAttribute("data-rr") === "done" && onLane && !onLane.bot.ended) {
+          botBox.setAttribute("data-rr", "run");
+          document.dispatchEvent(new CustomEvent("aprism:rr-mode", { detail: { mode: "run" } }));
+        }
+        frame();
+      }
+      settle();
+      setTimeout(settle, 120);
+    },
     ended: function () { return !!(onLane && onLane.bot && onLane.bot.ended); },   // [11/06] 데이터상 이미 끝난 미션의 로봇인가(시뮬레이션 완료와 다르다)
     stops: function () {
       var ln = onLane;
