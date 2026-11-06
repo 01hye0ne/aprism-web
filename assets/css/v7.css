@@ -57,3 +57,12 @@ body.ver-7 .dc6-card > .dc6-done, body.ver-7 .dc6-card > .dc6-btns { grid-column
 :root[data-theme] body.ver-7.ver-3.v2-2.v3 .delta3.is-open { width: var(--d3-w, 220px); }
 /* 220 칸에선 [위험 상세 확인] [위치 보기]가 한 줄에 안 들어간다(위치 보기가 칸 밖으로 잘림) — 위아래로 쌓아 둘 다 칸 너비 가득 */
 body.ver-7 .delta3 .dc6-btns { grid-template-columns: minmax(0, 1fr); }
+
+/*
+ * [11/06 디자이너] 펼친 Delta 판 안쪽 여백 좌우 · 아래 16 → 12 (220 칸이라 조금 줄임). 판 4 + 안쪽 8 = 12
+ *   대화 칸 오른쪽은 스크롤 자리 8 + 판 4 = 12 라 안쪽 0. 머리(Delta) 왼쪽도 같은 선으로 맞춘다
+ */
+body.ver-7 .delta3.is-open.is-chat .dc-thread { padding: 12px 0 16px 8px; }
+body.ver-7 .dc6-sugg { padding: 10px 8px 8px; }
+:root[data-theme][data-delta][data-glow] body.ver-7.ver-6.v2-2.v3 .delta3.is-open .delta3-body > .ai-input, body.ver-7.ver-6.v2-2.v3 .delta3.is-open .delta3-body > .ai-input { margin-left: 8px; margin-right: 8px; margin-bottom: 8px; }
+body.ver-7.ver-3.v2-2.v3 .delta3.is-open .delta3-name { padding-left: 8px; }
