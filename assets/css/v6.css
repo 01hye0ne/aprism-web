@@ -1684,3 +1684,8 @@ body.ver-6 .map-card-rows .mbt-act.rr-banner, :root[data-theme="light"] body.ver
 body.ver-6 .map-card-rows .mbt-sub { font-size: var(--font-size-12); line-height: 16px; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
 body.ver-6 .map-card-rows .mbt-warn { display: flex; align-items: center; gap: var(--space-4); margin-top: var(--space-4) !important; font-size: var(--font-size-12); line-height: 16px; font-weight: 600; color: var(--status-warning-text); }
 body.ver-6 .map-card-rows .mbt-warn .i { background-color: var(--status-warning-icon); }
+
+/* [11/06 v6] 지도 끌기 다시 연다(map-v6.js) — 손 모양으로 끌 수 있음을 알린다(route-rules 의 cursor: default 를 덮는다) */
+body.ver-6 .map-canvas { cursor: grab; }
+body.ver-6 .map-canvas.is-turning { cursor: grabbing; }
+body.ver-6 .map-canvas.is-panning { cursor: move; }

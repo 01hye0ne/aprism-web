@@ -644,8 +644,7 @@
       stirred = true;
     }
 
-    // [route-rules 10/21] 지도는 끌어서 돌리거나 밀 수 없다 — 시점은 고정(확대는 도구 버튼, 휠). 클릭은 그대로
-    if (mode === "turn" || mode === "slide" || mode === "pinch") { return; }
+    // [route-rules 10/21] 지도는 끌어서 돌리거나 밀 수 없게 막았었다 → [11/06 v6] 다시 연다(디자이너 "드래그로 360도"). 끌면 돌고, Shift · 가운데 · 오른쪽 끌기는 밀기, 두 손가락은 핀치
     if (mode === "pinch") {
       // 손가락 하나가 조용히 사라졌으면(pointerup 을 놓치는 기기가 있다) 남은 하나로 돈다.
       if (down.length < 2) { mode = down.length ? "turn" : ""; paint(); return; }
