@@ -465,7 +465,8 @@
     normal: "현장이나 로봇 상황을 물어보세요"
   };
   function hint() {
-    input.placeholder = V6 ? "원인, 조치, 위치, 처리 순서를 물어보세요" : thread ? "이어서 물어보세요" : (HINT[body.getAttribute("data-level")] || HINT.normal);
+    // [11/06] 한글판은 짧게(디자이너, 범위 나열이 길다). 영문판은 그대로
+    input.placeholder = V6 ? (document.documentElement.lang === "en" ? "원인, 조치, 위치, 처리 순서를 물어보세요" : "Delta에게 질문") :thread ? "이어서 물어보세요" : (HINT[body.getAttribute("data-level")] || HINT.normal);
   }
   hint();
 

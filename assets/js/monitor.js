@@ -822,7 +822,10 @@
    * 주소 ?alert=시각&wp=WP-nn, 관제 껍데기는 APRISM_OPEN_ALERT 를 부른다. 두 화면의 알림 데이터가 따로라 시각으로 찾고, 없으면 지점으로 찾는다.
    * 미션이 바뀌고 지도 번호가 깔린 뒤라야 쪽지가 제자리를 찾으므로 그때까지 기다린다.
    */
+  var openAlert = window.APRISM_OPEN_ALERT;
   window.APRISM_OPEN_ALERT = function (mission, time, wp) {
+    // [11/06] 알림 자체를 넘기는 쪽(펼친 Delta 의 [위치 보기] · [위험 상세 확인], 접힘 답 단추)은 위 정의 그대로 — 이 정의가 덮어써 눌러도 열리지 않았다
+    if (mission && typeof mission === "object") { openAlert(mission); return; }
     var tries = 0;
     (function go() {
       var d = window.APRISM_DELTA_ALERTS;

@@ -25,11 +25,14 @@
     ["others", /다른 위험|다른 미션/],
     ["priority", /요약|뭐부터|무엇부터|우선|먼저|순서|가이드|할 ?일/],
     ["cause", /원인|왜|이유|근거/],
-    ["actions", /조치|어떻게|해결|방법|고치|뭘 해야/],
+    ["actions", /조치|어떻게(?! ?됐)|해결|방법|고치|뭘 해야/],
     ["location", /위치|어디|지도/],
     ["count", /몇|개수/],
-    ["greet", /^(안녕|하이|hi|hello)/i]
+    ["greet", /^(안녕|하이|hi|hello)/i],
+    // [11/06] 한글판만 — "문제가 뭐야", "상태 어때"는 대상 알림의 지금 상태로 답한다(채팅 범위 문서 U1)
+    ["status", /문제|상태|어때|어떻게 ?됐|괜찮|이상|무슨 일|뭐가|상황|뭐야/]
   ];
+  var EN = document.documentElement.lang === "en";
   var SUGG = {
     priority: ["원인이 뭐야?", "어떻게 조치해?", "왜 이걸 먼저 봐야 해?"],
     why: ["원인이 뭐야?", "어떻게 조치해?", "다른 위험도 알려줘"],
@@ -38,9 +41,16 @@
     location: ["어떻게 조치해?", "원인이 뭐야?", "다른 위험도 알려줘"],
     others: ["뭐부터 처리해?", "원인이 뭐야?", "어떻게 조치해?"],
     alert: ["원인이 뭐야?", "어떻게 조치해?", "뭐부터 처리해?"],
-    other: ["뭐부터 처리해?", "원인이 뭐야?", "어떻게 조치해?"]
+    other: ["뭐부터 처리해?", "원인이 뭐야?", "어떻게 조치해?"],
+    status: ["원인이 뭐야?", "어떻게 조치해?", "위치 알려줘"],
+    fallback: ["뭐부터 처리해?", "원인이 뭐야?", "위치 알려줘"]
   };
+  // [11/06] 추천 질문은 마지막 답을 따른다 — 같은 알림에 이미 답한 종류는 빼고, 모자라면 아래 차례로 채운다
+  var Q_TYPE = { "뭐부터 처리해?": "priority", "왜 이걸 먼저 봐야 해?": "why", "원인이 뭐야?": "cause", "어떻게 조치해?": "actions", "위치 알려줘": "location", "다른 위험도 알려줘": "others" };
+  var Q_FILL = ["원인이 뭐야?", "어떻게 조치해?", "위치 알려줘", "왜 이걸 먼저 봐야 해?", "다른 위험도 알려줘", "뭐부터 처리해?"];
   var ST = { suggested: "추천", pending: "승인 대기", requested: "요청됨(시뮬레이션)", progress: "진행 중(시뮬레이션)" };
+  // [11/06] 한글판 상태 칩은 "(시뮬레이션)" 없이
+  if (document.documentElement.lang !== "en") { ST.requested = "요청됨"; ST.progress = "진행 중"; }
   // 라이팅 시스템 11 — "재측정 후 판단"은 판단이지 할 일이 아니고, "작업 중지 요청"은 무전으로 사람이 하는 일이다
   var NOT_ACT = /재측정 후 판단|작업 중지/;
 
@@ -64,7 +74,8 @@
     anchor.appendChild(jump);
     host.insertBefore(anchor, sugg);
     var stamp = el("span", "dc6-at num");
-    if (name) { name.appendChild(stamp); }
+    // [11/06] 한글판은 머리의 분석 시각을 뺐다(디자이너). 영문판은 그대로
+    if (name && EN) { name.appendChild(stamp); }
 
     function A() { return c.alerts(); }
     function ordered() { var a = A(); return a.order || a.all || []; }
@@ -127,7 +138,8 @@
       var m = { type: type, a: a, node: el("div", "dc-msg is-ai dc6"), rows: [], card: null, next: false };
       var h = el("div", "dc6-h");
       h.appendChild(el("h4", null, title));
-      if (right) { h.appendChild(el("span", null, right)); }
+      // [11/06] 한글판은 제목 오른쪽 대상 이름(N₂ 압력계 등)을 뺐다(디자이너)
+      if (right && EN) { h.appendChild(el("span", null, right)); }
       m.node.appendChild(h);
       msgs.push(m);
       return m;
@@ -141,9 +153,14 @@
       var t = (A().all || []).map(function (a) { return a.time || ""; }).sort().pop();
       stamp.textContent = t ? c.hhmm(t) + " 분석" : "";
     }
+    var done = {};   // 알림별로 이미 답한 종류
     function finish(m, type) {
       lastType = type || m.type;
-      if (m.a) { lastTarget = m.a; }
+      if (m.a) {
+        lastTarget = m.a;
+        var k = keyOf(m.a);
+        (done[k] = done[k] || {})[m.type] = true;
+      }
       c.add(m.node);
       refresh(m);
       toTop(m.node);
@@ -363,7 +380,8 @@
       }
       text(m, a.fixFirst || ("추천 조치 " + list.length + "건이에요. 확인 후 요청하세요."));
       var d = el("div", "dc6-card");
-      d.appendChild(el("p", "dc6-sim", "시뮬레이션: 확인 전에는 아무것도 보내지 않고, 상태는 이 화면에서만 바뀌어요."));
+      // [11/06] 한글판은 실제 제품처럼 — 시뮬레이션 안내와 두 번째 확인을 뺐다(디자이너). 영문판은 그대로
+      if (EN) { d.appendChild(el("p", "dc6-sim", "시뮬레이션: 확인 전에는 아무것도 보내지 않고, 상태는 이 화면에서만 바뀌어요.")); }
       var l = el("div", "dc6-acts");
       list.forEach(function (x, i) {
         var r = el("label", "dc6-act");
@@ -382,6 +400,7 @@
       var req = btn("선택 항목 요청", "is-pri", function () {
         var picked = Array.prototype.filter.call(l.querySelectorAll(".dc6-act"), function (r) { return r.querySelector("input").checked; }).map(function (r) { return r._t; });
         if (!picked.length) { return; }
+        if (!EN) { request(a, picked); return; }
         var cf = el("div", "dc6-confirm");
         cf.appendChild(el("span", null, "요청 " + picked.length + "건을 보낼까요? " + picked.join(", ")));
         cf.appendChild(el("span", "dc6-sim", "시뮬레이션: 작업자, 팀, 로봇에 연락하지 않아요."));
@@ -463,19 +482,39 @@
       if (intent === "location") { return location(t); }
       if (intent === "others") { return others(); }
       if (intent === "count") { return count(); }
+      if (intent === "status" && !EN) { return t ? status(t) : priority(false); }
       var n = counts(ordered());
       if (intent === "greet") {
         return plain("greet", "Delta", "안녕하세요. " + (n.c ? "지금 위험이 " + n.c + "건 있어요." : n.w ? "지금 주의가 " + n.w + "건 있어요." : "지금은 알림이 없어요."),
           btn("처리 순서 보기", "is-pri", function () { c.ask("뭐부터 처리해?"); }));
       }
-      return plain("fallback", "답할 수 없어요", "지금 데이터로는 답할 수 없는 질문이에요. Delta는 열린 알림의 원인, 조치, 위치, 처리 순서를 답할 수 있어요.");
+      if (EN) { return plain("fallback", "답할 수 없어요", "지금 데이터로는 답할 수 없는 질문이에요. Delta는 열린 알림의 원인, 조치, 위치, 처리 순서를 답할 수 있어요."); }
+      // [11/06] 한글판 — 못 알아들어도 빈손으로 끝내지 않는다(채팅 범위 문서 U4). 고를 질문은 아래 '이렇게 물어보세요'
+      var fm = msg("fallback", null, "지금 상황");
+      fm.node.appendChild(el("p", "dc6-p", "이걸 물으신 건가요?"));
+      fm.node.appendChild(countLine(n, "아래에서 고르세요."));
+      return finish(fm, "fallback");
+    }
+
+    // [11/06] 한글판 — 대상 알림의 지금 상태(채팅 범위 문서 U1). 등급, 설명 한 줄, 단추
+    function status(a) {
+      var nm = a.eq || label(a), word = a.sev === "critical" ? "위험" : "주의";
+      var m = msg("status", a, "지금 상태", a.eq);
+      text(m, nm + (c.batchim(nm) ? "은" : "는") + " 지금 " + word + "이에요.", true);
+      if (a.sum) { text(m, a.sum); }
+      m.node.appendChild(btnRow(detailBtn(a), btn("원인 보기", "", function () { c.ask("원인이 뭐야?"); })));
+      return finish(m);
     }
 
     function paintSugg(busy) {
       chips.textContent = "";
       sugg.hidden = !!busy || !c.thread();
       if (sugg.hidden) { return; }
-      (SUGG[lastType] || SUGG.other).filter(function (t) { return t !== lastQ; }).slice(0, 3).forEach(function (t) {
+      var did = lastTarget ? done[keyOf(lastTarget)] || {} : {};
+      var keep = function (t) { return t !== lastQ && !did[Q_TYPE[t]]; };
+      var list = (SUGG[lastType] || SUGG.other).filter(keep);
+      Q_FILL.forEach(function (t) { if (list.length < 3 && list.indexOf(t) < 0 && keep(t)) { list.push(t); } });
+      list.slice(0, 3).forEach(function (t) {
         var b = el("button", "dc6-q", t);
         b.type = "button";
         b.addEventListener("click", function () { c.ask(t); });
@@ -547,7 +586,7 @@
       busy: function () { stamp.textContent = "분석 중"; paintSugg(true); },
       settle: function () { stampNow(); paintSugg(); },
       read: function () { unread = false; hideJump(); },
-      reset: function () { msgs.length = 0; lastType = lastQ = lastTarget = null; unread = false; hideJump(); sugg.hidden = true; stamp.textContent = ""; }
+      reset: function () { msgs.length = 0; done = {}; lastType = lastQ = lastTarget = null; unread = false; hideJump(); sugg.hidden = true; stamp.textContent = ""; }
     };
   };
 })();
