@@ -1182,6 +1182,11 @@
 
   // ==================================================================
   wire();
+  // [11/06] 관제 "오늘 확인된 알림" [전체보기]는 ?tab=done 으로 연다 — 조치 요청됨(완료) 탭부터.
+  if (new URLSearchParams(location.search).get("tab") === "done") {
+    state.tab = "done";
+    $$("[data-ac-tab]").forEach(function (t) { t.setAttribute("aria-selected", t.getAttribute("data-ac-tab") === "done" ? "true" : "false"); });
+  }
   renderHandover();
   refresh();
 })();

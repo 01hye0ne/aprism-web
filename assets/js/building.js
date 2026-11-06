@@ -370,7 +370,8 @@
     var where = el("span", "ah-where t-caption");
     where.appendChild(el("span", "floor-tag num", a.floor));   // 층 꼬리표는 웨이포인트 이름 앞(10/19)
     var wp = /WP-\d+.*$/.exec(a.where);   // 위치는 웨이포인트만(10/19, 메인 v2.2 와 같다)
-    where.appendChild(el("span", "ah-wp", wp ? wp[0] : a.where));
+    // [11/06 v6] 번호(WP-nn)는 뺐다 — 관제 최신 알림과 같이 층 꼬리표 + 지점 이름만
+    where.appendChild(el("span", "ah-wp", wp ? (V6 ? wp[0].replace(/^WP-\d+\s*/, "") : wp[0]) : a.where));
     // [11/05] 측정 채널(CH1)은 목록 줄에서 뺐다 — 관제 최신 알림(monitor.js)과 같다. 채널은 상세가 말한다
 
     // 어느 층 · 미션의 알림인지 — 미션을 고르기 전 화면이라 이 줄이 하나 더 붙는다.
@@ -385,8 +386,10 @@
     node.appendChild(title);
     // v3(10/21 디자이너) — 미션(상위)이 장소(하위)보다 먼저: 무슨 일 → 어느 미션 → 어디서. v2.2 는 장소 → 미션.
     if (V3) { node.appendChild(scope); node.appendChild(where); } else { node.appendChild(where); node.appendChild(scope); }
-    node.addEventListener("mouseenter", function () { setHot(a.floor, null, true); });
-    node.addEventListener("mouseleave", function () { setHot(null); });
+    if (!V6) {
+      node.addEventListener("mouseenter", function () { setHot(a.floor, null, true); });
+      node.addEventListener("mouseleave", function () { setHot(null); });
+    }
     node.addEventListener("click", function () { enter(a.floor, a.mission, V6 ? a : null); });   // [11/05 v6] 그 알림의 팝오버까지 연다
 
     // [안전진단] — 메인 v2.2 목록과 같은 자리 · 모양(monitor.js). 화면은 아직 없다.
@@ -412,6 +415,11 @@
     go.appendChild(el("span", "ah-report-label", (document.body.classList.contains("ver-6") ? "진단 상세" : "안전진단")));
     row.appendChild(node);
     row.appendChild(go);
+    // [11/06 v6] 호버는 줄 하나 — [진단 상세] 위로 옮겨가도 층 강조가 꺼지지 않게 줄(.ah-row)에서 듣는다(관제 최신 알림과 같은 호버, v6.css)
+    if (V6) {
+      row.addEventListener("mouseenter", function () { setHot(a.floor, null, true); });
+      row.addEventListener("mouseleave", function () { setHot(null); });
+    }
     return row;
   }
 
@@ -423,7 +431,7 @@
     head.appendChild(el("span", "t-caption num", d.time));
     var how = el("span", "done-how t-caption");
     how.appendChild(icon("check"));
-    how.appendChild(el("span", null, d.how + (V6 && d.wp ? " · " + d.wp : "")));
+    how.appendChild(el("span", null, d.how));   // [11/06 v6] 끝의 지점 번호(WP-nn)는 뺐다 — 관제 오늘 확인된 알림과 같다
     how.appendChild(el("span", null, d.who));
     node.appendChild(head);
     node.appendChild(how);

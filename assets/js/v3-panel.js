@@ -11,7 +11,8 @@
   function set(folded) {
     sec.classList.toggle("is-folded", folded);
     btn.setAttribute("aria-expanded", folded ? "false" : "true");
-    btn.setAttribute("aria-label", folded ? "오늘 확인 완료 펼치기" : "오늘 확인 완료 접기");
+    var name = (sec.querySelector("h3") || {}).textContent || "오늘 확인 완료";   // [11/06 v6] 이름은 머리 제목을 따른다(v6 "오늘 확인된 알림")
+    btn.setAttribute("aria-label", name + (folded ? " 펼치기" : " 접기"));
     try { window.localStorage.setItem(KEY, folded ? "1" : "0"); } catch (e) { /* 저장이 막힌 곳 — 이번만 */ }
   }
 

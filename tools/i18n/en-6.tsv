@@ -91,3 +91,8 @@ WP-04 N₂ 배관 압력계의 압력이 0.86 MPa 로 정상 범위(0.60 ~ 0.80)
 기준 0.65 ~ 0.75 MPa · 최근 3회 계속 내림	Limit 0.65–0.75 MPa · last 3 readings falling
 최근 3회 계속 내림	last 3 readings falling
 점검 결과	Inspection result
+# [11/06] 관제 오늘 확인된 알림(이름 · 처리 줄 결과만)
+오늘 확인된 알림	Confirmed today
+오늘 확인된 알림 접기	Collapse today's confirmed
+오늘 확인된 알림 펼치기	Expand today's confirmed
+이상 없음	All clear
