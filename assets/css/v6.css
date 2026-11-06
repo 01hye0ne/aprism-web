@@ -1695,7 +1695,9 @@ body.ver-6 .map-canvas.is-panning { cursor: move; }
  *   3) 줄바꿈은 지점 이름 뒤에서(.mbt-nw 한 덩이, 낱말 안에서 끊지 않음)
  */
 body.ver-6 .map-bot-tip .map-card-head { padding-bottom: var(--space-8); border-bottom: var(--border-width-thin, 1px) solid var(--border-default); }
-body.ver-6 .map-card-rows.is-now { margin-top: var(--space-8); }
+/* [11/06 디자이너] 가로줄 → 행동 줄 간격을 행동 → 지점 줄 간격(4)과 하나로 — 팝오버 판의 gap 10 + 위 여백 8 = 18 이었다 */
+body.ver-6 .map-bot-tip:has(.map-card-rows.is-now) { gap: var(--space-4); }
+body.ver-6 .map-card-rows.is-now { margin-top: 0; }
 body.ver-6 .map-card-rows .mbt-act { word-break: keep-all; }
 body.ver-6 .map-card-rows .mbt-nw { white-space: nowrap; }
 body.ver-6 .map-card-rows .mbt-route { display: flex; align-items: center; gap: var(--space-4); }
