@@ -42,7 +42,7 @@
   <link rel="stylesheet" href="../assets/css/v5.css?v=aefc22b4" />
   <!-- v6 전용 규칙 — v5 는 10/30 부로 멈췄다. v6 에서 바꾸는 것은 여기(body.ver-6)에. -->
   <link rel="stylesheet" href="../assets/css/v6.css?v=18e4e9c8" />
-  <link rel="stylesheet" href="../assets/css/v7.css?v=1130f3ba" />
+  <link rel="stylesheet" href="../assets/css/v7.css?v=39873b94" />
   <!-- 지도 경로 표현 규칙(10/28 반영, 지도 경로 표현 전달서 1022) — 경로 네 구간 · 흐름 빛 · 번호 핀 · 시야 빔 로봇 · 충전 스테이션 · 아래 상태 시뮬레이션 막대 -->
   <link rel="stylesheet" href="../assets/css/route-rules.css?v=bd91ee52" />
   <style>
@@ -256,14 +256,15 @@
              · 알림마다 [보고서]
            Figma 에 아직 없는 판이다. 크기 · 색은 기존 패널 부품을 그대로 썼다.
            목록은 assets/js/monitor.js 가 알림 단계(정상 · 주의 · 위험)에 맞춰 채운다. -->
-      <aside class="context-panel" id="site-panel" aria-label="알림">
+      <aside class="context-panel" id="site-panel" aria-label="관제">
 
         <div class="panel-head">
-          <!-- [11/06 디자이너 v7] 패널 머리줄 자체가 [알림 센터 ›] 단추 — 두 목록(미확인 · 오늘 확인된)의 위 층이 곧 알림 센터. 따로 있던 이름(알림)과 링크를 하나로.
-               누르는 곳은 글 덩이만(오른쪽 끝 접기 단추와 떨어지게) -->
-          <button type="button" class="panel-ah-all panel-head-link t-label-1" data-ah-all aria-label="알림 센터 열기">알림 센터<span class="i i-16" style="--i:var(--ic-chevron-right)" aria-hidden="true"></span></button>
+          <!-- [11/06 디자이너 v7] 패널 머리줄 = 왼쪽 GNB 이름(다른 GNB 화면과 같은 이름표) …… 오른쪽 이 화면 단위의 이동.
+               [알림 센터 ›]는 두 목록(미확인 · 오늘 확인된)의 위 층이라 이 줄에 -->
+          <p class="t-overline section-label">관제</p>
+          <button type="button" class="btn btn-ghost is-xs ah-all panel-ah-all" data-ah-all>알림 센터<span class="i i-16" style="--i:var(--ic-chevron-right)" aria-hidden="true"></span></button>
           <button type="button" data-panel-toggle
-                  aria-expanded="true" aria-controls="site-panel" aria-label="알림 패널 접기">
+                  aria-expanded="true" aria-controls="site-panel" aria-label="관제 패널 접기">
             <span class="i i-20" style="--i:var(--ic-panel-left)"></span>
           </button>
         </div>
