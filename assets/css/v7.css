@@ -23,3 +23,7 @@ body.ver-7 .done-head { justify-content: space-between; gap: 10px; }
 body.ver-7 .done-head .done-count { margin-left: auto; }
 body.ver-7 .done-head .done-fold { margin-right: calc(var(--space-4) * -1); }
 body.ver-7.v2-2 #site-panel .ah-sec + .ah-sec { border-top-color: var(--border-default); }
+/* [11/06] 탭 줄이 남는 자리를 다 쓰게 — 탭 묶음이 글 폭만큼만 잡혀(1203) 오른쪽 226px 이 비어 있었다. 줄을 채우고 양옆 여백을 8 로:
+ *   1920 에서 미션 탭 하나 ≈ 168(가장 긴 "M2 발전기실 설비 점검 ▲" 가 말줄임 없이 든다), 좁은 화면에선 같은 폭으로 함께 줄고 넘치면 말줄임 */
+body.ver-7 .sb-tabs { flex: 1 1 auto; padding: 0 var(--space-8); }
+body.ver-7 .sb-tab[data-mission] { padding: 0 var(--space-8); }
