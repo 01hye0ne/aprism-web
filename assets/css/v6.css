@@ -1820,3 +1820,6 @@ body.ver-6 .rr-pin.is-point .rr-pin-head { transform: scale(1.4); transform-orig
 /* 짚는 동안 다른 핀은 한 발 물러난다 — "이 위치"만 남게 */
 body.ver-6 .has-point .rr-pin:not(.is-point) { opacity: .35 !important; transition: opacity .16s; }
 @media (prefers-reduced-motion: reduce) { body.ver-6 .rr-pin.is-point .rr-pin-head { animation: none; box-shadow: 0 0 0 2px #FFFFFF, 0 0 0 5px color-mix(in srgb, var(--pin) 45%, transparent); } }
+/* [11/06 디자이너] 번호 원과 설비 이름을 잇는 짧은 선 — 원 테두리에 붙은 8px · 1px 선(글과 같은 색), 선 끝과 이름 사이 4 */
+body.ver-6 .ma-stamp.ma-stamp6 { gap: 0; }
+body.ver-6 .ma-stamp6 .ma-st-place::before { content: ""; display: inline-block; width: 8px; height: 1px; margin-right: var(--space-4); vertical-align: middle; position: relative; top: -1px; background-color: currentColor; }   /* 이름 칸은 블록 그대로 — 길면 말줄임. middle 은 x 높이 기준이라 원 중심보다 1px 아래 → 올림 */
