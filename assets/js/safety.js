@@ -97,8 +97,8 @@
     '계기인식':['계측팀에 계기 교정을 요청해야 함',[['계기 교정 요청',1,'계측팀, 내선 2420'],['운전원 수동 판독 요청',0,'운전원, 내선 2201']]],
     '이상음향':['진동 정밀 측정을 요청해야 함',[['진동 정밀 측정 요청',1,'설비팀, 내선 2310'],['설비 정지 검토 요청',0,'운전원, 내선 2201']]],
     '부분방전':['절연 진단을 요청하고 전기팀에 알려야 함',[['절연 진단 요청',1,'전기팀, 내선 2405'],['감시 강화',1,'전기팀, 업무 메신저']]]};
-  // [10/30] 정기 순회 점검 계기인식은 위험(NG) — 관제 알림의 AI 추천(작업 중지)과 같은 조치
-  const SUG0 = {'계기인식':['현장에 작업 중지를 요청해야 함',[['현장 무전 연락, 작업 중지 요청',1,'현장 작업자, 무전 2채널'],['로봇 정지, 현장 점검 요청',1,'설비팀, 내선 2310'],['재측정 후 판단',0,'순회 근무자, 무전 1채널']]]};
+  // [10/30] 정기 순회 점검 계기인식은 위험(NG) — 관제 알림의 AI 추천과 같은 조치. [11/06] 결론 · 첫 줄은 현장 점검(Delta "현장 점검부터 요청하세요"와 같게)
+  const SUG0 = {'계기인식':['현장 점검을 요청해야 함',[['로봇 정지, 현장 점검 요청',1,'설비팀, 내선 2310'],['현장 무전 연락, 작업 중지 요청',1,'현장 작업자, 무전 2채널'],['재측정 후 판단',0,'순회 근무자, 무전 1채널']]]};
   // 자세히 보기: 좌측 지도 + 지점 × 6종, 가운데 판정과 근거, 오른쪽 조치
   function detail(){
     const {mi, k} = dt, m = M[mi], x0 = m.r[k], {sp, now, rows} = eData(mi);
@@ -184,7 +184,30 @@
     const jdet = isHit && x[1] && !x[1].includes(jvalT) && x[1] !== jwhat ? `<span class="jdt">${x[1]}</span>` : '';
     // [11/02] 계기 기준은 값의 단위를 따른다 — 같은 계기인식이라도 차압(Pa) · 압력(bar · MPa) 계기가 섞여 있다(디자이너 2번 "아무거나" → 화면끼리 데이터는 그대로 두고 기준을 맞춤)
     const stdK = k==='계기인식' && numU && numU[2]==='Pa' ? '250 Pa 미만' : k==='계기인식' && numU && numU[2]==='bar' ? '6.0 ~ 7.5 bar' : STD[k];
-    const jv = `<div class="jmain"><h5>${jwhat}</h5>${isHit ? `<b class="jn ${st}">${jvalT}</b>${jdet}` : `<span class="why1">기준: ${stdK}</span>`}</div>${jtrk}${isHit && !jtrk ? `<span class="why1">기준: ${stdK}</span>` : ''}`;
+    /*
+     * [11/06 v6] 값 뒤에 판정 — "압력 0.86 MPa" 숫자만으론 "그래서 어쨌다는 건지" 안 읽혔다(디자이너). 값 바로 뒤에 "기준 초과 +0.06",
+     *   기준 줄엔 근거(기준 범위 · 측정 이력 추세)를 붙인다. 차이는 정상 한계(주의 기준 · 범위 끝)에서 잰다, 자릿수는 값을 따른다
+     */
+    const vNum = cd && !isNaN(num) ? num : numU ? parseFloat(numU[1]) : NaN;
+    const stdNs = (stdK.match(/-?\d+(?:\.\d+)?/g) || []).map(Number), isRange = /~/.test(stdK) && stdNs.length > 1;
+    const limHi = cd ? cd[2] : stdNs.length ? stdNs[stdNs.length - 1] : NaN, limLo = isRange ? stdNs[0] : null;
+    const vUnit = cd ? (cd[4]==='%' ? '%' : cd[4]) : numU && numU[2] ? ' ' + numU[2] : '';   // 차이에도 단위 — "+7" 은 무엇의 7인지 안 읽힌다
+    const decs = (String(jvalT).match(/\.(\d+)/) || ['', ''])[1].length;
+    const verdict = !isHit ? '' : k==='안전감지' ? '기준 위반'
+      : isNaN(vNum) || isNaN(limHi) ? '기준 초과'
+      : (limLo !== null && vNum < limLo ? `기준 미달 −${(limLo - vNum).toFixed(decs)}` : `기준 초과 +${Math.max(0, vNum - limHi).toFixed(decs)}`) + vUnit;
+    // 지난 3회 값 — 시안 값. 범위 계기는 상한으로 다가가며 오름(알림 근거 "최근 3회 계속 오름"과 같은 수), 그 밖은 정상 안에서 오르내림
+    const pastV = n => { if(k==='안전감지') return '0명'; if(isNaN(vNum) || isNaN(limHi)) return '정상 범위';
+      const v = isRange ? limHi - (limHi - limLo) * [0.30, 0.15, 0.05][n] : limHi * [0.86, 0.80, 0.90][n];
+      return (n===2 && st==='warn' && !isRange ? limHi + (vNum - limHi) * 0.5 : v).toFixed(decs) + (cd && cd[4]==='%' ? '%' : ''); };
+    const histN = [pastV(0), pastV(1), pastV(2), String(jvalT)].map(parseFloat);
+    const rising = isHit && histN.every(q => !isNaN(q)) && histN.slice(1).every((q, n) => q > histN[n]);
+    const why6 = `<span class="why1">기준 ${stdK}${rising ? ' · 최근 3회 계속 오름' : ''}</span>`;
+    const jv = V6 && isHit
+      ? `<div class="jmain"><h5>${jwhat}</h5><b class="jn ${st}">${jvalT}</b><span class="jvd ${st}">${verdict}</span>${jdet}</div>${jtrk}${!jtrk || rising ? why6 : ''}`
+      : `<div class="jmain"><h5>${jwhat}</h5>${isHit ? `<b class="jn ${st}">${jvalT}</b>${jdet}` : `<span class="why1">기준: ${stdK}</span>`}</div>${jtrk}${isHit && !jtrk ? `<span class="why1">기준: ${stdK}</span>` : ''}`;
+    // [11/06 v6] 측정 이력 지난 3회에 숫자를 — "정상 범위 · 정상 범위" 로 말만 두 번 나와 오늘 값과 견줄 수 없었다
+    if(V6 && isHit) hist.forEach((h, n) => { if(n < 3 && h[2] !== 'plan') h[1] = pastV(n); });
     /*
      * [11/02] 정보 넷(디자이너) — 미션 · 로봇은 화면에 이미 있어(상단 탭 · 왼쪽 패널) 빼고, 이 화면 어디에도 없는 둘로 채운다.
      *   조치 상태  이 감지 하나에 누가 손댔나 — 요청 전 / HH:MM 요청됨([현장 조치 요청]을 누르면 바로 바뀐다). 왼쪽 패널 "요청 전 N건"은 미션 전체 수

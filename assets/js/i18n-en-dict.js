@@ -990,7 +990,7 @@ window.APRISM_EN = {"APRISM 공장 환경점검 로봇 관제 시스템 진입 �
 "10월 31일 (토)":"Sat, Oct 31",
 "계기인식 · 압력 0.86 MPa":"Gauge · pressure 0.86 MPa",
 "압력 0.86 MPa · 정상 범위 0.60 ~ 0.80 초과":"Pressure 0.86 MPa · above normal range 0.60–0.80",
-"최근 3회 측정 0.78 → 0.82 → 0.86 으로 계속 오름":"Last 3 readings rising: 0.78 → 0.82 → 0.86",
+"최근 3회 측정 0.77 → 0.79 → 0.86 으로 계속 오름":"Last 3 readings rising: 0.77 → 0.79 → 0.86",
 "감압 밸브 설정 이상 가능성이 가장 높음":"Most likely a pressure-reducing valve setting issue",
 "고소 작업 발판에서 안전벨트 미착용 1명 · 신뢰도 0.91":"1 without harness on the elevated platform · confidence 0.91",
 "고소 작업 중 — 착용 확인 전까지 작업을 멈추는 편이 안전함":"Elevated work in progress — safer to pause until the harness is confirmed",
@@ -1734,4 +1734,9 @@ window.APRISM_EN = {"APRISM 공장 환경점검 로봇 관제 시스템 진입 �
 "마지막 통신 11:16:42":"Last contact 11:16:42",
 "보고서 보러가기":"View report",
 "남은 시간 멈춤":"Remaining time paused",
-"정지 시각 11:16:42":"Stopped at 11:16:42"};
+"정지 시각 11:16:42":"Stopped at 11:16:42",
+"현장 점검을 요청해야 함":"A site check is needed",
+"최근 3회 계속 오름":"last 3 readings rising",
+"기준 위반":"Violation",
+"기준 미달":"Under limit",
+"기준 0.60 ~ 0.80 MPa · 최근 3회 계속 오름":"Limit 0.60–0.80 MPa · last 3 readings rising"};
