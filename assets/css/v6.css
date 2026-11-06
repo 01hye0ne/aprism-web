@@ -1660,5 +1660,8 @@ body.ver-6 .rr-banner.is-return { --rr-glyph: url("data:image/svg+xml,%3Csvg xml
 body.ver-6 .rr-banner.is-lost { --rr-glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none'%3E%3Crect x='2.8' y='9.6' width='2.2' height='3' rx='.6' fill='%23fff'/%3E%3Crect x='6.9' y='6.6' width='2.2' height='6' rx='.6' fill='%23fff'/%3E%3Crect x='11' y='3.4' width='2.2' height='9.2' rx='.6' fill='%23fff'/%3E%3Cpath d='M2.4 2.8l11.2 10.4' stroke='%23fff' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E"); }
 body.ver-6 .rr-banner.is-done { --rr-glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M3.8 8.4l2.8 2.8 5.6-6' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
 body.ver-6 .progress-meta > .rr-banner .btn { flex: none; text-decoration: none; }
+/* [11/06] 미조치 위험 건수 — 지점 머리줄 오른쪽. 색은 기호에만 */
+body.ver-6 .rr-open { display: inline-flex; align-items: center; gap: var(--space-4, 4px); margin-left: auto; margin-right: var(--space-8, 8px); color: var(--text-secondary); font-size: 13px; }
+body.ver-6 .rr-open::before { content: ""; width: 14px; height: 14px; background-color: var(--status-critical-icon); -webkit-mask: var(--ic-error) center / contain no-repeat; mask: var(--ic-error) center / contain no-repeat; }
 /* [11/05 디자이너] Delta 두 줄 — 2줄은 기본 회색 */
 body.ver-6[data-delta-copy="brief"] .delta3 .ai-line-2 .dl2 { color: var(--text-secondary); }

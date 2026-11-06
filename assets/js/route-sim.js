@@ -173,6 +173,8 @@
         '<circle cx="14" cy="14" r="11" class="val" stroke-dasharray="' + CIRC + '" stroke-dashoffset="' + CIRC + '" transform="rotate(-90 14 14)"></circle></svg>' +
         '<span>측정 중</span><span class="num" data-rr="pct">0%</span></div>';
     }
+    // [11/06 v6] 위험 감지는 그 지점에 서 있다 — 다음 지점에 "이동 중"을 띄우지 않는다. 재생을 누르면 이동 중으로 돌아간다
+    if (m === "alert" && document.body.classList.contains("ver-6")) { return ""; }
     if (m === "run" || m === "alert") { return '<div class="rr-note"><span>이동 중</span><span class="num" data-rr="eta"></span></div>'; }
     if (m === "pause") {
       return '<div class="rr-note"><span>일시정지 <b class="num" data-rr="held">1:24</b></span><span>자동복귀까지 <b class="num" data-rr="auto">8:36</b></span></div>' +
