@@ -1621,6 +1621,9 @@ body.ver-6 .delta3 .dl-wp {
 body.ver-6 .delta3 .dl-wp[data-sev] { border: 2px solid #0A0F18; color: #0A0F18; }
 body.ver-6 .delta3 .dl-wp[data-sev="critical"] { background-color: #FF383C; }
 body.ver-6 .delta3 .dl-wp[data-sev="warning"] { background-color: #FFC800; }
+/* [11/06] 라이트 — 지도 핀 머리(라이트)와 같게 흰 테, 위험은 흰 숫자 · 주의는 어두운 숫자 */
+:root[data-theme="light"] body.ver-6 .delta3 .dl-wp[data-sev] { border-color: #FFFFFF; }
+:root[data-theme="light"] body.ver-6 .delta3 .dl-wp[data-sev="critical"] { color: #FFFFFF; }
 
 /* [11/05 v6 한글판] Delta 접힘 2줄은 회색 고정 — 10/31 디자이너 시안(영문판 i18n-en.css 와 같은 값). 1줄 흰색 굵게, 2줄 한 단 옅은 회색 보통 굵기 */
 html:not([lang="en"]) body.ver-6[data-delta-copy="brief"] .delta3 .ai-line-2 .dl2 {
