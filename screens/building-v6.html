@@ -37,7 +37,7 @@
   <!-- v5 전용 규칙 — v4 는 10/29 부로 멈췄다. v5 에서 바꾸는 것은 여기(body.ver-5)에. -->
   <link rel="stylesheet" href="../assets/css/v5.css?v=aefc22b4" />
   <!-- v6 전용 규칙 — v5 는 10/30 부로 멈췄다. v6 에서 바꾸는 것은 여기(body.ver-6)에. -->
-  <link rel="stylesheet" href="../assets/css/v6.css?v=9e832ae2" />
+  <link rel="stylesheet" href="../assets/css/v6.css?v=a9367391" />
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
@@ -210,12 +210,16 @@
           <!-- v3(10/21) — 접을 수 있다. 머리 줄 어디를 눌러도 접히고, 접으면 위 최신 알림이 그만큼 자란다(v3-panel.js). -->
           <section class="ah-sec done-sec" aria-labelledby="done-title" data-done-sec>
             <div class="done-head" data-done-head>
-              <h3 class="t-title-2" id="done-title">오늘 확인 완료</h3>
-              <span class="badge done-count t-caption"><span class="badge-dot"></span><span class="num" data-done-count>0건</span></span>
-              <button type="button" class="done-fold" data-done-fold
-                      aria-expanded="true" aria-controls="done-box" aria-label="오늘 확인 완료 접기">
-                <span class="i i-16" aria-hidden="true" style="--i:var(--ic-chevron-down)"></span>
-              </button>
+              <!-- [11/06] 관제(main-v6) 오늘 확인된 알림 머리와 같다 — 이름 · 건수 점 뺌 · 접기 화살표 붙임 · 오른쪽 끝 [전체보기](조치 요청됨 탭) -->
+              <h3 class="t-title-2" id="done-title">오늘 확인된 알림</h3>
+              <span class="done-toggle">
+                <span class="done-count t-caption"><span class="num" data-done-count>0건</span></span>
+                <button type="button" class="done-fold" data-done-fold
+                        aria-expanded="true" aria-controls="done-box" aria-label="오늘 확인된 알림 접기">
+                  <span class="i i-16" aria-hidden="true" style="--i:var(--ic-chevron-down)"></span>
+                </button>
+              </span>
+              <button type="button" class="btn btn-ghost is-xs ah-all" data-ah-all="done">전체보기</button>
             </div>
             <div class="ah-box" id="done-box">
               <div class="ah-list" data-done-list role="list"></div>
@@ -411,13 +415,13 @@
 <script src="../assets/js/mini-plan.js?v=7f60f7eb"></script>
 <script src="../assets/js/ah-sort.js?v=db22578c"></script>
 <script src="../assets/js/alert-text-v6.js?v=e4280587"></script>
-<script src="../assets/js/building.js?v=3d99042d"></script>
+<script src="../assets/js/building.js?v=5ec59e2a"></script>
 <!-- [10/30 v6] 상단 미션 탭(윈도우 탐색기 꼴) — 미션 메뉴를 읽어 탭으로 늘어놓는다. 메뉴를 만드는 스크립트 다음에 -->
 <script src="../assets/js/mission-tabs-v6.js?v=18f484a3"></script>
 <script src="../assets/js/delta-pulse.js?v=2d0afced"></script>
 <script src="../assets/js/delta-v3.js?v=403861c7"></script>
 <script src="../assets/js/delta-resize.js?v=b83bd18b"></script>
 <script src="../assets/js/grid-overlay.js?v=164e4f2a"></script>
-<script src="../assets/js/v3-panel.js?v=af1cf778"></script>
+<script src="../assets/js/v3-panel.js?v=f045d18f"></script>
 </body>
 </html>

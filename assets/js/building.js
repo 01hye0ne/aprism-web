@@ -365,12 +365,21 @@
     title.appendChild(icon(a.sev === "critical" ? "error" : "warning"));
     var A6 = V6 && window.APRISM_ALERT6, r6 = A6 && A6.of(a.title);
     title.appendChild(el("span", null, A6 ? A6.title(a.title) : a.title));   // [11/02 v6] 제목 = 감지 · 측정 항목 + 값(alert-text-v6.js)
-    title.appendChild(el("span", "ah-time t-caption num", a.time));
+    // [11/06 v6] 시 · 분만 늘, 초는 호버 · 고를 때(관제 최신 알림과 같다, v6.css .ah-time-s)
+    var tm = el("span", "ah-time t-caption num");
+    var hm = V6 && /^(\d{1,2}:\d{2})(:\d{2})$/.exec(a.time || "");
+    if (hm) {
+      tm.appendChild(document.createTextNode(hm[1]));
+      tm.appendChild(el("span", "ah-time-s", hm[2]));
+      tm.title = a.time;
+    } else { tm.textContent = a.time; }
+    title.appendChild(tm);
 
     var where = el("span", "ah-where t-caption");
     where.appendChild(el("span", "floor-tag num", a.floor));   // 층 꼬리표는 웨이포인트 이름 앞(10/19)
     var wp = /WP-\d+.*$/.exec(a.where);   // 위치는 웨이포인트만(10/19, 메인 v2.2 와 같다)
-    where.appendChild(el("span", "ah-wp", wp ? wp[0] : a.where));
+    // [11/06 v6] 번호(WP-nn)는 뺐다 — 관제 최신 알림과 같이 층 꼬리표 + 지점 이름만
+    where.appendChild(el("span", "ah-wp", wp ? (V6 ? wp[0].replace(/^WP-\d+\s*/, "") : wp[0]) : a.where));
     // [11/05] 측정 채널(CH1)은 목록 줄에서 뺐다 — 관제 최신 알림(monitor.js)과 같다. 채널은 상세가 말한다
 
     // 어느 층 · 미션의 알림인지 — 미션을 고르기 전 화면이라 이 줄이 하나 더 붙는다.
@@ -385,8 +394,10 @@
     node.appendChild(title);
     // v3(10/21 디자이너) — 미션(상위)이 장소(하위)보다 먼저: 무슨 일 → 어느 미션 → 어디서. v2.2 는 장소 → 미션.
     if (V3) { node.appendChild(scope); node.appendChild(where); } else { node.appendChild(where); node.appendChild(scope); }
-    node.addEventListener("mouseenter", function () { setHot(a.floor, null, true); });
-    node.addEventListener("mouseleave", function () { setHot(null); });
+    if (!V6) {
+      node.addEventListener("mouseenter", function () { setHot(a.floor, null, true); });
+      node.addEventListener("mouseleave", function () { setHot(null); });
+    }
     node.addEventListener("click", function () { enter(a.floor, a.mission, V6 ? a : null); });   // [11/05 v6] 그 알림의 팝오버까지 연다
 
     // [안전진단] — 메인 v2.2 목록과 같은 자리 · 모양(monitor.js). 화면은 아직 없다.
@@ -412,6 +423,11 @@
     go.appendChild(el("span", "ah-report-label", (document.body.classList.contains("ver-6") ? "진단 상세" : "안전진단")));
     row.appendChild(node);
     row.appendChild(go);
+    // [11/06 v6] 호버는 줄 하나 — [진단 상세] 위로 옮겨가도 층 강조가 꺼지지 않게 줄(.ah-row)에서 듣는다(관제 최신 알림과 같은 호버, v6.css)
+    if (V6) {
+      row.addEventListener("mouseenter", function () { setHot(a.floor, null, true); });
+      row.addEventListener("mouseleave", function () { setHot(null); });
+    }
     return row;
   }
 
@@ -420,10 +436,20 @@
     node.setAttribute("role", "listitem");
     var head = el("span", "done-title");
     head.appendChild(el("span", "t-label-2", d.title));
-    head.appendChild(el("span", "t-caption num", d.time));
+    // [11/06 v6] 관제 오늘 확인된 알림(monitor.js doneItem)과 같은 줄 — 시각은 호버 때만(v6.css .done-time),
+    //   처리 줄은 결과 하나, 조치는 호버 때 앞에(.done-act), 지점 번호(WP-nn)는 뺐다
+    head.appendChild(el("span", "t-caption num" + (V6 ? " done-time" : ""), d.time));
     var how = el("span", "done-how t-caption");
     how.appendChild(icon("check"));
-    how.appendChild(el("span", null, d.how + (V6 && d.wp ? " · " + d.wp : "")));
+    if (V6) {
+      var parts = String(d.how || "").split(/\s*·\s*/);
+      var txt = el("span", "done-res");
+      if (parts.length > 1) { txt.appendChild(el("span", "done-act", parts[0])); }
+      txt.appendChild(document.createTextNode(parts[parts.length - 1]));
+      how.appendChild(txt);
+    } else {
+      how.appendChild(el("span", null, d.how));
+    }
     how.appendChild(el("span", null, d.who));
     node.appendChild(head);
     node.appendChild(how);
@@ -473,8 +499,14 @@
   $$("[data-ah-filter]").forEach(function (b) {
     b.addEventListener("click", function () { filter = b.getAttribute("data-ah-filter"); renderLeft(); });
   });
-  var allBtn = $("[data-ah-all]");
-  if (allBtn) { allBtn.addEventListener("click", function () { location.href = (window.aprismHref || String)(document.body.classList.contains("ver-6") ? "alert-center-v6.html" : document.body.classList.contains("ver-5") ? "alert-center-v5.html" : document.body.classList.contains("ver-3") ? "alert-center-v3.html" : "alert-center.html"); }); }
+  // [11/06 v6] 오늘 확인된 알림 머리에도 [전체보기](data-ah-all="done") — 알림 센터를 조치 요청됨 탭으로(관제 monitor.js 와 같다)
+  $$("[data-ah-all]").forEach(function (allBtn) {
+    allBtn.addEventListener("click", function (event) {
+      event.stopPropagation();   // 확인된 알림 머리 줄은 누르면 접힌다(v3-panel.js) — 이 버튼만 예외
+      var tab = allBtn.getAttribute("data-ah-all") === "done" ? "?tab=done" : "";
+      location.href = (window.aprismHref || String)((document.body.classList.contains("ver-6") ? "alert-center-v6.html" : document.body.classList.contains("ver-5") ? "alert-center-v5.html" : document.body.classList.contains("ver-3") ? "alert-center-v3.html" : "alert-center.html") + tab);
+    });
+  });
 
   /* ==================================================================
    * 오른쪽 — 로봇 현황 · 운행 흐름 · 다음 일정
