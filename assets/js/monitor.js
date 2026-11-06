@@ -383,7 +383,7 @@
           // [11/05 v6] 2줄 = {waypoint 번호}{waypoint 이름}부터 확인하세요. 번호는 경로 목록 번호 모양, 이름만 흰색 굵게(나머지는 2줄 회색) — 문형표 5
           if (V6) {
             var wpn = /\d+/.exec(first.wp || ""), wpName = first.eq || first.title;
-            var wpTok = wpn ? [{ wp: parseInt(wpn[0], 10) }] : [];
+            var wpTok = wpn ? [{ wp: parseInt(wpn[0], 10), sev: first.sev }] : [];
             say.parts = {
               ko: [[say.l[0]], wpTok.concat([{ wpName: wpName }, "부터 확인하세요."])],
               en: [[say.l[0]], ["Check "].concat(wpTok, [{ wpName: wpName }, " first."])]
@@ -397,7 +397,7 @@
             // [11/06 v6] 위험(F4)과 같은 짜임 — 1줄 "주의 n건이 있어요.", 2줄 {waypoint 번호}{waypoint 이름}부터 확인하세요(디자이너).
             //   미션별 건수 한 문장(예전 F5)은 길고 위험 문형과 짜임이 달랐다. 미션별 나눔은 펼친 Delta 가 맡는다.
             var wn = /\d+/.exec(first.wp || ""), wName = first.eq || first.title;
-            var wTok = wn ? [{ wp: parseInt(wn[0], 10) }] : [];
+            var wTok = wn ? [{ wp: parseInt(wn[0], 10), sev: first.sev }] : [];
             say.l = ["주의 " + j.warn + "건이 있어요.", wName + "부터 확인하세요."];
             say.parts = {
               ko: [[say.l[0]], wTok.concat([{ wpName: wName }, "부터 확인하세요."])],
