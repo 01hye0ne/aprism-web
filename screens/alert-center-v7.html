@@ -30,7 +30,7 @@
   <link rel="stylesheet" href="../assets/css/v5.css?v=aefc22b4" />
   <!-- v6 전용 규칙 — v5 는 10/30 부로 멈췄다. v6 에서 바꾸는 것은 여기(body.ver-6)에. -->
   <link rel="stylesheet" href="../assets/css/v6.css?v=18e4e9c8" />
-  <link rel="stylesheet" href="../assets/css/v7.css?v=c5f452a4" />
+  <link rel="stylesheet" href="../assets/css/v7.css?v=c29d9f40" />
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
@@ -260,12 +260,13 @@
           <div class="ac-panel-head">
             <div class="ac-tabs" role="tablist" aria-label="알림 상태">
               <button type="button" class="ac-tab" role="tab" aria-selected="true" data-ac-tab="open">
-                <span class="t-label-1">미확인</span>
+                <span class="t-label-1">미확인 알림</span>
                 <span class="ac-tab-count ac-mono" data-ac-count-open>11건</span>
               </button>
               <button type="button" class="ac-tab" role="tab" aria-selected="false" data-ac-tab="done">
                 <!-- [11/02 v6] "조치 완료" → "조치 요청됨" — 상세 버튼이 [조치 요청](관제 팝오버와 같다)이라 누른 뒤 가는 곳의 이름도 같은 말로. 안전진단의 상태 이름(요청됨)과도 같다 -->
-                <span class="t-label-1">조치 요청됨</span>
+                <!-- [11/06 디자이너 v7] 탭 이름을 관제 왼쪽 목록과 같게 — 미확인 알림 / 확인된 알림(관제 "오늘 확인된 알림"의 전체). 줄마다의 상태 글(조치 요청됨)은 그대로 -->
+                <span class="t-label-1">확인된 알림</span>
                 <span class="ac-tab-count ac-mono" data-ac-count-done>11건</span>
               </button>
             </div>

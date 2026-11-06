@@ -17,12 +17,12 @@ html[lang="en"] body.ver-7 .sb-tabs { overflow-x: visible; flex: 1 1 auto; }
 
 /*
  * [11/06 디자이너] 왼쪽 "오늘 확인된 알림" 머리를 예전 배치로 — 이름 · 건수(점) …… 오른쪽 끝 접기, [전체보기]는 위 최신 알림 하나만(HTML).
- *   이름은 한 단 낮게(t-label-1 · 14, HTML). v6 의 머리 배치 규칙(done-toggle · ah-all)을 되돌리고, 두 목록 사이 선을 되살린다
+ *   이름은 한 단 낮게(t-label-1 · 14, HTML). v6 의 머리 배치 규칙(done-toggle · ah-all)을 되돌린다
  */
 body.ver-7 .done-head { justify-content: space-between; gap: 10px; }
 body.ver-7 .done-head .done-count { margin-left: auto; }
 body.ver-7 .done-head .done-fold { margin-right: calc(var(--space-4) * -1); }
-body.ver-7.v2-2 #site-panel .ah-sec + .ah-sec { border-top-color: var(--border-default); }
+/* [11/06 디자이너] 두 목록 사이 선은 다시 뺀다(v6 처럼 투명) — 머리 이름 위계(16 / 14)로 나뉜다 */
 /* [11/06] 탭 줄이 남는 자리를 다 쓰게 — 탭 묶음이 글 폭만큼만 잡혀(1203) 오른쪽 226px 이 비어 있었다. 줄을 채우고 양옆 여백을 8 로:
  *   1920 에서 미션 탭 하나 ≈ 168(가장 긴 "M2 발전기실 설비 점검 ▲" 가 말줄임 없이 든다), 좁은 화면에선 같은 폭으로 함께 줄고 넘치면 말줄임 */
 body.ver-7 .sb-tabs { flex: 1 1 auto; padding: 0 var(--space-8); }
