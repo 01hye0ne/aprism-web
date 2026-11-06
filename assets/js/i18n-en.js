@@ -62,6 +62,7 @@
     [/^(\d+)대 연결$/, "$1 connected"],
     [/^(\d+)대 수행중$/, "$1 running"],
     [/^도착 약 ?(\d+)\s*초$/, "Arrives in ~$1 s"],
+    [/^로봇이 오는 중(?: · (.+))?$/, function (m, rest) { return "Robot on the way" + (rest ? " · " + rest.replace(/^도착 약 ?(\d+)\s*초$/, "arrives in ~$1 s") : ""); }],   // [11/06] 웨이포인트 팝오버 지금 지점 — 도착 글은 이미 영어일 수 있다
     [/^(\d{1,2})월 월 보고서( 생성)?$/, function (m, mo, g) { return (g ? "Generate " : "") + MONTH[mo - 1] + " monthly report"; }],
     [/^총 (\d+)쪽$/, "$1 pages total"],
     [/^(\d+) \/ (\d+) ?쪽$/, "$1 / $2"],

@@ -1747,4 +1747,7 @@ window.APRISM_EN = {"APRISM 공장 환경점검 로봇 관제 시스템 진입 �
 "오늘 확인된 알림":"Confirmed today",
 "오늘 확인된 알림 접기":"Collapse today's confirmed",
 "오늘 확인된 알림 펼치기":"Expand today's confirmed",
-"이상 없음":"All clear"};
+"이상 없음":"All clear",
+"측정 완료 · 정상 범위":"Measured, within range",
+"측정 시각":"Measured at",
+"다음 지점":"Next stop"};
