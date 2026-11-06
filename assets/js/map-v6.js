@@ -3681,14 +3681,14 @@
   /*
    * [11/05 디자이너] 지점 목록 접기 — 모든 상태에 공통. 목록 상자([data-timeline]) 머리줄 [지점 n곳] 단추로 접고 편다.
    *   미션 완료로 들어오면 접고, 다른 상태로 나가면 편다. 접히면 우측 패널 바탕도 같이 줄어든다(v6.css .rr-wp-closed).
-   *   상태 카드(통신 끊김 · 미션 완료, route-sim.js .rr-banner)는 목록 앞이 아니라 진행 막대 영역(.mission-header) 맨 위에 놓는다.
+   *   상태 이름(route-sim.js .rr-banner)은 목록 앞이 아니라 진행 제목 줄(.progress-meta) 제목 자리에 놓는다. 오른쪽 % 는 그대로 남는다.
    */
   var wpTog = null;
   function wpPlace() {
     var rail = document.querySelector(".right-panel [data-timeline]");
     if (!rail || !wpTog) { return; }
-    var host = rail.parentNode, head = host.querySelector(".mission-header");
-    Array.prototype.forEach.call(host.children, function (n) { if (n.classList.contains("rr-banner") && head) { head.insertBefore(n, head.firstChild); } });
+    var host = rail.parentNode, meta = host.querySelector(".mission-header .progress-meta");
+    Array.prototype.forEach.call(host.children, function (n) { if (n.classList.contains("rr-banner") && meta) { meta.insertBefore(n, meta.firstChild); } });
     if (wpTog.nextElementSibling !== rail) { host.insertBefore(wpTog, rail); }
   }
   function wpToggleSync() {

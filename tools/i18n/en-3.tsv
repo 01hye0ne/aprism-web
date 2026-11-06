@@ -167,7 +167,7 @@ Delta가 답을 쓰는 중	Delta is writing a reply
 충전 스테이션으로 복귀	Return to charging station
 일시정지 중, 남은 시간 멈춤	Paused, time remaining on hold
 긴급정지로 멈춤	Stopped by E-Stop
-미션 중단, 충전 스테이션으로 복귀 중	Mission stopped, returning to charging station
+미션 중단, 충전 스테이션으로 복귀 중	Stopped, returning to dock
 통신이 돌아오면 다시 계산	Recalculated when connection returns
 가스, 열화상 2종 기준 초과	Gas and thermal: 2 types over limit
 마지막 지점을 지나 충전 스테이션으로 가는 중이에요	Past the last point, heading to the charging station

@@ -946,7 +946,7 @@ window.APRISM_EN = {"APRISM 공장 환경점검 로봇 관제 시스템 진입 �
 "충전 스테이션으로 복귀":"Return to charging station",
 "일시정지 중, 남은 시간 멈춤":"Paused, time remaining on hold",
 "긴급정지로 멈춤":"Stopped by E-Stop",
-"미션 중단, 충전 스테이션으로 복귀 중":"Mission stopped, returning to charging station",
+"미션 중단, 충전 스테이션으로 복귀 중":"Stopped, returning to dock",
 "통신이 돌아오면 다시 계산":"Recalculated when connection returns",
 "가스, 열화상 2종 기준 초과":"Gas and thermal: 2 types over limit",
 "마지막 지점을 지나 충전 스테이션으로 가는 중이에요":"Past the last point, heading to the charging station",
@@ -1732,4 +1732,6 @@ window.APRISM_EN = {"APRISM 공장 환경점검 로봇 관제 시스템 진입 �
 "다음 미션 전에 잠깐 스트레칭 어떠세요?":"Perhaps a little stretch before your next mission?",
 "수고하셨습니다.":"Thank you for your time.",
 "마지막 통신 11:16:42":"Last contact 11:16:42",
-"보고서 보러가기":"View report"};
+"보고서 보러가기":"View report",
+"남은 시간 멈춤":"Remaining time paused",
+"정지 시각 11:16:42":"Stopped at 11:16:42"};

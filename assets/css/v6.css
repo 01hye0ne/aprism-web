@@ -1616,10 +1616,6 @@ body.ver-6:has(.map-bot[data-rr="lost"]) .robot-strip .robot-card[aria-pressed="
 /* [11/05] 미션 완료 — 초록 띠 대신 지점 목록을 접고 [미션 완료] 카드 하나만(route-sim.js .rr-banner.is-done). 색은 면 차이로만 */
 body.ver-6 [data-md-again] { display: none !important; }   /* 미션 완료 — [다시 실행] 뺌 */
 /* 카드 — 통신 끊김(.is-lost)과 같은 틀: 두 줄 + 오른쪽 [보고서 보러가기](세로 가운데), 아랫줄 지점 목록 펼침 */
-body.ver-6 .rr-done-head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-8, 8px); }
-body.ver-6 .rr-done-txt { display: grid; gap: 2px; min-width: 0; }
-body.ver-6 .rr-done-txt b { font-size: inherit; color: inherit; }
-body.ver-6 .rr-done-head .btn { flex: none; text-decoration: none; }
 body.ver-6 .right-panel:has(.rr-banner.is-done) .md-actions { display: none !important; }   /* 보고서 단추는 카드 안으로 옮겼다 */
 body.ver-6 [data-md-again] { display: none !important; }   /* 미션 완료 — [다시 실행] 뺌 */
 :root[data-theme] body.ver-6.v2-2 [data-timeline] .timeline-item.is-done[data-wp-cleared]:not([data-wp-alert]) .rail-dot { background-color: #9ea8bb; }   /* [11/05] 해결한 위험 · 주의 지점 — 레일 점도 회색(지도 번호와 같다) */
@@ -1642,10 +1638,17 @@ body.ver-6 .rr-wp-toggle:focus-visible { outline: 2px solid var(--border-focus);
 body.ver-6.rr-wp-closed .right-panel [data-timeline] { display: none !important; }
 body.ver-6.rr-wp-closed .right-panel .panel-card.is-fill { flex: 0 0 auto; height: auto; min-height: 0; }   /* 접히면 패널 바탕도 같이 */
 body.ver-6.rr-wp-closed .right-panel { height: auto; align-self: flex-start; max-height: 100%; }   /* 부모가 가로 flex — 높이만 내용에 맞춘다 */
-/* [11/05 디자이너 · 11/06] 상태 이름(통신 끊김 · 미션 완료)은 진행 제목 줄 자리에 — 면 · 여백은 다른 상태와 같게 두고, 글자 · 막대 자리도 맞춘다 */
-body.ver-6 .mission-header:has(> .rr-banner) .progress-meta { display: none; }
-body.ver-6 .mission-header > .rr-banner { display: block; margin: 0 0 var(--space-8, 8px); padding: 0; border: 0; border-radius: 0; background: none; color: var(--text-primary); font-size: 16px; line-height: 24px; }
-body.ver-6 .mission-header > .rr-banner b { font-size: inherit; font-weight: inherit; color: inherit; }
-:root[data-theme="light"] body.ver-6 .mission-header > .rr-banner { background: none; color: var(--text-primary); }   /* route-rules.css 의 라이트 면 · 글자색을 푼다 */
+/* [11/06] 상태 표시 규칙 하나 — 평소와 다른 상태(위험 감지 · 긴급정지 · 일시정지 · 자동복귀 · 통신 끊김 · 미션 완료)는 진행 제목 자리에 아이콘 + 굵은 이름. 면 · 여백 · 자리는 다른 상태와 같고, 색은 아이콘에만 */
+body.ver-6 .progress-meta:has(> .rr-banner) .progress-title { display: none; }
+body.ver-6 .progress-meta:has(> .rr-banner.is-done) .progress-percent { display: none; }   /* 완료는 % 대신 [보고서 보러가기] */
+body.ver-6 .progress-meta > .rr-banner, :root[data-theme="light"] body.ver-6 .progress-meta > .rr-banner { display: flex; flex: 1 1 auto; min-width: 0; align-items: center; justify-content: space-between; gap: var(--space-8, 8px); margin: 0; padding: 0; border: 0; border-radius: 0; background: none; color: var(--text-primary); font-size: 16px; line-height: 24px; }
+body.ver-6 .rr-state { display: inline-flex; align-items: center; gap: var(--space-4, 4px); min-width: 0; }
+body.ver-6 .rr-state b { font-size: inherit; font-weight: var(--font-weight-bold); color: inherit; white-space: nowrap; }
+body.ver-6 .rr-state .i { flex: none; }
+body.ver-6 .rr-tone-critical .rr-state .i { color: var(--status-critical-icon); }
+body.ver-6 .rr-tone-warning .rr-state .i { color: var(--status-warning-icon); }
+body.ver-6 .rr-tone-safe .rr-state .i { color: var(--status-safe-icon); }
+body.ver-6 .rr-tone-muted .rr-state .i { color: var(--text-tertiary); }
+body.ver-6 .progress-meta > .rr-banner .btn { flex: none; text-decoration: none; }
 /* [11/05 디자이너] Delta 두 줄 — 2줄은 기본 회색 */
 body.ver-6[data-delta-copy="brief"] .delta3 .ai-line-2 .dl2 { color: var(--text-secondary); }

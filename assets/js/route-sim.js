@@ -288,7 +288,9 @@
     if (left) {
       if (!left.hasAttribute("data-rr-orig")) { left.setAttribute("data-rr-orig", left.textContent); }
       var v6 = document.body.classList.contains("ver-6");
-      left.textContent = (v6 && m === "lost" ? "마지막 통신 11:16:42" : v6 && m === "done" ? "미션 완료, " + spent() + " 소요" : LEFTTXT[m]) || left.getAttribute("data-rr-orig");   // [11/05 v6] 통신 끊김은 남은 시간 자리에 마지막 통신 시각
+      var ttl = document.querySelector("[data-progress-title]");
+      var left6 = { alert: ttl && ttl.textContent, estop: "정지 시각 11:16:42", pause: "남은 시간 멈춤", lost: "마지막 통신 11:16:42", done: spent() + " 소요" };   // [11/06] 제목이 상태를 말하니 아랫줄은 그다음 정보
+      left.textContent = (v6 && left6[m] || LEFTTXT[m]) || left.getAttribute("data-rr-orig");   // [11/05 v6] 통신 끊김은 남은 시간 자리에 마지막 통신 시각
     }
     var rec = document.querySelector("[data-recall-button]"), es = document.querySelector('.rc-actions [data-modal-open="estop"]');
     if (rec) { rec.classList.toggle("rr-on", m === "return"); }
@@ -328,6 +330,8 @@
   }
 
   /* [10/22] 시안의 상태별 패널 — 긴급정지(버튼 글 · 아래 칸 흐리게), 통신 끊김(띠 · 목록 얼림 · Signal 끊김), 미션 완료(요약 띠) */
+  // [11/06 v6] 상태 이름 · 아이콘 · 색 — 아이콘에만 색을 쓴다(글자까지 물들면 Delta · 지도와 겹쳐 경보가 과하다)
+  var STATE6 = { alert: ["위험 감지", "error", "critical"], estop: ["긴급정지", "power", "critical"], pause: ["일시정지", "clock", "warning"], "return": ["자동복귀", "home", "muted"], lost: ["통신 끊김", "eye-off", "muted"], done: ["미션 완료", "check-circle", "safe"] };
   var bitsMode = null;
   function stateBits(m) {
     var rail = document.querySelector("[data-timeline]");
@@ -348,11 +352,20 @@
     rail.classList.toggle("rr-frozen", m === "lost");
     // 목록 위 띠
     var host = rail.parentNode, ban = host && host.querySelector(".rr-banner");
-    var want = m === "lost" || m === "done";
+    var v6 = document.body.classList.contains("ver-6");
+    var want = v6 ? !!STATE6[m] : m === "lost" || m === "done";
     if (!want) { if (ban) { ban.remove(); } bitsMode = m; return; }
     if (ban && bitsMode === m) { return; }
     bitsMode = m;
     if (!ban) { ban = el("div", "rr-banner"); host.insertBefore(ban, rail); }
+    // [11/06 v6] 평소와 다른 상태는 모두 진행 제목 자리에 같은 꼴로 — 상태 아이콘 + 굵은 이름. 면 · 여백은 다른 상태와 같다
+    if (v6) {
+      var s6 = STATE6[m];
+      ban.className = "rr-banner is-" + m + " rr-tone-" + s6[2];
+      ban.innerHTML = '<span class="rr-state"><span class="i i-16" style="--i:var(--ic-' + s6[1] + ')" aria-hidden="true"></span><b>' + s6[0] + "</b></span>" +
+        (m === "done" ? '<a class="btn is-xs btn-secondary" href="./report-v6.html" data-rr-report>보고서 보러가기</a>' : "");
+      return;
+    }
     if (m === "lost") {
       ban.className = "rr-banner is-lost";
       ban.innerHTML = document.body.classList.contains("ver-6") ? "<b>통신 끊김</b>" : "<b>통신 끊김</b><span>마지막 통신 11:16:42, 2분 전. 아래 목록은 그 시점 기준이다.</span>";   // [11/05 v6] 이름만 — 시각은 진행 막대 아랫줄
