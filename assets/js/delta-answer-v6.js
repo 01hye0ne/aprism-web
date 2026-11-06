@@ -51,9 +51,6 @@
   // [11/06] 추천 질문은 마지막 답을 따른다 — 같은 알림에 이미 답한 종류는 빼고, 모자라면 아래 차례로 채운다
   var Q_TYPE = { "뭐부터 처리해?": "priority", "왜 이걸 먼저 봐야 해?": "why", "원인이 뭐야?": "cause", "어떻게 조치해?": "actions", "위치 알려줘": "location", "다른 위험도 알려줘": "others", "로봇 지금 뭐 해?": "robot" };
   var Q_FILL = ["원인이 뭐야?", "어떻게 조치해?", "위치 알려줘", "왜 이걸 먼저 봐야 해?", "다른 위험도 알려줘", "뭐부터 처리해?"];
-  var ST = { suggested: "추천", pending: "승인 대기", requested: "요청됨(시뮬레이션)", progress: "진행 중(시뮬레이션)" };
-  // [11/06] 상태 칩은 "(시뮬레이션)" 없이 — 한글판 · 영문판 같다
-  ST.requested = "요청됨"; ST.progress = "진행 중";
   // 라이팅 시스템 11 — "재측정 후 판단"은 판단이지 할 일이 아니고, "작업 중지 요청"은 무전으로 사람이 하는 일이다
   var NOT_ACT = /재측정 후 판단|작업 중지/;
 
@@ -61,7 +58,6 @@
     var el = c.el, msgs = [];
     var lastType = null, lastQ = null, lastTarget = null;
     var seen = null, unread = false, jumpTo = null, jumpN = 0;
-    var acts = new WeakMap();
     var host = c.body, box = c.box, name = c.win.querySelector(".delta3-name-in");
 
     var sugg = el("div", "dc6-sugg");
@@ -343,34 +339,11 @@
       var list = (a.acts || []).filter(function (x) { return !NOT_ACT.test(x.t); });
       return list.length ? list : a.btn ? [{ t: a.btn, ai: true }] : [];
     }
-    function stateOf(a) { if (!acts.has(a)) { acts.set(a, {}); } return acts.get(a); }
-    function paintActs() {
-      var root = c.thread() || document;
-      Array.prototype.forEach.call(root.querySelectorAll(".dc6-act"), function (r) {
-        var st = stateOf(r._a)[r._t] || "suggested", chip = r.querySelector(".dc6-st"), cb = r.querySelector("input");
-        chip.setAttribute("data-st", st);
-        chip.textContent = ST[st];
-        cb.disabled = st !== "suggested";
-        if (cb.disabled) { cb.checked = false; }
-      });
-      Array.prototype.forEach.call(root.querySelectorAll("[data-dc6-req]"), function (b) {
-        var d = b.closest(".dc6-card");
-        b.disabled = !d.querySelector(".dc6-act input:checked") || !!d.querySelector(".dc6-confirm");
-      });
-    }
-    // 시뮬레이션 — 아무것도 보내지 않는다. 이 화면의 상태만 바뀐다
-    function request(a, names) {
-      var s = stateOf(a);
-      names.forEach(function (t, i) {
-        s[t] = "pending";
-        setTimeout(function () {
-          s[t] = "requested";
-          paintActs();
-          setTimeout(function () { s[t] = "progress"; paintActs(); }, 2600);
-        }, 700 + i * 250);
-      });
-      paintActs();
-    }
+    /*
+     * [11/06] 추천 조치 — Delta 는 조치를 요청하지 않는다(디자이너). "이렇게 조치하는 것을 추천드려요." + 추천 목록만 말하고,
+     *   요청은 알림 팝오버(조치 고르기 · 메모 · [조치 요청])에서 관제사가 한다 — 답과 함께 그 알림의 팝오버를 띄운다.
+     *   예전 흐름(체크 · [선택 항목 요청] · 요청됨 / 진행 중 상태 칩)은 뺐다.
+     */
     function actions(a) {
       var list = actList(a);
       var m = msg("actions", a, "추천 조치", a.eq);
@@ -379,42 +352,28 @@
         m.node.appendChild(btnRow(detailBtn(a), mapBtn(a)));
         return finish(m);
       }
-      text(m, a.fixFirst || ("추천 조치 " + list.length + "건이에요. 확인 후 요청하세요."));
-      var d = el("div", "dc6-card");
-      // [11/06] 실제 제품처럼 — 시뮬레이션 안내와 두 번째 확인은 뺐다(디자이너)
-      var l = el("div", "dc6-acts");
-      list.forEach(function (x, i) {
-        var r = el("label", "dc6-act");
-        r._a = a;
-        r._t = x.t;
-        var cb = el("input");
-        cb.type = "checkbox";
-        cb.checked = !!x.ai && i === 0 && !stateOf(a)[x.t];
-        cb.addEventListener("change", paintActs);
-        r.appendChild(cb);
-        r.appendChild(el("span", "dc6-act-t", x.t));
-        r.appendChild(el("span", "dc6-st"));
-        l.appendChild(r);
-      });
-      d.appendChild(l);
-      var req = btn("선택 항목 요청", "is-pri", function () {
-        var picked = Array.prototype.filter.call(l.querySelectorAll(".dc6-act"), function (r) { return r.querySelector("input").checked; }).map(function (r) { return r._t; });
-        if (!picked.length) { return; }
-        request(a, picked); return;
-        var cf = el("div", "dc6-confirm");
-        cf.appendChild(el("span", null, "요청 " + picked.length + "건을 보낼까요? " + picked.join(", ")));
-        cf.appendChild(el("span", "dc6-sim", "시뮬레이션: 작업자, 팀, 로봇에 연락하지 않아요."));
-        var yes = btn("요청 확인", "is-pri", function () { cf.remove(); request(a, picked); });
-        cf.appendChild(btnRow(yes, btn("취소", "", function () { cf.remove(); paintActs(); req.focus(); })));
-        d.appendChild(cf);
-        paintActs();
-        yes.focus();
-      });
-      req.setAttribute("data-dc6-req", "1");
-      d.appendChild(btnRow(req, mapBtn(a)));
-      m.node.appendChild(d);
+      /*
+       * [11/06] 답 짜임(디자이너) — "이런 이유로" 근거 글머리 → "이런 조치를 추천해요!" 추천 목록 → "바로 조치 요청할 수 있도록 화면을 열어드릴게요!"
+       *   그리고 알림 팝오버를 저절로 연다. 요청은 팝오버에서 관제사가 한다.
+       *   근거는 원인 분석(cause)과 같은 데이터: 무엇이 기준을 넘었나 · 측정 추세 · 오탐 가능성.
+       */
+      var why = [label(a)];
+      if (a.hist) { why.push(a.hist.length + "회 측정 " + a.hist.join(" → ")); } else if (a.trend) { why.push(a.trend); }
+      if (a.fp !== undefined) { why.push("오탐 가능성 " + a.fpLabel + " " + a.fp + "%"); }
+      text(m, "이런 이유로", true);
+      m.node.appendChild(ul(why, "ul", "dc6-ul"));
+      // 추천은 팝오버 DELTA 조치 제안의 AI 추천과 같은 목록 — Delta 와 팝오버가 다른 말을 하지 않게
+      var recs = (a.acts || []).filter(function (x) { return x.ai; });
+      if (!recs.length) { recs = list; }
+      text(m, "이런 조치를 추천해요!", true);
+      var l = el("ul", "dc6-recs");
+      recs.forEach(function (x) { l.appendChild(el("li", null, x.t)); });
+      m.node.appendChild(l);
+      text(m, "바로 조치 요청할 수 있도록 화면을 열어드릴게요!");
+      // 팝오버를 닫았으면 다시 여는 단추 하나만
+      m.node.appendChild(btnRow(btn("조치하기", "is-pri", open(a))));
       finish(m);
-      paintActs();
+      open(a)();   // 팝오버를 함께 띄운다 — 대화 창은 펼친 채(APRISM_OPEN_ALERT)
       return m;
     }
 
