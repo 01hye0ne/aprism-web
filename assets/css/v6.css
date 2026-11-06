@@ -1887,3 +1887,13 @@ body.ver-6 .ah-thumb[hidden] { display: none; }
 body.ver-6 .ah-box:hover .ah-thumb, body.ver-6 .ah-thumb.is-drag { opacity: 1; }
 body.ver-6 .ah-thumb:hover, body.ver-6 .ah-thumb.is-drag { background-color: var(--border-strong); }
 @media (prefers-reduced-motion: reduce) { body.ver-6 .ah-thumb { transition: none; } }
+
+/*
+ * [11/06 디자이너] 지점 번호 원 하나로 — 조치 · 웨이포인트 · 로봇 팝오버 모두 16px · 1px 테 · 숫자 10px, 색은 지도 핀 머리 그대로.
+ *   위치는 팝오버의 주인공에 따라 다르되(핵심 한 줄 바로 아래 / 웨이포인트는 헤더), 눈이 알아보는 "지점 덩어리" 모양은 같게. 원 ↔ 이름 4.
+ *   원 바깥 빛(box-shadow) · 확대(transform)는 지도 핀 몫이라 팝오버에선 없앤다 — 해상도에 따라 이름 첫 글자를 덮었다
+ */
+body.ver-6 .mbt-pin { width: 16px; height: 16px; border-width: 1px !important; box-shadow: none !important; transform: none !important; animation: none !important; }
+body.ver-6 .mbt-pin::after { font-size: 10px; font-weight: 700; }
+body.ver-6 .ma-stamp.ma-stamp6 { gap: var(--space-4); }
+body.ver-6 .ma-stamp6 .ma-st-place::before { display: none; }   /* 잇는 선은 뺀다 — 원 ↔ 이름 4 로 붙인다 */
