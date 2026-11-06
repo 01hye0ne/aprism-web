@@ -1689,3 +1689,17 @@ body.ver-6 .map-card-rows .mbt-warn .i { background-color: var(--status-warning-
 body.ver-6 .map-canvas { cursor: grab; }
 body.ver-6 .map-canvas.is-turning { cursor: grabbing; }
 body.ver-6 .map-canvas.is-panning { cursor: move; }
+
+/*
+ * [11/06 디자이너] 로봇 팝오버 2차 — 1) 머리 아래 가로줄 2) 지점 = 지도 번호 원(핀 머리 색 · 테를 map-v6.js 가 옮겨 온다)
+ *   3) 줄바꿈은 지점 이름 뒤에서(.mbt-nw 한 덩이, 낱말 안에서 끊지 않음)
+ */
+body.ver-6 .map-bot-tip .map-card-head { padding-bottom: var(--space-8); border-bottom: var(--border-width-thin, 1px) solid var(--border-default); }
+body.ver-6 .map-card-rows.is-now { margin-top: var(--space-8); }
+body.ver-6 .map-card-rows .mbt-act { word-break: keep-all; }
+body.ver-6 .map-card-rows .mbt-nw { white-space: nowrap; }
+body.ver-6 .map-card-rows .mbt-route { display: flex; align-items: center; gap: var(--space-4); }
+body.ver-6 .map-card-rows .mbt-pin { flex: none; width: 20px; height: 20px; box-sizing: border-box; border-radius: 50%; border: 2px solid; display: inline-grid; place-items: center; transform: none !important; box-shadow: none; }
+body.ver-6 .map-card-rows .mbt-pin::after { content: attr(data-n); font: 800 10px/1 "SUIT", "Pretendard", "Malgun Gothic", system-ui, sans-serif; letter-spacing: -0.2px; }
+body.ver-6 .map-card-rows .mbt-arrow { color: var(--text-tertiary); }
+body.ver-6 .map-card-rows .mbt-meta { margin-left: var(--space-4); }

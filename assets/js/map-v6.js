@@ -2699,19 +2699,33 @@
     var to = run ? run.getAttribute("data-waypoint") : "";
     var eta = run && run.querySelector('[data-rr="eta"]'), pct = run && run.querySelector('[data-rr="pct"]');
     var measuring = !!(pct && pct.offsetParent !== null);
-    var route = !to ? "" : measuring ? to + " · " + (en ? "measuring " : "측정 ") + pct.textContent.trim()
-      : (from ? from + " → " : "") + to + (eta && eta.textContent.trim() ? " · " + eta.textContent.trim() : "");
-    var html = "";
     var esc = function (t) { return String(t).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
+    // [11/06 디자이너] 지점은 글(WP-07) 대신 지도에 그려진 그 번호 원 — 지도 핀 머리의 색 · 테를 그대로 옮겨 와 지도와 바로 맞춰 본다
+    var pinOf = function (wp) {
+      var n = parseInt(String(wp).replace(/\D+/g, ""), 10), h = !isNaN(n) && document.querySelector('.rr-pin-head[data-n="' + n + '"]');
+      return h ? '<span class="mbt-pin" role="img" aria-label="' + esc(wp) + '" data-n="' + n + '" style="' + esc(h.getAttribute("style") || "") + '"></span>' : esc(wp);
+    };
+    var arrow = '<span class="mbt-arrow" aria-hidden="true">→</span>';
+    var route = !to ? "" : measuring ? pinOf(to) + '<span class="mbt-meta">' + (en ? "Measuring " : "측정 ") + esc(pct.textContent.trim()) + "</span>"
+      : (from ? pinOf(from) + arrow : "") + pinOf(to) + (eta && eta.textContent.trim() ? '<span class="mbt-meta">' + esc(eta.textContent.trim()) + "</span>" : "");
+    // [11/06 디자이너] 줄바꿈은 지점 이름 뒤에서 — "HX-1로 / 이동 중"(행동 말이 끊기지 않게 한 덩이로)
+    var actHtml = function (t) {
+      var name = run && run.querySelector(".step-title") ? run.querySelector(".step-title").textContent.trim() : "";
+      var m = !en && /^(.+?)(으로|로) (이동 중)$/.exec(t);
+      if (m) { return esc(m[1] + m[2]) + ' <span class="mbt-nw">' + m[3] + "</span>"; }
+      if (name && t.indexOf(name + " ") === 0) { return esc(name) + ' <span class="mbt-nw">' + esc(t.slice(name.length + 1)) + "</span>"; }
+      return esc(t);
+    };
+    var html = "";
     if (ban) {
       var tone = (ban.parentNode.className.match(/rr-tone-\S+/) || [""])[0], is = (ban.parentNode.className.match(/(^|\s)is-\S+/) || [""])[0].trim();
       html += '<p class="mbt-act rr-banner ' + is + " " + tone + '">' + ban.outerHTML + "</p>";
       var why = left && left.textContent.trim();
       if (why) { html += '<p class="mbt-sub">' + esc(why) + "</p>"; }
-      if (route && !/is-(done|lost|estop)/.test(is)) { html += '<p class="mbt-sub num">' + esc(route) + "</p>"; }
+      if (route && !/is-(done|lost|estop)/.test(is)) { html += '<p class="mbt-sub mbt-route num">' + route + "</p>"; }
     } else {
-      if (ttl) { html += '<p class="mbt-act">' + esc(ttl.textContent.trim()) + "</p>"; }
-      if (route) { html += '<p class="mbt-sub num">' + esc(route) + "</p>"; }
+      if (ttl) { html += '<p class="mbt-act">' + actHtml(ttl.textContent.trim()) + "</p>"; }
+      if (route) { html += '<p class="mbt-sub mbt-route num">' + route + "</p>"; }
     }
     // 예외 — 배터리 20% 이하 · 신호 약함(통신 끊김은 위 상태 줄이 말한다)
     var warn = [];
