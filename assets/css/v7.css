@@ -73,7 +73,7 @@ body.ver-7.ver-3.v2-2.v3 .delta3.is-open .delta3-name { padding-left: 8px; }
 :root[data-theme][data-delta][data-glow] body.ver-7.ver-6.v2-2.v3 .delta3.is-open .delta3-body > .ai-input, body.ver-7.ver-6.v2-2.v3 .delta3.is-open .delta3-body > .ai-input { margin-bottom: 3px; }
 
 /*
- * [11/06 디자이너] 우측 지점 목록 — 첫 카드 [출발] · 마지막 카드 [종점] 꼬리표(지금 카드의 "도착 약 n초"와 겹치지 않게 도착 → 종점)(제목 줄 오른쪽 끝). 목록은 screen.js 가 다시 그려도 CSS 라 따라간다
+ * [11/06 디자이너] 우측 지점 목록 — 첫 카드 [출발] · 마지막 카드 [도착] 꼬리표(지금 카드의 남은 시간은 "약 n초 남음" — route-sim.js)(제목 줄 오른쪽 끝). 목록은 screen.js 가 다시 그려도 CSS 라 따라간다
  */
 body.ver-7 .timeline-item:first-of-type .step-title-row::after,
 body.ver-7 .timeline-item:last-of-type .step-title-row::after {
@@ -87,7 +87,7 @@ body.ver-7 .timeline-item:last-of-type .step-title-row::after {
   font-weight: 500;
   color: var(--text-secondary);
 }
-body.ver-7 .timeline-item:last-of-type .step-title-row::after { content: "종점"; }
+body.ver-7 .timeline-item:last-of-type .step-title-row::after { content: "도착"; }
 html[lang="en"] body.ver-7 .timeline-item:first-of-type .step-title-row::after { content: "Start"; }
 html[lang="en"] body.ver-7 .timeline-item:last-of-type .step-title-row::after { content: "End"; }
 
