@@ -1410,7 +1410,7 @@
 
     if (card) {
       card.hidden = !picked;
-      if (picked && cardName) { cardName.textContent = picked.title; }
+      if (picked && cardName) { cardName.textContent = picked.title; card.setAttribute("aria-label", "설비 " + picked.title); }
     }
 
     plan();
@@ -2805,6 +2805,7 @@
         botRows.appendChild(line);
       });
     }
+    var bn = botTip.querySelector("[data-map-bot-title]"); if (bn) { botTip.setAttribute("aria-label", "로봇 " + bn.textContent.trim()); }
     botTip.hidden = false;
     botBox.classList.add("is-picked");
   }
@@ -2863,14 +2864,46 @@
       pin6.setAttribute("style", ph6 ? (ph6.getAttribute("style") || "") : "");
       pin6.classList.toggle("is-plain", !ph6);
       wpName.textContent = nm6;
+      wpBox.setAttribute("aria-label", "웨이포인트 " + info.id + " " + nm6 + ", " + (WP_WORD[info.tone] || "예정"));   // 꼬리표를 감춰도(v6.css) 낭독기는 종류 · 상태를 읽는다
       var more6 = wpBox.querySelector("[data-map-wp-more]"); if (more6) { more6.hidden = true; }
+      /*
+       * [11/06 디자이너] 세 팝오버 한 차례 — 헤더(꼬리표 · 주체) → 핵심 한 줄 → 상세 목록. 결과는 한 줄 나열이 아니라 설비 팝오버처럼 줄 목록(이름 칸 + 값 왼쪽 정렬).
+       *   핵심 한 줄: 지나온 정상 = "측정 완료 · 정상 범위", 지금 지점 = 측정 중 / 이동 중, 예정 = "아직 가지 않은 자리입니다."
+       *   목록: 측정 결과(온도 31.4℃ · 압력 0.71 MPa → 줄마다) + 측정 시각(09:31 – 09:52 (21분)). 예정 · 이동 중은 목록 없음
+       */
+      if (wpRead) {
+        var runRow = document.querySelector('[data-timeline] .timeline-item[data-waypoint="' + info.id + '"]');
+        var meas6 = !!(runRow && runRow.querySelector(".rr-note.is-measure"));
+        var core6 = info.tone === "safe" ? ""   // [11/06 디자이너] 정상은 따로 말하지 않는다 — 지도에 세모가 없으면 정상이다. 측정값 목록만
+          : /current|next|active|running/.test(info.tone) ? (meas6 ? "측정 항목 확인 중" : "로봇이 오는 중" + (function () { var e = runRow && runRow.querySelector('[data-rr="eta"]'); return e && e.textContent.trim() ? " · " + e.textContent.trim() : ""; })())
+          : info.kind === "upcoming" || info.tone === "upcoming" ? "아직 가지 않은 자리입니다." : (info.read || "");
+        wpRead.textContent = core6;
+        wpRead.hidden = !core6;
+        // 지금 지점 꼬리표 — 서서 재는 중이면 "측정 중", 아직 걸어오는 중이면 "다음 지점"(꼬리표와 핵심 줄이 어긋나지 않게)
+        if (wpChip && /current|next|active|running/.test(info.tone)) { wpChip.textContent = meas6 ? "측정 중" : "다음 지점"; }
+        wpRead.classList.add("mbt-core");
+        var rows6 = [];
+        if (info.tone === "safe") {
+          String(info.read || "").split(/\s*·\s*/).forEach(function (part) {
+            var m = /^(.*?)\s*(-?\d[\d.,]*\s*\S*)$/.exec(part.trim());
+            if (m && m[1]) { rows6.push([m[1], m[2]]); }
+          });
+          if (info.time) { var tm = String(info.time).split(/\s*·\s*/); rows6.push(["측정 시각", tm[0] + (tm[1] ? " (" + tm[1] + ")" : "")]); }
+        }
+        var dl6 = wpBox.querySelector(".mbt-wp-rows");
+        if (!dl6) { dl6 = document.createElement("dl"); dl6.className = "map-card-rows mbt-wp-rows"; wpRead.parentNode.insertBefore(dl6, wpRead.nextSibling); }
+        dl6.textContent = "";
+        rows6.forEach(function (r) { var d = document.createElement("div"), t = document.createElement("dt"), v = document.createElement("dd"); t.textContent = r[0]; v.textContent = r[1]; d.appendChild(t); d.appendChild(v); dl6.appendChild(d); });
+        dl6.hidden = !rows6.length;
+        var tEl = wpBox.querySelector("[data-map-wp-time]"); if (tEl) { tEl.hidden = true; }
+      }
     }
-    if (wpRead) {
+    if (wpRead && !document.body.classList.contains("ver-6")) {   // v6 는 위에서 핵심 한 줄 + 목록으로
       window.APRISM_TEXT.fill(wpRead, info.read ||
         (info.kind === "upcoming" ? "아직 가지 않은 자리입니다." : "측정 항목 확인 중"));
     }
     var wpTime = wpBox.querySelector("[data-map-wp-time]");
-    if (wpTime) { wpTime.textContent = info.time || ""; wpTime.hidden = !info.time; }
+    if (wpTime) { wpTime.textContent = info.time || ""; wpTime.hidden = !info.time || document.body.classList.contains("ver-6"); }   // [11/06 v6] 시각은 목록의 "측정 시각" 줄로
     wpBox.hidden = false;
     placeWp();
   }

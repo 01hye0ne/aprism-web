@@ -50,3 +50,56 @@
 
   window.APRISM_AH_SORT = { mount: mount, time: time, get: function () { return mode; } };
 })();
+
+/*
+ * [11/06 v6] 알림 목록 띄운 막대 — 브라우저 막대(12)가 넘칠 때만 생겨 줄 너비가 화면마다 달랐다(전체 미션 312 · 미션 관제 324).
+ * 막대는 v6.css 에서 숨기고, 상자(.ah-box) 안 오른쪽에 4 막대를 띄운다. 끌어서 넘길 수 있다.
+ */
+(function () {
+  "use strict";
+  if (!document.body || !document.body.classList.contains("ver-6")) { return; }
+  function attach(list) {
+    var box = list.parentElement;
+    if (!box || list.hasAttribute("data-ah-thumb")) { return; }
+    list.setAttribute("data-ah-thumb", "");
+    var t = document.createElement("span");
+    t.className = "ah-thumb";
+    t.setAttribute("aria-hidden", "true");
+    t.hidden = true;
+    box.appendChild(t);
+    var th = 0;
+    function update() {
+      var h = list.clientHeight, sh = list.scrollHeight;
+      if (sh <= h + 1 || !h) { t.hidden = true; return; }
+      t.hidden = false;
+      th = Math.max(24, Math.round(h * h / sh));
+      t.style.height = th + "px";
+      t.style.top = Math.round(list.offsetTop + (h - th) * list.scrollTop / (sh - h)) + "px";
+    }
+    list.addEventListener("scroll", update, { passive: true });
+    if (window.ResizeObserver) { new ResizeObserver(update).observe(list); }
+    new MutationObserver(update).observe(list, { childList: true, subtree: true });
+    t.addEventListener("pointerdown", function (e) {
+      e.preventDefault();
+      var y0 = e.clientY, s0 = list.scrollTop;
+      t.classList.add("is-drag");
+      t.setPointerCapture(e.pointerId);
+      function move(ev) {
+        var h = list.clientHeight, sh = list.scrollHeight;
+        list.scrollTop = s0 + (ev.clientY - y0) * (sh - h) / Math.max(1, h - th);
+      }
+      function up() {
+        t.classList.remove("is-drag");
+        t.removeEventListener("pointermove", move);
+        t.removeEventListener("pointerup", up);
+        t.removeEventListener("pointercancel", up);
+      }
+      t.addEventListener("pointermove", move);
+      t.addEventListener("pointerup", up);
+      t.addEventListener("pointercancel", up);
+    });
+    update();
+  }
+  function init() { Array.prototype.forEach.call(document.querySelectorAll(".ah-box > .ah-list"), attach); }
+  if (document.readyState === "loading") { document.addEventListener("DOMContentLoaded", init); } else { init(); }
+})();
