@@ -36,3 +36,7 @@ body.ver-7 .sb-tab[data-mission] { padding: 0 var(--space-8); }
 body.ver-7 .panel-head .panel-ah-all { order: 1; margin-left: auto; margin-right: 0; display: inline-flex; align-items: center; gap: 2px; width: auto; height: 24px; padding: 0 var(--space-4) 0 var(--space-6, 6px); }
 body.ver-7 .panel-head .panel-ah-all + [data-panel-toggle] { margin-left: calc(var(--space-8) * -1 + var(--space-4)); }
 body.ver-7 .context-panel.is-collapsed .panel-ah-all { display: none; }
+
+/* [11/06 디자이너] "조치 요청된 알림" 목록은 오늘 것만 — 범위는 제목 대신 건수 앞에 "오늘"(• 오늘 5건). 제목이 알림 센터 탭 이름과 똑같아진다 */
+body.ver-7 .done-head [data-done-count]::before { content: "오늘 "; }
+html[lang="en"] body.ver-7 .done-head [data-done-count]::before { content: "Today "; }
