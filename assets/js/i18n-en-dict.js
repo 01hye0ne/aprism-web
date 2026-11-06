@@ -472,6 +472,7 @@ window.APRISM_EN = {"APRISM 공장 환경점검 로봇 관제 시스템 진입 �
 "Delta 창 열기":"Open Delta",
 "Delta 에게 묻기 열기":"Open Ask Delta",
 "Delta 창 닫기":"Close Delta",
+"Delta 접기":"Collapse Delta",
 "전체 층 배치도":"All-floor layout",
 "로봇 현황":"Robot status",
 "층으로 거르기":"Filter by floor",
