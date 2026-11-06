@@ -17,7 +17,7 @@ html[lang="en"] body.ver-7 .sb-tabs { overflow-x: visible; flex: 1 1 auto; }
 
 /*
  * [11/06 디자이너] 왼쪽 "오늘 확인된 알림" 머리를 예전 배치로 — 이름 · 건수(점) …… 오른쪽 끝 접기, [전체보기]는 위 최신 알림 하나만(HTML).
- *   이름은 한 단 낮게(t-label-1 · 14, HTML). v6 의 머리 배치 규칙(done-toggle · ah-all)을 되돌린다
+ *   이름은 위 "미확인 알림"과 같은 위계(t-title-2 · 16, HTML — 형제). v6 의 머리 배치 규칙(done-toggle · ah-all)을 되돌린다
  */
 body.ver-7 .done-head { justify-content: space-between; gap: 10px; }
 body.ver-7 .done-head .done-count { margin-left: auto; }
