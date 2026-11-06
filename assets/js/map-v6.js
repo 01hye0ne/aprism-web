@@ -298,7 +298,7 @@
     done: 0x9ea8bb, left: 0x9ea8bb, dot: 0xffffff
   };
   ROBOTS[10] = {
-    name: "ROBOT 11", at: 0.15, floor: "B3", walk: 3,   // 전기실 열화상 점검 · 3/20 — WP-03 → WP-04 로 걸어가는 중(10/20, walkTick)
+    name: "ROBOT 11", at: 0.32, floor: "B3", walk: 7,   // 전기실 열화상 점검 · 7/20 — WP-07 → WP-08 로 걸어가는 중(10/20, walkTick · 11/06 패널 7/20 에 맞춤)
     dock: [0.12, 0.90],
     stops: [[0.12, 0.55], [0.45, 0.55], [0.45, 0.20], [0.15, 0.20]],
     done: 0x89b9ed, left: 0x4990e0, dot: 0xc7ddf8
