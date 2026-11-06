@@ -19,7 +19,7 @@
 (function () {
   "use strict";
 
-  var KINDS = [[/계기/, "gauge"], [/온도/, "thermometer"], [/방전/, "bolt"], [/누출/, "eye"], [/음향|진동/, "gauge"], [/안전/, "shield"]];
+  var KINDS = [[/계기/, "gauge"], [/온도/, "thermometer"], [/방전/, "bolt"], [/누출/, "eye"], [/음향|진동/, "gauge"], [/안전/, "cone"]];   // [11/06] 안전감지 = 꼬깔콘(v6.css --ic-cone)
   var INTENTS = [
     ["why", /왜.*(순위|먼저|순서)|먼저 봐야/],
     ["others", /다른 위험|다른 미션/],
