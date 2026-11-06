@@ -794,7 +794,9 @@
     return '<div class="ac-d-title-block ac-d6-head' + (a.sev === "critical" ? " is-critical" : "") + '">' +
       '<div class="ac-d6-top">' + sevBadge(a, prefix) +
         '<span class="ac-d6-kind t-label-2">' + esc(a.detect) + '</span></div>' +
-      '<h2 class="t-title-1 ac-d6-title">' + esc(r[0]) + (r[1] ? ' <b class="ac-d6-val">' + esc(r[1]) + '</b>' : "") + '</h2>' +
+      // [11/06 디자이너] 값 뒤 판정 — 관제 알림 팝오버 · 안전진단 상세와 같은 글(verdict-v6.js)
+      '<h2 class="t-title-1 ac-d6-title">' + esc(r[0]) + (r[1] ? ' <b class="ac-d6-val">' + esc(r[1]) + '</b>' : "") +
+        (function () { var vd = r[1] && window.APRISM_VERDICT && window.APRISM_VERDICT(a.detect, r[1]); return vd ? ' <span class="ac-d6-vd">' + esc(vd) + "</span>" : ""; })() + '</h2>' +
       under +
     '</div>';
   }
