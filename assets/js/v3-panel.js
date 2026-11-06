@@ -105,9 +105,11 @@
       });
       return m;
     },
-    wp: function (n) {
+    // [11/06] 지도 핀 머리와 같은 단계 색 원(핀 대는 없음) — sev 가 없으면 예전 어두운 원
+    wp: function (n, sev) {
       var w = document.createElement("span");
       w.className = "dl-wp";
+      if (sev) { w.setAttribute("data-sev", sev); }
       w.textContent = n;
       w.setAttribute("aria-label", "waypoint " + n);
       return w;
@@ -169,16 +171,11 @@
   function part(x) {
     if (typeof x === "string") { return document.createTextNode(x); }
     if (x.m) { return T.mission(x.m); }
-    if (x.wp) { return T.wp(x.wp); }
+    if (x.wp) { return T.wp(x.wp, x.sev); }
     var n = document.createElement("span");
     n.className = "dl-wp-name";
-    // [11/06] waypoint 이름은 【이름】 — 괄호는 회색(.dl-wb), 이름은 흰색 굵게. 이름 칸은 따로 두어 영문판 번역기가 이름만 옮긴다
-    [["dl-wb", "【"], [null, x.wpName], ["dl-wb", "】"]].forEach(function (k) {
-      var c = document.createElement("span");
-      if (k[0]) { c.className = k[0]; }
-      c.textContent = k[1];
-      n.appendChild(c);
-    });
+    // [11/06] waypoint 이름은 괄호 없이 흰색 굵게 — 앞의 단계 색 번호 원이 waypoint 라는 것을 말한다(【 】는 뺐다, 디자이너)
+    n.textContent = x.wpName;
     return n;
   }
   // 접힌 위젯의 답 단추는 창을 열지 않고 그 일을 한다(펼친 창에서는 원래대로 닫기 단추).

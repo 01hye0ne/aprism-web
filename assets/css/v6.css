@@ -1607,9 +1607,9 @@ body.ver-6 .ac-detail-contents > .ac-scroll-fade, body.ver-6 .ac-record > .ac-sc
 /* [11/05 v6] Delta 문장 속 미션은(접힘 · 펼침, 한글판 · 영문판) [M번호 이름] — 번호 · 이름은 문장 그대로, 괄호만 회색(문형표 5 확정). v3-panel.js 가 .dl-m · .dl-br 로 감싼다.
    2줄(회색) 속 waypoint 이름(.dl-wp-name)만 흰색 굵게 — 할 일의 대상이 먼저 읽히게 */
 body.ver-6 .delta3 .dl-wp-name { color: var(--text-primary); font-weight: var(--font-weight-bold); }
-/* [11/06] waypoint 이름 괄호 【 】 — 2줄 글과 같은 회색 보통 굵기 */
-body.ver-6 .delta3 .dl-wb { color: color-mix(in srgb, var(--text-primary) 55%, transparent); font-weight: var(--font-weight-regular); }
 body.ver-6 .delta3 .dl-br { color: color-mix(in srgb, var(--text-primary) 55%, transparent); font-weight: var(--font-weight-regular); }
+/* [11/06] 2줄(회색)의 대상이 미션일 때(전체 미션 Delta) — waypoint 이름처럼 미션 번호 · 이름만 흰색 굵게, 괄호는 회색 */
+body.ver-6 .delta3 .ai-line-2 .dl2 .dl-m { color: var(--text-primary); font-weight: var(--font-weight-bold); }
 /* waypoint 번호 — 경로 목록 번호 모양(W1). 숫자 바닥선 = 문장 바닥선, waypoint 이름과 사이 2px */
 body.ver-6 .delta3 .dl-wp {
   display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box;
@@ -1617,6 +1617,10 @@ body.ver-6 .delta3 .dl-wp {
   background-color: rgb(10 15 24 / 45%); color: #C9D0DC;
   font-size: 13px; line-height: 1; font-weight: 800; font-variant-numeric: tabular-nums; vertical-align: baseline;
 }
+/* [11/06] 단계가 있으면 지도 핀 머리와 같은 단계 색 원 + 어두운 숫자 · 테(제안 3에서 핀 대를 뺀 모양) */
+body.ver-6 .delta3 .dl-wp[data-sev] { border: 2px solid #0A0F18; color: #0A0F18; }
+body.ver-6 .delta3 .dl-wp[data-sev="critical"] { background-color: #FF383C; }
+body.ver-6 .delta3 .dl-wp[data-sev="warning"] { background-color: #FFC800; }
 
 /* [11/05 v6 한글판] Delta 접힘 2줄은 회색 고정 — 10/31 디자이너 시안(영문판 i18n-en.css 와 같은 값). 1줄 흰색 굵게, 2줄 한 단 옅은 회색 보통 굵기 */
 html:not([lang="en"]) body.ver-6[data-delta-copy="brief"] .delta3 .ai-line-2 .dl2 {
@@ -1823,6 +1827,20 @@ body.ver-6 .has-point .rr-pin:not(.is-point) { opacity: .35 !important; transiti
 /* [11/06 디자이너] 번호 원과 설비 이름을 잇는 짧은 선 — 원 테두리에 붙은 8px · 1px 선(글과 같은 색), 선 끝과 이름 사이 4 */
 body.ver-6 .ma-stamp.ma-stamp6 { gap: 0; }
 body.ver-6 .ma-stamp6 .ma-st-place::before { content: ""; display: inline-block; width: 8px; height: 1px; margin-right: var(--space-4); vertical-align: middle; position: relative; top: -1px; background-color: currentColor; }   /* 이름 칸은 블록 그대로 — 길면 말줄임. middle 은 x 높이 기준이라 원 중심보다 1px 아래 → 올림 */
+
+/*
+ * [11/06 v6] 펼친 Delta 여백 — 위계마다 한 값(디자이너). 예전엔 대화 12 · 추천 질문 16 · 입력 칸 4 · 목록 줄 14 로 제각각이었다.
+ *   판 안쪽(1단): 좌우 16 — 블록 제목, 문장, 카드, 목록 줄, 주의 토글, 내 질문, 추천 질문, 입력 칸이 같은 선
+ *   카드 안쪽(2단): 12, 카드 안 상자(3단, 먼저 보는 이유): 10 · 12
+ *   위아래: 답과 답 사이 20, 한 답 안 칸 사이 10
+ *   대화 칸 오른쪽은 스크롤 자리(8)가 있어 안쪽 여백은 4 만 더한다(8 + 4 + 판 4 = 16)
+ */
+body.ver-6 .delta3.is-open.is-chat .dc-thread { padding: 12px 4px 16px 12px; gap: 20px; }
+body.ver-6 .delta3 .dc-msg.dc6 { gap: 10px; }
+body.ver-6 .dc6-row { padding-left: 0; padding-right: 0; }
+body.ver-6 .dc6-toggle { padding-left: 0; padding-right: 0; }
+body.ver-6 .dc6-why { padding: 10px 12px; }
+:root[data-theme][data-delta][data-glow] body.ver-6.v2-2.v3 .delta3.is-open .delta3-body > .ai-input, body.ver-6.v2-2.v3 .delta3.is-open .delta3-body > .ai-input { margin-left: 12px; margin-right: 12px; margin-bottom: 12px; }
 
 /*
  * [11/06 디자이너] 웨이포인트 팝오버 — 로봇 · 설비 팝오버와 한 틀: 머리 불투명 bg/raised(판 끝까지) · [번호 원] 이름 · 닫기, [상세보기] 뺌.
