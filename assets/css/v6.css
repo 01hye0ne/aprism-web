@@ -1834,3 +1834,24 @@ body.ver-6 .map-wp .map-wp-pin { transform: none; margin-right: calc(var(--space
 body.ver-6 .map-wp .map-wp-more[hidden] { display: none; }
 /* [11/06 디자이너] 웨이포인트 팝오버 꼬리표도 로봇 · 설비 팝오버와 같은 회색(상태색은 번호 원 · 아래 글이 말한다) — app-shell 의 상태별 색을 덮는다 */
 body.ver-6 .map-wp[data-result] .map-card-tag { background-color: var(--color-gray-300); color: var(--color-gray-750); border: 0; box-shadow: none; }
+
+/* [11/06 v6] 왼쪽 알림 목록 — 줄 너비는 막대 없을 때(324)로 통일. 브라우저 막대는 넘칠 때만 생겨 전체 미션(넘침)과
+   미션 관제(안 넘침)의 줄이 312 / 324 로 갈렸다. 막대는 숨기고 상자 안 오른쪽에 4 막대(.ah-thumb, ah-sort.js)를 띄운다 —
+   로봇 줄 rf-thumb 와 같은 꼴, 상자에 올라갔을 때만 보인다 */
+body.ver-6 .ah-list { scrollbar-width: none; }
+body.ver-6 .ah-list::-webkit-scrollbar { display: none; }
+body.ver-6 .ah-thumb {
+  position: absolute;
+  right: 4px;
+  width: 4px;
+  border-radius: var(--radius-pill);
+  background-color: var(--border-default);
+  opacity: 0;
+  transition: opacity 160ms ease;
+  cursor: grab;
+  z-index: 3;
+}
+body.ver-6 .ah-thumb[hidden] { display: none; }
+body.ver-6 .ah-box:hover .ah-thumb, body.ver-6 .ah-thumb.is-drag { opacity: 1; }
+body.ver-6 .ah-thumb:hover, body.ver-6 .ah-thumb.is-drag { background-color: var(--border-strong); }
+@media (prefers-reduced-motion: reduce) { body.ver-6 .ah-thumb { transition: none; } }

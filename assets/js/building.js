@@ -581,7 +581,7 @@
     var steps = el("span", "bld-rc-steps");
     var wp = STEPS[r.n];
     if (r.st === "run" && wp) {
-      steps.appendChild(rcStep(r.now, wp[0][1] + " " + wp[0][0], true, "way"));
+      steps.appendChild(rcStep(r.now, (V6 ? wp[0][0] : wp[0][1] + " " + wp[0][0]), true, "way"));
       steps.appendChild(rcStep(wp[1][0], wp[1][1], false, "target", "is-no"));
     } else {
       var where = r.st === "done" ? (r.mission || "") + " 끝"
@@ -661,6 +661,12 @@
    *   진행   맨 아래 막대 하나 + 지나온 수
    * 상태 배지(Mission 줄) · 다음 웨이포인트 번호 · 오른쪽 칸은 뺐다.
    */
+  // [11/06 v6] 로봇 카드 지금 줄 — 하는 일("케미컬 공급 캐비닛 CDS-02 판독")과 지점 이름이 겹쳐 뭐가 뭔지 읽히지 않았다(사용자).
+  //   굵은 줄은 지점 이름, 아래는 짧은 하는 일(판독 중 · 이동 중), 다음 줄은 다음 지점 — 두 지점이 위아래로 경로처럼 이어진다(시안 A 확정)
+  function rcVerb(s) {
+    var m = /(이동 중|측정|판독|촬영|점검|순회)$/.exec(s || "");
+    return !m ? s : m[1] === "이동 중" ? "이동 중" : m[1] + " 중";
+  }
   function fleetCardSlim(r) {
     var node = el("button", "bld-robot bld-rc2 is-" + r.st);
     node.type = "button";
@@ -723,11 +729,16 @@
     nm.appendChild(icon(ic, 16));
     nowRow.appendChild(nm);
     var nt = el("span", "bld-rc2-txt");
+    if (wp && V6) {
+      nt.appendChild(el("span", "bld-rc2-now", wp[0][0]));
+      nt.appendChild(el("span", "bld-rc2-wp t-caption", rcVerb(r.now)));
+    } else {
     nt.appendChild(el("span", "bld-rc2-now", r.now));
-    if (wp) { nt.appendChild(el("span", "bld-rc2-wp t-caption", wp[0][1] + " " + wp[0][0])); }
+    if (wp) { nt.appendChild(el("span", "bld-rc2-wp t-caption", V6 ? wp[0][0] : wp[0][1] + " " + wp[0][0])); }   // [11/06 v6] 번호(WP-nn)는 뺐다 — 지점 이름만
     else {
       nt.appendChild(el("span", "bld-rc2-wp t-caption", r.st === "done" ? (r.mission || "") + " 끝"
         : r.st === "off" ? FNAME[r.floor] + " · 마지막 위치" : FNAME[r.floor] + (r.dock ? " · 도크" : "")));
+    }
     }
     nowRow.appendChild(nt);
     bodyEl.appendChild(nowRow);
