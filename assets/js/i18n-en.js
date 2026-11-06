@@ -26,6 +26,7 @@
     // 숫자와 낱말 사이는 줄바꿈 안 함( ) — "9 / WARNINGS" 로 갈라지지 않게
     [/^위험 (\d+)건, 주의 (\d+)건이 있어요\.$/, function (m, c, w) { return c + " critical, " + w + " warnings."; }],
     [/^위험 (\d+)건이 있어요\.$/, function (m, c) { return c + " critical."; }],
+    [/^주의 (\d+)건이 있어요\.$/, function (m, w) { return w + " warnings."; }],   // [11/06] 주의만 있을 때 1줄(monitor.js)
     // [11/05 v6] 미션 이동 답 단추 · 3번째 줄(하는 일) — monitor.js · v3-panel.js
     [/^미션 이동하기$/, "Go to mission"],
     [/^위험 (\d+)건 원인 분석 중\.\.\.$/, "Analyzing $1 critical alerts..."],
