@@ -312,6 +312,8 @@
   function handleOrder(all, mine) {
     var here = function (a) { return mine.indexOf(a) >= 0; };
     var crit = function (a) { return a.sev === "critical"; };
+    // [11/06] 같은 칸 안은 늘 오래된 알림부터 — 왼쪽 최신 알림 목록의 정렬([오래된 순 | 최신 순])을 바꿔도 Delta 가 먼저 말하는 알림은 바뀌지 않는다
+    all = all.slice().sort(function (a, b) { return a.time < b.time ? -1 : a.time > b.time ? 1 : 0; });
     return all.filter(function (a) { return here(a) && crit(a); })
       .concat(all.filter(function (a) { return !here(a) && crit(a); }))
       .concat(all.filter(function (a) { return here(a) && !crit(a); }))

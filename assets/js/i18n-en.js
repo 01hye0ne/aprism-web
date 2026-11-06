@@ -28,12 +28,12 @@
     [/^위험 (\d+)건이 있어요\.$/, function (m, c) { return c + " critical."; }],
     [/^주의 (\d+)건이 있어요\.$/, function (m, w) { return w + " warnings."; }],   // [11/06] 주의만 있을 때 1줄(monitor.js)
     // [11/06 v6] 펼친 Delta 답변 흐름(delta-answer-v6.js · delta-chat.js) — 상태 답(U1) · 못 알아들음(U4) · 단추 · 입력 칸
-    [/^지금 상태$/, "Current status"],
-    [/^지금 상황$/, "Current situation"],
+    [/^지금 상태$/, "Status"],
+    [/^지금 상황$/, "Overview"],
     [/^이걸 물으신 건가요\?$/, "Did you mean one of these?"],
     [/^이 있어요\. 아래에서 고르세요\.$/, " open. Pick one below."],
     [/^(.+?)(?:은|는) 지금 (위험|주의)이에요\.$/, function (m, x, sev) { return core(x) + " is " + (sev === "위험" ? "critical" : "at warning") + " now."; }],
-    [/^원인 보기$/, "View cause"],
+    [/^원인 보기$/, "Cause"],
     [/^Delta에게 질문$/, "Ask Delta"],
     [/^진행 중$/, "In progress"],
     [/^이것부터 확인하세요\. 열린 (\d+)건 중 첫 번째예요\.$/, "Check this first. It's #1 of $1 open alerts."],
