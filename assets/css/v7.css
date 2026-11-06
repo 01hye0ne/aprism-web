@@ -49,3 +49,11 @@ body.ver-7 .dc6-card > .dc6-need > .dc6-diag { width: 16px; height: 16px; }
 body.ver-7 .dc-msg.dc6 .dc6-card > .dc6-eq { grid-column: 2; grid-row: 1; margin: 0; font-size: 14px; line-height: 20px; font-weight: 700; }
 body.ver-7 .dc6-card > .dc6-desc, body.ver-7 .dc6-card > .dc6-why { display: none; }
 body.ver-7 .dc6-card > .dc6-done, body.ver-7 .dc6-card > .dc6-btns { grid-column: 1 / -1; }
+
+/*
+ * [11/06 디자이너] Delta 펼침 너비 = 접힘 너비(220) — 접힌 카드에서 그대로 아래로 자라게. 395 · 295 를 걷는다.
+ *   끌어서 넓히는 손잡이는 남긴다(가장 좁게 = 220, delta-resize.js 의 data-d3-min · data-d3-start)
+ */
+:root[data-theme] body.ver-7.ver-3.v2-2.v3 .delta3.is-open { width: var(--d3-w, 220px); }
+/* 220 칸에선 [위험 상세 확인] [위치 보기]가 한 줄에 안 들어간다(위치 보기가 칸 밖으로 잘림) — 위아래로 쌓아 둘 다 칸 너비 가득 */
+body.ver-7 .delta3 .dc6-btns { grid-template-columns: minmax(0, 1fr); }
