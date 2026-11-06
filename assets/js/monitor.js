@@ -1479,13 +1479,14 @@
   })();
 
   /*
-   * 지도에서 웨이포인트를 직접 눌렀다 — 그 자리에 남은 알림이 있으면 알림 목록에서 누른 것과 같은
+   * 지도 · 우측 지점 목록에서 웨이포인트를 직접 눌렀다(11/06 목록도) — 그 자리에 남은 알림이 있으면 알림 목록에서 누른 것과 같은
    * 팝오버(조치 제안 · 조치 완료)를 연다. 알림이 없는 웨이포인트는 지금처럼 웨이포인트 쪽지(10/19 디자이너).
    * 한 자리에 여럿이면 위험 먼저, 같은 단계면 먼저 난 것.
    */
   document.addEventListener("aprism:waypoint", function (event) {
     var d = event.detail || {};
-    if (d.from !== "map" || !d.id) { return; }
+    if ((d.from !== "map" && d.from !== "panel") || !d.id) { return; }
+    if (d.from === "panel" && picked && picked.wp === d.id) { return; }   // 쪽지가 열리며 우측 줄을 누른 것이다 — 다시 열지 않는다
     var robot = activeRobot();
     var here = items().filter(function (a) { return a.wp === d.id && a.robot === robot; });
     if (!here.length) { return; }
