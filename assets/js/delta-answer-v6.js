@@ -24,6 +24,8 @@
   var INTENTS = [
     ["why", /왜.*(순위|먼저|순서)|먼저 봐야|why .*(first|priority|order)/i],
     ["others", /다른 위험|다른 미션|other (risk|alert|mission)/i],
+    // [11/06] 로봇이 지금 무엇을 하는지 — 오른쪽 로봇 패널(진행 제목 · 지점 수 · 남은 시간 · 배터리)을 읽어 답한다(채팅 범위 문서 "답한다")
+    ["robot", /로봇|robot|뭐 ?하고|뭐 ?해|무엇을 하|하고 있|배터리|battery|어디쯤|doing/i],
     ["priority", /요약|뭐부터|무엇부터|우선|먼저|순서|가이드|할 ?일|summary|what first|where .*start|priorit|order/i],
     ["cause", /원인|왜|이유|근거|cause|why|reason|evidence/i],
     ["actions", /조치|어떻게(?! ?됐)|해결|방법|고치|뭘 해야|what should|what do i do|how (do|to|can|should) .*(fix|handle|solve|deal)|\bfix|action|resolve/i],
@@ -43,14 +45,12 @@
     alert: ["원인이 뭐야?", "어떻게 조치해?", "뭐부터 처리해?"],
     other: ["뭐부터 처리해?", "원인이 뭐야?", "어떻게 조치해?"],
     status: ["원인이 뭐야?", "어떻게 조치해?", "위치 알려줘"],
-    fallback: ["뭐부터 처리해?", "원인이 뭐야?", "위치 알려줘"]
+    fallback: ["뭐부터 처리해?", "로봇 지금 뭐 해?", "위치 알려줘"],
+    robot: ["뭐부터 처리해?", "위치 알려줘", "원인이 뭐야?"]
   };
   // [11/06] 추천 질문은 마지막 답을 따른다 — 같은 알림에 이미 답한 종류는 빼고, 모자라면 아래 차례로 채운다
-  var Q_TYPE = { "뭐부터 처리해?": "priority", "왜 이걸 먼저 봐야 해?": "why", "원인이 뭐야?": "cause", "어떻게 조치해?": "actions", "위치 알려줘": "location", "다른 위험도 알려줘": "others" };
+  var Q_TYPE = { "뭐부터 처리해?": "priority", "왜 이걸 먼저 봐야 해?": "why", "원인이 뭐야?": "cause", "어떻게 조치해?": "actions", "위치 알려줘": "location", "다른 위험도 알려줘": "others", "로봇 지금 뭐 해?": "robot" };
   var Q_FILL = ["원인이 뭐야?", "어떻게 조치해?", "위치 알려줘", "왜 이걸 먼저 봐야 해?", "다른 위험도 알려줘", "뭐부터 처리해?"];
-  var ST = { suggested: "추천", pending: "승인 대기", requested: "요청됨(시뮬레이션)", progress: "진행 중(시뮬레이션)" };
-  // [11/06] 상태 칩은 "(시뮬레이션)" 없이 — 한글판 · 영문판 같다
-  ST.requested = "요청됨"; ST.progress = "진행 중";
   // 라이팅 시스템 11 — "재측정 후 판단"은 판단이지 할 일이 아니고, "작업 중지 요청"은 무전으로 사람이 하는 일이다
   var NOT_ACT = /재측정 후 판단|작업 중지/;
 
@@ -58,7 +58,6 @@
     var el = c.el, msgs = [];
     var lastType = null, lastQ = null, lastTarget = null;
     var seen = null, unread = false, jumpTo = null, jumpN = 0;
-    var acts = new WeakMap();
     var host = c.body, box = c.box, name = c.win.querySelector(".delta3-name-in");
 
     var sugg = el("div", "dc6-sugg");
@@ -340,34 +339,11 @@
       var list = (a.acts || []).filter(function (x) { return !NOT_ACT.test(x.t); });
       return list.length ? list : a.btn ? [{ t: a.btn, ai: true }] : [];
     }
-    function stateOf(a) { if (!acts.has(a)) { acts.set(a, {}); } return acts.get(a); }
-    function paintActs() {
-      var root = c.thread() || document;
-      Array.prototype.forEach.call(root.querySelectorAll(".dc6-act"), function (r) {
-        var st = stateOf(r._a)[r._t] || "suggested", chip = r.querySelector(".dc6-st"), cb = r.querySelector("input");
-        chip.setAttribute("data-st", st);
-        chip.textContent = ST[st];
-        cb.disabled = st !== "suggested";
-        if (cb.disabled) { cb.checked = false; }
-      });
-      Array.prototype.forEach.call(root.querySelectorAll("[data-dc6-req]"), function (b) {
-        var d = b.closest(".dc6-card");
-        b.disabled = !d.querySelector(".dc6-act input:checked") || !!d.querySelector(".dc6-confirm");
-      });
-    }
-    // 시뮬레이션 — 아무것도 보내지 않는다. 이 화면의 상태만 바뀐다
-    function request(a, names) {
-      var s = stateOf(a);
-      names.forEach(function (t, i) {
-        s[t] = "pending";
-        setTimeout(function () {
-          s[t] = "requested";
-          paintActs();
-          setTimeout(function () { s[t] = "progress"; paintActs(); }, 2600);
-        }, 700 + i * 250);
-      });
-      paintActs();
-    }
+    /*
+     * [11/06] 추천 조치 — Delta 는 조치를 요청하지 않는다(디자이너). "이렇게 조치하는 것을 추천드려요." + 추천 목록만 말하고,
+     *   요청은 알림 팝오버(조치 고르기 · 메모 · [조치 요청])에서 관제사가 한다 — 답과 함께 그 알림의 팝오버를 띄운다.
+     *   예전 흐름(체크 · [선택 항목 요청] · 요청됨 / 진행 중 상태 칩)은 뺐다.
+     */
     function actions(a) {
       var list = actList(a);
       var m = msg("actions", a, "추천 조치", a.eq);
@@ -376,42 +352,28 @@
         m.node.appendChild(btnRow(detailBtn(a), mapBtn(a)));
         return finish(m);
       }
-      text(m, a.fixFirst || ("추천 조치 " + list.length + "건이에요. 확인 후 요청하세요."));
-      var d = el("div", "dc6-card");
-      // [11/06] 실제 제품처럼 — 시뮬레이션 안내와 두 번째 확인은 뺐다(디자이너)
-      var l = el("div", "dc6-acts");
-      list.forEach(function (x, i) {
-        var r = el("label", "dc6-act");
-        r._a = a;
-        r._t = x.t;
-        var cb = el("input");
-        cb.type = "checkbox";
-        cb.checked = !!x.ai && i === 0 && !stateOf(a)[x.t];
-        cb.addEventListener("change", paintActs);
-        r.appendChild(cb);
-        r.appendChild(el("span", "dc6-act-t", x.t));
-        r.appendChild(el("span", "dc6-st"));
-        l.appendChild(r);
-      });
-      d.appendChild(l);
-      var req = btn("선택 항목 요청", "is-pri", function () {
-        var picked = Array.prototype.filter.call(l.querySelectorAll(".dc6-act"), function (r) { return r.querySelector("input").checked; }).map(function (r) { return r._t; });
-        if (!picked.length) { return; }
-        request(a, picked); return;
-        var cf = el("div", "dc6-confirm");
-        cf.appendChild(el("span", null, "요청 " + picked.length + "건을 보낼까요? " + picked.join(", ")));
-        cf.appendChild(el("span", "dc6-sim", "시뮬레이션: 작업자, 팀, 로봇에 연락하지 않아요."));
-        var yes = btn("요청 확인", "is-pri", function () { cf.remove(); request(a, picked); });
-        cf.appendChild(btnRow(yes, btn("취소", "", function () { cf.remove(); paintActs(); req.focus(); })));
-        d.appendChild(cf);
-        paintActs();
-        yes.focus();
-      });
-      req.setAttribute("data-dc6-req", "1");
-      d.appendChild(btnRow(req, mapBtn(a)));
-      m.node.appendChild(d);
+      /*
+       * [11/06] 답 짜임(디자이너) — "이런 이유로" 근거 글머리 → "이런 조치를 추천해요!" 추천 목록 → "바로 조치 요청할 수 있도록 화면을 열어드릴게요!"
+       *   그리고 알림 팝오버를 저절로 연다. 요청은 팝오버에서 관제사가 한다.
+       *   근거는 원인 분석(cause)과 같은 데이터: 무엇이 기준을 넘었나 · 측정 추세 · 오탐 가능성.
+       */
+      var why = [label(a)];
+      if (a.hist) { why.push(a.hist.length + "회 측정 " + a.hist.join(" → ")); } else if (a.trend) { why.push(a.trend); }
+      if (a.fp !== undefined) { why.push("오탐 가능성 " + a.fpLabel + " " + a.fp + "%"); }
+      text(m, "이런 이유로", true);
+      m.node.appendChild(ul(why, "ul", "dc6-ul"));
+      // 추천은 팝오버 DELTA 조치 제안의 AI 추천과 같은 목록 — Delta 와 팝오버가 다른 말을 하지 않게
+      var recs = (a.acts || []).filter(function (x) { return x.ai; });
+      if (!recs.length) { recs = list; }
+      text(m, "이런 조치를 추천해요!", true);
+      var l = el("ul", "dc6-recs");
+      recs.forEach(function (x) { l.appendChild(el("li", null, x.t)); });
+      m.node.appendChild(l);
+      text(m, "바로 조치 요청할 수 있도록 화면을 열어드릴게요!");
+      // 팝오버를 닫았으면 다시 여는 단추 하나만
+      m.node.appendChild(btnRow(btn("조치하기", "is-pri", open(a))));
       finish(m);
-      paintActs();
+      open(a)();   // 팝오버를 함께 띄운다 — 대화 창은 펼친 채(APRISM_OPEN_ALERT)
       return m;
     }
 
@@ -479,6 +441,7 @@
       if (intent === "location") { return location(t); }
       if (intent === "others") { return others(); }
       if (intent === "count") { return count(); }
+      if (intent === "robot") { return robot(); }
       if (intent === "status") { return t ? status(t) : priority(false); }
       var n = counts(ordered());
       if (intent === "greet") {
@@ -488,8 +451,39 @@
       // [11/06] 못 알아들어도 빈손으로 끝내지 않는다(채팅 범위 문서 U4). 고를 질문은 아래 '이렇게 물어보세요'
       var fm = msg("fallback", null, "지금 상황");
       fm.node.appendChild(el("p", "dc6-p", "이걸 물으신 건가요?"));
-      fm.node.appendChild(countLine(n, "아래에서 고르세요."));
+      // 알림이 하나도 없으면 건수 문장("지금 이 있어요.")이 깨진다 — 없다고 말한다
+      if (n.c || n.w) { fm.node.appendChild(countLine(n, "아래에서 고르세요.")); } else { text(fm, "지금은 확인할 알림이 없어요. 아래에서 고르세요."); }
       return finish(fm, "fallback");
+    }
+
+    /*
+     * [11/06] 로봇 — 고른 로봇이 지금 하는 일. 데이터는 화면(오른쪽 로봇 패널)에서 읽는다: 진행 제목 · 지점 수 · 남은 시간 · 배터리.
+     *   첫 문장 "{로봇}은 지금 {하는 일}이에요." 다음 카드에 미션 · 진행 · 남은 시간 · 배터리. 알림이 있으면 [처리 순서 보기]
+     */
+    function robot() {
+      var q = function (sel) { var e = document.querySelector(sel); return e ? e.textContent.trim().replace(/\s+/g, " ") : ""; };
+      var card = document.querySelector(".robot-strip .robot-card[aria-pressed='true']");
+      var rn = card && card.querySelector(".robot-id") ? card.querySelector(".robot-id").textContent.trim() : "로봇";
+      var doing = q("[data-progress-title]");
+      var m = msg("robot", null, "로봇");
+      text(m, doing ? rn + (c.batchim(rn) ? "은" : "는") + " 지금 " + doing + (c.batchim(doing) ? "이에요." : "예요.") : rn + "의 지금 진행을 읽을 수 없어요. 오른쪽 로봇 패널을 보세요.", true);
+      var d = el("div", "dc6-card");
+      var dl = el("dl", "dc6-dl");
+      var batt = card ? (card.querySelector(".battery") || {}).textContent : "";
+      [["미션", A().mission && tok() ? tok().mission(A().mission) : (A().mission || "")],
+        ["진행", q("[data-progress-count]") ? q("[data-progress-count]") + " 지점" : ""],
+        ["남은 시간", q("[data-progress-left]").replace(/ · /g, ", ")],   // 가운뎃점은 쉼표로(문구 규칙)
+        ["배터리", (batt || "").trim()]].forEach(function (r) {
+        if (!r[1]) { return; }
+        dl.appendChild(el("dt", null, r[0]));
+        var dd = el("dd");
+        if (typeof r[1] === "string") { dd.textContent = r[1]; } else { dd.appendChild(r[1]); }
+        dl.appendChild(dd);
+      });
+      d.appendChild(dl);
+      m.node.appendChild(d);
+      if (counts(ordered()).c + counts(ordered()).w) { m.node.appendChild(btnRow(btn("처리 순서 보기", "is-pri", function () { c.ask("뭐부터 처리해?"); }))); }
+      return finish(m, "robot");
     }
 
     // [11/06] 대상 알림의 지금 상태(채팅 범위 문서 U1). 등급, 설명 한 줄, 단추

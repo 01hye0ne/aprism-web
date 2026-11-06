@@ -29,6 +29,18 @@
     [/^주의 (\d+)건이 있어요\.$/, function (m, w) { return w + " warnings."; }],   // [11/06] 주의만 있을 때 1줄(monitor.js)
     // [11/06 v6] 펼친 Delta 답변 흐름(delta-answer-v6.js · delta-chat.js) — 상태 답(U1) · 못 알아들음(U4) · 단추 · 입력 칸
     [/^지금 상태$/, "Status"],
+    // [11/06] 추천 조치 답(delta-answer-v6.js actions) — 요청은 팝오버에서
+    [/^이런 이유로$/, "Here is why:"],
+    [/^이런 조치를 추천해요!$/, "I recommend these actions:"],
+    [/^바로 조치 요청할 수 있도록 화면을 열어드릴게요!$/, "Opening the alert so you can request them right away."],
+    [/^조치하기$/, "Act"],
+    // [11/06] 로봇 답 · 알림 없을 때 못 알아들음(delta-answer-v6.js robot · fallback)
+    [/^(Robot \d+)(?:은|는) 지금 (.+?)(?:이에요|예요)\.$/, function (m, r, x) { var t = core(x).replace(/^\s+/, ""); return r + " is " + t.charAt(0).toLowerCase() + t.slice(1) + " now."; }],
+    [/^지금은 확인할 알림이 없어요\. 아래에서 고르세요\.$/, "No open alerts. Pick one below."],
+    [/^로봇 지금 뭐 해\?$/, "What is the robot doing?"],
+    [/^남은 시간$/, "Remaining"],
+    [/^진행$/, "Progress"],
+    [/^(\d+\/\d+) 지점$/, "$1 points"],
     [/^지금 상황$/, "Overview"],
     [/^이걸 물으신 건가요\?$/, "Did you mean one of these?"],
     [/^이 있어요\. 아래에서 고르세요\.$/, " open. Pick one below."],

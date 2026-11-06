@@ -1497,6 +1497,9 @@ body.ver-6 .dc6-gap { padding: 6px 8px; border: 1px solid var(--status-warning-b
 /* 추천 조치 */
 body.ver-6 .dc-msg.dc6 .dc6-sim, body.ver-6 .dc6-confirm .dc6-sim { font-size: 12px; line-height: 16px; color: var(--status-warning-text); }
 body.ver-6 .dc6-acts { display: grid; gap: 4px; }
+/* [11/06] 추천 조치 목록(읽기만) — 팝오버 AI 추천과 같은 목록, 요청은 팝오버에서 */
+body.ver-6 .dc6-recs { display: grid; gap: 4px; margin: 0; padding: 0; list-style: none; }
+body.ver-6 .dc6-recs li { padding: 6px 8px; border-radius: 6px; background-color: var(--dc6-why); font-size: 14px; line-height: 20px; color: var(--text-primary); }
 body.ver-6 .dc6-act { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 6px; background-color: var(--dc6-why); cursor: pointer; }
 body.ver-6 .dc6-act input { flex: none; width: 16px; height: 16px; margin: 0; accent-color: var(--color-blue-500, currentColor); }
 body.ver-6 .dc6-act-t { flex: 1; min-width: 0; font-size: 14px; line-height: 20px; color: var(--text-primary); }
