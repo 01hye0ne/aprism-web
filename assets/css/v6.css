@@ -1709,3 +1709,12 @@ body.ver-6 .map-card-rows .mbt-pin { flex: none; width: 20px; height: 20px; box-
 body.ver-6 .map-card-rows .mbt-pin::after { content: attr(data-n); font: 800 11px/1 "SUIT", "Pretendard", "Malgun Gothic", system-ui, sans-serif; letter-spacing: -0.2px; }
 body.ver-6 .map-card-rows .mbt-arrow { color: var(--text-tertiary); }
 body.ver-6 .map-card-rows .mbt-meta { margin-left: var(--space-4); }
+
+/*
+ * [11/06 디자이너] 설비 팝오버를 로봇 팝오버와 한 틀로 — 머리 불투명 bg/raised(판 끝까지), 사진 칸 뺌, 폭 200~280, 머리 아래 12.
+ *   상태 · 최근 점검 · 담당 로봇 줄은 그대로
+ */
+body.ver-6 .map-card { width: auto; min-width: 200px; max-width: 280px; gap: var(--space-4); }
+body.ver-6 .map-card .map-card-head { margin: -14px -14px 0 !important; padding: var(--space-12) 14px; border-radius: 10px 10px 0 0; background-color: var(--bg-raised); }
+body.ver-6 .map-card .map-card-photo { display: none; }
+body.ver-6 .map-card > .map-card-rows { margin-top: var(--space-8); }
