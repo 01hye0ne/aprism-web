@@ -1801,3 +1801,11 @@ body.ver-6.v2-2 .ah-report:active { color: #FFFFFF; }   /* [11/06] 줄 호버 �
 body.ver-6 .done-how .done-act::after { content: ", "; }   /* 조치 뒤 쉼표는 CSS 로 — 글 조각이 사전 문구 그대로라 영문판 번역이 붙는다 */
 /* [11/06] 전체 미션(building-v6)의 오늘 확인된 알림 줄은 누를 곳이 아니다(고르기는 관제만) — 손가락 표시만 뺀다, 호버 면 · 시각은 같다 */
 body.ver-6.is-building .done-item { cursor: default; }
+/*
+ * [11/06 디자이너] 알림 팝오버 아래 줄 번호 원 — 20px · 2px 밝은 테가 12px 회색 글보다 무거워 따로 놀았다.
+ *   글 줄 높이(18)에 맞춘 16px · 1px 테, 테 · 숫자 · 글을 같은 색(text/tertiary)으로 — "⑦ 고소 작업 발판" 한 덩어리. 사이 4
+ */
+body.ver-6 .ma-stamp6 { gap: var(--space-4); }
+body.ver-6 .ma-stamp6 .mbt-pin.is-plain { width: 16px; height: 16px; border-width: 1px; background: transparent; border-color: currentColor; color: inherit; }
+body.ver-6 .ma-stamp6 .mbt-pin::after { font-size: 10px; font-weight: 700; }
+body.ver-6 .ma-stamp6 .ma-st-time { margin-left: auto; padding-left: var(--space-8); }
