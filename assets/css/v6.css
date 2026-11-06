@@ -1897,3 +1897,12 @@ body.ver-6 .mbt-pin { width: 16px; height: 16px; border-width: 1px !important; b
 body.ver-6 .mbt-pin::after { font-size: 10px; font-weight: 700; }
 body.ver-6 .ma-stamp.ma-stamp6 { gap: var(--space-4); }
 body.ver-6 .ma-stamp6 .ma-st-place::before { display: none; }   /* 잇는 선은 뺀다 — 원 ↔ 이름 4 로 붙인다 */
+
+/*
+ * [11/06 디자이너] 팝오버 꼬리표 뺌 — [로봇] · [설비] · 웨이포인트 상태([정상] · [예정] …). 무엇을 눌렀는지는 사용자가 알고 이름이 말한다.
+ *   웨이포인트 상태는 핵심 한 줄(아직 가지 않은 자리 · 로봇이 오는 중 · 측정 항목 확인 중)이 말한다. 조치 팝오버의 [위험] · [주의] 배지는 심각도라 남긴다
+ */
+body.ver-6 .map-bot-tip .map-card-tag, body.ver-6 .map-card .map-card-tag, body.ver-6 .map-wp .map-card-tag { display: none; }
+body.ver-6 .map-wp .map-wp-read[hidden] { display: none; }
+/* 정상 지점은 핵심 한 줄이 없다 — 목록이 헤더 아래 12 에서 시작 */
+body.ver-6 .map-wp .map-wp-read[hidden] + .mbt-wp-rows { margin-top: var(--space-8); }

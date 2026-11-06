@@ -1410,7 +1410,7 @@
 
     if (card) {
       card.hidden = !picked;
-      if (picked && cardName) { cardName.textContent = picked.title; }
+      if (picked && cardName) { cardName.textContent = picked.title; card.setAttribute("aria-label", "설비 " + picked.title); }
     }
 
     plan();
@@ -2805,6 +2805,7 @@
         botRows.appendChild(line);
       });
     }
+    var bn = botTip.querySelector("[data-map-bot-title]"); if (bn) { botTip.setAttribute("aria-label", "로봇 " + bn.textContent.trim()); }
     botTip.hidden = false;
     botBox.classList.add("is-picked");
   }
@@ -2863,6 +2864,7 @@
       pin6.setAttribute("style", ph6 ? (ph6.getAttribute("style") || "") : "");
       pin6.classList.toggle("is-plain", !ph6);
       wpName.textContent = nm6;
+      wpBox.setAttribute("aria-label", "웨이포인트 " + info.id + " " + nm6 + ", " + (WP_WORD[info.tone] || "예정"));   // 꼬리표를 감춰도(v6.css) 낭독기는 종류 · 상태를 읽는다
       var more6 = wpBox.querySelector("[data-map-wp-more]"); if (more6) { more6.hidden = true; }
       /*
        * [11/06 디자이너] 세 팝오버 한 차례 — 헤더(꼬리표 · 주체) → 핵심 한 줄 → 상세 목록. 결과는 한 줄 나열이 아니라 설비 팝오버처럼 줄 목록(이름 칸 + 값 왼쪽 정렬).
@@ -2872,10 +2874,11 @@
       if (wpRead) {
         var runRow = document.querySelector('[data-timeline] .timeline-item[data-waypoint="' + info.id + '"]');
         var meas6 = !!(runRow && runRow.querySelector(".rr-note.is-measure"));
-        var core6 = info.tone === "safe" ? "측정 완료 · 정상 범위"
+        var core6 = info.tone === "safe" ? ""   // [11/06 디자이너] 정상은 따로 말하지 않는다 — 지도에 세모가 없으면 정상이다. 측정값 목록만
           : /current|next|active|running/.test(info.tone) ? (meas6 ? "측정 항목 확인 중" : "로봇이 오는 중" + (function () { var e = runRow && runRow.querySelector('[data-rr="eta"]'); return e && e.textContent.trim() ? " · " + e.textContent.trim() : ""; })())
           : info.kind === "upcoming" || info.tone === "upcoming" ? "아직 가지 않은 자리입니다." : (info.read || "");
         wpRead.textContent = core6;
+        wpRead.hidden = !core6;
         // 지금 지점 꼬리표 — 서서 재는 중이면 "측정 중", 아직 걸어오는 중이면 "다음 지점"(꼬리표와 핵심 줄이 어긋나지 않게)
         if (wpChip && /current|next|active|running/.test(info.tone)) { wpChip.textContent = meas6 ? "측정 중" : "다음 지점"; }
         wpRead.classList.add("mbt-core");
