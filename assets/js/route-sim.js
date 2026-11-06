@@ -330,8 +330,8 @@
   }
 
   /* [10/22] 시안의 상태별 패널 — 긴급정지(버튼 글 · 아래 칸 흐리게), 통신 끊김(띠 · 목록 얼림 · Signal 끊김), 미션 완료(요약 띠) */
-  // [11/06 v6] 상태 이름 · 아이콘 · 색 — 아이콘에만 색을 쓴다(글자까지 물들면 Delta · 지도와 겹쳐 경보가 과하다)
-  var STATE6 = { alert: ["위험 감지", "error", "critical"], estop: ["긴급정지", "power", "critical"], pause: ["일시정지", "clock", "warning"], "return": ["자동복귀", "home", "muted"], lost: ["통신 끊김", "eye-off", "muted"], done: ["미션 완료", "check-circle", "safe"] };
+  // [11/06 v6] 상태 이름 · 색 — 기호는 v6.css .rr-dot, 색은 기호에만 쓴다(글자까지 물들면 Delta · 지도와 겹쳐 경보가 과하다)
+  var STATE6 = { alert: ["위험 감지", "critical"], estop: ["긴급정지", "critical"], pause: ["일시정지", "pause"], "return": ["자동복귀", "muted"], lost: ["통신 끊김", "muted"], done: ["미션 완료", "safe"] };
   var bitsMode = null;
   function stateBits(m) {
     var rail = document.querySelector("[data-timeline]");
@@ -358,11 +358,11 @@
     if (ban && bitsMode === m) { return; }
     bitsMode = m;
     if (!ban) { ban = el("div", "rr-banner"); host.insertBefore(ban, rail); }
-    // [11/06 v6] 평소와 다른 상태는 모두 진행 제목 자리에 같은 꼴로 — 상태 아이콘 + 굵은 이름. 면 · 여백은 다른 상태와 같다
+    // [11/06 v6] 평소와 다른 상태는 모두 진행 제목 자리에 같은 꼴로 — 컬러 원 기호 + 굵은 이름. 면 · 여백은 다른 상태와 같다
     if (v6) {
       var s6 = STATE6[m];
-      ban.className = "rr-banner is-" + m + " rr-tone-" + s6[2];
-      ban.innerHTML = '<span class="rr-state"><span class="i i-16" style="--i:var(--ic-' + s6[1] + ')" aria-hidden="true"></span><b>' + s6[0] + "</b></span>" +
+      ban.className = "rr-banner is-" + m + " rr-tone-" + s6[1];
+      ban.innerHTML = '<span class="rr-state"><span class="rr-dot" aria-hidden="true"></span><b>' + s6[0] + "</b></span>" +
         (m === "done" ? '<a class="btn is-xs btn-secondary" href="./report-v6.html" data-rr-report>보고서 보러가기</a>' : "");
       return;
     }

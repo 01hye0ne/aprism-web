@@ -1646,11 +1646,19 @@ body.ver-6 .progress-meta:has(> .rr-banner.is-done) .progress-percent { display:
 body.ver-6 .progress-meta > .rr-banner, :root[data-theme="light"] body.ver-6 .progress-meta > .rr-banner { display: flex; flex: 1 1 auto; min-width: 0; align-items: center; justify-content: space-between; gap: var(--space-8, 8px); margin: 0; padding: 0; border: 0; border-radius: 0; background: none; color: var(--text-primary); font-size: 16px; line-height: 24px; }
 body.ver-6 .rr-state { display: inline-flex; align-items: center; gap: var(--space-4, 4px); min-width: 0; }
 body.ver-6 .rr-state b { font-size: inherit; font-weight: var(--font-weight-bold); color: inherit; white-space: nowrap; }
-body.ver-6 .rr-state .i { flex: none; }
-body.ver-6 .rr-tone-critical .rr-state .i { color: var(--status-critical-icon); }
-body.ver-6 .rr-tone-warning .rr-state .i { color: var(--status-warning-icon); }
-body.ver-6 .rr-tone-safe .rr-state .i { color: var(--status-safe-icon); }
-body.ver-6 .rr-tone-muted .rr-state .i { color: var(--text-tertiary); }
+/* [11/06] 기호 — 컬러 원 안에 모양. 일시정지 = 로봇 머리 위 배지와 같은 색 · 막대, 자동복귀 = 복귀 지점과 같은 네모, 통신 끊김 = Signal 막대 + 사선 */
+body.ver-6 .rr-dot { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border-radius: 50%; background-color: var(--rr-dot); }
+body.ver-6 .rr-dot::before { content: ""; width: 14px; height: 14px; background-color: var(--rr-dot-fg); -webkit-mask: var(--rr-glyph) center / contain no-repeat; mask: var(--rr-glyph) center / contain no-repeat; }
+body.ver-6 .rr-tone-critical { --rr-dot: var(--status-critical-icon); --rr-dot-fg: #ffffff; }
+body.ver-6 .rr-tone-pause { --rr-dot: #ffb020; --rr-dot-fg: #1a1300; }
+body.ver-6 .rr-tone-muted { --rr-dot: var(--text-tertiary); --rr-dot-fg: var(--bg-raised); }
+body.ver-6 .rr-tone-safe { --rr-dot: var(--status-safe-icon); --rr-dot-fg: #06240f; }
+body.ver-6 .rr-banner.is-alert { --rr-glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none'%3E%3Crect x='7' y='2.8' width='2' height='7' rx='1' fill='%23fff'/%3E%3Ccircle cx='8' cy='12.4' r='1.2' fill='%23fff'/%3E%3C/svg%3E"); }
+body.ver-6 .rr-banner.is-estop { --rr-glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M8 2.6v5M4.7 4.8a4.8 4.8 0 1 0 6.6 0' stroke='%23fff' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E"); }
+body.ver-6 .rr-banner.is-pause { --rr-glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none'%3E%3Crect x='4.2' y='3.5' width='2.8' height='9' fill='%23fff'/%3E%3Crect x='9' y='3.5' width='2.8' height='9' fill='%23fff'/%3E%3C/svg%3E"); }
+body.ver-6 .rr-banner.is-return { --rr-glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none'%3E%3Crect x='4.2' y='4.2' width='7.6' height='7.6' rx='1.6' fill='%23fff'/%3E%3C/svg%3E"); }
+body.ver-6 .rr-banner.is-lost { --rr-glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none'%3E%3Crect x='2.8' y='9.6' width='2.2' height='3' rx='.6' fill='%23fff'/%3E%3Crect x='6.9' y='6.6' width='2.2' height='6' rx='.6' fill='%23fff'/%3E%3Crect x='11' y='3.4' width='2.2' height='9.2' rx='.6' fill='%23fff'/%3E%3Cpath d='M2.4 2.8l11.2 10.4' stroke='%23fff' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E"); }
+body.ver-6 .rr-banner.is-done { --rr-glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M3.8 8.4l2.8 2.8 5.6-6' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
 body.ver-6 .progress-meta > .rr-banner .btn { flex: none; text-decoration: none; }
 /* [11/05 디자이너] Delta 두 줄 — 2줄은 기본 회색 */
 body.ver-6[data-delta-copy="brief"] .delta3 .ai-line-2 .dl2 { color: var(--text-secondary); }
