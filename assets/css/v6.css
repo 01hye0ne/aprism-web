@@ -1694,7 +1694,10 @@ body.ver-6 .map-canvas.is-panning { cursor: move; }
  * [11/06 디자이너] 로봇 팝오버 2차 — 1) 머리 아래 가로줄 2) 지점 = 지도 번호 원(핀 머리 색 · 테를 map-v6.js 가 옮겨 온다)
  *   3) 줄바꿈은 지점 이름 뒤에서(.mbt-nw 한 덩이, 낱말 안에서 끊지 않음)
  */
-body.ver-6 .map-bot-tip .map-card-head { padding-bottom: var(--space-8); border-bottom: var(--border-width-thin, 1px) solid var(--border-default); }
+/* [11/06 디자이너] 머리는 조치 팝오버(.ma-v3 .ma-head)처럼 불투명 bg/raised 로 채운다 — 판 여백(14)을 넘어 끝까지, 위 모서리는 판과 같은 10.
+ *   채운 면 끝이 가로줄 몫을 해서 줄은 뺐다. 행동 줄은 면 아래 12(조치 팝오버 머리 여백과 같은 값) */
+body.ver-6 .map-bot-tip .map-card-head { margin: -14px -14px 0 !important; padding: var(--space-12) 14px; border-radius: 10px 10px 0 0; background-color: var(--bg-raised); }
+body.ver-6 .map-bot-tip:has(.map-card-rows.is-now) .map-card-rows.is-now { margin-top: var(--space-8); }
 /* [11/06 디자이너] 가로줄 → 행동 줄 간격을 행동 → 지점 줄 간격(4)과 하나로 — 팝오버 판의 gap 10 + 위 여백 8 = 18 이었다 */
 body.ver-6 .map-bot-tip:has(.map-card-rows.is-now) { gap: var(--space-4); }
 body.ver-6 .map-card-rows.is-now { margin-top: 0; }
