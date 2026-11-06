@@ -1239,6 +1239,9 @@ body.ver-6 .ac-d6-kind { color: var(--text-secondary); font-weight: 500; }
 body.ver-6 .ac-d6-title { margin: 0; }
 body.ver-6 .ac-d6-val { font-weight: inherit; color: var(--status-warning-text); }
 body.ver-6 .ac-d6-head.is-critical .ac-d6-val { color: var(--status-critical-text); }
+/* [11/06 디자이너] 값 뒤 판정("기준 초과 +0.06 MPa") — 관제 팝오버(.ma-vd) · 안전진단(.jvd)과 같은 글 16 굵게 · 단계색, 넘치면 판정만 다음 줄로 */
+body.ver-6 .ac-d6-vd { display: inline-block; font-size: var(--font-size-16); line-height: var(--font-line-height-24); font-weight: 600; color: var(--status-warning-text); font-variant-numeric: tabular-nums; white-space: nowrap; }
+body.ver-6 .ac-d6-head.is-critical .ac-d6-vd { color: var(--status-critical-text); }
 body.ver-6 .ac-d6-head .ac-record-age { margin: 0; }
 
 /* 4. DELTA 조치 제안 — 반대색 판(다크 화면에선 흰 판 .is-light-scope, 라이트 화면에선 짙은 판 .is-dark-scope) */

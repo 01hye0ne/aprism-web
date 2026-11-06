@@ -183,7 +183,8 @@
     // [11/02] 세부 묘사(누출 의심 1곳 등) — 판정 글에 값이 안 들어 있으면 결과 옆에 흐린 글로(디자이너 1번). 항목 + 값 규칙은 그대로
     const jdet = isHit && x[1] && !x[1].includes(jvalT) && x[1] !== jwhat ? `<span class="jdt">${x[1]}</span>` : '';
     // [11/02] 계기 기준은 값의 단위를 따른다 — 같은 계기인식이라도 차압(Pa) · 압력(bar · MPa) 계기가 섞여 있다(디자이너 2번 "아무거나" → 화면끼리 데이터는 그대로 두고 기준을 맞춤)
-    const stdK = k==='계기인식' && numU && numU[2]==='Pa' ? '250 Pa 미만' : k==='계기인식' && numU && numU[2]==='bar' ? '6.0 ~ 7.5 bar' : STD[k];
+    const stdK = k==='계기인식' && isHit && window.APRISM_VERDICT && window.APRISM_VERDICT.gaugeStd(jvalT) ? window.APRISM_VERDICT.gaugeStd(jvalT)   // [11/06] 계기마다 범위(verdict-v6.js)
+      : k==='계기인식' && numU && numU[2]==='Pa' ? '250 Pa 미만' : k==='계기인식' && numU && numU[2]==='bar' ? '6.0 ~ 7.5 bar' : STD[k];
     /*
      * [11/06 v6] 값 뒤에 판정 — "압력 0.86 MPa" 숫자만으론 "그래서 어쨌다는 건지" 안 읽혔다(디자이너). 값 바로 뒤에 "기준 초과 +0.06",
      *   기준 줄엔 근거(기준 범위 · 측정 이력 추세)를 붙인다. 차이는 정상 한계(주의 기준 · 범위 끝)에서 잰다, 자릿수는 값을 따른다
@@ -193,18 +194,22 @@
     const limHi = cd ? cd[2] : stdNs.length ? stdNs[stdNs.length - 1] : NaN, limLo = isRange ? stdNs[0] : null;
     const vUnit = cd ? (cd[4]==='%' ? '%' : cd[4]) : numU && numU[2] ? ' ' + numU[2] : '';   // 차이에도 단위 — "+7" 은 무엇의 7인지 안 읽힌다
     const decs = (String(jvalT).match(/\.(\d+)/) || ['', ''])[1].length;
-    const verdict = !isHit ? '' : k==='안전감지' ? '기준 위반'
+    const verdict = !isHit ? '' : window.APRISM_VERDICT ? window.APRISM_VERDICT(k, jvalT) || '기준 초과'   // [11/06] 관제 팝오버와 같은 셈(verdict-v6.js)
+      : k==='안전감지' ? '기준 위반'
       : isNaN(vNum) || isNaN(limHi) ? '기준 초과'
       : (limLo !== null && vNum < limLo ? `기준 미달 −${(limLo - vNum).toFixed(decs)}` : `기준 초과 +${Math.max(0, vNum - limHi).toFixed(decs)}`) + vUnit;
     // 지난 3회 값 — 시안 값. 범위 계기는 상한으로 다가가며 오름(알림 근거 "최근 3회 계속 오름"과 같은 수), 그 밖은 정상 안에서 오르내림
     const pastV = n => { if(k==='안전감지') return '0명'; if(isNaN(vNum) || isNaN(limHi)) return '정상 범위';
-      const v = isRange ? limHi - (limHi - limLo) * [0.30, 0.15, 0.05][n] : limHi * [0.86, 0.80, 0.90][n];
-      return (n===2 && st==='warn' && !isRange ? limHi + (vNum - limHi) * 0.5 : v).toFixed(decs) + (cd && cd[4]==='%' ? '%' : ''); };
+      const below = isRange && vNum < limLo;   // 범위 아래로 내려간 계기(0.62 · 정상 0.65~0.75)는 하한으로 다가가며 내려옴
+      const v = below ? limLo + (limHi - limLo) * [0.30, 0.15, 0.05][n] : isRange ? limHi - (limHi - limLo) * [0.30, 0.15, 0.05][n] : limHi * [0.86, 0.80, 0.90][n];
+      // 지난 회도 주의였으면(셋째 줄 '주의') 그 값도 기준 밖 — 오늘 값과 기준 한계의 가운데
+      return (n===2 && st==='warn' ? (below ? limLo - (limLo - vNum) * 0.5 : limHi + (vNum - limHi) * 0.5) : v).toFixed(decs) + (cd && cd[4]==='%' ? '%' : ''); };
     const histN = [pastV(0), pastV(1), pastV(2), String(jvalT)].map(parseFloat);
     const rising = isHit && histN.every(q => !isNaN(q)) && histN.slice(1).every((q, n) => q > histN[n]);
-    const why6 = `<span class="why1">기준 ${stdK}${rising ? ' · 최근 3회 계속 오름' : ''}</span>`;
+    const falling = isHit && histN.every(q => !isNaN(q)) && histN.slice(1).every((q, n) => q < histN[n]);
+    const why6 = `<span class="why1">기준 ${stdK}${rising ? ' · 최근 3회 계속 오름' : falling ? ' · 최근 3회 계속 내림' : ''}</span>`;
     const jv = V6 && isHit
-      ? `<div class="jmain"><h5>${jwhat}</h5><b class="jn ${st}">${jvalT}</b><span class="jvd ${st}">${verdict}</span>${jdet}</div>${jtrk}${!jtrk || rising ? why6 : ''}`
+      ? `<div class="jmain"><h5>${jwhat}</h5><b class="jn ${st}">${jvalT}</b><span class="jvd ${st}">${verdict}</span>${jdet}</div>${jtrk}${!jtrk || rising || falling ? why6 : ''}`
       : `<div class="jmain"><h5>${jwhat}</h5>${isHit ? `<b class="jn ${st}">${jvalT}</b>${jdet}` : `<span class="why1">기준: ${stdK}</span>`}</div>${jtrk}${isHit && !jtrk ? `<span class="why1">기준: ${stdK}</span>` : ''}`;
     // [11/06 v6] 측정 이력 지난 3회에 숫자를 — "정상 범위 · 정상 범위" 로 말만 두 번 나와 오늘 값과 견줄 수 없었다
     if(V6 && isHit) hist.forEach((h, n) => { if(n < 3 && h[2] !== 'plan') h[1] = pastV(n); });

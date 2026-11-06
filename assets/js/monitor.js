@@ -1037,10 +1037,27 @@
           title.appendChild(document.createTextNode(rs[0] + " "));
           var vb = document.createElement("b"); vb.className = "ma-val"; vb.textContent = rs[1];
           title.appendChild(vb);
+          // [11/06 디자이너] 값 뒤 판정 — 안전진단 상세와 같은 글(verdict-v6.js)
+          var vd = window.APRISM_VERDICT && window.APRISM_VERDICT(kind.textContent, rs[1]);
+          if (vd) { var vs = document.createElement("span"); vs.className = "ma-vd"; vs.textContent = vd; title.appendChild(document.createTextNode(" ")); title.appendChild(vs); }
           title.title = a.title;
         }
       }
       stamp.textContent = stampOf(a);
+      // [11/06 디자이너] v6 — 지점은 글(WP-05) 대신 지도 핀 머리와 같은 번호 원, 시각은 오른쪽 끝. 설비 이름이 길면 이름만 줄인다
+      if (body.classList.contains("ver-6") && a.wp) {
+        var wn = parseInt(String(a.wp).replace(/\D+/g, ""), 10), ph = !isNaN(wn) && document.querySelector('.rr-pin-head[data-n="' + wn + '"]');
+        var st6 = stampOf(a), cut = st6.lastIndexOf(" · "), where6 = cut < 0 ? st6 : st6.slice(0, cut), when6 = cut < 0 ? "" : st6.slice(cut + 3);
+        if (where6.indexOf(a.wp) === 0) { where6 = where6.slice(a.wp.length).trim(); }
+        stamp.textContent = "";
+        stamp.classList.add("ma-stamp6");
+        var pin6 = document.createElement("span"); pin6.className = "mbt-pin"; pin6.setAttribute("data-n", isNaN(wn) ? "" : String(wn));
+        pin6.setAttribute("role", "img"); pin6.setAttribute("aria-label", a.wp);
+        if (ph) { pin6.setAttribute("style", ph.getAttribute("style") || ""); } else { pin6.classList.add("is-plain"); }
+        var pl6 = document.createElement("span"); pl6.className = "ma-st-place"; pl6.textContent = where6;
+        var tm6 = document.createElement("span"); tm6.className = "ma-st-time num"; tm6.textContent = when6;
+        stamp.appendChild(pin6); stamp.appendChild(pl6); stamp.appendChild(tm6);
+      }
 
       $("[data-ma-wp]", box).textContent = a.wp || "";
       $("[data-ma-place]", box).textContent = placeOf(a);
@@ -1156,6 +1173,8 @@
       "차압 NG · HEPA Filter 차압계": "alert/wp02-gauge-hepa.webp",
       "압력 편차 · N₂ 배관 압력계": "alert/wp04-gauge-n2.webp"
     };
+    // [11/06 v6] WP-04 N₂ 압력계 위험은 안전진단 상세와 같은 사진(N₂ 배관 · MPa 계기 · "gauge 0.86 MPa") — 예전 그림은 Spiral Casing psi 계기에 "NG 90, 기준 87" 라벨이라 제목(0.86 MPa)과 어긋났다
+    if (body.classList.contains("ver-6")) { SHOT["지하발전소 B3 터빈 2 NG 1건 발견"] = SHOT["지하발전소 터빈 2 NG 1건 발견"] = "safety/gauge_crit.jpg"; }
     function liveSrc(a) {
       if (SHOT[a.title]) { return "../assets/img/" + SHOT[a.title]; }
       if (useDeid && a.live === "ppe") { return "../assets/img/alert-live-deid-grid.webp?v=12"; }   // 그림을 바꾸면 v 를 올린다(캐시)

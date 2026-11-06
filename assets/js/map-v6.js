@@ -2472,12 +2472,12 @@
    *   상태 — 걷기(이동 · 위험 감지 · 자동복귀)는 앞 호 점멸, 서기(측정 · 일시정지)는 앞 호를 켠 채 멈춤, 완료는 01 대기(링 12%),
    *   긴급정지 · 끊김은 끈다 — 초록 빛이 "괜찮다"로 읽히면 안 된다. 휠 로봇(Robot 05)은 시안 밖이라 뺀다.
    * [11/05 디자이너] 빗금 원판 · 테 · 겹친 원 넷 · 앞 부채꼴 빛을 걷고 호만 남긴다. 호는 흰색으로 그려 상태색을 입힌다(HALO_TINT) —
-   *   위험 감지 빨강, 자동복귀 회색. 지점 측정은 파란 눈금(.rr-ring, v6.css 가 숨김) 대신 앞 호가 시계방향으로 돈다.
+   *   위험 감지 빨강, 자동복귀 회색. 지점 측정은 파란 눈금(.rr-ring, v6.css 가 숨김) 대신 앞 호가 시야 빔과 함께 좌우를 둘러보며 밝기가 숨 쉰다(11/06).
    */
   var HALO_R = 0.77, HALO_G = "#3BE07A", HALO_GX = 0x3BE07A;
   var HALO_TINT = { alert: 0xff383c, estop: 0xff383c, "return": 0x9ea8bb, pause: 0xffb020 };   // [11/05] 긴급정지도 빨강, 일시정지 노랑(주의 세모 #ffcc00 보다 주황 쪽)
   var HALO_PAUSE = 0xffb020;   // 그 밖은 초록(HALO_GX). 빨강 = danger/500, 회색 = 복귀 회색(RR_GRAY)
-  var HALO_SPIN = 1800;   // 측정 중 앞 호 한 바퀴(ms)
+  var HALO_BREATH = 1800;   // 측정 중 앞 호 밝기 숨 한 번(ms)
   var halo = null;
   function haloArt(light) {
     // 시안 SVG 를 캔버스에 그대로 옮긴다. 한 칸 = 시안 1단위 × k. 둘레 여유는 겹친 원(1.03R)과 빛 번짐 몫.
@@ -2548,8 +2548,11 @@
     var tint = HALO_TINT[st] || HALO_GX;
     halo.base.material.color.setHex(tint); halo.front.material.color.setHex(tint); halo.duo.material.color.setHex(tint); halo.brk.material.color.setHex(tint);
     halo.duo.material.opacity = walk ? 0.55 + 0.45 * (0.5 - 0.5 * Math.cos(now / 2400 * Math.PI * 2)) : 1;   // 걷는 동안 두 줄이 천천히 숨 쉰다
-    // 측정 중 — 앞 호가 시계방향으로 돈다(위에서 볼 때 시계방향 = y 축 음의 회전). 다른 상태는 앞을 본다
-    halo.front.rotation.y = st === "inspect" && !rrReduce ? -((now % HALO_SPIN) / HALO_SPIN) * Math.PI * 2 : 0;
+    // [11/06 리뷰 제안] 측정 중 — 앞 호가 시야 빔과 같은 각도로 좌우를 둘러보고(빔: rrTick 의 sin(t / 650) · 0.42), 1.8초 박자로 밝기가 숨 쉰다.
+    //   예전(11/05)엔 호만 한 바퀴씩 시계방향으로 돌아 빔과 따로 놀았다. 다른 상태는 앞을 본다
+    var look = st === "inspect" && !rrReduce;
+    halo.front.rotation.y = look ? Math.sin(now / 650) * 0.42 : 0;   // 빔과 같은 식 · 같은 축이라 둘이 한 덩어리로 움직인다
+    halo.front.material.opacity = look ? 0.45 + 0.55 * (0.5 - 0.5 * Math.cos(now / HALO_BREATH * Math.PI * 2)) : 1;
     var sz = DOG_PX * baseSize / (view.clientHeight || 1);   // rrDog 와 같은 배율
     halo.g.position.set(onLane.here.x, onLane.here.y + span * 0.0006, onLane.here.z);
     halo.g.scale.setScalar(sz * HALO_R * halo.size * 2);
@@ -2698,7 +2701,7 @@
     var from = dones.length ? dones[dones.length - 1].getAttribute("data-waypoint") : "";
     var to = run ? run.getAttribute("data-waypoint") : "";
     var eta = run && run.querySelector('[data-rr="eta"]'), pct = run && run.querySelector('[data-rr="pct"]');
-    var measuring = !!(pct && pct.offsetParent !== null);
+    var measuring = !!(run && run.querySelector(".rr-note.is-measure"));   // [11/06] 측정 % 는 지웠다 — 측정 중 줄이 있는지로 본다
     var esc = function (t) { return String(t).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
     // [11/06 디자이너] 지점은 글(WP-07) 대신 지도에 그려진 그 번호 원 — 지도 핀 머리의 색 · 테를 그대로 옮겨 와 지도와 바로 맞춰 본다
     var pinOf = function (wp) {
@@ -2706,7 +2709,7 @@
       return h ? '<span class="mbt-pin" role="img" aria-label="' + esc(wp) + '" data-n="' + n + '" style="' + esc(h.getAttribute("style") || "") + '"></span>' : esc(wp);
     };
     var arrow = '<span class="mbt-arrow" aria-hidden="true">→</span>';
-    var route = !to ? "" : measuring ? pinOf(to) + '<span class="mbt-meta">' + (en ? "Measuring " : "측정 ") + esc(pct.textContent.trim()) + "</span>"
+    var route = !to ? "" : measuring ? pinOf(to) + '<span class="mbt-meta">' + (en ? "Measuring" : "측정 중") + "</span>"
       : (from ? pinOf(from) + arrow : "") + pinOf(to) + (eta && eta.textContent.trim() ? '<span class="mbt-meta">' + esc(eta.textContent.trim()) + "</span>" : "");
     // [11/06 디자이너] 줄바꿈은 지점 이름 뒤에서 — "HX-1로 / 이동 중"(행동 말이 끊기지 않게 한 덩이로)
     var actHtml = function (t) {
