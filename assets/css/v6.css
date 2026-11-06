@@ -1830,5 +1830,5 @@ body.ver-6 .ma-stamp6 .ma-st-place::before { content: ""; display: inline-block;
  */
 body.ver-6 .map-wp { min-width: 200px; max-width: 280px; }
 body.ver-6 .map-wp .map-card-head { margin: -14px -14px 0 !important; padding: var(--space-12) 14px; border-radius: 10px 10px 0 0; background-color: var(--bg-raised); gap: var(--space-8); }
-body.ver-6 .map-wp .map-wp-pin { transform: none; }
+body.ver-6 .map-wp .map-wp-pin { transform: none; margin-right: calc(var(--space-8) * -1 + var(--space-4)); }   /* 원 ↔ 이름 4 (꼬리표 ↔ 원은 머리 틈 8) */
 body.ver-6 .map-wp .map-wp-more[hidden] { display: none; }
