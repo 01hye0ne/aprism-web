@@ -353,25 +353,22 @@
         return finish(m);
       }
       /*
-       * [11/06] 답 짜임(디자이너) — "이런 이유로" 근거 글머리 → "이런 조치를 추천해요!" 추천 목록 → "바로 조치 요청할 수 있도록 화면을 열어드릴게요!"
-       *   그리고 알림 팝오버를 저절로 연다. 요청은 팝오버에서 관제사가 한다.
+       * [11/06] 답 짜임(디자이너) — 근거 글머리 → "위 이유로 다음 조치를 추천해요." 추천 목록 → "바로 조치 요청할 수 있도록 화면을 열어드릴게요!"
+       *   그리고 알림 팝오버를 저절로 연다. 요청은 팝오버에서 관제사가 한다 — 채팅 안에는 조치 단추를 두지 않는다.
        *   근거는 원인 분석(cause)과 같은 데이터: 무엇이 기준을 넘었나 · 측정 추세 · 오탐 가능성.
        */
       var why = [label(a)];
       if (a.hist) { why.push(a.hist.length + "회 측정 " + a.hist.join(" → ")); } else if (a.trend) { why.push(a.trend); }
       if (a.fp !== undefined) { why.push("오탐 가능성 " + a.fpLabel + " " + a.fp + "%"); }
-      text(m, "이런 이유로", true);
       m.node.appendChild(ul(why, "ul", "dc6-ul"));
       // 추천은 팝오버 DELTA 조치 제안의 AI 추천과 같은 목록 — Delta 와 팝오버가 다른 말을 하지 않게
       var recs = (a.acts || []).filter(function (x) { return x.ai; });
       if (!recs.length) { recs = list; }
-      text(m, "이런 조치를 추천해요!", true);
+      text(m, "위 이유로 다음 조치를 추천해요.", true);
       var l = el("ul", "dc6-recs");
       recs.forEach(function (x) { l.appendChild(el("li", null, x.t)); });
       m.node.appendChild(l);
       text(m, "바로 조치 요청할 수 있도록 화면을 열어드릴게요!");
-      // 팝오버를 닫았으면 다시 여는 단추 하나만
-      m.node.appendChild(btnRow(btn("조치하기", "is-pri", open(a))));
       finish(m);
       open(a)();   // 팝오버를 함께 띄운다 — 대화 창은 펼친 채(APRISM_OPEN_ALERT)
       return m;
