@@ -1051,7 +1051,8 @@
         stamp.classList.add("ma-stamp6");
         var pin6 = document.createElement("span"); pin6.className = "mbt-pin"; pin6.setAttribute("data-n", isNaN(wn) ? "" : String(wn));
         pin6.setAttribute("role", "img"); pin6.setAttribute("aria-label", a.wp);
-        if (ph) { pin6.setAttribute("style", ph.getAttribute("style") || ""); } else { pin6.classList.add("is-plain"); }
+        // [11/06 디자이너] 단계색은 배지 · 값 · 판정이 이미 말한다 — 번호 원까지 노랑 · 빨강이면 덩어리가 흩어진다. 위치 표시라 지도 기본(예정) 핀 꼴로
+        pin6.classList.add("is-plain");
         var pl6 = document.createElement("span"); pl6.className = "ma-st-place"; pl6.textContent = where6;
         var tm6 = document.createElement("span"); tm6.className = "ma-st-time num"; tm6.textContent = when6;
         stamp.appendChild(pin6); stamp.appendChild(pl6); stamp.appendChild(tm6);

@@ -1743,7 +1743,9 @@ body.ver-6 .map-card .map-card-rows { grid-template-columns: max-content 1fr; co
 body.ver-6 .map-card .map-card-rows > div { display: contents; }
 body.ver-6 .map-card .map-card-rows dd { text-align: left; }
 /* [11/06 디자이너] 알림 팝오버 제목 아래 줄 — [지점 번호 원] 설비 이름 ……… 시각(오른쪽 끝). 이름이 길면 이름만 말줄임 */
-body.ver-6 .ma-stamp.ma-stamp6 { display: flex; align-items: center; gap: 6px; min-width: 0; align-self: stretch; }
+body.ver-6 .ma-stamp.ma-stamp6 { display: flex; align-items: center; gap: 6px; min-width: 0; align-self: stretch; margin-right: calc((24px + var(--space-8)) * -1); }   /* 시각 끝 = 닫기 단추 오른쪽 끝(머리 안쪽 여백 12) — 제목 칸은 닫기 단추 칸(24 + 틈 8)만큼 짧다 */
 body.ver-6 .ma-stamp6 .ma-st-place { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 body.ver-6 .ma-stamp6 .ma-st-time { flex: none; margin-left: auto; font-variant-numeric: tabular-nums; }
-body.ver-6 .mbt-pin.is-plain { background: var(--bg-raised); border-color: var(--text-tertiary); color: var(--text-primary); }
+/* 기본 번호 원 = 지도 예정 핀(map-v6.js rr-pin 예정: 어두운 판 · 밝은 회색 테 · 밝은 글) */
+body.ver-6 .mbt-pin.is-plain { background: #0A0F18; border-color: #AFB7C8; color: #E4E8EF; }
+:root[data-theme="light"] body.ver-6 .mbt-pin.is-plain { background: #F2F4F5; border-color: rgb(11 14 19 / 24%); color: #494E54; }
