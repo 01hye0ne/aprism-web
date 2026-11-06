@@ -29,9 +29,14 @@ body.ver-7 .sb-tabs { flex: 1 1 auto; padding: 0 var(--space-8) 0 0; }   /* 왼�
 body.ver-7 .sb-tab[data-mission] { padding: 0 var(--space-8); }
 
 /*
- * [11/06 디자이너] 왼쪽 패널 머리줄 = "알림 …… 알림 센터 › ▢" — [알림 센터]는 두 목록(미확인 알림 · 오늘 확인된 알림)의 위 층이라 패널 머리줄에.
- *   새 줄 없이 원래 있던 머리줄을 쓴다. 접기 단추 바로 앞(사이 4), 패널을 접으면 같이 숨는다
+ * [11/06 디자이너] 왼쪽 패널 머리줄 = [알림 센터 ›] 단추(왼쪽) …… 접기(오른쪽 끝). 따로 있던 이름 "알림"과 링크를 하나로.
+ *   패널 이름 자리 · 크기(14) 그대로, 색만 한 단 밝게(text/primary) — 아래 "미확인 알림"(16 굵게)보다는 낮다.
+ *   누르는 곳은 글 덩이만: 올리면 면(state-hover) · 화살표 밝게. 접기 단추 꼴(20 × 20 · 순서 1)을 받지 않게 덮는다. 패널을 접으면 숨는다
  */
-body.ver-7 .panel-head .panel-ah-all { order: 1; margin-left: auto; margin-right: 0; display: inline-flex; align-items: center; gap: 2px; width: auto; height: 24px; padding: 0 var(--space-4) 0 var(--space-6, 6px); }   /* 접기 단추 꼴(20 × 20 · 여백 0)을 받지 않게 — 위 [전체보기]와 같은 ghost xs 단추 */
-body.ver-7 .panel-head .panel-ah-all + [data-panel-toggle] { margin-left: calc(var(--space-8) * -1 + var(--space-4)); }
-body.ver-7 .context-panel.is-collapsed .panel-ah-all { display: none; }
+body.ver-7 .panel-head .panel-head-link { order: 0; flex: 0 1 auto; min-width: 0; width: auto; height: 28px; margin: 0 auto 0 calc(var(--space-6, 6px) * -1); padding: 0 var(--space-4) 0 var(--space-6, 6px);
+  display: inline-flex; align-items: center; gap: 2px; border-radius: var(--radius-control, 6px); color: var(--text-primary); font-weight: 700; white-space: nowrap; }
+body.ver-7 .panel-head .panel-head-link .i { color: var(--text-secondary); transition: transform .15s ease; }
+body.ver-7 .panel-head .panel-head-link:hover { background-color: var(--state-hover); color: var(--text-primary); }
+body.ver-7 .panel-head .panel-head-link:hover .i { color: var(--text-primary); transform: translateX(2px); }
+body.ver-7 .panel-head .panel-head-link:focus-visible { outline: 2px solid var(--border-focus); outline-offset: -2px; }
+body.ver-7 .context-panel.is-collapsed .panel-head-link { display: none; }
