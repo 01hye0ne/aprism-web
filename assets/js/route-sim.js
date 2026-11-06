@@ -171,7 +171,8 @@
     if (m === "inspect") {
       return '<div class="rr-note is-measure"><svg viewBox="0 0 28 28" width="28" height="28" aria-hidden="true"><circle cx="14" cy="14" r="11" class="trk"></circle>' +
         '<circle cx="14" cy="14" r="11" class="val" stroke-dasharray="' + CIRC + '" stroke-dashoffset="' + CIRC + '" transform="rotate(-90 14 14)"></circle></svg>' +
-        '<span>측정 중</span><span class="num" data-rr="pct">0%</span></div>';
+        // [11/06 v6] 숫자(%)는 뺀다 — 너무 빨리 올라 눈이 따라가다 지친다(공동작업자). 진행은 원 테두리가 말한다
+        '<span>측정 중</span>' + (document.body.classList.contains("ver-6") ? "" : '<span class="num" data-rr="pct">0%</span>') + '</div>';
     }
     // [11/06 v6] 위험 감지는 그 지점에 서 있다 — 다음 지점에 "이동 중"을 띄우지 않는다. 재생을 누르면 이동 중으로 돌아간다
     if (m === "alert" && document.body.classList.contains("ver-6")) { return ""; }

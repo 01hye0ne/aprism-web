@@ -2698,7 +2698,7 @@
     var from = dones.length ? dones[dones.length - 1].getAttribute("data-waypoint") : "";
     var to = run ? run.getAttribute("data-waypoint") : "";
     var eta = run && run.querySelector('[data-rr="eta"]'), pct = run && run.querySelector('[data-rr="pct"]');
-    var measuring = !!(pct && pct.offsetParent !== null);
+    var measuring = !!(run && run.querySelector(".rr-note.is-measure"));   // [11/06] 측정 % 는 지웠다 — 측정 중 줄이 있는지로 본다
     var esc = function (t) { return String(t).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
     // [11/06 디자이너] 지점은 글(WP-07) 대신 지도에 그려진 그 번호 원 — 지도 핀 머리의 색 · 테를 그대로 옮겨 와 지도와 바로 맞춰 본다
     var pinOf = function (wp) {
@@ -2706,7 +2706,7 @@
       return h ? '<span class="mbt-pin" role="img" aria-label="' + esc(wp) + '" data-n="' + n + '" style="' + esc(h.getAttribute("style") || "") + '"></span>' : esc(wp);
     };
     var arrow = '<span class="mbt-arrow" aria-hidden="true">→</span>';
-    var route = !to ? "" : measuring ? pinOf(to) + '<span class="mbt-meta">' + (en ? "Measuring " : "측정 ") + esc(pct.textContent.trim()) + "</span>"
+    var route = !to ? "" : measuring ? pinOf(to) + '<span class="mbt-meta">' + (en ? "Measuring" : "측정 중") + "</span>"
       : (from ? pinOf(from) + arrow : "") + pinOf(to) + (eta && eta.textContent.trim() ? '<span class="mbt-meta">' + esc(eta.textContent.trim()) + "</span>" : "");
     // [11/06 디자이너] 줄바꿈은 지점 이름 뒤에서 — "HX-1로 / 이동 중"(행동 말이 끊기지 않게 한 덩이로)
     var actHtml = function (t) {
