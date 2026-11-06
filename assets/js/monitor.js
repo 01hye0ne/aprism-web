@@ -388,25 +388,19 @@
             };
           }
         } else {
-          // 주의만 있을 때 — 한 문장(굵은 1줄 없이), 근거 줄에 먼저 볼 설비(10/30 디자이너 문구)
+          // 주의만 있을 때 — v5 이하는 한 문장(10/30 디자이너 문구), v6 은 아래에서 위험과 같은 두 줄로
           say = { l: ["지금 미션에서 " + mc + "건" + (oc ? ", 다른 미션에서 " + oc + "건" : "") + "의 확인해야 할 주의 단계 알림이 있어요."],
             clue: "먼저: " + (first.eq || first.title), yes: "처리 순서 보기", act: "order", open: "처리 순서 알려 줘" };
           if (V6) {
-            // 보는 미션 먼저, 나머지는 처리 순서에 처음 나온 차례로 — "정기 순회 점검에 2건, 설비 집중 점검에 1건"
-            var per = {}, names = [];
-            ord.forEach(function (a) {
-              if (a.sev !== sev) { return; }
-              var n = missionOf(a) || "미션 밖";
-              if (!(n in per)) { per[n] = 0; names.push(n); }
-              per[n]++;
-            });
-            say.l = ["확인해야 할 주의 단계 알림이 " + names.map(function (n) { return n + "에 " + per[n] + "건"; }).join(", ") + " 있어요."];
-            var ko = ["확인해야 할 주의 단계 알림이 "], en = ["Warnings to check: "];
-            names.forEach(function (n, i) {
-              ko.push({ m: n }, "에 " + per[n] + "건" + (i < names.length - 1 ? ", " : " 있어요."));
-              en.push({ m: n }, " " + per[n] + (i < names.length - 1 ? ", " : "."));
-            });
-            say.parts = { ko: [ko], en: [en] };
+            // [11/06 v6] 위험(F4)과 같은 짜임 — 1줄 "주의 n건이 있어요.", 2줄 {waypoint 번호}{waypoint 이름}부터 확인하세요(디자이너).
+            //   미션별 건수 한 문장(예전 F5)은 길고 위험 문형과 짜임이 달랐다. 미션별 나눔은 펼친 Delta 가 맡는다.
+            var wn = /\d+/.exec(first.wp || ""), wName = first.eq || first.title;
+            var wTok = wn ? [{ wp: parseInt(wn[0], 10) }] : [];
+            say.l = ["주의 " + j.warn + "건이 있어요.", wName + "부터 확인하세요."];
+            say.parts = {
+              ko: [[say.l[0]], wTok.concat([{ wpName: wName }, "부터 확인하세요."])],
+              en: [[say.l[0]], ["Check "].concat(wTok, [{ wpName: wName }, " first."])]
+            };
           }
         }
       }
@@ -833,7 +827,10 @@
    * 주소 ?alert=시각&wp=WP-nn, 관제 껍데기는 APRISM_OPEN_ALERT 를 부른다. 두 화면의 알림 데이터가 따로라 시각으로 찾고, 없으면 지점으로 찾는다.
    * 미션이 바뀌고 지도 번호가 깔린 뒤라야 쪽지가 제자리를 찾으므로 그때까지 기다린다.
    */
+  var openAlert = window.APRISM_OPEN_ALERT;
   window.APRISM_OPEN_ALERT = function (mission, time, wp) {
+    // [11/06] 알림 자체를 넘기는 쪽(펼친 Delta 의 [위치 보기] · [위험 상세 확인], 접힘 답 단추)은 위 정의 그대로 — 이 정의가 덮어써 눌러도 열리지 않았다
+    if (mission && typeof mission === "object") { openAlert(mission); return; }
     var tries = 0;
     (function go() {
       var d = window.APRISM_DELTA_ALERTS;

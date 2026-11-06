@@ -171,7 +171,13 @@
     if (x.wp) { return T.wp(x.wp); }
     var n = document.createElement("span");
     n.className = "dl-wp-name";
-    n.textContent = x.wpName;
+    // [11/06] waypoint 이름은 【이름】 — 괄호는 회색(.dl-wb), 이름은 흰색 굵게. 이름 칸은 따로 두어 영문판 번역기가 이름만 옮긴다
+    [["dl-wb", "【"], [null, x.wpName], ["dl-wb", "】"]].forEach(function (k) {
+      var c = document.createElement("span");
+      if (k[0]) { c.className = k[0]; }
+      c.textContent = k[1];
+      n.appendChild(c);
+    });
     return n;
   }
   // 접힌 위젯의 답 단추는 창을 열지 않고 그 일을 한다(펼친 창에서는 원래대로 닫기 단추).
