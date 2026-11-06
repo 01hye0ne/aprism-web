@@ -2681,11 +2681,67 @@
     return out;
   }
 
+  /*
+   * [11/06 v6] 로봇 팝오버 = 지금 하는 일(디자이너) — 미션 · 배터리 · 시그널은 오른쪽 위 로봇 카드에 늘 있어 뺐다.
+   *   1줄 지금 행동(진행 막대 제목과 같은 글) — 평소와 다른 상태면 그 상태 기호 + 이름(진행 막대 자리 띠와 같은 꼴)
+   *   2줄 지도에서만 쓸모 있는 것 — 지나온 → 가는 지점 번호 · 도착까지(측정 중이면 지점 · 측정 %). 핀 번호와 바로 맞춰 본다
+   *   3줄 예외만 — 배터리 20% 이하 · 신호 약함일 때 경고 한 줄
+   *   글은 모두 우측 패널에서 읽는다(두 곳에 적으면 어긋난다). 열려 있는 동안 0.4초마다 다시 읽는다.
+   */
+  var botNowTimer = 0;
+  function botNow(card) {
+    var en = document.documentElement.lang === "en";
+    var rail = document.querySelector("[data-timeline]");
+    var ban = document.querySelector(".progress-meta > .rr-banner .rr-state");
+    var ttl = document.querySelector("[data-progress-title]"), left = document.querySelector("[data-progress-left]");
+    var run = rail && rail.querySelector(".timeline-item[data-waypoint].is-running");
+    var dones = rail ? rail.querySelectorAll(".timeline-item[data-waypoint].is-done") : [];
+    var from = dones.length ? dones[dones.length - 1].getAttribute("data-waypoint") : "";
+    var to = run ? run.getAttribute("data-waypoint") : "";
+    var eta = run && run.querySelector('[data-rr="eta"]'), pct = run && run.querySelector('[data-rr="pct"]');
+    var measuring = !!(pct && pct.offsetParent !== null);
+    var route = !to ? "" : measuring ? to + " · " + (en ? "measuring " : "측정 ") + pct.textContent.trim()
+      : (from ? from + " → " : "") + to + (eta && eta.textContent.trim() ? " · " + eta.textContent.trim() : "");
+    var html = "";
+    var esc = function (t) { return String(t).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
+    if (ban) {
+      var tone = (ban.parentNode.className.match(/rr-tone-\S+/) || [""])[0], is = (ban.parentNode.className.match(/(^|\s)is-\S+/) || [""])[0].trim();
+      html += '<p class="mbt-act rr-banner ' + is + " " + tone + '">' + ban.outerHTML + "</p>";
+      var why = left && left.textContent.trim();
+      if (why) { html += '<p class="mbt-sub">' + esc(why) + "</p>"; }
+      if (route && !/is-(done|lost|estop)/.test(is)) { html += '<p class="mbt-sub num">' + esc(route) + "</p>"; }
+    } else {
+      if (ttl) { html += '<p class="mbt-act">' + esc(ttl.textContent.trim()) + "</p>"; }
+      if (route) { html += '<p class="mbt-sub num">' + esc(route) + "</p>"; }
+    }
+    // 예외 — 배터리 20% 이하 · 신호 약함(통신 끊김은 위 상태 줄이 말한다)
+    var warn = [];
+    botFacts(card).forEach(function (f) {
+      var k = f[0].toLowerCase(), v = f[1];
+      if (/battery|배터리/.test(k)) { var b = parseInt(v, 10); if (!isNaN(b) && b <= 20) { warn.push((en ? "Battery " : "배터리 ") + b + "%"); } }
+      if (/signal|신호/.test(k) && /^(Weak|약함)$/i.test(v)) { warn.push(en ? "Weak signal" : "신호 약함"); }
+    });
+    if (warn.length) { html += '<p class="mbt-warn"><span class="i i-14" style="--i:var(--ic-warning)" aria-hidden="true"></span>' + esc(warn.join(" · ")) + "</p>"; }
+    return html;
+  }
+
   function tellBot(on) {
     if (!botTip) { return; }
+    clearInterval(botNowTimer);
     if (!on || !onLane) { botTip.hidden = true; botBox.classList.remove("is-picked"); return; }
     var card = document.querySelector(".robot-strip .robot-card[data-robot='" + onLane.id + "']");
-    if (card && botRows) {
+    // 팝오버 로봇이 우측 패널 로봇이면 지금 하는 일을 — 아니면(패널이 다른 로봇) 예전처럼 카드 값
+    var mine = card && card.getAttribute("aria-pressed") === "true" && document.body.classList.contains("ver-6");
+    if (mine && botRows) {
+      var paint = function () {
+        var h = botNow(card);
+        if (botRows.getAttribute("data-now") !== h) { botRows.setAttribute("data-now", h); botRows.innerHTML = h; }
+      };
+      botRows.classList.add("is-now");
+      paint();
+      botNowTimer = setInterval(function () { if (botTip.hidden) { clearInterval(botNowTimer); return; } paint(); }, 400);
+    } else if (card && botRows) {
+      botRows.classList.remove("is-now"); botRows.removeAttribute("data-now");
       botRows.textContent = "";
       botFacts(card).forEach(function (fact) {
         var line = document.createElement("div");

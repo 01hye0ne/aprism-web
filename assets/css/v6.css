@@ -1671,3 +1671,16 @@ body.ver-6 .rr-banner.is-done { --rr-glyph: url("data:image/svg+xml,%3Csvg xmlns
 body.ver-6 .progress-meta > .rr-banner .btn { flex: none; text-decoration: none; }
 /* [11/05 디자이너] Delta 두 줄 — 2줄은 기본 회색 */
 body.ver-6[data-delta-copy="brief"] .delta3 .ai-line-2 .dl2 { color: var(--text-secondary); }
+
+/*
+ * [11/06 v6] 로봇 팝오버 = 지금 하는 일(map-v6.js botNow) — 1줄 행동(14/20 굵게) · 2줄 지점 번호 · 도착(12/16 흐리게) · 예외만 경고 줄.
+ *   평소와 다른 상태는 진행 막대 자리 띠와 같은 기호 + 이름(.rr-banner.is-* 의 기호를 그대로 쓰되 띠의 면 · 여백은 없앤다)
+ */
+body.ver-6 .map-bot-tip { min-width: 200px; max-width: 280px; z-index: 6; }   /* 로봇 머리 위 상태 배지(일시정지 등)가 마지막 줄을 가리지 않게 */
+body.ver-6 .map-card-rows.is-now { display: grid; gap: var(--space-4); margin-top: var(--space-4); }
+body.ver-6 .map-card-rows.is-now p { margin: 0; }
+body.ver-6 .map-card-rows .mbt-act { font-size: var(--font-size-14); line-height: var(--font-line-height-20); font-weight: 700; color: var(--text-primary); white-space: normal; }
+body.ver-6 .map-card-rows .mbt-act.rr-banner, :root[data-theme="light"] body.ver-6 .map-card-rows .mbt-act.rr-banner { display: flex; margin: 0; padding: 0; border: 0; border-radius: 0; background: none; color: var(--text-primary); font-size: var(--font-size-14); line-height: var(--font-line-height-20); }
+body.ver-6 .map-card-rows .mbt-sub { font-size: var(--font-size-12); line-height: 16px; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+body.ver-6 .map-card-rows .mbt-warn { display: flex; align-items: center; gap: var(--space-4); margin-top: var(--space-4) !important; font-size: var(--font-size-12); line-height: 16px; font-weight: 600; color: var(--status-warning-text); }
+body.ver-6 .map-card-rows .mbt-warn .i { background-color: var(--status-warning-icon); }

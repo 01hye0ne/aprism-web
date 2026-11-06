@@ -221,6 +221,9 @@
     var ce = document.querySelector("[data-progress-count]"); if (ce) { ce.textContent = done + "/" + items.length; }
     var te = document.querySelector("[data-progress-title]");
     if (te && run) { te.textContent = document.body.classList.contains("ver-6") ? wpAct(run.textContent.trim(), mode !== "inspect") : run.textContent + " 판독"; }
+    // [11/06 v6] 위험 감지 땐 아랫줄이 지금 행동 — 제목이 바뀐 뒤에 따라 적는다(먼저 적으면 지난 행동이 남는다)
+    var lf = document.querySelector("[data-progress-left]");
+    if (te && lf && mode === "alert" && document.body.classList.contains("ver-6")) { lf.textContent = te.textContent; }
   }
   /*
    * [11/06 v6] 진행 막대 제목 = 로봇이 지금 하는 일 하나(디자이너 "이동 중인데 판독 중이라 행동이 둘").
