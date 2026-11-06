@@ -298,7 +298,7 @@
     done: 0x9ea8bb, left: 0x9ea8bb, dot: 0xffffff
   };
   ROBOTS[10] = {
-    name: "ROBOT 11", at: 0.15, floor: "B3", walk: 3,   // 전기실 열화상 점검 · 3/20 — WP-03 → WP-04 로 걸어가는 중(10/20, walkTick)
+    name: "ROBOT 11", at: 0.32, floor: "B3", walk: 7,   // 전기실 열화상 점검 · 7/20 — WP-07 → WP-08 로 걸어가는 중(10/20, walkTick · 11/06 패널 7/20 에 맞춤)
     dock: [0.12, 0.90],
     stops: [[0.12, 0.55], [0.45, 0.55], [0.45, 0.20], [0.15, 0.20]],
     done: 0x89b9ed, left: 0x4990e0, dot: 0xc7ddf8
@@ -644,8 +644,7 @@
       stirred = true;
     }
 
-    // [route-rules 10/21] 지도는 끌어서 돌리거나 밀 수 없다 — 시점은 고정(확대는 도구 버튼, 휠). 클릭은 그대로
-    if (mode === "turn" || mode === "slide" || mode === "pinch") { return; }
+    // [route-rules 10/21] 지도는 끌어서 돌리거나 밀 수 없게 막았었다 → [11/06 v6] 다시 연다(디자이너 "드래그로 360도"). 끌면 돌고, Shift · 가운데 · 오른쪽 끌기는 밀기, 두 손가락은 핀치
     if (mode === "pinch") {
       // 손가락 하나가 조용히 사라졌으면(pointerup 을 놓치는 기기가 있다) 남은 하나로 돈다.
       if (down.length < 2) { mode = down.length ? "turn" : ""; paint(); return; }
@@ -2681,11 +2680,81 @@
     return out;
   }
 
+  /*
+   * [11/06 v6] 로봇 팝오버 = 지금 하는 일(디자이너) — 미션 · 배터리 · 시그널은 오른쪽 위 로봇 카드에 늘 있어 뺐다.
+   *   1줄 지금 행동(진행 막대 제목과 같은 글) — 평소와 다른 상태면 그 상태 기호 + 이름(진행 막대 자리 띠와 같은 꼴)
+   *   2줄 지도에서만 쓸모 있는 것 — 지나온 → 가는 지점 번호 · 도착까지(측정 중이면 지점 · 측정 %). 핀 번호와 바로 맞춰 본다
+   *   3줄 예외만 — 배터리 20% 이하 · 신호 약함일 때 경고 한 줄
+   *   글은 모두 우측 패널에서 읽는다(두 곳에 적으면 어긋난다). 열려 있는 동안 0.4초마다 다시 읽는다.
+   */
+  var botNowTimer = 0;
+  function botNow(card) {
+    var en = document.documentElement.lang === "en";
+    var rail = document.querySelector("[data-timeline]");
+    var ban = document.querySelector(".progress-meta > .rr-banner .rr-state");
+    var ttl = document.querySelector("[data-progress-title]"), left = document.querySelector("[data-progress-left]");
+    var run = rail && rail.querySelector(".timeline-item[data-waypoint].is-running");
+    var dones = rail ? rail.querySelectorAll(".timeline-item[data-waypoint].is-done") : [];
+    var from = dones.length ? dones[dones.length - 1].getAttribute("data-waypoint") : "";
+    var to = run ? run.getAttribute("data-waypoint") : "";
+    var eta = run && run.querySelector('[data-rr="eta"]'), pct = run && run.querySelector('[data-rr="pct"]');
+    var measuring = !!(pct && pct.offsetParent !== null);
+    var esc = function (t) { return String(t).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
+    // [11/06 디자이너] 지점은 글(WP-07) 대신 지도에 그려진 그 번호 원 — 지도 핀 머리의 색 · 테를 그대로 옮겨 와 지도와 바로 맞춰 본다
+    var pinOf = function (wp) {
+      var n = parseInt(String(wp).replace(/\D+/g, ""), 10), h = !isNaN(n) && document.querySelector('.rr-pin-head[data-n="' + n + '"]');
+      return h ? '<span class="mbt-pin" role="img" aria-label="' + esc(wp) + '" data-n="' + n + '" style="' + esc(h.getAttribute("style") || "") + '"></span>' : esc(wp);
+    };
+    var arrow = '<span class="mbt-arrow" aria-hidden="true">→</span>';
+    var route = !to ? "" : measuring ? pinOf(to) + '<span class="mbt-meta">' + (en ? "Measuring " : "측정 ") + esc(pct.textContent.trim()) + "</span>"
+      : (from ? pinOf(from) + arrow : "") + pinOf(to) + (eta && eta.textContent.trim() ? '<span class="mbt-meta">' + esc(eta.textContent.trim()) + "</span>" : "");
+    // [11/06 디자이너] 줄바꿈은 지점 이름 뒤에서 — "HX-1로 / 이동 중"(행동 말이 끊기지 않게 한 덩이로)
+    var actHtml = function (t) {
+      var name = run && run.querySelector(".step-title") ? run.querySelector(".step-title").textContent.trim() : "";
+      var m = !en && /^(.+?)(으로|로) (이동 중)$/.exec(t);
+      if (m) { return esc(m[1] + m[2]) + ' <span class="mbt-nw">' + m[3] + "</span>"; }
+      if (name && t.indexOf(name + " ") === 0) { return esc(name) + ' <span class="mbt-nw">' + esc(t.slice(name.length + 1)) + "</span>"; }
+      return esc(t);
+    };
+    var html = "";
+    if (ban) {
+      var tone = (ban.parentNode.className.match(/rr-tone-\S+/) || [""])[0], is = (ban.parentNode.className.match(/(^|\s)is-\S+/) || [""])[0].trim();
+      html += '<p class="mbt-act rr-banner ' + is + " " + tone + '">' + ban.outerHTML + "</p>";
+      var why = left && left.textContent.trim();
+      if (why) { html += '<p class="mbt-sub">' + esc(why) + "</p>"; }
+      if (route && !/is-(done|lost|estop)/.test(is)) { html += '<p class="mbt-sub mbt-route num">' + route + "</p>"; }
+    } else {
+      if (ttl) { html += '<p class="mbt-act">' + actHtml(ttl.textContent.trim()) + "</p>"; }
+      if (route) { html += '<p class="mbt-sub mbt-route num">' + route + "</p>"; }
+    }
+    // 예외 — 배터리 20% 이하 · 신호 약함(통신 끊김은 위 상태 줄이 말한다)
+    var warn = [];
+    botFacts(card).forEach(function (f) {
+      var k = f[0].toLowerCase(), v = f[1];
+      if (/battery|배터리/.test(k)) { var b = parseInt(v, 10); if (!isNaN(b) && b <= 20) { warn.push((en ? "Battery " : "배터리 ") + b + "%"); } }
+      if (/signal|신호/.test(k) && /^(Weak|약함)$/i.test(v)) { warn.push(en ? "Weak signal" : "신호 약함"); }
+    });
+    if (warn.length) { html += '<p class="mbt-warn"><span class="i i-14" style="--i:var(--ic-warning)" aria-hidden="true"></span>' + esc(warn.join(" · ")) + "</p>"; }
+    return html;
+  }
+
   function tellBot(on) {
     if (!botTip) { return; }
+    clearInterval(botNowTimer);
     if (!on || !onLane) { botTip.hidden = true; botBox.classList.remove("is-picked"); return; }
     var card = document.querySelector(".robot-strip .robot-card[data-robot='" + onLane.id + "']");
-    if (card && botRows) {
+    // 팝오버 로봇이 우측 패널 로봇이면 지금 하는 일을 — 아니면(패널이 다른 로봇) 예전처럼 카드 값
+    var mine = card && card.getAttribute("aria-pressed") === "true" && document.body.classList.contains("ver-6");
+    if (mine && botRows) {
+      var paint = function () {
+        var h = botNow(card);
+        if (botRows.getAttribute("data-now") !== h) { botRows.setAttribute("data-now", h); botRows.innerHTML = h; }
+      };
+      botRows.classList.add("is-now");
+      paint();
+      botNowTimer = setInterval(function () { if (botTip.hidden) { clearInterval(botNowTimer); return; } paint(); }, 400);
+    } else if (card && botRows) {
+      botRows.classList.remove("is-now"); botRows.removeAttribute("data-now");
       botRows.textContent = "";
       botFacts(card).forEach(function (fact) {
         var line = document.createElement("div");
@@ -3325,6 +3394,7 @@
    *   return 자동복귀 · lost 통신 끊김 · done 미션 완료
    */
   var RRS = { mode: "run", s: null, lane: null, at: 0 };
+  var rrMoved = [];   // 시뮬레이션이 옮긴 길
   function rrNeutral() { return isLight() ? 0x2b3445 : 0xe4e8ef; }   // 복귀 도로색(시안 --rt-return)
   var RR_GRAY = 0x9ea8bb, RR_NEUTRAL = 0xe4e8ef;
   // [10/29 v5] 시안 1022 기준 — 앞으로 갈 길은 로봇색 동그란 점선(2/6, 80%), 번호는 막대 핀(지나온 지점도 옅게). 위 RR 의 ahead "A" · pins "P0" · pastNo "on".
@@ -3768,6 +3838,8 @@
       if (!ln || !ln.rr) { return; }
       if (ln.bot.ended) { rrApply(ln); frame(); return; }   // [10/30 v6] 완료한 미션은 시뮬레이션이 옮기지 않는다
       ln.walk = null;   // 시연용 걸음은 멈춘다 — 이제 시뮬레이션이 자리를 정한다
+      if (ln.rrHome === undefined) { ln.rrHome = ln.rr.s; }   // [11/06] 되돌릴 데이터 자리(reset) — 처음 값 하나만 기억한다
+      if (rrMoved.indexOf(ln) < 0) { rrMoved.push(ln); }
       RRS.lane = ln.id;
       RRS.s = Math.max(0, Math.min(ln.total, s));
       rrPlace(ln, RRS.s, RRS.mode === "return" ? -1 : 1);
@@ -3777,6 +3849,23 @@
       frame();
     },
     mode: function (m) { if (m !== RRS.mode) { RRS.at = performance.now(); } RRS.mode = m; this.set(this.get()); },
+    // [11/06] 미션을 바꾸면 시뮬레이션을 처음으로 — 상태 · 옮긴 자리를 버리고 그 미션의 데이터 자리로 돌아간다
+    reset: function () {
+      RRS.mode = "run"; RRS.s = null; RRS.lane = null; RRS.at = performance.now();
+      rrMoved.splice(0).forEach(function (ln) { ln.rr.s = ln.rrHome; rrPlace(ln, ln.rr.s, 1); });
+      // 로봇 카드가 바뀐 직후라 지도가 아직 앞 미션일 수 있다 — 새 미션으로 넘어간 뒤 한 번 더 맞춘다
+      function settle() {
+        if (onLane) { rrApply(onLane); }
+        // 시뮬레이션 길이 없는 로봇(Robot 05)은 rrApply 가 지나가므로 완료 표시를 여기서 푼다
+        if (botBox && botBox.getAttribute("data-rr") === "done" && onLane && !onLane.bot.ended) {
+          botBox.setAttribute("data-rr", "run");
+          document.dispatchEvent(new CustomEvent("aprism:rr-mode", { detail: { mode: "run" } }));
+        }
+        frame();
+      }
+      settle();
+      setTimeout(settle, 120);
+    },
     ended: function () { return !!(onLane && onLane.bot && onLane.bot.ended); },   // [11/06] 데이터상 이미 끝난 미션의 로봇인가(시뮬레이션 완료와 다르다)
     stops: function () {
       var ln = onLane;

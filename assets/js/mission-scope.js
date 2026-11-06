@@ -75,8 +75,10 @@
   var GROUPS = [["run", "수행중"], ["idle", "대기"], ["done", "완료"]];
   function stateOf(m) {
     var mine = cards.filter(function (c) { return missionOf(c) === m; });
-    if (mine.some(function (c) { return c.querySelector(".robot-lists .badge-info"); })) { return "run"; }
-    if (mine.length && mine.every(function (c) { return c.querySelector(".robot-lists .badge-normal"); })) { return "done"; }
+    // [11/06] 시뮬레이션이 바꾼 배지가 아니라 원래 배지(data-rr-orig)로 본다 — 일시정지를 눌렀다고 미션이 대기가 되면 탭이 미션 설정으로 간다
+    function is(c, k) { var b = c.querySelector(".robot-lists .badge"); return !!b && (b.getAttribute("data-rr-orig") || b.className).indexOf(k) >= 0; }
+    if (mine.some(function (c) { return is(c, "badge-info"); })) { return "run"; }
+    if (mine.length && mine.every(function (c) { return is(c, "badge-normal"); })) { return "done"; }
     return "idle";
   }
 

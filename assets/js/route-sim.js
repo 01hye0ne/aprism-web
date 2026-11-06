@@ -211,7 +211,7 @@
     if (mode === "lost" && document.body.classList.contains("ver-6")) { return; }   // [11/05 v6] 통신 끊김 — 진행 막대는 끊기기 직전 그대로(회색은 v6.css)
     var items = rail.querySelectorAll(".timeline-item[data-waypoint]"), done = rail.querySelectorAll(".timeline-item[data-waypoint].is-done").length;
     var run = rail.querySelector(".timeline-item[data-waypoint].is-running .step-title");
-    var key = done + "/" + items.length + "|" + (run ? run.textContent : "");
+    var key = done + "/" + items.length + "|" + (run ? run.textContent : "") + "|" + (mode === "inspect");
     if (key === lastProg) { return; }
     lastProg = key;
     var p = items.length ? done / items.length * 100 : 0;
@@ -219,7 +219,34 @@
     if (track) { track.style.setProperty("--progress", p + "%"); }
     var pe = document.querySelector("[data-progress-percent]"); if (pe) { pe.textContent = Math.round(p) + "%"; }
     var ce = document.querySelector("[data-progress-count]"); if (ce) { ce.textContent = done + "/" + items.length; }
-    var te = document.querySelector("[data-progress-title]"); if (te && run) { te.textContent = run.textContent + " 판독"; }
+    var te = document.querySelector("[data-progress-title]");
+    if (te && run) { te.textContent = document.body.classList.contains("ver-6") ? wpAct(run.textContent.trim(), mode !== "inspect") : run.textContent + " 판독"; }
+    // [11/06 v6] 위험 감지 땐 아랫줄이 지금 행동 — 제목이 바뀐 뒤에 따라 적는다(먼저 적으면 지난 행동이 남는다)
+    var lf = document.querySelector("[data-progress-left]");
+    if (te && lf && mode === "alert" && document.body.classList.contains("ver-6")) { lf.textContent = te.textContent; }
+  }
+  /*
+   * [11/06 v6] 진행 막대 제목 = 로봇이 지금 하는 일 하나(디자이너 "이동 중인데 판독 중이라 행동이 둘").
+   *   걷는 중이면 "다음 지점(으)로 이동 중", 지점에 서서 재는 중이면 "지점 + 그 설비에 맞는 측정"(판독은 계기에만).
+   */
+  var ACT6 = [
+    [/압력계|유량계|차압계|온도계|계기|gauge|meter/i, "판독", "reading"],
+    [/열교환기|heat exchanger/i, "출구 온도 측정", "outlet temperature"],
+    [/펌프|모터|발전기|터빈|pump|motor|generator|turbine/i, "진동 · 온도 측정", "vibration & temperature"],
+    [/배전반|MCC|변압기|panel|switchgear|transformer/i, "발열 스캔", "thermal scan"],
+    [/밸브|배관|valve|pipe/i, "누출 점검", "leak check"],
+    [/발판|작업|scaffold|work/i, "안전 장구 확인", "PPE check"]
+  ];
+  function josaRo(s) {
+    var c = s.charAt(s.length - 1), code = c.charCodeAt(0);
+    if (code >= 0xAC00 && code <= 0xD7A3) { var j = (code - 0xAC00) % 28; return j === 0 || j === 8 ? "로" : "으로"; }
+    return "036".indexOf(c) >= 0 ? "으로" : "로";   // 숫자는 읽는 소리로(영 · 삼 · 육 = 받침)
+  }
+  function wpAct(name, moving) {
+    var en = document.documentElement.lang === "en";
+    if (moving) { return en ? "Moving to " + name : name + josaRo(name) + " 이동 중"; }
+    var a = ACT6.filter(function (r) { return r[0].test(name); })[0];
+    return en ? name + ", " + (a ? a[2] : "inspection") : name + " " + (a ? a[1] : "점검");
   }
 
   /* ---------- 자동복귀 — 남은 카드를 "건너뜀 n곳" 한 장으로, 끝에 충전 스테이션 복귀 카드 ---------- */
@@ -285,7 +312,7 @@
     badgeMode = key;
     var badge = document.querySelector('.robot-strip .robot-card[aria-pressed="true"] .robot-lists .badge');
     if (badge) {
-      if (!badge.hasAttribute("data-rr-orig")) { badge.setAttribute("data-rr-orig", badge.className); }
+      if (!badge.hasAttribute("data-rr-orig")) { badge.setAttribute("data-rr-orig", badge.className); badge.setAttribute("data-rr-html", badge.innerHTML); }
       var b = BADGE[m] || BADGE.run;
       badge.className = "badge " + b[1] + " t-caption";
       badge.innerHTML = '<span class="badge-dot"></span>' + b[0];
@@ -496,7 +523,25 @@
   }
 
   function mmss(sec) { sec = Math.max(0, Math.floor(sec)); return Math.floor(sec / 60) + ":" + String(sec % 60).padStart(2, "0"); }
+  // [11/06 v6] 시뮬레이션 상태는 화면에 하나라, 미션(로봇)을 바꾸면 이동 중으로 되돌린다 — 앞 미션의 상태가 다음 미션에 묻어가지 않게
+  var simRobot;
+  function simReset() {
+    if (!api || !document.body.classList.contains("ver-6")) { return; }
+    var card = document.querySelector('.robot-strip .robot-card[aria-pressed="true"]'), id = card ? card.getAttribute("data-robot") : null;
+    if (id === simRobot) { return; }
+    var first = simRobot === undefined;
+    simRobot = id;
+    if (first) { return; }
+    if (playing) { stop(); }
+    if (touched) { press("run"); if (api.reset) { api.reset(); } else { api.mode("run"); } }
+    // 앞 로봇 카드의 시뮬레이션 배지를 되돌린다 — 일시정지로 남으면 그 미션이 대기로 읽혀 탭이 미션 설정으로 간다
+    Array.prototype.forEach.call(document.querySelectorAll('.robot-strip .robot-card:not([aria-pressed="true"]) .badge[data-rr-orig]'), function (b) {
+      b.className = b.getAttribute("data-rr-orig"); b.innerHTML = b.getAttribute("data-rr-html") || b.innerHTML;
+      b.removeAttribute("data-rr-orig"); b.removeAttribute("data-rr-html");
+    });
+  }
   function decorate(t) {
+    simReset();
     if (!api || !touched) { return; }
     var e = t - modeAt;
     // 지도 측정 눈금
