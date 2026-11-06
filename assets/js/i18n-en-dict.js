@@ -347,6 +347,7 @@ window.APRISM_EN = {"APRISM 공장 환경점검 로봇 관제 시스템 진입 �
 "없음":"None",
 "지도":"Map",
 "측정 중":"Measuring",
+"판독 중":"Reading",
 "예정":"Upcoming",
 "아직 가지 않은 자리입니다.":"Not visited yet.",
 "이동 중":"Moving",
