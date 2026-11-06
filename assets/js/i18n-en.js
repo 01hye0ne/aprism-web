@@ -64,7 +64,6 @@
     [/^알림 (\d+)건부터 보여 드릴까요\?$/, "Start with the $1 alerts?"],
     [/^어서오세요 (.+?) ?님$/, "Welcome, $1"],
     [/^(\d.*) 소요$/, function (m, t) { return "Took " + core(t); }],
-    [/^미조치 위험 (\d+)건$/, "$1 critical open"],
     [/^지점 (\d+)곳$/, "$1 waypoints"],
     [/^주의 (\d+)건 묶어 보기$/, "View $1 warnings together"],
     [/^가장 급한 것은 (.+?)(?:이에요|예요)\.$/, "Most urgent: $1."],

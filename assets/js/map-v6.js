@@ -3705,9 +3705,6 @@
     }
     wpPlace();
     wpTog.textContent = "지점 " + rail.querySelectorAll(".timeline-item[data-waypoint]").length + "곳";
-    // [11/06] 조치 안 한 위험 — 제목은 지금 하는 일로 돌아가도 남은 건수는 여기서 계속 보인다. 없으면 안 그린다
-    var dA = window.APRISM_DELTA_ALERTS, open = dA && dA.mine ? dA.mine.filter(function (a) { return a.sev === "critical"; }).length : 0;
-    if (open) { var oc = document.createElement("span"); oc.className = "rr-open"; oc.textContent = "미조치 위험 " + open + "건"; wpTog.appendChild(oc); }
     wpTog.setAttribute("aria-expanded", String(!document.body.classList.contains("rr-wp-closed")));
   }
   document.addEventListener("aprism:rr-mode", function (event) {
@@ -3715,7 +3712,6 @@
     wpToggleSync();
   });
   document.addEventListener("aprism:mission", function () { setTimeout(wpToggleSync, 0); });
-  document.addEventListener("aprism:alerts", wpToggleSync);
   setTimeout(wpToggleSync, 0);
 
   var simWp = null;

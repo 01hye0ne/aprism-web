@@ -764,7 +764,6 @@
     jd.mine = mine;
     // 펼침 대화가 답에 쓰는 알림(라이팅 시스템 8 — 이 미션 먼저, 다른 미션은 미션 이름을 붙여)
     window.APRISM_DELTA_ALERTS = { all: all, mine: mine, mission: mission, missionOf: missionOf, order: handleOrder(all, mine) };   // Delta 두 줄(brief)과 대화의 처리 순서
-    document.dispatchEvent(new CustomEvent("aprism:alerts"));   // [11/06] 지도 쪽 미조치 위험 건수(map-v6.js)
     tellAi(jd, top);
     markWaypoints();
   }
