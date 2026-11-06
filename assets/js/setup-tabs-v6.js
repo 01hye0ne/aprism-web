@@ -36,6 +36,16 @@
   function tabOf(name) { return tabs.filter(function (t) { var k = t.getAttribute("data-mission"); return k === name || EN[k] === name; })[0]; }
   var asked = /[?&]mission=([^&#]+)/.exec(window.location.search);
   var current = asked ? decodeURIComponent(asked[1]) : "";
+  // [11/06] 탭 차례 — 관제 · 전체 미션에서 끌어 바꾼 차례(mission-tabs-v6.js)를 그대로 따른다. 처음 보는 미션은 기본 차례로 뒤에
+  var saved = [];
+  try { saved = JSON.parse(localStorage.getItem("aprism-v6-tab-order") || "[]") || []; } catch (e) { /* 못 읽으면 기본 차례 */ }
+  if (saved.length) {
+    var pos = function (t, i) { var k = t.getAttribute("data-mission"), n = saved.indexOf(k); if (n < 0) { n = saved.indexOf(EN[k]); } return n >= 0 ? n : 1e3 + i; };
+    tabs.filter(function (t) { return t.hasAttribute("data-mission"); })
+      .map(function (t, i) { return [pos(t, i), t]; })
+      .sort(function (a, b) { return a[0] - b[0]; })
+      .forEach(function (e) { bar.appendChild(e[1]); });
+  }
   var mine = tabOf(current) || tabOf("정기 순회 점검");
   current = mine ? mine.getAttribute("data-mission") : "정기 순회 점검";
   if (mine) { mine.classList.add("is-on"); mine.setAttribute("aria-current", "page"); }
