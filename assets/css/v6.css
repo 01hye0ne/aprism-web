@@ -1823,3 +1823,12 @@ body.ver-6 .has-point .rr-pin:not(.is-point) { opacity: .35 !important; transiti
 /* [11/06 디자이너] 번호 원과 설비 이름을 잇는 짧은 선 — 원 테두리에 붙은 8px · 1px 선(글과 같은 색), 선 끝과 이름 사이 4 */
 body.ver-6 .ma-stamp.ma-stamp6 { gap: 0; }
 body.ver-6 .ma-stamp6 .ma-st-place::before { content: ""; display: inline-block; width: 8px; height: 1px; margin-right: var(--space-4); vertical-align: middle; position: relative; top: -1px; background-color: currentColor; }   /* 이름 칸은 블록 그대로 — 길면 말줄임. middle 은 x 높이 기준이라 원 중심보다 1px 아래 → 올림 */
+
+/*
+ * [11/06 디자이너] 웨이포인트 팝오버 — 로봇 · 설비 팝오버와 한 틀: 머리 불투명 bg/raised(판 끝까지) · [번호 원] 이름 · 닫기, [상세보기] 뺌.
+ *   번호 원은 지도 핀 머리 색 그대로(map-v6.js tellWaypoint), 머리 아래 12
+ */
+body.ver-6 .map-wp { min-width: 200px; max-width: 280px; }
+body.ver-6 .map-wp .map-card-head { margin: -14px -14px 0 !important; padding: var(--space-12) 14px; border-radius: 10px 10px 0 0; background-color: var(--bg-raised); gap: var(--space-8); }
+body.ver-6 .map-wp .map-wp-pin { transform: none; }
+body.ver-6 .map-wp .map-wp-more[hidden] { display: none; }

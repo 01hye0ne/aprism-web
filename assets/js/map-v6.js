@@ -2848,6 +2848,25 @@
     wpBox.setAttribute("data-result", info.tone);
     if (wpChip) { wpChip.textContent = WP_WORD[info.tone] || "예정"; }
     if (wpName) { window.APRISM_TEXT.fill(wpName, [info.id, info.name || "waypoint"]); }
+    /*
+     * [11/06 디자이너 v6] 머리 = [지도 핀과 같은 번호 원] + 지점 이름 — 상태 꼬리표(예정)와 "WP-09" 글을 걷는다.
+     *   상태는 원의 색(지도 핀 그대로)과 아래 글("아직 가지 않은 자리입니다.")이 말한다. 이름은 우측 목록과 같은 글(이름 없는 지점은 설비 nn)
+     */
+    if (document.body.classList.contains("ver-6") && wpName) {
+      var n6 = found.no, ph6 = document.querySelector('.rr-pin-head[data-n="' + n6 + '"]');
+      var row6 = document.querySelector('[data-timeline] .timeline-item[data-waypoint="' + info.id + '"] .step-title');
+      var nm6 = (row6 && row6.textContent.trim()) || wpNameOf[info.id] || info.name || info.id;
+      if (wpChip) {
+        wpChip.textContent = "";
+        wpChip.className = "mbt-pin map-wp-pin";
+        wpChip.setAttribute("data-n", String(n6));
+        wpChip.setAttribute("role", "img"); wpChip.setAttribute("aria-label", info.id + " · " + (WP_WORD[info.tone] || "예정"));
+        wpChip.setAttribute("style", ph6 ? (ph6.getAttribute("style") || "") : "");
+        if (!ph6) { wpChip.classList.add("is-plain"); }
+      }
+      wpName.textContent = nm6;
+      var more6 = wpBox.querySelector("[data-map-wp-more]"); if (more6) { more6.hidden = true; }
+    }
     if (wpRead) {
       window.APRISM_TEXT.fill(wpRead, info.read ||
         (info.kind === "upcoming" ? "아직 가지 않은 자리입니다." : "측정 항목 확인 중"));
