@@ -1045,6 +1045,20 @@
         }
       }
       stamp.textContent = stampOf(a);
+      // [11/06 디자이너] v6 — 지점은 글(WP-05) 대신 지도 핀 머리와 같은 번호 원, 시각은 오른쪽 끝. 설비 이름이 길면 이름만 줄인다
+      if (body.classList.contains("ver-6") && a.wp) {
+        var wn = parseInt(String(a.wp).replace(/\D+/g, ""), 10), ph = !isNaN(wn) && document.querySelector('.rr-pin-head[data-n="' + wn + '"]');
+        var st6 = stampOf(a), cut = st6.lastIndexOf(" · "), where6 = cut < 0 ? st6 : st6.slice(0, cut), when6 = cut < 0 ? "" : st6.slice(cut + 3);
+        if (where6.indexOf(a.wp) === 0) { where6 = where6.slice(a.wp.length).trim(); }
+        stamp.textContent = "";
+        stamp.classList.add("ma-stamp6");
+        var pin6 = document.createElement("span"); pin6.className = "mbt-pin"; pin6.setAttribute("data-n", isNaN(wn) ? "" : String(wn));
+        pin6.setAttribute("role", "img"); pin6.setAttribute("aria-label", a.wp);
+        if (ph) { pin6.setAttribute("style", ph.getAttribute("style") || ""); } else { pin6.classList.add("is-plain"); }
+        var pl6 = document.createElement("span"); pl6.className = "ma-st-place"; pl6.textContent = where6;
+        var tm6 = document.createElement("span"); tm6.className = "ma-st-time num"; tm6.textContent = when6;
+        stamp.appendChild(pin6); stamp.appendChild(pl6); stamp.appendChild(tm6);
+      }
 
       $("[data-ma-wp]", box).textContent = a.wp || "";
       $("[data-ma-place]", box).textContent = placeOf(a);
