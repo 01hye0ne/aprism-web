@@ -218,6 +218,18 @@
     var c = list.filter(function (a) { return a.sev === "critical"; }).length, w = list.length - c;
     return (c ? "위험 " + c + "건" + (w ? ", 주의 " + w + "건" : "") : "주의 " + w + "건") + "이";
   }
+  // [11/06 v6] 위험 · 주의를 따로 — 단계마다 제 점 + 제 색 글자(층 이름표 · 층 쪽지)
+  function sevParts(box, list) {
+    [["critical", "위험"], ["warning", "주의"]].forEach(function (k) {
+      var n = list.filter(function (a) { return a.sev === k[0]; }).length;
+      if (!n) { return; }
+      var one = el("span", "bld-sev");
+      one.setAttribute("data-sev", k[0]);
+      one.appendChild(el("span", "bld-sev-dot"));
+      one.appendChild(document.createTextNode(k[1] + " " + n));
+      box.appendChild(one);
+    });
+  }
   function sevCount(list) {
     var c = list.filter(function (a) { return a.sev === "critical"; }).length;
     var w = list.length - c;
@@ -1598,18 +1610,8 @@
       txt.appendChild(name);
       var sub = el("span", "t-caption bld-ftag-sub");
       sub.appendChild(document.createTextNode("로봇 " + robotsOn(f).length + "대"));
-      // [11/06 v6] 위험 · 주의를 따로 — 단계마다 제 점 + 제 색 글자
-      if (V6) {
-        [["critical", "위험"], ["warning", "주의"]].forEach(function (k) {
-          var n = list.filter(function (a) { return a.sev === k[0]; }).length;
-          if (!n) { return; }
-          var one = el("span", "bld-sev");
-          one.setAttribute("data-sev", k[0]);
-          one.appendChild(el("span", "bld-sev-dot"));
-          one.appendChild(document.createTextNode(k[1] + " " + n));
-          sub.appendChild(one);
-        });
-      } else if (list.length) {
+      if (V6) { sevParts(sub, list); }
+      else if (list.length) {
         var sev = el("span", "bld-sev");
         sev.setAttribute("data-sev", topSev(list));
         sev.appendChild(el("span", "bld-sev-dot"));
@@ -1724,7 +1726,13 @@
     }
     row("로봇", bots.length + "대 · " + run + "대 수행중");
     row("미션", missionsOn(f).length + "건 지남");
-    row("알림", list.length ? sevCount(list) : "없음", topSev(list));
+    if (V6 && list.length) {
+      var ar = el("div"), ad = el("dd", "t-label-2 bld-sev-row");
+      ar.appendChild(el("dt", "t-caption", "알림"));
+      sevParts(ad, list);
+      ar.appendChild(ad);
+      rows.appendChild(ar);
+    } else { row("알림", list.length ? sevCount(list) : "없음", topSev(list)); }
     tip.appendChild(rows);
     var go = el("p", "t-caption bld-tip-go");
     if (V3) { go.appendChild(el("span", null, !inScope(f) ? "이 미션은 이 층을 지나지 않아요" : scopeMission ? "누르면 이 층으로 들어가요" : "누르면 이 층만 펼쳐요")); }
