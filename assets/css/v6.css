@@ -1762,6 +1762,7 @@ body.ver-6 .mbt-pin.is-plain { background: #0A0F18; border-color: #AFB7C8; color
  *   줄: 고를 수 있다(호버 · 고른 면은 최신 알림 줄과 같은 토큰). 시각은 호버 · 초점 · 고를 때만.
  *   최신 알림 줄 시각은 시:분만 늘, 초는 호버 · 초점 · 고를 때 붙는다.
  * ================================================================ */
+
 body.ver-6 .done-head { justify-content: flex-start; gap: var(--space-8); }
 body.ver-6 .done-head .done-toggle { display: inline-flex; align-items: center; gap: 2px; }
 body.ver-6 .done-head .done-count { margin-left: 0; }
@@ -1934,3 +1935,10 @@ body.ver-6 .delta3 .dl-wp[data-sev="warning"] { background-color: #FFCC00; color
  */
 body.ver-6 .mbt-pin::after { font-family: var(--font-family-mono); font-weight: 700; letter-spacing: -0.4px; font-size: 9px; }
 body.ver-6 .map-wp .map-card-head .map-wp-pin::after { font-size: 10px; }
+
+/*
+ * [11/06 디자이너] 상단 미션 탭 — 자주 누르는 단추라 높이를 키우고(40 → 44, 상태바 52 → 56), 미션 탭 너비를 하나로.
+ *   미션 탭(M1~M8)은 모두 같은 폭(남는 자리를 똑같이 나누되 최대 184), 넘치는 이름은 말줄임 — 전체 이름은 탭 title(마우스 올림)에 있다.
+ *   [전체 미션] 탭은 미션이 아니라 짧은 제 폭 그대로
+ */
+/* (v7 로 옮김 — v7.css) */

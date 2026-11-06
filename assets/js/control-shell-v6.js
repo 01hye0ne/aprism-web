@@ -11,9 +11,11 @@
 (function () {
   "use strict";
   var EN = /-en\.html$/.test(location.pathname);
-  var SELF = EN ? "control-v6-en.html" : "control-v6.html";
-  var BLD = EN ? "building-v6-en.html" : "building-v6.html";
-  var MAIN = EN ? "main-v6-en.html" : "main-v6.html";
+  // [11/06] 판은 껍데기 파일 이름에서 — control-v7.html 이면 v7 두 화면을 띄운다(영문판은 v6-en 이름 그대로, 내용은 v7)
+  var VER = (/control-(v\d+)/.exec(location.pathname) || [, "v6"])[1];
+  var SELF = "control-" + VER + (EN ? "-en" : "") + ".html";
+  var BLD = "building-" + VER + (EN ? "-en" : "") + ".html";
+  var MAIN = "main-" + VER + (EN ? "-en" : "") + ".html";
   var q = location.search;
   // 보기 설정(테마 등)은 두 화면에 그대로 넘긴다
   var keep = (q.match(/[?&](theme|palette|delta|glow)=[\w-]+/g) || []).map(function (s) { return s.slice(1); });
@@ -67,9 +69,11 @@
     });
   }
   function route(to) {
+    // v7 껍데기 — 안쪽 화면 JS 가 만든 *-v6.html 주소를 같은 판(v7)으로(영문판은 v6-en 이름 그대로라 그대로 둔다)
+    if (VER !== "v6" && !EN) { to = to.replace(/(\/)(mission-setup|mission-precheck|building|main|control|alert-center|safety|report)-v6\.html/, "$1$2-" + VER + ".html"); }
     var path = new URL(to).pathname;
-    if (/\/main-v6(-en)?\.html$/.test(path)) { toMain(to); }
-    else if (/\/building-v6(-en)?\.html$/.test(path)) { toBuilding(); }
+    if (/\/main-v\d+(-en)?\.html$/.test(path)) { toMain(to); }
+    else if (/\/building-v\d+(-en)?\.html$/.test(path)) { toBuilding(); }
     else { location.href = to; }
   }
   bld.addEventListener("load", function () { guard(bld); });

@@ -63,7 +63,9 @@
     var running = "0";
     try { running = window.sessionStorage.getItem("aprism.running") || "0"; } catch (e) { running = "0"; }
     // [11/03] v6 화면으로 — 돌고 있으면 v6 관제(main-v6), 아니면 v6 미션 설정
-    return running === "1" ? "./main-v6.html" : "./mission-setup-v6.html";
+    // [11/06] 한글판은 v7 로(작업판), 영문판은 *-v6-en(내용은 v7) — 영문판 주소는 aprismHref 가 -en 으로 바꾼다
+    var v = /-en\.html$/.test(location.pathname) ? "v6" : "v7";
+    return running === "1" ? "./main-" + v + ".html" : "./mission-setup-" + v + ".html";
   }
   var form = document.querySelector("[data-login-form]");
   if (form) {

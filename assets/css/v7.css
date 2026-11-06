@@ -1,0 +1,25 @@
+/*
+ * v7 (11/06~) — v6 화면을 복제한 다음 판. body 에 ver-6 과 ver-7 이 함께 붙는다: v6 규칙(v6.css)을 그대로 쓰고, 여기서 v7 에서 바뀐 것만 덮는다.
+ *   v6 한글판은 11/06 피드백 전 상태로 멈춘다. 영문판 *-v6-en.html 은 v7 한글판에서 만든다(tools/build-en.mjs).
+ */
+
+/*
+ * [11/06 디자이너] 상단 미션 탭 — 자주 누르는 단추라 높이를 키우고(40 → 44, 상태바 52 → 56), 미션 탭 너비를 하나로.
+ *   미션 탭(M1~M8)은 모두 같은 폭(남는 자리를 똑같이 나누되 최대 184), 넘치는 이름은 말줄임 — 전체 이름은 탭 title(마우스 올림).
+ *   [전체 미션] 탭은 미션이 아니라 짧은 제 폭 그대로
+ */
+body.ver-7 .status-bar { height: 56px; flex: 0 0 56px; }
+body.ver-7 .sb-tab { height: 44px; }
+body.ver-7 .sb-tab[data-mission] { flex: 1 1 0; min-width: 0; max-width: 184px; justify-content: flex-start; padding: 0 var(--space-10, 10px); gap: var(--space-4); }
+html[lang="en"] body.ver-7 .sb-tab[data-mission] { flex: 1 1 0; max-width: 184px; }
+html[lang="en"] body.ver-7 .sb-tab[data-mission] .sb-tab-name { overflow: hidden; text-overflow: ellipsis; }
+html[lang="en"] body.ver-7 .sb-tabs { overflow-x: visible; flex: 1 1 auto; }
+
+/*
+ * [11/06 디자이너] 왼쪽 "오늘 확인된 알림" 머리를 예전 배치로 — 이름 · 건수(점) …… 오른쪽 끝 접기, [전체보기]는 위 최신 알림 하나만(HTML).
+ *   이름은 한 단 낮게(t-label-1 · 14, HTML). v6 의 머리 배치 규칙(done-toggle · ah-all)을 되돌리고, 두 목록 사이 선을 되살린다
+ */
+body.ver-7 .done-head { justify-content: space-between; gap: 10px; }
+body.ver-7 .done-head .done-count { margin-left: auto; }
+body.ver-7 .done-head .done-fold { margin-right: calc(var(--space-4) * -1); }
+body.ver-7.v2-2 #site-panel .ah-sec + .ah-sec { border-top-color: var(--border-default); }

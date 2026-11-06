@@ -41,7 +41,8 @@
   <!-- v5 전용 규칙 — v4 는 10/29 부로 멈췄다. v5 에서 바꾸는 것은 여기(body.ver-5)에. -->
   <link rel="stylesheet" href="../assets/css/v5.css?v=aefc22b4" />
   <!-- v6 전용 규칙 — v5 는 10/30 부로 멈췄다. v6 에서 바꾸는 것은 여기(body.ver-6)에. -->
-  <link rel="stylesheet" href="../assets/css/v6.css?v=8d829666" />
+  <link rel="stylesheet" href="../assets/css/v6.css?v=18e4e9c8" />
+  <link rel="stylesheet" href="../assets/css/v7.css?v=a44bf8e3" />
   <!-- 지도 경로 표현 규칙(10/28 반영, 지도 경로 표현 전달서 1022) — 경로 네 구간 · 흐름 빛 · 번호 핀 · 시야 빔 로봇 · 충전 스테이션 · 아래 상태 시뮬레이션 막대 -->
   <link rel="stylesheet" href="../assets/css/route-rules.css?v=bd91ee52" />
   <style>
@@ -66,7 +67,7 @@
      Delta 만 다른 시안이라 나머지 조건이 같아야 둘을 나란히 놓고 고를 수 있다.
      주소 끝 #normal · #few · #warning 으로 다른 단계도 볼 수 있다. -->
 <!-- data-route-rules — 지도 경로 표현 규칙(map-v3.js · route-rules.css · route-sim.js)을 쓰는 화면. screen.js 가 Robot 11 웨이포인트 20칸 더미를 고른다. -->
-<body class="v2 v3 v2-2 ver-3 ver-5 ver-6" data-level="critical" data-delta-copy="brief" data-mission-scope data-route-rules>
+<body class="v2 v3 v2-2 ver-3 ver-5 ver-6 ver-7" data-level="critical" data-delta-copy="brief" data-mission-scope data-route-rules>
 
 <!-- Robot Dog Walk 리그(assets/robot-dog/ 핸드오프)의 공용 defs — 카드 썸네일이 url(#rd-*) 로 참조한다. -->
 <svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute" xmlns="http://www.w3.org/2000/svg">
@@ -292,17 +293,14 @@
           <!-- v3(10/21) — 접을 수 있다. 머리 줄 어디를 눌러도 접히고, 접으면 위 최신 알림이 그만큼 자란다(v3-panel.js). -->
           <section class="ah-sec done-sec" aria-labelledby="done-title" data-done-sec>
             <div class="done-head" data-done-head>
-              <!-- [11/06] 이름 "오늘 확인 완료" → "오늘 확인된 알림". 위 최신 알림과 같은 위계라 [전체보기]도 같은 자리(오른쪽 끝) — 알림 센터 조치 요청됨 탭으로 연다.
-                   건수는 점 없이 글만, 접기 화살표와 붙여 제목 옆 한 덩어리. 머리 줄 어디를 눌러도 접히는 것은 그대로, [전체보기]만 예외. -->
-              <h3 class="t-title-2" id="done-title">오늘 확인된 알림</h3>
-              <span class="done-toggle">
-                <span class="done-count t-caption"><span class="num" data-done-count>0건</span></span>
-                <button type="button" class="done-fold" data-done-fold
-                        aria-expanded="true" aria-controls="done-box" aria-label="오늘 확인된 알림 접기">
-                  <span class="i i-16" aria-hidden="true" style="--i:var(--ic-chevron-down)"></span>
-                </button>
-              </span>
-              <button type="button" class="btn btn-ghost is-xs ah-all" data-ah-all="done">전체보기</button>
+              <!-- [11/06 디자이너] 머리를 예전 배치로 — 이름 · 건수(점) · 오른쪽 끝 접기. [전체보기]는 위 최신 알림 하나만.
+                   이름은 위 "최신 알림"보다 한 단 낮게(t-label-1 · 14) — 주로 보는 목록은 위, 이쪽은 기록 -->
+              <h3 class="t-label-1" id="done-title">오늘 확인된 알림</h3>
+              <span class="badge done-count t-caption"><span class="badge-dot"></span><span class="num" data-done-count>0건</span></span>
+              <button type="button" class="done-fold" data-done-fold
+                      aria-expanded="true" aria-controls="done-box" aria-label="오늘 확인된 알림 접기">
+                <span class="i i-16" aria-hidden="true" style="--i:var(--ic-chevron-down)"></span>
+              </button>
             </div>
             <div class="ah-box" id="done-box">
               <div class="ah-list" data-done-list role="list"></div>
