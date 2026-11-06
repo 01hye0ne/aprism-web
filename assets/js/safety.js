@@ -193,7 +193,8 @@
     const limHi = cd ? cd[2] : stdNs.length ? stdNs[stdNs.length - 1] : NaN, limLo = isRange ? stdNs[0] : null;
     const vUnit = cd ? (cd[4]==='%' ? '%' : cd[4]) : numU && numU[2] ? ' ' + numU[2] : '';   // 차이에도 단위 — "+7" 은 무엇의 7인지 안 읽힌다
     const decs = (String(jvalT).match(/\.(\d+)/) || ['', ''])[1].length;
-    const verdict = !isHit ? '' : k==='안전감지' ? '기준 위반'
+    const verdict = !isHit ? '' : window.APRISM_VERDICT ? window.APRISM_VERDICT(k, jvalT) || '기준 초과'   // [11/06] 관제 팝오버와 같은 셈(verdict-v6.js)
+      : k==='안전감지' ? '기준 위반'
       : isNaN(vNum) || isNaN(limHi) ? '기준 초과'
       : (limLo !== null && vNum < limLo ? `기준 미달 −${(limLo - vNum).toFixed(decs)}` : `기준 초과 +${Math.max(0, vNum - limHi).toFixed(decs)}`) + vUnit;
     // 지난 3회 값 — 시안 값. 범위 계기는 상한으로 다가가며 오름(알림 근거 "최근 3회 계속 오름"과 같은 수), 그 밖은 정상 안에서 오르내림

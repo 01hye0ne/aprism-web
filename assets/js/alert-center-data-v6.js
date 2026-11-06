@@ -26,7 +26,7 @@
     /* ---- 미확인 12건 (위험 3 · 주의 9) — v6 관제 최신 알림 ---- */
     { id: "A-1", sev: "critical", day: "today", time: "10:12:40", stamp: T + "10:12:40",
       title: "계기인식 · 압력 0.86 MPa", res: ["압력", "0.86 MPa"], floor: "B4", wp: "WP-04", place: "N₂ 배관 압력계",
-      mission: "정기 순회 점검", detect: "계기인식", robot: "Robot 01", img: "alert/wp04-gauge-spiral.webp",
+      mission: "정기 순회 점검", detect: "계기인식", robot: "Robot 01", img: "safety/gauge_crit.jpg",
       why: ["압력 0.86 MPa · 정상 범위 0.60 ~ 0.80 초과", "최근 3회 측정 0.77 → 0.79 → 0.86 으로 계속 오름", "감압 밸브 설정 이상 가능성이 가장 높음"],
       lead: "현장 점검부터 요청하세요.", fp: 8, fpLabel: "낮음",
       acts: [{ t: "로봇 정지 · 현장 점검 요청", delta: true }, { t: "현장 무전 연락 · 작업 중지 요청", delta: true }, { t: "재측정 후 판단" }] },

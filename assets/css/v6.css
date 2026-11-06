@@ -1718,3 +1718,7 @@ body.ver-6 .map-card { width: auto; min-width: 200px; max-width: 280px; gap: var
 body.ver-6 .map-card .map-card-head { margin: -14px -14px 0 !important; padding: var(--space-12) 14px; border-radius: 10px 10px 0 0; background-color: var(--bg-raised); }
 body.ver-6 .map-card .map-card-photo { margin: calc(var(--space-4) * -1) -14px 0; border-radius: 0; }
 body.ver-6 .map-card > .map-card-rows { margin-top: var(--space-8); }
+
+/* [11/06 디자이너] 알림 팝오버 제목 값 뒤 판정("기준 초과 +0.06 MPa") — 안전진단 상세(.jvd)와 같은 글 16 굵게 · 단계색. 넘치면 판정만 다음 줄로 */
+body.ver-6 .ma-title .ma-vd { display: inline-block; font-size: var(--font-size-16); line-height: var(--font-line-height-24); font-weight: 600; color: var(--status-warning-text); font-variant-numeric: tabular-nums; white-space: nowrap; }
+body.ver-6 .map-alert.is-critical .ma-title .ma-vd { color: var(--status-critical-text); }

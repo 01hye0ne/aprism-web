@@ -1739,4 +1739,5 @@ window.APRISM_EN = {"APRISM 공장 환경점검 로봇 관제 시스템 진입 �
 "최근 3회 계속 오름":"last 3 readings rising",
 "기준 위반":"Violation",
 "기준 미달":"Under limit",
-"기준 0.60 ~ 0.80 MPa · 최근 3회 계속 오름":"Limit 0.60–0.80 MPa · last 3 readings rising"};
+"기준 0.60 ~ 0.80 MPa · 최근 3회 계속 오름":"Limit 0.60–0.80 MPa · last 3 readings rising",
+"WP-04 N₂ 배관 압력계의 압력이 0.86 MPa 로 정상 범위(0.60 ~ 0.80)를 0.06 넘었어요. 최근 3회 측정이 잇달아 올랐습니다. 현장 점검부터 요청하는 것을 권해요.":"WP-04 N₂ line gauge reads 0.86 MPa, 0.06 above the normal range (0.60–0.80). The last 3 readings kept rising. Request a site check first."};
