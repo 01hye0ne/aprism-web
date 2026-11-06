@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="dark" class="js">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>APRISM — [자문] 26.11.06</title>
+  <meta name="description" content="v5 와 11.06 기준 v6 비교 — 로봇 3D 구현 · 상단 미션 탭 · 지도 번호 · Delta 펼침 · 안전진단" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/static/woff2/SUIT.css" />
+  <link rel="stylesheet" href="./assets/css/tokens.css?v=b64812bd" />
+  <link rel="stylesheet" href="./assets/css/base.css?v=5ccd4bb3" />
+  <style>
+    /*
+     * 발표형 한 장 — 화면 높이 하나에 주제 하나. 넓은 화면에서는 휠 · 방향키 한 번에 한 장씩
+     * 천천히 미끄러지고(아래 스크립트), 들어온 장의 글과 그림이 차례로 떠오른다.
+     * 왼쪽 글 · 오른쪽 화면. 화면은 주제에 해당하는 부분만 잘라 2배로 찍은 것이고,
+     * 위 단추로 같은 화면의 다른 상태를 바꿔 본다. 값은 토큰만 쓴다.
+     * 11.03 판(advisory-261103.html)을 복제했다. 이번 판은 v5 와 v6 를 나란히 비교한다 — 그림은 advisory-1106/(v5 미션 메뉴는 compare-1030/ 재사용, v5 펼친 Delta 는 compare-1030/03-v5 를 잘라 씀).
+     */
+    body { margin: 0; background-color: var(--bg-page); }
+
+    .back {
+      position: fixed; top: var(--space-16); right: var(--space-16); z-index: 3;
+      padding: var(--space-4) var(--space-12);
+      border: var(--border-width-thin) solid var(--border-default); border-radius: var(--radius-pill);
+      background-color: var(--bg-panel); color: var(--text-secondary);
+      font-size: var(--font-size-12); text-decoration: none;
+    }
+    .back:hover { color: var(--text-primary); border-color: var(--border-strong); }
+
+    /* 페이지네이션 — 1~6장에서 왼쪽 아래. 표지(00)에서는 숨긴다. ‹ 01 … 06 › */
+    .pager {
+      position: fixed; left: var(--space-48); bottom: var(--space-16); z-index: 3;
+      display: flex; align-items: center; gap: var(--space-2, 2px);
+      padding: var(--space-4);
+      border: var(--border-width-thin) solid var(--border-divider); border-radius: var(--radius-pill);
+      background-color: var(--bg-panel);
+      font-size: var(--font-size-12); font-variant-numeric: tabular-nums;
+      transition: opacity 300ms ease;
+    }
+    .pager[hidden] { display: flex; opacity: 0; pointer-events: none; }
+    .pager button {
+      min-width: 28px; height: 28px; padding: 0 var(--space-4);
+      border: 0; border-radius: var(--radius-pill);
+      background: transparent; color: var(--text-tertiary);
+      font: inherit; cursor: pointer;
+    }
+    .pager button:hover:not(:disabled) { color: var(--text-primary); background-color: var(--bg-cell); }
+    .pager button[aria-current="page"] { background-color: var(--bg-inverse); color: var(--text-on-inverse); font-weight: 700; }
+    .pager button:disabled { opacity: 0.35; cursor: default; }
+    .pager .arw { font-size: var(--font-size-16); line-height: 1; }
+
+    .slide {
+      box-sizing: border-box;
+      height: 100vh; height: 100dvh;
+      display: grid;
+      grid-template-columns: minmax(320px, 30%) minmax(0, 1fr);
+      gap: var(--space-40);
+      padding: var(--space-48) var(--space-48) var(--space-40);
+      border-bottom: var(--border-width-thin) solid var(--border-divider);
+    }
+
+    /* 왼쪽 글 */
+    .txt { display: flex; flex-direction: column; justify-content: center; min-width: 0; }
+    .num { margin: 0; color: var(--text-tertiary); font-size: var(--font-size-13); font-weight: 600; font-variant-numeric: tabular-nums; letter-spacing: 0.04em; }
+    .txt h2 { margin: var(--space-8) 0 var(--space-32); color: var(--text-primary); font-size: var(--font-size-32); line-height: var(--font-line-height-40); word-break: keep-all; }
+    .blk { margin: 0 0 var(--space-20); }
+    .blk .k { margin: 0 0 var(--space-4); color: var(--text-tertiary); font-size: var(--font-size-12); font-weight: 600; }
+    .blk p:last-child { margin: 0; color: var(--text-secondary); font-size: var(--font-size-14); line-height: var(--font-line-height-22); word-break: keep-all; }
+    .blk.now p:last-child { color: var(--text-primary); font-size: var(--font-size-16); line-height: var(--font-line-height-26); }
+    .blk.now b { color: var(--text-primary); }
+    .why {
+      margin: var(--space-8) 0 0; padding: var(--space-12) var(--space-16);
+      border-left: 3px solid var(--border-strong); background-color: var(--bg-panel);
+      border-radius: 0 var(--radius-card) var(--radius-card) 0;
+      color: var(--text-secondary); font-size: var(--font-size-13); line-height: var(--font-line-height-20); word-break: keep-all;
+    }
+    .nw { white-space: nowrap; }
+    .why::before { content: "왜 "; color: var(--text-primary); font-weight: 700; }
+
+    /* 오른쪽 화면 */
+    .pic { display: flex; flex-direction: column; justify-content: center; min-width: 0; min-height: 0; margin: 0; }
+    .tabs { display: flex; flex-wrap: wrap; gap: var(--space-4); margin: 0 0 var(--space-12); padding: 0; list-style: none; }
+    .tabs button {
+      padding: var(--space-4) var(--space-12);
+      border: var(--border-width-thin) solid var(--border-default); border-radius: var(--radius-pill);
+      background: transparent; color: var(--text-tertiary);
+      font: inherit; font-size: var(--font-size-13); cursor: pointer;
+    }
+    .tabs button:hover { color: var(--text-primary); }
+    .tabs button[aria-pressed="true"] { background-color: var(--bg-inverse); border-color: var(--bg-inverse); color: var(--text-on-inverse); font-weight: 600; }
+    /* 그림을 한 칸에 겹쳐 둔다 — 칸 높이는 가장 큰 그림, 화면 높이를 넘지 않는다 */
+    .frame { display: grid; min-height: 0; }
+    .frame img {
+      grid-area: 1 / 1; width: 100%; height: auto; max-height: calc(100dvh - 176px);
+      object-fit: contain; object-position: left top;
+      border-radius: var(--radius-card);
+      opacity: 0; transition: opacity 420ms ease;
+    }
+    .frame img.is-on { opacity: 1; }
+    /* 나란히 보기 — 단추 없이 셋을 한 번에(세로로 긴 목록 · 오른쪽 칸) */
+    .frame.is-row { grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: var(--space-16); align-items: start; }
+    .frame.is-col { grid-auto-flow: row; gap: var(--space-12); justify-items: start; }
+    .frame.is-row > div, .frame.is-col > div { min-width: 0; }
+    .frame.is-row img, .frame.is-col img { grid-area: auto; opacity: 1; display: block; }
+    .frame.is-row img { max-height: calc(100dvh - 200px); width: auto; max-width: 100%; }
+    .frame.is-col img { max-height: calc((100dvh - 260px) / 3); width: auto; max-width: 100%; }
+    .frame .lbl { margin: 0 0 var(--space-8); color: var(--text-tertiary); font-size: var(--font-size-13); font-weight: 600; }
+    .frame .lbl.is-now { color: var(--text-primary); }
+    .cap { margin: var(--space-8) 0 0; color: var(--text-tertiary); font-size: var(--font-size-12); }
+
+    /* 제안 장 — 왼쪽 1 · 2 · 3 칸이 오른쪽 그림 단추를 겸한다 */
+    .opts { display: flex; flex-direction: column; gap: var(--space-8); margin: 0; padding: 0; list-style: none; }
+    .opts button {
+      display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: var(--space-4) var(--space-12); width: 100%;
+      padding: var(--space-12) var(--space-16); text-align: left;
+      border: var(--border-width-thin) solid var(--border-divider); border-radius: var(--radius-card);
+      background: transparent; color: var(--text-tertiary); font: inherit; cursor: pointer;
+      transition: background-color 300ms ease, border-color 300ms ease, color 300ms ease;
+    }
+    .opts button:hover { border-color: var(--border-default); }
+    .opts button[aria-pressed="true"] { background-color: var(--bg-panel); border-color: var(--border-strong); color: var(--text-secondary); }
+    .opts .key {
+      grid-row: span 2; display: grid; place-items: center; width: 28px; height: 28px;
+      border-radius: var(--radius-pill); background-color: var(--bg-cell); color: var(--text-secondary);
+      font-size: var(--font-size-13); font-weight: 700;
+    }
+    .opts button[aria-pressed="true"] .key { background-color: var(--bg-inverse); color: var(--text-on-inverse); }
+    .opts .t { color: var(--text-secondary); font-size: var(--font-size-14); font-weight: 700; }
+    .opts button[aria-pressed="true"] .t { color: var(--text-primary); }
+    .opts .d { font-size: var(--font-size-13); line-height: var(--font-line-height-20); word-break: keep-all; }
+    .pic.no-tabs .tabs { display: none; }
+
+    /* 표지 */
+    .cover .txt h1 { margin: var(--space-8) 0 var(--space-16); color: var(--text-primary); font-size: var(--font-size-40); line-height: var(--font-line-height-48); word-break: keep-all; }
+    .cover .lead { margin: 0 0 var(--space-32); color: var(--text-secondary); font-size: var(--font-size-16); line-height: var(--font-line-height-26); word-break: keep-all; }
+    .cover .lead b { color: var(--text-primary); }
+    .toc { margin: 0; padding: 0; list-style: none; counter-reset: t; }
+    .toc li { counter-increment: t; border-top: var(--border-width-thin) solid var(--border-divider); }
+    .toc a { display: flex; gap: var(--space-12); padding: var(--space-8) 0; color: var(--text-secondary); font-size: var(--font-size-14); text-decoration: none; }
+    .toc a::before { content: counter(t, decimal-leading-zero); color: var(--text-tertiary); font-variant-numeric: tabular-nums; }
+    .toc a:hover { color: var(--text-primary); }
+    .toc a span { color: var(--text-tertiary); }
+
+    /* 들어오는 장 — 글은 위에서부터 차례로, 그림은 조금 늦게 떠오른다 */
+    .js .slide .txt > *, .js .slide .pic {
+      opacity: 0; transform: translateY(20px);
+      transition: opacity 800ms cubic-bezier(0.22, 0.61, 0.36, 1), transform 1000ms cubic-bezier(0.22, 0.61, 0.36, 1);
+    }
+    .js .slide.is-in .txt > *, .js .slide.is-in .pic { opacity: 1; transform: none; }
+    .js .slide.is-in .txt > :nth-child(2) { transition-delay: 80ms; }
+    .js .slide.is-in .txt > :nth-child(3) { transition-delay: 160ms; }
+    .js .slide.is-in .txt > :nth-child(4) { transition-delay: 240ms; }
+    .js .slide.is-in .txt > :nth-child(5) { transition-delay: 320ms; }
+    .js .slide.is-in .pic { transition-delay: 200ms; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .frame img, .js .slide .txt > *, .js .slide .pic { transition: none; transform: none; }
+    }
+
+    /* 좁은 화면 — 장 높이를 풀고 위아래로 쌓는다 */
+    @media (max-width: 900px) {
+      .slide { height: auto; grid-template-columns: minmax(0, 1fr); gap: var(--space-20); padding: var(--space-48) var(--space-16) var(--space-32); }
+      .frame img { display: none; max-height: none; opacity: 1; }
+      .frame.is-row { grid-auto-flow: row; }
+      .frame.is-row img, .frame.is-col img { display: block; width: 100%; max-height: none; }
+      .frame img.is-on { display: block; }
+      .pager { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <a href="./index.html" class="back">목록으로</a>
+  <nav class="pager" aria-label="페이지" data-pager hidden></nav>
+
+  <main>
+    <!-- 표지 -->
+    <section class="slide cover" id="s0" aria-labelledby="s0-title">
+      <div class="txt">
+        <p class="num">V5 → V6</p>
+        <h1 id="s0-title">[자문] 26.11.06</h1>
+        <p class="lead"><b>v5(10.30)</b>와 <b>11.06 기준 v6</b>를 나란히 비교함. 크게 달라진 다섯 가지를 장마다 하나씩 담음.</p>
+        <ol class="toc">
+          <li><a href="#s1">로봇 3D 구현 <span>상태마다 지도 위 로봇 표현</span></a></li>
+          <li><a href="#s2">상단 미션 탭 <span>미션 메뉴 → 미션의 창</span></a></li>
+          <li><a href="#s3">지도 번호 <span>모든 지점 → 문제 지점 + 지금 지점</span></a></li>
+          <li><a href="#s4">Delta 펼침 <span>대화 → 정해진 꼴의 답</span></a></li>
+          <li><a href="#s5">안전진단 <span>미션 탭 · 관제 알림 기준 · 실제 경로</span></a></li>
+        </ol>
+      </div>
+      <figure class="pic">
+        <div class="frame"><img class="is-on" src="./assets/img/advisory-1106/00-v6.webp" alt="v6 미션 관제 — 상단에 전체 미션 · M1~M8 미션 탭, 왼쪽 최신 알림, 지도 왼쪽 위 Delta, 3D 지도 위 로봇과 문제 지점 번호, 오른쪽 로봇 패널과 지점 목록" /></div>
+        <figcaption class="cap">v6 미션 관제 · M1 정기 순회 점검(11.06)</figcaption>
+      </figure>
+    </section>
+
+    <section class="slide" id="s1" aria-labelledby="s1-title">
+      <div class="txt">
+        <p class="num">01</p>
+        <h2 id="s1-title">로봇 3D 구현</h2>
+        <div class="blk"><p class="k">v5</p><p>지도에 실물 비율 3D 로봇(SPOT · 휠 로봇 모베드)이 걷고 앉음. 둘레 바닥 표식(빗금 원판 · 겹친 원 · 초록 호)은 <b>상태와 상관없이 같은 모양</b>이라, 상태는 오른쪽 패널 글자를 읽어야 앎.</p></div>
+        <div class="blk now"><p class="k">v6</p><p>로봇 둘레 <b>호 · 시야 빔의 색과 모양이 상태를 말함</b>. 이동 중 초록 두 줄 · 측정 중 앞 호가 돎 · 위험 감지와 긴급정지 빨강 · 일시정지 노랑 끊긴 줄 + 머리 위 배지 · 자동복귀 회색 + 돌아가는 점선 · 통신 끊김은 <b>직전 자세로 멈춰 옅게</b>. 충전 자리는 바닥의 DOCK 판. 오른쪽 패널도 같은 상태를 <b>제목 자리에 아이콘 + 굵은 이름</b>으로 보여 줌(한 규칙).</p></div>
+        <p class="why">관제자의 눈은 지도에 있음. 로봇만 보고 "지금 무슨 상태인지" 알아야 패널 글자를 찾으러 눈을 옮기지 않음.</p>
+      </div>
+      <figure class="pic">
+        <div class="tabs" role="group" aria-label="화면 고르기"></div>
+        <div class="frame">
+          <img data-tab="v5 이동 중" src="./assets/img/advisory-1106/01-v5-run.webp" alt="v5 이동 중 — 지도 위 3D SPOT 둘레에 빗금 원판과 초록 호, 지나온 · 앞으로 갈 지점 번호가 모두 보인다" loading="lazy" />
+          <img data-tab="v5 일시정지" src="./assets/img/advisory-1106/01-v5-pause.webp" alt="v5 일시정지 — 로봇 둘레 표식은 이동 중과 같은 초록, 재생 단추 표식만 붙는다" loading="lazy" />
+          <img data-tab="v6 이동 중" data-default src="./assets/img/advisory-1106/01-v6-run.webp" alt="v6 이동 중 — 로봇 둘레 초록 두 줄 호와 초록 시야 빔, 다음 지점 8 은 흰 판에 파란 테" loading="lazy" />
+          <img data-tab="측정 중" src="./assets/img/advisory-1106/01-v6-inspect.webp" alt="v6 지점 측정 중 — 로봇이 8번 지점 위에 서고 앞 호가 돈다, 패널 Mission 측정 중" loading="lazy" />
+          <img data-tab="위험 감지" src="./assets/img/advisory-1106/01-v6-alert.webp" alt="v6 위험 감지 — 로봇 둘레 호와 시야 빔이 빨강, 위험 지점 바닥에 빨간 고리, 패널 제목 자리에 위험 감지" loading="lazy" />
+          <img data-tab="일시정지" src="./assets/img/advisory-1106/01-v6-pause.webp" alt="v6 일시정지 — 노란 끊긴 두 줄 호와 노란 시야 빔, 로봇 머리 위 노란 일시정지 배지, 패널 제목 자리에 일시정지" loading="lazy" />
+          <img data-tab="자동복귀" src="./assets/img/advisory-1106/01-v6-return.webp" alt="v6 자동복귀 — 회색 호와 회색 빔, 충전 자리로 돌아가는 흰 점선, 패널 제목 자리에 자동복귀" loading="lazy" />
+          <img data-tab="통신 끊김" src="./assets/img/advisory-1106/01-v6-lost.webp" alt="v6 통신 끊김 — 로봇이 직전 자세로 멈춘 채 옅어지고 둘레 표식이 꺼진다, 패널 로봇도 옅게, 제목 자리에 통신 끊김과 마지막 통신 시각" loading="lazy" />
+          <img data-tab="긴급정지" src="./assets/img/advisory-1106/01-v6-estop.webp" alt="v6 긴급정지 — 로봇 둘레 빨간 고리, 패널 E-STOP 이 눌린 모양, 제목 자리에 긴급정지와 정지 시각" loading="lazy" />
+        </div>
+      </figure>
+    </section>
+
+    <section class="slide" id="s2" aria-labelledby="s2-title">
+      <div class="txt">
+        <p class="num">02</p>
+        <h2 id="s2-title">상단 미션 탭</h2>
+        <div class="blk"><p class="k">v5</p><p>상단 바 <b>[통합 순회 현황] › [미션 ▾]</b> 두 칸. 다른 미션은 드롭다운 표를 열어야 보이고, 다른 미션에 무슨 일이 났는지도 메뉴 안 기호로만 앎.</p></div>
+        <div class="blk now"><p class="k">v6</p><p>브라우저 탭처럼 <b>[전체 미션] [M1] … [M8]</b>을 늘어놓음. 탭 이름 뒤 <b>위험 · 주의 기호</b>로 다른 미션의 이상이 늘 보임. 탭은 <b>미션의 창</b> — 누르면 그 미션의 지금 상태로 감(수행중 → 관제 · 대기 → 실행 전 미션 설정 · 완료 → 미션 완료 + 보고서). M 번호는 미션을 따라 고정되고, 끌어서 순서를 바꾸면 <b>모든 화면의 탭 줄</b>이 같이 바뀜. 전체 미션의 알림을 누르면 그 미션 탭 + 조치 팝오버까지 바로 열림.</p></div>
+        <p class="why">여러 미션이 동시에 돌 때, 메뉴를 열지 않아도 어디에 문제가 있는지 보이고 한 번에 옮겨 가야 함.</p>
+      </div>
+      <figure class="pic">
+        <div class="tabs" role="group" aria-label="화면 고르기"></div>
+        <div class="frame">
+          <img data-tab="v5 상단 바" src="./assets/img/advisory-1106/02-v5-bar.webp" alt="v5 상단 바 — 통합 순회 현황 › 정기 순회 점검 ▾ 두 칸" loading="lazy" />
+          <img data-tab="v5 미션 메뉴" src="./assets/img/compare-1030/01-v5-menu.webp" alt="v5 미션 메뉴 — 수행 · 미션 · 층 · 로봇 표, 알림이 있는 미션 이름 뒤에 위험 · 주의 기호" loading="lazy" />
+          <img data-tab="v6 수행중 (M1)" data-default src="./assets/img/advisory-1106/02-v6-run.webp" alt="v6 상단 탭 — 전체 미션, M1 정기 순회 점검 위험, M2 발전기실 설비 점검 주의, M3 전기실 열화상 점검 위험, M4~M8, 지금 탭 M1 이 아래 화면과 이어진다" loading="lazy" />
+          <img data-tab="v6 대기 (M5)" src="./assets/img/advisory-1106/02-v6-idle.webp" alt="v6 대기 미션 탭 M5 주간 설비 점검 — 실행 전 미션 설정 화면이 열리고 미션 이름은 읽기 전용" loading="lazy" />
+          <img data-tab="v6 완료 (M6)" src="./assets/img/advisory-1106/02-v6-done.webp" alt="v6 완료 미션 탭 M6 야간 순회 점검 — 오른쪽 패널 미션 완료와 보고서 보러가기, Delta 미션 완료 인사" loading="lazy" />
+          <img data-tab="v6 전체 미션" src="./assets/img/advisory-1106/02-v6-all.webp" alt="v6 전체 미션 탭 — 모든 미션의 알림, 오른쪽 로봇 현황 12대 연결 · 수행중 3 · 끊김 1 · 완료 3 · 대기 5" loading="lazy" />
+        </div>
+      </figure>
+    </section>
+
+    <section class="slide" id="s3" aria-labelledby="s3-title">
+      <div class="txt">
+        <p class="num">03</p>
+        <h2 id="s3-title">지도 번호</h2>
+        <div class="blk"><p class="k">v5</p><p>지나온 지점 · 앞으로 갈 지점까지 <b>번호 핀을 모두</b> 세움. 겹치면 솎아 내서 3D · 탑뷰 · 확대마다 보이는 번호가 달라짐.</p></div>
+        <div class="blk now"><p class="k">v6</p><p>기본은 <b>문제 지점(위험 · 주의 · 건너뜀) + 지금 지점</b>만. 문제없이 지나온 지점은 바닥 점만 남고, 다른 번호는 <b>오른쪽 지점 목록에 손을 올릴 때</b> 그 번호만 뜸. 위험 · 주의는 축소해도 남음. 측정을 마친 정상 지점은 초록으로 잠깐 떴다 사라지고, 처리한 위험 · 주의는 회색으로 남음. (미션 설정 · 사전 점검은 점검 순서라 번호를 모두 보여 줌)</p></div>
+        <p class="why">번호가 많으면 정작 봐야 할 지점이 묻힘. 지도는 "어디가 문제고 로봇이 지금 어디 있나"만 말하면 됨.</p>
+      </div>
+      <figure class="pic">
+        <div class="frame is-row">
+          <img data-tab="v5" src="./assets/img/advisory-1106/03-v5-pins.webp" alt="v5 지도 — 문제 지점 3 · 4 · 5 · 6 · 7 과 지금 8 말고도 지나온 2 · 19 · 20, 앞으로 갈 10 · 11 · 13 · 15 번 핀이 지도 곳곳에 선다" loading="lazy" />
+          <img data-tab="v6" src="./assets/img/advisory-1106/03-v6-pins.webp" alt="v6 지도 — 위험 4 · 7, 주의 3 · 5 · 6 과 지금 가는 8 번만 서고 나머지는 바닥 점" loading="lazy" />
+        </div>
+      </figure>
+    </section>
+
+    <section class="slide" id="s4" aria-labelledby="s4-title">
+      <div class="txt">
+        <p class="num">04</p>
+        <h2 id="s4-title">Delta 펼침</h2>
+        <div class="blk"><p class="k">v5</p><p>펼치면 <b>대화</b>. 굵은 첫 줄과 물음 한 줄, 물어보면 문장으로 답하고 알림 줄 · 단추가 붙음.</p></div>
+        <div class="blk now"><p class="k">v6</p><p>펼치면 묻지 않아도 <b>정해진 꼴의 답</b>이 바로 보임. 현재 관제 요약 → <b>가장 급한 1건</b>(판정 · 값과 기준 · 재발, 먼저 보는 이유, [위험 상세 확인] [위치 보기]) → <b>다음 확인 항목</b>(미션은 [M번호 이름]) → 주의 n건(접힘) → 물어볼 말. 접힌 위젯에도 지점 번호 표식.</p></div>
+        <p class="why">관제자에게 필요한 건 대화보다 "무엇부터, 왜". 늘 같은 꼴이라 한눈에 읽히고, 미션 번호가 상단 탭과 같아 바로 찾아감.</p>
+      </div>
+      <figure class="pic">
+        <div class="frame is-row">
+          <img data-tab="v5" src="./assets/img/advisory-1106/04-v5-delta.webp" alt="v5 Delta 펼침 — 굵은 첫 줄과 물음 한 줄, 아래 조치 단추 셋과 묻기 칸, 가운데는 비어 있다" loading="lazy" />
+          <img data-tab="v6" src="./assets/img/advisory-1106/04-v6-delta.webp" alt="v6 Delta 펼침 — 현재 관제 요약, 현장 점검이 필요해요 N₂ 압력계 기준 초과(0.86 MPa, 정상 0.60~0.80, 최근 3회 측정), 먼저 보는 이유, 위험 상세 확인 · 위치 보기, 다음 확인 항목 [M1 정기 순회 점검] · [M3 전기실 열화상 점검], 주의 9건, 물어볼 말 칩" loading="lazy" />
+        </div>
+      </figure>
+    </section>
+
+    <section class="slide" id="s5" aria-labelledby="s5-title">
+      <div class="txt">
+        <p class="num">05</p>
+        <h2 id="s5-title">안전진단</h2>
+        <div class="blk"><p class="k">v5</p><p>왼쪽에 미션 전체 목록과 미션별 작은 지도를 쌓음. 판정은 관제와 따로 계산해 관제 알림과 어긋날 수 있었음.</p></div>
+        <div class="blk now"><p class="k">v6</p><p>관제와 <b>같은 상단 미션 탭</b>(첫 탭 전체 미션). 왼쪽은 <b>고른 미션 하나</b>의 미니맵 — 관제 지도의 <b>실제 경로</b>를 그대로 뽑아 그리고, 로봇은 3D 로봇을 위에서 본 그림. 판정은 모든 미션이 <b>관제 알림 기준</b>이라 관제에서 본 알림과 카드가 같음. 완료 미션도 들어와 지난 순회와 견줌.</p></div>
+        <p class="why">관제에서 본 위험이 안전진단에서 다르게 보이면 근거를 믿을 수 없음. 같은 탭 · 같은 길 · 같은 판정이어야 화면을 옮겨도 이어짐.</p>
+      </div>
+      <figure class="pic">
+        <div class="tabs" role="group" aria-label="화면 고르기"></div>
+        <div class="frame">
+          <img data-tab="v5" src="./assets/img/advisory-1106/05-v5-safety.webp" alt="v5 안전진단 — 상단 통합 순회 현황 › 정기 순회 점검, 왼쪽 미션 전체 현황과 미션별 작은 지도 셋, 오른쪽 감지 6종 카드" loading="lazy" />
+          <img data-tab="v6" data-default src="./assets/img/advisory-1106/05-v6-safety.webp" alt="v6 안전진단 — 상단 미션 탭 M1, 왼쪽 정기 순회 점검 B4 미니맵(관제 실제 경로, 위에서 본 로봇), 오른쪽 감지 6종 카드 중 위험 카드는 빨간 테" loading="lazy" />
+        </div>
+      </figure>
+    </section>
+  </main>
+
+  <script src="./assets/js/theme.js?v=c86093d9"></script>
+  <script>
+    (function () {
+      "use strict";
+      // 장마다 단추를 그림 수만큼 만든다. 기본은 data-default, 없으면 첫 그림.
+      // 나란히 보기 칸은 그림마다 이름표를 단다
+      Array.prototype.forEach.call(document.querySelectorAll(".frame.is-row, .frame.is-col"), function (f) {
+        Array.prototype.slice.call(f.querySelectorAll("img[data-tab]")).forEach(function (img) {
+          var box = document.createElement("div");
+          var lbl = document.createElement("p");
+          lbl.className = "lbl" + (/^v6/.test(img.getAttribute("data-tab")) ? " is-now" : "");
+          lbl.textContent = img.getAttribute("data-tab");
+          f.insertBefore(box, img);
+          box.appendChild(lbl);
+          box.appendChild(img);
+        });
+      });
+
+      Array.prototype.forEach.call(document.querySelectorAll(".slide .pic"), function (pic) {
+        var tabs = pic.querySelector(".tabs");
+        var imgs = Array.prototype.slice.call(pic.querySelectorAll(".frame img[data-tab]"));
+        if (!tabs || !imgs.length) { return; }
+        var start = imgs.filter(function (i) { return i.hasAttribute("data-default"); })[0] ||
+          imgs[0];
+        var btns = imgs.map(function (img) {
+          var b = document.createElement("button");
+          b.type = "button";
+          b.textContent = img.getAttribute("data-tab");
+          b.addEventListener("click", function () { show(img); });
+          tabs.appendChild(b);
+          return b;
+        });
+        function show(img) {
+          imgs.forEach(function (i, n) {
+            var on = i === img;
+            if (on && i.hasAttribute("data-anim") && i.getAttribute("data-started")) {
+              i.src = i.getAttribute("src").split("#")[0] + "#" + Date.now();
+            }
+            if (on) { i.setAttribute("data-started", "1"); }
+            i.classList.toggle("is-on", on);
+            btns[n].setAttribute("aria-pressed", on ? "true" : "false");
+          });
+          // 제안 장 — 왼쪽 칸 표시를 그림과 맞춘다
+          var key = img.getAttribute("data-key");
+          if (key) {
+            Array.prototype.forEach.call(pic.parentNode.querySelectorAll("[data-opt]"), function (b) {
+              b.setAttribute("aria-pressed", b.getAttribute("data-opt") === key ? "true" : "false");
+            });
+          }
+        }
+        show(start);
+        // 제안 장 — 왼쪽 칸을 누르면 그 그림으로
+        Array.prototype.forEach.call(pic.parentNode.querySelectorAll("[data-opt]"), function (b) {
+          b.addEventListener("click", function () {
+            var img = imgs.filter(function (i) { return i.getAttribute("data-key") === b.getAttribute("data-opt"); })[0];
+            if (img) { show(img); }
+          });
+        });
+      });
+
+      // 장 넘기기 — 넓은 화면에서는 휠 · 방향키 · 목차를 한 장씩, 천천히 미끄러지게 옮긴다.
+      // 브라우저 기본 부드러운 스크롤은 빠르고 속도를 못 바꿔서, 직접 1.1초 ease-in-out 으로 옮긴다.
+      var slides = Array.prototype.slice.call(document.querySelectorAll(".slide"));
+      var pager = document.querySelector("[data-pager]");
+      // 페이지 단추 — ‹ · 01 ~ 06 · ›. 표지는 목차가 있으니 넣지 않는다.
+      var prevB = document.createElement("button");
+      prevB.type = "button"; prevB.className = "arw"; prevB.textContent = "‹"; prevB.setAttribute("aria-label", "이전 장");
+      prevB.addEventListener("click", function () { go(cur - 1); });
+      pager.appendChild(prevB);
+      var pageBtns = slides.slice(1).map(function (sl, k) {
+        var b = document.createElement("button");
+        b.type = "button"; b.textContent = (k + 1 < 10 ? "0" : "") + (k + 1);
+        var h = sl.querySelector("h2");
+        b.setAttribute("aria-label", (k + 1) + "장" + (h ? " · " + h.textContent : ""));
+        b.addEventListener("click", function () { go(k + 1); });
+        pager.appendChild(b);
+        return b;
+      });
+      var nextB = document.createElement("button");
+      nextB.type = "button"; nextB.className = "arw"; nextB.textContent = "›"; nextB.setAttribute("aria-label", "다음 장");
+      nextB.addEventListener("click", function () { go(cur + 1); });
+      pager.appendChild(nextB);
+      var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      var wide = window.matchMedia("(min-width: 901px)");
+      var DUR = reduce ? 0 : 1100;
+      var cur = 0, busy = false, lockUntil = 0;
+
+      function mark(n) {
+        cur = n;
+        pager.hidden = n === 0;
+        pageBtns.forEach(function (b, k) {
+          if (k + 1 === n) { b.setAttribute("aria-current", "page"); } else { b.removeAttribute("aria-current"); }
+        });
+        prevB.disabled = n <= 1;
+        nextB.disabled = n >= slides.length - 1;
+        slides.forEach(function (s, k) { if (k === n) { s.classList.add("is-in"); } });
+      }
+      function ease(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
+      function go(n) {
+        n = Math.max(0, Math.min(slides.length - 1, n));
+        var from = window.scrollY, to = slides[n].offsetTop;
+        mark(n);
+        // 움직이는 그림이 있는 장은 들어올 때 처음부터 다시 튼다
+        var anim = slides[n].querySelector("img[data-anim].is-on");
+        if (anim) { anim.src = anim.getAttribute("src").split("#")[0] + "#" + Date.now(); }
+        if (history.replaceState) { history.replaceState(null, "", "#" + slides[n].id); }
+        if (!DUR || Math.abs(to - from) < 2) { window.scrollTo(0, to); return; }
+        busy = true;
+        var t0 = performance.now();
+        (function step(t) {
+          var k = Math.min(1, (t - t0) / DUR);
+          window.scrollTo(0, from + (to - from) * ease(k));
+          if (k < 1) { requestAnimationFrame(step); }
+          else { busy = false; lockUntil = performance.now() + 450; }   // 트랙패드 관성 휠을 흘려 보낸다
+        })(t0);
+      }
+
+      // 손으로 끌거나 좁은 화면에서는 보이는 장을 따라간다
+      if ("IntersectionObserver" in window) {
+        var io = new IntersectionObserver(function (es) {
+          es.forEach(function (e) {
+            if (!e.isIntersecting) { return; }
+            e.target.classList.add("is-in");
+            if (!busy && e.intersectionRatio >= 0.55) { mark(slides.indexOf(e.target)); }
+          });
+        }, { threshold: [0.2, 0.55] });
+        slides.forEach(function (s) { io.observe(s); });
+      } else {
+        slides.forEach(function (s) { s.classList.add("is-in"); });
+      }
+
+      window.addEventListener("wheel", function (e) {
+        if (!wide.matches || e.ctrlKey) { return; }
+        e.preventDefault();
+        if (busy || performance.now() < lockUntil || Math.abs(e.deltaY) < 8) { return; }
+        go(cur + (e.deltaY > 0 ? 1 : -1));
+      }, { passive: false });
+
+      document.addEventListener("keydown", function (e) {
+        if (!wide.matches) { return; }
+        if (e.target.closest && e.target.closest("input, textarea, button")) { if (e.key === " ") { return; } }
+        var step = { ArrowDown: 1, ArrowRight: 1, PageDown: 1, " ": 1, ArrowUp: -1, ArrowLeft: -1, PageUp: -1 }[e.key];
+        if (e.key === "Home") { e.preventDefault(); go(0); return; }
+        if (e.key === "End") { e.preventDefault(); go(slides.length - 1); return; }
+        if (!step) { return; }
+        e.preventDefault();
+        if (!busy) { go(cur + (e.shiftKey && e.key === " " ? -1 : step)); }
+      });
+
+      Array.prototype.forEach.call(document.querySelectorAll('a[href^="#s"]'), function (a) {
+        a.addEventListener("click", function (e) {
+          var t = document.getElementById(a.getAttribute("href").slice(1));
+          if (!t || !wide.matches) { return; }
+          e.preventDefault();
+          go(slides.indexOf(t));
+        });
+      });
+
+      // 창 크기가 바뀌면 지금 장 맨 위에 다시 맞춘다
+      window.addEventListener("resize", function () { if (wide.matches && !busy) { window.scrollTo(0, slides[cur].offsetTop); } });
+
+      // 주소의 #s3 처럼 장을 집어 열면 그 장에서 시작한다
+      var first = slides.indexOf(document.getElementById((location.hash || "").slice(1)));
+      if (first > 0) { window.scrollTo(0, slides[first].offsetTop); mark(first); } else { mark(0); }
+    })();
+  </script>
+</body>
+</html>
