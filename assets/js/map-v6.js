@@ -2831,6 +2831,7 @@
     return !!(alertBox && !alertBox.hidden && chosenWp && alertBox.getAttribute("data-wp") === chosenWp);
   }
 
+  var wpEtaTimer = 0;
   var WP_WORD = {
     safe: "정상", caution: "주의", danger: "위험",
     current: "측정 중", upcoming: "예정"
@@ -2875,10 +2876,22 @@
         var runRow = document.querySelector('[data-timeline] .timeline-item[data-waypoint="' + info.id + '"]');
         var meas6 = !!(runRow && runRow.querySelector(".rr-note.is-measure"));
         var core6 = info.tone === "safe" ? ""   // [11/06 디자이너] 정상은 따로 말하지 않는다 — 지도에 세모가 없으면 정상이다. 측정값 목록만
-          : /current|next|active|running/.test(info.tone) ? (meas6 ? "측정 항목 확인 중" : "로봇이 오는 중" + (function () { var e = runRow && runRow.querySelector('[data-rr="eta"]'); return e && e.textContent.trim() ? " · " + e.textContent.trim() : ""; })())
+          : /current|next|active|running/.test(info.tone) ? (meas6 ? "측정 항목 확인 중" : "로봇이 오는 중")
           : info.kind === "upcoming" || info.tone === "upcoming" ? "아직 가지 않은 자리입니다." : (info.read || "");
         wpRead.textContent = core6;
         wpRead.hidden = !core6;
+        /*
+         * [11/06 디자이너] 도착 시간은 로봇 · 조치 팝오버처럼 오른쪽 끝 회색 보조 글 — 굵은 핵심 줄은 상태만 말한다.
+         *   우측 목록의 도착 글을 0.4초마다 다시 읽는다(로봇 팝오버와 같은 박자)
+         */
+        clearInterval(wpEtaTimer);
+        if (core6 === "로봇이 오는 중") {
+          var etaEl = document.createElement("span"); etaEl.className = "mbt-meta";
+          wpRead.appendChild(etaEl);
+          var etaPaint = function () { var e = runRow && runRow.querySelector('[data-rr="eta"]'), t = e ? e.textContent.trim() : ""; if (etaEl.textContent !== t) { etaEl.textContent = t; } };
+          etaPaint();
+          wpEtaTimer = setInterval(function () { if (wpBox.hidden || !etaEl.isConnected) { clearInterval(wpEtaTimer); return; } etaPaint(); }, 400);
+        }
         // 지금 지점 꼬리표 — 서서 재는 중이면 "측정 중", 아직 걸어오는 중이면 "다음 지점"(꼬리표와 핵심 줄이 어긋나지 않게)
         if (wpChip && /current|next|active|running/.test(info.tone)) { wpChip.textContent = meas6 ? "측정 중" : "다음 지점"; }
         wpRead.classList.add("mbt-core");
