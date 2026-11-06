@@ -2110,6 +2110,40 @@
     rrCamT = setTimeout(function () { if (onLane && onLane.turns) { layWaypoints(); frame(); } }, 150);
   }
 
+  /*
+   * [11/06 공동작업자] 이름이 아직 없는 지점("waypoint name")은 지도 설비 이름으로 — "설비 13".
+   *   번호를 지점 번호(WP-09 → 설비 09)로 지으면 지도의 설비 09 와 엉뚱한 곳을 가리킨다. 그래서 그 지점에서 가장 가까운 설비의 이름을 쓴다.
+   *   지점 차례대로, 이미 쓴 설비는 건너뛴다(두 지점이 같은 이름이 되지 않게). 우측 목록 · 진행 제목 · 로봇 팝오버가 이 글을 읽는다
+   */
+  var PH_NAME = /^waypoint name$/i, wpNameOf = {};
+  function nameWps() {
+    var rail = document.querySelector("[data-timeline]");
+    if (!rail || !wpSpots.length) { return; }
+    var eq = meshes.filter(function (m) { return m.key === "equipment" && m.title; }).map(function (m) {
+      m.mesh.updateWorldMatrix(true, false);
+      return { title: m.title, at: m.mesh.localToWorld(m.center.clone()) };
+    });
+    if (!eq.length) { return; }
+    var used = {};
+    var near = function (w) { var best = null, bd = Infinity; eq.forEach(function (e) { if (used[e.title]) { return; } var d = e.at.distanceToSquared(w.spot); if (d < bd) { bd = d; best = e; } }); return best; };
+    // 이름이 있는 지점(N₂ 배관 압력계 등)이 서 있는 설비는 먼저 비켜 둔다 — 그 설비를 다른 지점 이름으로 쓰지 않게
+    wpSpots.forEach(function (w) {
+      var row = rail.querySelector('.timeline-item[data-waypoint="' + w.id + '"] .step-title');
+      if (row && !row.hasAttribute("data-ph-name") && !PH_NAME.test(row.textContent.trim())) { var b = near(w); if (b) { used[b.title] = true; } }
+    });
+    wpSpots.slice().sort(function (a, b) { return a.no - b.no; }).forEach(function (w) {
+      var row = rail.querySelector('.timeline-item[data-waypoint="' + w.id + '"] .step-title');
+      if (!row) { return; }
+      var ph = row.hasAttribute("data-ph-name") || PH_NAME.test(row.textContent.trim());
+      if (!ph) { return; }
+      var best = near(w);
+      if (!best) { return; }
+      used[best.title] = true;
+      wpNameOf[w.id] = best.title;
+      if (row.getAttribute("data-ph-name") !== best.title) { row.setAttribute("data-ph-name", best.title); row.textContent = best.title; }   // 영문판은 번역된 글을 다시 덮지 않게 속성으로 본다
+    });
+  }
+
   function layWaypoints() {
     if (!scene) { return; }
     clearWaypoints();
@@ -2168,6 +2202,7 @@
       (bucket[key] = bucket[key] || []).push(spot);
     });
 
+    nameWps();   // [11/06] 이름 없는 지점 → 가까운 설비 이름
     Object.keys(bucket).forEach(function (key) {
       var tone = key.split("|")[1];
       var wk = tone === "upcoming" ? "ring" : "full", ws = 15;
