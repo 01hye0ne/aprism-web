@@ -1143,6 +1143,7 @@
     var l1 = $(".ai-line-1"), l2 = $(".ai-line-2");
     if (deltaFirst === null && l2) { deltaFirst = { line1: l1 ? l1.textContent : "", line2: l2.textContent }; }
     window.APRISM_DELTA_SCOPE = floorView;
+    window.APRISM_DELTA_SAY = null;   // 두 줄 문형(v3-panel.js)은 쌓인 건물(전체 미션)에서만 — 층 · 미션을 펼치면 예전 한 문장
     if (scopeMission && !floorView) {
       var fl = MISSION_FLOORS[scopeMission];
       d.line1 = scopeMission;
@@ -1158,7 +1159,22 @@
         // 건수는 목록에서 센다 — HTML 문장의 숫자가 알림 데이터와 어긋나지 않게(10/28, Robot 11 알림 두 건 추가)
         var nc = list.filter(function (a) { return a.sev === "critical"; }).length;
         if (!V6) { d.line2 = deltaFirst.line2.replace(/위험 알림 \d+건, 주의 알림 \d+건/, "위험 알림 " + nc + "건, 주의 알림 " + (list.length - nc) + "건"); }
-        else d.line2 = list.length ? sevSay(list) + " 있어요. " + (list.some(function (a) { return a.sev === "critical"; }) ? "위험 미션부터 확인하세요." : "왼쪽 목록에서 확인하세요.") : "알림이 없어요. 순회는 정상이에요.";
+        else if (!list.length) { d.line2 = "알림이 없어요. 순회는 정상이에요."; }
+        else {
+          /*
+           * [11/06 v6] 개별 미션(monitor.js COPY.brief)과 같은 두 줄 — 1줄 건수, 2줄 "[M번호 미션]부터 확인하세요."(회색, 미션 표식은 v3-panel.js).
+           *   먼저 볼 미션 = 위험이 있으면 가장 오래된 위험 알림의 미션, 없으면 가장 오래된 주의 알림의 미션.
+           */
+          var crit = list.filter(function (a) { return a.sev === "critical"; });
+          var first = (crit.length ? crit : list).slice().sort(function (a, b) { return a.time < b.time ? -1 : a.time > b.time ? 1 : 0; })[0];
+          var say = { l: [sevSay(list) + " 있어요.", first.mission + "부터 확인하세요."] };
+          say.parts = {
+            ko: [[say.l[0]], [{ m: first.mission }, "부터 확인하세요."]],
+            en: [[say.l[0]], ["Check ", { m: first.mission }, " first."]]
+          };
+          window.APRISM_DELTA_SAY = say;
+          d.line2 = say.l.join("\n");
+        }
       }
       return d;
     }
