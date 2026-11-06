@@ -1603,6 +1603,8 @@ body.ver-6 .ac-detail-contents > .ac-scroll-fade, body.ver-6 .ac-record > .ac-sc
 /* [11/05 v6] Delta 문장 속 미션은(접힘 · 펼침, 한글판 · 영문판) [M번호 이름] — 번호 · 이름은 문장 그대로, 괄호만 회색(문형표 5 확정). v3-panel.js 가 .dl-m · .dl-br 로 감싼다.
    2줄(회색) 속 waypoint 이름(.dl-wp-name)만 흰색 굵게 — 할 일의 대상이 먼저 읽히게 */
 body.ver-6 .delta3 .dl-wp-name { color: var(--text-primary); font-weight: var(--font-weight-bold); }
+/* [11/06] waypoint 이름 괄호 【 】 — 2줄 글과 같은 회색 보통 굵기 */
+body.ver-6 .delta3 .dl-wb { color: color-mix(in srgb, var(--text-primary) 55%, transparent); font-weight: var(--font-weight-regular); }
 body.ver-6 .delta3 .dl-br { color: color-mix(in srgb, var(--text-primary) 55%, transparent); font-weight: var(--font-weight-regular); }
 /* waypoint 번호 — 경로 목록 번호 모양(W1). 숫자 바닥선 = 문장 바닥선, waypoint 이름과 사이 2px */
 body.ver-6 .delta3 .dl-wp {
