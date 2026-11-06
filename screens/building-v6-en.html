@@ -215,12 +215,16 @@
           <!-- v3(10/21) — 접을 수 있다. 머리 줄 어디를 눌러도 접히고, 접으면 위 최신 알림이 그만큼 자란다(v3-panel.js). -->
           <section class="ah-sec done-sec" aria-labelledby="done-title" data-done-sec>
             <div class="done-head" data-done-head>
-              <h3 class="t-title-2" id="done-title">오늘 확인 완료</h3>
-              <span class="badge done-count t-caption"><span class="badge-dot"></span><span class="num" data-done-count>0건</span></span>
-              <button type="button" class="done-fold" data-done-fold
-                      aria-expanded="true" aria-controls="done-box" aria-label="오늘 확인 완료 접기">
-                <span class="i i-16" aria-hidden="true" style="--i:var(--ic-chevron-down)"></span>
-              </button>
+              <!-- [11/06] 관제(main-v6) 오늘 확인된 알림 머리와 같다 — 이름 · 건수 점 뺌 · 접기 화살표 붙임 · 오른쪽 끝 [전체보기](조치 요청됨 탭) -->
+              <h3 class="t-title-2" id="done-title">오늘 확인된 알림</h3>
+              <span class="done-toggle">
+                <span class="done-count t-caption"><span class="num" data-done-count>0건</span></span>
+                <button type="button" class="done-fold" data-done-fold
+                        aria-expanded="true" aria-controls="done-box" aria-label="오늘 확인된 알림 접기">
+                  <span class="i i-16" aria-hidden="true" style="--i:var(--ic-chevron-down)"></span>
+                </button>
+              </span>
+              <button type="button" class="btn btn-ghost is-xs ah-all" data-ah-all="done">전체보기</button>
             </div>
             <div class="ah-box" id="done-box">
               <div class="ah-list" data-done-list role="list"></div>

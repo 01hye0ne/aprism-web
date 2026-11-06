@@ -1797,3 +1797,5 @@ body.ver-6.v2-2 .ah-report:active { color: #FFFFFF; }   /* [11/06] 줄 호버 �
 :root[data-theme="light"] body.ver-6.v2-2 .ah-report:hover,
 :root[data-theme="light"] body.ver-6.v2-2 .ah-report:active { color: var(--text-primary); }
 body.ver-6 .done-how .done-act::after { content: ", "; }   /* 조치 뒤 쉼표는 CSS 로 — 글 조각이 사전 문구 그대로라 영문판 번역이 붙는다 */
+/* [11/06] 전체 미션(building-v6)의 오늘 확인된 알림 줄은 누를 곳이 아니다(고르기는 관제만) — 손가락 표시만 뺀다, 호버 면 · 시각은 같다 */
+body.ver-6.is-building .done-item { cursor: default; }
