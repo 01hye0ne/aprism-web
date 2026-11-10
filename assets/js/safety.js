@@ -173,7 +173,9 @@
     const isHit = !!hx, here = cellOf(k, wp), spi = sp.find(p => p[0]===wp) || [wp, ''];
     const x = isHit ? hx : [here && here[0]==='plan' ? 'plan' : 'ok', here && here[1] ? here[1] : '정상 범위', wp, spi[1]];
     const st = x[0];
-    const tabs = K.map(k2 => { const y = m.r[k2]; if(!y) return `<span class="tb na">${k2}</span>`; const s2 = y[0]==='ok' ? '' : y[0];
+    // [11/10 v7] 넘은 지점이 모두 조치 완료면 탭의 단계 표식(삼각형)을 뺀다
+    const allDone = k2 => V7 && (() => { const hs = itemsOf(mi, k2).filter(it => it[0]==='crit' || it[0]==='warn'); return hs.length > 0 && hs.every(it => (REQ[mi + '|' + k2 + '|' + wpOf(it)] || {}).st === 'done'); })();
+    const tabs = K.map(k2 => { const y = m.r[k2]; if(!y) return `<span class="tb na">${k2}</span>`; const s2 = y[0]==='ok' || allDone(k2) ? '' : y[0];
       return `<button type="button" class="tb ${k2===k ? 'on' : ''}" data-dk="${k2}">${k2}<i class="d ${s2}"></i></button>`; }).join('');
     // [10/30] 안전감지(안전모 · 안전벨트 착용)는 히트맵 칸이 없다 — 원본만 크게
     const md = MD(k, st, mi), canBig = !md[1].includes('canvas'), heat = k !== '안전감지';
