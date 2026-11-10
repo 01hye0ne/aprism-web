@@ -6,7 +6,11 @@
   var head = document.querySelector("[data-done-head]");
   var btn = document.querySelector("[data-done-fold]");
   if (!sec || !head || !btn) { return; }
-  var KEY = "aprism.v3.doneFolded";
+  // [11/10 v7 · UT 개선 시각화 1c] v7 은 처음에 접힌 채로 연다 — 조치 요청된 알림은 테스트에서 4명만 눌렀고 숨기자는 의견(P09 · P12)이 있었다.
+  //   접힌 채 조치하면 쪽지가 건수로 빨려 드는 착지(monitor.js .is-landed)가 피드백을 맡는다. 펼쳐 두면 그 선택은 기억한다.
+  //   v7 은 따로 기억한다 — 예전 키(v3)엔 지금까지 "펼침(0)"이 적혀 있어 그대로 읽으면 기본값이 안 바뀐다.
+  var V7 = document.body.classList.contains("ver-7");
+  var KEY = V7 ? "aprism.v7.doneFolded" : "aprism.v3.doneFolded";
 
   function set(folded) {
     sec.classList.toggle("is-folded", folded);
@@ -16,8 +20,8 @@
     try { window.localStorage.setItem(KEY, folded ? "1" : "0"); } catch (e) { /* 저장이 막힌 곳 — 이번만 */ }
   }
 
-  var start = false;
-  try { start = window.localStorage.getItem(KEY) === "1"; } catch (e) { /* 펼친 채로 */ }
+  var start = V7;
+  try { var kept = window.localStorage.getItem(KEY); if (kept !== null) { start = kept === "1"; } } catch (e) { /* v7 접힘 · 이전 판 펼침으로 */ }
   // 처음 그릴 때는 움직이지 않는다 — 새로 고칠 때마다 접히는 모션이 보이면 거슬린다.
   sec.classList.add("no-motion");
   set(start);
