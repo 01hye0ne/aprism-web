@@ -206,7 +206,6 @@ body.ver-7 .ah-where > .mbt-pin.is-plain.ah-wp-pin,
 :root[data-theme="light"] body.ver-7 .ah-where > .mbt-pin.is-plain.ah-wp-pin { color: inherit; }
 :root[data-theme="light"] body.ver-7 .ah-item .ah-wp-pin { border-color: var(--color-gray-100); }   /* 라이트 층 꼬리표 바탕(v6.css)과 같게 */
 
-<<<<<<< HEAD
 /* ==================================================================
  * [11/10 v7 디자이너] 알림 팝오버 가로형 — Figma UI_00 1233:16459
  *   판 564 · 여백 8 · 칸 사이 8 · 모서리 16 · 유리(bg/glass 55% + 흐림 20)
@@ -330,7 +329,7 @@ body.ver-7 .ma-v3 .ma-snap { min-height: 204px; border-radius: 0 0 0 16px; }
 body.ver-7 .ma-v3 .ma-snap > .ma-stamp.ma-stamp6 { left: var(--space-8); right: var(--space-8); bottom: var(--space-8); }
 body.ver-7 .ma-v3 .ma-lower { padding: var(--space-8); }
 body.ver-7 .map-alert.ma-v3.no-snap { grid-template-columns: minmax(0, 1fr); }
-=======
+
 /*
  * [11/10 v7] 안전진단 현장 조치 요청 뒤 — safety.js reqSide
  *   보낸 내용 잠금(.dl.is-sent): 체크 · 메모는 바꿀 수 없음, 글자는 그대로 읽힘(흐리게 하지 않음)
@@ -371,15 +370,9 @@ body.ver-7 .sf .rqd { width: 100%; height: var(--size-control-lg); font-size: va
 body.ver-7 > .toast.sf-toast { position: fixed; bottom: var(--space-32); z-index: 1000; }
 body.ver-7 > .toast.sf-toast .toast-undo[hidden] { display: none; }
 body.ver-7 > .toast.sf-toast:has(.toast-undo[hidden]) { padding-right: var(--space-16); min-height: 34px; }
-<<<<<<< HEAD
->>>>>>> b6a9d0a (v7 안전진단 현장 조치 요청 피드백 — 버튼 '요청 전송됨'으로 끔, 조치 진행 세 단계(응답 대기 · 현장 조치 중 · 조치 완료), DS 토스트(되돌리기))
-=======
 
 /* [11/10 v7] 연관 감지 줄 — 지점 · 값 대신 출처 미션(같은 미션). 연관 감지는 같은 미션 안에서만 고른다(safety.js LINKS[미션]) */
 body.ver-7 .sf .rlx .rmi { flex: none; padding: 0 var(--space-8); border-radius: var(--radius-4); background-color: var(--bg-cell); font-size: var(--font-size-14); line-height: var(--font-line-height-22); color: var(--text-secondary); }
-<<<<<<< HEAD
->>>>>>> e0fb0d0 (v7 안전진단 상세 — 판정 카드 감지 이름 · 세부 묘사, 오탐 가능성, 측정 이력 꼬리표, 연관 감지 지점 · 값 뺌. 연관 감지에 '같은 미션' 표시)
-=======
 /* 목록 카드 — 진행 배지도 판정 칩 자리(사진 아래 걸침)에. safety.css 는 .pl 없는 줄을 숨긴다 */
 body.ver-7 .sf .cx .kd > .rw:has(.jrq) { display: flex; }
 body.ver-7 .sf .cx .kd > .rw:has(.jrq) + * { margin-top: 0; }
@@ -391,4 +384,3 @@ body.ver-7 .sf .jsp-b:hover { background-color: var(--bg-cell); }
 body.ver-7 .sf .jsp-b.on { background-color: var(--bg-cell); color: var(--text-primary); }
 body.ver-7 .sf .jsp-b b { font-weight: 700; }
 body.ver-7 .sf .jsp-b .jrq { height: 24px; }
->>>>>>> 18eeb83 (v7 안전진단 — 목록 카드 · 측정 이력 오늘 줄도 진행 배지, 목록에서도 단계 갱신, 넘은 지점 둘 이상이면 판정 카드에 지점 고르기)
