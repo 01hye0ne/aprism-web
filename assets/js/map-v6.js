@@ -4010,6 +4010,23 @@
     var watch = function (el, fn) { if (el) { new MutationObserver(fn).observe(el, { childList: true, characterData: true, subtree: true }); fn(); } };
     watch(ptEl, ptSplit);
     watch(ppEl, ppSplit);
+    /*
+     * [11/10 v7 디자이너] 우측 패널 머리 = 로봇 이름 — "1대 배정 · 1대 수행중" 대신. 미션 하나에 로봇 한 대라 대수는 늘 같은 값이었다.
+     *   카드 안 이름(.robot-id)은 머리로 올라가 감춘다(v7.css). 고른 카드의 이름을 따라간다(미션을 바꾸면 그 로봇).
+     */
+    var rCounts = document.querySelector(".robot-list .robot-counts"), rStrip = document.querySelector(".robot-strip");
+    if (rCounts && rStrip) {
+      var rName = document.createElement("span");
+      rName.className = "robot-head-name t-label-1";
+      rCounts.appendChild(rName);
+      var rSync = function () {
+        var id = rStrip.querySelector(".robot-card[aria-pressed='true'] .robot-id") || rStrip.querySelector(".robot-card .robot-id");
+        var t = id ? id.textContent.trim() : "";
+        if (rName.textContent !== t) { rName.textContent = t; }
+      };
+      new MutationObserver(rSync).observe(rStrip, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ["aria-pressed"] });
+      rSync();
+    }
     watch(pcEl, function () { if (wpTog) { wpToggleSync(); } });
   }
 

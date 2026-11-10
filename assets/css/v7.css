@@ -184,3 +184,12 @@ body.ver-7 .progress-count { display: none; }
  *   ".ah-where > .floor-tag + span" 이 바로 뒤 칸을 늘이고 말줄임하는 규칙(monitor.css)이라 원은 늘지 않게 되돌린다 — 늘이는 건 지점 이름(.ah-wp)
  */
 body.ver-7 .ah-where > .ah-wp-pin { flex: none; overflow: visible; white-space: normal; }
+
+/*
+ * [11/10 v7 디자이너] 우측 패널 머리 = 로봇 이름(map-v6.js 가 고른 카드 이름을 옮겨 적는다). "n대 배정 · n대 수행중"은 감춘다 — 미션 하나에 로봇 한 대.
+ *   카드 안 이름은 머리로 올라가 감춘다. 이름은 Label/1 · text/primary, 앞 로봇 아이콘은 그대로.
+ */
+body.ver-7 .robot-list .robot-counts [data-scope-count],
+body.ver-7 .robot-list .robot-counts .badge { display: none; }
+body.ver-7 .robot-list .robot-counts .robot-head-name { color: var(--text-primary); }
+body.ver-7 .robot-strip .robot-card .label .robot-id { display: none; }
