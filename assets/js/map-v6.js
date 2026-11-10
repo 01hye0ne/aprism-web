@@ -3958,6 +3958,11 @@
     }
     wpPlace();
     wpTog.textContent = "지점 " + rail.querySelectorAll(".timeline-item[data-waypoint]").length + "곳";
+    // [11/10 v7 디자이너] 진행 막대 아래의 지나온 수(7/20)를 이 머리로 옮겨 하나로 — "지점 7/20"
+    if (document.body.classList.contains("ver-7")) {
+      var cnt = document.querySelector("[data-progress-count]"), ct = cnt ? cnt.textContent.trim() : "";
+      if (/^\d+\/\d+$/.test(ct)) { wpTog.textContent = (document.documentElement.lang === "en" ? "Waypoints " : "지점 ") + ct; }
+    }
     wpTog.setAttribute("aria-expanded", String(!document.body.classList.contains("rr-wp-closed")));
   }
   document.addEventListener("aprism:rr-mode", function (event) {
@@ -3966,6 +3971,47 @@
   });
   document.addEventListener("aprism:mission", function () { setTimeout(wpToggleSync, 0); });
   setTimeout(wpToggleSync, 0);
+
+  /*
+   * [11/10 v7 디자이너 · Figma UI_00 63:219 Status=Brand] 진행 막대 머리 — 지금 하는 일 두 줄 + 오른쪽 큰 %.
+   *   제목 "냉각수 열교환기 HX-1로 이동 중" 을 지점 이름 / 행동 두 덩이로 감싼다(줄바꿈은 지점 이름 뒤 — 로봇 팝오버 actHtml 과 같은 규칙).
+   *   %는 숫자와 단위를 나눠 단위만 작게(Data/Large 36 + Overline 13).
+   *   글자는 그대로 둔다 — 제목 · % 를 다시 읽는 곳(Delta 답 · 팝오버)이 textContent 로 같은 글을 받는다. 제목을 쓰는 곳(route-sim · screen.js)이 글을 갈면 다시 감싼다.
+   *   지나온 수(7/20)는 아래 지점 목록 머리로 옮겨 "지점 7/20"(위 wpToggleSync) — 숫자가 바뀌면 머리도 따라간다.
+   */
+  if (document.body.classList.contains("ver-7")) {
+    var ptEl = document.querySelector("[data-progress-title]"), ppEl = document.querySelector("[data-progress-percent]"), pcEl = document.querySelector("[data-progress-count]");
+    var ptSplit = function () {
+      if (!ptEl || ptEl.querySelector(".pt-act")) { return; }
+      var t = ptEl.textContent.replace(/\s+/g, " ").trim();
+      if (!t) { return; }
+      var head = "", act = "", m = /^(.+?(?:으로|로)) (이동 중)$/.exec(t);
+      if (m) { head = m[1]; act = m[2]; }
+      else {
+        var runT = document.querySelector("[data-timeline] .timeline-item[data-waypoint].is-running .step-title");
+        var nm = runT ? runT.textContent.trim() : "";
+        if (nm && t.indexOf(nm + " ") === 0) { head = nm; act = t.slice(nm.length + 1); }
+        else if ((m = /^(.+?,) (.+)$/.exec(t))) { head = m[1]; act = m[2]; }   // 영문 "Heat Exchanger HX-1, outlet temperature"
+      }
+      if (!head) { return; }
+      ptEl.textContent = "";
+      var h = document.createElement("span"); h.className = "pt-head"; h.textContent = head;
+      var a = document.createElement("span"); a.className = "pt-act"; a.textContent = act;
+      ptEl.appendChild(h); ptEl.appendChild(document.createTextNode(" ")); ptEl.appendChild(a);
+    };
+    var ppSplit = function () {
+      if (!ppEl || ppEl.querySelector(".pp-unit")) { return; }
+      var m = /^(\d+)\s*%$/.exec(ppEl.textContent.trim());
+      if (!m) { return; }
+      ppEl.textContent = m[1];
+      var u = document.createElement("span"); u.className = "pp-unit"; u.textContent = "%";
+      ppEl.appendChild(u);
+    };
+    var watch = function (el, fn) { if (el) { new MutationObserver(fn).observe(el, { childList: true, characterData: true, subtree: true }); fn(); } };
+    watch(ptEl, ptSplit);
+    watch(ppEl, ppSplit);
+    watch(pcEl, function () { if (wpTog) { wpToggleSync(); } });
+  }
 
   var simWp = null;
   function rsimPress(m) { var b = document.querySelector(".rsim-chips [data-m='" + m + "']"); if (b) { b.click(); } }

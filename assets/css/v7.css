@@ -131,3 +131,44 @@ body.ver-7 [data-timeline] .timeline-item[data-wp-state="completed"] .step-card 
 }
 body.ver-7 .map-dim .map-dim-txt { display: block; min-width: 20px; text-align: center; line-height: 20px; letter-spacing: 0; color: currentColor; font-variant-numeric: tabular-nums; }
 body.ver-7 .map-dim[aria-pressed="true"] { color: var(--status-info-icon); }
+
+/*
+ * [11/10 v7 디자이너 · Figma UI_00 63:219 Mission Progress / Status=Brand] 진행 막대 머리.
+ *   1) 지금 하는 일 두 줄 — 지점 이름 / 행동(map-v6.js 가 .pt-head · .pt-act 로 감싼다). Body 14 / 22 Bold · text/primary, 줄마다 말줄임
+ *   2) 오른쪽 % 크게 — 숫자 Data/Large 36 / 44 SemiBold -2%, 단위 Overline 13 / 18 Medium +4% · text/secondary. 제목 줄과 아래를 맞춘다(Title align MAX)
+ *   3) 남은 시간 = "약 12:17 종료 예정"(screen.js) — Caption 12 / 18 · text/tertiary
+ *   4) 지나온 수(7/20)는 아래 지점 목록 머리 "지점 7/20" 으로 옮겼다 — 여기서는 숨긴다
+ *   간격 — 제목 줄 ↔ 막대 8, 막대 ↔ 아랫줄 4(Figma). 막대 바탕 comp/chart/track(Figma — 예전 bg/page 는 어긋났던 값)
+ */
+body.ver-7 .progress-meta { height: auto; align-items: flex-end; margin-bottom: 0; }
+body.ver-7 .progress-title {
+  display: block;
+  white-space: normal;
+  overflow: hidden;
+  max-height: 44px;
+  font-size: var(--font-size-14);
+  line-height: var(--font-line-height-22);
+  font-weight: var(--font-weight-bold);
+}
+body.ver-7 .progress-title .pt-head,
+body.ver-7 .progress-title .pt-act { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+body.ver-7 .progress-percent {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-36);
+  line-height: var(--font-line-height-44);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: -0.02em;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+body.ver-7 .progress-percent .pp-unit {
+  font-size: var(--font-size-13);
+  line-height: var(--font-line-height-18);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: 0.04em;
+  margin-left: 1px;
+}
+body.ver-7 .progress-track { background-color: var(--comp-chart-track); }
+body.ver-7 .progress-foot { margin-top: calc(var(--space-4) * -1); }
+body.ver-7 .progress-left { font-size: var(--font-size-12); line-height: var(--font-line-height-18); }
+body.ver-7 .progress-count { display: none; }

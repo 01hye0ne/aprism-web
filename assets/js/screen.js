@@ -1169,6 +1169,10 @@ window.APRISM_TEXT = (function () {
     var end = (now + left) % (24 * 60);
     var hh = ("0" + Math.floor(end / 60)).slice(-2);
     var mm = ("0" + (end % 60)).slice(-2);
+    // [11/10 v7 디자이너 · Figma 63:219] 남은 시간은 끝날 시각 하나로 줄인다 — "약 12:17 종료 예정"
+    if (document.body.classList.contains("ver-7")) {
+      return document.documentElement.lang === "en" ? "Est. finish ~" + hh + ":" + mm : "약 " + hh + ":" + mm + " 종료 예정";
+    }
     return span + " · " + hh + ":" + mm + " 종료 예상";
   }
 
