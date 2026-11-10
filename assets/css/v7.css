@@ -312,3 +312,20 @@ body.ver-7 .map-alert.ma-v3::after { width: 2px; height: var(--line-h, 0px); tra
 body.ver-7 .map-alert.ma-v3::before { z-index: 1; width: 8px; height: 8px; margin-top: var(--line-h, 0px); transform: translate(-50%, -50%); border-radius: 50%; box-shadow: 0 0 0 3px color-mix(in srgb, var(--ma-line-c) 30%, transparent); }
 body.ver-7 .map-alert.ma-v3.is-no-tail::after,
 body.ver-7 .map-alert.ma-v3.is-no-tail::before { display: none; }
+
+/* [11/10 v7 디자이너] 알림 팝오버 3차 — 불필요한 여백 걷음(Figma 1233:16459 다시 실측)
+ *   판 여백 0 · 칸 사이 0 · 면 bg/map-chip 50% + 흐림 20 · 머리 bg/cell(여백 8, 판 끝까지)
+ *   사진은 왼쪽 아래 끝까지(왼쪽 아래 모서리만 판과 같은 16) · 위치 띠는 사진 끝에서 8 · 오른쪽 칸 여백 8 · 두 칸 같은 폭 */
+body.ver-7 .map-alert.ma-v3 {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0;
+  padding: 0;
+  background-color: color-mix(in srgb, var(--bg-map-chip) 50%, transparent);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+}
+body.ver-7 .ma-v3 .ma-head { margin: 0; padding: var(--space-8); border-radius: 16px 16px 0 0; background-color: var(--bg-cell); }
+body.ver-7 .ma-v3 .ma-snap { min-height: 204px; border-radius: 0 0 0 16px; }
+body.ver-7 .ma-v3 .ma-snap > .ma-stamp.ma-stamp6 { left: var(--space-8); right: var(--space-8); bottom: var(--space-8); }
+body.ver-7 .ma-v3 .ma-lower { padding: var(--space-8); }
+body.ver-7 .map-alert.ma-v3.no-snap { grid-template-columns: minmax(0, 1fr); }
