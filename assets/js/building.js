@@ -377,6 +377,16 @@
 
     var where = el("span", "ah-where t-caption");
     where.appendChild(el("span", "floor-tag num", a.floor));   // 층 꼬리표는 웨이포인트 이름 앞(10/19)
+    // [11/10 v7 디자이너 · UT 개선 사용성 1b] 층 꼬리표와 지점 이름 사이에 웨이포인트 번호 원(기본 지점 모양 — 지도 팝오버 .mbt-pin.is-plain 과 같다).
+    //   목록 · 지도 · 우측 지점 목록이 같은 번호로 이어진다(UT P01 "목록에도 지도처럼 번호를"). 단계색은 앞 아이콘 · 왼쪽 띠가 말하므로 번호는 기본색
+    var wpNo = document.body.classList.contains("ver-7") && /WP-(\d+)/.exec((a.wp || "") + " " + (a.where || ""));
+    if (wpNo) {
+      var wpPin = el("span", "mbt-pin is-plain ah-wp-pin");
+      wpPin.setAttribute("data-n", String(parseInt(wpNo[1], 10)));
+      wpPin.setAttribute("role", "img");
+      wpPin.setAttribute("aria-label", "WP-" + wpNo[1]);
+      where.appendChild(wpPin);
+    }
     var wp = /WP-\d+.*$/.exec(a.where);   // 위치는 웨이포인트만(10/19, 메인 v2.2 와 같다)
     // [11/06 v6] 번호(WP-nn)는 뺐다 — 관제 최신 알림과 같이 층 꼬리표 + 지점 이름만
     where.appendChild(el("span", "ah-wp", wp ? (V6 ? wp[0].replace(/^WP-\d+\s*/, "") : wp[0]) : a.where));

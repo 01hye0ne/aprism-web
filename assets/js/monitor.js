@@ -576,6 +576,16 @@
     if (!scoped) { where.appendChild(icon("target")); }
     // v2.2 — 층 꼬리표는 웨이포인트 이름 앞(10/19 디자이너). 미션이 여러 층을 지나므로 줄마다 층을 말한다.
     if (scoped && a.floor) { where.appendChild(el("span", "floor-tag num", a.floor)); }
+    // [11/10 v7 디자이너 · UT 개선 사용성 1b] 층 꼬리표와 지점 이름 사이에 웨이포인트 번호 원(기본 지점 모양 — 지도 팝오버 .mbt-pin.is-plain 과 같다).
+    //   목록 · 지도 · 우측 지점 목록이 같은 번호로 이어진다(UT P01 "목록에도 지도처럼 번호를"). 단계색은 앞 아이콘 · 왼쪽 띠가 말하므로 번호는 기본색
+    var wpNo = scoped && document.body.classList.contains("ver-7") && /WP-(\d+)/.exec((a.wp || "") + " " + (a.where || ""));
+    if (wpNo) {
+      var wpPin = el("span", "mbt-pin is-plain ah-wp-pin");
+      wpPin.setAttribute("data-n", String(parseInt(wpNo[1], 10)));
+      wpPin.setAttribute("role", "img");
+      wpPin.setAttribute("aria-label", "WP-" + wpNo[1]);
+      where.appendChild(wpPin);
+    }
     // v2.2 — 위치는 웨이포인트만 "WP-nn 웨이포인트명"(10/19 디자이너). 로봇 · 설비 단위 앞말은 뺀다.
     // [11/06 v6] 번호(WP-nn)는 뺐다(디자이너) — 층 꼬리표 + 지점 이름만. 줄을 누르면 지도가 그 지점을 가리킨다.
     var place = scoped ? wpPlace(a) : a.where;

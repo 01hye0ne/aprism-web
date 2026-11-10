@@ -177,3 +177,10 @@ body.ver-7 .progress-track { background-color: var(--comp-chart-track); }
 body.ver-7 .progress-foot { margin-top: calc(var(--space-4) * -1); }
 body.ver-7 .progress-left { font-size: var(--font-size-12); line-height: var(--font-line-height-18); }
 body.ver-7 .progress-count { display: none; }
+
+/*
+ * [11/10 v7 디자이너 · UT 개선 사용성 1b] 알림 목록 둘째 줄 — 층 꼬리표 · 웨이포인트 번호 원 · 지점 이름.
+ *   원은 지도 팝오버의 기본 지점 원(.mbt-pin.is-plain, v6.css — 16 · 1px 테 · 숫자 9 mono)을 그대로. 간격은 줄의 4.
+ *   ".ah-where > .floor-tag + span" 이 바로 뒤 칸을 늘이고 말줄임하는 규칙(monitor.css)이라 원은 늘지 않게 되돌린다 — 늘이는 건 지점 이름(.ah-wp)
+ */
+body.ver-7 .ah-where > .ah-wp-pin { flex: none; overflow: visible; white-space: normal; }
