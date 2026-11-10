@@ -366,7 +366,7 @@ body.ver-7 .ma-v3 .ma-snap > .ma-stamp.ma-stamp6 { display: none; }
 body.ver-7 .ma-v3 .ma-head-time { flex: none; margin-left: auto; color: var(--text-tertiary); font-size: var(--font-size-12); line-height: var(--font-line-height-18); font-variant-numeric: tabular-nums; }
 body.ver-7 .ma-v3 .ma-head-time:empty { display: none; }
 body.ver-7 .ma-v3 .ma-title-block { flex: 0 1 auto; }
-/* 이름표 — 바닥 고리 아래 14. 바탕 bg/cell(예전 띠와 같은 면) · 1줄 위치 12/18 primary SemiBold · 2줄 층 · 시각 12/18 secondary */
+/* 이름표 — 바닥 고리 아래 14. 바탕 bg/cell(예전 띠와 같은 면) · 1줄 위치 12/18 primary SemiBold · 2줄 감지 시각 12/18 secondary */
 body.ver-7 .ma-wp-label {
   position: absolute; left: var(--x, 0); top: var(--y, 0); z-index: 5;
   display: flex; flex-direction: column; align-items: center;

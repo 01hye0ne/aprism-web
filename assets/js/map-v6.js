@@ -4346,7 +4346,7 @@
   }
   /*
    * [11/10 v7 디자이너] 알림 지점 이름표 — 팝오버 사진 위 띠(위치 · 시각)를 지도로 옮겼다. 타겟팅한 지점 바닥 고리 바로 아래 두 줄:
-   *   1줄 위치 이름 · 2줄 층 · 감지 시각. 글은 팝오버의 stamp(monitor.js 가 채운다)에서 읽는다. 점이 칸 밖이면 숨긴다
+   *   1줄 위치 이름 · 2줄 감지 시각. 글은 팝오버의 stamp(monitor.js 가 채운다)에서 읽는다. 점이 칸 밖이면 숨긴다
    */
   var maLabel = null;
   function maLabelAt(x, y, W, H) {
@@ -4357,8 +4357,8 @@
       hit.appendChild(maLabel);
     }
     var pl = alertBox.querySelector(".ma-st-place"), tm = alertBox.querySelector(".ma-st-time");
-    var w = wpSpots.filter(function (q) { return q.id === chosenWp; })[0], fl = (w && w.floor) || floorNow || "";
-    var place = pl ? pl.textContent.trim() : "", meta = [fl, tm ? tm.textContent.trim() : ""].filter(Boolean).join(" · ");
+    // [11/10 디자이너] 층은 뺀다 — 지도가 이미 그 층을 보여 주고 있다. 2줄 = 감지 시각
+    var place = pl ? pl.textContent.trim() : "", meta = tm ? tm.textContent.trim() : "";
     var a = maLabel.firstChild, b = maLabel.lastChild;
     if (a.textContent !== place) { a.textContent = place; }
     if (b.textContent !== meta) { b.textContent = meta; }
