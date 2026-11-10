@@ -133,9 +133,34 @@
   }
   function hideToast(){ clearTimeout(tstTimer); tstUndo = null; if(tst) tst.hidden = true; }
   const reqName = key => { const [, k, w] = key.split('|'); return `${w} ${k}`; };
+  /*
+   * [11/10 v7] 처리 기록을 관제와 나눈다(sessionStorage 'aprism-handled', monitor.js 와 같은 열쇠 · 꼴).
+   *   관제에서 확인 처리한 알림은 여기서 '응답 대기'로 시작하고, 여기서 보낸 요청은 관제 알림 목록에서 빠진다.
+   *   미션 이름은 관제가 '지하 4층 정기 순회 점검', 여기가 '정기 순회 점검' — 한쪽이 다른 쪽을 품으면 같은 미션.
+   */
+  const HKEY = 'aprism-handled';
+  const hRead = () => { try { return JSON.parse(sessionStorage.getItem(HKEY) || '[]') || []; } catch(e){ return []; } };
+  const hWrite = l => { try { sessionStorage.setItem(HKEY, JSON.stringify(l)); } catch(e){ /* 저장 막힘 — 이 화면에서만 */ } };
+  const hMis = (a, b) => !!a && !!b && (a.includes(b) || b.includes(a));
+  const hSame = (e, key) => { const [mi, k, w] = key.split('|'); return e.k===k && e.wp===w && hMis(e.mis, M[+mi].mis); };
+  function hPut(key){ if(!V7) return; const R = REQ[key], [mi, k, w] = key.split('|'), l = hRead().filter(e => !hSame(e, key));
+    if(R) l.push({mis:M[+mi].mis, k, wp:w, t:R.t, t2:R.t2, t3:R.t3, acts:R.acts, memo:R.memo, who:R.who, st:R.st, src:R.src || 'sf'}); hWrite(l); }
+  // 처음 그리기 전 — 기록에 있는 요청을 이 화면 자료(요청 시각 x[4] · REQ)에 얹는다
+  function hLoad(){
+    if(!V7) return;
+    hRead().forEach(e => M.forEach((m, mi) => {
+      if(!hMis(e.mis, m.mis) || !m.r[e.k]) return;
+      const it = itemsOf(mi, e.k).find(y => wpOf(y)===e.wp && y[0] !== 'ok'); if(!it) return;
+      if(m.rs && m.rs[e.k]){ const src = m.rs[e.k].find(y => wpOf(y)===e.wp); if(src) src[4] = e.t; sync(m, mi); } else m.r[e.k][4] = e.t;
+      const key = mi + '|' + e.k + '|' + e.wp;
+      REQ[key] = {st:e.st || 'wait', t:e.t, t2:e.t2, t3:e.t3, acts:e.acts || [], memo:e.memo || '', who:e.who || '현장 작업자', src:e.src};
+      if(REQ[key].st === 'wait') reqT[key] = setTimeout(() => reqStep(key, 'work'), 5000);
+    }));
+  }
   function reqSend(mi, k, w, info){
     const key = mi + '|' + k + '|' + w;
     REQ[key] = Object.assign({st:'wait', t:'10:17'}, info);
+    hPut(key);
     toast(`${reqName(key)} 현장 조치 요청 전송됨`, () => reqUndo(key));
     clearTimeout(reqT[key]); reqT[key] = setTimeout(() => reqStep(key, 'work'), 5000);   // 시안: 현장 수신 확인
   }
@@ -144,12 +169,14 @@
     clearTimeout(reqT[key]); R.st = st;
     if(st === 'work'){ R.t2 = '10:18'; toast(`${reqName(key)} 현장 조치 시작됨`); }
     if(st === 'done'){ R.t3 = '10:24'; toast(`${reqName(key)} 조치 완료 기록됨`); }
+    hPut(key);
     if(!dt || (dt.mi + '|' + dt.k + '|' + dt.wp) === key) render();   // 목록이거나 그 상세를 보고 있을 때만 다시 그린다
   }
   // 되돌리기 — 요청 시각(x[4])까지 지워 '요청 전'으로
   function reqUndo(key){
     const [mi0, k, w] = key.split('|'), mi = +mi0, m = M[mi];
     clearTimeout(reqT[key]); delete REQ[key];
+    hPut(key);
     if(m.rs && m.rs[k]){ const it = m.rs[k].find(y => wpOf(y)===w); if(it) it[4] = undefined; sync(m, mi); }
     else if(m.r[k]) m.r[k][4] = undefined;
     render();
@@ -643,7 +670,7 @@
     const same = its.filter(it => it[0]===x[0]).length;
     return its.length > 1 ? html.replace(`<span class="nm">${k}</span>`, `<span class="nm">${k} ${its.length}개${V6 ? '·' + same : ''}</span>`) : html;
   }
-  function init(){ Object.values(reqT).forEach(clearTimeout); REQ = {}; reqT = {}; hideToast(); M = JSON.parse(JSON.stringify(BASE)); scope = 0; menu = false; fired = false; toasts = []; drawer = null; newSeen = true; M.forEach(sync); }
+  function init(){ Object.values(reqT).forEach(clearTimeout); REQ = {}; reqT = {}; hideToast(); M = JSON.parse(JSON.stringify(BASE)); scope = 0; menu = false; fired = false; toasts = []; drawer = null; newSeen = true; M.forEach(sync); hLoad(); }
   init();
   const scr = document.querySelector('.app'), sf = document.querySelector('[data-sf]'), v = document.getElementById('sfv'), bc = document.querySelector('[data-sf-crumb]'), side = document.querySelector('[data-sf-sb]');
   if(!sf || !v || !bc || !side) return;
