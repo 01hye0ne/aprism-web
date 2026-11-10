@@ -274,3 +274,41 @@ body.ver-7 .ma-v3 .ma-actions > .btn { width: 100%; justify-content: center; }
 /* 체크리스트 — Lists: bg/raised(뒤집은 판이라 흰 면) · border/default 1 · 모서리 4 · 줄 30(여백 4/4/4/8) */
 body.ver-7 .ma-v3 .ma-checks { border: var(--border-width-thin) solid var(--border-default); border-radius: var(--radius-4); background-color: var(--bg-raised); }
 body.ver-7 .ma-v3 .ma-check { min-height: 30px; padding: var(--space-4) var(--space-4) var(--space-4) var(--space-8); border-bottom-color: var(--border-default); }
+
+/* ==================================================================
+ * [11/10 v7 디자이너] 알림 팝오버 2차 — 지도 위쪽 고정 카드 + 지점까지 세로선, 배경은 다른 팝오버(로봇 · 설비)와 한 벌
+ *   자리: map-v6.js placeAlert(V7MA) — 위 끝 = Delta 위 끝, 가로 = Delta 오른쪽 ~ 지도 도구 왼쪽, 지점 x 를 따라가다 끝에서 멈춘다
+ *   선: 카드 아래 끝 → 지점(--line-x · --line-h), 단계색 2px · 끝에 점. 카메라는 지점을 카드 아래 칸 한가운데로(aimAt)
+ *   배경: 몸 gray/750 92% + 흐림 12(라이트 bg/raised 92%) · 머리 bg/raised 불투명(판 끝까지) · 테 대신 안쪽 1px 빛
+ * ================================================================== */
+body.ver-7 .map-alert.ma-v3,
+body.ver-7 .map-alert.ma-v3.is-below,
+body.ver-7 .map-alert.ma-v3.is-side-r,
+body.ver-7 .map-alert.ma-v3.is-side-l { transform: translate(-50%, 0); }
+body.ver-7 .map-alert.ma-v3 {
+  --fac-bg: color-mix(in srgb, var(--color-gray-750) 92%, transparent);
+  --ma-line-c: var(--status-warning-icon);
+  border: 0;
+  background-color: var(--fac-bg);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 8%), 0 6px 16px rgb(0 0 0 / 35%);
+}
+:root[data-theme="light"] body.ver-7 .map-alert.ma-v3 {
+  --fac-bg: color-mix(in srgb, var(--bg-raised) 92%, transparent);
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 6%), 0 6px 16px rgb(0 0 0 / 14%);
+}
+body.ver-7 .map-alert.ma-v3.is-critical { --ma-line-c: var(--status-critical-icon); }
+/* 머리 — 판 여백(8)을 넘어 끝까지 채운다. 위 모서리 = 판 16 */
+body.ver-7 .ma-v3 .ma-head { margin: calc(var(--space-8) * -1) calc(var(--space-8) * -1) 0; padding: var(--space-8) var(--space-12) var(--space-8) var(--space-8); border-radius: 16px 16px 0 0; background-color: var(--bg-raised); }
+/* 세로선(::after) · 끝 점(::before) — 꼬리 세모 대신 */
+body.ver-7 .map-alert.ma-v3::after,
+body.ver-7 .map-alert.ma-v3::before {
+  top: 100%; bottom: auto; left: var(--line-x, 50%); right: auto;
+  clip-path: none; border: 0; -webkit-backdrop-filter: none; backdrop-filter: none;
+  background-color: var(--ma-line-c); pointer-events: none;
+}
+body.ver-7 .map-alert.ma-v3::after { width: 2px; height: var(--line-h, 0px); transform: translateX(-50%); border-radius: 1px; }
+body.ver-7 .map-alert.ma-v3::before { z-index: 1; width: 8px; height: 8px; margin-top: var(--line-h, 0px); transform: translate(-50%, -50%); border-radius: 50%; box-shadow: 0 0 0 3px color-mix(in srgb, var(--ma-line-c) 30%, transparent); }
+body.ver-7 .map-alert.ma-v3.is-no-tail::after,
+body.ver-7 .map-alert.ma-v3.is-no-tail::before { display: none; }

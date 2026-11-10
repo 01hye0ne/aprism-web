@@ -2889,6 +2889,24 @@
    * 다른 웨이포인트로 옮겨 가거나 고른 것을 놓으면 닫고 aprism:map-alert 로 알린다.
    */
   var alertBox = document.querySelector("[data-map-alert]");
+  var V7MA = document.body.classList.contains("ver-7");   // [11/10 v7] 알림 팝오버 = 지도 위쪽 고정 카드 + 지점까지 세로선
+  /*
+   * [11/10 v7] 고정 카드의 자리 — 위 끝은 Delta 카드 위 끝과 같은 줄, 가로는 Delta 오른쪽 ~ 지도 도구 왼쪽 사이.
+   * 아래 끝(바닥)은 시뮬레이션 막대 위 또는 칸 끝. placeAlert · aimAt 가 같이 쓴다.
+   */
+  function v7Room(W, H) {
+    var box = hit.getBoundingClientRect();
+    var toolsEl = document.querySelector(".map-canvas > .map-tools"), deltaEl = document.querySelector(".delta3");
+    var right = toolsEl && toolsEl.offsetParent ? toolsEl.getBoundingClientRect().left - box.left - 12 : W - 12;
+    var dr = deltaEl && deltaEl.getClientRects().length ? deltaEl.getBoundingClientRect() : null;
+    var simEl = document.querySelector(".rsim"), sr = simEl && simEl.getClientRects().length ? simEl.getBoundingClientRect() : null;
+    return {
+      left: dr ? dr.right - box.left + 12 : 12,
+      right: right,
+      top: dr ? Math.max(8, dr.top - box.top) : 16,
+      floor: sr ? Math.min(H - 8, sr.top - box.top - 8) : H - 8
+    };
+  }
   var alertSide = "";     // [11/05] 옆으로 세운 쪽 — "r" 점 오른쪽 · "l" 왼쪽(placeAlert)
   var alertAim = false;   // 쪽지를 열고 카메라가 점을 찾아가는 중
 
@@ -3018,6 +3036,24 @@
    */
   function placeAlert(x, y, W, H) {
     var w = alertBox.offsetWidth, h = alertBox.offsetHeight;
+    if (V7MA && !alertBox.classList.contains("is-docked")) {
+      var rm = v7Room(W, H), hw = w / 2;
+      var lo = rm.left, hi = rm.right;
+      if (hi - lo < w) { lo = Math.max(12, hi - w); }   // Delta 를 펼쳐 자리가 모자라면 Delta 쪽으로 겹친다
+      var ccx = Math.min(hi - hw, Math.max(lo + hw, x));
+      var lineTop = rm.top + h;
+      var lx = x - (ccx - hw);
+      // 선은 카드 아래 끝에서 지점까지 곧게 — 지점이 카드 폭 밖이거나 카드 위로 올라가 있으면(카메라가 아직 못 따라왔을 때) 숨긴다
+      var lineOk = lx >= 16 && lx <= w - 16 && y > lineTop + 12 && y <= H;
+      alertBox.classList.remove("is-side-r", "is-side-l", "is-below");
+      alertBox.classList.add("is-top");
+      alertBox.classList.toggle("is-no-tail", !lineOk);
+      alertBox.style.setProperty("--x", snapPx(ccx));
+      alertBox.style.setProperty("--y", snapPx(rm.top));
+      alertBox.style.setProperty("--line-x", snapPx(lx));
+      alertBox.style.setProperty("--line-h", snapPx(Math.max(0, y - lineTop)));
+      return;
+    }
     var half = w / 2;
     var tall = h + 16;
     /*
@@ -3084,6 +3120,11 @@
   function aimAt(spot, z) {
     if (!alertOn() || !upOnGround) { return spot; }
     var lift = (alertBox.offsetHeight + 16) / 2;
+    // [11/10 v7] 지점을 카드 아래 남은 칸의 한가운데로 — 카드가 위쪽에 고정이라 지점은 화면 가운데보다 아래에 선다
+    if (V7MA) {
+      var hb = hit.getBoundingClientRect(), rm = v7Room(hb.width, hb.height);
+      lift = (rm.top + alertBox.offsetHeight + rm.floor) / 2 - hb.height / 2;
+    }
     var s = (baseSize / z) / (view.clientHeight || 1);
     return spot.clone().addScaledVector(upOnGround, lift * s);
   }
