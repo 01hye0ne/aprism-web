@@ -194,6 +194,13 @@
     WARNINGS[3].time = "09:20:14"; WARNINGS[1].time = "09:36:42"; WARNINGS[2].time = "09:56:05";
   }
 
+  // [11/10 v7] 알림 데이터 한 곳(alert-data-v7.js) — v7 화면은 위에서 만든 값 대신 거기서 읽는다(안전진단 · 알림 센터 · 전체 미션과 같은 12건).
+  //   그 파일이 없는 화면(v6 · 영문판 · v5 이하)은 위 데이터 그대로다.
+  if (window.APRISM_ALERTS7) {
+    var S7 = window.APRISM_ALERTS7.forMonitor(body.hasAttribute("data-route-rules"));
+    CRITICAL = S7.CRITICAL; WARNINGS = S7.WARNINGS; R01_MORE = S7.R01_MORE; ROUTE_ALERTS = S7.ROUTE_ALERTS;
+  }
+
   // 검토용 단계 — 주소 끝 #… 로 고른다. few 는 알림은 있지만 Delta 종합 기준에 못 미친 판이다.
   var SETS = {
     normal: function () { return []; },

@@ -133,6 +133,8 @@
       { sev: "critical", robot: 1, floor: "B4", where: "APRO 4F · WP-07 고소 작업 발판",  time: "10:16:48", title: "안전감지 · 안전벨트 미착용 1명",  uv: [0.40, 0.62] }
     );
   }
+  // [11/10 v7] 알림 데이터 한 곳(alert-data-v7.js) — v7 화면은 위 목록 대신 거기서 읽는다(관제 · 안전진단 · 알림 센터와 같은 12건)
+  if (window.APRISM_ALERTS7) { ALERTS = window.APRISM_ALERTS7.forBuilding(); }
   ALERTS.forEach(function (a) {
     // 층은 알림이 난 웨이포인트의 층이다(로봇이 지금 선 층이 아니다 — 메인 v2.2 monitor.js 와 같다).
     a.mission = robotNo(a.robot).mission;

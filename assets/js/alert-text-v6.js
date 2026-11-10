@@ -35,7 +35,8 @@
   function v7() { return !!(document.body && document.body.classList.contains("ver-7")); }
   function lab7(detect, label) { return label === "이상 점수" ? detect + " 점수" : label; }
   function of(t) {
-    var r = T[String(t || "")];
+    // [11/10 v7] 알림 데이터 한 곳(alert-data-v7.js)이 있으면 거기서 먼저 — 없을 때만 위 표
+    var r = (window.APRISM_ALERTS7 && window.APRISM_ALERTS7.of(t)) || T[String(t || "")];
     if (!r) { return null; }
     return { detect: r[0], label: v7() ? lab7(r[0], r[1]) : r[1], value: r[2], ch: r[3] || "" };
   }

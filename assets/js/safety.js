@@ -82,6 +82,25 @@
       {mis:'공조 설비 순회', fl:'지하 3층', ab:'B3', robot:'Robot 07', done:20, total:20, r:{'안전감지':ok(3),'누출감지':ok(4),'온도감지':ok(6),'계기인식':ok(5),'이상음향':ok(6),'부분방전':ok(2)}},
       {mis:'유틸리티 순회', fl:'지하 4층', ab:'B4', robot:'Robot 09', done:20, total:20, r:{'안전감지':ok(3),'누출감지':ok(6),'온도감지':ok(5),'계기인식':ok(6),'이상음향':ok(4),'부분방전':ok(3)}});
   }
+  /*
+   * [11/10 v7] 위험 · 주의 칸은 알림 데이터 한 곳(alert-data-v7.js)에서 — 관제 · 알림 센터 · 전체 미션과 같은 12건, 문장도 관제 메인과 같다
+   *   ("이상음향 점수 20.4" · "누출 의심도 62%"). 위에 적은 넘은 칸은 지우고 다시 채운다. 정상 범위 칸 · 판정 안 함(null)은 그대로.
+   *   그 파일이 없는 화면(v6 · 영문판 · v5)은 위 데이터 그대로다.
+   */
+  const S7 = window.APRISM_ALERTS7;
+  const LAB7 = {};   // 감지마다 고정인 항목 이름(누출 의심도 · 최고 온도 · 이상음향 점수 · 부분방전 점수) — 아래 MLAB 을 대신한다
+  if(S7){
+    BASE.forEach(m => { delete m.rs; K.forEach(k => { const x = m.r[k]; if(x && x[0] !== 'ok') m.r[k] = ['ok', '정상 범위', '측정 1곳']; }); });
+    const got = {};
+    S7.forSafety().forEach(s => {
+      const mi = BASE.findIndex(m => m.mis === s.mission), m = BASE[mi];
+      if(!m || !m.r[s.detect]) return;   // 이 화면에 없는 미션 · 판정하지 않는 감지
+      (got[mi + '|' + s.detect] = got[mi + '|' + s.detect] || []).push(s.cell);
+      if(['누출감지', '온도감지', '이상음향', '부분방전'].includes(s.detect)) LAB7[s.detect] = s.label;
+    });
+    Object.keys(got).forEach(key => { const [mi, k] = key.split('|'), m = BASE[+mi], cs = got[key];
+      m.r[k] = cs[0].slice(); if(cs.length > 1){ m.rs = m.rs || {}; m.rs[k] = cs; } });   // 한 감지에 여럿이면 rs(대표는 init 의 sync 가 고른다)
+  }
   const NEWR = [1, '온도감지', ['crit','최고 71.2 ℃','WP-104 변압기 TR-1','10:15']];
   const RANK = {crit:3, warn:2, done:1, ok:0};
   const WORD = {crit:'위험', warn:'주의', done:'요청됨', ok:'정상 범위', plan:'예정'};
@@ -175,7 +194,7 @@
     const numU = (x[1] || '').match(/(-?\d+(?:\.\d+)?)\s*(℃|%|MPa|kPa|Pa|bar|명|곳|건)?/);
     const jvalT = !isHit ? '' : cd && !isNaN(num) ? `${num}${cd[4]==='%' ? '%' : cd[4]}` : k==='계기인식' && numU ? numU[1] + (numU[2] ? ' ' + numU[2] : '') : (SHORT[x[1]] || x[1]);
     let jwhat = !isHit ? (st==='plan' ? '측정 전' : '정상 범위')
-      : MLAB[k] ? MLAB[k]
+      : (LAB7[k] || MLAB[k]) ? (LAB7[k] || MLAB[k])   // [11/10 v7] 항목 이름은 알림 데이터 한 곳(관제 메인과 같은 말)
       : k==='계기인식' ? ((x[1] || '').split(/\s*-?\d/)[0].trim() || '측정값')
       : (x[1] || '').replace(jvalT, '').trim() || '미착용 인원';
     const jtrk = isHit && cd && !isNaN(num) ? (() => { const [lo, hi, w2, c2, u] = cd, p = q => Math.max(0, Math.min(100, (q - lo) / (hi - lo) * 100)).toFixed(1);
@@ -268,6 +287,8 @@
   const SRC = {'안전감지':'영상','누출감지':'영상 + 열화상','온도감지':'열화상','계기인식':'영상','이상음향':'마이크','부분방전':'PD 센서'};
   const OKV = {'안전감지':'0명','누출감지':'9%','온도감지':'31.0','계기인식':'0.71','이상음향':'7.9','부분방전':'6.4'};
   const MEMO = {'1|온도감지':'10:15 새로 넘음, 직전 순회보다 +18.9 ℃','1|계기인식':'PG-A3 상한 초과, 계기 점검 필요','1|부분방전':'CH1만 주의, 같은 전기 계통 변압기 과열','2|누출감지':'지하 3층 순회 끝, 13:00 전까지 다시 못 잼. CCTV 사각 구간','2|온도감지':'지하 3층에서 측정, 평소보다 +6.3 ℃'};
+  // [11/10 v7] 알림 데이터 한 곳의 문장 → 표 칸 짧은 값(62% · 1명은 그대로, 나머지는 숫자만 — 위 SHORT 와 같은 꼴)
+  if(S7) S7.forSafety().forEach(s => { SHORT[s.cell[1]] = /%|명$/.test(s.value) ? s.value : s.value.split(' ')[0]; });
   if(V6){   // [10/30 v6] 관제 알림 값 — 표 칸 짧은 값 · 메모
     Object.assign(SHORT, {'이상 점수 21.6':'21.6', '차압 312 Pa':'312', '압력 0.62 MPa':'0.62', '최고 68.4 ℃':'68.4', '압력 7.9 bar':'7.9', '이상 점수 9.41':'9.41'});
     Object.assign(MEMO, {'1|계기인식':'HEPA 필터 차압이 교체 기준을 넘음, 최근 3회 잇달아 오름. WP-04 N₂ 압력도 정상 범위 아래',
@@ -586,7 +607,7 @@
     if(!x || !x[1] || x[0]==='ok' || x[0]==='plan') return null;
     const cd = COND[k], num = parseFloat(SHORT[x[1]] || x[1]), numU = (x[1] || '').match(/(-?\d+(?:\.\d+)?)\s*(℃|%|MPa|kPa|Pa|bar|명|곳|건)?/);
     const val = cd && !isNaN(num) ? `${num}${cd[4]==='%' ? '%' : cd[4]}` : k==='계기인식' && numU ? numU[1] + (numU[2] ? ' ' + numU[2] : '') : (SHORT[x[1]] || x[1]);
-    const lab = MLAB6[k] || (k==='계기인식' ? ((x[1] || '').split(/\s*-?\d/)[0].trim() || '측정값') : (x[1] || '').replace(val, '').trim() || '미착용 인원');
+    const lab = LAB7[k] || MLAB6[k] || (k==='계기인식' ? ((x[1] || '').split(/\s*-?\d/)[0].trim() || '측정값') : (x[1] || '').replace(val, '').trim() || '미착용 인원');
     const det = !x[1].includes(val) && x[1] !== lab ? x[1] : '';
     return [lab, val, det];
   }

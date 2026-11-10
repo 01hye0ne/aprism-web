@@ -286,6 +286,12 @@
     DAYS = window.APRISM_AC6.DAYS;
     ALERTS = window.APRISM_AC6.ALERTS;
     HANDOVER = window.APRISM_AC6.HANDOVER;
+    // [11/10 v7] 미확인 12건은 알림 데이터 한 곳(alert-data-v7.js)에서 — 관제 · 안전진단 · 전체 미션과 같은 알림. 지난 기록 · 조치 요청됨은 위 파일 그대로
+    if (window.APRISM_ALERTS7) {
+      var C7 = {}; window.APRISM_ALERTS7.forCenter().forEach(function (a) { C7[a.id] = a; });
+      ALERTS = ALERTS.map(function (a) { var b = C7[a.id]; delete C7[a.id]; return b || a; })
+        .concat(Object.keys(C7).map(function (id) { return C7[id]; }));   // 여기에만 새로 넣은 알림도 목록에 오게
+    }
   }
 
   // 보이는 제목 · 측정 결과 — 관제와 같은 표(alert-text-v6.js)가 먼저, 표에 없는 지난 기록은 데이터의 res 로 적는다.
