@@ -28,6 +28,19 @@ body.ver-7 .done-head .done-fold { margin-right: calc(var(--space-4) * -1); }
 body.ver-7 .sb-tabs { flex: 1 1 auto; padding: 0 var(--space-8) 0 0; }   /* 왼쪽은 0 — v6 처럼 [전체 미션] 탭이 로고 칸(76)에 바로 붙는다 */
 body.ver-7 .sb-tab[data-mission] { padding: 0 var(--space-8); }
 
+/*
+ * [11/10 v7 · UT 개선 시각화 1b — 내부 결정] 미션 탭은 기본을 번호만(M2 ▲), 지금 보는 탭만 번호 + 이름.
+ *   v6 사용성 테스트에서 미션 이름을 16명 중 12명이 지금 지점 이름으로 답했고, 상태 파악 중 탭을 누른 사람은 0명 — 아홉 개의 긴 이름이 읽히지 않았다.
+ *   위 "모두 같은 폭(최대 184)" 규칙(11/06)을 대신한다: 탭은 제 내용 폭. 전체 이름은 마우스 올림(title)으로 그대로 본다.
+ *   알림 기호(▲ · ⓧ)와 새 위험 점은 번호 옆에 남는다 — 다른 미션에 무슨 일이 났는지는 이름 없이도 보인다.
+ *   탭 줄을 쓰는 다섯 화면(관제 · 전체 미션 · 안전진단 · 미션 설정 · 사전 점검)과 영문판이 같은 규칙을 탄다.
+ */
+body.ver-7 .sb-tab[data-mission],
+html[lang="en"] body.ver-7 .sb-tab[data-mission] { flex: 0 0 auto; max-width: none; min-width: 56px; justify-content: center; padding: 0 var(--space-12); }
+body.ver-7 .sb-tab[data-mission]:not(.is-on) .sb-tab-name { display: none; }
+body.ver-7 .sb-tab[data-mission].is-on .sb-tab-name,
+html[lang="en"] body.ver-7 .sb-tab[data-mission].is-on .sb-tab-name { overflow: visible; text-overflow: clip; white-space: nowrap; }
+
 /* [11/06 디자이너] [알림 센터 ›] — 미조치 알림 머리 오른쪽(알림 목록 바로 위). 글 뒤 화살표 사이 2 */
 body.ver-7 .ah-head .ah-all { display: inline-flex; align-items: center; gap: 2px; }
 

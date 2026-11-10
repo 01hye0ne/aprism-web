@@ -51,6 +51,17 @@
   if (mine) { mine.classList.add("is-on"); mine.setAttribute("aria-current", "page"); }
   // 설정 중인 미션은 아직 돌기 전이다 — 수행중 탭(정기 순회 점검)을 열어도 알림 기호는 뺀다
   if (mine) { Array.prototype.forEach.call(mine.querySelectorAll(".sb-tab-sev"), function (s) { s.remove(); }); }
+  // [11/10 v7 · UT 개선 시각화 1b] v7 미션 탭은 번호만 보인다(v7.css) — 관제 탭(mission-tabs-v6.js)처럼 마우스를 올리면 전체 이름.
+  //   이 화면 탭은 HTML 에 적혀 있어 title 이 없었다. 영문판은 번역된 이름을 읽도록 올릴 때마다 채운다
+  if (body.classList.contains("ver-7")) {
+    tabs.forEach(function (t) {
+      if (!t.hasAttribute("data-mission")) { return; }
+      t.addEventListener("mouseenter", function () {
+        var no = t.querySelector(".sb-tab-no"), nm = t.querySelector(".sb-tab-name");
+        t.title = ((no ? no.textContent.trim() + " " : "") + (nm ? nm.textContent.trim() : "")).trim();
+      });
+    });
+  }
   // 영문판은 번역기가 칸 값을 먼저 쓰므로 값 · 속성을 둘 다, 번역한 이름으로 넣는다
   if (nameInput) {
     nameInput.value = window.APRISM_TR ? window.APRISM_TR(current) : current;
