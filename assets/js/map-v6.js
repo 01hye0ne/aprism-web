@@ -3993,6 +3993,16 @@
         if (nm && t.indexOf(nm + " ") === 0) { head = nm; act = t.slice(nm.length + 1); }
         else if ((m = /^(.+?,) (.+)$/.exec(t))) { head = m[1]; act = m[2]; }   // 영문 "Heat Exchanger HX-1, outlet temperature"
       }
+      // [11/10 디자이너] 장소가 없는 상태 문구도 두 줄(어디 / 무엇)로 — 한 줄이면 큰 % 와 균형이 깨진다. 로봇이 있는 곳 = 도킹 스테이션
+      if (!head) {
+        var DOCK = { "충전 중":0, "대기 중":0, "대기":0, "순회 완료":0, "복귀 중":1, "자동복귀 중":1, "도킹 스테이션 복귀":2,
+                     "Charging":3, "Standby":3, "Patrol complete":3, "Returning":4, "Auto returning":4, "Return to Docking Station":5 };
+        var k = DOCK[t];
+        if (k === 0 || k === 1) { head = k ? "도킹 스테이션으로" : "도킹 스테이션"; act = t; }
+        else if (k === 2) { head = "도킹 스테이션으로"; act = "복귀 중"; }
+        else if (k === 3 || k === 4) { head = k === 4 ? "To docking station" : "Docking station"; act = t; }
+        else if (k === 5) { head = "To docking station"; act = "Returning"; }
+      }
       if (!head) { return; }
       ptEl.textContent = "";
       var h = document.createElement("span"); h.className = "pt-head"; h.textContent = head;

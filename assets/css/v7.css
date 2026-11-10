@@ -145,7 +145,8 @@ body.ver-7 .map-dim[aria-pressed="true"] { color: var(--status-info-icon); }
  *   4) 지나온 수(7/20)는 아래 지점 목록 머리 "지점 7/20" 으로 옮겼다 — 여기서는 숨긴다
  *   간격 — 제목 줄 ↔ 막대 8, 막대 ↔ 아랫줄 4(Figma). 막대 바탕 comp/chart/track(Figma — 예전 bg/page 는 어긋났던 값)
  */
-body.ver-7 .progress-meta { height: auto; align-items: flex-end; margin-bottom: 0; }
+/* [11/10] 가운데 정렬 — 제목이 한 줄로 남아도 큰 % 의 가운데에 선다(두 줄 48 ≈ 숫자 44 라 두 줄 모습은 그대로) */
+body.ver-7 .progress-meta { height: auto; align-items: center; margin-bottom: 0; }
 body.ver-7 .progress-title {
   display: block;
   white-space: normal;
