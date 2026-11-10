@@ -108,3 +108,56 @@ body.ver-7 .status-bar-right { align-self: flex-end; height: 44px; }   /* 40 이
  *   이 칸도 .status-bar-left 라 flex 1 을 받아 탭 줄과 남는 자리를 나눠 가졌다(탭 169 → 150, 긴 이름 말줄임). 늘지 않게
  */
 body.ver-7 .status-bar-left > [data-sf-crumb] { flex: 0 0 auto; min-width: 0; }
+
+/*
+ * [11/10 v7 · UT 개선 시각화 1a] 우측 지점 목록 — 지나온 지점 한 줄(rail-fold-v7.js).
+ *   접힌 칸은 감추고, 목록 맨 위에 요약 줄 하나: 레일 자리(28 + 간격 16)에 체크 고리, 카드 자리에 "지나온 지점 n곳 · 번호 · 위험 · 주의 ⌄".
+ *   카드 면 · 둥글기는 지점 카드(.step-card)와 같고, 높이는 낮게(44) — 요약이 지점 하나처럼 읽히지 않게 글은 보조색.
+ *   꺾쇠 — 접힘은 아래(펼치면 아래로 자란다), 펼침은 위.
+ */
+body.ver-7 [data-timeline] .timeline-item.rps-hidden { display: none; }
+body.ver-7 .rail-past-sum {
+  flex: none;
+  display: flex;
+  align-items: stretch;
+  gap: var(--space-16);
+  width: 100%;
+  margin: 0;
+  padding: var(--space-8) 0 var(--space-4);
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+body.ver-7 .rail-past-sum .rps-ic { flex: none; width: 28px; display: grid; place-items: center; color: var(--text-tertiary, var(--text-secondary)); }
+body.ver-7 .rail-past-sum .rps-card {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  min-height: 44px;
+  padding: var(--space-8) var(--space-8) var(--space-8) var(--space-12);
+  border-radius: var(--radius-card);
+  background-color: var(--bg-cell);
+}
+body.ver-7 .rail-past-sum .rps-title { color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; flex: 0 1 auto; }
+body.ver-7 .rail-past-sum .rps-nos { color: var(--text-tertiary, var(--text-secondary)); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+body.ver-7 .rail-past-sum .rps-alerts { display: inline-flex; gap: var(--space-8); margin-left: auto; flex: none; }
+body.ver-7 .rail-past-sum .rps-sev { display: inline-flex; align-items: center; gap: 2px; white-space: nowrap; font-weight: 700; }
+body.ver-7 .rail-past-sum .rps-sev[data-sev="danger"] .i { color: var(--status-critical-icon); }
+body.ver-7 .rail-past-sum .rps-sev[data-sev="caution"] .i { color: var(--status-warning-icon); }
+body.ver-7 .rail-past-sum .rps-sev[data-sev="danger"] { color: var(--status-critical-text, var(--status-critical-icon)); }
+body.ver-7 .rail-past-sum .rps-sev[data-sev="caution"] { color: var(--status-warning-text, var(--status-warning-icon)); }
+body.ver-7 .rail-past-sum .rps-fold { flex: none; color: var(--text-secondary); transform: rotate(180deg); transition: transform 200ms cubic-bezier(.2, .7, .3, 1); }
+body.ver-7 .rail-past-sum .rps-alerts:empty + .rps-fold { margin-left: auto; }
+body.ver-7 .rail-past-sum.is-folded .rps-fold { transform: none; }
+body.ver-7 .rail-past-sum:hover .rps-card { background-color: color-mix(in srgb, var(--bg-cell) 88%, var(--text-primary)); }
+body.ver-7 .rail-past-sum:hover .rps-title,
+body.ver-7 .rail-past-sum:hover .rps-fold { color: var(--text-primary); }
+body.ver-7 .rail-past-sum:focus-visible { outline: none; }
+body.ver-7 .rail-past-sum:focus-visible .rps-card { box-shadow: 0 0 0 2px var(--border-focus, var(--status-info-icon)); }
+:root[data-theme="light"] body.ver-7 .rail-past-sum .rps-card { background-color: var(--color-gray-100); }
+@media (prefers-reduced-motion: reduce) { body.ver-7 .rail-past-sum .rps-fold { transition: none; } }

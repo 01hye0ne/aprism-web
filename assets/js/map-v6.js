@@ -3856,6 +3856,8 @@
     var prev = item.previousElementSibling;
     while (prev && !(prev.matches && prev.matches(".timeline-item:not(.rr-hide)"))) { prev = prev.previousElementSibling; }
     var top = (prev || item).getBoundingClientRect().top - box.getBoundingClientRect().top + box.scrollTop - (parseFloat(getComputedStyle(box).paddingTop) || 0);
+    var lead = box.querySelector(".rail-past-sum.is-folded");   // [11/10 v7] 지나온 지점 요약 줄(rail-fold-v7.js)이 접혀 있으면 그 줄까지 맨 위에
+    if (lead) { top -= lead.offsetHeight; }
     box.scrollTo({ top: Math.max(0, top), behavior: behavior });
   }
 
