@@ -1076,6 +1076,9 @@
 
     function fill(a) {
       box.classList.toggle("is-critical", a.sev === "critical");
+      // [11/10] 판정 칩은 공통 .verdict-chip — 단계를 칩 자신이 갖는다(예전 .ma-badge 는 팝오버 .is-critical 을 보고 색을 바꿨다)
+      var sevChip = $("[data-ma-badge]", box);
+      if (sevChip) { sevChip.classList.toggle("is-crit", a.sev === "critical"); sevChip.classList.toggle("is-warn", a.sev !== "critical"); }
       sev.textContent = a.sev === "critical" ? "위험" : "주의";
       title.textContent = a.title;
       title.title = a.title;
@@ -1307,6 +1310,8 @@
       var a = picked;
       if (!zoomBox || !a || !a.live) { return; }
       zoomBox.classList.toggle("is-critical", a.sev === "critical");
+      var zoomChip = $("[data-ma-zoom-badge]", zoomBox);
+      if (zoomChip) { zoomChip.classList.toggle("is-crit", a.sev === "critical"); zoomChip.classList.toggle("is-warn", a.sev !== "critical"); }
       $("[data-ma-zoom-sev]", zoomBox).textContent = a.sev === "critical" ? "위험" : "주의";
       $("[data-ma-zoom-title]", zoomBox).textContent = a.title;
       $("[data-ma-zoom-time]", zoomBox).textContent = a.time;

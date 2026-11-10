@@ -881,32 +881,7 @@
 
 .ac-d-title-row h2 { margin: 0; }
 
-/* Figma Badge 48:48 — 면 status/critical/bg, 테두리 status/critical/border. */
-.ac-sev-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-4);
-  flex: none;
-  padding: var(--space-4) var(--space-12) var(--space-4) var(--space-8);
-  border: var(--border-width-thin) solid var(--status-critical-border);
-  border-radius: var(--radius-pill);
-  background-color: var(--status-critical-bg);
-  color: var(--status-critical-text);
-}
-
-.ac-sev-badge .badge-dot { background-color: var(--status-critical-icon); }
-
-.ac-sev-badge.is-warning {
-  border-color: var(--status-warning-border);
-  background-color: var(--status-warning-bg);
-  color: var(--status-warning-text);
-}
-
-.ac-sev-badge.is-warning .badge-dot { background-color: var(--status-warning-icon); }
-
-/* 기호 — 지도 알림 팝오버 .ma-badge-ic 와 같은 14 · 위험은 글자와 한 톤인 icon-subtle(10/20) */
-.ac-sev-badge .ac-sev-ic { --i: var(--ic-error); width: 14px; height: 14px; color: var(--status-critical-icon-subtle); }
-.ac-sev-badge.is-warning .ac-sev-ic { --i: var(--ic-warning); color: var(--status-warning-icon); }
+/* 판정 칩(.ac-sev-badge)은 app-shell.css 공통 .verdict-chip 으로 옮겼다(11/10). */
 
 /* ── 스냅숏 + 메타 ───────────────────────────────────────── */
 .ac-d-snap-meta {

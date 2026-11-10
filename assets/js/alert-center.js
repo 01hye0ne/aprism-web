@@ -646,9 +646,9 @@
   }
 
   function sevBadge(a, prefix) {
-    return '<span class="ac-sev-badge t-label-2' + (a.sev === "warning" ? " is-warning" : "") + '">' +
+    return '<span class="verdict-chip ' + (a.sev === "warning" ? "is-warn" : "is-crit") + '">' +
       // 단계 칩의 표식은 점이 아니라 기호 — 위험 ⓧ · 주의 △(10/20 디자이너, 지도 알림 팝오버와 같다). 점은 상태에만 쓴다.
-      '<span class="i ac-sev-ic" aria-hidden="true"></span>' + prefix + SEV_LABEL[a.sev] + '</span>';
+      prefix + SEV_LABEL[a.sev] + '</span>';
   }
 
   /* ── 미확인 — 조치를 입력받는 판 (Figma 1177:15981) ───────── */

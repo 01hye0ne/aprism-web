@@ -93,7 +93,7 @@ html[lang="en"] body.ver-6 .sf .jinfo b { overflow: visible; text-overflow: clip
 html[lang="en"] body.ver-6 .sf .hi { display: flex; flex-wrap: wrap; align-items: center; column-gap: var(--space-8); row-gap: 0; }
 html[lang="en"] body.ver-6 .sf .hi > .t { flex: none; width: 92px; }
 html[lang="en"] body.ver-6 .sf .hi > span:nth-child(2) { flex: none; width: 56px; }
-html[lang="en"] body.ver-6 .sf .hi .pl { flex: none; }
+html[lang="en"] body.ver-6 .sf .hi .verdict-chip { flex: none; }
 html[lang="en"] body.ver-6 .sf .hi .hia { flex: 1 1 auto; overflow: visible; text-overflow: clip; white-space: nowrap; }
 /* 연관 감지 — 좁은 칸에서 낱말이 꺾이고(Partial / discharge · WP- / 06) 오른쪽 덩어리가 겹치던 것: 낱말은 한 덩어리, 덩어리째 다음 줄로. 지점 + 값도 한 덩어리 */
 html[lang="en"] body.ver-6 .sf .rlx .rlt,
