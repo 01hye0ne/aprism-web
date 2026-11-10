@@ -1010,6 +1010,9 @@
     var snap = $(".ma-snap", box);
     var img = $("[data-ma-img]", box);
     var options = $("[data-ma-options]", box);
+    // [11/10 v7 디자이너] 가로 팝오버(Figma UI_00 1233:16459) — 위치 · 시각은 사진 아래 띠로 내린다(머리는 배지 · 제목 한 줄)
+    var V7 = body.classList.contains("ver-7");
+    if (V7 && stamp && snap) { snap.appendChild(stamp); }
     var confirm = $("[data-ma-confirm]", box);
     var opening = false;
     // v2.2 팝오버 v3(Figma 1233:16460) — 조치는 체크리스트, [더보기] 메뉴 · 도킹 · 정보 hover · 접힌 메모.
@@ -1148,7 +1151,11 @@
       options.textContent = "";
       if (V3) {
         // 체크리스트 — 조치를 모두 세우고, DELTA 가 미는 것은 [AI 추천] 을 달고 미리 체크해 둔다(Figma Default).
-        a.acts.slice().sort(function (x, y) { return (y.ai ? 1 : 0) - (x.ai ? 1 : 0); }).forEach(function (act) {
+        // [11/10 v7] AI 추천은 1순위 하나만 — 추천이 둘이면 무엇이 먼저인지 흐려진다. 나머지는 대안(체크 안 함)
+        var aiLeft = V7 ? 1 : Infinity;
+        a.acts.slice().sort(function (x, y) { return (y.ai ? 1 : 0) - (x.ai ? 1 : 0); }).forEach(function (src) {
+          var act = src;
+          if (src.ai) { if (aiLeft > 0) { aiLeft--; } else { act = { t: src.t }; } }
           var row = el("button", "ma-check");
           row.type = "button";
           row.setAttribute("role", "checkbox");
@@ -1321,6 +1328,8 @@
       zoomClose.addEventListener("click", closeZoom);
       // 카드 바깥(어두운 면)을 누르면 닫힌다.
       zoomBox.addEventListener("click", function (event) { if (event.target === zoomBox) { closeZoom(); } });
+      // [11/10 v7] [더보기] 메뉴를 걷어서 크게 보기는 사진을 누르면 열린다
+      if (V7 && img) { img.addEventListener("click", openZoom); img.title = "크게 보기"; }
     }
 
     // 타임라인에서 그 칸을 고른다 — 타임라인이 지도에 알리고, 지도가 카메라를 데려간다.

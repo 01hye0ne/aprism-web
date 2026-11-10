@@ -205,3 +205,72 @@ body.ver-7 .mbt-pin.is-plain,
 body.ver-7 .ah-where > .mbt-pin.is-plain.ah-wp-pin,
 :root[data-theme="light"] body.ver-7 .ah-where > .mbt-pin.is-plain.ah-wp-pin { color: inherit; }
 :root[data-theme="light"] body.ver-7 .ah-item .ah-wp-pin { border-color: var(--color-gray-100); }   /* 라이트 층 꼬리표 바탕(v6.css)과 같게 */
+
+/* ==================================================================
+ * [11/10 v7 디자이너] 알림 팝오버 가로형 — Figma UI_00 1233:16459
+ *   판 564 · 여백 8 · 칸 사이 8 · 모서리 16 · 유리(bg/glass 55% + 흐림 20)
+ *   머리 한 줄: 위험 배지 · 제목 · 닫기 (감지 이름 · 더보기는 뺌)
+ *   왼쪽 사진(모서리 8) — 아래 띠에 지점 번호 · 위치 · 시각(bg/cell 알약, monitor.js 가 stamp 를 사진 안으로 옮긴다)
+ *   오른쪽 263: 권고 한 줄 · 체크리스트(1순위만 AI 추천) · 메모 · 버튼 둘(같은 폭)
+ *   위계 조정(코드): 메모 라벨은 한 톤 낮춤 · 권고 글은 제목(18)보다 낮은 14 SemiBold
+ * ================================================================== */
+body.ver-7 .map-alert.ma-v3 {
+  width: 564px;
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 263px;
+  grid-template-areas: "head head" "snap lower";
+  gap: var(--space-8);
+  padding: var(--space-8);
+  border-color: var(--border-strong);
+  background-color: color-mix(in srgb, var(--bg-glass) 55%, transparent);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+}
+body.ver-7 .map-alert.ma-v3::after {
+  background-color: color-mix(in srgb, var(--bg-glass) 55%, transparent);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+}
+body.ver-7 .map-alert.ma-v3.no-snap { width: 360px; grid-template-columns: minmax(0, 1fr); grid-template-areas: "head" "lower"; }
+
+/* 머리 — 한 줄 */
+body.ver-7 .ma-v3 .ma-head { grid-area: head; display: flex; align-items: center; gap: var(--space-12); padding: 0; border-radius: 0; background: none; }
+body.ver-7 .ma-v3 .ma-title-block { display: flex; flex-direction: row; align-items: center; text-align: left; gap: var(--space-8); flex: 1 1 auto; min-width: 0; }
+body.ver-7 .ma-v3 .ma-top { flex: none; }
+body.ver-7 .ma-v3 .ma-kind { display: none; }
+body.ver-7 .ma-v3 .ma-title { flex: 1 1 auto; min-width: 0; margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--font-size-18); line-height: var(--font-line-height-26); font-weight: 600; color: var(--text-primary); }
+body.ver-7 .ma-v3 .ma-title .ma-vd { display: inline; font-size: inherit; line-height: inherit; }
+
+/* 사진 — 칸을 꽉 채우고(cover), 누르면 크게 보기 */
+body.ver-7 .ma-v3 .ma-snap { grid-area: snap; position: relative; min-height: 160px; border-radius: 8px; overflow: hidden; background-color: var(--bg-cell); }
+body.ver-7 .ma-v3 .ma-snap::before { display: none; }
+body.ver-7 .ma-v3 .ma-shot { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; cursor: zoom-in; }
+/* 위치 · 시각 띠 — Title Block: 알약 · bg/cell · 여백 4/8/4/4 · 칸 사이 6 · 글 12/18 text/primary · 사진 끝에서 4 */
+body.ver-7 .ma-v3 .ma-snap > .ma-stamp.ma-stamp6 {
+  position: absolute; left: var(--space-4); right: var(--space-4); bottom: var(--space-4); z-index: 2;
+  display: flex; align-items: center; gap: 6px; margin: 0; padding: var(--space-4) var(--space-8) var(--space-4) var(--space-4);
+  border-radius: 9999px; background-color: var(--bg-cell); color: var(--text-primary);
+  font-size: var(--font-size-12); line-height: var(--font-line-height-18);
+}
+body.ver-7 .ma-v3 .ma-stamp6 .mbt-pin { width: 18px; height: 18px; border-width: 1px; }
+body.ver-7 .ma-v3 .ma-stamp6 .mbt-pin::after { font-size: 10px; }
+body.ver-7 .ma-v3 .ma-stamp6 .ma-st-place::before { display: none; }
+body.ver-7 .ma-v3 .ma-stamp6 .ma-st-time { margin-left: auto; padding-left: var(--space-8); }
+
+/* 오른쪽 칸 — 위에 조치, 아래 끝에 버튼 */
+body.ver-7 .ma-v3 .ma-lower { grid-area: lower; display: flex; flex-direction: column; justify-content: space-between; gap: var(--space-8); min-width: 0; margin: 0; border-radius: 0; }
+body.ver-7 .ma-v3 .ma-lower::before { display: none; }
+body.ver-7 .ma-v3 .ma-lower-in { padding: 0; background: none; }
+body.ver-7 .ma-v3 .ma-delta { gap: var(--space-8); padding: 0; border-radius: 0; background: none; box-shadow: none; }
+body.ver-7 .ma-v3 .ma-delta-head { display: none; }
+body.ver-7 .ma-v3 .ma-act { gap: var(--space-8); }
+/* 체크리스트만 뒤집은 판(흰 면) — 판 밖 글은 유리 위라 on-inverse(뒤집은 판 안에서 = 바깥 화면의 기본 글자색) */
+body.ver-7 .ma-v3 .ma-delta-lead { margin: 0; font-size: var(--font-size-14); line-height: var(--font-line-height-20); font-weight: 600; color: var(--text-on-inverse); }
+body.ver-7 .ma-v3 .ma-memo-row #ma-memo-label,
+body.ver-7 .ma-v3 .ma-memo-row .icon-button { color: color-mix(in srgb, var(--text-on-inverse) 72%, transparent); }
+body.ver-7 .ma-v3 .ma-actions { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-8); padding: 0; border-radius: 0; background: none; }
+body.ver-7 .ma-v3 .ma-actions > .btn { width: 100%; justify-content: center; }
+/* 체크리스트 — Lists: bg/raised(뒤집은 판이라 흰 면) · border/default 1 · 모서리 4 · 줄 30(여백 4/4/4/8) */
+body.ver-7 .ma-v3 .ma-checks { border: var(--border-width-thin) solid var(--border-default); border-radius: var(--radius-4); background-color: var(--bg-raised); }
+body.ver-7 .ma-v3 .ma-check { min-height: 30px; padding: var(--space-4) var(--space-4) var(--space-4) var(--space-8); border-bottom-color: var(--border-default); }
