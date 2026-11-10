@@ -3127,7 +3127,10 @@
     // [11/10 v7] 지점을 카드 아래 남은 칸의 한가운데로 — 카드가 위쪽에 고정이라 지점은 화면 가운데보다 아래에 선다
     if (V7MA) {
       var hb = hit.getBoundingClientRect(), rm = v7Room(hb.width, hb.height);
-      lift = (rm.top + (rm.floor - alertBox.offsetHeight)) / 2 - hb.height / 2;   // 카드 위 남은 칸의 한가운데
+      // [11/10 디자이너] 지점을 지도 칸 가운데 쪽으로 — 카드 위 칸의 한가운데는 너무 위로 붙어 보였다.
+      //   바닥 점은 칸 가운데보다 30 위(핀 머리까지 한 덩이가 가운데에 오게), 카드 위 끝과는 60 이상 띄운다
+      var want = Math.min(hb.height / 2 - 30, rm.floor - alertBox.offsetHeight - 60);
+      lift = want - hb.height / 2;
     }
     var s = (baseSize / z) / (view.clientHeight || 1);
     return spot.clone().addScaledVector(upOnGround, lift * s);
