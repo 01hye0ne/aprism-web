@@ -856,10 +856,75 @@
 
   // 탑뷰 — 바로 위에서 내려다본다. yaw 도 0 으로 돌려 벽이 화면 축과 나란해진다.
   var top = document.querySelector("[data-map-top]");
-  if (top) {
+  if (top && !top.hasAttribute("data-map-dim")) {
     top.addEventListener("click", function () {
       unwind(0);
       glide(0, TOP_PITCH, zoom, null);
+    });
+  }
+
+  /*
+   * [11/10 v7] 지도 도구 줄 정리(디자이너) — 눈 아이콘은 "보이기 · 숨기기"로 읽혀 탑뷰로 알아보기 어려웠다.
+   *   2D / 3D 글자 토글: 지도 앱처럼 지금 상태가 아니라 누르면 바뀔 상태를 적는다(3D 로 보는 중이면 "2D").
+   *   2D = 바로 위(위 탑뷰와 같다), 3D = 2D 로 오기 전 각도로 되돌아간다(처음이면 처음 각도). 손으로 기울여 탑뷰를 벗어나도 글자가 따라간다.
+   *   v7 단추(data-map-dim)에만 — v6 은 위 탑뷰 그대로.
+   */
+  if (top && top.hasAttribute("data-map-dim")) {
+    var dimTxt = top.querySelector("[data-map-dim-txt]");
+    var EN_DIM = document.documentElement.lang === "en";
+    var before3d = null;
+    var isTop = function () { return pitch >= TOP_PITCH - 2 * Math.PI / 180; };
+    var dimSync = function () {
+      var flat = isTop();
+      var next = flat ? "3D" : "2D";
+      if (dimTxt && dimTxt.textContent !== next) { dimTxt.textContent = next; }
+      var label = EN_DIM ? (flat ? "View in 3D" : "View in 2D") : (flat ? "3D로 보기" : "2D로 보기");
+      if (top.getAttribute("aria-label") !== label) { top.setAttribute("aria-label", label); top.title = label; }
+      top.setAttribute("aria-pressed", flat ? "true" : "false");
+    };
+    top.addEventListener("click", function () {
+      if (isTop()) {
+        var b = before3d || { yaw: HOME_YAW, pitch: HOME_PITCH };
+        before3d = null;
+        unwind(b.yaw);
+        glide(b.yaw, b.pitch, zoom, null);
+      } else {
+        before3d = { yaw: yaw, pitch: pitch };
+        unwind(0);
+        glide(0, TOP_PITCH, zoom, null);
+      }
+      setTimeout(dimSync, 380);
+    });
+    setInterval(dimSync, 400);   // 끌어 기울인 경우 · 다른 단추로 각도가 바뀐 경우까지 — 값 비교만 하는 가벼운 확인
+    dimSync();
+  }
+
+  /*
+   * [11/10 v7 · UT 개선 사용성 4a] 로봇 위치 — 지도 앱의 "내 위치"처럼 지금 보는 로봇에게 간다(P04 "다른 화면 보다가 로봇이 어디 있는지 바로").
+   *   각도는 그대로, 보는 지점만 로봇으로(우측 로봇 카드를 누를 때와 같다). 로봇이 다른 층이면 그 층으로 옮긴 뒤 간다.
+   */
+  var toBot = document.querySelector("[data-map-robot]");
+  if (toBot) {
+    var goBot = function () {
+      if (!onLane || !renderer || !onLane.here) { return; }
+      setFocusWorld(onLane.here);
+      glide(yaw, pitch, Math.max(zoom, 2.2), onLane.here.clone());
+    };
+    toBot.addEventListener("click", function () {
+      var lane = onLane;
+      if (!lane || !renderer) { return; }
+      var fl = lane.floor || (lane.bot && lane.bot.floor);
+      if (fl && floors.length && fl !== floorNow) {
+        goFloor(fl, "button");
+        var tries = 0;
+        (function wait() {   // 층 옮기기(약 0.9초) · 도착 둘러보기가 끝나면 로봇에게
+          tries += 1;
+          if (floorBusy && tries < 60) { setTimeout(wait, 100); return; }
+          setTimeout(goBot, 360);
+        })();
+        return;
+      }
+      goBot();
     });
   }
 

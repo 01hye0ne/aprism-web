@@ -8,7 +8,7 @@
   <!-- 영문판 — tools/build-en.mjs 가 한글판에서 만든 파일이다. 여기를 고치지 말고 한글판을 고친 뒤 다시 만든다. -->
   <style>html:not(.i18n-ready) body { visibility: hidden; }</style>
   <link rel="stylesheet" href="../assets/css/i18n-en.css?v=d64c011f" />
-  <script src="../assets/js/i18n-en-dict.js?v=a0a176bf"></script>
+  <script src="../assets/js/i18n-en-dict.js?v=bdba43e8"></script>
   <script src="../assets/js/i18n-en.js?v=9f2969ec"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>v6 · 사전 점검 — APRISM</title>
@@ -38,7 +38,7 @@
   <link rel="stylesheet" href="../assets/css/v5.css?v=aefc22b4" />
   <!-- v6 전용 규칙 — v5 는 10/30 부로 멈췄다. v6 에서 바꾸는 것은 여기(body.ver-6)에. -->
   <link rel="stylesheet" href="../assets/css/v6.css?v=0e16c37a" />
-  <link rel="stylesheet" href="../assets/css/v7.css?v=002f5709" />
+  <link rel="stylesheet" href="../assets/css/v7.css?v=a6dfe6c6" />
   <!-- [10/29] v5 지도(map-v6.js)가 그리는 설비 이름표 · 충전 스테이션 · 번호 핀 꼴 — 메인과 같다 -->
   <link rel="stylesheet" href="../assets/css/route-rules.css?v=bd91ee52" />
   <style>
@@ -482,11 +482,11 @@
                 <button type="button" class="icon-button" data-map-zoom-out aria-label="축소">
                   <span class="i i-20" style="--i:var(--ic-zoom-out)"></span>
                 </button>
-                            <button type="button" class="icon-button" data-map-track aria-label="전체 보기">
-                              <span class="i i-20" style="--i:var(--ic-target)"></span>
+                            <button type="button" class="icon-button" data-map-track aria-label="전체 보기" title="전체 보기">
+                              <span class="i i-20" style="--i:var(--ic-fit-screen)"></span>
                             </button>
-                            <button type="button" class="icon-button" data-map-top aria-label="탑뷰">
-                              <span class="i i-20" style="--i:var(--ic-eye)"></span>
+                            <button type="button" class="icon-button map-dim" data-map-top data-map-dim aria-label="2D로 보기" title="2D로 보기">
+                              <span class="map-dim-txt t-label-1" data-map-dim-txt>2D</span>
                             </button>
                             <button type="button" class="icon-button is-secondary" aria-label="영상 리플레이">
                               <span class="i i-20" style="--i:var(--ic-play)"></span>
@@ -1649,7 +1649,7 @@
 <script src="../assets/js/map-model.js?v=0f88c871"></script>
 <!-- [10/29] v5 지도(map-v6.js) — 라이트 단계 톤 지도 · 바닥 표식 · 바닥 띠 경로를 메인과 같게. map.js 는 v3 · v4 가 쓴다 -->
 <script src="../assets/js/map-fx-v6.js?v=05546ef0"></script>
-<script src="../assets/js/map-v6.js?v=4c2b84a3"></script>
+<script src="../assets/js/map-v6.js?v=03c22134"></script>
 <script src="../assets/js/robot-spot.js?v=2a3061e4"></script>
 <script src="../assets/js/sian.js?v=8caef8ce"></script>
 <!-- 미션 설정 — 점검항목 · 순서 · 로봇이 소요시간과 배터리를 움직인다. screen.js 뒤에 온다. -->

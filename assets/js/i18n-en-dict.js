@@ -1759,4 +1759,7 @@ window.APRISM_EN = {"APRISM 공장 환경점검 로봇 관제 시스템 진입 �
 "미조치 알림":"Unactioned alerts",
 "조치 요청된 알림":"Action requested",
 "조치 요청된 알림 접기":"Collapse action requested",
-"조치 요청된 알림 펼치기":"Expand action requested"};
+"조치 요청된 알림 펼치기":"Expand action requested",
+"2D로 보기":"View in 2D",
+"3D로 보기":"View in 3D",
+"로봇 위치로":"Go to robot"};
