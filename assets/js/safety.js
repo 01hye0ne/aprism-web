@@ -675,7 +675,10 @@
   const scr = document.querySelector('.app'), sf = document.querySelector('[data-sf]'), v = document.getElementById('sfv'), bc = document.querySelector('[data-sf-crumb]'), side = document.querySelector('[data-sf-sb]');
   if(!sf || !v || !bc || !side) return;
   const hits = i => K.reduce((a, k) => a + itemsOf(i, k).filter(isOpen).length, 0);
-  const worst = i => K.reduce((a, k) => { const x = M[i].r[k]; return x && RANK[x[0]] > RANK[a] ? x[0] : a; }, 'ok');
+  // [11/10 v7] 조치 완료한 지점은 미션 단계(상단 미션 탭 · 왼쪽 목록 표식)에서 뺀다 — 남은 것 중 가장 높은 단계
+  const worst = i => K.reduce((a, k) => {
+    if(V7){ const s = itemsOf(i, k).filter(y => (REQ[i + '|' + k + '|' + wpOf(y)] || {}).st !== 'done').reduce((b, y) => RANK[y[0]] > RANK[b] ? y[0] : b, 'ok'); return RANK[s] > RANK[a] ? s : a; }
+    const x = M[i].r[k]; return x && RANK[x[0]] > RANK[a] ? x[0] : a; }, 'ok');
   const worstAll = () => M.reduce((a, m, i) => RANK[worst(i)] > RANK[a] ? worst(i) : a, 'ok');
   /*
    * [11/02 v6] 판정 결과 글 — 카드 · 상세 · 관제 알림이 같은 규칙("측정 항목 + 값", 세부 묘사는 따로). 상세(detail)와 같은 셈.
