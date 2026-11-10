@@ -2889,11 +2889,12 @@
    * 다른 웨이포인트로 옮겨 가거나 고른 것을 놓으면 닫고 aprism:map-alert 로 알린다.
    */
   var alertBox = document.querySelector("[data-map-alert]");
-  var V7MA = document.body.classList.contains("ver-7");   // [11/10 v7] 알림 팝오버 = 지도 고정 카드(세로선은 뺐다)
-  var V7MA_AT = "bottom";   // [11/10 디자이너] "top" = 위쪽(Delta 와 같은 줄) · "bottom" = 아래쪽(시뮬레이션 막대 위) — 둘을 비교해 본다
+  // [11/10 v7 디자이너] 알림 팝오버 = 지도 아래쪽 고정 카드 — 위쪽 · 세로선 안을 거쳐 아래쪽으로 정했다.
+  //   로봇 · 설비 팝오버는 대상 위로 열려 위쪽을 쓰고, Delta 는 왼쪽 위다 — 아래쪽은 그들과 부딪히지 않는 "처리할 것" 자리
+  var V7MA = document.body.classList.contains("ver-7");
   /*
-   * [11/10 v7] 고정 카드의 자리 — 위 끝은 Delta 카드 위 끝과 같은 줄, 가로는 Delta 오른쪽 ~ 지도 도구 왼쪽 사이.
-   * 아래 끝(바닥)은 시뮬레이션 막대 위 또는 칸 끝. placeAlert · aimAt 가 같이 쓴다.
+   * [11/10 v7] 고정 카드의 자리 — 가로는 지도 칸 왼쪽 끝 ~ 지도 도구 왼쪽의 한가운데(알림을 바꿔도 늘 같은 자리),
+   * 아래 끝은 우측 패널 아래 여백과 같은 줄(시안의 시뮬레이션 막대가 떠 있으면 그 위). 위 끝(top)은 Delta 위 끝 — 카메라 보정이 쓴다.
    */
   function v7Room(W, H) {
     var box = hit.getBoundingClientRect();
@@ -2901,11 +2902,14 @@
     var right = toolsEl && toolsEl.offsetParent ? toolsEl.getBoundingClientRect().left - box.left - 12 : W - 12;
     var dr = deltaEl && deltaEl.getClientRects().length ? deltaEl.getBoundingClientRect() : null;
     var simEl = document.querySelector(".rsim"), sr = simEl && simEl.getClientRects().length ? simEl.getBoundingClientRect() : null;
+    var panelEl = document.querySelector(".right-panel"), pr = panelEl && panelEl.getClientRects().length ? panelEl.getBoundingClientRect() : null;
+    var gap = pr ? Math.max(8, box.bottom - pr.bottom) : 16;
+    var floor = H - gap;
+    if (sr) { floor = Math.min(floor, sr.top - box.top - 8); }
     return {
-      left: dr ? dr.right - box.left + 12 : 12,
-      right: right,
+      center: right / 2,
       top: dr ? Math.max(8, dr.top - box.top) : 16,
-      floor: sr ? Math.min(H - 8, sr.top - box.top - 8) : H - 8
+      floor: floor
     };
   }
   var alertSide = "";     // [11/05] 옆으로 세운 쪽 — "r" 점 오른쪽 · "l" 왼쪽(placeAlert)
@@ -3038,22 +3042,13 @@
   function placeAlert(x, y, W, H) {
     var w = alertBox.offsetWidth, h = alertBox.offsetHeight;
     if (V7MA && !alertBox.classList.contains("is-docked")) {
-      var rm = v7Room(W, H), hw = w / 2, atBottom = V7MA_AT === "bottom";
-      var lo = atBottom ? 12 : rm.left, hi = rm.right;   // 아래쪽은 Delta(왼쪽 위)와 겹치지 않는다
-      if (hi - lo < w) { lo = Math.max(12, hi - w); }   // Delta 를 펼쳐 자리가 모자라면 Delta 쪽으로 겹친다
-      var ccx = Math.min(hi - hw, Math.max(lo + hw, x));
-      var cardTop = atBottom ? rm.floor - h : rm.top;
-      var lineTop = cardTop + h;
-      var lx = x - (ccx - hw);
-      // 선은 카드 아래 끝에서 지점까지 곧게 — 지점이 카드 폭 밖이거나 카드 위로 올라가 있으면(카메라가 아직 못 따라왔을 때) 숨긴다
-      var lineOk = lx >= 16 && lx <= w - 16 && y > lineTop + 12 && y <= H;
+      var rm = v7Room(W, H), hw = w / 2;
+      var ccx = Math.max(12 + hw, rm.center);
+      var cardTop = rm.floor - h;
       alertBox.classList.remove("is-side-r", "is-side-l", "is-below");
-      alertBox.classList.add("is-top");
-      alertBox.classList.toggle("is-no-tail", !lineOk);
+      alertBox.classList.add("is-fixed", "is-no-tail");
       alertBox.style.setProperty("--x", snapPx(ccx));
       alertBox.style.setProperty("--y", snapPx(cardTop));
-      alertBox.style.setProperty("--line-x", snapPx(lx));
-      alertBox.style.setProperty("--line-h", snapPx(Math.max(0, y - lineTop)));
       return;
     }
     var half = w / 2;
@@ -3125,9 +3120,7 @@
     // [11/10 v7] 지점을 카드 아래 남은 칸의 한가운데로 — 카드가 위쪽에 고정이라 지점은 화면 가운데보다 아래에 선다
     if (V7MA) {
       var hb = hit.getBoundingClientRect(), rm = v7Room(hb.width, hb.height);
-      lift = V7MA_AT === "bottom"
-        ? (rm.top + (rm.floor - alertBox.offsetHeight)) / 2 - hb.height / 2   // 카드 위 남은 칸의 한가운데
-        : (rm.top + alertBox.offsetHeight + rm.floor) / 2 - hb.height / 2;
+      lift = (rm.top + (rm.floor - alertBox.offsetHeight)) / 2 - hb.height / 2;   // 카드 위 남은 칸의 한가운데
     }
     var s = (baseSize / z) / (view.clientHeight || 1);
     return spot.clone().addScaledVector(upOnGround, lift * s);
