@@ -357,3 +357,6 @@ body.ver-7 .map-alert.is-critical .ma-reason { color: var(--status-critical-text
 body.ver-7 .ma-v3 .ma-reason[hidden] { display: none; }
 body.ver-7 .ma-v3 .ma-reason:not([hidden]) { margin-bottom: var(--space-4); }   /* 이유 ↔ 조치 제안 4 — 한 덩이로 읽힌다 */
 body.ver-7 .ma-v3 .ma-shot { -webkit-mask-image: none; mask-image: none; }   /* [11/10 디자이너] 사진 아래 끝 녹아듦(마스크 64) 뺌 — 사진이 칸을 꽉 채워 녹일 바탕이 없다
+/* [11/10 디자이너] 알림 목록 번호 원 = 층 꼬리표 높이(18) — 16 이라 한 줄에서 원만 작아 보였다. 팝오버 위치 띠의 원(18)과도 같다. 숫자 10 */
+body.ver-7 .ah-where > .mbt-pin.ah-wp-pin { width: 18px; height: 18px; }
+body.ver-7 .ah-where > .mbt-pin.ah-wp-pin::after { font-size: 10px; }
