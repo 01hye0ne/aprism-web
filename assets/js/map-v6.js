@@ -4264,7 +4264,7 @@
         else if (next) { head.style.background = "#FFFFFF"; head.style.borderColor = col; head.style.color = col; }
         else if (past) { head.style.background = C.bg; head.style.borderColor = col; head.style.color = col; }
         else if (cau || dan) { head.style.background = col; head.style.borderColor = C.bg; head.style.color = cau ? "#1A1300" : "#FFFFFF"; }
-        else if (document.body.classList.contains("ver-7")) { head.style.background = C.bg; head.style.borderColor = "var(--bg-raised)"; head.style.color = "var(--text-secondary)"; }   // [11/10 v7 디자이너] 기본 핀 테 = 층 꼬리표 바탕(bg/raised), 숫자 = 보조 글자색 — 밝은 테가 너무 튀었다
+        else if (document.body.classList.contains("ver-7")) { head.style.background = C.bg; head.style.borderColor = "var(--pin-plain)"; head.style.color = "var(--text-secondary)"; el.style.setProperty("--pin", "var(--pin-plain)"); }   // [11/10 v7 디자이너] 기본 핀 테 = 층 꼬리표 바탕보다 한 단계 밝은 회색(v7.css --pin-plain), 막대도 같은 색, 숫자 = 보조 글자색
         else { head.style.background = C.bg; head.style.borderColor = light ? "rgb(11 14 19 / 24%)" : "#AFB7C8"; head.style.color = light ? "#494E54" : "#E4E8EF"; }
         el.appendChild(head);
         if (w.off) { el.hidden = true; }
