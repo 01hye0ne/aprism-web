@@ -544,6 +544,36 @@
   var pickedDone = null;   // [11/06 v6] 고른 확인된 알림(객체) — 알림을 고르면 놓는다
   var resolved = [];       // 확인 처리한 알림 — 목록에서 빠지고 오늘 확인 완료로 간다
   var cleared = [];        // [11/05] 확인 처리한 알림 전부(화면에서 생긴 것 포함) — 지도 번호를 회색으로 남긴다(markWaypoints)
+  /*
+   * [11/10 v7] 처리 기록을 안전진단과 나눈다(sessionStorage 'aprism-handled') — 관제에서 처리하고 안전진단에 갔다 오면 알림이 되살아났다.
+   *   한 줄 = {mis 미션 이름, k 감지, wp 지점, t 시각(HH:MM), acts, memo, st 진행 단계}. 관제 확인 처리 · 안전진단 현장 조치 요청 둘 다 여기에 적는다(safety.js 같은 열쇠).
+   *   미션 이름은 관제가 '지하 4층 정기 순회 점검', 안전진단이 '정기 순회 점검' — 한쪽이 다른 쪽을 품으면 같은 미션.
+   */
+  var V7H = body.classList.contains("ver-7"), HKEY = "aprism-handled";
+  function hRead() { try { return JSON.parse(sessionStorage.getItem(HKEY) || "[]") || []; } catch (e) { return []; } }
+  function hWrite(list) { try { sessionStorage.setItem(HKEY, JSON.stringify(list)); } catch (e) { /* 저장 막힘 — 이 화면에서만 */ } }
+  function hSame(e, a) { var m = missionOf(a) || ""; return !!m && !!e.mis && e.k === a.detect && e.wp === a.wp && (m.indexOf(e.mis) >= 0 || e.mis.indexOf(m) >= 0); }
+  function hAdd(a, rec) {
+    if (!V7H) { return; }
+    var l = hRead().filter(function (e) { return !hSame(e, a); });
+    l.push({ mis: missionOf(a), k: a.detect, wp: a.wp, t: rec.time.slice(0, 5), acts: rec.how ? rec.how.split(" · ") : [], memo: rec.memo || "", st: "wait", src: "ctl" });
+    hWrite(l);
+  }
+  function hDel(a) { if (V7H) { hWrite(hRead().filter(function (e) { return !hSame(e, a); })); } }
+  // 판을 새로 고를 때마다(처음 · 주소 # · 델타 시뮬레이션) 기록을 다시 얹는다 — 목록에서 빼고 오늘 확인된 알림에 넣는다
+  function hRestore() {
+    if (!V7H) { return; }
+    var list = hRead(); if (!list.length) { return; }
+    var all = [CRITICAL].concat(WARNINGS, R01_MORE, ROUTE_ALERTS);
+    list.forEach(function (e) {
+      all.forEach(function (a) {
+        if (!hSame(e, a) || resolved.indexOf(a) >= 0) { return; }
+        resolved.push(a); cleared.push(a);
+        DONE.unshift({ wp: a.wp || "", time: e.t + ":00", title: window.APRISM_ALERT6 ? window.APRISM_ALERT6.title(a.title) : a.title,
+                       how: (e.acts || []).join(" · ") || "현장 조치 요청", who: "홍길동", memo: e.memo || "" });
+      });
+    });
+  }
 
   function items() {
     var base = (SETS[level] || SETS.critical)().filter(function (a) { return resolved.indexOf(a) < 0; });
@@ -966,6 +996,7 @@
     extra = [];
     resolved = []; cleared = [];
     DONE = DONE_BASE.slice();
+    hRestore();
     note.close();
     document.dispatchEvent(new CustomEvent("aprism:monitor-reset"));
     render();
@@ -1456,6 +1487,7 @@
       DONE.unshift(rec);
       if (extra.indexOf(a) >= 0) { extra.splice(extra.indexOf(a), 1); } else { resolved.push(a); }
       cleared.push(a);
+      hAdd(a, rec);
       lastDone = { a: a, rec: rec };
       render();
       showToast(a);
@@ -1539,6 +1571,7 @@
         if (i >= 0) { DONE.splice(i, 1); }
         var r = resolved.indexOf(a);
         if (r >= 0) { resolved.splice(r, 1); } else { extra.unshift(a); }
+        hDel(a);
         hideToast();
         render();
       });
@@ -1608,6 +1641,7 @@
     extra = [];
     resolved = []; cleared = [];
     DONE = DONE_BASE.slice();
+    hRestore();
     note.close();
     document.dispatchEvent(new CustomEvent("aprism:monitor-reset"));
     render();
