@@ -119,6 +119,8 @@ body.ver-7 .status-bar-left > [data-sf-crumb] { flex: 0 0 auto; min-width: 0; }
  */
 body.ver-7 [data-timeline] .timeline-item[data-wp-state="completed"] .step-times-foot { display: none; }
 body.ver-7 [data-timeline] .timeline-item[data-wp-state="completed"] .step-card { padding-bottom: var(--space-12); }
+/* [11/10 디자이너] 지나온 지점 이름은 글자 톤 한 단계 아래(text/primary → text/secondary) — 지금 · 앞으로 갈 지점이 먼저 읽히게. 번호 · 알림 세모는 그대로 */
+body.ver-7 [data-timeline] .timeline-item[data-wp-state="completed"]:not(.is-selected) .step-title { color: var(--text-secondary); }
 
 /*
  * [11/10 v7] 지도 도구 줄 정리(디자이너) — 로봇 위치(UT 개선 사용성 4a) · 전체 보기(화면 맞춤) · 눈 → 2D / 3D 글자 토글.
