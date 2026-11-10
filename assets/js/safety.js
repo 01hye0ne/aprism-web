@@ -843,7 +843,8 @@
     if(menu){ menu = false; bc.innerHTML = crumb(); }
   });
   // 시연 — 다른 미션에 새 위험이 들어온 상태(레일 점 깜빡임 · 새로 표시). 화면에는 단추를 두지 않고 콘솔에서 부른다(APRISM_SAFETY.fire · reset)
-  window.APRISM_SAFETY = {
+  //   [11/10 v7] v7 에서는 뺐다 — 관제에 없는 알림(WP-104 변압기)이라 네 화면이 같은 알림을 본다는 규칙과 어긋난다(디자이너). v6 · v5 는 그대로
+  window.APRISM_SAFETY = S7 ? { reset(){ mapF = {}; init(); dt = null; render(); } } : {
     fire(){ if(fired) return; fired = true; newSeen = false; if(scope===1) scope = 0; M[NEWR[0]].r[NEWR[1]] = NEWR[2].slice(); toasts.unshift({mi:NEWR[0], k:NEWR[1]}); render(); },
     reset(){ mapF = {}; init(); dt = null; render(); }
   };
