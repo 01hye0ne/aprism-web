@@ -24,7 +24,27 @@
     "진동 상승 · 냉각 펌프 P-2": ["이상음향", "이상 점수", "21.6"],   // v6 — WP-12 는 이상음향 21.6(monitor · building 과 같다)
     "압력 편차 · 공기 압축기 C-1": ["계기인식", "압력", "7.9 bar"]
   };
-  function of(t) { var r = T[String(t || "")]; return r ? { detect: r[0], label: r[1], value: r[2], ch: r[3] || "" } : null; }
-  function title(t) { var r = of(t); return r ? r.detect + " · " + r.label + " " + r.value : t; }
+  /*
+   * [11/10 v7 디자이너] 알림명에서 감지 이름(카테고리)을 뺀다 — "감지 · 측정 항목 + 값" → "측정 항목 + 값".
+   *   카테고리가 붙어 목록 · 팝오버 · 조치 요청된 알림의 이름이 서로 달라 보였다(UT P11). 둘째 줄에도 남기지 않는다(디자이너).
+   *   측정 항목만으로 뜻이 안 서는 "이상 점수"는 감지 이름을 붙여 "이상음향 점수" · "부분방전 점수" — 둘이 같은 목록에 나란히 오면 구분이 안 된다.
+   *   팝오버 제목(monitor.js maResult)도 같은 항목 이름을 쓴다. 감지 이름은 팝오버 배지 옆 · 안전진단 칸 이름으로 남는다.
+   *   이미 "감지 · …" 꼴로 적힌 기록(조치 요청된 알림 기본 기록 · 알림 센터 지난 기록)도 같은 규칙으로 바꿔 보여 준다.
+   */
+  var DET = /^(안전감지|누출감지|온도감지|계기인식|이상음향|부분방전) · (.+)$/;
+  function v7() { return !!(document.body && document.body.classList.contains("ver-7")); }
+  function lab7(detect, label) { return label === "이상 점수" ? detect + " 점수" : label; }
+  function of(t) {
+    var r = T[String(t || "")];
+    if (!r) { return null; }
+    return { detect: r[0], label: v7() ? lab7(r[0], r[1]) : r[1], value: r[2], ch: r[3] || "" };
+  }
+  function title(t) {
+    var r = of(t);
+    if (r) { return v7() ? r.label + " " + r.value : r.detect + " · " + r.label + " " + r.value; }
+    var m = v7() && DET.exec(String(t || ""));
+    if (m) { var rest = m[2]; return rest.indexOf("이상 점수") === 0 ? m[1] + " 점수" + rest.slice(5) : rest; }
+    return t;
+  }
   window.APRISM_ALERT6 = { of: of, title: title };
 })();

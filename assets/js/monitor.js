@@ -667,7 +667,7 @@
 
     var head = el("span", "done-title");
     // 확인 완료 제목도 알림 제목과 같은 Label/2 다 — 처리 끝난 것이 처리할 것보다 크면 위계가 뒤집힌다.
-    head.appendChild(el("span", "t-label-2", d.title));
+    head.appendChild(el("span", "t-label-2", window.APRISM_ALERT6 ? window.APRISM_ALERT6.title(d.title) : d.title));   // [11/10 v7] 이름 규칙(alert-text-v6.js — v7 은 감지 이름 뺌). v6 이하는 그대로
     // [11/06 v6] 시각은 줄에 올라가거나 고를 때만 보인다(v6.css .done-time) — 확인된 기록은 시각보다 무엇을 어떻게 처리했는지가 먼저다.
     head.appendChild(el("span", "t-caption num done-time", d.time));
 

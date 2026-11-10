@@ -293,6 +293,7 @@
   function titleOf(a) {
     if (!V6) { return a.title; }
     var r = of6(a);
+    if (window.APRISM_ALERT6 && document.body.classList.contains("ver-7")) { return window.APRISM_ALERT6.title(a.title); }   // [11/10 v7] 감지 이름 뺀 이름(alert-text-v6.js)
     return r ? r.detect + " · " + r.label + " " + r.value : a.title;
   }
   function resOf(a) {

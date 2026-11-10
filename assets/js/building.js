@@ -435,7 +435,7 @@
     var node = el("div", "done-item");
     node.setAttribute("role", "listitem");
     var head = el("span", "done-title");
-    head.appendChild(el("span", "t-label-2", d.title));
+    head.appendChild(el("span", "t-label-2", window.APRISM_ALERT6 ? window.APRISM_ALERT6.title(d.title) : d.title));   // [11/10 v7] 이름 규칙(alert-text-v6.js — v7 은 감지 이름 뺌). v6 이하는 그대로
     // [11/06 v6] 관제 오늘 확인된 알림(monitor.js doneItem)과 같은 줄 — 시각은 호버 때만(v6.css .done-time),
     //   처리 줄은 결과 하나, 조치는 호버 때 앞에(.done-act), 지점 번호(WP-nn)는 뺐다
     head.appendChild(el("span", "t-caption num" + (V6 ? " done-time" : ""), d.time));
