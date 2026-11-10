@@ -336,3 +336,10 @@ body.ver-7 .robot-strip.is-carousel .robot-card .label { display: none; }
 body.ver-7 .robot-strip.is-carousel .robot-thumb { height: 114px; }
 body.ver-7 .robot-stage { height: calc(114px + var(--stage-pad) * 2); }
 body.ver-7 .rc-actions { top: 0; }   /* 이름 줄(20 + 8)이 빠진 만큼 버튼도 위 끝으로 */
+
+/* [11/10 디자이너] 알림 팝오버 배경 = 로봇 팝오버(.map-bot-tip)와 한 벌 — 몸 --fac-bg(gray/750 92% · 라이트 bg/raised 92%) + 흐림 12, 머리 bg/raised.
+ * 팝오버 ↔ 지점 세로선은 뺀다(디자이너) — 카드 자리(위쪽 고정)와 카메라 보정은 그대로 */
+body.ver-7 .map-alert.ma-v3 { background-color: var(--fac-bg); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
+body.ver-7 .ma-v3 .ma-head { background-color: var(--bg-raised); }
+body.ver-7 .map-alert.ma-v3::after,
+body.ver-7 .map-alert.ma-v3::before { display: none; }
