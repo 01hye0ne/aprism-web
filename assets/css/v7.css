@@ -347,3 +347,8 @@ body.ver-7 .map-alert.ma-v3::before { display: none; }
 body.ver-7 .map-alert.ma-v3 { border-radius: 10px; }
 body.ver-7 .ma-v3 .ma-head { border-radius: 10px 10px 0 0; }
 body.ver-7 .ma-v3 .ma-snap { border-radius: 0 0 0 10px; }
+/* [11/10 디자이너] 알림 이유(판정) — 조치 제안 위 한 줄. 단계색 13 SemiBold: 제목(18)보다 낮고 조치 제안(14)과 색으로 갈린다 */
+body.ver-7 .ma-v3 .ma-reason { margin: 0; font-size: var(--font-size-13); line-height: var(--font-line-height-18); font-weight: 600; color: var(--status-warning-text); font-variant-numeric: tabular-nums; }
+body.ver-7 .map-alert.is-critical .ma-reason { color: var(--status-critical-text); }
+body.ver-7 .ma-v3 .ma-reason[hidden] { display: none; }
+body.ver-7 .ma-v3 .ma-reason:not([hidden]) { margin-bottom: var(--space-4); }   /* 이유 ↔ 조치 제안 4 — 한 덩이로 읽힌다 */

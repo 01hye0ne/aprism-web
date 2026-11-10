@@ -3012,6 +3012,7 @@
   // 쪽지 자리 — 고른 웨이포인트를 화면 좌표로 옮긴다. 설비 카드와 같은 셈이다.
   function placeWp() {
     if (!camera) { return; }
+    maPinSync();
     var showAlert = alertOn();
     if (!showAlert) { alertSide = ""; }
     if (!showAlert && (!wpBox || wpBox.hidden)) { return; }
@@ -4322,8 +4323,21 @@
    * 관제 기본은 문제 지점만 번호를 보이므로(is-quiet), 다른 번호가 필요할 때 찾는 길이다.
    */
   var rrHotId = null, rrHotPoint = false;
-  function rrHot(id, point) {
-    id = id || null; point = !!(id && point);
+  /*
+   * [11/10 v7 디자이너] 알림 팝오버가 열려 있는 동안 그 지점을 호버처럼 짚어 둔다(핀 머리 크게 · 고리 · 다른 핀 흐리게).
+   *   손이 다른 줄 · 점에 닿으면 그쪽이 앞서고, 떠나면 알림 지점으로 돌아온다. 팝오버를 닫으면 풀린다.
+   */
+  var rrHov = null, rrHovPt = false, maPinId = null;
+  function rrHot(id, point) { rrHov = id || null; rrHovPt = !!point; rrHotApply(); }
+  function maPinSync() {
+    if (!V7MA) { return; }
+    var mp = alertOn() ? chosenWp : null;
+    if (mp !== maPinId) { maPinId = mp; rrHotApply(); }
+  }
+  if (V7MA && alertBox) { new MutationObserver(maPinSync).observe(alertBox, { attributes: true, attributeFilter: ["hidden", "data-wp"] }); }
+  function rrHotApply() {
+    var id = rrHov, point = !!(id && rrHovPt);
+    if (!id && maPinId) { id = maPinId; point = true; }
     if (id === rrHotId && point === rrHotPoint) { return; }
     rrHotId = id; rrHotPoint = point;
     wpSpots.forEach(function (w) { if (w.pinEl) { w.pinEl.classList.toggle("is-hot", w.id === id); w.pinEl.classList.toggle("is-point", point && w.id === id); } });
