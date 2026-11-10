@@ -590,7 +590,34 @@
     return ALERTS.filter(function (a) { return a.id === id; })[0] || null;
   }
 
+  /*
+   * [11/10 v7] 조치 요청 기록 한 곳(alert-data-v7.js req) — 관제 · 안전진단에서 요청한 알림도 여기서 "조치 요청됨"으로.
+   *   그리기 전마다 기록과 맞춘다(여러 번 불러도 같다). 기록에서 온 처리 정보는 reqId 를 단다 — 기록이 지워지면 미조치로 돌린다.
+   */
+  function took7(from, to) {
+    var s = function (t) { var p = String(t).split(":"); return (+p[0]) * 60 + (+p[1]); }, n = s(to) - s(from);
+    if (!(n > 0)) { return "방금"; }
+    return "발생 후 " + (n >= 60 ? Math.floor(n / 60) + "시간 " + (n % 60) + "분" : n + "분");
+  }
+  function sync7() {
+    var S = window.APRISM_ALERTS7;
+    if (!S || !V6) { return; }
+    var R = S.req.all();
+    ALERTS.forEach(function (a) {
+      var r = R[a.id];
+      if (r && !a.done) {
+        a.done = { day: "today", at: r.t.slice(0, 5), by: r.who || "홍길동", took: took7(a.time, r.t), picked: (r.how || []).slice(),
+                   memo: r.memo || "", delta: deltaUse(a, r.how || []), reqId: a.id };
+      } else if (!r && a.done && a.done.reqId) {
+        delete a.done;
+      }
+    });
+  }
+  var selfReq = false;   // 이 화면이 쓴 기록 — 곧 직접 그리므로 이벤트로 한 번 더 그리지 않는다
+  document.addEventListener("aprism:requested", function () { if (!selfReq) { refresh(); } });
+
   function refresh() {
+    sync7();
     clearTimeout(hoverTimer);
     hoverId = null;
     var rows = visible();
@@ -957,6 +984,13 @@
         var acts = chosenOf(a).slice();
         a.done = { day: "today", at: nowHM(), by: "홍길동", took: "방금",
                    picked: acts, memo: state.memo[a.id] || "", delta: deltaUse(a, acts) };
+        // [11/10 v7] 조치 요청 기록 한 곳에 남긴다 — 관제 · 안전진단도 요청됨으로 본다
+        var S7r = window.APRISM_ALERTS7;
+        if (S7r && V6 && S7r.req.find(a.mission, a.detect, a.wp) === a.id) {
+          var now = new Date(), hms = [now.getHours(), now.getMinutes(), now.getSeconds()].map(function (n) { return (n < 10 ? "0" : "") + n; }).join(":");
+          a.done.reqId = a.id;
+          selfReq = true; S7r.req.set(a.id, { t: hms, how: acts, memo: a.done.memo, who: a.done.by }); selfReq = false;
+        }
         delete state.chosen[a.id];
         delete state.memo[a.id];
         setPicked(null);

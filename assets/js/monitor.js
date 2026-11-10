@@ -764,7 +764,41 @@
     });
   }
 
+  /*
+   * [11/10 v7] 조치 요청 기록 한 곳(alert-data-v7.js req) — 안전진단 · 알림 센터에서 요청한 알림도 여기서 "조치 요청된 알림"으로 옮긴다.
+   *   그리기 전마다 기록과 맞춘다(여러 번 불러도 같다). 기록에서 온 줄은 reqId 를 단다 — 여기서 누른 줄도 같은 표를 달아 둘로 쌓이지 않게.
+   */
+  function sync7() {
+    var S = window.APRISM_ALERTS7;
+    if (!S) { return; }
+    var R = S.req.all(), moved = false;
+    [CRITICAL].concat(WARNINGS, R01_MORE, ROUTE_ALERTS).forEach(function (a) {
+      var id = a && S.req.idOf(a);
+      if (!id) { return; }
+      var r = R[id], i = resolved.indexOf(a), di = -1;
+      DONE.forEach(function (d, n) { if (d.reqId === id) { di = n; } });
+      if (r) {
+        if (i < 0) { resolved.push(a); moved = true; }
+        if (cleared.indexOf(a) < 0) { cleared.push(a); }
+        if (di < 0) {
+          DONE.push({ wp: a.wp || "", time: r.t, title: window.APRISM_ALERT6 ? window.APRISM_ALERT6.title(a.title) : a.title,
+                      how: (r.how || []).join(" · "), who: r.who || "홍길동", memo: r.memo || "", reqId: id });
+          moved = true;
+        }
+      } else if (di >= 0) {   // 다른 화면에서 되돌린 요청
+        DONE.splice(di, 1);
+        if (i >= 0) { resolved.splice(i, 1); }
+        if (cleared.indexOf(a) >= 0) { cleared.splice(cleared.indexOf(a), 1); }
+        moved = true;
+      }
+    });
+    if (moved) { DONE.sort(function (x, y) { return x.time < y.time ? 1 : x.time > y.time ? -1 : 0; }); }
+  }
+  var selfReq = false;   // 이 화면이 쓴 기록 — 곧 직접 그리므로 이벤트로 한 번 더 그리지 않는다(새 줄 빛남이 끊긴다)
+  document.addEventListener("aprism:requested", function () { if (!selfReq) { render(); } });
+
   function render() {
+    sync7();
     var all = items();
     if (picked && all.indexOf(picked) < 0) { picked = null; }
 
@@ -1439,6 +1473,9 @@
       DONE.unshift(rec);
       if (extra.indexOf(a) >= 0) { extra.splice(extra.indexOf(a), 1); } else { resolved.push(a); }
       cleared.push(a);
+      // [11/10 v7] 조치 요청 기록 한 곳에 남긴다(목록에서 옮긴 뒤 — 먼저 쓰면 sync7 이 한 번 더 옮긴다) — 안전진단 · 알림 센터도 요청됨으로 본다
+      var S7r = window.APRISM_ALERTS7, id7 = S7r && S7r.req.idOf(a);
+      if (id7) { rec.reqId = id7; selfReq = true; S7r.req.set(id7, { t: rec.time, how: rec.how ? rec.how.split(" · ") : [], memo: rec.memo || "", who: rec.who }); selfReq = false; }
       lastDone = { a: a, rec: rec };
       render();
       showToast(a);
@@ -1522,6 +1559,7 @@
         if (i >= 0) { DONE.splice(i, 1); }
         var r = resolved.indexOf(a);
         if (r >= 0) { resolved.splice(r, 1); } else { extra.unshift(a); }
+        if (rec.reqId && window.APRISM_ALERTS7) { selfReq = true; window.APRISM_ALERTS7.req.clear(rec.reqId); selfReq = false; }   // [11/10 v7] 되돌리면 기록에서도 뺀다
         hideToast();
         render();
       });

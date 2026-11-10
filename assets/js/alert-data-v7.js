@@ -301,7 +301,7 @@
 
   // 전체 미션(building.js) — robot 은 그 화면의 로봇 번호(1부터)
   function buildingObj(a) {
-    return { sev: a.sev, robot: a.robot + 1, floor: a.floor, where: a.monitor.where, time: a.time, title: a.monitor.title, uv: a.uv.slice() };
+    return { id: a.id, sev: a.sev, robot: a.robot + 1, floor: a.floor, where: a.monitor.where, time: a.time, title: a.monitor.title, uv: a.uv.slice() };
   }
 
   // 안전진단(safety.js) — 감지 카드 한 칸 [판정, 문장, "지점 설비", 시:분]
@@ -319,8 +319,42 @@
     return null;
   }
 
+  /*
+   * 조치 요청 기록 — 어느 화면에서 [조치 요청]을 눌러도 네 화면이 같이 "요청됨"으로 본다(디자이너 11/10 "조치 요청, 요청됨으로 통일").
+   *   이 브라우저 localStorage 에 둔다 — 다른 탭에서 누른 것도 바로 따라온다(storage 이벤트). 날짜가 바뀌면 비운다(시안 데이터라 어제 요청이 남지 않게).
+   *   한 건 = { t: "시:분:초", how: [고른 조치], memo, who }. 알림 데이터(판정 · 값)는 바꾸지 않는다 — 판정은 그대로, 처리 상태만 요청됨.
+   *   바뀌면 document 에 aprism:requested 를 쏜다 — 각 화면이 다시 칠한다.
+   */
+  var KEY = "aprism-v7-requested";
+  function today() { var d = new Date(); return d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate(); }
+  function loadReq() {
+    try { var s = JSON.parse(localStorage.getItem(KEY) || "null"); return s && s.day === today() && s.items ? s.items : {}; } catch (e) { return {}; }
+  }
+  function saveReq(items) { try { localStorage.setItem(KEY, JSON.stringify({ day: today(), items: items })); } catch (e) { /* 저장 못 하면 이 화면에서만 */ } }
+  function fire() { document.dispatchEvent(new CustomEvent("aprism:requested")); }
+  window.addEventListener("storage", function (e) { if (e.key === KEY || e.key === null) { fire(); } });
+  window.addEventListener("pageshow", function (e) { if (e.persisted) { fire(); } });   // 뒤로 가기로 돌아온 화면도 최신 기록으로
+  var req = {
+    all: loadReq,
+    set: function (id, r) { if (!id) { return; } var s = loadReq(); s[id] = r; saveReq(s); fire(); },
+    clear: function (id) { var s = loadReq(); if (id && s[id]) { delete s[id]; saveReq(s); fire(); } },
+    reset: function () { saveReq({}); fire(); },
+    // 관제 알림 객체 → id(로봇 · 지점 · 감지가 같은 것)
+    idOf: function (o) {
+      if (!o) { return null; }
+      for (var i = 0; i < ALERTS.length; i++) { var a = ALERTS[i]; if (a.robot === o.robot && a.wp === o.wp && a.detect === o.detect) { return a.id; } }
+      return null;
+    },
+    // 안전진단 칸 → id(미션 · 감지 · 지점)
+    find: function (mission, detect, wp) {
+      for (var i = 0; i < ALERTS.length; i++) { var a = ALERTS[i]; if (a.mission === mission && a.detect === detect && a.wp === wp) { return a.id; } }
+      return null;
+    }
+  };
+
   window.APRISM_ALERTS7 = {
     list: ALERTS,
+    req: req,
     text: text,
     of: of,
     forMonitor: forMonitor,

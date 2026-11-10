@@ -155,6 +155,24 @@
       .forEach(function (x, i) { DONE[i].title = x[0]; DONE[i].wp = x[1]; });
     DONE[0].time = "10:19:10";
   }
+  /*
+   * [11/10 v7] 조치 요청 기록 한 곳(alert-data-v7.js req) — 관제 · 안전진단 · 알림 센터에서 요청한 알림은 관제처럼 목록 · 지도에서 빼고
+   *   조치 요청된 알림으로 옮긴다. 이 화면은 요청 단추가 없어 기록은 열 때 한 번 맞춘다 — 다른 탭에서 기록이 바뀌면 다시 연다.
+   */
+  if (window.APRISM_ALERTS7) {
+    var R7 = window.APRISM_ALERTS7.req.all(), ids7 = Object.keys(R7).sort().join(",");
+    ALERTS = ALERTS.filter(function (a) {
+      var r = a.id && R7[a.id];
+      if (!r) { return true; }
+      DONE.push({ time: r.t, title: window.APRISM_ALERT6 ? window.APRISM_ALERT6.title(a.title) : a.title, how: (r.how || []).join(" · "),
+                  who: r.who || "홍길동", wp: (/WP-\d+/.exec(a.where) || [""])[0] });
+      return false;
+    });
+    DONE.sort(function (x, y) { return x.time < y.time ? 1 : x.time > y.time ? -1 : 0; });
+    document.addEventListener("aprism:requested", function () {
+      if (Object.keys(window.APRISM_ALERTS7.req.all()).sort().join(",") !== ids7) { location.reload(); }
+    });
+  }
 
   /*
    * 운행 흐름 — 06:00 ~ 14:00(분). 미션이 있는 로봇만 줄을 갖는다.

@@ -101,6 +101,23 @@
     Object.keys(got).forEach(key => { const [mi, k] = key.split('|'), m = BASE[+mi], cs = got[key];
       m.r[k] = cs[0].slice(); if(cs.length > 1){ m.rs = m.rs || {}; m.rs[k] = cs; } });   // 한 감지에 여럿이면 rs(대표는 init 의 sync 가 고른다)
   }
+  // [11/10 v7] 말 통일(디자이너 "조치 요청, 요청됨으로 통일") — 관제 · 알림 센터 단추 [조치 요청] · 상태 "요청됨"과 같게. v6 · v5 는 예전 말
+  const RQ_BTN = S7 ? '조치 요청' : '현장 조치 요청', RQ_DONE = S7 ? '요청됨' : '현장 조치 요청됨';
+  /*
+   * [11/10 v7] 조치 요청 기록 한 곳(alert-data-v7.js req) → 칸의 요청 시각(x[4]). 관제 · 알림 센터에서 요청한 것도 여기서 요청됨.
+   *   판정(위험 · 주의)은 그대로 두고 처리 상태만 바뀐다. 기록이 지워지면(되돌림) 요청 전으로. 여러 번 불러도 같다.
+   */
+  function apply7(){
+    if(!S7 || !M) return;
+    const R = S7.req.all();
+    M.forEach((m, mi) => {
+      K.forEach(k => { const its = (m.rs && m.rs[k]) || (m.r[k] ? [m.r[k]] : []);
+        its.forEach(it => { if(!it || it[0]==='ok') return; const id = S7.req.find(m.mis, k, wpOf(it)); if(!id) return;
+          const r = R[id]; if(r) it[4] = r.t.slice(0, 5); else if(it.length > 4) it.length = 4; }); });
+      sync(m, mi);
+    });
+  }
+  document.addEventListener('aprism:requested', () => { if(!M) return; apply7(); render(); });
   const NEWR = [1, '온도감지', ['crit','최고 71.2 ℃','WP-104 변압기 TR-1','10:15']];
   const RANK = {crit:3, warn:2, done:1, ok:0};
   const WORD = {crit:'위험', warn:'주의', done:'요청됨', ok:'정상 범위', plan:'예정'};
@@ -140,7 +157,7 @@
       : `<span class="why1">기준: ${STD[k]}</span>`;
     const SG = (mi===0 && SUG0[k]) || SUG[k];
     const prevAct = (SG ? SG[1][0][0] : '현장 조치').replace(/ 요청$/, '') + ' 요청';
-    const nowAct = !isHit ? (st==='plan' ? '' : '조치 없음') : st==='done' ? (x[4] || '10:17') + ' 현장 조치 요청됨' : '';
+    const nowAct = !isHit ? (st==='plan' ? '' : '조치 없음') : st==='done' ? (x[4] || '10:17') + ' ' + RQ_DONE : '';
     // [11/02 v6] 지난 순회 날짜 — 상태바 시계(2026-11-02 = 오늘)보다 앞(예전 10/22 · 10/23 은 오늘보다 뒤였다)
     const D6 = V6 ? ['10/31','10/31','11/01'] : ['10/22','10/22','10/23'];
     const hist0 = !isHit ? [['10/22 09:00','정상 범위','ok','조치 없음'],['10/22 14:00','정상 범위','ok','조치 없음'],['10/23 09:00','정상 범위','ok','조치 없음'],['오늘 ' + (x[3] || ''), st==='plan' ? '측정 전' : x[1], st, nowAct]] : [['10/22 09:00','정상 범위','ok','조치 없음'],['10/22 14:00','정상 범위','ok','조치 없음'],['10/23 09:00', st==='warn' ? '주의' : '정상 범위', st==='warn' ? 'warn' : 'ok', st==='warn' ? '09:14 ' + prevAct : '조치 없음'],['오늘 ' + x[3], SHORT[x[1]] || x[1], st, nowAct]];
@@ -160,10 +177,10 @@
         <details class="hmore"><summary>지난 3회 모두 정상 범위<span class="i i-14" style="--i:var(--ic-chevron-down)" aria-hidden="true"></span></summary><div class="hist">${hist.slice(0, 3).map(hiRow).join('')}</div></details>`;
     const rel = K.filter(k2 => k2 !== k && m.r[k2] && (m.r[k2][0]==='crit' || m.r[k2][0]==='warn'));
     const sug = SG;
-    const side = !isHit ? `<div class="donec"><b>${st==='plan' ? '아직 측정 전' : '조치 필요 없음'}</b><span>${st==='plan' ? '로봇이 도착하면 결과가 표시됨' : '정상 범위의 측정값'}</span></div>` : st==='done' ? `<div class="donec"><b>${x[4] || '10:17'} 현장 조치 요청됨</b><span>재측정에서 다시 넘으면 다시 표시</span></div>`
+    const side = !isHit ? `<div class="donec"><b>${st==='plan' ? '아직 측정 전' : '조치 필요 없음'}</b><span>${st==='plan' ? '로봇이 도착하면 결과가 표시됨' : '정상 범위의 측정값'}</span></div>` : st==='done' ? `<div class="donec"><b>${x[4] || '10:17'} ${RQ_DONE}</b><span>재측정에서 다시 넘으면 다시 표시</span></div>`
       : `<div class="dl${V6 ? ' is-light-scope is-dark-scope' : ''}"><div class="hh"><span><span class="dlogo" aria-hidden="true"></span>DELTA 조치 제안</span><span>오탐 가능성 <b>낮음</b></span></div><div class="ti">${sug[0]}</div>
         <div class="cks">${sug[1].map(([l, a2, to]) => `<label class="c1x"><input type="checkbox" ${a2 ? 'checked' : ''}><span><b>${l}</b><small>${to}</small></span>${a2 ? (V6 ? '<em class="ma-check-tag">AI 추천</em>' : '<em class="badge badge-mode badge-info t-caption">AI 추천</em>') : ''}</label>`).join('')}</div>
-        <label class="mm" for="sfMemo">메모 (선택)</label><textarea class="fd" id="sfMemo" rows="2" placeholder="현장에 전달할 내용"></textarea></div><button type="button" class="btn btn-accent rqx" data-req="1">현장 조치 요청</button>`;
+        <label class="mm" for="sfMemo">메모 (선택)</label><textarea class="fd" id="sfMemo" rows="2" placeholder="현장에 전달할 내용"></textarea></div><button type="button" class="btn btn-accent rqx" data-req="1">${RQ_BTN}</button>`;
     const step = q => `<div class="sth"><b>${q}</b></div>`;   // [v5 점검] 번호 원을 뺐다 — 배치가 동시에 보는 격자라 순서를 강요하지 않는다(위계는 판 밝기가 말한다)
     const lks = (LINKS[dt.mi] || []).filter(l => l[0]===k || l[1]===k).map(l => { const k2 = l[0]===k ? l[1] : l[0], y = m.r[k2]; return y && (y[0]==='crit' || y[0]==='warn') ? {k2, y, w2:y[2].split(' ')[0], role:l[0]===k ? '영향 후보' : '원인 후보', why:l[2], p:l[3]} : null; }).filter(Boolean);
     const rest = rel.filter(k2 => !lks.some(l => l.k2===k2));
@@ -585,13 +602,13 @@
     if(x[0]==='ok') return cardC(k, ['ok', x[1], okLatest(i, k) || x[2]], '', i);
     if(!m.rs || !m.rs[k]) return cardC(k, x, '', i);
     const its = itemsOf(i, k), dn = its.filter(it => it[4] && it !== its[0]);
-    const extra = dn.length ? `<span class="req">${dn.map(wpOf).join(', ')} ${dn[0][4]} 현장 조치 요청됨</span>` : '';
+    const extra = dn.length ? `<span class="req">${dn.map(wpOf).join(', ')} ${dn[0][4]} ${RQ_DONE}</span>` : '';
     const html = cardC(k, [x[0], x[1], x[2], x[3], x[4]], extra, i);
     // [10/30 v6] 단계가 섞이면 "위험 1 외 1곳" — 배지 숫자는 그 단계 수만, 나머지는 곳 수로(예전 "위험 2"는 위험이 둘로 읽혔다). ·뒤 = 같은 단계 수
     const same = its.filter(it => it[0]===x[0]).length;
     return its.length > 1 ? html.replace(`<span class="nm">${k}</span>`, `<span class="nm">${k} ${its.length}개${V6 ? '·' + same : ''}</span>`) : html;
   }
-  function init(){ M = JSON.parse(JSON.stringify(BASE)); scope = 0; menu = false; fired = false; toasts = []; drawer = null; newSeen = true; M.forEach(sync); }
+  function init(){ M = JSON.parse(JSON.stringify(BASE)); scope = 0; menu = false; fired = false; toasts = []; drawer = null; newSeen = true; M.forEach(sync); apply7(); }
   init();
   const scr = document.querySelector('.app'), sf = document.querySelector('[data-sf]'), v = document.getElementById('sfv'), bc = document.querySelector('[data-sf-crumb]'), side = document.querySelector('[data-sf-sb]');
   if(!sf || !v || !bc || !side) return;
@@ -623,7 +640,7 @@
     const todo = V6 && s==='crit' && !rq, seenK = mi + '|' + k, fresh = todo && !KD_SEEN.has(seenK);
     if(todo) KD_SEEN.add(seenK);
     return `<div class="kd ${s} ${s==='done' ? 'dim' : ''}${todo ? ' is-todo' : ''}${fresh ? ' is-new' : ''}" data-n="${k}" tabindex="0" role="button"><div class="rw"><span class="nm">${k}</span><span class="pl ${s}">${WORD[s]}</span></div>
-      <div class="big">${(() => { const r6 = V6 && res6(k, x); return r6 ? `${r6[0]} ${r6[1]}${r6[2] ? `<span class="kdt">${r6[2]}</span>` : ''}` : sent; })()}</div><span class="sm">${loc}, ${t}</span>${rq ? `<span class="req">${rq} 현장 조치 요청됨</span>` : ''}${extra || ''}<div class="md ${md[0]}">${md[1]}</div><span class="more">자세히 보기 →</span></div>`;
+      <div class="big">${(() => { const r6 = V6 && res6(k, x); return r6 ? `${r6[0]} ${r6[1]}${r6[2] ? `<span class="kdt">${r6[2]}</span>` : ''}` : sent; })()}</div><span class="sm">${loc}, ${t}</span>${rq ? `<span class="req">${rq} ${RQ_DONE}</span>` : ''}${extra || ''}<div class="md ${md[0]}">${md[1]}</div><span class="more">자세히 보기 →</span></div>`;
   }
   function head(title, done, total, n){
     // [10/30] 'n건 현장 조치 요청 전'은 뺐다 — 왼쪽 목록의 '요청 전'(전체 · 고른 미션)과 같은 숫자다. 요청을 보내면 목록 값이 줄어 피드백이 된다
@@ -804,6 +821,11 @@
       if(e.target.closest('[data-dback]')){ const k = dt.k, w = dt.w, mi = dt.mi; dt = null; render(); const c = v.querySelector(`.kd[data-n="${k}"]`) || v.querySelector(`[data-dk="${k}"][data-dm="${mi}"]${w ? `[data-dw="${w}"]` : ''}`) || v.querySelector(`[data-dk="${k}"][data-dm="${mi}"]`); if(c){ const t = c.closest('td') || c; zoomOut(t, () => { t.classList.add('ring'); setTimeout(() => t.classList.remove('ring'), 1500); }); } return; }
       if(e.target.closest('[data-bigd]')){ bigD = !bigD; return render(); }
       if(e.target.closest('[data-req]')){ const m = M[dt.mi];
+        // [11/10 v7] 조치 요청 기록 한 곳(alert-data-v7.js req)에 쓴다 — 관제 · 알림 센터도 요청됨으로 본다. 칸의 요청 시각은 apply7 이 기록에서 채운다
+        if(S7){ const w = dt.w || wpOf(m.r[dt.k]), id = S7.req.find(m.mis, dt.k, w);
+          if(id){ const now = new Date(), hms = [now.getHours(), now.getMinutes(), now.getSeconds()].map(n => (n < 10 ? '0' : '') + n).join(':');
+            const how = [...v.querySelectorAll('.c1x input:checked')].map(c => (c.parentElement.querySelector('b') || {}).textContent).filter(Boolean), memo = (v.querySelector('#sfMemo') || {}).value || '';
+            dt.w = w; S7.req.set(id, {t: hms, how, memo: memo.trim(), who: '홍길동'}); return; } }
         if(m.rs && m.rs[dt.k]){ const w = dt.w || wpOf(m.r[dt.k]), it = m.rs[dt.k].find(y => wpOf(y)===w); if(it){ it[4] = '10:17'; } sync(m, dt.mi); dt.w = w; }
         else { m.r[dt.k][4] = '10:17'; }
         return render(); }
