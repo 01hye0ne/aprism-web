@@ -937,29 +937,7 @@ a.map-floor {
 .ma-head .icon-button { flex: none; }
 .ma-head .icon-button[hidden] { display: none; }
 
-/* Badge Status=Warning · Critical — 알림 센터 .ac-sev-badge 와 같은 알약이다. */
-.ma-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-4);
-  flex: none;
-  padding: var(--space-4) var(--space-12) var(--space-4) var(--space-8);
-  border: var(--border-width-thin) solid var(--status-warning-border);
-  border-radius: var(--radius-pill);
-  background-color: var(--status-warning-bg);
-  color: var(--status-warning-text);
-  white-space: nowrap;
-}
-
-.ma-badge .badge-dot { background-color: var(--status-warning-icon); }
-
-.map-alert.is-critical .ma-badge {
-  border-color: var(--status-critical-border);
-  background-color: var(--status-critical-bg);
-  color: var(--status-critical-text);
-}
-
-.map-alert.is-critical .ma-badge .badge-dot { background-color: var(--status-critical-icon); }
+/* 판정 칩(.ma-badge)은 app-shell.css 공통 .verdict-chip 으로 옮겼다(11/10). */
 
 /*
  * 제목은 두 줄까지 접는다. 한 줄 말줄임으로 두면 "지하발전소 B3 터빈 2 NG 1건 발견" 처럼
@@ -1185,20 +1163,7 @@ a.map-floor {
 .ma-zoom-title { flex: 1 1 auto; min-width: 0; margin: 0; color: var(--text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ma-zoom-time { flex: none; color: var(--text-secondary); }
 .ma-zoom-close { flex: none; }
-.ma-zoom.is-critical .ma-badge { color: var(--status-critical-text); }
-.ma-zoom.is-critical .ma-badge .badge-dot { background-color: var(--status-critical-icon); }
 
-/*
- * v2.2 — 단계 칩의 표식을 점에서 기호로(10/19 디자이너). 목록 줄(.ah-title)과 같은 ⓧ · △ 라
- * 목록에서 누른 줄과 팝오버가 같은 모양으로 이어진다. 점(●)은 "상태"(수행중 · 완료 …)에만 남는다.
- * Figma 는 Badge(48:78) 인스턴스에서 Dot 끄고 Icon 켬 — Icon / error(29:12) 14 · status/critical/icon(알림 팝오버 1233:16460).
- * 여백 8/12 · 간격 4 는 Badge 그대로다.
- */
-.ma-badge-ic { --i: var(--ic-warning); width: 14px; height: 14px; color: var(--status-warning-icon); }
-/* 위험 칩의 기호는 글자와 명도차를 줄인 status/critical/icon-subtle(다크 red-300)이다(10/19 디자이너).
-   목록 · 지도의 위험 기호는 그대로 진한 status/critical/icon(red-500) — 칩 안에서만 글자와 한 톤으로 묶는다. */
-.map-alert.is-critical .ma-badge-ic,
-.ma-zoom.is-critical .ma-badge-ic { --i: var(--ic-error); color: var(--status-critical-icon-subtle); }
 
 /* 높이를 정하고 폭은 그림 비율대로 따라가게 둔다 — 폭을 못 박으면 좌우에 빈 띠가 생긴다. */
 .ma-zoom-img {

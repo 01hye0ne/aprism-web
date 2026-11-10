@@ -3039,6 +3039,40 @@ input.field-box { outline: 0; }
   mask-size: contain;
 }
 
+/* ── 판정 칩 Severity Chip (Figma Badge Status=Critical · Warning · Neutral, Emphasis=Subtle + Icon) ── */
+/*
+ * [11/10] 화면마다 따로 만든 세 벌을 하나로 — 안전진단 .pl(24 · 12px), 관제 팝오버 .ma-badge · 알림 센터 .ac-sev-badge(28 · 13px).
+ * 꼴: 테 + 면 + 알약, 높이 26, 글 14px, 기호 14. 위험과 주의는 같은 꼴에 색만 다르다(기호도 같은 세모 — v6.css 11/02).
+ * 단계는 클래스로: is-crit 위험 · is-warn 주의 · is-ok 정상 범위 · is-done 요청됨 · is-plan 예정 · is-na 대상 아님(점선 테).
+ * 기호는 ::before 마스크라 표시만 넣으면 된다. 위험 기호는 글자와 한 톤인 icon-subtle(10/20 관제 · 알림 센터 결정).
+ */
+.verdict-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex: none;
+  box-sizing: border-box;
+  height: 26px;
+  padding: 0 var(--space-12) 0 var(--space-8);
+  border: var(--border-width-thin) solid var(--border-default);
+  border-radius: var(--radius-pill);
+  background-color: var(--bg-cell);
+  color: var(--text-secondary);
+  font-size: var(--font-size-14);
+  line-height: var(--font-line-height-20);
+  font-weight: 500;
+  white-space: nowrap;
+}
+.verdict-chip::before { content: ""; flex: none; width: 6px; height: 6px; border-radius: var(--radius-pill); background-color: var(--text-tertiary); }
+.verdict-chip.is-crit { border-color: var(--status-critical-border); background-color: var(--status-critical-bg); color: var(--status-critical-text); }
+.verdict-chip.is-warn { border-color: var(--status-warning-border); background-color: var(--status-warning-bg); color: var(--status-warning-text); }
+.verdict-chip.is-crit::before,
+.verdict-chip.is-warn::before { width: 14px; height: 14px; border-radius: 0; -webkit-mask: var(--ic-error) center / contain no-repeat; mask: var(--ic-error) center / contain no-repeat; background-color: var(--status-critical-icon-subtle); }
+.verdict-chip.is-warn::before { -webkit-mask-image: var(--ic-warning); mask-image: var(--ic-warning); background-color: var(--status-warning-icon); }
+.verdict-chip.is-plan,
+.verdict-chip.is-na { border-style: dashed; background-color: transparent; color: var(--text-tertiary); }
+.verdict-chip.is-na::before { display: none; }
+
 /* ── Toast (Figma UI_99 1605:38529) ──────────────────────────── */
 /*
  * 방금 한 일을 알리고 되돌릴 틈을 준다. 확인 대화상자 대신이라 막지 않는다 — 떠 있어도 화면은 그대로 쓴다.

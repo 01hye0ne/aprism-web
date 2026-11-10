@@ -26,11 +26,11 @@
   }
   </script>
   <link rel="stylesheet" href="../assets/css/tokens.css?v=b64812bd" />
-  <link rel="stylesheet" href="../assets/css/app-shell.css?v=01264297" />
+  <link rel="stylesheet" href="../assets/css/app-shell.css?v=ae003cd8" />
   <link rel="stylesheet" href="../assets/css/map-overlays.css?v=96f51348" />
   <link rel="stylesheet" href="../assets/css/icons-outline.css?v=86d19675" />
   <link rel="stylesheet" href="../assets/css/text-parts.css?v=e38e19ea" />
-  <link rel="stylesheet" href="../assets/css/monitor.css?v=9a6fa318" />
+  <link rel="stylesheet" href="../assets/css/monitor.css?v=7a8f053d" />
   <link rel="stylesheet" href="../assets/css/palette-neutral.css?v=0c969aea" />
   <link rel="stylesheet" href="../assets/css/delta-v3.css?v=b1562ee4" />
   <!-- v3 전용 규칙 — v2.2 는 10/21 부로 멈췄다. v3 에서 바꾸는 것은 여기(body.ver-3)에. -->
@@ -38,7 +38,7 @@
   <!-- v5 전용 규칙 — v4 는 10/29 부로 멈췄다. v5 에서 바꾸는 것은 여기(body.ver-5)에. -->
   <link rel="stylesheet" href="../assets/css/v5.css?v=aefc22b4" />
   <!-- v6 전용 규칙 — v5 는 10/30 부로 멈췄다. v6 에서 바꾸는 것은 여기(body.ver-6)에. -->
-  <link rel="stylesheet" href="../assets/css/v6.css?v=0e16c37a" />
+  <link rel="stylesheet" href="../assets/css/v6.css?v=6ce16336" />
   <link rel="stylesheet" href="../assets/css/v7.css?v=4bbb9162" />
   <!-- 지도 경로 표현 규칙(10/28 반영, 지도 경로 표현 전달서 1022) — 경로 네 구간 · 흐름 빛 · 번호 핀 · 시야 빔 로봇 · 충전 스테이션 · 아래 상태 시뮬레이션 막대 -->
   <link rel="stylesheet" href="../assets/css/route-rules.css?v=bd91ee52" />
@@ -479,7 +479,7 @@
                 <div class="ma-head">
                   <div class="ma-title-block">
                     <!-- [11/02 v6] 안전진단 상세와 같은 머리 — 배지 옆 감지 이름(작게), 제목은 측정 항목 + 값(monitor.js maResult) -->
-                    <span class="ma-top"><span class="ma-badge t-label-2" data-ma-badge><span class="i i-16 ma-badge-ic" aria-hidden="true"></span><span data-ma-sev>주의</span></span><span class="ma-kind t-label-2" data-ma-kind></span></span>
+                    <span class="ma-top"><span class="verdict-chip is-warn" data-ma-badge><span data-ma-sev>주의</span></span><span class="ma-kind t-label-2" data-ma-kind></span></span>
                     <h3 class="ma-title" id="ma-title" data-ma-title></h3>
                     <p class="ma-stamp t-caption" data-ma-stamp></p>
                   </div>
@@ -1765,7 +1765,7 @@
 <div class="ma-zoom" data-ma-zoom-box hidden role="dialog" aria-modal="true" aria-labelledby="ma-zoom-title">
   <div class="ma-zoom-card">
     <div class="ma-zoom-head">
-      <span class="ma-badge t-label-2" data-ma-zoom-badge><span class="i i-16 ma-badge-ic" aria-hidden="true"></span><span data-ma-zoom-sev>주의</span></span>
+      <span class="verdict-chip is-warn" data-ma-zoom-badge><span data-ma-zoom-sev>주의</span></span>
       <h3 class="t-title-2 ma-zoom-title" id="ma-zoom-title" data-ma-zoom-title></h3>
       <span class="t-caption num ma-zoom-time" data-ma-zoom-time></span>
       <button type="button" class="icon-button ma-zoom-close" data-ma-zoom-close aria-label="닫기">
@@ -1791,7 +1791,7 @@
 <script src="../assets/js/ah-sort.js?v=8010f248"></script>
 <script src="../assets/js/alert-text-v6.js?v=358c4f85"></script>
 <script src="../assets/js/verdict-v6.js?v=ee80312a"></script>
-<script src="../assets/js/monitor.js?v=945020f4"></script>
+<script src="../assets/js/monitor.js?v=8e86cadf"></script>
 <script src="../assets/js/mission-scope.js?v=0c8908e6"></script>
 <!-- [10/30 v6] 상단 미션 탭(윈도우 탐색기 꼴) — 미션 메뉴를 읽어 탭으로 늘어놓는다. 메뉴를 만드는 스크립트 다음에 -->
 <script src="../assets/js/mission-tabs-v6.js?v=18f484a3"></script>
