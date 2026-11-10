@@ -107,7 +107,7 @@
       done: cur === 2 ? `재측정 ${nextM}, 다시 넘으면 다시 표시` : '관제사가 결과를 확인하면 기록'};
     const tm = {wait:R.t, work:cur > 0 ? R.t2 : '', done:cur > 1 ? R.t3 : ''};
     const steps = ord.map((s, n) => `<li class="${n < cur ? 'is-past' : n === cur ? 'is-now' : ''}"${n === cur ? ' aria-current="step"' : ''}><i aria-hidden="true"></i><div><b>${RQ_WORD[s]}</b><span>${sub[s]}</span></div><time>${tm[s]}</time></li>`).join('');
-    return `<div class="dl is-light-scope is-dark-scope is-sent"><div class="hh"><span><span class="dlogo" aria-hidden="true"></span>DELTA 조치 제안</span><span>오탐 가능성 <b>낮음</b></span></div><div class="ti">${sug[0]}</div>
+    return `<div class="dl is-light-scope is-dark-scope is-sent"><div class="hh"><span><span class="dlogo" aria-hidden="true"></span>DELTA 조치 제안</span></div><div class="ti">${sug[0]}</div>
         <div class="cks">${sug[1].map(([l, a2, to]) => `<label class="c1x"><input type="checkbox" disabled ${R.acts.includes(l) ? 'checked' : ''}><span><b>${l}</b><small>${to}</small></span>${a2 ? '<em class="ma-check-tag">AI 추천</em>' : ''}</label>`).join('')}</div>
         ${R.memo ? `<span class="mm">메모</span><p class="fd rq-memo">${R.memo.replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'})[c])}</p>` : ''}</div>
       <button type="button" class="btn btn-accent rqx" disabled><span class="i i-16" style="--i:var(--ic-check)" aria-hidden="true"></span>${R.t} 요청 전송됨</button>
@@ -206,7 +206,7 @@
     const rel = K.filter(k2 => k2 !== k && m.r[k2] && (m.r[k2][0]==='crit' || m.r[k2][0]==='warn'));
     const sug = SG;
     const side = !isHit ? `<div class="donec"><b>${st==='plan' ? '아직 측정 전' : '조치 필요 없음'}</b><span>${st==='plan' ? '로봇이 도착하면 결과가 표시됨' : '정상 범위의 측정값'}</span></div>` : st==='done' ? `<div class="donec"><b>${x[4] || '10:17'} 현장 조치 요청됨</b><span>재측정에서 다시 넘으면 다시 표시</span></div>`
-      : `<div class="dl${V6 ? ' is-light-scope is-dark-scope' : ''}"><div class="hh"><span><span class="dlogo" aria-hidden="true"></span>DELTA 조치 제안</span><span>오탐 가능성 <b>낮음</b></span></div><div class="ti">${sug[0]}</div>
+      : `<div class="dl${V6 ? ' is-light-scope is-dark-scope' : ''}"><div class="hh"><span><span class="dlogo" aria-hidden="true"></span>DELTA 조치 제안</span>${V7 ? "" : "<span>오탐 가능성 <b>낮음</b></span>"}</div><div class="ti">${sug[0]}</div>
         <div class="cks">${sug[1].map(([l, a2, to]) => `<label class="c1x"><input type="checkbox" ${a2 ? 'checked' : ''}><span><b>${l}</b><small>${to}</small></span>${a2 ? (V6 ? '<em class="ma-check-tag">AI 추천</em>' : '<em class="badge badge-mode badge-info t-caption">AI 추천</em>') : ''}</label>`).join('')}</div>
         <label class="mm" for="sfMemo">메모 (선택)</label><textarea class="fd" id="sfMemo" rows="2" placeholder="현장에 전달할 내용"></textarea></div><button type="button" class="btn btn-accent rqx" data-req="1">현장 조치 요청</button>`;
     const step = q => `<div class="sth"><b>${q}</b></div>`;   // [v5 점검] 번호 원을 뺐다 — 배치가 동시에 보는 격자라 순서를 강요하지 않는다(위계는 판 밝기가 말한다)
@@ -214,7 +214,7 @@
     const rest = rel.filter(k2 => !lks.some(l => l.k2===k2));
     // [11/02 v6] 연관 감지 줄 — 한 줄에 다섯 덩어리가 이어져 어색했다(디자이너). 덩어리를 둘로 가른다:
     //   왼쪽 = 그 감지(단계 배지 · 감지 이름 + 지점 · 값), 오른쪽 = 이 판정과의 관계(원인/영향 후보 · 가능성). 근거 문장은 아래 줄
-    const lkRow = V6 ? (l => `<button type="button" class="rlx lk" data-dk="${l.k2}" data-dw="${l.w2}" data-rel="1"><span class="rlt"><span class="rlw"><span class="verdict-chip is-${l.y[0]}">${WORD[l.y[0]]}</span><b>${l.k2}</b><span class="rwv"><span class="rwp">${l.w2}</span><span class="rv">${SHORT[l.y[1]] || l.y[1]}</span></span></span><span class="rlr"><em class="rr r0">${l.role}</em><small class="lp">가능성 ${l.p}</small></span></span><span class="rwhy">${l.why}</span></button>`)
+    const lkRow = V6 ? (l => `<button type="button" class="rlx lk" data-dk="${l.k2}" data-dw="${l.w2}" data-rel="1"><span class="rlt"><span class="rlw"><span class="verdict-chip is-${l.y[0]}">${WORD[l.y[0]]}</span><b>${l.k2}</b>${V7 ? `<span class="rmi" title="${m.mis}">같은 미션</span>` : `<span class="rwv"><span class="rwp">${l.w2}</span><span class="rv">${SHORT[l.y[1]] || l.y[1]}</span></span>`}</span><span class="rlr"><em class="rr r0">${l.role}</em><small class="lp">가능성 ${l.p}</small></span></span><span class="rwhy">${l.why}</span></button>`)
       : (l => `<button type="button" class="rlx lk" data-dk="${l.k2}" data-dw="${l.w2}" data-rel="1"><span class="rlt"><span class="verdict-chip is-${l.y[0]}">${WORD[l.y[0]]}</span><b>${l.k2}</b><span>${l.w2}</span><em class="rr r0">${l.role}</em><small class="lp">가능성 ${l.p}</small><span class="t">${SHORT[l.y[1]] || l.y[1]}</span></span><span class="rwhy">${l.why}</span></button>`);
     const restRow = k2 => { const y = m.r[k2], w2 = y[2].split(' ')[0]; return `<button type="button" class="rlx" data-dk="${k2}" data-dw="${w2}" data-rel="1"><span class="verdict-chip is-${y[0]}">${WORD[y[0]]}</span><b>${k2}</b><span>${w2}</span><span class="t">${SHORT[y[1]] || y[1]}</span></button>`; };
     const relB = (lks.length ? `<div class="rl b">${lks.map(lkRow).join('')}</div>` : '<span class="why1">연관 근거가 있는 감지 없음</span>');
@@ -245,7 +245,7 @@
     const jtrk = isHit && cd && !isNaN(num) ? (() => { const [lo, hi, w2, c2, u] = cd, p = q => Math.max(0, Math.min(100, (q - lo) / (hi - lo) * 100)).toFixed(1);
       return `<div class="jtrk"><span class="f ${st}" style="width:${p(num)}%"></span><span class="jm w" style="left:${p(w2)}%"><span>주의 ${w2}${u}</span></span><span class="jm c" style="left:${p(c2)}%"><span>위험 ${c2}${u}</span></span></div>`; })() : '';
     // [11/02] 세부 묘사(누출 의심 1곳 등) — 판정 글에 값이 안 들어 있으면 결과 옆에 흐린 글로(디자이너 1번). 항목 + 값 규칙은 그대로
-    const jdet = isHit && x[1] && !x[1].includes(jvalT) && x[1] !== jwhat ? `<span class="jdt">${x[1]}</span>` : '';
+    const jdet = !V7 && isHit && x[1] && !x[1].includes(jvalT) && x[1] !== jwhat ? `<span class="jdt">${x[1]}</span>` : '';
     // [11/02] 계기 기준은 값의 단위를 따른다 — 같은 계기인식이라도 차압(Pa) · 압력(bar · MPa) 계기가 섞여 있다(디자이너 2번 "아무거나" → 화면끼리 데이터는 그대로 두고 기준을 맞춤)
     const stdK = k==='계기인식' && isHit && window.APRISM_VERDICT && window.APRISM_VERDICT.gaugeStd(jvalT) ? window.APRISM_VERDICT.gaugeStd(jvalT)   // [11/06] 계기마다 범위(verdict-v6.js)
       : k==='계기인식' && numU && numU[2]==='Pa' ? '250 Pa 미만' : k==='계기인식' && numU && numU[2]==='bar' ? '6.0 ~ 7.5 bar' : STD[k];
@@ -288,10 +288,10 @@
     const actS = RQ ? RQ_WORD[RQ.st] : !isHit ? (st==='plan' ? '—' : '필요 없음') : st==='done' || x[4] ? `${x[4] || '10:17'} 요청됨` : '요청 전';   // 요청 시각은 x[4](data-req 가 적는다)
     const jinfo = [['발생위치', `${wp}${isHit ? ' ' + x[2].split(' ').slice(1).join(' ') : ''}`, ''], [isHit ? '발생시간' : '측정 시간', x[3] || '—', ''], ['조치 상태', actS, ''], ['다음 측정', nextM, '']]
       .map(([l, v, c]) => `<div><span>${l}</span><b class="${c}" title="${v}">${v}</b></div>`).join('');
-    const judge = V6 ? `<div class="lvA s1 jx ${st}"><div class="jtop"><div class="jrow"><span class="verdict-chip is-${st}">${WORD[st]}</span><span class="jk">${k}</span></div>${jv}</div><div class="jinfo">${jinfo}</div></div>`
+    const judge = V6 ? `<div class="lvA s1 jx ${st}"><div class="jtop"><div class="jrow"><span class="verdict-chip is-${st}">${WORD[st]}</span>${V7 ? '' : `<span class="jk">${k}</span>`}</div>${jv}</div><div class="jinfo">${jinfo}</div></div>`
       : `<div class="lvA s1 ${st}">${step('이상 판정')}<div class="tt"><span class="verdict-chip is-${st}">${WORD[st]}</span><h5>${k}, ${isHit ? x[1] : st==='plan' ? '측정 전' : '정상 범위 ' + x[1]}</h5></div>${loc}${cond}</div>`;
     // [11/02 v6] 측정 이력(11/02 "재발 여부" 에서 이름 바꿈 — 관제에서 익숙한 말, 반복 판단은 꼬리표가 한다) — Figma 처럼 네 줄을 다 보이고(줄 32 라 접을 만큼 길지 않다), 결론(처음 넘음 · 반복)은 머리 오른쪽 꼬리표로
-    const histV6 = `<div class="sth"><b>측정 이력</b><span class="hfl ${rep3 ? 'is-rep' : ''}">${rep3 ? '반복' : isHit ? '처음 넘음' : '계속 정상 범위'}</span></div><div class="hist">${hist.map(hiRow).join('')}</div>`;
+    const histV6 = `<div class="sth"><b>측정 이력</b>${V7 ? '' : `<span class="hfl ${rep3 ? 'is-rep' : ''}">${rep3 ? '반복' : isHit ? '처음 넘음' : '계속 정상 범위'}</span>`}</div><div class="hist">${hist.map(hiRow).join('')}</div>`;
     return `<div class="dtop"><button type="button" class="btn btn-secondary bkx" data-dback="1"><span class="i i-16" style="--i:var(--ic-chevron-left)" aria-hidden="true"></span>돌아가기</button><div class="tbs">${tabs}</div></div>
       <div class="dB">
         <div class="dBm">

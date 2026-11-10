@@ -371,4 +371,10 @@ body.ver-7 .sf .rqd { width: 100%; height: var(--size-control-lg); font-size: va
 body.ver-7 > .toast.sf-toast { position: fixed; bottom: var(--space-32); z-index: 1000; }
 body.ver-7 > .toast.sf-toast .toast-undo[hidden] { display: none; }
 body.ver-7 > .toast.sf-toast:has(.toast-undo[hidden]) { padding-right: var(--space-16); min-height: 34px; }
+<<<<<<< HEAD
 >>>>>>> b6a9d0a (v7 안전진단 현장 조치 요청 피드백 — 버튼 '요청 전송됨'으로 끔, 조치 진행 세 단계(응답 대기 · 현장 조치 중 · 조치 완료), DS 토스트(되돌리기))
+=======
+
+/* [11/10 v7] 연관 감지 줄 — 지점 · 값 대신 출처 미션(같은 미션). 연관 감지는 같은 미션 안에서만 고른다(safety.js LINKS[미션]) */
+body.ver-7 .sf .rlx .rmi { flex: none; padding: 0 var(--space-8); border-radius: var(--radius-4); background-color: var(--bg-cell); font-size: var(--font-size-14); line-height: var(--font-line-height-22); color: var(--text-secondary); }
+>>>>>>> e0fb0d0 (v7 안전진단 상세 — 판정 카드 감지 이름 · 세부 묘사, 오탐 가능성, 측정 이력 꼬리표, 연관 감지 지점 · 값 뺌. 연관 감지에 '같은 미션' 표시)
