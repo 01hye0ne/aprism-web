@@ -3056,6 +3056,7 @@
       alertBox.classList.add("is-fixed", "is-no-tail");
       alertBox.style.setProperty("--x", snapPx(ccx));
       alertBox.style.setProperty("--y", snapPx(cardTop));
+      maLabelAt(x, y, W, H);
       return;
     }
     var half = w / 2;
@@ -4341,7 +4342,29 @@
   function maPinSync() {
     if (!V7MA) { return; }
     var mp = alertOn() ? chosenWp : null;
-    if (mp !== maPinId) { maPinId = mp; rrHotApply(); }
+    if (mp !== maPinId) { maPinId = mp; rrHotApply(); if (!mp && maLabel) { maLabel.hidden = true; } }
+  }
+  /*
+   * [11/10 v7 디자이너] 알림 지점 이름표 — 팝오버 사진 위 띠(위치 · 시각)를 지도로 옮겼다. 타겟팅한 지점 바닥 고리 바로 아래 두 줄:
+   *   1줄 위치 이름 · 2줄 층 · 감지 시각. 글은 팝오버의 stamp(monitor.js 가 채운다)에서 읽는다. 점이 칸 밖이면 숨긴다
+   */
+  var maLabel = null;
+  function maLabelAt(x, y, W, H) {
+    if (!hit) { return; }
+    if (!maLabel) {
+      maLabel = document.createElement("div"); maLabel.className = "ma-wp-label"; maLabel.setAttribute("aria-hidden", "true");
+      maLabel.innerHTML = '<span class="mwl-place"></span><span class="mwl-meta"></span>';
+      hit.appendChild(maLabel);
+    }
+    var pl = alertBox.querySelector(".ma-st-place"), tm = alertBox.querySelector(".ma-st-time");
+    var w = wpSpots.filter(function (q) { return q.id === chosenWp; })[0], fl = (w && w.floor) || floorNow || "";
+    var place = pl ? pl.textContent.trim() : "", meta = [fl, tm ? tm.textContent.trim() : ""].filter(Boolean).join(" · ");
+    var a = maLabel.firstChild, b = maLabel.lastChild;
+    if (a.textContent !== place) { a.textContent = place; }
+    if (b.textContent !== meta) { b.textContent = meta; }
+    maLabel.hidden = !place || x < 0 || x > W || y < 0 || y > H || floorBusy;
+    maLabel.style.setProperty("--x", snapPx(x));
+    maLabel.style.setProperty("--y", snapPx(y));
   }
   if (V7MA && alertBox) { new MutationObserver(maPinSync).observe(alertBox, { attributes: true, attributeFilter: ["hidden", "data-wp"] }); }
   function rrHotApply() {

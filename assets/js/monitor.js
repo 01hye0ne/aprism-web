@@ -1015,6 +1015,9 @@
     if (V7 && stamp && snap) { snap.appendChild(stamp); }
     // [11/10 v7 디자이너] 알림 이유(판정 "기준 초과 +0.06 MPa")는 제목 뒤가 아니라 조치 제안 바로 위 — 이유를 읽고 조치로 내려간다
     var reason7 = null, lead7 = $("[data-ma-lead]", box);
+    // [11/10 v7 디자이너] 위치 · 시각 띠는 지도 이름표로 옮겼다(map-v6.js maLabelAt) — 팝오버엔 감지 시각만 머리 닫기 단추 왼쪽에 작게 남긴다
+    var headTime7 = null, closeBtn7 = $("[data-ma-close]", box);
+    if (V7 && closeBtn7) { headTime7 = document.createElement("span"); headTime7.className = "ma-head-time num"; closeBtn7.parentNode.insertBefore(headTime7, closeBtn7); }
     var deltaCard7 = $(".ma-delta", box);   // 뒤집은 판(.is-light-scope) 바깥에 둔다 — 안에 두면 단계색이 판 기준으로 뒤집혀 다크에서 어둡게 나온다
     if (V7 && lead7 && deltaCard7) { reason7 = document.createElement("p"); reason7.className = "ma-reason"; reason7.hidden = true; deltaCard7.parentNode.insertBefore(reason7, deltaCard7); }
     var confirm = $("[data-ma-confirm]", box);
@@ -1117,6 +1120,7 @@
         var pl6 = document.createElement("span"); pl6.className = "ma-st-place"; pl6.textContent = where6;
         var tm6 = document.createElement("span"); tm6.className = "ma-st-time num"; tm6.textContent = when6;
         stamp.appendChild(pin6); stamp.appendChild(pl6); stamp.appendChild(tm6);
+        if (headTime7) { headTime7.textContent = when6; }
       }
 
       $("[data-ma-wp]", box).textContent = a.wp || "";
