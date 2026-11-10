@@ -98,6 +98,9 @@
   let REQ = {}, reqT = {};
   const RQ_WORD = {wait:'응답 대기', work:'현장 조치 중', done:'조치 완료'};
   const RQ_BADGE = {wait:'', work:'badge-info', done:'badge-normal'};   // Figma Badge-미션 566:19149 — 대기 · 진행 · 완료
+  // [11/10 v7] 요청한 감지는 판정 칩 대신 진행 배지(판정 카드 · 목록 카드 · 측정 이력 오늘 줄 같은 꼴), 처리 줄은 그 단계의 시각 + 이름
+  const rqBadge = R => `<span class="badge badge-mode ${RQ_BADGE[R.st]} jrq"><span class="badge-dot"></span>${RQ_WORD[R.st]}</span>`;
+  const rqLine = R => `${R.st==='done' ? R.t3 : R.st==='work' ? R.t2 : R.t} ${RQ_WORD[R.st]}`;
   // 요청 뒤 오른쪽 칸 — 보낸 내용은 잠그고(체크 · 메모 바꿀 수 없음), 버튼은 꺼진 '요청 전송됨', 아래에 조치 진행 세 단계
   function reqSide(sug, R, nextM){
     const ord = ['wait','work','done'], cur = ord.indexOf(R.st);
@@ -141,7 +144,7 @@
     clearTimeout(reqT[key]); R.st = st;
     if(st === 'work'){ R.t2 = '10:18'; toast(`${reqName(key)} 현장 조치 시작됨`); }
     if(st === 'done'){ R.t3 = '10:24'; toast(`${reqName(key)} 조치 완료 기록됨`); }
-    if(dt && (dt.mi + '|' + dt.k + '|' + dt.wp) === key) render();   // 보고 있는 상세만 다시 그린다
+    if(!dt || (dt.mi + '|' + dt.k + '|' + dt.wp) === key) render();   // 목록이거나 그 상세를 보고 있을 때만 다시 그린다
   }
   // 되돌리기 — 요청 시각(x[4])까지 지워 '요청 전'으로
   function reqUndo(key){
@@ -287,13 +290,16 @@
     const tm = (x[3] || '').match(/(\d+):(\d+)/), mins = tm ? +tm[1] * 60 + +tm[2] : null;
     const nextM = st==='plan' ? '이번 순회 중' : mins === null ? '—' : mins < 14 * 60 ? '오늘 14:00' : '내일 09:00';
     const RQ = V7 && isHit && st !== 'done' ? REQ[dt.mi + '|' + k + '|' + wp] : null;
+    // [11/10 v7] 넘은 지점이 둘 이상이면(목록 카드 '위험 1 외 1곳') 판정 카드 머리 오른쪽에 지점 고르기 — 상세가 한 곳만 보여 나머지를 찾을 수 없었다
+    const spots = V7 && its.length > 1 ? `<div class="jsp" role="group" aria-label="기준을 넘은 지점 ${its.length}곳">${its.map(it => { const w2 = wpOf(it), on = w2===wp, R2 = REQ[dt.mi + '|' + k + '|' + w2];
+      return `<button type="button" class="jsp-b${on ? ' on' : ''}" data-dk="${k}" data-dw="${w2}" aria-pressed="${on}">${R2 ? rqBadge(R2) : `<span class="verdict-chip is-${it[0]}">${WORD[it[0]]}</span>`}<b>${w2}</b><span>${it[2].split(' ').slice(1).join(' ')}</span></button>`; }).join('')}</div>` : '';
     const actS = RQ ? RQ_WORD[RQ.st] : !isHit ? (st==='plan' ? '—' : '필요 없음') : st==='done' || x[4] ? `${x[4] || '10:17'} 요청됨` : '요청 전';   // 요청 시각은 x[4](data-req 가 적는다)
     const jinfo = [['발생위치', `${wp}${isHit ? ' ' + x[2].split(' ').slice(1).join(' ') : ''}`, ''], [isHit ? '발생시간' : '측정 시간', x[3] || '—', ''], ['조치 상태', actS, ''], ['다음 측정', nextM, '']]
       .map(([l, v, c]) => `<div><span>${l}</span><b class="${c}" title="${v}">${v}</b></div>`).join('');
-    const judge = V6 ? `<div class="lvA s1 jx ${st}"><div class="jtop"><div class="jrow">${RQ ? `<span class="badge badge-mode ${RQ_BADGE[RQ.st]} jrq"><span class="badge-dot"></span>${RQ_WORD[RQ.st]}</span>` : `<span class="verdict-chip is-${st}">${WORD[st]}</span>`}${V7 ? '' : `<span class="jk">${k}</span>`}</div>${jv}</div><div class="jinfo">${jinfo}</div></div>`
+    const judge = V6 ? `<div class="lvA s1 jx ${st}"><div class="jtop"><div class="jrow">${RQ ? rqBadge(RQ) :`<span class="verdict-chip is-${st}">${WORD[st]}</span>`}${V7 ? '' : `<span class="jk">${k}</span>`}${spots}</div>${jv}</div><div class="jinfo">${jinfo}</div></div>`
       : `<div class="lvA s1 ${st}">${step('이상 판정')}<div class="tt"><span class="verdict-chip is-${st}">${WORD[st]}</span><h5>${k}, ${isHit ? x[1] : st==='plan' ? '측정 전' : '정상 범위 ' + x[1]}</h5></div>${loc}${cond}</div>`;
     // [11/02 v6] 측정 이력(11/02 "재발 여부" 에서 이름 바꿈 — 관제에서 익숙한 말, 반복 판단은 꼬리표가 한다) — Figma 처럼 네 줄을 다 보이고(줄 32 라 접을 만큼 길지 않다), 결론(처음 넘음 · 반복)은 머리 오른쪽 꼬리표로
-    const histV6 = `<div class="sth"><b>측정 이력</b>${V7 ? '' : `<span class="hfl ${rep3 ? 'is-rep' : ''}">${rep3 ? '반복' : isHit ? '처음 넘음' : '계속 정상 범위'}</span>`}</div><div class="hist">${hist.map(hiRow).join('')}</div>`;
+    const histV6 = `<div class="sth"><b>측정 이력</b>${V7 ? '' : `<span class="hfl ${rep3 ? 'is-rep' : ''}">${rep3 ? '반복' : isHit ? '처음 넘음' : '계속 정상 범위'}</span>`}</div><div class="hist">${hist.map((h, n) => n===3 && RQ ? hiRow(h, n).replace(/<span class="verdict-chip [^"]*">[^<]*<\/span>/, rqBadge(RQ)).replace(/<span class="hia[^"]*">[^<]*<\/span>/, `<span class="hia on">${rqLine(RQ)}</span>`) : hiRow(h, n)).join('')}</div>`;
     return `<div class="dtop"><button type="button" class="btn btn-secondary bkx" data-dback="1"><span class="i i-16" style="--i:var(--ic-chevron-left)" aria-hidden="true"></span>돌아가기</button><div class="tbs">${tabs}</div></div>
       <div class="dB">
         <div class="dBm">
@@ -668,8 +674,9 @@
      */
     const todo = V6 && s==='crit' && !rq, seenK = mi + '|' + k, fresh = todo && !KD_SEEN.has(seenK);
     if(todo) KD_SEEN.add(seenK);
-    return `<div class="kd ${s} ${s==='done' ? 'dim' : ''}${todo ? ' is-todo' : ''}${fresh ? ' is-new' : ''}" data-n="${k}" tabindex="0" role="button"><div class="rw"><span class="nm">${k}</span><span class="verdict-chip is-${s}">${WORD[s]}</span></div>
-      <div class="big">${(() => { const r6 = V6 && res6(k, x); return r6 ? `${r6[0]} ${r6[1]}${r6[2] ? `<span class="kdt">${r6[2]}</span>` : ''}` : sent; })()}</div><span class="sm">${loc}, ${t}</span>${rq ? `<span class="req">${rq} 현장 조치 요청됨</span>` : ''}${extra || ''}<div class="md ${md[0]}">${md[1]}</div><span class="more">자세히 보기 →</span></div>`;
+    const R = V7 && s !== 'done' ? REQ[mi + '|' + k + '|' + wpOf(x)] : null;   // [11/10 v7] 요청한 감지 — 칩 · 처리 줄을 진행 단계로
+    return `<div class="kd ${s} ${s==='done' ? 'dim' : ''}${todo ? ' is-todo' : ''}${fresh ? ' is-new' : ''}" data-n="${k}" tabindex="0" role="button"><div class="rw"><span class="nm">${k}</span>${R ? rqBadge(R) : `<span class="verdict-chip is-${s}">${WORD[s]}</span>`}</div>
+      <div class="big">${(() => { const r6 = V6 && res6(k, x); return r6 ? `${r6[0]} ${r6[1]}${r6[2] ? `<span class="kdt">${r6[2]}</span>` : ''}` : sent; })()}</div><span class="sm">${loc}, ${t}</span>${R ? `<span class="req">${rqLine(R)}</span>` : rq ? `<span class="req">${rq} 현장 조치 요청됨</span>` : ''}${extra || ''}<div class="md ${md[0]}">${md[1]}</div><span class="more">자세히 보기 →</span></div>`;
   }
   function head(title, done, total, n){
     // [10/30] 'n건 현장 조치 요청 전'은 뺐다 — 왼쪽 목록의 '요청 전'(전체 · 고른 미션)과 같은 숫자다. 요청을 보내면 목록 값이 줄어 피드백이 된다

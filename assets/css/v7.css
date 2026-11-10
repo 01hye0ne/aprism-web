@@ -377,4 +377,18 @@ body.ver-7 > .toast.sf-toast:has(.toast-undo[hidden]) { padding-right: var(--spa
 
 /* [11/10 v7] 연관 감지 줄 — 지점 · 값 대신 출처 미션(같은 미션). 연관 감지는 같은 미션 안에서만 고른다(safety.js LINKS[미션]) */
 body.ver-7 .sf .rlx .rmi { flex: none; padding: 0 var(--space-8); border-radius: var(--radius-4); background-color: var(--bg-cell); font-size: var(--font-size-14); line-height: var(--font-line-height-22); color: var(--text-secondary); }
+<<<<<<< HEAD
 >>>>>>> e0fb0d0 (v7 안전진단 상세 — 판정 카드 감지 이름 · 세부 묘사, 오탐 가능성, 측정 이력 꼬리표, 연관 감지 지점 · 값 뺌. 연관 감지에 '같은 미션' 표시)
+=======
+/* 목록 카드 — 진행 배지도 판정 칩 자리(사진 아래 걸침)에. safety.css 는 .pl 없는 줄을 숨긴다 */
+body.ver-7 .sf .cx .kd > .rw:has(.jrq) { display: flex; }
+body.ver-7 .sf .cx .kd > .rw:has(.jrq) + * { margin-top: 0; }
+/* 판정 카드 머리 오른쪽 — 넘은 지점 고르기(둘 이상일 때). 테 없이 면 색으로만 고른 것을 구분 */
+body.ver-7 .sf .jx .jrow { display: flex; align-items: center; align-self: stretch; width: 100%; }
+body.ver-7 .sf .jsp { display: flex; gap: var(--space-8); margin-left: auto; }
+body.ver-7 .sf .jsp-b { display: inline-flex; align-items: center; gap: var(--space-8); height: 36px; padding: 0 var(--space-12) 0 var(--space-6, 6px); border: 0; border-radius: var(--radius-6); background-color: transparent; font-size: var(--font-size-14); line-height: var(--font-line-height-20); color: var(--text-tertiary); cursor: pointer; }
+body.ver-7 .sf .jsp-b:hover { background-color: var(--bg-cell); }
+body.ver-7 .sf .jsp-b.on { background-color: var(--bg-cell); color: var(--text-primary); }
+body.ver-7 .sf .jsp-b b { font-weight: 700; }
+body.ver-7 .sf .jsp-b .jrq { height: 24px; }
+>>>>>>> 18eeb83 (v7 안전진단 — 목록 카드 · 측정 이력 오늘 줄도 진행 배지, 목록에서도 단계 갱신, 넘은 지점 둘 이상이면 판정 카드에 지점 고르기)
