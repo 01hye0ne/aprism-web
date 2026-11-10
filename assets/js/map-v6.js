@@ -2929,6 +2929,42 @@
     current: "측정 중", upcoming: "예정"
   };
 
+  /*
+   * [11/10 v7 디자이너] 조치를 요청한 지점 — 지점 팝오버 아래 칸을 처리 과정으로 바꾼다(Figma UI_00 1680:11326).
+   *   1단계(지난 점): 알림 이유(판정 "기준 초과 +1.4") + 요청한 조치 목록
+   *   2단계(지금 고리 = 로딩): 지금 단계 + 시각 — 응답 대기 · 현장 조치 중(고리가 돈다) · 조치 완료(체크, 멈춤). 말은 안전진단과 같다
+   *   기록은 조치 요청 한 곳(alert-data-v7.js S7.req) — 이 로봇 · 이 지점의 알림 중 요청된 것. 없으면 예전 칸 그대로
+   */
+  var WP_ST = { wait: "현장 응답 대기", work: "현장 조치 중", done: "조치 완료" };
+  function wpProgress(info, dl) {
+    var box = wpBox.querySelector(".mwp-prog");
+    var S7 = window.APRISM_ALERTS7, all = S7 ? S7.req.all() : {}, rb = +activeRobot();
+    var hits = S7 ? S7.list.filter(function (a) { return a.wp === info.id && a.robot === rb && all[a.id]; }) : [];
+    if (!hits.length) { if (box) { box.hidden = true; } return; }
+    if (!box) { box = document.createElement("div"); box.className = "mwp-prog"; wpBox.appendChild(box); }
+    box.textContent = "";
+    hits.forEach(function (a) {
+      var r = all[a.id], st = WP_ST[r.st] ? r.st : "wait";
+      var vd = (window.APRISM_VERDICT && window.APRISM_VERDICT(a.detect, a.value)) || "기준 위반";
+      var ol = document.createElement("ol"); ol.className = "mwp-steps is-" + st;
+      var li1 = document.createElement("li"); li1.className = "is-past";
+      li1.innerHTML = '<i aria-hidden="true"></i><div><span class="ms-l"></span><ul class="ms-acts"></ul></div>';
+      li1.querySelector(".ms-l").textContent = vd;
+      (r.how || []).forEach(function (h) { var x = document.createElement("li"); x.textContent = h; li1.querySelector(".ms-acts").appendChild(x); });
+      var li2 = document.createElement("li"); li2.className = "is-now"; li2.setAttribute("aria-current", "step");
+      li2.innerHTML = '<i aria-hidden="true"></i><div><span class="ms-l"></span><span class="ms-t num"></span></div>';
+      li2.querySelector(".ms-l").textContent = WP_ST[st];
+      li2.querySelector(".ms-t").textContent = ((st === "done" ? r.t3 : st === "work" ? r.t2 : r.t) || "").slice(0, 5);
+      ol.appendChild(li1); ol.appendChild(li2); box.appendChild(ol);
+    });
+    box.hidden = false;
+    // 처리 과정이 아래 칸을 맡는다 — 핵심 한 줄 · 측정값 목록은 감춘다
+    if (wpRead) { wpRead.hidden = true; }
+    if (dl) { dl.hidden = true; }
+  }
+  // 다른 화면(안전진단 · 알림 센터)에서 단계가 바뀌면 열린 지점 팝오버도 다시 칠한다
+  document.addEventListener("aprism:requested", function () { if (V7MA && wpBox && !wpBox.hidden) { tellWaypoint(); } });
+
   function tellWaypoint() {
     if (alertBox && !alertBox.hidden && alertBox.getAttribute("data-wp") !== chosenWp) {
       alertBox.hidden = true;
@@ -3001,6 +3037,7 @@
         rows6.forEach(function (r) { var d = document.createElement("div"), t = document.createElement("dt"), v = document.createElement("dd"); t.textContent = r[0]; v.textContent = r[1]; d.appendChild(t); d.appendChild(v); dl6.appendChild(d); });
         dl6.hidden = !rows6.length;
         var tEl = wpBox.querySelector("[data-map-wp-time]"); if (tEl) { tEl.hidden = true; }
+        if (V7MA) { wpProgress(info, dl6); }
       }
     }
     if (wpRead && !document.body.classList.contains("ver-6")) {   // v6 는 위에서 핵심 한 줄 + 목록으로
