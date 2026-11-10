@@ -344,7 +344,7 @@ body.ver-7 .sf .rqx:disabled { display: inline-flex; align-items: center; justif
 body.ver-7 .sf .rqp { display: flex; flex-direction: column; gap: var(--space-12); margin-top: var(--space-12); padding: var(--space-16); border-radius: var(--radius-card); background-color: var(--bg-raised); }
 body.ver-7 .sf .rqp-h { display: flex; align-items: center; justify-content: space-between; }
 body.ver-7 .sf .rqp-h b { font-size: var(--font-size-16); line-height: var(--font-line-height-24); font-weight: 700; color: var(--text-primary); }
-body.ver-7 .sf .rqp-b { align-self: center; font-size: var(--font-size-14); line-height: var(--font-line-height-20); font-weight: 700; }
+body.ver-7 .sf .rqp-b, body.ver-7 .sf .jrq { align-self: center; font-size: var(--font-size-14); line-height: var(--font-line-height-20); font-weight: 700; }
 body.ver-7 .sf .badge-mode.badge-normal { background-color: var(--status-safe-bg); border-color: var(--status-safe-border); }   /* Badge-미션 완료 — app-shell 주석대로 두 줄 더함 */
 body.ver-7 .sf .rqp-st { display: flex; flex-direction: column; margin: 0; padding: 0; list-style: none; }
 body.ver-7 .sf .rqp-st li { position: relative; display: grid; grid-template-columns: 20px 1fr auto; column-gap: var(--space-8); padding-bottom: var(--space-16); }

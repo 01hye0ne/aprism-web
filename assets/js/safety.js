@@ -290,7 +290,7 @@
     const actS = RQ ? RQ_WORD[RQ.st] : !isHit ? (st==='plan' ? '—' : '필요 없음') : st==='done' || x[4] ? `${x[4] || '10:17'} 요청됨` : '요청 전';   // 요청 시각은 x[4](data-req 가 적는다)
     const jinfo = [['발생위치', `${wp}${isHit ? ' ' + x[2].split(' ').slice(1).join(' ') : ''}`, ''], [isHit ? '발생시간' : '측정 시간', x[3] || '—', ''], ['조치 상태', actS, ''], ['다음 측정', nextM, '']]
       .map(([l, v, c]) => `<div><span>${l}</span><b class="${c}" title="${v}">${v}</b></div>`).join('');
-    const judge = V6 ? `<div class="lvA s1 jx ${st}"><div class="jtop"><div class="jrow"><span class="verdict-chip is-${st}">${WORD[st]}</span>${V7 ? '' : `<span class="jk">${k}</span>`}</div>${jv}</div><div class="jinfo">${jinfo}</div></div>`
+    const judge = V6 ? `<div class="lvA s1 jx ${st}"><div class="jtop"><div class="jrow">${RQ ? `<span class="badge badge-mode ${RQ_BADGE[RQ.st]} jrq"><span class="badge-dot"></span>${RQ_WORD[RQ.st]}</span>` : `<span class="verdict-chip is-${st}">${WORD[st]}</span>`}${V7 ? '' : `<span class="jk">${k}</span>`}</div>${jv}</div><div class="jinfo">${jinfo}</div></div>`
       : `<div class="lvA s1 ${st}">${step('이상 판정')}<div class="tt"><span class="verdict-chip is-${st}">${WORD[st]}</span><h5>${k}, ${isHit ? x[1] : st==='plan' ? '측정 전' : '정상 범위 ' + x[1]}</h5></div>${loc}${cond}</div>`;
     // [11/02 v6] 측정 이력(11/02 "재발 여부" 에서 이름 바꿈 — 관제에서 익숙한 말, 반복 판단은 꼬리표가 한다) — Figma 처럼 네 줄을 다 보이고(줄 32 라 접을 만큼 길지 않다), 결론(처음 넘음 · 반복)은 머리 오른쪽 꼬리표로
     const histV6 = `<div class="sth"><b>측정 이력</b>${V7 ? '' : `<span class="hfl ${rep3 ? 'is-rep' : ''}">${rep3 ? '반복' : isHit ? '처음 넘음' : '계속 정상 범위'}</span>`}</div><div class="hist">${hist.map(hiRow).join('')}</div>`;
