@@ -133,6 +133,8 @@
       { sev: "critical", robot: 1, floor: "B4", where: "APRO 4F · WP-07 고소 작업 발판",  time: "10:16:48", title: "안전감지 · 안전벨트 미착용 1명",  uv: [0.40, 0.62] }
     );
   }
+  // [11/10 v7] 알림 데이터 한 곳(alert-data-v7.js) — v7 화면은 위 목록 대신 거기서 읽는다(관제 · 안전진단 · 알림 센터와 같은 12건)
+  if (window.APRISM_ALERTS7) { ALERTS = window.APRISM_ALERTS7.forBuilding(); }
   ALERTS.forEach(function (a) {
     // 층은 알림이 난 웨이포인트의 층이다(로봇이 지금 선 층이 아니다 — 메인 v2.2 monitor.js 와 같다).
     a.mission = robotNo(a.robot).mission;
@@ -152,6 +154,24 @@
     [["온도감지 · 최고 온도 44.2 ℃", "WP-03"], ["부분방전 · 이상 점수 8.92", "WP-11"], ["이상음향 · 이상 점수 19.6", "WP-02"], ["온도감지 · 최고 온도 41.5 ℃", "WP-03"], ["누출감지 · 누출 의심도 58%", "WP-09"]]
       .forEach(function (x, i) { DONE[i].title = x[0]; DONE[i].wp = x[1]; });
     DONE[0].time = "10:19:10";
+  }
+  /*
+   * [11/10 v7] 조치 요청 기록 한 곳(alert-data-v7.js req) — 관제 · 안전진단 · 알림 센터에서 요청한 알림은 관제처럼 목록 · 지도에서 빼고
+   *   조치 요청된 알림으로 옮긴다. 이 화면은 요청 단추가 없어 기록은 열 때 한 번 맞춘다 — 다른 탭에서 기록이 바뀌면 다시 연다.
+   */
+  if (window.APRISM_ALERTS7) {
+    var R7 = window.APRISM_ALERTS7.req.all(), ids7 = Object.keys(R7).sort().join(",");
+    ALERTS = ALERTS.filter(function (a) {
+      var r = a.id && R7[a.id];
+      if (!r) { return true; }
+      DONE.push({ time: r.t, title: window.APRISM_ALERT6 ? window.APRISM_ALERT6.title(a.title) : a.title, how: (r.how || []).join(" · "),
+                  who: r.who || "홍길동", wp: (/WP-\d+/.exec(a.where) || [""])[0] });
+      return false;
+    });
+    DONE.sort(function (x, y) { return x.time < y.time ? 1 : x.time > y.time ? -1 : 0; });
+    document.addEventListener("aprism:requested", function () {
+      if (Object.keys(window.APRISM_ALERTS7.req.all()).sort().join(",") !== ids7) { location.reload(); }
+    });
   }
 
   /*

@@ -50,6 +50,9 @@ for (const name of PAGES) {
   if (from !== name) {
     src = src.replace(/\r?\n\s*<!-- v7\(11\/06~\)[^\n]*-->\r?\n\s*<script src="\.\.\/assets\/js\/v7\.js[^"]*"><\/script>/, '');
     if (src.includes('assets/js/v7.js')) throw new Error(from + ': v7.js 를 못 뺌');
+    // [11/10] v7 알림 데이터 한 곳(alert-data-v7.js)도 뺀다 — 영문판은 v7 기능이 필요 없다(디자이너). 없으면 각 JS 가 예전 데이터를 쓴다
+    src = src.replace(/\r?\n\s*<!-- \[11\/10\] 알림 데이터 한 곳[^\n]*-->\r?\n\s*<script src="\.\.\/assets\/js\/alert-data-v7\.js[^"]*"><\/script>/, '');
+    if (src.includes('assets/js/alert-data-v7.js')) throw new Error(from + ': alert-data-v7.js 를 못 뺌');
     src = src.replace('<title>v7 ·', '<title>v6 ·');
   }
   let out = src.replace(/<html lang="ko"/, '<html lang="en"');

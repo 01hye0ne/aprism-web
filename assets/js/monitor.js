@@ -194,6 +194,13 @@
     WARNINGS[3].time = "09:20:14"; WARNINGS[1].time = "09:36:42"; WARNINGS[2].time = "09:56:05";
   }
 
+  // [11/10 v7] 알림 데이터 한 곳(alert-data-v7.js) — v7 화면은 위에서 만든 값 대신 거기서 읽는다(안전진단 · 알림 센터 · 전체 미션과 같은 12건).
+  //   그 파일이 없는 화면(v6 · 영문판 · v5 이하)은 위 데이터 그대로다.
+  if (window.APRISM_ALERTS7) {
+    var S7 = window.APRISM_ALERTS7.forMonitor(body.hasAttribute("data-route-rules"));
+    CRITICAL = S7.CRITICAL; WARNINGS = S7.WARNINGS; R01_MORE = S7.R01_MORE; ROUTE_ALERTS = S7.ROUTE_ALERTS;
+  }
+
   // 검토용 단계 — 주소 끝 #… 로 고른다. few 는 알림은 있지만 Delta 종합 기준에 못 미친 판이다.
   var SETS = {
     normal: function () { return []; },
@@ -787,7 +794,41 @@
     });
   }
 
+  /*
+   * [11/10 v7] 조치 요청 기록 한 곳(alert-data-v7.js req) — 안전진단 · 알림 센터에서 요청한 알림도 여기서 "조치 요청된 알림"으로 옮긴다.
+   *   그리기 전마다 기록과 맞춘다(여러 번 불러도 같다). 기록에서 온 줄은 reqId 를 단다 — 여기서 누른 줄도 같은 표를 달아 둘로 쌓이지 않게.
+   */
+  function sync7() {
+    var S = window.APRISM_ALERTS7;
+    if (!S) { return; }
+    var R = S.req.all(), moved = false;
+    [CRITICAL].concat(WARNINGS, R01_MORE, ROUTE_ALERTS).forEach(function (a) {
+      var id = a && S.req.idOf(a);
+      if (!id) { return; }
+      var r = R[id], i = resolved.indexOf(a), di = -1;
+      DONE.forEach(function (d, n) { if (d.reqId === id) { di = n; } });
+      if (r) {
+        if (i < 0) { resolved.push(a); moved = true; }
+        if (cleared.indexOf(a) < 0) { cleared.push(a); }
+        if (di < 0) {
+          DONE.push({ wp: a.wp || "", time: r.t, title: window.APRISM_ALERT6 ? window.APRISM_ALERT6.title(a.title) : a.title,
+                      how: (r.how || []).join(" · "), who: r.who || "홍길동", memo: r.memo || "", reqId: id });
+          moved = true;
+        }
+      } else if (di >= 0) {   // 다른 화면에서 되돌린 요청
+        DONE.splice(di, 1);
+        if (i >= 0) { resolved.splice(i, 1); }
+        if (cleared.indexOf(a) >= 0) { cleared.splice(cleared.indexOf(a), 1); }
+        moved = true;
+      }
+    });
+    if (moved) { DONE.sort(function (x, y) { return x.time < y.time ? 1 : x.time > y.time ? -1 : 0; }); }
+  }
+  var selfReq = false;   // 이 화면이 쓴 기록 — 곧 직접 그리므로 이벤트로 한 번 더 그리지 않는다(새 줄 빛남이 끊긴다)
+  document.addEventListener("aprism:requested", function () { if (!selfReq) { render(); } });
+
   function render() {
+    sync7();
     var all = items();
     if (picked && all.indexOf(picked) < 0) { picked = null; }
 
@@ -1487,7 +1528,11 @@
       DONE.unshift(rec);
       if (extra.indexOf(a) >= 0) { extra.splice(extra.indexOf(a), 1); } else { resolved.push(a); }
       cleared.push(a);
-      hAdd(a, rec);
+      // [11/10 PR #21 + #22 합침] 조치 요청 기록 — v7 은 한 곳(alert-data-v7.js S7.req)에, 그 파일이 없는 화면은 예전 sessionStorage(hAdd).
+      //   목록에서 옮긴 뒤 쓴다(먼저 쓰면 sync7 이 한 번 더 옮긴다). 진행 단계(st)는 대기로 시작 — 안전진단이 이어서 단계를 올린다
+      var S7r = window.APRISM_ALERTS7, id7 = S7r && S7r.req.idOf(a);
+      if (id7) { rec.reqId = id7; selfReq = true; S7r.req.set(id7, { t: rec.time, how: rec.how ? rec.how.split(" · ") : [], memo: rec.memo || "", who: rec.who, to: "현장 작업자", st: "wait", src: "ctl" }); selfReq = false; }
+      else { hAdd(a, rec); }
       lastDone = { a: a, rec: rec };
       render();
       showToast(a);
@@ -1571,7 +1616,8 @@
         if (i >= 0) { DONE.splice(i, 1); }
         var r = resolved.indexOf(a);
         if (r >= 0) { resolved.splice(r, 1); } else { extra.unshift(a); }
-        hDel(a);
+        if (rec.reqId && window.APRISM_ALERTS7) { selfReq = true; window.APRISM_ALERTS7.req.clear(rec.reqId); selfReq = false; }   // [11/10 v7] 되돌리면 기록에서도 뺀다
+        else { hDel(a); }
         hideToast();
         render();
       });
