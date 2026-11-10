@@ -206,6 +206,7 @@ body.ver-7 .ah-where > .mbt-pin.is-plain.ah-wp-pin,
 :root[data-theme="light"] body.ver-7 .ah-where > .mbt-pin.is-plain.ah-wp-pin { color: inherit; }
 :root[data-theme="light"] body.ver-7 .ah-item .ah-wp-pin { border-color: var(--color-gray-100); }   /* 라이트 층 꼬리표 바탕(v6.css)과 같게 */
 
+<<<<<<< HEAD
 /* ==================================================================
  * [11/10 v7 디자이너] 알림 팝오버 가로형 — Figma UI_00 1233:16459
  *   판 564 · 여백 8 · 칸 사이 8 · 모서리 16 · 유리(bg/glass 55% + 흐림 20)
@@ -329,3 +330,45 @@ body.ver-7 .ma-v3 .ma-snap { min-height: 204px; border-radius: 0 0 0 16px; }
 body.ver-7 .ma-v3 .ma-snap > .ma-stamp.ma-stamp6 { left: var(--space-8); right: var(--space-8); bottom: var(--space-8); }
 body.ver-7 .ma-v3 .ma-lower { padding: var(--space-8); }
 body.ver-7 .map-alert.ma-v3.no-snap { grid-template-columns: minmax(0, 1fr); }
+=======
+/*
+ * [11/10 v7] 안전진단 현장 조치 요청 뒤 — safety.js reqSide
+ *   보낸 내용 잠금(.dl.is-sent): 체크 · 메모는 바꿀 수 없음, 글자는 그대로 읽힘(흐리게 하지 않음)
+ *   버튼: DS btn-accent:disabled + 확인 아이콘 '10:17 요청 전송됨'
+ *   조치 진행(.rqp): 머리(제목 + Mode Badge 대기 · 진행 · 완료) → 세로 단계 셋(점 + 이름 + 설명 + 시각) → 진행 중이면 [조치 완료 확인]
+ */
+body.ver-7 .sf .dl.is-sent .c1x { cursor: default; }
+body.ver-7 .sf .dl.is-sent .c1x input[type="checkbox"]:disabled { opacity: 1; cursor: default; }
+body.ver-7 .sf .dl.is-sent .rq-memo { margin: 0; min-height: 0; color: var(--text-primary); white-space: pre-wrap; word-break: keep-all; }
+body.ver-7 .sf .rqx:disabled { display: inline-flex; align-items: center; justify-content: center; gap: var(--space-8); }
+body.ver-7 .sf .rqp { display: flex; flex-direction: column; gap: var(--space-12); margin-top: var(--space-12); padding: var(--space-16); border-radius: var(--radius-card); background-color: var(--bg-raised); }
+body.ver-7 .sf .rqp-h { display: flex; align-items: center; justify-content: space-between; }
+body.ver-7 .sf .rqp-h b { font-size: var(--font-size-16); line-height: var(--font-line-height-24); font-weight: 700; color: var(--text-primary); }
+body.ver-7 .sf .rqp-b { align-self: center; font-size: var(--font-size-14); line-height: var(--font-line-height-20); font-weight: 700; }
+body.ver-7 .sf .badge-mode.badge-normal { background-color: var(--status-safe-bg); border-color: var(--status-safe-border); }   /* Badge-미션 완료 — app-shell 주석대로 두 줄 더함 */
+body.ver-7 .sf .rqp-st { display: flex; flex-direction: column; margin: 0; padding: 0; list-style: none; }
+body.ver-7 .sf .rqp-st li { position: relative; display: grid; grid-template-columns: 20px 1fr auto; column-gap: var(--space-8); padding-bottom: var(--space-16); }
+body.ver-7 .sf .rqp-st li:last-child { padding-bottom: 0; }
+/* 점 사이 세로줄 — 지난 단계까지는 실선 info, 앞으로는 테두리색 */
+body.ver-7 .sf .rqp-st li:not(:last-child)::before { content: ""; position: absolute; left: 9px; top: 18px; bottom: 0; width: 2px; background-color: var(--border-default); }
+body.ver-7 .sf .rqp-st li.is-past::before { background-color: var(--status-info-icon); }
+body.ver-7 .sf .rqp-st i { position: relative; z-index: 1; width: 12px; height: 12px; margin: 5px 4px 0; border: 2px solid var(--border-default); border-radius: 50%; background-color: var(--bg-raised); box-sizing: border-box; }
+body.ver-7 .sf .rqp-st li.is-past i { border-color: var(--status-info-icon); background-color: var(--status-info-icon); }
+body.ver-7 .sf .rqp-st li.is-now i { border-color: var(--status-info-icon); background-color: var(--bg-raised); box-shadow: 0 0 0 4px color-mix(in srgb, var(--status-info-icon) 24%, transparent); }
+body.ver-7 .sf .rqp-st.is-wait li.is-now i { animation: rqp-pulse 1.6s ease-in-out infinite; }
+body.ver-7 .sf .rqp-st.is-done li.is-now i { border-color: var(--status-safe-icon); background-color: var(--status-safe-icon); box-shadow: none; }
+body.ver-7 .sf .rqp-st li div { display: flex; flex-direction: column; gap: var(--space-2); min-width: 0; }
+body.ver-7 .sf .rqp-st b { font-size: var(--font-size-14); line-height: var(--font-line-height-22); font-weight: 700; color: var(--text-tertiary); }
+body.ver-7 .sf .rqp-st li.is-past b { font-weight: 400; color: var(--text-secondary); }
+body.ver-7 .sf .rqp-st li.is-now b { color: var(--text-primary); }
+body.ver-7 .sf .rqp-st span { font-size: var(--font-size-14); line-height: var(--font-line-height-20); color: var(--text-tertiary); word-break: keep-all; }
+body.ver-7 .sf .rqp-st li.is-now span { color: var(--text-secondary); }
+body.ver-7 .sf .rqp-st time { font-size: var(--font-size-14); line-height: var(--font-line-height-22); color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+body.ver-7 .sf .rqd { width: 100%; height: var(--size-control-lg); font-size: var(--font-size-14); font-weight: 700; }
+@keyframes rqp-pulse { 50% { box-shadow: 0 0 0 7px color-mix(in srgb, var(--status-info-icon) 0%, transparent); } }
+@media (prefers-reduced-motion: reduce) { body.ver-7 .sf .rqp-st.is-wait li.is-now i { animation: none; } }
+/* 토스트 — DS .toast 그대로, 자리만 감지 결과 칸 아래 가운데(left 는 safety.js 가 #sfv 가운데로 적는다) */
+body.ver-7 > .toast.sf-toast { position: fixed; bottom: var(--space-32); z-index: 1000; }
+body.ver-7 > .toast.sf-toast .toast-undo[hidden] { display: none; }
+body.ver-7 > .toast.sf-toast:has(.toast-undo[hidden]) { padding-right: var(--space-16); min-height: 34px; }
+>>>>>>> b6a9d0a (v7 안전진단 현장 조치 요청 피드백 — 버튼 '요청 전송됨'으로 끔, 조치 진행 세 단계(응답 대기 · 현장 조치 중 · 조치 완료), DS 토스트(되돌리기))

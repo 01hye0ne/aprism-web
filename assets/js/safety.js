@@ -87,6 +87,70 @@
   const WORD = {crit:'위험', warn:'주의', done:'요청됨', ok:'정상 범위', plan:'예정'};
   const COLR = {crit:'var(--status-critical-icon)', warn:'var(--status-warning-icon)', done:'var(--text-tertiary)', ok:'var(--text-disabled)'};
   let M, scope, menu, fired, toasts, drawer, newSeen, lay = 'card', dt = null, bigD = false;
+  /*
+   * [11/10 v7] 현장 조치 요청 뒤 피드백 — 누른 뒤 버튼만 그대로 살아 있어 보냈는지 알 수 없었다.
+   *   요청 하나 = REQ['미션|감지|지점'] { st: wait(응답 대기) → work(현장 조치 중) → done(조치 완료), 시각 셋, 보낸 조치 · 메모 · 받는 사람 }
+   *   응답 대기 → 현장 조치 중: 시안에서는 5초 뒤 현장 수신 확인으로 넘긴다(현장 단말 연동 전).
+   *   현장 조치 중 → 조치 완료: 현장에서 완료를 보내는 길이 없어 관제사가 통화로 듣고 [조치 완료 확인]으로 기록한다.
+   *   요청 · 단계가 바뀔 때마다 DS 토스트(app-shell .toast, 관제 조치 요청과 같은 부품) — 요청 직후에만 [되돌리기].
+   */
+  const V7 = document.body.classList.contains('ver-7');
+  let REQ = {}, reqT = {};
+  const RQ_WORD = {wait:'응답 대기', work:'현장 조치 중', done:'조치 완료'};
+  const RQ_BADGE = {wait:'', work:'badge-info', done:'badge-normal'};   // Figma Badge-미션 566:19149 — 대기 · 진행 · 완료
+  // 요청 뒤 오른쪽 칸 — 보낸 내용은 잠그고(체크 · 메모 바꿀 수 없음), 버튼은 꺼진 '요청 전송됨', 아래에 조치 진행 세 단계
+  function reqSide(sug, R, nextM){
+    const ord = ['wait','work','done'], cur = ord.indexOf(R.st);
+    const sub = {
+      wait: cur > 0 ? `${R.who} 수신 확인` : `${R.who}에게 전송, 수신 확인 대기`,
+      work: cur > 1 ? '관제사가 통화로 결과 확인' : cur === 1 ? '현장에서 조치 진행, 결과는 통화로 확인' : '현장에서 요청을 확인하면 시작',
+      done: cur === 2 ? `재측정 ${nextM}, 다시 넘으면 다시 표시` : '관제사가 결과를 확인하면 기록'};
+    const tm = {wait:R.t, work:cur > 0 ? R.t2 : '', done:cur > 1 ? R.t3 : ''};
+    const steps = ord.map((s, n) => `<li class="${n < cur ? 'is-past' : n === cur ? 'is-now' : ''}"${n === cur ? ' aria-current="step"' : ''}><i aria-hidden="true"></i><div><b>${RQ_WORD[s]}</b><span>${sub[s]}</span></div><time>${tm[s]}</time></li>`).join('');
+    return `<div class="dl is-light-scope is-dark-scope is-sent"><div class="hh"><span><span class="dlogo" aria-hidden="true"></span>DELTA 조치 제안</span><span>오탐 가능성 <b>낮음</b></span></div><div class="ti">${sug[0]}</div>
+        <div class="cks">${sug[1].map(([l, a2, to]) => `<label class="c1x"><input type="checkbox" disabled ${R.acts.includes(l) ? 'checked' : ''}><span><b>${l}</b><small>${to}</small></span>${a2 ? '<em class="ma-check-tag">AI 추천</em>' : ''}</label>`).join('')}</div>
+        ${R.memo ? `<span class="mm">메모</span><p class="fd rq-memo">${R.memo.replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'})[c])}</p>` : ''}</div>
+      <button type="button" class="btn btn-accent rqx" disabled><span class="i i-16" style="--i:var(--ic-check)" aria-hidden="true"></span>${R.t} 요청 전송됨</button>
+      <section class="rqp" aria-label="조치 진행"><div class="rqp-h"><b>조치 진행</b><span class="badge badge-mode ${RQ_BADGE[R.st]} rqp-b"><span class="badge-dot"></span>${RQ_WORD[R.st]}</span></div>
+        <ol class="rqp-st is-${R.st}">${steps}</ol>
+        ${R.st === 'work' ? '<button type="button" class="btn btn-secondary rqd" data-reqdone="1">조치 완료 확인</button>' : ''}</section>`;
+  }
+  // DS 토스트 하나를 페이지에 둔다 — 감지 결과 칸(#sfv) 아래 가운데
+  let tst = null, tstTimer = null, tstUndo = null;
+  function toast(msg, undo){
+    if(!tst){ tst = document.createElement('div'); tst.className = 'toast sf-toast'; tst.hidden = true; tst.setAttribute('role', 'status'); tst.setAttribute('aria-live', 'polite');
+      tst.innerHTML = '<span class="toast-msg t-label-2"></span><button type="button" class="btn btn-ghost is-xs toast-undo">되돌리기</button>';
+      tst.querySelector('.toast-undo').addEventListener('click', () => { const f = tstUndo; hideToast(); if(f) f(); });
+      document.body.appendChild(tst); }
+    const box = document.getElementById('sfv'), r = box && box.getBoundingClientRect();
+    if(r) tst.style.left = (r.left + r.width / 2) + 'px';
+    tst.querySelector('.toast-msg').textContent = msg;
+    tstUndo = undo || null; tst.querySelector('.toast-undo').hidden = !undo;
+    tst.hidden = false; clearTimeout(tstTimer); tstTimer = setTimeout(hideToast, undo ? 5000 : 4000);
+  }
+  function hideToast(){ clearTimeout(tstTimer); tstUndo = null; if(tst) tst.hidden = true; }
+  const reqName = key => { const [, k, w] = key.split('|'); return `${w} ${k}`; };
+  function reqSend(mi, k, w, info){
+    const key = mi + '|' + k + '|' + w;
+    REQ[key] = Object.assign({st:'wait', t:'10:17'}, info);
+    toast(`${reqName(key)} 현장 조치 요청 전송됨`, () => reqUndo(key));
+    clearTimeout(reqT[key]); reqT[key] = setTimeout(() => reqStep(key, 'work'), 5000);   // 시안: 현장 수신 확인
+  }
+  function reqStep(key, st){
+    const R = REQ[key]; if(!R) return;
+    clearTimeout(reqT[key]); R.st = st;
+    if(st === 'work'){ R.t2 = '10:18'; toast(`${reqName(key)} 현장 조치 시작됨`); }
+    if(st === 'done'){ R.t3 = '10:24'; toast(`${reqName(key)} 조치 완료 기록됨`); }
+    if(dt && (dt.mi + '|' + dt.k + '|' + dt.wp) === key) render();   // 보고 있는 상세만 다시 그린다
+  }
+  // 되돌리기 — 요청 시각(x[4])까지 지워 '요청 전'으로
+  function reqUndo(key){
+    const [mi0, k, w] = key.split('|'), mi = +mi0, m = M[mi];
+    clearTimeout(reqT[key]); delete REQ[key];
+    if(m.rs && m.rs[k]){ const it = m.rs[k].find(y => wpOf(y)===w); if(it) it[4] = undefined; sync(m, mi); }
+    else if(m.r[k]) m.r[k][4] = undefined;
+    render();
+  }
   const COND = {'안전감지':null,'누출감지':[0,100,55,70,'%'],'온도감지':[18,90,40,55,' ℃'],'계기인식':null,'이상음향':[0,30,19,22.8,''],'부분방전':[0,10,8.6,9.23,'']};
   // [11/02 v6] 판정 막대에 위험 기준까지 세우니 v6 값(관제 알림 기준 주의 — 발전기 베어링 68.4 ℃ · 수배전반 9.41)이 위험 기준(55 ℃ · 9.23)을 넘어 판정과 어긋났다.
   //   시안 값이라 판정(관제 알림)을 그대로 두고 위험 기준을 올린다 — 온도 70 ℃(변압기 71.2 ℃ 위험은 그대로 위험), 부분방전 9.60.
@@ -220,7 +284,8 @@
      */
     const tm = (x[3] || '').match(/(\d+):(\d+)/), mins = tm ? +tm[1] * 60 + +tm[2] : null;
     const nextM = st==='plan' ? '이번 순회 중' : mins === null ? '—' : mins < 14 * 60 ? '오늘 14:00' : '내일 09:00';
-    const actS = !isHit ? (st==='plan' ? '—' : '필요 없음') : st==='done' || x[4] ? `${x[4] || '10:17'} 요청됨` : '요청 전';   // 요청 시각은 x[4](data-req 가 적는다)
+    const RQ = V7 && isHit && st !== 'done' ? REQ[dt.mi + '|' + k + '|' + wp] : null;
+    const actS = RQ ? RQ_WORD[RQ.st] : !isHit ? (st==='plan' ? '—' : '필요 없음') : st==='done' || x[4] ? `${x[4] || '10:17'} 요청됨` : '요청 전';   // 요청 시각은 x[4](data-req 가 적는다)
     const jinfo = [['발생위치', `${wp}${isHit ? ' ' + x[2].split(' ').slice(1).join(' ') : ''}`, ''], [isHit ? '발생시간' : '측정 시간', x[3] || '—', ''], ['조치 상태', actS, ''], ['다음 측정', nextM, '']]
       .map(([l, v, c]) => `<div><span>${l}</span><b class="${c}" title="${v}">${v}</b></div>`).join('');
     const judge = V6 ? `<div class="lvA s1 jx ${st}"><div class="jtop"><div class="jrow"><span class="verdict-chip is-${st}">${WORD[st]}</span><span class="jk">${k}</span></div>${jv}</div><div class="jinfo">${jinfo}</div></div>`
@@ -237,7 +302,7 @@
               ${V6 && !lks.length ? '' : `<div class="lvB s4 ref">${relHead}${relB}</div>`}</div>
           </div>
         </div>
-        <div class="lvD">${V6 ? '' : step('조치 결정')}${side}</div>
+        <div class="lvD">${V6 ? '' : step('조치 결정')}${RQ ? reqSide(sug, RQ, nextM) : side}</div>
       </div>${dt.from ? `<div class="rtbar" role="group" aria-label="동시 발생에서 이동함"><span class="ri" aria-hidden="true">↩</span><button type="button" class="rtb" data-dret="1">${dt.from.k}로 돌아가기</button><button type="button" class="rtx" data-dretx="1" aria-label="돌아가기 닫기">✕</button></div>` : ''}`;
   }
   const STD = {'안전감지':'미착용 0명','누출감지':'55% 미만','온도감지':'40 ℃ 미만','계기인식':'0.60 ~ 0.80 MPa','이상음향':'19.0 미만','부분방전':'8.60 미만'};
@@ -570,7 +635,7 @@
     const same = its.filter(it => it[0]===x[0]).length;
     return its.length > 1 ? html.replace(`<span class="nm">${k}</span>`, `<span class="nm">${k} ${its.length}개${V6 ? '·' + same : ''}</span>`) : html;
   }
-  function init(){ M = JSON.parse(JSON.stringify(BASE)); scope = 0; menu = false; fired = false; toasts = []; drawer = null; newSeen = true; M.forEach(sync); }
+  function init(){ Object.values(reqT).forEach(clearTimeout); REQ = {}; reqT = {}; hideToast(); M = JSON.parse(JSON.stringify(BASE)); scope = 0; menu = false; fired = false; toasts = []; drawer = null; newSeen = true; M.forEach(sync); }
   init();
   const scr = document.querySelector('.app'), sf = document.querySelector('[data-sf]'), v = document.getElementById('sfv'), bc = document.querySelector('[data-sf-crumb]'), side = document.querySelector('[data-sf-sb]');
   if(!sf || !v || !bc || !side) return;
@@ -783,9 +848,15 @@
       if(e.target.closest('[data-dback]')){ const k = dt.k, w = dt.w, mi = dt.mi; dt = null; render(); const c = v.querySelector(`.kd[data-n="${k}"]`) || v.querySelector(`[data-dk="${k}"][data-dm="${mi}"]${w ? `[data-dw="${w}"]` : ''}`) || v.querySelector(`[data-dk="${k}"][data-dm="${mi}"]`); if(c){ const t = c.closest('td') || c; zoomOut(t, () => { t.classList.add('ring'); setTimeout(() => t.classList.remove('ring'), 1500); }); } return; }
       if(e.target.closest('[data-bigd]')){ bigD = !bigD; return render(); }
       if(e.target.closest('[data-req]')){ const m = M[dt.mi];
+        // [11/10 v7] 보낸 조치 · 메모를 요청에 남긴다(그리기 전에 읽어야 한다)
+        const acts = [...v.querySelectorAll('.lvD .c1x')].filter(l => l.querySelector('input:checked')).map(l => l.querySelector('b').textContent);
+        const c0 = v.querySelector('.lvD .c1x input:checked'), to0 = c0 ? c0.closest('.c1x').querySelector('small').textContent : '현장 작업자';
+        const memo = (v.querySelector('#sfMemo') || {}).value || '';
         if(m.rs && m.rs[dt.k]){ const w = dt.w || wpOf(m.r[dt.k]), it = m.rs[dt.k].find(y => wpOf(y)===w); if(it){ it[4] = '10:17'; } sync(m, dt.mi); dt.w = w; }
         else { m.r[dt.k][4] = '10:17'; }
+        if(V7) reqSend(dt.mi, dt.k, dt.wp, {acts, memo:memo.trim(), who:to0.split(',')[0].trim()});
         return render(); }
+      if(e.target.closest('[data-reqdone]')){ reqStep(dt.mi + '|' + dt.k + '|' + dt.wp, 'done'); return; }
       if(e.target.closest('[data-dret]')){ dt = {mi:dt.mi, k:dt.from.k, w:dt.from.w}; return render(); }
       if(e.target.closest('[data-dretx]')){ delete dt.from; return render(); }
       const dk2 = e.target.closest('[data-dk]'); if(dk2){ const from = dk2.dataset.rel ? (dt.from || {k:dt.k, w:dt.w}) : null; dt = {mi:dt.mi, k:dk2.dataset.dk, w:dk2.dataset.dw}; if(from) dt.from = from; return render(); }
