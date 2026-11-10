@@ -41,24 +41,15 @@ fs.writeFileSync(path.join(ROOT, 'assets/js/i18n-en-dict.js'),
   'window.APRISM_EN = ' + JSON.stringify(dict, null, 0).replace(/","/g, '",\n"') + ';\n');
 console.log('assets/js/i18n-en-dict.js — ' + Object.keys(dict).length + ' 문구');
 
-// [11/06] 영문판 *-v6-en.html 은 v7 한글판(*-v7.html)에서 만든다(디자이너 — v6 한글은 멈추고, 영문은 v7 을 계속 따른다).
-//   파일 이름 · 화면 사이 주소는 v6-en 그대로. v7 주소 잇개(v7.js)는 빼고, 제목 판 표기는 파일 이름과 같게 v6.
+// [11/11] 영문판 *-v6-en.html 은 다시 v6 한글판(*-v6.html)에서 만든다(디자이너 — 영문 디자인은 v7 이 아니라 v6).
+//   (11/06~11/10 엔 v7 한글판에서 만들었었다. v7 주소 잇개 · alert-data-v7.js 를 빼던 처리는 이제 필요 없다.)
 for (const name of PAGES) {
-  const v7 = name.replace(/-v6$/, '-v7');
-  const from = v7 !== name && fs.existsSync(path.join(ROOT, 'screens', v7 + '.html')) ? v7 : name;
-  let src = fs.readFileSync(path.join(ROOT, 'screens', from + '.html'), 'utf8');
-  if (from !== name) {
-    src = src.replace(/\r?\n\s*<!-- v7\(11\/06~\)[^\n]*-->\r?\n\s*<script src="\.\.\/assets\/js\/v7\.js[^"]*"><\/script>/, '');
-    if (src.includes('assets/js/v7.js')) throw new Error(from + ': v7.js 를 못 뺌');
-    // [11/10] v7 알림 데이터 한 곳(alert-data-v7.js)도 뺀다 — 영문판은 v7 기능이 필요 없다(디자이너). 없으면 각 JS 가 예전 데이터를 쓴다
-    src = src.replace(/\r?\n\s*<!-- \[11\/10\] 알림 데이터 한 곳[^\n]*-->\r?\n\s*<script src="\.\.\/assets\/js\/alert-data-v7\.js[^"]*"><\/script>/, '');
-    if (src.includes('assets/js/alert-data-v7.js')) throw new Error(from + ': alert-data-v7.js 를 못 뺌');
-    src = src.replace('<title>v7 ·', '<title>v6 ·');
-  }
+  const src = fs.readFileSync(path.join(ROOT, 'screens', name + '.html'), 'utf8');
+  if (src.includes('assets/js/v7.js')) throw new Error(name + ': v7 화면이 원본으로 들어옴');
   let out = src.replace(/<html lang="ko"/, '<html lang="en"');
   out = out.replace(/(<meta charset="[^"]*"\s*\/?>)/i, `$1${HEAD}`);
   if (!out.includes('i18n-en.js')) throw new Error(name + ': <meta charset> 를 못 찾음');
   out = out.replace(LINK, '$1$2-en.html');
   fs.writeFileSync(path.join(ROOT, 'screens', name + '-en.html'), out);
-  console.log('screens/' + name + '-en.html' + (from !== name ? '  ← ' + from + '.html' : ''));
+  console.log('screens/' + name + '-en.html');
 }

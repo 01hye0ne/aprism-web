@@ -112,3 +112,5 @@ WP-04 N₂ 배관 압력계의 압력이 0.86 MPa 로 정상 범위(0.60 ~ 0.80)
 이상음향 점수	Acoustic score
 부분방전 점수	PD score
 도킹 스테이션으로	To docking station
+델타	Delta
+기본 → 위험 1건	Default → Critical 1

@@ -9,9 +9,9 @@
   <meta charset="UTF-8" />
   <!-- 영문판 — tools/build-en.mjs 가 한글판에서 만든 파일이다. 여기를 고치지 말고 한글판을 고친 뒤 다시 만든다. -->
   <style>html:not(.i18n-ready) body { visibility: hidden; }</style>
-  <link rel="stylesheet" href="../assets/css/i18n-en.css" />
-  <script src="../assets/js/i18n-en-dict.js"></script>
-  <script src="../assets/js/i18n-en.js"></script>
+  <link rel="stylesheet" href="../assets/css/i18n-en.css?v=cd720ab1" />
+  <script src="../assets/js/i18n-en-dict.js?v=0ac78c28"></script>
+  <script src="../assets/js/i18n-en.js?v=9f2969ec"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>v6 · 통합 관제 메인 — APRISM</title>
   <meta name="description" content="v2.2 — 화면 전체가 미션 하나를 본다. 최신 알림 · 로봇 패널 · 지도 층이 상단 미션 고르기를 따른다" />
@@ -42,7 +42,6 @@
   <link rel="stylesheet" href="../assets/css/v5.css?v=aefc22b4" />
   <!-- v6 전용 규칙 — v5 는 10/30 부로 멈췄다. v6 에서 바꾸는 것은 여기(body.ver-6)에. -->
   <link rel="stylesheet" href="../assets/css/v6.css?v=6ce16336" />
-  <link rel="stylesheet" href="../assets/css/v7.css?v=b3aa0656" />
   <!-- 지도 경로 표현 규칙(10/28 반영, 지도 경로 표현 전달서 1022) — 경로 네 구간 · 흐름 빛 · 번호 핀 · 시야 빔 로봇 · 충전 스테이션 · 아래 상태 시뮬레이션 막대 -->
   <link rel="stylesheet" href="../assets/css/route-rules.css?v=bd91ee52" />
   <style>
@@ -67,7 +66,7 @@
      Delta 만 다른 시안이라 나머지 조건이 같아야 둘을 나란히 놓고 고를 수 있다.
      주소 끝 #normal · #few · #warning 으로 다른 단계도 볼 수 있다. -->
 <!-- data-route-rules — 지도 경로 표현 규칙(map-v3.js · route-rules.css · route-sim.js)을 쓰는 화면. screen.js 가 Robot 11 웨이포인트 20칸 더미를 고른다. -->
-<body class="v2 v3 v2-2 ver-3 ver-5 ver-6 ver-7" data-level="critical" data-delta-copy="brief" data-mission-scope data-route-rules>
+<body class="v2 v3 v2-2 ver-3 ver-5 ver-6" data-level="critical" data-delta-copy="brief" data-mission-scope data-route-rules>
 
 <!-- Robot Dog Walk 리그(assets/robot-dog/ 핸드오프)의 공용 defs — 카드 썸네일이 url(#rd-*) 로 참조한다. -->
 <svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute" xmlns="http://www.w3.org/2000/svg">
@@ -270,11 +269,8 @@
           <div class="ah-head">
             <!-- 제목은 아래 "오늘 확인 완료" 와 같은 Title/2 다 — 같은 패널의 형제 칸이다(v2.2 위계 정리).
                  제목 줄은 이름 + 이동만. 정렬 안내는 목록을 다루는 거르기 줄로 내려갔다. -->
-            <!-- [11/06 디자이너 v7] "최신 알림" → "미조치 알림" — 알림 센터 탭 이름(미조치 알림 / 조치 요청된 알림)과 같은 말, 버튼 [조치 요청]과 같은 "조치" -->
-            <h2 class="t-title-2" id="ah-title">미조치 알림</h2>
-            <!-- [11/06 디자이너 v7] [알림 센터 ›]는 알림 목록 바로 위 — 패널 머리줄(관제)은 GNB 자리라 알림 링크만 떠 보였다.
-                 이름이 가는 곳(알림 센터 = 미조치 · 조치 요청된 두 탭)이라 "이 목록만의 전체"로 읽히지 않는다. 누르면 미조치 탭으로 연다 -->
-            <button type="button" class="btn btn-ghost is-xs ah-all" data-ah-all>알림 센터<span class="i i-16" style="--i:var(--ic-chevron-right)" aria-hidden="true"></span></button>
+            <h2 class="t-title-2" id="ah-title">최신 알림</h2>
+            <button type="button" class="btn btn-ghost is-xs ah-all" data-ah-all>전체보기</button>
           </div>
 
           <!-- 처리 필요 — 거르기(Button Small · 고른 것 Accent) · 정렬 · 목록 -->
@@ -296,15 +292,17 @@
           <!-- v3(10/21) — 접을 수 있다. 머리 줄 어디를 눌러도 접히고, 접으면 위 최신 알림이 그만큼 자란다(v3-panel.js). -->
           <section class="ah-sec done-sec" aria-labelledby="done-title" data-done-sec>
             <div class="done-head" data-done-head>
-              <!-- [11/06 디자이너] 머리를 예전 배치로 — 이름 · 건수(점) · 오른쪽 끝 접기. [전체보기]는 위 최신 알림 하나만.
-                   이름은 위 "미조치 알림"과 같은 위계(t-title-2 · 16) — 알림 센터 탭(미조치 알림 / 조치 요청된 알림)과 같은 이름 · 형제. 위 층은 패널 머리줄(관제 …… 알림 센터 ›).
-                   [11/06] "조치" 로 통일(버튼 [조치 요청]과 같은 말) — "완료"는 현장 결과가 돌아오는 다음 단계 몫이라 쓰지 않는다. 범위(오늘)는 제목 대신 건수 앞에(v7.css) -->
-              <h3 class="t-title-2" id="done-title">조치 요청된 알림</h3>
-              <span class="badge done-count t-caption"><span class="badge-dot"></span><span class="num" data-done-count>0건</span></span>
-              <button type="button" class="done-fold" data-done-fold
-                      aria-expanded="true" aria-controls="done-box" aria-label="조치 요청된 알림 접기">
-                <span class="i i-16" aria-hidden="true" style="--i:var(--ic-chevron-down)"></span>
-              </button>
+              <!-- [11/06] 이름 "오늘 확인 완료" → "오늘 확인된 알림". 위 최신 알림과 같은 위계라 [전체보기]도 같은 자리(오른쪽 끝) — 알림 센터 조치 요청됨 탭으로 연다.
+                   건수는 점 없이 글만, 접기 화살표와 붙여 제목 옆 한 덩어리. 머리 줄 어디를 눌러도 접히는 것은 그대로, [전체보기]만 예외. -->
+              <h3 class="t-title-2" id="done-title">오늘 확인된 알림</h3>
+              <span class="done-toggle">
+                <span class="done-count t-caption"><span class="num" data-done-count>0건</span></span>
+                <button type="button" class="done-fold" data-done-fold
+                        aria-expanded="true" aria-controls="done-box" aria-label="오늘 확인된 알림 접기">
+                  <span class="i i-16" aria-hidden="true" style="--i:var(--ic-chevron-down)"></span>
+                </button>
+              </span>
+              <button type="button" class="btn btn-ghost is-xs ah-all" data-ah-all="done">전체보기</button>
             </div>
             <div class="ah-box" id="done-box">
               <div class="ah-list" data-done-list role="list"></div>
@@ -390,7 +388,7 @@
                 <span class="ai-delta-mark delta3-orb" aria-hidden="true"><i></i></span>
                 <b>Delta</b>
               </span>
-              <button type="button" class="delta3-close" data-delta3-close aria-label="Delta 접기">
+              <button type="button" class="delta3-close" data-delta3-close aria-label="Delta 창 닫기">
                 <span class="i i-16" aria-hidden="true"></span>
               </button>
             </div>
@@ -429,15 +427,11 @@
                 <button type="button" class="icon-button" data-map-zoom-out aria-label="축소">
                   <span class="i i-20" style="--i:var(--ic-zoom-out)"></span>
                 </button>
-                <!-- [11/10 v7 · UT 개선 사용성 4a] 로봇 위치 — 지도 앱의 "내 위치"처럼 지금 보는 로봇에게 간다(다른 층이면 층부터). 아이콘은 전체 보기와 같은 네 모서리 틀 + 로봇(Figma 46:39) -->
-                <button type="button" class="icon-button" data-map-robot aria-label="로봇 위치로" title="로봇 위치로">
-                  <span class="i i-20" style="--i:var(--ic-robot-locate)"></span>
+                <button type="button" class="icon-button" data-map-track aria-label="전체 보기">
+                  <span class="i i-20" style="--i:var(--ic-target)"></span>
                 </button>
-                <button type="button" class="icon-button" data-map-track aria-label="전체 보기" title="전체 보기">
-                  <span class="i i-20" style="--i:var(--ic-fit-screen)"></span>
-                </button>
-                <button type="button" class="icon-button map-dim" data-map-top data-map-dim aria-label="2D로 보기" title="2D로 보기">
-                  <span class="map-dim-txt t-label-1" data-map-dim-txt>2D</span>
+                <button type="button" class="icon-button" data-map-top aria-label="탑뷰">
+                  <span class="i i-20" style="--i:var(--ic-eye)"></span>
                 </button>
                 <button type="button" class="icon-button is-secondary" aria-label="영상 리플레이">
                   <span class="i i-20" style="--i:var(--ic-play)"></span>
