@@ -2902,10 +2902,14 @@
     var right = toolsEl && toolsEl.offsetParent ? toolsEl.getBoundingClientRect().left - box.left - 12 : W - 12;
     var dr = deltaEl && deltaEl.getClientRects().length ? deltaEl.getBoundingClientRect() : null;
     var simEl = document.querySelector(".rsim"), sr = simEl && simEl.getClientRects().length ? simEl.getBoundingClientRect() : null;
+    // 눈에 보이는 우측 판 = .right-panel 과 그 겉 상자(.floating) 중 아래 끝이 더 낮은 쪽
     var panelEl = document.querySelector(".right-panel"), pr = panelEl && panelEl.getClientRects().length ? panelEl.getBoundingClientRect() : null;
-    var gap = pr ? Math.max(8, box.bottom - pr.bottom) : 16;
+    var panelOut = panelEl && panelEl.parentElement, po = panelOut && panelOut.getClientRects().length ? panelOut.getBoundingClientRect() : null;
+    if (pr && po && po.bottom > pr.bottom && po.bottom <= box.bottom) { pr = po; }
+    var gap = pr ? Math.max(0, box.bottom - pr.bottom) : 16;   // 우측 패널은 지도 칸 아래 끝에 붙어 있다(여백 0) — 최소 8 을 두면 카드만 8 떠 보였다
     var floor = H - gap;
-    if (sr) { floor = Math.min(floor, sr.top - box.top - 8); }
+    // 시안 리모콘(.rsim)이 펼쳐져 있을 때만 그 위에 선다 — 접히면 오른쪽 아래 작은 단추라 카드 줄(우측 패널 아래 끝)을 지킨다
+    if (sr && !simEl.classList.contains("is-folded")) { floor = Math.min(floor, sr.top - box.top - 8); }
     return {
       center: right / 2,
       top: dr ? Math.max(8, dr.top - box.top) : 16,
@@ -3044,8 +3048,10 @@
     var w = alertBox.offsetWidth, h = alertBox.offsetHeight;
     if (V7MA && !alertBox.classList.contains("is-docked")) {
       var rm = v7Room(W, H), hw = w / 2;
-      var ccx = Math.max(12 + hw, rm.center);
-      var cardTop = rm.floor - h;
+      // 자리 셈은 지도 칸(hit) 기준이지만 카드는 제 부모(.map-canvas) 기준으로 선다 — 두 상자의 어긋남을 더해 우측 패널 아래 끝과 정확히 맞춘다
+      var hb0 = hit.getBoundingClientRect(), op = alertBox.offsetParent ? alertBox.offsetParent.getBoundingClientRect() : hb0;
+      var ccx = Math.max(12 + hw, rm.center) + (hb0.left - op.left);
+      var cardTop = rm.floor - h + (hb0.top - op.top);
       alertBox.classList.remove("is-side-r", "is-side-l", "is-below");
       alertBox.classList.add("is-fixed", "is-no-tail");
       alertBox.style.setProperty("--x", snapPx(ccx));
