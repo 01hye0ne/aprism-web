@@ -1069,3 +1069,6 @@ body.ver-7 .rc-box .progress-fill::before {
   background-image: linear-gradient(90deg, rgb(40 100 200 / 40%) 0%, rgb(20 150 190 / 32%) 30%, rgb(120 80 210 / 30%) 62%, rgb(40 100 200 / 40%) 100%);
 }
 @media (prefers-reduced-motion: reduce) { body.ver-7 .rc-box .progress-fill::before { animation: none; } }
+
+/* [11/12 디자이너] 로봇 카드 진행 글 칸 바탕 = 웨이포인트 머리(.rr-wp-head)와 같은 bg/raised(예전 bg/cell — 한 단 어두웠다) */
+:root[data-theme] body.ver-7 .rc-box .progress-meta { background-color: var(--bg-raised); }
