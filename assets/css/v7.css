@@ -637,3 +637,7 @@ body.ver-7.ver-6.v2-2.v3 .delta3.is-open .delta3-card { overflow: hidden; }   /*
 body.ver-7.d3-wide.v2-2.v3 .delta3:not(.is-open) { width: calc(526px + var(--space-20) * 2); height: calc(128px + var(--space-20) * 2); }
 :root[data-theme][data-delta][data-glow] body.ver-7.d3-wide.v2-2.v3 .delta3:not(.is-open) .delta3-card { width: 526px; height: 128px; }
 body.ver-7.d3-wide.v2-2.v3 .delta3:not(.is-open) .delta3-name { width: 526px; }
+
+/* [11/11 디자이너] Delta 요약 속 번호 원(.dl-wp 22)이 1배율에서 왼쪽 · 아래 테가 잘려 보였다 — 원의 끝이 요약 칸(.ai-line-2, overflow hidden)의 잘라내는 경계와 딱 붙어서.
+ *   칸 안쪽에 2 여유(padding)를 주고 같은 만큼 바깥 여백(margin)으로 되돌려 글 자리는 그대로. 위젯형 · 가로형 모두 */
+:root[data-theme] body.ver-7.v2-2.v3 .delta3:not(.is-open) .delta3-body > .ai-line-2 { padding: 2px; margin: -2px; }
