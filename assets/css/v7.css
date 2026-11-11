@@ -521,3 +521,5 @@ body.ver-7 .rc-box .progress-meta:has(> .rr-banner) { flex-wrap: wrap; }
 body.ver-7 .rc-box .progress-meta:has(> .rr-banner) .progress-titles { order: 3; flex-basis: 100%; }
 /* [11/11 디자이너] 로봇 그래픽 좌우 반전 — 머리가 오른쪽(정보 칸 쪽)을 본다. Figma 1068:16438 Robot-grahpics 와 같은 방향 */
 body.ver-7 .robot-strip.is-carousel .robot-thumb > svg { transform: scaleX(-1); }
+/* [11/11 디자이너 · Figma 1068:16446 List] 로봇 카드 상자 테두리 — 1px 안쪽 · border/divider. 안쪽 Progress Bar 아래 모서리는 상자(overflow hidden)가 자른다 */
+body.ver-7 .rc-box { border: var(--border-width-thin, 1px) solid var(--border-divider); }
