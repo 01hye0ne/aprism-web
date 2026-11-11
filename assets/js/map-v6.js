@@ -2307,6 +2307,8 @@
       var wk = tone === "upcoming" ? "ring" : "full", ws = 15;
       if (RR.wpExcept && tone === "safe") { wk = "disc"; ws = 7; }   // route-rules — 지나온 정상 지점은 작은 점
       if (RR.wpExcept && (tone === "caution" || tone === "danger")) { wk = "tri"; ws = 18; }   // 주의 · 위험은 세모
+      var alertDot = document.body.classList.contains("ver-7") && (tone === "caution" || tone === "danger");
+      if (alertDot) { wk = "disc"; ws = 7; }   // [11/11 v7 디자이너] 주의 · 위험도 세모 대신 바닥 작은 점(위험 단계 색) — 번호 핀이 단계를 말한다
       if (RR.wpExcept && tone === "upcoming") { ws = 12; }   // 예정 — 작은 회색 고리(시안 r5.5)
       if (RR.ahead === "C4" && tone === "upcoming") { wk = "disc"; ws = 5; }   // [10/22 실험 C4] 납작한 지점 — 선 안의 바닥색 점
       if (tone === "skipped") { wk = "dash"; ws = 11; }   // 건너뜀 — 점선 고리(자동복귀)
@@ -2319,7 +2321,7 @@
       if (RR.ahead === "C4" && tone === "upcoming") { wc = isLight() ? 0xf2f4f7 : 0x141b27; }
       var mark = (RR.floorMarks && wk !== "tri") ? floorStops(bucket[key], wc, wk, ws) : stopDots(bucket[key], wc, wk, ws);
       mark.userData.floor = key.split("|")[0];
-      mark.userData.tone = wk === "disc" ? null : tone;   // 테마가 바뀌면 applyTheme 이 이 이름으로 다시 칠한다(길색 점은 길을 다시 깔 때 칠한다)
+      mark.userData.tone = (wk === "disc" && !alertDot) ? null : tone;   // 테마가 바뀌면 applyTheme 이 이 이름으로 다시 칠한다(길색 점은 길을 다시 깔 때 칠한다)
       scene.add(mark);
       wpMarks.push(mark);
       // [10/29] 다음 지점 — 표식 아래 바닥에 은은한 빛. 주의 · 위험 지점의 빛은 뺐다(10/30 클라이언트 피드백 "위험/주의 지점 라이팅 없애 주세요")
@@ -4368,6 +4370,7 @@
         else if (measuring) { head.style.background = col; head.style.borderColor = "#FFFFFF"; head.style.color = "#FFFFFF"; }
         else if (next) { head.style.background = "#FFFFFF"; head.style.borderColor = col; head.style.color = col; }
         else if (past) { head.style.background = C.bg; head.style.borderColor = col; head.style.color = col; }
+        else if ((cau || dan) && document.body.classList.contains("ver-7")) { head.style.background = "#0A0F18"; head.style.borderColor = col; head.style.color = col; }   // [11/11 v7 디자이너] 주의 · 위험 핀 = 검정 속 + 단계 색 테 · 번호
         else if (cau || dan) { head.style.background = col; head.style.borderColor = C.bg; head.style.color = cau ? "#1A1300" : "#FFFFFF"; }
         else if (document.body.classList.contains("ver-7")) { head.style.background = C.bg; head.style.borderColor = "var(--pin-plain)"; head.style.color = "var(--text-secondary)"; el.style.setProperty("--pin", "var(--pin-plain)"); }   // [11/10 v7 디자이너] 기본 핀 테 = 층 꼬리표 바탕보다 한 단계 밝은 회색(v7.css --pin-plain), 막대도 같은 색, 숫자 = 보조 글자색
         else { head.style.background = C.bg; head.style.borderColor = light ? "rgb(11 14 19 / 24%)" : "#AFB7C8"; head.style.color = light ? "#494E54" : "#E4E8EF"; }
