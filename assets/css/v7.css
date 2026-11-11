@@ -953,3 +953,6 @@ body.ver-7.ver-3.v2-2.v3 .delta3 .delta3-close:hover { background-color: rgb(255
 :root[data-theme="light"] body.ver-7 .delta3 .dchat-dock:hover { background-color: rgb(0 0 0 / 5%); }
 :root[data-theme="light"] body.ver-7 .delta3 .dchat-dock[aria-pressed="true"] { border-color: rgb(0 0 0 / 10%); background-color: rgb(255 255 255 / 70%); }
 :root[data-theme="light"] body.ver-7.ver-3.v2-2.v3 .delta3 .delta3-close:hover { background-color: rgb(0 0 0 / 6%); }
+/* [11/11 디자이너] 판단 근거 상자 바탕 = 알림 목록 바탕(--bg-inset) — 팝오버 면보다 한 단 어둡게 */
+body.ver-7 .ma-ins-sec { background-color: var(--bg-inset); }
+body.ver-7 .ma-ins-pt { fill: var(--bg-inset); }
