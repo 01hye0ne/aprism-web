@@ -107,6 +107,9 @@
     var tools = document.querySelector(".map-canvas > .map-tools");
     var tb = tools && tools.getClientRects().length ? tools.getBoundingClientRect() : null;
     var panel = document.querySelector(".right-panel"), pb = panel && panel.getClientRects().length ? panel.getBoundingClientRect() : null;
+    // [11/11] 웨이포인트를 접으면 우측 패널(.right-panel)이 짧아진다 — 오브가 따라 올라가지 않게 늘 전체 높이인 겉 상자(.floating) 아래 끝을 쓴다
+    var pOut = panel && panel.parentElement, pob = pOut && pOut.getClientRects().length ? pOut.getBoundingClientRect() : null;
+    if (pb && pob && pob.bottom > pb.bottom && pob.bottom <= sb.bottom) { pb = pob; }
     var r = tb ? Math.max(8, sb.right - tb.right) : 16;
     var b = pb ? Math.max(8, sb.bottom - pb.bottom) : 16;
     stage.style.setProperty("--dchat-r", Math.round(r) + "px");

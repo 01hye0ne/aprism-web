@@ -705,7 +705,7 @@ body.ver-7 .rr-wp-head > .rr-wp-toggle { display: flex; align-items: center; gap
 body.ver-7 .rr-wp-head .rr-wp-t { font-size: var(--font-size-16); line-height: var(--font-line-height-24); font-weight: var(--font-weight-bold); }
 body.ver-7 .rr-wp-head .rr-wp-n { font-size: var(--font-size-14); line-height: var(--font-line-height-20); font-weight: var(--font-weight-medium, 500); font-variant-numeric: tabular-nums; }
 body.ver-7 .rr-wp-head > .rr-wp-toggle::after { width: 20px; height: 20px; margin-left: auto; color: var(--text-secondary); background-color: var(--text-secondary); transform: none; }
-body.ver-7 .rr-wp-head > .rr-wp-toggle[aria-expanded="false"]::after { transform: rotate(-90deg); }
+body.ver-7 .rr-wp-head > .rr-wp-toggle[aria-expanded="false"]::after { transform: rotate(180deg); }   /* [11/11 디자이너] 접힘 = [∧](위로 펴진다) · 펼침 = [∨] — 예전 [>] */
 body.ver-7 .rr-wp-seg { display: flex; gap: 2px; padding: 2px; border-radius: var(--radius-4); background-color: var(--bg-map-chip); }
 body.ver-7.rr-wp-closed .rr-wp-seg { display: none; }
 body.ver-7 .rr-wp-seg > button { flex: 1 1 0; height: 24px; padding: 0 var(--space-8); border: 1px solid transparent; border-radius: var(--radius-4); background: none; color: var(--comp-button-ghost-text-default); font: inherit; font-size: var(--font-size-13); line-height: var(--font-line-height-18); font-weight: var(--font-weight-medium, 500); cursor: pointer; }
