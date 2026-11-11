@@ -591,4 +591,6 @@ body.ver-7 .ma-req [data-req-undo] { font-variant-numeric: tabular-nums; }
  *   지점 카드도 bg/cell 이라 상자와 붙어 버린다 — 카드는 한 단 위 bg/raised(다크 gray/700 · 라이트 흰)로 올린다. 지금 카드(어두운 면)는 그대로 */
 body.ver-7 .rr-wp-toggle,
 body.ver-7 .right-panel .timeline { background-color: var(--bg-cell); box-shadow: none; }
-:root[data-theme] body.ver-7 .right-panel .timeline .timeline-item:not(.is-running) .step-card { background-color: var(--bg-raised); }
+/* [11/11 디자이너 2차] 안쪽 목록 상자는 예전 어두운 반투명(--bg-well = bg/map-chip · 라이트 gray/300 + 안쪽 그림자)으로 되돌린다 — 머리 줄만 bg/cell.
+ *   카드도 예전 면(bg/cell)으로 — 위에서 카드를 bg/raised 로 올렸던 건 상자와 붙지 않게 하려던 것이라 함께 되돌린다 */
+body.ver-7 .right-panel .timeline { background-color: var(--bg-well); box-shadow: var(--shadow-well); }
