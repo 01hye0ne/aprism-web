@@ -871,3 +871,29 @@ body.dchat-popup { height: 100%; margin: 0; overflow: hidden; background-color: 
 }
 /* [11/11 디자이너] 로고를 오른쪽 탭 글자 줄에 맞춰 6px 내림 — 워드마크 가운데(28) → 탭 글자 몸통 가운데(34, '전체 미션' · 'M1' 실측) */
 body.ver-7 .status-bar-logo .i { transform: translateY(6px); }
+
+/* [11/11 v7 디자이너] 좌측 패널 폭 340 → 320 — 우측 패널(320)과 같은 폭(지도를 가운데 둔 대칭) · 8px 배수(340 은 42.5×8).
+ *   탭끼리 열 너비 통일(10/29) 그대로 — 관제 · 전체 미션(--lp-w) · 미션 설정 · 사전 점검(.sian) · 안전진단(.sf) · 보고서(.rp-body) 같이.
+ *   320 이면 거르기 줄(버튼 셋 190 + 정렬 84 + 좌우 24 = 298)과 알림 제목 한 줄이 그대로 들어간다.
+ *   1600 이하에서 우측 패널이 308 로 줄 때(app-shell.css) 좌측도 308 — 대칭 유지 */
+body.ver-7.v2 { --lp-w: 320px; }
+body.ver-7.sian .context-panel:not(.is-collapsed) { flex-basis: 320px; }
+body.ver-7.sian .lp-body { width: 320px; }
+body.ver-7 .sf { grid-template-columns: 320px minmax(0, 1fr); }
+body.ver-7 .rp-body { grid-template-columns: 320px minmax(0, 1fr); }
+@media (max-width: 1600px) {
+  body.ver-7.v2 { --lp-w: 308px; }
+  body.ver-7.sian .context-panel:not(.is-collapsed) { flex-basis: 308px; }
+  body.ver-7.sian .lp-body { width: 308px; }
+  body.ver-7 .sf, body.ver-7 .rp-body { grid-template-columns: 308px minmax(0, 1fr); }
+}
+
+/* [11/11 디자이너] Delta 번호 원(.dl-wp) = 지도 위험 · 주의 핀 머리(map-v6.js rrPins v7 분기)와 같은 꼴 — 채움 원 → 속 비운 단계색 테 + 단계색 숫자.
+ *   다크: 속 #0A0F18 · 테/숫자 위험 #FF383C · 주의 #FFCC00 / 라이트: 속 #FFFFFF · 테 위험 #FF383C · 주의 #F2A900, 숫자 주의만 #8A6100(대비)
+ *   Delta 창(요약 · 대화 답) · 챗봇형 말풍선 모두 */
+:root[data-theme] body.ver-7 .delta3 .dl-wp[data-sev], :root[data-theme] body.ver-7 .dchat-l2 .dl-wp[data-sev] { border: 2px solid; background-color: #0A0F18; }
+:root[data-theme] body.ver-7 .delta3 .dl-wp[data-sev="critical"], :root[data-theme] body.ver-7 .dchat-l2 .dl-wp[data-sev="critical"] { border-color: #FF383C; background-color: #0A0F18; color: #FF383C; }
+:root[data-theme] body.ver-7 .delta3 .dl-wp[data-sev="warning"], :root[data-theme] body.ver-7 .dchat-l2 .dl-wp[data-sev="warning"] { border-color: #FFCC00; background-color: #0A0F18; color: #FFCC00; }
+:root[data-theme="light"] body.ver-7 .delta3 .dl-wp[data-sev], :root[data-theme="light"] body.ver-7 .dchat-l2 .dl-wp[data-sev] { background-color: #FFFFFF; }
+:root[data-theme="light"] body.ver-7 .delta3 .dl-wp[data-sev="critical"], :root[data-theme="light"] body.ver-7 .dchat-l2 .dl-wp[data-sev="critical"] { border-color: #FF383C; background-color: #FFFFFF; color: #FF383C; }
+:root[data-theme="light"] body.ver-7 .delta3 .dl-wp[data-sev="warning"], :root[data-theme="light"] body.ver-7 .dchat-l2 .dl-wp[data-sev="warning"] { border-color: #F2A900; background-color: #FFFFFF; color: #8A6100; }
