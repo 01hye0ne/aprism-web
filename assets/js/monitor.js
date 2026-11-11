@@ -1443,6 +1443,7 @@
       fill(a);
       box.setAttribute("data-wp", a.wp);
       box.hidden = false;
+      if (V7) { maSlide(true); }   // [11/11 디자이너] 왼쪽에서 오른쪽으로 들어온다
       pointAt(a.wp);
       opening = false;
       render();
@@ -1547,6 +1548,21 @@
      *   ③ 아래 단추 [되돌리기 5초](토스트 대신 · 5초 뒤 [진단 상세]) · [다음 위험 →](없으면 [닫기])
      *   위험 배지 · 빨강은 그대로 — 요청은 해결이 아니다(위험도 정책). 기록 · 목록 이동은 바로(commit, 토스트 없이)
      */
+    /*
+     * [11/11 v7 디자이너] 팝오버 들고 나기 — 들어올 때 왼쪽 → 오른쪽(24px · 0.28초), [확인함]으로 나갈 때 오른쪽 → 왼쪽(32px · 0.22초).
+     *   자리(transform)는 지도 스크립트가 쥐고 있어 따로 도는 translate 속성으로 민다. 동작 줄이기면 바로 나타나고 사라진다
+     */
+    var maAnim = null;
+    function maSlide(enter, done) {
+      if (maAnim) { maAnim.cancel(); maAnim = null; }
+      var still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (still || !box.animate) { if (done) { done(); } return; }
+      maAnim = enter
+        ? box.animate([{ translate: "-24px 0", opacity: 0 }, { translate: "0 0", opacity: 1 }], { duration: 280, easing: "cubic-bezier(.2, .8, .2, 1)" })
+        : box.animate([{ translate: "0 0", opacity: 1 }, { translate: "-32px 0", opacity: 0 }], { duration: 220, easing: "cubic-bezier(.4, 0, 1, 1)", fill: "forwards" });
+      var a = maAnim;
+      a.onfinish = function () { if (maAnim === a) { maAnim = null; } if (done) { done(); } if (!enter) { a.cancel(); } };
+    }
     var reqBox7 = null, reqTimer7 = 0, reqTick7 = 0, reqA7 = null;   // reqA7 — 요청한 알림. 목록에서 빠지면 render() 가 picked 를 비우므로 따로 든다
     function reqReset7() {
       clearTimeout(reqTimer7); clearInterval(reqTick7);
@@ -1574,7 +1590,8 @@
           reqReset7();
           if (p) { picked = p; fill(p); syncConfirm(); render(); }
         });
-        $("[data-req-ok]", reqBox7).addEventListener("click", function () { reqReset7(); close(); });
+        // [11/11 디자이너] [확인함] — 판이 왼쪽으로 빠지며 사라진 뒤 닫는다
+        $("[data-req-ok]", reqBox7).addEventListener("click", function () { maSlide(false, function () { reqReset7(); close(); }); });
       }
       var S7t = window.APRISM_ALERTS7, to = S7t && S7t.req.to ? S7t.req.to(a).text : "현장 작업자";
       $(".ma-req-to", reqBox7).textContent = to + "에게 조치 요청됨";

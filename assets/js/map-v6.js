@@ -2964,6 +2964,7 @@
       floor: floor
     };
   }
+  var reqTopY = null;   // [11/11] 조치 요청됨 판의 위 끝(placeAlert)
   var MA_FOLD = 330;      // [11/11] 팝오버가 머리 한 줄로 접히는 남은 높이 — 머리 42 + 사진 최소 80 + 아래 칸 약 208
   var alertSide = "";     // [11/05] 옆으로 세운 쪽 — "r" 점 오른쪽 · "l" 왼쪽(placeAlert)
   var alertAim = false;   // 쪽지를 열고 카메라가 점을 찾아가는 중
@@ -3152,6 +3153,11 @@
       var opEl = alertBox.offsetParent;
       var ccx = (dRect ? dRect.left : hb0.left + rm.left) - op.left - (opEl ? opEl.clientLeft : 0) + w / 2;
       var cardTop = rm.floor - h + (hb0.top - op.top);
+      // [11/11 디자이너] "조치 요청됨" 판은 위 끝을 지킨다 — 줄어든 만큼 아래 끝이 올라간다(예전엔 아래 끝에 붙어 아래로 모였다)
+      if (alertBox.classList.contains("is-requested")) {
+        if (reqTopY === null) { var py = parseFloat(alertBox.style.getPropertyValue("--y")); reqTopY = isNaN(py) ? cardTop : py; }
+        cardTop = Math.min(reqTopY, cardTop);   // 판이 바닥을 넘으면 그만큼만 올린다
+      } else { reqTopY = null; }
       alertBox.classList.remove("is-side-r", "is-side-l", "is-below");
       alertBox.classList.add("is-fixed", "is-no-tail");
       alertBox.style.setProperty("--x", snapPx(ccx));
