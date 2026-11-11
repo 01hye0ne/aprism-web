@@ -8,7 +8,7 @@
 - 둥근 획(P·R 볼, S, D)은 바깥 = 원(또는 원호), 속 = 같은 중심의 타원.
   타원 반지름 = 바깥 반지름 - 획 두께 (가로는 세로획 두께, 세로는 가로획 두께).
 
-실행: python tools/build-logo-svg.py  → assets/img/logo/*.svg
+실행: python tools/build-logo-svg.py  → assets/img/logo/*.svg (*-dark.svg = 어두운 배경용)
 """
 import math
 import os
@@ -18,6 +18,13 @@ OUT = os.path.join(os.path.dirname(__file__), '..', 'assets', 'img', 'logo')
 COLOR_BLACK = '#111111'   # CI 문서 Dark Gray/Black (이미지 값은 #000000)
 COLOR_BLUE = '#004893'    # CI 문서 Deep Blue (이미지 값은 #2C5790)
 COLOR_GRAY = '#7D848C'    # CI 문서 Cool Gray (이미지 값은 #D9D9D9)
+
+# 어두운 배경용(11/11). 문서 색은 어두운 바탕에서 묻혀서(Deep Blue 2.1:1),
+# 같은 색상(hue)을 유지한 채 밝기만 올렸다. 관제 어두운 바탕 3단
+# (gray-950 #070A10 · gray-800 #202838 · gray-750 #2C3443) 모두에서 4.5:1 이상.
+COLOR_WHITE_DARK = '#FFFFFF'   # 글자 (12.5:1 ~)
+COLOR_BLUE_DARK = '#4DA4FF'    # Deep Blue 밝힘 (4.8 · 5.7 · 7.6:1)
+COLOR_GRAY_DARK = '#A0A5AB'    # Cool Gray 밝힘 (5.0 · 6.0 · 8.0:1)
 
 
 class Pen:
@@ -194,7 +201,7 @@ def svg(w, h, parts, title):
             f'<title>{title}</title>{body}</svg>\n')
 
 
-def build_aprism():
+def build_aprism(ink=COLOR_BLACK):
     d = A_DELTA
     x0 = d['cx'] - (d['base_y'] - d['apex_y']) * d['k']
     y0 = d['apex_y']
@@ -202,10 +209,10 @@ def build_aprism():
     delta(p, **d)
     for g in (glyph_P, glyph_R, glyph_I, glyph_S, glyph_M):
         g(p)
-    return svg(1099.31 - x0, A_B - y0, [(COLOR_BLACK, p.path())], 'APRISM')
+    return svg(1099.31 - x0, A_B - y0, [(ink, p.path())], 'APRISM')
 
 
-def build_delta():
+def build_delta(ink=COLOR_BLACK):
     d = D_DELTA
     x0, y0 = 685.5, d['apex_y']
     x1 = d['cx'] + (d['base_y'] - d['apex_y']) * d['k']
@@ -213,10 +220,10 @@ def build_delta():
     for g in (glyph_D, glyph_E, glyph_L, glyph_T):
         g(p)
     delta(p, **d)
-    return svg(x1 - x0, D_B - y0, [(COLOR_BLACK, p.path())], 'DELTA')
+    return svg(x1 - x0, D_B - y0, [(ink, p.path())], 'DELTA')
 
 
-def build_aprism_blue():
+def build_aprism_blue(blue=COLOR_BLUE, gray=COLOR_GRAY):
     """파란 Δ + 회색 PRISM. Δ 는 APRISM 의 Δ 와 같은 크기,
     PRISM 은 APRISM 글자를 0.3512 배로 줄여 Δ 밑변에 기준선을 맞춘다."""
     d = A_DELTA
@@ -232,13 +239,16 @@ def build_aprism_blue():
     for g in (glyph_P, glyph_R, glyph_I, glyph_S, glyph_M):
         g(txt)
     w = px + (1099.31 - 528.07) * s
-    return svg(w, by, [(COLOR_BLUE, tri.path()), (COLOR_GRAY, txt.path())], 'APRISM')
+    return svg(w, by, [(blue, tri.path()), (gray, txt.path())], 'APRISM')
 
 
 if __name__ == '__main__':
     os.makedirs(OUT, exist_ok=True)
     for name, fn in (('aprism.svg', build_aprism), ('delta.svg', build_delta),
-                     ('aprism-blue.svg', build_aprism_blue)):
+                     ('aprism-blue.svg', build_aprism_blue),
+                     ('aprism-dark.svg', lambda: build_aprism(COLOR_WHITE_DARK)),
+                     ('delta-dark.svg', lambda: build_delta(COLOR_WHITE_DARK)),
+                     ('aprism-blue-dark.svg', lambda: build_aprism_blue(COLOR_BLUE_DARK, COLOR_GRAY_DARK))):
         with open(os.path.join(OUT, name), 'w', encoding='utf-8') as f:
             f.write(fn())
         print('wrote', os.path.normpath(os.path.join(OUT, name)))
