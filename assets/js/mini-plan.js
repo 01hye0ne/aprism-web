@@ -65,7 +65,8 @@
     for (var j = 0; j < o.n; j += 1) {
       var q = pos2(L, L.sAt[j]), mk = o.marks && o.marks[j];
       var t = "translate(" + q.x.toFixed(1) + "," + q.y.toFixed(1) + ")" + (o.land ? " rotate(90)" : "");
-      if (mk) { g += '<path transform="' + t + '" class="mp-' + (mk === "crit" ? "c" : "w") + '" d="M0 ' + u(-4.4) + " " + u(4.2) + " " + u(2.8) + " " + u(-4.2) + " " + u(2.8) + 'Z" stroke-width="' + u(0.9) + '" stroke-linejoin="round"/>'; }
+      if (mk && o.dots) { g += '<circle transform="' + t + '" class="mp-' + (mk === "crit" ? "c" : "w") + '" r="' + u(3) + '" stroke-width="' + u(0.9) + '"/>'; }   // [11/11 v7] 위험 · 주의 = 단계 색 점(관제 지도 · 목록과 같은 말)
+      else if (mk) { g += '<path transform="' + t + '" class="mp-' + (mk === "crit" ? "c" : "w") + '" d="M0 ' + u(-4.4) + " " + u(4.2) + " " + u(2.8) + " " + u(-4.2) + " " + u(2.8) + 'Z" stroke-width="' + u(0.9) + '" stroke-linejoin="round"/>'; }
       else if (j < done) { g += '<circle transform="' + t + '" class="mp-ok" r="' + u(2.2) + '"/>'; }
       else { g += '<circle transform="' + t + '" class="mp-plan" r="' + u(2.4) + '" stroke-width="' + u(1) + '"/>'; }
     }

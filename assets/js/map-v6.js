@@ -4075,13 +4075,44 @@
    *   미션 완료로 들어오면 접고, 다른 상태로 나가면 편다. 접히면 우측 패널 바탕도 같이 줄어든다(v6.css .rr-wp-closed).
    *   상태 이름(route-sim.js .rr-banner)은 목록 앞이 아니라 진행 제목 줄(.progress-meta) 제목 자리에 놓는다. 오른쪽 % 는 그대로 남는다.
    */
-  var wpTog = null;
+  var wpTog = null, wpHead = null, wpNum = null, wpMini = null, wpView = "list";
+  /*
+   * [11/11 v7 디자이너 · Figma UI_00 1736:14747] 지점 상자 머리 = "웨이포인트 7/20" + 접기 꺾쇠, 아래 [지도] [목록] 전환.
+   *   목록 = 지금 지점 카드 목록, 지도 = 이 층 평면 미니맵(mini-plan.js — 안전진단 · 전체 미션과 같은 그림, 위험 · 주의는 단계 색 점)
+   */
+  var WP_MIS = { "0": "정기 순회 점검", "3": "야간 순회 점검", "4": "발전기실 설비 점검", "6": "공조 설비 순회", "8": "유틸리티 순회", "10": "전기실 열화상 점검" };
+  function wpMiniDraw() {
+    if (!wpMini || wpView !== "map" || !window.APRISM_MINI) { return; }
+    var rail = document.querySelector(".right-panel [data-timeline]");
+    var items = rail ? Array.prototype.slice.call(rail.querySelectorAll(".timeline-item[data-waypoint]")) : [];
+    var flBtn = document.querySelector(".map-floor[aria-pressed='true']"), fl = flBtn ? flBtn.getAttribute("data-map-floor") : "B4";
+    var mis = WP_MIS[activeRobot()] || "", R = window.APRISM_MINI_ROUTES && window.APRISM_MINI_ROUTES[mis];
+    if (R && !R[fl]) { fl = Object.keys(R)[0]; }
+    var part = R && R[fl] ? items.slice(R[fl].n0 - 1, R[fl].n0 - 1 + R[fl].sAt.length) : items;
+    var marks = {}, done = 0;
+    part.forEach(function (it, j) {
+      var al = it.getAttribute("data-wp-alert");
+      if (al) { marks[j] = /danger|crit/.test(al) ? "crit" : "warn"; }
+      if (it.classList.contains("is-done")) { done = j + 1; }
+    });
+    var run = part.filter(function (it) { return it.classList.contains("is-running"); }).length > 0;
+    wpMini.innerHTML = window.APRISM_MINI.svg({ mission: mis, floor: fl, n: part.length, done: done, robot: run, marks: marks, dots: true, kind: activeRobot() === "4" ? "wheel" : "spot", w: 300, label: (mis ? mis + " " : "") + fl + " 웨이포인트 지도" });
+  }
+  function wpViewSet(v) {
+    wpView = v;
+    document.body.classList.toggle("rr-wp-map", v === "map");
+    if (wpHead) { Array.prototype.forEach.call(wpHead.querySelectorAll("[data-wpv]"), function (b) { b.setAttribute("aria-selected", String(b.getAttribute("data-wpv") === v)); }); }
+    if (wpMini) { wpMini.hidden = v !== "map"; }
+    wpMiniDraw();
+  }
   function wpPlace() {
     var rail = document.querySelector(".right-panel [data-timeline]");
     if (!rail || !wpTog) { return; }
     var host = rail.parentNode, meta = host.querySelector(".mission-header .progress-meta") || document.querySelector(".right-panel .mission-header .progress-meta");   // [11/11 v7] 진행 막대는 로봇 카드 안
     Array.prototype.forEach.call(host.children, function (n) { if (n.classList.contains("rr-banner") && meta) { meta.insertBefore(n, meta.firstChild); } });
-    if (wpTog.nextElementSibling !== rail) { host.insertBefore(wpTog, rail); }
+    var node = wpHead || wpTog;
+    if (node.nextElementSibling !== rail) { host.insertBefore(node, rail); }
+    if (wpMini && wpMini.previousElementSibling !== rail) { rail.after(wpMini); }
   }
   function wpToggleSync() {
     var rail = document.querySelector(".right-panel [data-timeline]");
@@ -4093,14 +4124,39 @@
       wpTog.addEventListener("click", function () {
         wpTog.setAttribute("aria-expanded", String(!document.body.classList.toggle("rr-wp-closed")));
       });
+      if (document.body.classList.contains("ver-7")) {
+        wpHead = document.createElement("div");
+        wpHead.className = "rr-wp-head";
+        wpHead.appendChild(wpTog);
+        var seg = document.createElement("div");
+        seg.className = "rr-wp-seg"; seg.setAttribute("role", "tablist"); seg.setAttribute("aria-label", "웨이포인트 보기");
+        [["map", "지도"], ["list", "목록"]].forEach(function (o) {
+          var b = document.createElement("button");
+          b.type = "button"; b.setAttribute("role", "tab"); b.setAttribute("data-wpv", o[0]); b.textContent = o[1];
+          b.addEventListener("click", function () { wpViewSet(o[0]); });
+          seg.appendChild(b);
+        });
+        wpHead.appendChild(seg);
+        wpMini = document.createElement("div");
+        wpMini.className = "rr-wp-mini"; wpMini.hidden = true;
+        // 지점 목록 · 층이 바뀌면 지도도 다시 그린다
+        new MutationObserver(function () { wpMiniDraw(); }).observe(rail, { subtree: true, attributes: true, attributeFilter: ["class", "data-wp-alert"] });
+        document.addEventListener("click", function (e) { if (e.target.closest && e.target.closest(".map-floor, .robot-card")) { setTimeout(wpMiniDraw, 0); } });
+      }
       new MutationObserver(wpPlace).observe(rail.parentNode, { childList: true });
+      if (wpHead) { wpViewSet("list"); }
     }
     wpPlace();
     wpTog.textContent = "지점 " + rail.querySelectorAll(".timeline-item[data-waypoint]").length + "곳";
     // [11/10 v7 디자이너] 진행 막대 아래의 지나온 수(7/20)를 이 머리로 옮겨 하나로 — "지점 7/20"
     if (document.body.classList.contains("ver-7")) {
       var cnt = document.querySelector("[data-progress-count]"), ct = cnt ? cnt.textContent.trim() : "";
-      if (/^\d+\/\d+$/.test(ct)) { wpTog.textContent = (document.documentElement.lang === "en" ? "Waypoints " : "지점 ") + ct; }
+      if (/^\d+\/\d+$/.test(ct)) {
+        wpTog.textContent = "";
+        var t1 = document.createElement("span"); t1.className = "rr-wp-t"; t1.textContent = document.documentElement.lang === "en" ? "Waypoints" : "웨이포인트";
+        var t2 = document.createElement("span"); t2.className = "rr-wp-n num"; t2.textContent = ct;
+        wpTog.appendChild(t1); wpTog.appendChild(t2);
+      }
     }
     wpTog.setAttribute("aria-expanded", String(!document.body.classList.contains("rr-wp-closed")));
   }

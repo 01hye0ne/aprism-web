@@ -134,7 +134,7 @@
     return `<div class="dl is-light-scope is-dark-scope is-sent"><div class="hh"><span><span class="dlogo" aria-hidden="true"></span>DELTA 조치 제안</span></div><div class="ti">${sug[0]}</div>
         <div class="cks">${sug[1].map(([l, a2, to]) => `<label class="c1x"><input type="checkbox" disabled ${R.acts.includes(l) ? 'checked' : ''}><span><b>${l}</b><small>${to}</small></span>${a2 ? '<em class="ma-check-tag">AI 추천</em>' : ''}</label>`).join('')}</div>
         ${R.memo ? `<span class="mm">메모</span><p class="fd rq-memo">${R.memo.replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'})[c])}</p>` : ''}</div>
-      <button type="button" class="btn btn-accent rqx" disabled><span class="i i-16" style="--i:var(--ic-check)" aria-hidden="true"></span>${R.t} 요청 전송됨</button>
+      <button type="button" class="btn btn-accent rqx" disabled><span class="i i-16" style="--i:var(--ic-check)" aria-hidden="true"></span>${R.t} ${S7 ? '요청됨' : '요청 전송됨'}</button>
       <section class="rqp" aria-label="조치 진행"><div class="rqp-h"><b>조치 진행</b><span class="badge badge-mode ${RQ_BADGE[R.st]} rqp-b"><span class="badge-dot"></span>${RQ_WORD[R.st]}</span></div>
         <ol class="rqp-st is-${R.st}">${steps}</ol>
         ${R.st === 'work' ? '<button type="button" class="btn btn-secondary rqd" data-reqdone="1">조치 완료 확인</button>' : ''}</section>`;

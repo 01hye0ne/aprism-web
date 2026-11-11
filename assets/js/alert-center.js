@@ -266,7 +266,7 @@
     items: [
       ["조치", "오늘 6건 조치 · 위험 3건 · 평균 6분"],
       ["반복", "보호구 미착용 3회 (B3 작업구역 · T-3 계단). 작업 전 안내가 필요해 보여요"],
-      ["남은 위험", "미확인 위험 3건: WP-07 2건 · WP-02. 탱크 T-3 외벽 균열은 어제부터 남아 있어요"],
+      ["남은 위험", (document.body.classList.contains("ver-7") ? "조치 필요한 위험 3건" : "미확인 위험 3건") + ": WP-07 2건 · WP-02. 탱크 T-3 외벽 균열은 어제부터 남아 있어요"],
       ["다음 근무", "옥외 저장탱크 순찰(가스 농도 · 난간 개방) 묶음을 먼저 확인해 주세요"]
     ]
   };
@@ -1021,7 +1021,7 @@
     var doneCrit = countBy("critical", true), doneWarn = countBy("warning", true);
     var open = openCrit + openWarn, closed = doneCrit + doneWarn;
 
-    $("[data-ac-open-badge]").textContent = "미확인 " + open + "건";
+    $("[data-ac-open-badge]").textContent = (document.body.classList.contains("ver-7") ? "조치 필요 " : "미확인 ") + open + "건";   // [11/11 v7] 용어 통일 — 조치 필요
     $("[data-ac-count-open]").textContent = open + "건";
     $("[data-ac-count-done]").textContent = closed + "건";
 

@@ -218,6 +218,23 @@
   function thermBlk(id) { return { h: secH("th", "열화상 분석 결과") + '<div class="ft">' + f2("최고 온도", THERM[id][0], "고온감지", THERM[id][1]) + "</div></div>" }; }
   function opinionBlk(id) { return { h: secH("o", "종합 소견") + '<div class="ft">' + fl("소견", OPINION[id]) + "</div></div>" }; }
 
+  /*
+   * [11/11 v7 디자이너] 용어 통일 — "미조치" → "조치 필요"(관제 목록 · 알림 센터 탭과 같은 말). v7 보고서에서만, v6 이하는 그대로.
+   *   표 머리 · 칸 · 소견 문장이 모두 blocks · firstPage 를 거치므로 그 출구에서 바꾼다
+   */
+  if (document.body.classList.contains("ver-7")) {
+    var termFix = function (s) { return typeof s === "string" ? s.replace(/미조치/g, "조치 필요") : s; };
+    var blocks0 = blocks, firstPage0 = firstPage;
+    blocks = function (id) {
+      return blocks0(id).map(function (b) {
+        ["h", "open", "close", "row", "cOpen", "cClose"].forEach(function (k) { if (b[k]) { b[k] = termFix(b[k]); } });
+        if (b.rows) { b.rows = b.rows.map(termFix); }
+        return b;
+      });
+    };
+    firstPage = function (d) { return termFix(firstPage0(d)); };
+  }
+
   /* ---------- 쪽 나누기 — 종이 높이(1123)에서 위아래 여백 · 머리줄을 뺀 만큼 ---------- */
   var LIMIT = 1123 - 40 - 48 - 26 - 20;
   var measureBox = document.createElement("div");
