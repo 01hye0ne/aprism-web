@@ -1432,6 +1432,7 @@
     }
 
     function open(a) {
+      if (V7 && reqBox7 !== undefined) { reqReset7(); }
       opening = true;
       if (a.robot !== activeRobot()) {
         var card = $(".robot-strip .robot-card[data-robot='" + a.robot + "']");
@@ -1448,6 +1449,7 @@
     }
 
     function close() {
+      if (V7 && reqBox7 !== undefined) { reqReset7(); }
       closeZoom();
       if (box.hidden) { picked = null; return; }
       var wp = box.getAttribute("data-wp");
@@ -1523,7 +1525,7 @@
       ];
     }
 
-    function commit(a, rec) {
+    function commit(a, rec, quiet) {
       // fresh 를 내리는 일은 render() 한 곳이 맡는다 — 두 곳에서 손대면 어느 쪽이 늦는지에 따라 달라진다.
       DONE.unshift(rec);
       if (extra.indexOf(a) >= 0) { extra.splice(extra.indexOf(a), 1); } else { resolved.push(a); }
@@ -1535,8 +1537,80 @@
       else { hAdd(a, rec); }
       lastDone = { a: a, rec: rec };
       render();
-      showToast(a);
+      if (!quiet) { showToast(a); }
       busy = false;
+    }
+
+    /*
+     * [11/11 v7 디자이너] 조치 요청 피드백 — 쪽지를 날려 보내지 않고 그 자리에서 "조치 요청됨" 판으로 바꾼다.
+     *   ① 단추가 0.35초 "✓ 요청됨" → ② 아래 칸이 처리 과정(지점 팝오버와 같은 .mwp-steps: 알림 이유 + 고른 조치 → 현장 응답 대기)
+     *   ③ 아래 단추 [되돌리기 5초](토스트 대신 · 5초 뒤 [진단 상세]) · [다음 위험 →](없으면 [닫기])
+     *   위험 배지 · 빨강은 그대로 — 요청은 해결이 아니다(위험도 정책). 기록 · 목록 이동은 바로(commit, 토스트 없이)
+     */
+    var reqBox7 = null, reqTimer7 = 0, reqTick7 = 0, reqA7 = null;   // reqA7 — 요청한 알림. 목록에서 빠지면 render() 가 picked 를 비우므로 따로 든다
+    function reqReset7() {
+      clearTimeout(reqTimer7); clearInterval(reqTick7);
+      reqA7 = null;
+      box.classList.remove("is-requested");
+      if (reqBox7) { reqBox7.hidden = true; }
+      confirm.classList.remove("is-sent");
+      confirm.textContent = "조치 요청";
+    }
+    function nextAlert7() {
+      var list = $$(".ah-item").filter(function (n) { return n.getAttribute("aria-pressed") !== "true" && !n.classList.contains("is-selected"); });
+      return list.filter(function (n) { return n.classList.contains("is-critical"); })[0] || list[0] || null;
+    }
+    function reqShow7(a, rec, picks) {
+      if (!reqBox7) {
+        reqBox7 = el("div", "ma-req");
+        reqBox7.innerHTML =
+          '<div class="ma-req-head"><span class="ma-req-ok"><span class="i i-16" style="--i:var(--ic-check)" aria-hidden="true"></span>조치 요청됨</span><span class="ma-req-meta num"></span></div>' +
+          '<ol class="mwp-steps is-wait"><li class="is-past"><i aria-hidden="true"></i><div><span class="ms-l"></span><ul class="ms-acts"></ul><p class="ma-req-memo"></p></div></li>' +
+          '<li class="is-now" aria-current="step"><i aria-hidden="true"></i><div><span class="ms-l">현장 응답 대기</span><span class="ms-t num"></span></div></li></ol>' +
+          '<div class="ma-req-actions"><button type="button" class="btn btn-secondary" data-req-undo></button><a class="btn btn-secondary" data-req-more style="text-decoration:none">진단 상세</a><button type="button" class="btn btn-secondary" data-req-next></button></div>';
+        $(".ma-lower", box).appendChild(reqBox7);
+        $("[data-req-undo]", reqBox7).addEventListener("click", function () {
+          var p = reqA7;
+          undoLast();
+          reqReset7();
+          if (p) { picked = p; fill(p); syncConfirm(); render(); }
+        });
+        $("[data-req-next]", reqBox7).addEventListener("click", function () {
+          var nx = nextAlert7();
+          reqReset7();
+          if (nx) { nx.click(); } else { close(); }
+        });
+      }
+      var reason = $(".ma-reason", box);
+      $(".ma-req-meta", reqBox7).textContent = rec.time.slice(0, 5) + " · " + rec.who + " → 현장 작업자";
+      $(".is-past .ms-l", reqBox7).textContent = (reason && reason.textContent.trim()) || "기준 위반";
+      var acts = $(".ms-acts", reqBox7); acts.textContent = "";
+      picks.forEach(function (h) { var li = el("li"); li.textContent = h; acts.appendChild(li); });
+      var memo = $(".ma-req-memo", reqBox7); memo.textContent = rec.memo ? "메모 · " + rec.memo : ""; memo.hidden = !rec.memo;
+      $(".is-now .ms-t", reqBox7).textContent = rec.time.slice(0, 5);
+      var more = $("[data-req-more]", reqBox7), more0 = $("[data-ma-more]", box);
+      more.href = more0 ? more0.getAttribute("href") : "#"; more.hidden = true;
+      var undo = $("[data-req-undo]", reqBox7); undo.hidden = false;
+      var left = 5;
+      var tick = function () { undo.textContent = "되돌리기 " + left; };
+      tick();
+      reqTick7 = setInterval(function () { left -= 1; if (left > 0) { tick(); } }, 1000);
+      reqTimer7 = setTimeout(function () { clearInterval(reqTick7); undo.hidden = true; more.hidden = false; lastDone = null; }, 5000);
+      var nx = nextAlert7(), nb = $("[data-req-next]", reqBox7);
+      nb.textContent = nx ? (nx.classList.contains("is-critical") ? "다음 위험 →" : "다음 알림 →") : "닫기";
+      reqBox7.hidden = false;
+      box.classList.add("is-requested");
+    }
+    function sent7(a, rec, picks) {
+      confirm.classList.add("is-sent");
+      confirm.disabled = true;
+      confirm.innerHTML = '<span class="i i-16" style="--i:var(--ic-check)" aria-hidden="true"></span>요청됨';
+      setTimeout(function () {
+        commit(a, rec, true);
+        if (box.hidden || box.getAttribute("data-wp") !== (a.wp || "")) { reqReset7(); return; }
+        reqShow7(a, rec, picks);
+        reqA7 = a;
+      }, slow.matches ? 0 : 350);
     }
 
     confirm.addEventListener("click", function () {
@@ -1548,6 +1622,7 @@
 
       var rec = { wp: a.wp || "", time: clock(), title: window.APRISM_ALERT6 ? window.APRISM_ALERT6.title(a.title) : a.title, how: picks.join(" · "), who: "홍길동", fresh: true,
                   memo: memoField ? memoField.value.trim() : "" };
+      if (V7) { sent7(a, rec, picks); return; }
       var from = box.getBoundingClientRect();
       // 분신을 먼저 띄우고 진짜 쪽지를 닫는다 — 순서가 바뀌면 잴 자리가 사라진다.
       var flyer = box.cloneNode(true);
@@ -1608,8 +1683,7 @@
         });
     });
 
-    if (undoBtn) {
-      undoBtn.addEventListener("click", function () {
+    function undoLast() {
         if (!lastDone || busy) { return; }
         var a = lastDone.a, rec = lastDone.rec;
         var i = DONE.indexOf(rec);
@@ -1620,8 +1694,8 @@
         else { hDel(a); }
         hideToast();
         render();
-      });
     }
+    if (undoBtn) { undoBtn.addEventListener("click", undoLast); }
 
     // 단계를 바꾸면(주소 #…) 들고 있던 되돌리기도 버린다.
     document.addEventListener("aprism:monitor-reset", hideToast);
