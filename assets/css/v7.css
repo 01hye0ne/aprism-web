@@ -660,3 +660,20 @@ body.ver-7 .mwp-steps > li.is-now .ms-t { display: none; }
 
 /* [11/11 v7 디자이너] 지도 도구 2D · 3D 두 단추 — 영상 리플레이를 빼고 그 자리에 3D. 지금 보는 쪽이 계속 눌린 상태(aria-pressed, 위 규칙의 아이콘색).
  *   관제 · 가로형 · 미션 설정 · 사전 점검 같은 줄. 로직 map-v6.js(data-map-3d) */
+
+/* [11/11 v7 디자이너] 조치 요청 뒤 팝오버 = 줄인 판 — Figma UI_00 1733:14619 실측
+ *   남기는 것: 머리(배지 + 제목) · 받은 팀 · 사람 정보 상자 · [되돌리기 5] [확인함]. 사진 · 더보기 · 닫기는 감춘다([확인함]이 닫는다)
+ *   정보 상자: status/info bg · border 1 · 반경 4 · 안쪽 8/12 · 사이 4 — 받는 사람 16/24 bold info/text, 요청한 조치 14/22 info/text 80% (• 목록)
+ *   단추 줄: 둘 다 Small(32) 반반 — 되돌리기 = Secondary, 확인함 = Primary(inverse). 5초 뒤 되돌리기가 빠지면 확인함이 줄을 채운다 */
+body.ver-7 .map-alert.ma-v3.is-requested > .ma-snap,
+body.ver-7 .map-alert.ma-v3.is-requested > .ma-head .ma-more-box,
+body.ver-7 .map-alert.ma-v3.is-requested > .ma-head [data-ma-close] { display: none; }
+body.ver-7 .map-alert.ma-v3.is-requested > .ma-lower { padding-top: 0; }
+body.ver-7 .ma-req { gap: var(--space-8); }
+body.ver-7 .ma-req-head { gap: var(--space-4); padding: var(--space-8) var(--space-12); border: 1px solid var(--status-info-border); border-radius: var(--radius-4); background-color: var(--status-info-bg); box-shadow: none; }
+body.ver-7 .ma-req-to { margin: 0; color: var(--status-info-text); font-size: var(--font-size-16); line-height: var(--font-line-height-24); font-weight: var(--font-weight-bold); }
+body.ver-7 .ma-req-acts { margin: 0; padding: 0 0 0 var(--space-20); list-style: disc; color: var(--status-info-text); opacity: 0.8; font-size: var(--font-size-14); line-height: var(--font-line-height-22); }
+body.ver-7 .ma-req-acts:empty { display: none; }
+body.ver-7 .ma-req-acts > .is-memo { list-style: none; margin-left: calc(var(--space-20) * -1); }
+body.ver-7 .ma-req-actions { display: flex; }
+body.ver-7 .ma-req-actions > .btn { flex: 1 1 0; min-width: 0; height: var(--size-control-sm); }

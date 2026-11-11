@@ -1533,7 +1533,7 @@
       // [11/10 PR #21 + #22 합침] 조치 요청 기록 — v7 은 한 곳(alert-data-v7.js S7.req)에, 그 파일이 없는 화면은 예전 sessionStorage(hAdd).
       //   목록에서 옮긴 뒤 쓴다(먼저 쓰면 sync7 이 한 번 더 옮긴다). 진행 단계(st)는 대기로 시작 — 안전진단이 이어서 단계를 올린다
       var S7r = window.APRISM_ALERTS7, id7 = S7r && S7r.req.idOf(a);
-      if (id7) { rec.reqId = id7; selfReq = true; S7r.req.set(id7, { t: rec.time, how: rec.how ? rec.how.split(" · ") : [], memo: rec.memo || "", who: rec.who, to: "현장 작업자", st: "wait", src: "ctl" }); selfReq = false; }
+      if (id7) { rec.reqId = id7; selfReq = true; S7r.req.set(id7, { t: rec.time, how: rec.how ? rec.how.split(" · ") : [], memo: rec.memo || "", who: rec.who, to: S7r.req.to ? S7r.req.to(a).text : "현장 작업자", st: "wait", src: "ctl" }); selfReq = false; }
       else { hAdd(a, rec); }
       lastDone = { a: a, rec: rec };
       render();
@@ -1560,18 +1560,13 @@
       confirm.classList.remove("is-sent");
       confirm.textContent = "조치 요청";
     }
-    function nextAlert7() {
-      var list = $$(".ah-item").filter(function (n) { return n.getAttribute("aria-pressed") !== "true" && !n.classList.contains("is-selected"); });
-      return list.filter(function (n) { return n.classList.contains("is-critical"); })[0] || list[0] || null;
-    }
     function reqShow7(a, rec, picks) {
       if (!reqBox7) {
         reqBox7 = el("div", "ma-req");
+        // [11/11 v7 디자이너] 정보를 줄여 "누구에게 갔나"만 크게 — 받은 팀 · 사람 한 줄(정보 상자) + 요청한 조치 + [되돌리기 5] [확인함](Figma UI_00 1733:14619)
         reqBox7.innerHTML =
-          '<div class="ma-req-head"><span class="ma-req-ok"><span class="i i-16" style="--i:var(--ic-check)" aria-hidden="true"></span>조치 요청됨</span><span class="ma-req-meta num"></span></div>' +
-          '<ol class="mwp-steps is-wait"><li class="is-past"><i aria-hidden="true"></i><div><span class="ms-l"></span><ul class="ms-acts"></ul><p class="ma-req-memo"></p></div></li>' +
-          '<li class="is-now" aria-current="step"><i aria-hidden="true"></i><div><span class="ms-l">현장 응답 대기</span><span class="ms-t num"></span></div></li></ol>' +
-          '<div class="ma-req-actions"><button type="button" class="btn btn-secondary" data-req-undo></button><a class="btn btn-secondary" data-req-more style="text-decoration:none">진단 상세</a><button type="button" class="btn btn-secondary" data-req-next></button></div>';
+          '<div class="ma-req-head" role="status"><p class="ma-req-to"></p><ul class="ma-req-acts"></ul></div>' +
+          '<div class="ma-req-actions"><button type="button" class="btn btn-secondary" data-req-undo></button><button type="button" class="btn btn-primary" data-req-ok>확인함</button></div>';
         $(".ma-lower", box).appendChild(reqBox7);
         $("[data-req-undo]", reqBox7).addEventListener("click", function () {
           var p = reqA7;
@@ -1579,29 +1574,19 @@
           reqReset7();
           if (p) { picked = p; fill(p); syncConfirm(); render(); }
         });
-        $("[data-req-next]", reqBox7).addEventListener("click", function () {
-          var nx = nextAlert7();
-          reqReset7();
-          if (nx) { nx.click(); } else { close(); }
-        });
+        $("[data-req-ok]", reqBox7).addEventListener("click", function () { reqReset7(); close(); });
       }
-      var reason = $(".ma-reason", box);
-      $(".ma-req-meta", reqBox7).textContent = rec.time.slice(0, 5) + " · " + rec.who + " → 현장 작업자";
-      $(".is-past .ms-l", reqBox7).textContent = (reason && reason.textContent.trim()) || "기준 위반";
-      var acts = $(".ms-acts", reqBox7); acts.textContent = "";
+      var S7t = window.APRISM_ALERTS7, to = S7t && S7t.req.to ? S7t.req.to(a).text : "현장 작업자";
+      $(".ma-req-to", reqBox7).textContent = to + "에게 조치 요청됨";
+      var acts = $(".ma-req-acts", reqBox7); acts.textContent = "";
       picks.forEach(function (h) { var li = el("li"); li.textContent = h; acts.appendChild(li); });
-      var memo = $(".ma-req-memo", reqBox7); memo.textContent = rec.memo ? "메모 · " + rec.memo : ""; memo.hidden = !rec.memo;
-      $(".is-now .ms-t", reqBox7).textContent = rec.time.slice(0, 5);
-      var more = $("[data-req-more]", reqBox7), more0 = $("[data-ma-more]", box);
-      more.href = more0 ? more0.getAttribute("href") : "#"; more.hidden = true;
+      if (rec.memo) { var mm = el("li", "is-memo"); mm.textContent = "메모 · " + rec.memo; acts.appendChild(mm); }
       var undo = $("[data-req-undo]", reqBox7); undo.hidden = false;
       var left = 5;
       var tick = function () { undo.textContent = "되돌리기 " + left; };
       tick();
       reqTick7 = setInterval(function () { left -= 1; if (left > 0) { tick(); } }, 1000);
-      reqTimer7 = setTimeout(function () { clearInterval(reqTick7); undo.hidden = true; more.hidden = false; lastDone = null; }, 5000);
-      var nx = nextAlert7(), nb = $("[data-req-next]", reqBox7);
-      nb.textContent = nx ? (nx.classList.contains("is-critical") ? "다음 위험 →" : "다음 알림 →") : "닫기";
+      reqTimer7 = setTimeout(function () { clearInterval(reqTick7); undo.hidden = true; lastDone = null; }, 5000);   // 5초 뒤엔 [확인함] 하나가 줄을 채운다
       reqBox7.hidden = false;
       box.classList.add("is-requested");
     }

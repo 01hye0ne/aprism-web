@@ -334,7 +334,14 @@
   function fire() { document.dispatchEvent(new CustomEvent("aprism:requested")); }
   window.addEventListener("storage", function (e) { if (e.key === KEY || e.key === null) { fire(); } });
   window.addEventListener("pageshow", function (e) { if (e.persisted) { fire(); } });   // 뒤로 가기로 돌아온 화면도 최신 기록으로
+  /*
+   * [11/11 v7 디자이너] 조치를 받는 팀 · 사람 — 요청 뒤 팝오버가 "어느 팀 누구에게 갔는지"를 가장 크게 말한다(Figma UI_00 1733:14619).
+   *   감지 종류로 정한 시안 값(임시). 설비 이상은 설비팀, 전기(부분방전)는 전기팀, 사람 안전은 안전관리팀
+   */
+  var TO = { "계기인식": ["설비팀", "김현우"], "누출감지": ["설비팀", "김현우"], "온도감지": ["설비팀", "박지훈"], "이상음향": ["설비팀", "박지훈"], "부분방전": ["전기팀", "이도윤"], "안전감지": ["안전관리팀", "최서연"] };
+  function toOf(o) { var t = (o && TO[o.detect]) || ["현장팀", "담당자"]; return { team: t[0], who: t[1], text: t[0] + " " + t[1] }; }
   var req = {
+    to: toOf,
     all: loadReq,
     set: function (id, r) { if (!id) { return; } var s = loadReq(); s[id] = r; saveReq(s); fire(); },
     clear: function (id) { var s = loadReq(); if (id && s[id]) { delete s[id]; saveReq(s); fire(); } },
