@@ -54,6 +54,20 @@
     });
   })();
 
+  (function () {   // [11/11 디자이너] 요청 기록 지우기 — 시연을 처음부터. v7 공용 기록(alert-data-v7.js S7.req) + v6 탭 기록(sessionStorage 'aprism-handled')을 비우고 다시 불러온다
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "rsim-reset";
+    b.textContent = "요청 기록 지우기";
+    b.title = "조치 요청 · 처리 기록을 모두 지우고 처음 상태로";
+    box.querySelector(".rsim-bar").appendChild(b);
+    b.addEventListener("click", function () {
+      try { if (window.APRISM_ALERTS7) { window.APRISM_ALERTS7.req.reset(); } } catch (e) { }
+      try { localStorage.removeItem("aprism-v7-requested"); sessionStorage.removeItem("aprism-handled"); } catch (e) { }
+      location.reload();
+    });
+  })();
+
   var api = null, range = box.querySelector("input"), pct = box.querySelector(".rsim-pct"), play = box.querySelector(".rsim-play");
   var mode = "run", playing = false, dwell = null, last = 0, modeAt = performance.now(), touched = false;
   var SPEED_SEC = 70;   // 한 바퀴 시간

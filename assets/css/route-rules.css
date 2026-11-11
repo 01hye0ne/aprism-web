@@ -427,3 +427,7 @@
   display: block; left: 0; bottom: 0; width: calc(15px * var(--pz, 1)); height: calc(1.5px * var(--pz, 1));
   background: var(--pin); opacity: .8; transform-origin: 0 50%; transform: rotate(-48deg);
 }
+
+/* [11/11] 요청 기록 지우기 — 재생 단추와 같은 꼴, 슬라이더 오른쪽 끝 */
+.rsim-reset { flex: none; font: inherit; border: 1px solid #2f3a4c; background: transparent; color: #c5ccd8; border-radius: 7px; padding: 5px 12px; cursor: pointer; white-space: nowrap; }
+.rsim-reset:hover { background: #1b2230; color: #e4e8ef; }
