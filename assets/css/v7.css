@@ -753,3 +753,57 @@ body.ver-7 .mp-hq .mp-tag line { stroke: #8D99B0; }
 body.ver-7 .mp-hq .mp-tag rect { fill: #0A0F18; stroke: #8D99B0; }
 body.ver-7 .mp-hq .mp-tag text { fill: #E4E8EF; font-family: var(--font-family-base, "SUIT", "Pretendard", sans-serif); font-weight: 600; }
 body.ver-7 .mp-hq .mp-tag.is-now line, body.ver-7 .mp-hq .mp-tag.is-now rect { stroke: #5BB4FF; }
+
+/* ================= [11/11 v7 디자이너] Delta 챗봇형 시안(main-v7-chat · body.d3-chat · delta-chatbot-v7.js) =================
+ *   Delta = 지도 오른쪽 아래 오브 단추(56, 오른쪽 끝 = 지도 도구 줄 오른쪽 끝 · 아래 끝 = 우측 패널 아래 끝) + 왼쪽 말풍선(Delta 두 줄).
+ *   대화창 = 원래 Delta 창(.delta3.is-open)을 오브 왼쪽에 아래 끝 맞춰 세운다(지도 도구 줄을 덮지 않게). 왼쪽 위 Delta 카드는 숨긴다.
+ *   알림 팝오버 = 왼쪽 위(우측 패널 위 여백)부터 아래 끝까지 꽉 — 사진 칸이 남는 높이를 먹는다 */
+:root[data-theme][data-delta][data-glow] body.ver-7.d3-chat.v2-2.v3 .delta3:not(.is-open) { display: none !important; }
+:root[data-theme][data-delta][data-glow] body.ver-7.d3-chat.v2-2.v3 .delta3.is-open,
+:root[data-theme][data-delta][data-glow] body.ver-7.d3-chat.ma-on.v2-2.v3 .delta3.is-open {
+  --d3-w: 380px;
+  left: auto !important; top: auto !important; transform: none !important;
+  right: calc(var(--dchat-r, 16px) + 56px + 12px) !important; bottom: var(--dchat-lift, var(--dchat-b, 16px)) !important;
+  width: 380px !important; height: min(560px, calc(100% - var(--dchat-lift, var(--dchat-b, 16px)) - 32px)) !important; max-height: none;
+  animation: dchat-in .2s ease-out;
+}
+@keyframes dchat-in { from { opacity: 0; transform: translateY(8px) !important; } to { opacity: 1; } }
+body.ver-7.d3-chat .delta3 .d3-grip, body.ver-7.d3-chat .delta3 [role="separator"] { display: none !important; }   /* 너비 손잡이 — 챗봇 창은 폭 고정 */
+
+body.ver-7 .dchat { position: absolute; right: var(--dchat-r, 16px); bottom: var(--dchat-b, 16px); z-index: 8; display: flex; align-items: flex-end; gap: var(--space-12); pointer-events: none; }
+body.ver-7 .dchat > * { pointer-events: auto; }
+body.ver-7 .dchat-orb { position: relative; flex: none; width: 56px; height: 56px; padding: 0; border: 0; border-radius: 50%; overflow: visible; cursor: pointer;
+  background: radial-gradient(circle at 35% 30%, #9CC8FF, #3B79D5 55%, #1B2F6B); box-shadow: 0 6px 20px rgb(0 0 0 / 45%), 0 0 0 1px rgb(255 255 255 / 10%); transition: transform .15s; }
+body.ver-7 .dchat-orb:hover { transform: scale(1.06); }
+body.ver-7 .dchat-orb:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 3px; }
+body.ver-7 .dchat-orb-in { position: absolute; inset: 0; border-radius: 50%; overflow: hidden; }
+body.ver-7 .dchat-orb-in > canvas { width: 100% !important; height: 100% !important; display: block; }
+body.ver-7.dchat-open .dchat-orb { box-shadow: 0 0 0 2px var(--status-info-icon), 0 6px 20px rgb(0 0 0 / 45%); }
+body.ver-7 .dchat-badge { position: absolute; top: 2px; right: 2px; width: 12px; height: 12px; border-radius: 50%; border: 2px solid #0A0F18; background-color: var(--status-critical-icon); }
+body.ver-7 .dchat[data-sev="warning"] .dchat-badge { background-color: var(--status-warning-icon); }
+body.ver-7 .dchat-badge[hidden] { display: none; }
+body.ver-7 .dchat-bubble { position: absolute; right: calc(56px + 12px); bottom: calc(var(--dchat-lift, var(--dchat-b, 16px)) - var(--dchat-b, 16px) + 6px); width: max-content; display: flex; align-items: flex-start; gap: var(--space-4); max-width: 300px; padding: var(--space-12) var(--space-8) var(--space-12) var(--space-16);
+  border: 1px solid var(--border-divider); border-radius: 16px 16px 4px 16px; background-color: var(--bg-raised); box-shadow: 0 8px 24px rgb(0 0 0 / 40%); animation: dchat-pop .24s ease-out; }
+@keyframes dchat-pop { from { opacity: 0; transform: translateY(6px) scale(.97); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { body.ver-7 .dchat-bubble, :root[data-theme][data-delta][data-glow] body.ver-7.d3-chat.v2-2.v3 .delta3.is-open { animation: none; } }
+body.ver-7 .dchat-bubble[hidden] { display: none; }
+body.ver-7 .dchat[data-sev="critical"] .dchat-bubble { border-color: color-mix(in srgb, var(--status-critical-icon) 55%, transparent); }
+body.ver-7 .dchat[data-sev="warning"] .dchat-bubble { border-color: color-mix(in srgb, var(--status-warning-icon) 55%, transparent); }
+body.ver-7 .dchat-bubble-body { display: flex; flex-direction: column; gap: 2px; min-width: 0; padding: 0; border: 0; background: none; text-align: left; cursor: pointer; font: inherit; }
+body.ver-7 .dchat-l1 { color: var(--text-primary); font-size: var(--font-size-14); line-height: var(--font-line-height-20); font-weight: var(--font-weight-bold); }
+body.ver-7 .dchat-l2 { color: var(--text-secondary); font-size: var(--font-size-13); line-height: var(--font-line-height-20); }
+body.ver-7 .dchat-l2:empty { display: none; }
+body.ver-7 .dchat-x { flex: none; display: grid; place-items: center; width: 24px; height: 24px; margin: -4px 0 0; padding: 0; border: 0; border-radius: var(--radius-4); background: none; color: var(--text-tertiary); cursor: pointer; }
+body.ver-7 .dchat-x:hover { background-color: var(--bg-cell); color: var(--text-primary); }
+body.ver-7 .dchat-x .i { background-color: currentColor; }
+
+body.ver-7.d3-chat .map-alert.ma-v3:not(.is-docked):not(.is-requested):not(.is-folded) { height: var(--ma-max); max-height: var(--ma-max); }
+body.ver-7.d3-chat .map-alert.ma-v3:not(.is-docked):not(.is-requested):not(.is-folded) .ma-snap { flex: 1 1 auto; height: auto; min-height: 120px; }
+body.ver-7.d3-chat .map-alert.ma-v3 .ma-snap > .ma-shot { width: 100%; height: 100%; object-fit: cover; }
+/* 말풍선 둘째 줄 — Delta 카드와 같은 번호 원 · 이름 굵게(v6.css .delta3 .dl-wp 를 말풍선에도) */
+body.ver-7 .dchat-l2 .dl-wp-name { color: var(--text-primary); font-weight: var(--font-weight-bold); }
+body.ver-7 .dchat-l2 .dl-wp { display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box; width: 20px; height: 20px; margin-right: 2px; border-radius: 50%;
+  background-color: rgb(10 15 24 / 45%); color: #C9D0DC; font-size: 12px; line-height: 1; font-weight: 800; font-variant-numeric: tabular-nums; vertical-align: middle; }
+body.ver-7 .dchat-l2 .dl-wp[data-sev] { border: 2px solid #0A0F18; color: #0A0F18; }
+body.ver-7 .dchat-l2 .dl-wp[data-sev="critical"] { background-color: #FF383C; }
+body.ver-7 .dchat-l2 .dl-wp[data-sev="warning"] { background-color: #FFC800; }

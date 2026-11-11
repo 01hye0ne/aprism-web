@@ -2937,6 +2937,8 @@
     var toolsEl = document.querySelector(".map-canvas > .map-tools"), deltaEl = document.querySelector(".delta3");
     var right = toolsEl && toolsEl.offsetParent ? toolsEl.getBoundingClientRect().left - box.left - 12 : W - 12;
     var dr = deltaEl && deltaEl.getClientRects().length ? deltaEl.getBoundingClientRect() : null;
+    var chat7 = document.body.classList.contains("d3-chat");   // [11/11 v7 챗봇형 시안] Delta 는 오른쪽 아래 챗봇 — 왼쪽 위가 비어 팝오버가 그 자리까지 쓴다
+    if (chat7) { dr = null; }
     var simEl = document.querySelector(".rsim"), sr = simEl && simEl.getClientRects().length ? simEl.getBoundingClientRect() : null;
     // 눈에 보이는 우측 판 = .right-panel 과 그 겉 상자(.floating) 중 아래 끝이 더 낮은 쪽
     var panelEl = document.querySelector(".right-panel"), pr = panelEl && panelEl.getClientRects().length ? panelEl.getBoundingClientRect() : null;
@@ -2946,11 +2948,12 @@
     var floor = H - gap;
     // 시안 리모콘(.rsim)이 펼쳐져 있을 때만 그 위에 선다 — 접히면 오른쪽 아래 작은 단추라 카드 줄(우측 패널 아래 끝)을 지킨다
     if (sr && !simEl.classList.contains("is-folded")) { floor = Math.min(floor, sr.top - box.top - 8); }
+    var edge = chat7 && pr ? Math.max(8, Math.round(pr.top - box.top)) : 16;   // 챗봇형 — 위 · 왼쪽 여백 = 우측 패널 위 여백
     return {
       center: right / 2,
-      top: dr ? Math.max(8, dr.top - box.top) : 16,
-      left: dr ? Math.max(8, dr.left - box.left) : 16,                 // [11/11] 왼쪽 끝 = Delta 왼쪽 끝
-      below: dr ? dr.bottom - box.top + 8 : 16,                         // [11/11] Delta 아래 끝 + 8 — 팝오버가 쓸 수 있는 위 끝
+      top: dr ? Math.max(8, dr.top - box.top) : edge,
+      left: dr ? Math.max(8, dr.left - box.left) : edge,                 // [11/11] 왼쪽 끝 = Delta 왼쪽 끝
+      below: dr ? dr.bottom - box.top + 8 : edge,                         // [11/11] Delta 아래 끝 + 8 — 팝오버가 쓸 수 있는 위 끝
       floor: floor
     };
   }
@@ -3138,7 +3141,7 @@
       w = alertBox.offsetWidth; h = alertBox.offsetHeight;
       // 가로는 화면 좌표로 바로 맞춘다 — Delta 왼쪽 끝(화면) - 부모 안쪽 왼쪽 끝. 지도 칸 기준으로 셈하면 부모 테 · 여백만큼 어긋났다
       //   접힌 Delta 는 바깥 상자(.delta3)보다 안쪽 카드(.delta3-card)가 눈에 보이는 끝이다
-      var dEl = document.querySelector(".delta3.is-open") || document.querySelector(".delta3 .delta3-card") || document.querySelector(".delta3"), dRect = dEl && dEl.getClientRects().length ? dEl.getBoundingClientRect() : null;
+      var dEl = document.body.classList.contains("d3-chat") ? null : (document.querySelector(".delta3.is-open") || document.querySelector(".delta3 .delta3-card") || document.querySelector(".delta3")), dRect = dEl && dEl.getClientRects().length ? dEl.getBoundingClientRect() : null;
       var opEl = alertBox.offsetParent;
       var ccx = (dRect ? dRect.left : hb0.left + rm.left) - op.left - (opEl ? opEl.clientLeft : 0) + w / 2;
       var cardTop = rm.floor - h + (hb0.top - op.top);
