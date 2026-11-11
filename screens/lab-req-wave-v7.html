@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<!--
+  [11/11 실험] 조치 요청 물결 전환 — 참고: Distortion Waves(libraries.dev/waves, SwiftUI · Metal, MIT).
+  그대로는 웹에 못 쓰므로 웹으로 다시 짰다: SVG 필터(feTurbulence + feDisplacementMap)로 진짜 화면 내용을 일그러뜨리고,
+  [조치 요청] 단추에서 퍼지는 원형 가림(mask)으로 "조치 요청됨" 판을 펼친다. 퍼지는 물결 앞머리 · 테 빛은 위에 덧그린다.
+  팝오버 모양은 v7 관제(main-v7) 것을 그대로 읽는다(v7.css). 여기서 고른 값을 v7 monitor.js 의 조치 요청에 옮긴다.
+-->
+<html lang="ko" data-theme="dark" data-delta="glass" data-glow="top">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>실험 · 조치 요청 물결 전환 — APRISM v7</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/static/woff2/SUIT.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" />
+  <link rel="stylesheet" href="../assets/css/tokens.css?v=b64812bd" />
+  <link rel="stylesheet" href="../assets/css/app-shell.css?v=ae003cd8" />
+  <link rel="stylesheet" href="../assets/css/map-overlays.css?v=96f51348" />
+  <link rel="stylesheet" href="../assets/css/icons-outline.css?v=86d19675" />
+  <link rel="stylesheet" href="../assets/css/text-parts.css?v=e38e19ea" />
+  <link rel="stylesheet" href="../assets/css/monitor.css?v=7a8f053d" />
+  <link rel="stylesheet" href="../assets/css/palette-neutral.css?v=0c969aea" />
+  <link rel="stylesheet" href="../assets/css/delta-v3.css?v=b1562ee4" />
+  <link rel="stylesheet" href="../assets/css/v3.css?v=7fce80d4" />
+  <link rel="stylesheet" href="../assets/css/v5.css?v=aefc22b4" />
+  <link rel="stylesheet" href="../assets/css/v6.css?v=6ce16336" />
+  <link rel="stylesheet" href="../assets/css/v7.css?v=a8d9896b" />
+  <style>
+    html, body { height: 100%; margin: 0; }
+    h1, h2, h3, p { margin: 0; }
+    body.lab { display: grid; grid-template-columns: minmax(0, 1fr) 320px; min-height: 100vh; background: var(--bg-page); color: var(--text-primary); font-family: var(--font-family-sans); }
+
+    /* 무대 — 지도 대신 어두운 격자. 팝오버는 관제처럼 왼쪽 아래 */
+    .lab-stage {
+      position: relative; overflow: hidden;
+      background:
+        linear-gradient(rgb(255 255 255 / 3%) 1px, transparent 1px) 0 0 / 40px 40px,
+        linear-gradient(90deg, rgb(255 255 255 / 3%) 1px, transparent 1px) 0 0 / 40px 40px,
+        radial-gradient(1200px 700px at 60% 40%, #1a2233, #0a0e15 70%);
+    }
+    :root[data-theme="light"] .lab-stage {
+      background:
+        linear-gradient(rgb(0 0 0 / 4%) 1px, transparent 1px) 0 0 / 40px 40px,
+        linear-gradient(90deg, rgb(0 0 0 / 4%) 1px, transparent 1px) 0 0 / 40px 40px,
+        radial-gradient(1200px 700px at 60% 40%, #f0f1f5, #dcdfe6 70%);
+    }
+    .lab-note { position: absolute; left: 24px; top: 20px; max-width: 560px; color: var(--text-secondary); font-size: 13px; line-height: 20px; }
+    .lab-note b { color: var(--text-primary); }
+    .lab-pop-wrap { position: absolute; left: 24px; bottom: 24px; width: 295px; }
+    .lab-pop-wrap .map-alert { position: relative; left: auto; top: auto; transform: none !important; }
+    .lab-pop-wrap .map-alert[hidden] { display: none; }
+    .lab-pop-wrap > .map-alert[data-pop] { z-index: 1; }   /* .map-alert 기본 z 5 — 전환 층(3~6)이 그 위에 와야 한다 */
+
+    /* 전환 층 — 옛 판(복제)이 새 판 위에 덮여 있다가 단추 자리부터 구멍이 넓어진다 */
+    .wv-old { position: absolute; inset: 0; z-index: 3; pointer-events: none;
+      -webkit-mask-image: radial-gradient(circle at var(--ox) var(--oy), transparent calc(var(--r) - var(--feather)), #000 var(--r));
+              mask-image: radial-gradient(circle at var(--ox) var(--oy), transparent calc(var(--r) - var(--feather)), #000 var(--r)); }
+    .wv-front { position: absolute; inset: 0; z-index: 4; pointer-events: none; border-radius: 10px; overflow: hidden; mix-blend-mode: screen; }
+    :root[data-theme="light"] .wv-front { mix-blend-mode: multiply; }
+    .wv-front i { position: absolute; inset: 0; }
+    .wv-rim { position: absolute; inset: 0; z-index: 5; pointer-events: none; border-radius: 10px; opacity: 0; }
+    .wv-dot { position: absolute; z-index: 6; width: 3px; height: 3px; border-radius: 50%; pointer-events: none; }
+
+    /* 조절판 */
+    .lab-panel { border-left: 1px solid var(--border-divider); background: var(--bg-panel, #141a24); padding: 20px; overflow: auto; display: flex; flex-direction: column; gap: 18px; font-size: 13px; }
+    .lab-panel h1 { font-size: 16px; line-height: 24px; font-weight: 700; }
+    .lab-panel h2 { font-size: 12px; line-height: 18px; color: var(--text-tertiary); font-weight: 500; letter-spacing: 0.04em; margin-bottom: 8px; }
+    .lab-presets { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+    .lab-presets button, .lab-row button { height: 32px; border-radius: 4px; border: 1px solid var(--border-default); background: var(--bg-cell); color: var(--text-primary); font: inherit; cursor: pointer; }
+    .lab-presets button[aria-pressed="true"] { border-color: var(--border-brand); background: color-mix(in srgb, var(--status-info-icon) 18%, var(--bg-cell)); }
+    .lab-presets button small { display: block; font-size: 11px; color: var(--text-tertiary); line-height: 14px; }
+    .lab-presets button { height: auto; padding: 6px 4px; }
+    .lab-ctl { display: grid; grid-template-columns: 80px 1fr 44px; align-items: center; gap: 8px; margin-bottom: 6px; color: var(--text-secondary); }
+    .lab-ctl input[type="range"] { width: 100%; }
+    .lab-ctl output { text-align: right; font-family: var(--font-family-mono); font-size: 12px; color: var(--text-primary); }
+    .lab-ctl select { grid-column: 2 / 4; height: 28px; background: var(--bg-cell); color: var(--text-primary); border: 1px solid var(--border-default); border-radius: 4px; font: inherit; }
+    .lab-check { display: flex; align-items: center; gap: 8px; color: var(--text-secondary); margin-bottom: 6px; }
+    .lab-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+    .lab-foot { color: var(--text-tertiary); font-size: 12px; line-height: 18px; }
+  </style>
+</head>
+<body class="lab v2 v3 v2-2 ver-3 ver-5 ver-6 ver-7">
+
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <filter id="wv-f" x="-15%" y="-15%" width="130%" height="130%" color-interpolation-filters="sRGB">
+      <feTurbulence id="wv-turb" type="fractalNoise" baseFrequency="0.010 0.030" numOctaves="2" seed="4" result="n" />
+      <feDisplacementMap id="wv-disp" in="SourceGraphic" in2="n" scale="0" xChannelSelector="R" yChannelSelector="G" />
+    </filter>
+    <filter id="wv-f2" x="-15%" y="-15%" width="130%" height="130%" color-interpolation-filters="sRGB">
+      <feTurbulence id="wv-turb2" type="fractalNoise" baseFrequency="0.010 0.030" numOctaves="2" seed="9" result="n" />
+      <feDisplacementMap id="wv-disp2" in="SourceGraphic" in2="n" scale="0" xChannelSelector="R" yChannelSelector="G" />
+    </filter>
+  </svg>
+
+  <main class="lab-stage">
+    <p class="lab-note"><b>조치 요청 물결 전환 실험</b> — 팝오버의 [조치 요청]을 누르면 그 단추에서 물결이 퍼지며 "조치 요청됨" 판으로 넘어갑니다.
+      오른쪽에서 시안(A · B · C)을 고르거나 값을 바꿔 보고, [처음으로]로 되돌려 다시 누르세요. 참고: Distortion Waves(SwiftUI · Metal) — 웹으로 다시 짠 것입니다.</p>
+
+    <div class="lab-pop-wrap">
+      <section class="map-alert ma-v3 is-critical is-fixed is-no-tail" data-pop aria-label="알림 팝오버">
+        <div class="ma-head">
+          <div class="ma-title-block">
+            <span class="ma-top"><span class="verdict-chip is-crit"><span>위험</span></span></span>
+            <h3 class="ma-title">압력 <span class="ma-vd">0.86 MPa</span></h3>
+          </div>
+          <button type="button" class="icon-button is-xs" aria-label="닫기"><span class="i i-16" style="--i:var(--ic-close)" aria-hidden="true"></span></button>
+        </div>
+        <div class="ma-snap">
+          <img class="ma-shot" src="../assets/img/alert/wp04-gauge-n2.webp" alt="" />
+          <p class="ma-stamp t-caption ma-stamp6"><span class="mbt-pin is-plain" data-n="4" role="img" aria-label="WP-04"></span><span class="ma-st-place">N₂ 배관 압력계</span><span class="ma-st-time num">10:12:40</span></p>
+        </div>
+        <div class="ma-lower">
+          <div class="ma-lower-in">
+            <section class="ma-delta is-light-scope is-dark-scope">
+              <p class="ma-reason">기준 초과 +0.06 MPa</p>
+              <div class="ma-act">
+                <p class="ma-delta-lead">현장 점검부터 요청하세요.</p>
+                <div class="ma-checks" role="group" aria-label="조치 내용">
+                  <button type="button" class="ma-check" role="checkbox" aria-checked="true"><span class="ma-check-box"><span class="i" style="--i:var(--ic-check)" aria-hidden="true"></span></span><span class="ma-check-label">로봇 정지 · 현장 점검 요청</span><span class="ma-check-tag">AI 추천</span></button>
+                  <button type="button" class="ma-check" role="checkbox" aria-checked="false"><span class="ma-check-box"><span class="i" style="--i:var(--ic-check)" aria-hidden="true"></span></span><span class="ma-check-label">현장 무전 연락 · 작업 중지 요청</span></button>
+                  <button type="button" class="ma-check" role="checkbox" aria-checked="false"><span class="ma-check-box"><span class="i" style="--i:var(--ic-check)" aria-hidden="true"></span></span><span class="ma-check-label">재측정 후 판단</span></button>
+                </div>
+              </div>
+              <div class="ma-memo"><div class="ma-memo-row"><span class="t-label-2" id="ma-memo-label">메모 (선택)</span><button type="button" class="icon-button is-xs" aria-label="메모 펼치기"><span class="i i-16" style="--i:var(--ic-chevron-down)" aria-hidden="true"></span></button></div></div>
+            </section>
+          </div>
+          <div class="ma-actions">
+            <a class="btn btn-secondary" href="#" style="text-decoration:none">진단 상세</a>
+            <button type="button" class="btn btn-accent ma-confirm" data-confirm>조치 요청</button>
+          </div>
+          <div class="ma-req" hidden>
+            <div class="ma-req-head"><span class="ma-req-ok"><span class="i i-16" style="--i:var(--ic-check)" aria-hidden="true"></span>조치 요청됨</span><span class="ma-req-meta num">10:14 · 홍길동 → 현장 작업자</span></div>
+            <ol class="mwp-steps is-wait">
+              <li class="is-past"><i aria-hidden="true"></i><div><span class="ms-l">기준 초과 +0.06 MPa</span><ul class="ms-acts"><li>로봇 정지 · 현장 점검 요청</li></ul></div></li>
+              <li class="is-now" aria-current="step"><i aria-hidden="true"></i><div><span class="ms-l">현장 응답 대기</span><span class="ms-t num">10:14</span></div></li>
+            </ol>
+            <div class="ma-req-actions"><button type="button" class="btn btn-secondary" data-reset>처음으로</button><button type="button" class="btn btn-secondary">다음 위험 →</button></div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <aside class="lab-panel" aria-label="조절판">
+    <h1>물결 전환 조절판</h1>
+    <div>
+      <h2>시안</h2>
+      <div class="lab-presets" data-presets>
+        <button type="button" data-preset="a" aria-pressed="false">A 약하게<small>일그러짐 약 · 한 색</small></button>
+        <button type="button" data-preset="b" aria-pressed="true">B 강하게<small>일그러짐 강 · 테 빛</small></button>
+        <button type="button" data-preset="c" aria-pressed="false">C 색 번짐<small>색 갈라짐 · 점</small></button>
+      </div>
+    </div>
+    <div>
+      <h2>값</h2>
+      <label class="lab-ctl">일그러짐<input type="range" min="0" max="60" step="1" data-k="disp" /><output></output></label>
+      <label class="lab-ctl">길이(ms)<input type="range" min="300" max="1400" step="20" data-k="dur" /><output></output></label>
+      <label class="lab-ctl">물결 폭<input type="range" min="8" max="90" step="1" data-k="band" /><output></output></label>
+      <label class="lab-ctl">물결 세기<input type="range" min="0" max="100" step="1" data-k="glow" /><output></output></label>
+      <label class="lab-ctl">당김<input type="range" min="0" max="8" step="0.5" data-k="pull" /><output></output></label>
+      <label class="lab-ctl">테 빛 남김<input type="range" min="0" max="1500" step="50" data-k="rim" /><output></output></label>
+      <label class="lab-ctl">점 개수<input type="range" min="0" max="40" step="1" data-k="dots" /><output></output></label>
+      <label class="lab-ctl">색<select data-k="pal">
+        <option value="blue">한 색 — 파랑(status/info)</option>
+        <option value="split">파랑 + 색 갈라짐(빨강 · 청록 가장자리)</option>
+        <option value="brand">브랜드 그라데이션(파랑 → 청록 → 보라)</option>
+        <option value="rainbow">무지개(원본 기본값 · 참고용)</option>
+      </select></label>
+    </div>
+    <div>
+      <h2>보기</h2>
+      <label class="lab-check"><input type="checkbox" data-light /> 라이트 테마</label>
+      <label class="lab-check"><input type="checkbox" data-reduce /> 동작 줄이기(페이드로 대신)</label>
+      <label class="lab-check"><input type="checkbox" data-slow /> 4배 느리게(확인용)</label>
+      <div class="lab-row"><button type="button" data-reset>처음으로</button><button type="button" data-play>바로 재생</button></div>
+    </div>
+    <p class="lab-foot">고른 시안 · 값을 알려 주시면 v7 관제의 [조치 요청]에 그대로 옮깁니다. 이 화면은 실험용이라 다른 화면과 이어지지 않습니다.</p>
+  </aside>
+
+<script>
+(function () {
+  "use strict";
+  var PRESETS = {
+    a: { disp: 10, dur: 560, band: 24, glow: 55, pull: 1.5, rim: 0, dots: 0, pal: "blue" },
+    b: { disp: 28, dur: 720, band: 40, glow: 80, pull: 3.5, rim: 700, dots: 0, pal: "blue" },
+    c: { disp: 18, dur: 820, band: 48, glow: 85, pull: 2.5, rim: 900, dots: 18, pal: "split" }
+  };
+  var P = Object.assign({}, PRESETS.b);
+  var pop = document.querySelector("[data-pop]");
+  var wrap = pop.parentNode;
+  var confirmBtn = pop.querySelector("[data-confirm]");
+  var lowerIn = pop.querySelector(".ma-lower-in"), actions = pop.querySelector(".ma-actions"), req = pop.querySelector(".ma-req");
+  var disp = document.getElementById("wv-disp"), disp2 = document.getElementById("wv-disp2"), turb = document.getElementById("wv-turb"), turb2 = document.getElementById("wv-turb2");
+  var running = false;
+  // ?scrub=0.4 — 그 진행 지점에서 멈춘 장면(그림 찍기용). ?preset=a|b|c
+  var qs = new URLSearchParams(location.search), SCRUB = qs.has("scrub") ? +qs.get("scrub") : -1;
+
+  // ---------- 조절판 ----------
+  var ctl = Array.prototype.slice.call(document.querySelectorAll("[data-k]"));
+  function paint() {
+    ctl.forEach(function (c) { c.value = P[c.getAttribute("data-k")]; var o = c.parentNode.querySelector("output"); if (o) { o.textContent = c.value; } });
+  }
+  ctl.forEach(function (c) {
+    c.addEventListener("input", function () {
+      var k = c.getAttribute("data-k"); P[k] = c.tagName === "SELECT" ? c.value : +c.value;
+      var o = c.parentNode.querySelector("output"); if (o) { o.textContent = c.value; }
+      document.querySelectorAll("[data-preset]").forEach(function (b) { b.setAttribute("aria-pressed", "false"); });
+    });
+  });
+  document.querySelectorAll("[data-preset]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      P = Object.assign({}, PRESETS[b.getAttribute("data-preset")]);
+      document.querySelectorAll("[data-preset]").forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); });
+      paint(); reset(); setTimeout(play, 120);
+    });
+  });
+  document.querySelector("[data-light]").addEventListener("change", function (e) { document.documentElement.setAttribute("data-theme", e.target.checked ? "light" : "dark"); });
+  document.querySelectorAll("[data-reset]").forEach(function (b) { b.addEventListener("click", reset); });
+  document.querySelector("[data-play]").addEventListener("click", function () { reset(); setTimeout(play, 60); });
+  if (PRESETS[qs.get("preset")]) {
+    P = Object.assign({}, PRESETS[qs.get("preset")]);
+    document.querySelectorAll("[data-preset]").forEach(function (x) { x.setAttribute("aria-pressed", String(x.getAttribute("data-preset") === qs.get("preset"))); });
+  }
+  if (qs.get("theme") === "light") { document.documentElement.setAttribute("data-theme", "light"); document.querySelector("[data-light]").checked = true; }
+  paint();
+
+  // ---------- 상태 ----------
+  function showReq(on) {
+    lowerIn.style.display = on ? "none" : "";
+    actions.style.display = on ? "none" : "";
+    req.hidden = !on;
+    pop.classList.toggle("is-requested", on);
+  }
+  function reset() {
+    if (running) { return; }
+    wrap.querySelectorAll(".wv-old, .wv-front, .wv-rim, .wv-dot").forEach(function (n) { n.remove(); });
+    pop.style.filter = ""; pop.style.transform = "";
+    confirmBtn.classList.remove("is-sent"); confirmBtn.disabled = false; confirmBtn.textContent = "조치 요청";
+    showReq(false);
+  }
+  confirmBtn.addEventListener("click", function () {
+    if (running) { return; }
+    confirmBtn.classList.add("is-sent");
+    confirmBtn.innerHTML = '<span class="i i-16" style="--i:var(--ic-check)" aria-hidden="true"></span>요청됨';
+    setTimeout(play, 200);
+  });
+
+  // ---------- 색 ----------
+  function palette(kind, a) {
+    var b = "59 121 213", c = "86 200 230", v = "150 110 240";
+    if (document.documentElement.getAttribute("data-theme") === "light") { b = "40 100 200"; c = "20 150 190"; v = "120 80 210"; }
+    if (kind === "rainbow") { return ["255 90 90", "255 190 60", "90 220 120", "70 170 255", "170 110 255"].map(function (x) { return "rgb(" + x + " / " + a + ")"; }); }
+    if (kind === "brand") { return ["rgb(" + b + " / " + a + ")", "rgb(" + c + " / " + a + ")", "rgb(" + v + " / " + a + ")"]; }
+    return ["rgb(" + b + " / " + a + ")"];
+  }
+  function ringGradient(ox, oy, r, band, a, kind) {
+    var cols = palette(kind, a), n = cols.length, stops = ["transparent " + Math.max(0, r - band) + "px"];
+    cols.forEach(function (col, i) { stops.push(col + " " + (r - band + band * (i + 0.5) / n).toFixed(1) + "px"); });
+    stops.push("transparent " + (r + band * 0.25).toFixed(1) + "px");
+    return "radial-gradient(circle at " + ox + "px " + oy + "px, " + stops.join(", ") + ")";
+  }
+
+  // ---------- 재생 ----------
+  function ease(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
+  function play() {
+    if (running) { return; }
+    var slowK = document.querySelector("[data-slow]").checked ? 4 : 1;
+    var reduce = document.querySelector("[data-reduce]").checked || (SCRUB < 0 && window.matchMedia("(prefers-reduced-motion: reduce)").matches);   // 멈춘 장면(scrub)은 시스템 설정과 상관없이 그린다
+    var W = pop.offsetWidth, H = pop.offsetHeight;
+    var br = confirmBtn.getBoundingClientRect(), pr = pop.getBoundingClientRect();
+    var ox = br.left + br.width / 2 - pr.left, oy = br.top + br.height / 2 - pr.top;
+    var far = Math.max(Math.hypot(ox, oy), Math.hypot(W - ox, oy), Math.hypot(ox, H - oy), Math.hypot(W - ox, H - oy)) + P.band;
+
+    // 옛 판을 복제해 위에 덮는다 — 새 판(조치 요청됨)은 그 아래에 미리 펼쳐 둔다
+    var old = pop.cloneNode(true);
+    old.removeAttribute("data-pop"); old.classList.add("wv-old"); old.setAttribute("aria-hidden", "true");
+    old.style.position = "absolute"; old.style.left = "0"; old.style.top = "0"; old.style.width = W + "px"; old.style.height = H + "px";
+    showReq(true);
+    var H2 = pop.offsetHeight;   // 새 판 높이 — 옛 판이 더 길면 그 높이에서 줄어든다
+    pop.style.minHeight = H + "px";
+    wrap.appendChild(old);
+    running = true;
+
+    if (reduce) {
+      old.style.webkitMaskImage = old.style.maskImage = "none";
+      old.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 180 * slowK }).finished.then(function () { old.remove(); pop.style.minHeight = ""; running = false; });
+      return;
+    }
+
+    var front = document.createElement("div"); front.className = "wv-front"; front.style.height = H + "px"; wrap.appendChild(front);
+    var fi = document.createElement("i"); front.appendChild(fi);
+    var rim = document.createElement("div"); rim.className = "wv-rim"; rim.style.height = H + "px"; wrap.appendChild(rim);
+    old.style.filter = "url(#wv-f)";
+    pop.style.filter = "url(#wv-f2)";
+    old.style.transformOrigin = ox + "px " + oy + "px";
+
+    // 점 — 물결 앞머리에서 튀어 나가 사라진다(C)
+    var dots = [];
+    for (var d = 0; d < P.dots; d++) {
+      var dot = document.createElement("span"); dot.className = "wv-dot";
+      var ang = -Math.PI * (0.15 + 0.7 * Math.random()) - (Math.random() < 0.3 ? Math.PI * 0.2 : 0);
+      dot.style.background = palette(P.pal === "blue" ? "blue" : (P.pal === "split" ? "brand" : P.pal), 0.95)[d % 3] || palette("blue", 0.95)[0];
+      dots.push({ el: dot, ang: ang, at: 0.15 + Math.random() * 0.55, life: 0.25 + Math.random() * 0.2, reach: 18 + Math.random() * 40 });
+      wrap.appendChild(dot);
+    }
+
+    var D = P.dur * slowK, t0 = performance.now(), ANT = 0.14;   // 앞 14% = 당김(단추 쪽으로 살짝 빨려 듦)
+    function frame(now) {
+      var t = SCRUB >= 0 ? SCRUB : Math.min(1, (now - t0) / D);
+      // 당김 → 진행
+      var pull = t < ANT ? Math.sin(t / ANT * Math.PI / 2) : Math.max(0, 1 - (t - ANT) / 0.35);
+      old.style.transform = "scale(" + (1 - P.pull / 100 * pull) + ")";
+      var k = t < ANT ? 0 : ease((t - ANT) / (1 - ANT));
+      var r = k * far;
+      old.style.setProperty("--ox", ox + "px"); old.style.setProperty("--oy", oy + "px");
+      old.style.setProperty("--r", r + "px"); old.style.setProperty("--feather", (P.band * 0.6) + "px");
+      // 일그러짐 — 옛 판은 물결이 지나는 동안 커지고, 새 판은 물결 직후 남은 흔들림이 잦아든다
+      var swell = Math.sin(Math.min(1, k * 1.15) * Math.PI);
+      disp.setAttribute("scale", (P.disp * (0.35 * pull + swell)).toFixed(2));
+      disp2.setAttribute("scale", (P.disp * 0.6 * Math.max(0, swell - 0.15) * (1 - k)).toFixed(2));
+      var bf = (0.010 + 0.006 * k).toFixed(4) + " " + (0.030 - 0.010 * k).toFixed(4);
+      turb.setAttribute("baseFrequency", bf); turb2.setAttribute("baseFrequency", bf);
+      // 물결 앞머리
+      var a = (P.glow / 100) * Math.min(1, k * 4) * (1 - Math.max(0, k - 0.75) / 0.25);
+      if (P.pal === "split") {
+        fi.style.backgroundImage = [ringGradient(ox, oy, r, P.band, a, "blue"), ringGradient(ox, oy, r + 4, P.band * 0.35, a * 0.7, "rainbow-r"), ringGradient(ox, oy, r - 4, P.band * 0.35, a * 0.7, "rainbow-c")].join(",");
+      } else {
+        fi.style.backgroundImage = ringGradient(ox, oy, r, P.band, a, P.pal);
+      }
+      // 점
+      dots.forEach(function (o) {
+        var u = (k - o.at) / o.life;
+        if (u <= 0 || u >= 1) { o.el.style.opacity = "0"; return; }
+        var rr = o.at * far + o.reach * u;
+        o.el.style.left = (wrap.offsetLeft * 0 + ox + Math.cos(o.ang) * rr) + "px";
+        o.el.style.top = (oy + Math.sin(o.ang) * rr) + "px";
+        o.el.style.opacity = String(1 - u);
+      });
+      // 옛 판이 더 길면(체크리스트 > 처리 과정) 물결 뒤쪽 높이를 새 판으로 줄인다
+      pop.style.minHeight = (H + (H2 - H) * k) + "px";
+      if (SCRUB >= 0) {
+        return;
+      }
+      if (t < 1) { requestAnimationFrame(frame); return; }
+      old.remove(); front.remove(); dots.forEach(function (o) { o.el.remove(); });
+      pop.style.filter = ""; pop.style.minHeight = "";
+      disp.setAttribute("scale", "0"); disp2.setAttribute("scale", "0");
+      // 테 빛 — 가장자리에 색이 잠깐 남았다 빠진다
+      if (P.rim > 0) {
+        var col = palette(P.pal === "split" ? "brand" : P.pal, 0.85);
+        rim.style.height = pop.offsetHeight + "px";
+        rim.style.boxShadow = "inset 0 0 0 1.5px " + col[0] + ", inset 0 0 18px " + (col[1] || col[0]) + ", 0 0 16px " + (col[col.length - 1]);
+        rim.animate([{ opacity: 1 }, { opacity: 0 }], { duration: P.rim * slowK, easing: "ease-out" }).finished.then(function () { rim.remove(); running = false; });
+      } else { rim.remove(); running = false; }
+    }
+    if (SCRUB >= 0) { frame(performance.now()); } else { requestAnimationFrame(frame); }
+  }
+
+  // 색 갈라짐용 가장자리 두 색(빨강 쪽 · 청록 쪽) — palette 에 덧붙인다
+  var basePal = palette;
+  if (SCRUB >= 0) { (function () { confirmBtn.classList.add("is-sent"); confirmBtn.innerHTML = '<span class="i i-16" style="--i:var(--ic-check)" aria-hidden="true"></span>요청됨'; play(); })(); }
+  palette = function (kind, a) {
+    if (kind === "rainbow-r") { return ["rgb(255 80 110 / " + a + ")"]; }
+    if (kind === "rainbow-c") { return ["rgb(60 220 230 / " + a + ")"]; }
+    return basePal(kind, a);
+  };
+})();
+</script>
+</body>
+</html>
