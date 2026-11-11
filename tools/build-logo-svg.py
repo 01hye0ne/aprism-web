@@ -15,9 +15,9 @@ import os
 
 OUT = os.path.join(os.path.dirname(__file__), '..', 'assets', 'img', 'logo')
 
-COLOR_BLACK = '#000000'   # 이미지 값 (CI 문서 표기는 #111111)
-COLOR_BLUE = '#2C5790'    # 이미지 값 (CI 문서 표기는 #004893)
-COLOR_GRAY = '#D9D9D9'    # 이미지 값 (CI 문서 표기는 #7D848C)
+COLOR_BLACK = '#111111'   # CI 문서 Dark Gray/Black (이미지 값은 #000000)
+COLOR_BLUE = '#004893'    # CI 문서 Deep Blue (이미지 값은 #2C5790)
+COLOR_GRAY = '#7D848C'    # CI 문서 Cool Gray (이미지 값은 #D9D9D9)
 
 
 class Pen:
