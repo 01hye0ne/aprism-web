@@ -1611,7 +1611,8 @@
      *   원 가장자리엔 브랜드 그라데이션 물결(파랑 → 청록 → 보라) · 튀는 점, 끝나면 테 빛이 0.9초 남았다 빠진다. 동작 줄이기면 바로 바뀐다
      */
     var wvRun = 0;
-    var WV = { disp: 18, dur: 820, band: 48, glow: 85, pull: 2.5, rim: 900, dots: 18 };
+    // [11/11 디자이너] 일그러짐(SVG 필터)은 뺀다 — disp 0 이면 필터를 걸지 않는다. 원형 걷힘 · 물결 띠 · 점 · 테 빛 · 당김은 그대로
+    var WV = { disp: 0, dur: 820, band: 48, glow: 85, pull: 2.5, rim: 900, dots: 18 };
     function wvDefs() {
       if (document.getElementById("wv-f")) { return; }
       var NS = "http://www.w3.org/2000/svg", svg = document.createElementNS(NS, "svg");
@@ -1658,8 +1659,7 @@
       var dOld = null, dNew = null, fOld = document.getElementById("wv-f"), fNew = document.getElementById("wv-f2");
       dOld = fOld.querySelector("feDisplacementMap"); dNew = fNew.querySelector("feDisplacementMap");
       var tOld = fOld.querySelector("feTurbulence"), tNew = fNew.querySelector("feTurbulence");
-      old.style.filter = "url(#wv-f)";
-      if (lower) { lower.style.filter = "url(#wv-f2)"; }
+      if (WV.disp > 0) { old.style.filter = "url(#wv-f)"; if (lower) { lower.style.filter = "url(#wv-f2)"; } }
       var dots = [];
       for (var d = 0; d < WV.dots; d++) {
         var dot = el("span", "wv-dot");
