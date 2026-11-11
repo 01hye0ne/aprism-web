@@ -627,3 +627,12 @@ body.ver-7.ver-6.v2-2.v3 .delta3.is-open .delta3-body > .ai-input { margin-left:
 body.ver-7.ver-6.v2-2.v3 .delta3.is-open .delta3-card,
 body.ver-7.ver-6.v2-2.v3 .delta3.is-open .delta3-body { overflow: visible; }
 body.ver-7.ver-6.v2-2.v3 .delta3.is-open .delta3-card { overflow: hidden; }   /* 안쪽 판(.delta3-card, 안 여백 4)의 둥근 끝이 입력 칸 아래 모서리를 자른다 — 입력 칸은 그 여백 4 를 음수 여백으로 넘어 판 끝까지 */
+
+/* ==================================================================
+ * [11/11 디자이너] Delta 가로형(main-v7-wide · body.d3-wide) — 접힘 카드만 가로 비율로. 펼침 · 내용 · 동작은 v7 그대로
+ *   카드 295 × 128(폭 = 알림 팝오버 · 펼친 Delta 와 같은 295). 판(.delta3)은 카드 + 사방 20(빛 자리)
+ *   카드 안: 머리 36(Delta) · 요약 두 줄 · 아래 줄(근거 / 호버 때 단추)
+ * ================================================================== */
+body.ver-7.d3-wide.v2-2.v3 .delta3:not(.is-open) { width: calc(295px + var(--space-20) * 2); height: calc(128px + var(--space-20) * 2); }
+:root[data-theme][data-delta][data-glow] body.ver-7.d3-wide.v2-2.v3 .delta3:not(.is-open) .delta3-card { width: 295px; height: 128px; }
+body.ver-7.d3-wide.v2-2.v3 .delta3:not(.is-open) .delta3-name { width: 295px; }
