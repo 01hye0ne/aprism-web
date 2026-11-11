@@ -1443,7 +1443,7 @@
       fill(a);
       box.setAttribute("data-wp", a.wp);
       box.hidden = false;
-      if (V7) { maSlide(true); }   // [11/11 디자이너] 왼쪽에서 오른쪽으로 들어온다
+      if (V7) { maSlide(true); }   // [11/11 디자이너] 좌측 패널 뒤에서 서랍처럼 나온다
       pointAt(a.wp);
       opening = false;
       render();
@@ -1549,17 +1549,25 @@
      *   위험 배지 · 빨강은 그대로 — 요청은 해결이 아니다(위험도 정책). 기록 · 목록 이동은 바로(commit, 토스트 없이)
      */
     /*
-     * [11/11 v7 디자이너] 팝오버 들고 나기 — 들어올 때 왼쪽 → 오른쪽(24px · 0.28초), [확인함]으로 나갈 때 오른쪽 → 왼쪽(32px · 0.22초).
+     * [11/11 v7 디자이너] 팝오버 들고 나기 = 서랍 — 좌측 패널 뒤(지도 판 왼쪽 끝, .two-col 이 자른다)에서 통째로 밀려 나오고 그리로 다시 들어간다.
+     *   거리 = 팝오버 폭 + 판 왼쪽 끝까지(끝까지 숨게). 나올 때 0.42초 감속 · 들어갈 때 0.3초 가속, 흐림 없이 밀기만.
      *   자리(transform)는 지도 스크립트가 쥐고 있어 따로 도는 translate 속성으로 민다. 동작 줄이기면 바로 나타나고 사라진다
      */
     var maAnim = null;
+    function maDrawerX() {
+      var clip = box.closest(".two-col") || box.offsetParent, br = box.getBoundingClientRect();
+      var off = clip ? br.left - clip.getBoundingClientRect().left : 40;
+      return -(Math.max(0, Math.round(off)) + Math.round(br.width || box.offsetWidth || 370) + 8) + "px";
+    }
     function maSlide(enter, done) {
       if (maAnim) { maAnim.cancel(); maAnim = null; }
       var still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      if (still || !box.animate) { if (done) { done(); } return; }
+      if (still || !box.animate || box.hidden) { if (done) { done(); } return; }
+      // 나올 때는 아직 지도 스크립트가 자리를 잡기 전이라 잴 수 없다 — 폭 + 48(판 끝 ~ 팝오버 왼쪽 여백 20 남짓보다 넉넉히)
+      var out = enter ? "calc(-100% - 48px) 0" : maDrawerX() + " 0";
       maAnim = enter
-        ? box.animate([{ translate: "-24px 0", opacity: 0 }, { translate: "0 0", opacity: 1 }], { duration: 280, easing: "cubic-bezier(.2, .8, .2, 1)" })
-        : box.animate([{ translate: "0 0", opacity: 1 }, { translate: "-32px 0", opacity: 0 }], { duration: 220, easing: "cubic-bezier(.4, 0, 1, 1)", fill: "forwards" });
+        ? box.animate([{ translate: out }, { translate: "0 0" }], { duration: 420, easing: "cubic-bezier(.22, 1, .36, 1)" })
+        : box.animate([{ translate: "0 0" }, { translate: out }], { duration: 300, easing: "cubic-bezier(.55, 0, .8, .25)", fill: "forwards" });
       var a = maAnim;
       a.onfinish = function () { if (maAnim === a) { maAnim = null; } if (done) { done(); } if (!enter) { a.cancel(); } };
     }
@@ -1807,7 +1815,7 @@
     document.addEventListener("aprism:monitor-reset", hideToast);
 
     var closeBtn = $("[data-ma-close]", box);
-    if (closeBtn) { closeBtn.addEventListener("click", close); }
+    if (closeBtn) { closeBtn.addEventListener("click", function () { if (V7) { maSlide(false, close); } else { close(); } }); }   // [11/11 v7] [×] 도 서랍으로 들어간다
 
     // 지도가 다른 웨이포인트로 옮겨 가며 쪽지를 닫았다 — 목록의 고른 표시도 놓는다.
     document.addEventListener("aprism:map-alert", function (event) {
