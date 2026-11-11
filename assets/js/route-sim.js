@@ -387,7 +387,7 @@
     rail.classList.toggle("rr-frozen", m === "lost");
     // 목록 위 띠
     m = doneMode(m);
-    var host = rail.parentNode, ban = host && host.querySelector(".rr-banner");
+    var host = rail.parentNode, ban = host && (host.querySelector(".rr-banner") || document.querySelector(".right-panel .mission-header .rr-banner"));   // [11/11 v7] 진행 막대가 로봇 카드로 올라가 띠도 목록 상자 밖에 있다
     var v6 = document.body.classList.contains("ver-6");
     var want = v6 ? !!STATE6[m] : m === "lost" || m === "done";
     if (!want) { if (ban) { ban.remove(); } bitsMode = m; return; }

@@ -4026,7 +4026,7 @@
   function wpPlace() {
     var rail = document.querySelector(".right-panel [data-timeline]");
     if (!rail || !wpTog) { return; }
-    var host = rail.parentNode, meta = host.querySelector(".mission-header .progress-meta");
+    var host = rail.parentNode, meta = host.querySelector(".mission-header .progress-meta") || document.querySelector(".right-panel .mission-header .progress-meta");   // [11/11 v7] 진행 막대는 로봇 카드 안
     Array.prototype.forEach.call(host.children, function (n) { if (n.classList.contains("rr-banner") && meta) { meta.insertBefore(n, meta.firstChild); } });
     if (wpTog.nextElementSibling !== rail) { host.insertBefore(wpTog, rail); }
   }

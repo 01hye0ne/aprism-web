@@ -41,7 +41,7 @@
   <link rel="stylesheet" href="../assets/css/v5.css?v=aefc22b4" />
   <!-- v6 전용 규칙 — v5 는 10/30 부로 멈췄다. v6 에서 바꾸는 것은 여기(body.ver-6)에. -->
   <link rel="stylesheet" href="../assets/css/v6.css?v=6ce16336" />
-  <link rel="stylesheet" href="../assets/css/v7.css?v=b3aa0656" />
+  <link rel="stylesheet" href="../assets/css/v7.css?v=eb1786fe" />
   <!-- 지도 경로 표현 규칙(10/28 반영, 지도 경로 표현 전달서 1022) — 경로 네 구간 · 흐름 빛 · 번호 핀 · 시야 빔 로봇 · 충전 스테이션 · 아래 상태 시뮬레이션 막대 -->
   <link rel="stylesheet" href="../assets/css/route-rules.css?v=bd91ee52" />
   <style>
@@ -629,6 +629,8 @@
 
                   <!-- 한 대씩 넘겨 본다 — 왼쪽 < 그래픽 > , 오른쪽 이름 · 자동복귀 · E-STOP · 상태 세 줄.
                        카드는 메인 화면 것 그대로이고 선택된 한 장만 보인다(is-carousel). -->
+                  <!-- [11/11 v7 · Figma UI_00 1068:16438] 로봇 카드 + 진행 막대가 한 상자다 — 위 로봇(그래픽 | 상태 세 줄 · 단추), 끝에서 끝까지 진행 선(8), 아래 지금 하는 일 · 남은 시간 · %. -->
+                  <div class="rc-box">
                   <div class="robot-carousel" data-robot-carousel>
                   <div class="robot-strip is-carousel" role="group" aria-label="로봇 선택">
                     <button type="button" class="robot-card" data-robot="0" aria-pressed="true">
@@ -1084,29 +1086,32 @@
                   </div>
                   </div>
 
+                  <!-- 진행 — 선(8)이 로봇 칸 바로 밑을 끝에서 끝까지 지나고, 그 아래 Progress Bar(bg/cell): 지금 하는 일 · 남은 시간 | %. 지나온 수(7/20)는 지점 목록 머리가 말한다. -->
+                  <div class="mission-header">
+                    <div class="progress-bar">
+                      <div class="progress-track" role="img" data-progress-track>
+                        <span class="progress-fill"></span>
+                        <span class="progress-knob"><span class="i i-16" style="--i:var(--ic-way)"></span></span>
+                      </div>
+                      <div class="progress-meta">
+                        <div class="progress-titles">
+                          <span class="progress-title" data-progress-title>현재 수행명</span>
+                          <span class="progress-left" data-progress-left>—</span>
+                        </div>
+                        <span class="progress-percent num" data-progress-percent>00%</span>
+                      </div>
+                      <div class="progress-foot" hidden>
+                        <span class="progress-count num" data-progress-count>0/00</span>
+                      </div>
+                    </div>
+                  </div>
+                  </div>
+
                 </div>
               </div>
 
-              <!-- 아래쪽 — 진행 막대와 타임라인 -->
+              <!-- 아래쪽 — 지점 목록 -->
               <div class="panel-card is-fill">
-                <div class="mission-header">
-                  <div class="progress-bar">
-                    <div class="progress-meta">
-                      <!-- 종류 아이콘은 뺐다(10/20 디자이너) — 저해상도에서 뭉개지고 웨이포인트마다 맞는 그림을 다 댈 수 없다. -->
-                      <span class="progress-title" data-progress-title>현재 수행명</span>
-                      <span class="progress-percent num" data-progress-percent>00%</span>
-                    </div>
-                    <!-- Figma Progress Bar(1054:20548) — 4px 선 위를 표식이 지나간다. 아래 줄은 남은 거리와 지나온 수. -->
-                    <div class="progress-track" role="img" data-progress-track>
-                      <span class="progress-fill"></span>
-                      <span class="progress-knob"><span class="i i-16" style="--i:var(--ic-way)"></span></span>
-                    </div>
-                    <div class="progress-foot">
-                      <span class="progress-left" data-progress-left>—</span>
-                      <span class="progress-count num" data-progress-count>0/00</span>
-                    </div>
-                  </div>
-                </div>
 
                 <!-- 선택된 로봇의 waypoint 다. screen.js 가 그린다. -->
                 <div class="timeline" data-timeline aria-live="polite">
@@ -1786,7 +1791,7 @@
 <script src="../assets/js/map-model.js?v=0f88c871"></script>
 <!-- v5 전용 지도(map-v3.js 를 10/29 에 복제) -->
 <script src="../assets/js/map-fx-v6.js?v=05546ef0"></script>
-<script src="../assets/js/map-v6.js?v=51d81c87"></script>
+<script src="../assets/js/map-v6.js?v=00ed061d"></script>
 <!-- 지도 위 3D 로봇(SPOT · 휠 로봇) — 10/29 디자이너 "SPOT 로봇 360 시안". 예전 로봇개(robot-stage.js)는 v5 에서 안 쓴다. -->
 <script src="../assets/js/robot-spot.js?v=2a3061e4"></script>
 <script src="../assets/js/robot-2d.js?v=dd759e17"></script>
@@ -1806,6 +1811,6 @@
 <script src="../assets/js/grid-overlay.js?v=164e4f2a"></script>
 <script src="../assets/js/v3-panel.js?v=342f6059"></script>
 <!-- 상태 8개(이동 중 · 측정 중 · 위험 감지 · 일시정지 · 긴급정지 · 자동복귀 · 통신 끊김 · 미션 완료) · 재생 · 진행 막대 -->
-<script src="../assets/js/route-sim.js?v=137ac3e6"></script>
+<script src="../assets/js/route-sim.js?v=f42944c5"></script>
 </body>
 </html>
