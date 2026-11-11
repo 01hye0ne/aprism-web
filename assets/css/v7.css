@@ -812,3 +812,8 @@ body.ver-7 .dchat-l2 .dl-wp[data-sev="warning"] { background-color: #FFC800; }
  *   로고 칸 폭(GNB 레일 76)은 그대로 두고 좌우 여백만 16 → 8 로 줄여 워드마크 폭 60(높이 약 7.7). 색은 글자색(text/primary) 그대로 */
 body.ver-7 .status-bar-logo { padding-left: var(--space-8); padding-right: var(--space-8); }
 body.ver-7 .status-bar-logo .i { width: 60px; height: 8px; }
+
+/* [11/11] Delta 패널 이름 = 글자 'Delta' 대신 DELTA 워드마크(assets/img/logo/delta.svg → icons/brand-delta.svg).
+ *   높이 12 = 예전 16px 글자의 대문자 높이 · 폭은 비율대로 78. 색은 이름 글자색 그대로. 접힘 상태에선 예전처럼 숨는다 */
+body.ver-7.ver-3.v2-2.v3 .delta3.is-open .delta3-name b.delta3-logo { display: flex; align-items: center; height: 24px; }
+body.ver-7 .delta3 .delta3-name b.delta3-logo .i { width: 78px; height: 12px; }
