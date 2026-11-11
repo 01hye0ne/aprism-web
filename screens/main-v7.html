@@ -41,7 +41,7 @@
   <link rel="stylesheet" href="../assets/css/v5.css?v=aefc22b4" />
   <!-- v6 전용 규칙 — v5 는 10/30 부로 멈췄다. v6 에서 바꾸는 것은 여기(body.ver-6)에. -->
   <link rel="stylesheet" href="../assets/css/v6.css?v=6ce16336" />
-  <link rel="stylesheet" href="../assets/css/v7.css?v=a7fcb0e0" />
+  <link rel="stylesheet" href="../assets/css/v7.css?v=6f4c1cf8" />
   <!-- 지도 경로 표현 규칙(10/28 반영, 지도 경로 표현 전달서 1022) — 경로 네 구간 · 흐름 빛 · 번호 핀 · 시야 빔 로봇 · 충전 스테이션 · 아래 상태 시뮬레이션 막대 -->
   <link rel="stylesheet" href="../assets/css/route-rules.css?v=901136aa" />
   <style>
@@ -435,11 +435,12 @@
                 <button type="button" class="icon-button" data-map-track aria-label="전체 보기" title="전체 보기">
                   <span class="i i-20" style="--i:var(--ic-fit-screen)"></span>
                 </button>
-                <button type="button" class="icon-button map-dim" data-map-top data-map-dim aria-label="2D로 보기" title="2D로 보기">
-                  <span class="map-dim-txt t-label-1" data-map-dim-txt>2D</span>
+                <!-- [11/11 v7 디자이너] 2D · 3D 두 단추 — 지금 보는 쪽이 계속 눌린 상태(aria-pressed). 영상 리플레이 단추는 뺐다 -->
+                <button type="button" class="icon-button map-dim" data-map-top data-map-dim aria-label="2D로 보기" title="2D로 보기" aria-pressed="false">
+                  <span class="map-dim-txt t-label-1">2D</span>
                 </button>
-                <button type="button" class="icon-button is-secondary" aria-label="영상 리플레이">
-                  <span class="i i-20" style="--i:var(--ic-play)"></span>
+                <button type="button" class="icon-button map-dim" data-map-3d aria-label="3D로 보기" title="3D로 보기" aria-pressed="true">
+                  <span class="map-dim-txt t-label-1">3D</span>
                 </button>
                 </div>
                 <div class="map-tools-box is-floors">
@@ -1791,7 +1792,7 @@
 <script src="../assets/js/map-model.js?v=0f88c871"></script>
 <!-- v5 전용 지도(map-v3.js 를 10/29 에 복제) -->
 <script src="../assets/js/map-fx-v6.js?v=05546ef0"></script>
-<script src="../assets/js/map-v6.js?v=8835feee"></script>
+<script src="../assets/js/map-v6.js?v=ec08bbe9"></script>
 <!-- 지도 위 3D 로봇(SPOT · 휠 로봇) — 10/29 디자이너 "SPOT 로봇 360 시안". 예전 로봇개(robot-stage.js)는 v5 에서 안 쓴다. -->
 <script src="../assets/js/robot-spot.js?v=2a3061e4"></script>
 <script src="../assets/js/robot-2d.js?v=dd759e17"></script>

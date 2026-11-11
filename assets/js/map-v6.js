@@ -869,7 +869,41 @@
    *   2D = 바로 위(위 탑뷰와 같다), 3D = 2D 로 오기 전 각도로 되돌아간다(처음이면 처음 각도). 손으로 기울여 탑뷰를 벗어나도 글자가 따라간다.
    *   v7 단추(data-map-dim)에만 — v6 은 위 탑뷰 그대로.
    */
-  if (top && top.hasAttribute("data-map-dim")) {
+  /*
+   * [11/11 v7 디자이너] 2D · 3D 두 단추(data-map-3d 가 있으면) — 토글 글자 대신 두 단추가 늘 서 있고, 지금 보는 쪽이 계속 눌린 상태.
+   *   2D = 바로 위로(가기 전 각도 기억), 3D = 기억한 각도로(처음이면 처음 각도). 이미 그 상태면 아무 일 없음. 손으로 기울여도 눌림이 따라간다
+   */
+  var btn3d = document.querySelector("[data-map-3d]");
+  if (top && btn3d) {
+    var keep3d = null;
+    var flatNow = function () { return pitch >= TOP_PITCH - 2 * Math.PI / 180; };
+    var dimSync2 = function () {
+      var flat = flatNow();
+      if (top.getAttribute("aria-pressed") !== String(flat)) { top.setAttribute("aria-pressed", String(flat)); }
+      if (btn3d.getAttribute("aria-pressed") !== String(!flat)) { btn3d.setAttribute("aria-pressed", String(!flat)); }
+    };
+    var press = function (flat) {
+      // 누른 쪽을 바로 켠다 — 카메라가 다 돌기 전에도 눌린 쪽이 바뀌어 보이게
+      top.setAttribute("aria-pressed", String(flat)); btn3d.setAttribute("aria-pressed", String(!flat));
+    };
+    top.addEventListener("click", function () {
+      if (flatNow()) { return; }
+      keep3d = { yaw: yaw, pitch: pitch };
+      press(true);
+      unwind(0);
+      glide(0, TOP_PITCH, zoom, null);
+    });
+    btn3d.addEventListener("click", function () {
+      if (!flatNow()) { return; }
+      var b3 = keep3d || { yaw: HOME_YAW, pitch: HOME_PITCH };
+      keep3d = null;
+      press(false);
+      unwind(b3.yaw);
+      glide(b3.yaw, b3.pitch, zoom, null);
+    });
+    setInterval(function () { if (!trip) { dimSync2(); } }, 400);   // 움직이는 중(trip)엔 누른 쪽을 지킨다
+    dimSync2();
+  } else if (top && top.hasAttribute("data-map-dim")) {
     var dimTxt = top.querySelector("[data-map-dim-txt]");
     var EN_DIM = document.documentElement.lang === "en";
     var before3d = null;
