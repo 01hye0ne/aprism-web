@@ -651,3 +651,5 @@ body.ver-7 .rc-box .progress-percent { flex: none; min-width: 56px; text-align: 
 /* [11/11 디자이너] % 숫자 24 → 32(줄 40) · 단위 13 → 14 — 숫자 높이(약 23)가 왼쪽 두 줄 덩이(46)의 절반을 넘어 요약 값으로 선다. 칸 폭은 “100%” 자리 72 */
 body.ver-7 .rc-box .progress-percent { font-size: 32px; line-height: 40px; min-width: 72px; }
 body.ver-7 .rc-box .progress-percent .pp-unit { font-size: var(--font-size-14); line-height: var(--font-line-height-20); }
+/* [11/11 디자이너] 진행 칸 위아래 여백 16 → 12(좌우 8 그대로) */
+body.ver-7 .rc-box .progress-meta { padding-top: var(--space-12); padding-bottom: var(--space-12); }
