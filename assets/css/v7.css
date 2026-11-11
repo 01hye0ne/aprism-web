@@ -617,3 +617,13 @@ body.ver-7 .rc-box .progress-title .pt-pp { flex: none; }
 body.ver-7 .rc-box .progress-title .pt-act { display: inline; flex: none; white-space: nowrap; }
 body.ver-7 .rc-box .progress-title:not(:has(.pt-head)) { display: block; text-overflow: ellipsis; }
 body.ver-7 .rc-box .progress-title .pt-head:not(:has(.pt-nm)) { display: block; text-overflow: ellipsis; white-space: nowrap; }   /* 조사 없는 머리(영문 "…, ") — 머리 글 자체를 줄인다 */
+
+/* [11/11 디자이너] 펼친 Delta 여백 —
+ *   머리(Delta 로고 줄) 아래 여백 = 위 여백(10) — 2 였다
+ *   입력 칸은 좌우 · 아래 여백 없이 안쪽 판 끝까지 꽉 차게. 아래 두 모서리는 안쪽 판 둥근 끝을 따른다 */
+body.ver-7.ver-3.v2-2.v3 .delta3.is-open .delta3-name { padding-bottom: 10px; }
+:root[data-theme][data-delta][data-glow] body.ver-7.ver-6.v2-2.v3 .delta3.is-open .delta3-body > .ai-input,
+body.ver-7.ver-6.v2-2.v3 .delta3.is-open .delta3-body > .ai-input { margin-left: -4px; margin-right: -4px; margin-bottom: -4px; border-radius: 0; }
+body.ver-7.ver-6.v2-2.v3 .delta3.is-open .delta3-card,
+body.ver-7.ver-6.v2-2.v3 .delta3.is-open .delta3-body { overflow: visible; }
+body.ver-7.ver-6.v2-2.v3 .delta3.is-open .delta3-card { overflow: hidden; }   /* 안쪽 판(.delta3-card, 안 여백 4)의 둥근 끝이 입력 칸 아래 모서리를 자른다 — 입력 칸은 그 여백 4 를 음수 여백으로 넘어 판 끝까지 */
