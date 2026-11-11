@@ -4108,7 +4108,14 @@
       }
       if (!head) { return; }
       ptEl.textContent = "";
-      var h = document.createElement("span"); h.className = "pt-head"; h.textContent = head;
+      var h = document.createElement("span"); h.className = "pt-head";
+      // [11/11 디자이너] 한 줄에서 넘치면 장소 이름만 줄인다(행동은 늘 보인다) — 조사(로 · 으로)는 이름 뒤에 남게 따로 감싼다. 글자(textContent)는 그대로
+      var pm = /^(.+?)(으로|로)$/.exec(head);
+      if (pm) {
+        var hn = document.createElement("span"); hn.className = "pt-nm"; hn.textContent = pm[1];
+        var hp = document.createElement("span"); hp.className = "pt-pp"; hp.textContent = pm[2];
+        h.appendChild(hn); h.appendChild(hp);
+      } else { h.textContent = head; }
       var a = document.createElement("span"); a.className = "pt-act"; a.textContent = act;
       ptEl.appendChild(h); ptEl.appendChild(document.createTextNode(" ")); ptEl.appendChild(a);
     };

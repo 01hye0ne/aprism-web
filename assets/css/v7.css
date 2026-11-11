@@ -607,3 +607,13 @@ body.ver-7 .map-alert > .wv-front { position: absolute; inset: 0; z-index: 7; po
 body.ver-7 .map-alert > .wv-front > i { position: absolute; inset: 0; }
 body.ver-7 .map-alert > .wv-rim { position: absolute; inset: 0; z-index: 8; pointer-events: none; border-radius: inherit; opacity: 0; }
 body.ver-7 .map-alert > .wv-dot { position: absolute; z-index: 9; width: 3px; height: 3px; border-radius: 50%; pointer-events: none; }
+
+/* [11/11 디자이너] 진행 제목 한 줄 — 넘치면 장소 이름만 말줄임, 조사 · 행동("로 이동 중")은 늘 보인다(map-v6.js ptSplit 가 .pt-nm · .pt-pp 로 감싼다).
+ *   장소 전체 이름은 바로 아래 지점 목록의 지금 카드가 말한다. 높이는 한 줄 그대로(Figma 1068:16438) */
+body.ver-7 .rc-box .progress-title { display: flex; align-items: baseline; gap: 0.25em; text-overflow: clip; }
+body.ver-7 .rc-box .progress-title .pt-head { display: inline-flex; flex: 0 1 auto; min-width: 0; overflow: hidden; }
+body.ver-7 .rc-box .progress-title .pt-nm { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+body.ver-7 .rc-box .progress-title .pt-pp { flex: none; }
+body.ver-7 .rc-box .progress-title .pt-act { display: inline; flex: none; white-space: nowrap; }
+body.ver-7 .rc-box .progress-title:not(:has(.pt-head)) { display: block; text-overflow: ellipsis; }
+body.ver-7 .rc-box .progress-title .pt-head:not(:has(.pt-nm)) { display: block; text-overflow: ellipsis; white-space: nowrap; }   /* 조사 없는 머리(영문 "…, ") — 머리 글 자체를 줄인다 */
