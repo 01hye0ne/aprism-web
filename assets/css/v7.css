@@ -1023,3 +1023,7 @@ body.ver-7 .robot-strip.is-carousel .robot-2d.is-mobed { left: -12px; }
 
 /* [11/11 디자이너] 챗봇형 창 머리 접기 = [∨] — 창이 아래 오브 쪽으로 접혀 들어간다. 일반 main-v7 은 왼쪽 위 카드로 접혀 올라가 [∧] 그대로 */
 body.ver-7.d3-chat .delta3 .delta3-close .i { transform: none; }
+
+/* [11/11 디자이너] 로봇 카드 진행 막대 손잡이(16) — 진행률 자리를 가운데로 서서 0% 면 반이 카드 왼 끝 밖으로 잘렸다(100% 면 오른 끝).
+ *   손잡이 가운데를 막대 양 끝 8 안쪽으로 묶는다 — 그 사이에선 진행률 그대로 */
+body.ver-7 .rc-box .progress-knob { left: clamp(8px, var(--progress, 0%), calc(100% - 8px)); }
