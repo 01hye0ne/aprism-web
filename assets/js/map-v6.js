@@ -2913,9 +2913,12 @@
     return {
       center: right / 2,
       top: dr ? Math.max(8, dr.top - box.top) : 16,
+      left: dr ? Math.max(8, dr.left - box.left) : 16,                 // [11/11] 왼쪽 끝 = Delta 왼쪽 끝
+      below: dr ? dr.bottom - box.top + 8 : 16,                         // [11/11] Delta 아래 끝 + 8 — 팝오버가 쓸 수 있는 위 끝
       floor: floor
     };
   }
+  var MA_FOLD = 330;      // [11/11] 팝오버가 머리 한 줄로 접히는 남은 높이 — 머리 42 + 사진 최소 80 + 아래 칸 약 208
   var alertSide = "";     // [11/05] 옆으로 세운 쪽 — "r" 점 오른쪽 · "l" 왼쪽(placeAlert)
   var alertAim = false;   // 쪽지를 열고 카메라가 점을 찾아가는 중
 
@@ -3084,10 +3087,24 @@
   function placeAlert(x, y, W, H) {
     var w = alertBox.offsetWidth, h = alertBox.offsetHeight;
     if (V7MA && !alertBox.classList.contains("is-docked")) {
-      var rm = v7Room(W, H), hw = w / 2;
+      var rm = v7Room(W, H);
       // 자리 셈은 지도 칸(hit) 기준이지만 카드는 제 부모(.map-canvas) 기준으로 선다 — 두 상자의 어긋남을 더해 우측 패널 아래 끝과 정확히 맞춘다
       var hb0 = hit.getBoundingClientRect(), op = alertBox.offsetParent ? alertBox.offsetParent.getBoundingClientRect() : hb0;
-      var ccx = Math.max(12 + hw, rm.center) + (hb0.left - op.left);
+      /*
+       * [11/11 디자이너] 세로형 팝오버(Figma 1713:13853) — 왼쪽 아래 고정. 알림 목록(왼쪽) → 팝오버 → 가운데 지점으로 시선이 이어진다.
+       *   왼쪽 끝 = Delta 왼쪽 끝, 아래 끝 = 우측 패널 아래 끝. 위로는 Delta 아래 끝 + 8 까지만 쓴다 —
+       *   Delta 를 펼치면 Delta 가 위, 팝오버가 남은 아래를 쓰고(사진이 먼저 줄어든다, v7.css --ma-max),
+       *   남은 높이가 MA_FOLD 보다 작으면 머리 한 줄로 접는다(.is-folded — 머리를 누르면 Delta 를 접고 다시 편다)
+       */
+      var room = Math.floor(rm.floor - rm.below);
+      alertBox.style.setProperty("--ma-max", room + "px");
+      alertBox.classList.toggle("is-folded", room < MA_FOLD);
+      w = alertBox.offsetWidth; h = alertBox.offsetHeight;
+      // 가로는 화면 좌표로 바로 맞춘다 — Delta 왼쪽 끝(화면) - 부모 안쪽 왼쪽 끝. 지도 칸 기준으로 셈하면 부모 테 · 여백만큼 어긋났다
+      //   접힌 Delta 는 바깥 상자(.delta3)보다 안쪽 카드(.delta3-card)가 눈에 보이는 끝이다
+      var dEl = document.querySelector(".delta3.is-open") || document.querySelector(".delta3 .delta3-card") || document.querySelector(".delta3"), dRect = dEl && dEl.getClientRects().length ? dEl.getBoundingClientRect() : null;
+      var opEl = alertBox.offsetParent;
+      var ccx = (dRect ? dRect.left : hb0.left + rm.left) - op.left - (opEl ? opEl.clientLeft : 0) + w / 2;
       var cardTop = rm.floor - h + (hb0.top - op.top);
       alertBox.classList.remove("is-side-r", "is-side-l", "is-below");
       alertBox.classList.add("is-fixed", "is-no-tail");
@@ -3165,9 +3182,9 @@
     // [11/10 v7] 지점을 카드 아래 남은 칸의 한가운데로 — 카드가 위쪽에 고정이라 지점은 화면 가운데보다 아래에 선다
     if (V7MA) {
       var hb = hit.getBoundingClientRect(), rm = v7Room(hb.width, hb.height);
-      // [11/10 디자이너] 지점을 지도 칸 가운데 쪽으로 — 카드 위 칸의 한가운데는 너무 위로 붙어 보였다.
-      //   바닥 점은 칸 가운데보다 30 위(핀 머리까지 한 덩이가 가운데에 오게), 카드 위 끝과는 60 이상 띄운다
-      var want = Math.min(hb.height / 2 - 30, rm.floor - alertBox.offsetHeight - 60);
+      // [11/10 디자이너] 지점을 지도 칸 가운데 쪽으로 — 바닥 점은 칸 가운데보다 30 위(핀 머리까지 한 덩이가 가운데에 오게).
+      // [11/11] 팝오버가 왼쪽 아래로 옮겨 가운데를 가리지 않는다 — 카드 위 끝과 띄우던 셈은 뺐다
+      var want = hb.height / 2 - 30;
       lift = want - hb.height / 2;
     }
     var s = (baseSize / z) / (view.clientHeight || 1);
@@ -4380,6 +4397,7 @@
     if (!V7MA) { return; }
     var mp = alertOn() ? chosenWp : null;
     if (mp !== maPinId) { maPinId = mp; rrHotApply(); if (!mp && maLabel) { maLabel.hidden = true; } }
+    document.body.classList.toggle("ma-on", !!mp);   // [11/11] 팝오버가 떠 있는 동안 Delta 펼침은 위쪽 반(v7.css)
   }
   /*
    * [11/10 v7 디자이너] 알림 지점 이름표 — 팝오버 사진 위 띠(위치 · 시각)를 지도로 옮겼다. 타겟팅한 지점 바닥 고리 바로 아래 두 줄:
@@ -4404,6 +4422,19 @@
     maLabel.style.setProperty("--y", snapPx(y));
   }
   if (V7MA && alertBox) { new MutationObserver(maPinSync).observe(alertBox, { attributes: true, attributeFilter: ["hidden", "data-wp"] }); }
+  /*
+   * [11/11] 세로형 팝오버 ↔ Delta — Delta 가 펴지고 접힐 때(크기 변화) 팝오버 자리 · 높이를 다시 잡는다.
+   *   접힌 팝오버(.is-folded)는 머리를 누르면 Delta 를 접는다 → 자리가 생겨 다시 펴진다(나중에 연 쪽이 앞선다)
+   */
+  if (V7MA && alertBox) {
+    var maDelta = document.querySelector(".delta3");
+    if (maDelta && window.ResizeObserver) { new ResizeObserver(function () { if (alertOn()) { frame(); } }).observe(maDelta); }
+    alertBox.addEventListener("click", function (event) {
+      if (!alertBox.classList.contains("is-folded") || !event.target.closest(".ma-head") || event.target.closest("button, a")) { return; }
+      var dw = document.querySelector(".delta3.is-open [data-ai-toggle], [data-ai-toggle][aria-expanded='true']");
+      if (dw) { dw.click(); }
+    });
+  }
   function rrHotApply() {
     var id = rrHov, point = !!(id && rrHovPt);
     if (!id && maPinId) { id = maPinId; point = true; }
