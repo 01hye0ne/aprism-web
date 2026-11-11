@@ -26,7 +26,8 @@
     '<div class="dchat-bubble" role="status">' +
       '<button type="button" class="dchat-bubble-body" aria-label="Delta 대화창 열기"><span class="dchat-l1"></span><span class="dchat-l2"></span></button>' +
     '</div>' +
-    '<button type="button" class="dchat-orb" aria-label="Delta 대화창 열기" aria-expanded="false"><span class="dchat-orb-in" aria-hidden="true"></span><span class="dchat-badge" hidden></span></button>';
+    '<button type="button" class="dchat-orb" aria-label="Delta 대화창 열기" aria-expanded="false"><span class="dchat-orb-in" aria-hidden="true"></span><span class="dchat-badge" hidden></span>' +
+      '<span class="dchat-logo" role="img" aria-label="DELTA"></span></button>';   // [11/11 디자이너] 말풍선 상태(닫힘)엔 오브 아래 DELTA 워드마크
   stage.appendChild(dock);
   var bubble = dock.querySelector(".dchat-bubble"), l1 = dock.querySelector(".dchat-l1"), l2 = dock.querySelector(".dchat-l2");
   var orbBtn = dock.querySelector(".dchat-orb"), badge = dock.querySelector(".dchat-badge");
@@ -36,7 +37,7 @@
   function sev() { return win.classList.contains("is-critical") ? "critical" : win.classList.contains("is-warning") ? "warning" : win.classList.contains("is-safe") ? "safe" : "info"; }
   if (window.PrismOrb) { orb = window.PrismOrb.mount(dock.querySelector(".dchat-orb-in"), { palette: sev() }); }
 
-  var lastKey = "";
+  var lastKey = "", orbHoldT = 0;
   // [11/11 디자이너] 말풍선 둘째 줄은 첫 문장("…있어요.") 뒤에서 한 번 줄을 바꾼다
   function brAfterFirst(root) {
     var w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT), n;
@@ -67,6 +68,16 @@
     if (orb && orb.setPalette) { orb.setPalette(s); }
     var open = win.classList.contains("is-open");
     body.classList.toggle("dchat-open", open);
+    /*
+     * [11/11 디자이너] 대화창이 열리면 큰 오브는 숨긴다 — 창 머리의 작은 오브가 Delta 표식 · 단계 색을 이어받는다(오브가 창이 된다).
+     *   새 창일 때만 남긴다(이 화면에 Delta 가 사라지지 않게 · 누르면 새 창을 앞으로). 숨긴 오브는 그리기를 멈춘다
+     */
+    var orbOff = open && (mode || "float") !== "window";
+    if (orbOff !== body.classList.contains("dchat-orb-off")) {
+      body.classList.toggle("dchat-orb-off", orbOff);
+      clearTimeout(orbHoldT);
+      if (orb && orb.pause) { if (orbOff) { orbHoldT = setTimeout(function () { orb.pause(); }, 240); } else { orb.resume(); } }
+    }
     orbBtn.setAttribute("aria-expanded", String(open));
     orbBtn.setAttribute("aria-label", open ? "Delta 대화창 닫기" : "Delta 대화창 열기");
     bubble.hidden = open || !t1;
@@ -109,7 +120,7 @@
      * [11/11 디자이너] 떠 있기 = 오브 바로 위 정사각형(1:1) — 오른쪽 끝 = 오브 · 지도 도구 줄 오른쪽 끝, 아래 끝 = 오브 위 12,
      *   위 끝은 도구 줄(층 전환 포함) 아래 12 까지. 크기 = 최대 380 · 남는 높이만큼. 남는 높이가 320 아래면 예전처럼 오브 왼쪽에 선다
      */
-    var abB = Math.max(ob + 56 + 12, lift);
+    var abB = Math.max(ob, lift);   // [11/11] 열리면 오브가 빠진다 — 창 오른쪽 아래 모서리 = 오브가 있던 모서리
     var topLim = tb ? tb.bottom - sb.top + 12 : 16;
     var avail = Math.floor(sb.height - topLim - abB);
     var above = (mode || "float") === "float" && avail >= 320;

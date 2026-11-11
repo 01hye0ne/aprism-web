@@ -956,3 +956,14 @@ body.ver-7.ver-3.v2-2.v3 .delta3 .delta3-close:hover { background-color: rgb(255
 /* [11/11 디자이너] 판단 근거 상자 바탕 = 알림 목록 바탕(--bg-inset) — 팝오버 면보다 한 단 어둡게 */
 body.ver-7 .ma-ins-sec { background-color: var(--bg-inset); }
 body.ver-7 .ma-ins-pt { fill: var(--bg-inset); }
+
+/* [11/11 디자이너] 대화창이 열리면 큰 오브는 줄어들며 사라진다(body.dchat-orb-off — 새 창일 땐 남는다). 창은 같은 모서리에서 커진다(dchat-grow) */
+body.ver-7 .dchat-orb { transition: transform .2s ease, opacity .2s ease, visibility 0s linear 0s; transform-origin: 100% 100%; }
+body.ver-7.dchat-orb-off .dchat-orb { opacity: 0; transform: scale(.5); visibility: hidden; pointer-events: none; transition: transform .2s ease, opacity .16s ease, visibility 0s linear .2s; }
+@media (prefers-reduced-motion: reduce) { body.ver-7 .dchat-orb, body.ver-7.dchat-orb-off .dchat-orb { transition: none; } }
+/* 말풍선 상태(닫힘) — 오브 아래 DELTA 워드마크(52 × 8, 사이 6). 그만큼 오브를 올리고 말풍선도 오브 아래 끝에 맞춰 같이 올린다 */
+body.ver-7 .dchat-logo { position: absolute; left: 50%; top: calc(100% + 6px); width: 52px; height: 8px; transform: translateX(-50%); pointer-events: none;
+  background-color: var(--text-primary); -webkit-mask: var(--ic-brand-delta) center / contain no-repeat; mask: var(--ic-brand-delta) center / contain no-repeat; }
+body.ver-7.dchat-open .dchat-logo { display: none; }
+body.ver-7:not(.dchat-open) .dchat { padding-bottom: 14px; }
+body.ver-7 .dchat-bubble { margin-bottom: 14px; }

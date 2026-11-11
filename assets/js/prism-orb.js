@@ -796,8 +796,9 @@
       if (raf) { cancelAnimationFrame(raf); raf = 0; }
     }
 
+    var held = false;   // [11/11] pause() 로 붙잡아 둔 동안은 탭이 다시 보여도 돌지 않는다
     function play() {
-      if (dead || running) return;
+      if (dead || running || held) return;
       if (reduce && reduce.matches) { still(); return; }
       running = true;
       start = 0;
@@ -855,6 +856,9 @@
         pal = next;
         if (!running) still();
       },
+      // [11/11 v7 챗봇형] 가려 둔 오브는 그리기를 멈춘다(delta-chatbot-v7.js — 대화창이 열리면 큰 오브를 숨긴다)
+      pause: function () { held = true; stop(); },
+      resume: function () { held = false; play(); },
       destroy: destroy
     };
   }
