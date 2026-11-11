@@ -845,11 +845,18 @@
    * 전체 보기 — 처음 각도 · 처음 배율 · 한가운데로 돌아온다.
    * 마음껏 돌려 놓고도 한 번에 제자리로 오는 이 길이, 각도를 열어 둘 수 있는 근거다.
    */
+  var TOP_FIT = 0.74;   // 2D 전체 보기 배율 — 탑뷰에서 층 전체가 들어오는 값(화면에서 맞춤)
   var reset = document.querySelector("[data-map-track]");
   if (reset) {
     reset.addEventListener("click", function () {
-      unwind(HOME_YAW);
       clearFocus();               // 전체 보기는 기준을 푼다
+      // [11/11 v7 디자이너] 2D(탑뷰)로 보는 중이면 2D 를 지킨 채 줄여서 전체를 보인다 — 3D 처음 각도로 튀지 않게
+      if (document.body.classList.contains("ver-7") && pitch >= TOP_PITCH - 2 * Math.PI / 180) {
+        unwind(0);
+        glide(0, TOP_PITCH, TOP_FIT, home);
+        return;
+      }
+      unwind(HOME_YAW);
       glide(HOME_YAW, HOME_PITCH, 1, home);
     });
   }
