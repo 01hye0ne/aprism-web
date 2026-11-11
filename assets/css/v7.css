@@ -998,3 +998,21 @@ body.ver-7 .dchat-tail .s { fill: none; stroke: var(--bl); stroke-width: 1; }
  *   꺾쇠 칸은 3 바깥으로, 정렬 단추는 2 안으로 */
 body.ver-7 .context-panel .ah-all { margin-right: -3px; }
 body.ver-7 .context-panel .ah-sort-btn { margin-right: 2px; }
+
+/* [11/11 디자이너] 다크 말풍선도 라이트처럼 색조를 섞는다 — 같은 짜임(oklab 165°: 회보라 → 중간 → 단계색)을 어둡게 낮춰 90% 로(뒤 지도가 조금 비친다).
+ *   안쪽 단계색 번짐(--bin)도 라이트와 같은 방식. 꼬리 = 그라데이션 끝 색 */
+:root:not([data-theme="light"]) body.ver-7 .dchat .dchat-bubble {
+  --bi: linear-gradient(in oklab 165deg, rgb(46 42 62 / 90%) 0%, rgb(43 51 80 / 90%) 34%, rgb(31 55 102 / 90%) 70%, rgb(26 58 122 / 90%) 100%);
+  --tf: rgb(26 58 122 / 90%);
+  --bin: inset 0 2px 3px -1px rgb(255 255 255 / 14%), inset 0 0 20px 0 rgb(90 140 255 / 18%);
+}
+:root:not([data-theme="light"]) body.ver-7 .dchat[data-sev="critical"] .dchat-bubble {
+  --bi: linear-gradient(in oklab 165deg, rgb(46 42 62 / 90%) 0%, rgb(62 38 53 / 90%) 34%, rgb(90 35 40 / 90%) 70%, rgb(110 36 32 / 90%) 100%);
+  --tf: rgb(110 36 32 / 90%);
+  --bin: inset 0 2px 3px -1px rgb(255 255 255 / 14%), inset 0 0 20px 0 rgb(255 100 80 / 20%);
+}
+:root:not([data-theme="light"]) body.ver-7 .dchat[data-sev="warning"] .dchat-bubble {
+  --bi: linear-gradient(in oklab 165deg, rgb(46 42 62 / 90%) 0%, rgb(58 50 38 / 90%) 34%, rgb(77 58 26 / 90%) 70%, rgb(92 69 18 / 90%) 100%);
+  --tf: rgb(92 69 18 / 90%);
+  --bin: inset 0 2px 3px -1px rgb(255 255 255 / 14%), inset 0 0 20px 0 rgb(255 190 80 / 16%);
+}
