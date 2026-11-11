@@ -79,5 +79,109 @@
     return g + "</g></svg>";
   }
 
-  window.APRISM_MINI = { svg: svg, PLAN2: PLAN2, tour2: tour2, routeL: routeL };
+  /*
+   * [11/11 v7 디자이너] 고급 미니맵(관제 웨이포인트 상자 [지도]) — 레퍼런스(서킷 안내도)처럼:
+   *   어두운 바닥 위 설비 = 살짝 밝은 블록 + 아래 오른쪽 그림자 띠(2.5D) + 밝은 윗테, 벽 = 가는 선
+   *   경로 = 어두운 테(케이싱)를 두른 밝은 파랑 한 줄(지나온 길 = 진하게 + 빛, 앞길 = 옅게), 지점 = 흰 테 작은 점
+   *   번호 = 길 바깥쪽(경로 무게중심 반대 · 길에 수직)으로 짧은 지시선 + 번호 원(관제 지도 핀과 같은 말: 기본 회색 테 · 위험 · 주의 = 단계 색 테 · 지금 = 파랑)
+   *   이름표 상자 = 출발 · 지금 지점(지시선 + 테 상자). o = svg() 와 같고 + names[](지점 이름) · nos[](지점 번호) · cur(지금 순번)
+   */
+  function svgHQ(o) {
+    var P = PLAN2[o.floor] || PLAN2.B4, L = (o.mission && routeL(o.mission, o.floor, Math.max(1, o.n))) || tour2(o.floor in TOUR2 ? o.floor : "B4", Math.max(1, o.n));
+    // 경로 둘레로 확대 — 칸(o.w × o.h) 안에 경로 + 번호 자리(가장자리 44px)가 꽉 차게. 그림 크기(u)는 화면 px 기준으로 맞춘다
+    var W0 = o.w || 300, H0 = o.h || 480, M = 44;
+    var x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+    L.pts.forEach(function (q) { x0 = Math.min(x0, q[0]); y0 = Math.min(y0, q[1]); x1 = Math.max(x1, q[0]); y1 = Math.max(y1, q[1]); });
+    var sc = Math.min((W0 - 2 * M) / Math.max(1, x1 - x0), (H0 - 2 * M) / Math.max(1, y1 - y0));
+    var vw = W0 / sc, vh = H0 / sc, vx = (x0 + x1) / 2 - vw / 2, vy = (y0 + y1) / 2 - vh / 2;
+    var px = 1 / sc, u = function (v) { return +(v * px).toFixed(1); };
+    var n = o.n, done = Math.max(0, Math.min(n, o.done));
+    var sCut = done <= 0 ? 0 : done >= n ? L.len : L.sAt[done - 1];
+    var sR = o.robot && done < n ? (done > 0 ? L.sAt[done - 1] + (L.sAt[done] - L.sAt[done - 1]) * 0.35 : L.sAt[0] * 0.5) : null;
+    if (sR !== null) { sCut = sR; }
+    var cx = 0, cy = 0;
+    L.pts.forEach(function (q) { cx += q[0]; cy += q[1]; });
+    cx /= L.pts.length; cy /= L.pts.length;
+    var all = cut2(L, 0, L.len);
+    var esc = function (t) { return String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;"); };
+    var g = '<svg class="mini-plan mp-hq" viewBox="' + [vx, vy, vw, vh].map(function (v) { return v.toFixed(1); }).join(" ") + '" role="img" aria-label="' + esc(o.label || "") + '">' +
+      '<defs><filter id="mphq-gl" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="' + u(2.2) + '"/></filter>' +
+      '<filter id="mpbl2" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="2.2"/></filter></defs>';
+    P.equipment.forEach(function (r) {
+      if (r[2] < 12 || r[3] < 12) { return; }
+      var d = u(3.5);
+      g += '<rect class="mp-eq-side" x="' + (r[0] + d) + '" y="' + (r[1] + d) + '" width="' + r[2] + '" height="' + r[3] + '" rx="' + u(1.5) + '"/>';
+      g += '<rect class="mp-eq-top" x="' + r[0] + '" y="' + r[1] + '" width="' + r[2] + '" height="' + r[3] + '" rx="' + u(1.5) + '" stroke-width="' + u(0.6) + '"/>';
+    });
+    P.wall.forEach(function (r) { g += '<rect class="mp-wl2" x="' + r[0] + '" y="' + r[1] + '" width="' + r[2] + '" height="' + r[3] + '"/>'; });
+    g += '<polyline class="mp-case" points="' + all + '" stroke-width="' + u(5.6) + '"/>';
+    g += '<polyline class="mp-line-ahead" points="' + all + '" stroke-width="' + u(2.6) + '"/>';
+    if (sCut > 0) {
+      var pastPts = cut2(L, 0, sCut);
+      g += '<polyline class="mp-line-glow" points="' + pastPts + '" stroke-width="' + u(5) + '" filter="url(#mphq-gl)"/>';
+      g += '<polyline class="mp-line" points="' + pastPts + '" stroke-width="' + u(2.6) + '"/>';
+    }
+    var labels = "", placed = [], dots = [];
+    for (var k0 = 0; k0 < n; k0 += 1) { var q0 = pos2(L, L.sAt[k0]); dots.push({ x: q0.x, y: q0.y }); }
+    // 지금 지점 · 위험 · 주의를 먼저 앉힌다 — 좋은 자리는 중요한 번호가 갖는다
+    var order = [];
+    for (var j0 = 0; j0 < n; j0 += 1) { order.push(j0); }
+    order.sort(function (a1, b1) {
+      var w = function (k) { return k === o.cur ? 0 : (o.marks && o.marks[k]) ? 1 : 2; };
+      return w(a1) - w(b1) || a1 - b1;
+    });
+    for (var oi = 0; oi < n; oi += 1) {
+      var j = order[oi];
+      var q = pos2(L, L.sAt[j]), mk = o.marks && o.marks[j], cur = j === o.cur;
+      var nx = q.x - cx, ny = q.y - cy, nl = Math.hypot(nx, ny) || 1;
+      nx /= nl; ny /= nl;
+      // 길 방향 성분을 빼서 길에 수직으로 — 번호가 길 위에 앉지 않게
+      var tx = Math.cos(q.ang), ty = Math.sin(q.ang), dt = nx * tx + ny * ty;
+      nx -= tx * dt; ny -= ty * dt; nl = Math.hypot(nx, ny);
+      if (nl < 0.01) { nx = -ty; ny = tx; nl = 1; }
+      nx /= nl; ny /= nl;
+      var R = u(cur ? 7.5 : 6.5), Ld = u(cur ? 15 : 13), lx = q.x + nx * Ld, ly = q.y + ny * Ld;
+      // 겹침 피하기 — 왕복 길은 같은 자리에 지점이 둘 놓인다. 바깥 → 안쪽 → 더 멀리(1.9 · 2.8배) 차례로 빈자리를 찾는다
+      var pick = null;
+      [1, 1.9, 2.8, 3.7].some(function (k) {
+        return [1, -1].some(function (sd) {
+          var x = q.x + sd * nx * Ld * k, y = q.y + sd * ny * Ld * k;
+          if (x < vx + R || x > vx + vw - R || y < vy + R || y > vy + vh - R) { return false; }
+          var free = placed.every(function (c) { return Math.hypot(c.x - x, c.y - y) > c.r + R + u(1.2); }) &&
+            dots.every(function (c) { return Math.hypot(c.x - x, c.y - y) > R + u(3); });
+          if (free) { pick = { x: x, y: y, sd: sd }; }
+          return free;
+        });
+      });
+      if (pick) { lx = pick.x; ly = pick.y; if (pick.sd < 0) { nx = -nx; ny = -ny; } }
+      placed.push({ x: lx, y: ly, r: R });
+      var tone = mk === "crit" ? "c" : mk === "warn" ? "w" : cur ? "now" : j < done ? "past" : "plan";
+      g += '<circle class="mp-dot2 is-' + tone + '" cx="' + q.x.toFixed(1) + '" cy="' + q.y.toFixed(1) + '" r="' + u(2.3) + '" stroke-width="' + u(1) + '"/>';
+      labels += '<line class="mp-lead is-' + tone + '" x1="' + q.x.toFixed(1) + '" y1="' + q.y.toFixed(1) + '" x2="' + (lx - nx * R).toFixed(1) + '" y2="' + (ly - ny * R).toFixed(1) + '" stroke-width="' + u(0.8) + '"/>';
+      labels += '<g class="mp-no is-' + tone + '" transform="translate(' + lx.toFixed(1) + ',' + ly.toFixed(1) + ')"><circle r="' + R + '" stroke-width="' + u(1.2) + '"/>' +
+        '<text y="' + u(0.5) + '" font-size="' + u(cur ? 8 : 7) + '" text-anchor="middle" dominant-baseline="middle">' + ((o.nos && o.nos[j]) || j + 1) + '</text></g>';
+      var name = j === 0 && !cur ? "출발" : (cur && o.names ? o.names[j] : "");
+      if (name) {
+        var fs = u(8), bw = Math.min(u(150), name.length * fs * 0.92 + u(12)), bh = u(16);
+        // 번호 원의 위(바깥이 위쪽이면) 또는 아래에 가운데 맞춰 — 옆에 두면 칸 끝에서 밀려 원을 덮었다
+        var up = ny < 0, gap = u(6);
+        var bx = Math.max(vx + u(4), Math.min(vx + vw - u(4) - bw, lx - bw / 2));
+        var by = up ? ly - R - gap - bh : ly + R + gap;
+        if (by < vy + u(4) || by + bh > vy + vh - u(4)) { up = !up; by = up ? ly - R - gap - bh : ly + R + gap; }
+        labels += '<g class="mp-tag' + (cur ? " is-now" : "") + '"><line x1="' + lx.toFixed(1) + '" y1="' + (ly + (up ? -R : R)).toFixed(1) + '" x2="' + lx.toFixed(1) + '" y2="' + (up ? by + bh : by).toFixed(1) + '" stroke-width="' + u(0.8) + '"/>' +
+          '<rect x="' + bx.toFixed(1) + '" y="' + by.toFixed(1) + '" width="' + bw.toFixed(1) + '" height="' + bh + '" rx="' + u(2) + '" stroke-width="' + u(0.8) + '"/>' +
+          '<text x="' + (bx + u(6)).toFixed(1) + '" y="' + (by + bh / 2 + u(0.5)).toFixed(1) + '" font-size="' + fs + '" dominant-baseline="middle">' + esc(name) + '</text></g>';
+      }
+    }
+    if (sR !== null) {
+      var rq = pos2(L, sR), S = u(30), h = (S / 2).toFixed(1);
+      g += '<g transform="translate(' + rq.x.toFixed(1) + "," + rq.y.toFixed(1) + ") rotate(" + (rq.ang * 180 / Math.PI).toFixed(1) + ')">' +
+        '<ellipse class="mp-sh" cx="' + u(1) + '" cy="' + u(1.5) + '" rx="' + u(13) + '" ry="' + u(8) + '" filter="url(#mpbl2)"/>' +
+        '<image href="../assets/img/safety/robot-top-' + (o.kind || "spot") + '.png" x="-' + h + '" y="-' + h + '" width="' + S + '" height="' + S + '" transform="rotate(90)"/></g>';
+    }
+    return g + labels + "</svg>";
+  }
+
+
+  window.APRISM_MINI = { svgHQ: svgHQ, svg: svg, PLAN2: PLAN2, tour2: tour2, routeL: routeL };
 })();

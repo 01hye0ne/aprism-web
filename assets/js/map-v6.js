@@ -4096,7 +4096,14 @@
       if (it.classList.contains("is-done")) { done = j + 1; }
     });
     var run = part.filter(function (it) { return it.classList.contains("is-running"); }).length > 0;
-    wpMini.innerHTML = window.APRISM_MINI.svg({ mission: mis, floor: fl, n: part.length, done: done, robot: run, marks: marks, dots: true, kind: activeRobot() === "4" ? "wheel" : "spot", w: 300, label: (mis ? mis + " " : "") + fl + " 웨이포인트 지도" });
+    var cur = -1, names = [], nos = [];
+    part.forEach(function (it, j) {
+      if (it.classList.contains("is-running")) { cur = j; }
+      var t = it.querySelector(".step-title"); names.push(t ? t.textContent.trim() : "");
+      nos.push((R && R[fl] ? R[fl].n0 : 1) + j);
+    });
+    var draw = window.APRISM_MINI.svgHQ || window.APRISM_MINI.svg;
+    wpMini.innerHTML = draw({ mission: mis, floor: fl, n: part.length, done: done, robot: run, marks: marks, dots: true, cur: cur, names: names, nos: nos, h: Math.max(240, wpMini.clientHeight - 16), kind: activeRobot() === "4" ? "wheel" : "spot", w: Math.max(200, wpMini.clientWidth - 16), label: (mis ? mis + " " : "") + fl + " 웨이포인트 지도" });
   }
   function wpViewSet(v) {
     wpView = v;
@@ -4139,6 +4146,7 @@
         wpHead.appendChild(seg);
         wpMini = document.createElement("div");
         wpMini.className = "rr-wp-mini"; wpMini.hidden = true;
+        if (window.ResizeObserver) { var wpMiniW = 0; new ResizeObserver(function () { var k = wpMini.clientWidth + "x" + wpMini.clientHeight; if (k !== wpMiniW) { wpMiniW = k; wpMiniDraw(); } }).observe(wpMini); }   // 칸 크기가 바뀌면 확대를 다시 잰다
         // 지점 목록 · 층이 바뀌면 지도도 다시 그린다
         new MutationObserver(function () { wpMiniDraw(); }).observe(rail, { subtree: true, attributes: true, attributeFilter: ["class", "data-wp-alert"] });
         document.addEventListener("click", function (e) { if (e.target.closest && e.target.closest(".map-floor, .robot-card")) { setTimeout(wpMiniDraw, 0); } });
