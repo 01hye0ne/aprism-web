@@ -899,7 +899,7 @@ body.ver-7 .rp-body { grid-template-columns: 320px minmax(0, 1fr); }
 :root[data-theme="light"] body.ver-7 .delta3 .dl-wp[data-sev="warning"], :root[data-theme="light"] body.ver-7 .dchat-l2 .dl-wp[data-sev="warning"] { border-color: #F2A900; background-color: #FFFFFF; color: #8A6100; }
 
 /* [11/11 디자이너] 떠 있기 = 오브 바로 위 정사각형(body.dchat-above, delta-chatbot-v7.js place 가 남는 높이를 재서 붙인다)
- *   오른쪽 끝 = 오브 오른쪽 끝(--dchat-r) · 아래 끝 = 오브 위 12(--dchat-ab) · 한 변 = 최대 380, 층 전환 아래 12 까지 남는 만큼(--dchat-sq, 320 ↓ 면 붙이지 않아 오브 왼쪽 자리)
+ *   오른쪽 끝 = 오브 오른쪽 끝(--dchat-r) · 아래 끝 = 오브 위 12(--dchat-ab) · 한 변 = 최대 460(11/11 380 → 460), 층 전환 아래 12 까지 남는 만큼(--dchat-sq, 320 ↓ 면 붙이지 않아 오브 왼쪽 자리)
  *   오브에서 위로 커지며 나온다. 칸이 낮아 '이렇게 물어보세요' 제목은 빼고 칩만 한 줄(넘치면 옆으로 민다) */
 :root[data-theme][data-delta][data-glow] body.ver-7.d3-chat.dchat-above.v2-2.v3 .delta3.is-open,
 :root[data-theme][data-delta][data-glow] body.ver-7.d3-chat.dchat-above.ma-on.v2-2.v3 .delta3.is-open {
