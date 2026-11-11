@@ -105,6 +105,17 @@
     // 리모콘이 오브 위까지 덮으면(오른쪽 붙임으로 지도 칸이 좁아졌을 때) 오브도 그 위로
     var orbL = sb.right - r - 56, ob = sr && sr.right > orbL && sr.left < sb.right - r ? lift : b;
     stage.style.setProperty("--dchat-ob", Math.round(ob) + "px");
+    /*
+     * [11/11 디자이너] 떠 있기 = 오브 바로 위 정사각형(1:1) — 오른쪽 끝 = 오브 · 지도 도구 줄 오른쪽 끝, 아래 끝 = 오브 위 12,
+     *   위 끝은 도구 줄(층 전환 포함) 아래 12 까지. 크기 = 최대 380 · 남는 높이만큼. 남는 높이가 320 아래면 예전처럼 오브 왼쪽에 선다
+     */
+    var abB = Math.max(ob + 56 + 12, lift);
+    var topLim = tb ? tb.bottom - sb.top + 12 : 16;
+    var avail = Math.floor(sb.height - topLim - abB);
+    var above = (mode || "float") === "float" && avail >= 320;
+    body.classList.toggle("dchat-above", above);
+    stage.style.setProperty("--dchat-ab", Math.round(abB) + "px");
+    stage.style.setProperty("--dchat-sq", Math.min(380, Math.max(320, avail)) + "px");
     // 오른쪽 붙임 자리 — 우측 패널(.floating) 왼쪽에 칸 사이(gap)를 두고, 위 · 아래 끝은 지도 칸과 같은 줄
     var fl = stage.querySelector(":scope > .floating"), mp = stage.querySelector(":scope > .map-panel");
     if (fl && mp && fl.getClientRects().length) {
@@ -247,5 +258,6 @@
 
   if (load(KEY_DOCK) === "right") { mode = "right"; }
   paintBar();
+  place();
   sync();
 })();
