@@ -1020,3 +1020,6 @@ body.ver-7 .context-panel .ah-sort-btn { margin-right: 2px; }
 /* [11/11 디자이너] 휠 로봇(모베드) 그림을 그림 칸 가운데로 — v7 로봇개 보정(좌우 반전 · 오른쪽 7%)이 모베드에도 걸려 17 오른쪽에 섰다
  *   (1배율 실측: 칸 1577–1728 가운데 1652.5 · 그림 1607–1733 가운데 1669.6, 오른 바퀴가 정보 칸 쪽으로 넘침). v6 의 left 5 보정에서 17 을 뺀다 */
 body.ver-7 .robot-strip.is-carousel .robot-2d.is-mobed { left: -12px; }
+
+/* [11/11 디자이너] 챗봇형 창 머리 접기 = [∨] — 창이 아래 오브 쪽으로 접혀 들어간다. 일반 main-v7 은 왼쪽 위 카드로 접혀 올라가 [∧] 그대로 */
+body.ver-7.d3-chat .delta3 .delta3-close .i { transform: none; }
