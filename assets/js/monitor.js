@@ -1551,6 +1551,10 @@
     function reqReset7() {
       clearTimeout(reqTimer7); clearInterval(reqTick7);
       reqA7 = null;
+      wvRun += 1;   // 도는 물결이 있으면 멈추고 걷는다
+      Array.prototype.forEach.call(box.querySelectorAll(".wv-old, .wv-front, .wv-rim, .wv-dot"), function (n) { n.remove(); });
+      box.style.minHeight = ""; var lw = $(".ma-lower", box); if (lw) { lw.style.filter = ""; }
+      if (reqBox7) { reqBox7.style.animation = ""; }
       box.classList.remove("is-requested");
       if (reqBox7) { reqBox7.hidden = true; }
       confirm.classList.remove("is-sent");
@@ -1601,6 +1605,106 @@
       reqBox7.hidden = false;
       box.classList.add("is-requested");
     }
+    /*
+     * [11/11 v7 디자이너] 물결 전환 — 실험 화면(lab-req-wave-v7)에서 고른 값. 참고 Distortion Waves(SwiftUI · Metal, MIT)를 웹으로 다시 짬.
+     *   옛 판(복제)을 위에 덮고 SVG 필터로 일그러뜨리며, [조치 요청] 단추 자리부터 넓어지는 원형 가림으로 "조치 요청됨" 판을 드러낸다.
+     *   원 가장자리엔 브랜드 그라데이션 물결(파랑 → 청록 → 보라) · 튀는 점, 끝나면 테 빛이 0.9초 남았다 빠진다. 동작 줄이기면 바로 바뀐다
+     */
+    var wvRun = 0;
+    var WV = { disp: 18, dur: 820, band: 48, glow: 85, pull: 2.5, rim: 900, dots: 18 };
+    function wvDefs() {
+      if (document.getElementById("wv-f")) { return; }
+      var NS = "http://www.w3.org/2000/svg", svg = document.createElementNS(NS, "svg");
+      svg.setAttribute("width", "0"); svg.setAttribute("height", "0"); svg.setAttribute("aria-hidden", "true");
+      svg.style.position = "absolute";
+      svg.innerHTML = ["wv-f", "wv-f2"].map(function (id, i) {
+        return '<filter id="' + id + '" x="-15%" y="-15%" width="130%" height="130%" color-interpolation-filters="sRGB">' +
+          '<feTurbulence type="fractalNoise" baseFrequency="0.010 0.030" numOctaves="2" seed="' + (i ? 9 : 4) + '" result="n"/>' +
+          '<feDisplacementMap in="SourceGraphic" in2="n" scale="0" xChannelSelector="R" yChannelSelector="G"/></filter>';
+      }).join("");
+      document.body.appendChild(svg);
+    }
+    function wvPal(a) {
+      var lt = document.documentElement.getAttribute("data-theme") === "light";
+      return (lt ? ["40 100 200", "20 150 190", "120 80 210"] : ["59 121 213", "86 200 230", "150 110 240"]).map(function (c) { return "rgb(" + c + " / " + a + ")"; });
+    }
+    function wvRing(ox, oy, r, band, a) {
+      var cols = wvPal(a), n = cols.length, st = ["transparent " + Math.max(0, r - band) + "px"];
+      cols.forEach(function (c, i) { st.push(c + " " + (r - band + band * (i + 0.5) / n).toFixed(1) + "px"); });
+      st.push("transparent " + (r + band * 0.25).toFixed(1) + "px");
+      return "radial-gradient(circle at " + ox + "px " + oy + "px, " + st.join(", ") + ")";
+    }
+    function wave7(after) {
+      if (slow.matches) { after(); return; }
+      wvDefs();
+      var W = box.offsetWidth, H = box.offsetHeight;
+      var br = confirm.getBoundingClientRect(), pr = box.getBoundingClientRect();
+      var ox = br.left + br.width / 2 - pr.left, oy = br.top + br.height / 2 - pr.top;
+      var far = Math.max(Math.hypot(ox, oy), Math.hypot(W - ox, oy), Math.hypot(ox, H - oy), Math.hypot(W - ox, H - oy)) + WV.band;
+      // 옛 판 복제 — 아이디는 지운다(같은 아이디 둘)
+      var old = box.cloneNode(true);
+      old.removeAttribute("data-map-alert");
+      Array.prototype.forEach.call(old.querySelectorAll("[id]"), function (n) { n.removeAttribute("id"); });
+      old.classList.add("wv-old"); old.hidden = false; old.setAttribute("aria-hidden", "true");
+      old.style.cssText = "position:absolute;left:0;top:0;margin:0;width:" + W + "px;height:" + H + "px;max-height:none;transform-origin:" + ox + "px " + oy + "px";
+      after();
+      if (reqBox7) { reqBox7.style.animation = "none"; }
+      var H2 = box.offsetHeight;
+      box.style.minHeight = H + "px";
+      box.appendChild(old);
+      var front = el("div", "wv-front"), fi = el("i"), rim = el("div", "wv-rim");
+      front.appendChild(fi); box.appendChild(front); box.appendChild(rim);
+      var lower = $(".ma-lower", box);
+      var dOld = null, dNew = null, fOld = document.getElementById("wv-f"), fNew = document.getElementById("wv-f2");
+      dOld = fOld.querySelector("feDisplacementMap"); dNew = fNew.querySelector("feDisplacementMap");
+      var tOld = fOld.querySelector("feTurbulence"), tNew = fNew.querySelector("feTurbulence");
+      old.style.filter = "url(#wv-f)";
+      if (lower) { lower.style.filter = "url(#wv-f2)"; }
+      var dots = [];
+      for (var d = 0; d < WV.dots; d++) {
+        var dot = el("span", "wv-dot");
+        dot.style.background = wvPal(0.95)[d % 3];
+        dots.push({ el: dot, ang: -Math.PI * (0.15 + 0.7 * Math.random()) - (Math.random() < 0.3 ? Math.PI * 0.2 : 0), at: 0.15 + Math.random() * 0.55, life: 0.25 + Math.random() * 0.2, reach: 18 + Math.random() * 40 });
+        box.appendChild(dot);
+      }
+      var t0 = performance.now(), ANT = 0.14, run = wvRun;
+      var ease = function (t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; };
+      var tick = function (now) {
+        if (run !== wvRun) { return; }
+        var t = Math.min(1, (now - t0) / WV.dur);
+        var pull = t < ANT ? Math.sin(t / ANT * Math.PI / 2) : Math.max(0, 1 - (t - ANT) / 0.35);
+        old.style.transform = "scale(" + (1 - WV.pull / 100 * pull) + ")";
+        var k = t < ANT ? 0 : ease((t - ANT) / (1 - ANT)), r = k * far;
+        old.style.setProperty("--ox", ox + "px"); old.style.setProperty("--oy", oy + "px");
+        old.style.setProperty("--r", r + "px"); old.style.setProperty("--feather", (WV.band * 0.6) + "px");
+        var swell = Math.sin(Math.min(1, k * 1.15) * Math.PI);
+        dOld.setAttribute("scale", (WV.disp * (0.35 * pull + swell)).toFixed(2));
+        dNew.setAttribute("scale", (WV.disp * 0.6 * Math.max(0, swell - 0.15) * (1 - k)).toFixed(2));
+        var bf = (0.010 + 0.006 * k).toFixed(4) + " " + (0.030 - 0.010 * k).toFixed(4);
+        tOld.setAttribute("baseFrequency", bf); tNew.setAttribute("baseFrequency", bf);
+        var a = (WV.glow / 100) * Math.min(1, k * 4) * (1 - Math.max(0, k - 0.75) / 0.25);
+        fi.style.backgroundImage = wvRing(ox, oy, r, WV.band, a);
+        dots.forEach(function (o) {
+          var u = (k - o.at) / o.life;
+          if (u <= 0 || u >= 1) { o.el.style.opacity = "0"; return; }
+          var rr = o.at * far + o.reach * u;
+          o.el.style.left = (ox + Math.cos(o.ang) * rr) + "px"; o.el.style.top = (oy + Math.sin(o.ang) * rr) + "px";
+          o.el.style.opacity = String(1 - u);
+        });
+        box.style.minHeight = (H + (H2 - H) * k) + "px";
+        if (t < 1 && !box.hidden) { requestAnimationFrame(tick); return; }
+        old.remove(); front.remove(); dots.forEach(function (o) { o.el.remove(); });
+        if (lower) { lower.style.filter = ""; }
+        box.style.minHeight = "";
+        dOld.setAttribute("scale", "0"); dNew.setAttribute("scale", "0");
+        if (box.hidden) { rim.remove(); return; }
+        var col = wvPal(0.85);
+        rim.style.boxShadow = "inset 0 0 0 1.5px " + col[0] + ", inset 0 0 18px " + col[1] + ", 0 0 16px " + col[2];
+        rim.animate([{ opacity: 1 }, { opacity: 0 }], { duration: WV.rim, easing: "ease-out" }).finished.catch(function () {}).then(function () { rim.remove(); });
+      };
+      requestAnimationFrame(tick);
+    }
+
     function sent7(a, rec, picks) {
       confirm.classList.add("is-sent");
       confirm.disabled = true;
@@ -1608,9 +1712,9 @@
       setTimeout(function () {
         commit(a, rec, true);
         if (box.hidden || box.getAttribute("data-wp") !== (a.wp || "")) { reqReset7(); return; }
-        reqShow7(a, rec, picks);
+        wave7(function () { reqShow7(a, rec, picks); });
         reqA7 = a;
-      }, slow.matches ? 0 : 350);
+      }, slow.matches ? 0 : 200);
     }
 
     confirm.addEventListener("click", function () {
