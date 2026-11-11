@@ -992,3 +992,9 @@ body.ver-7 .dchat-tail { position: absolute; right: -14px; bottom: -1px; overflo
   clip-path: path("M0 0C0 9 4 16.5 13.5 19.5C9 20 3.5 20 0 20Z"); -webkit-backdrop-filter: blur(12px) saturate(1.12); backdrop-filter: blur(12px) saturate(1.12); }
 body.ver-7 .dchat-tail .f { fill: var(--tf); }
 body.ver-7 .dchat-tail .s { fill: none; stroke: var(--bl); stroke-width: 1; }
+
+/* [11/11 디자이너] 좌측 패널 머리 오른쪽 끝 맞춤 — 상자는 셋 다 같은 끝(384)인데 보이는 끝이 달랐다(1배율 실측):
+ *   접기 아이콘 381 · [알림 센터 >] 꺾쇠 378(16 칸 안 가운데 글리프) · "오래된 순" 383(글자는 여백 없음) → 셋 다 381 로.
+ *   꺾쇠 칸은 3 바깥으로, 정렬 단추는 2 안으로 */
+body.ver-7 .context-panel .ah-all { margin-right: -3px; }
+body.ver-7 .context-panel .ah-sort-btn { margin-right: 2px; }
