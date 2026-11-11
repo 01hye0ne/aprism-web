@@ -7021,6 +7021,8 @@
 
     if (window.ResizeObserver) {
       new ResizeObserver(frame).observe(view);
+      // [11/11 v7 챗봇형] 대화창 오른쪽 붙임 — 창(.map-view)은 그대로고 보는 칸(.map-canvas)만 좁아져 위 관찰이 못 잡는다. 가운데를 다시 잡는다
+      document.addEventListener("aprism:map-room", frame);
     } else {
       window.addEventListener("resize", frame);
     }
