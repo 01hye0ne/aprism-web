@@ -4440,12 +4440,12 @@
         head.setAttribute("data-n", String(w.no));
         // [10/22] 구분 또렷하게 — 다음: 길색 채움 + 흰 숫자 + 흰 테, 지난 정상: 어두운 판 + 길색 숫자(옅게), 예정: 어두운 판 + 밝은 회색 숫자, 주의 · 위험: 채움
         if (ok) { head.style.background = "#34C759"; head.style.borderColor = C.bg; head.style.color = "#0A0F18"; el.style.animationDelay = -Math.round(now - (rrOk[w.id] - RR_OK_MS)) + "ms"; }   // 이동 중엔 핀이 자주 새로 깔린다 — 처음부터 다시 돌지 않고 이어서
-        else if (was && document.body.classList.contains("ver-7")) { head.style.background = "#0A0F18"; head.style.borderColor = col; head.style.color = col; }   // [11/11 v7 디자이너] 해결한 지점(회색)도 검정 속 + 밝은 회색 테 · 번호 — 테가 막대와 이어진다
+        else if (was && document.body.classList.contains("ver-7")) { head.style.background = light ? "#FFFFFF" : "#0A0F18"; head.style.borderColor = col; head.style.color = light ? "#5E6675" : col; }   // [11/11] 라이트 = 흰 속(번호는 대비 위해 한 단 짙게)   // [11/11 v7 디자이너] 해결한 지점(회색)도 검정 속 + 밝은 회색 테 · 번호 — 테가 막대와 이어진다
         else if (was) { head.style.background = col; head.style.borderColor = C.bg; head.style.color = "#0A0F18"; }
         else if (measuring) { head.style.background = col; head.style.borderColor = "#FFFFFF"; head.style.color = "#FFFFFF"; }
         else if (next) { head.style.background = "#FFFFFF"; head.style.borderColor = col; head.style.color = col; }
         else if (past) { head.style.background = C.bg; head.style.borderColor = col; head.style.color = col; }
-        else if ((cau || dan) && document.body.classList.contains("ver-7")) { head.style.background = "#0A0F18"; head.style.borderColor = col; head.style.color = col; }   // [11/11 v7 디자이너] 주의 · 위험 핀 = 검정 속 + 단계 색 테 · 번호
+        else if ((cau || dan) && document.body.classList.contains("ver-7")) { head.style.background = light ? "#FFFFFF" : "#0A0F18"; head.style.borderColor = col; head.style.color = (light && cau) ? "#8A6100" : col; }   // [11/11 디자이너] 라이트 = 흰 속 · 단계 색 테. 주의 번호는 흰 바탕 대비가 약해(노랑 2:1) 짙은 황토   // [11/11 v7 디자이너] 주의 · 위험 핀 = 검정 속 + 단계 색 테 · 번호
         else if (cau || dan) { head.style.background = col; head.style.borderColor = C.bg; head.style.color = cau ? "#1A1300" : "#FFFFFF"; }
         else if (document.body.classList.contains("ver-7")) { head.style.background = C.bg; head.style.borderColor = "var(--pin-plain)"; head.style.color = "var(--text-secondary)"; el.style.setProperty("--pin", "var(--pin-plain)"); }   // [11/10 v7 디자이너] 기본 핀 테 = 층 꼬리표 바탕보다 한 단계 밝은 회색(v7.css --pin-plain), 막대도 같은 색, 숫자 = 보조 글자색
         else { head.style.background = C.bg; head.style.borderColor = light ? "rgb(11 14 19 / 24%)" : "#AFB7C8"; head.style.color = light ? "#494E54" : "#E4E8EF"; }
