@@ -4,7 +4,7 @@
  *   말풍선 · 오브를 누르면 대화창이 열린다 — 대화창은 원래 Delta 창(.delta3.is-open)을 오른쪽 아래로 옮겨 쓴다(답 · 묻기 · 대화가 그대로 돈다).
  *   왼쪽 위 Delta 카드는 숨는다 — 비는 자리는 알림 팝오버가 위까지 채워 쓴다(map-v6.js v7Room · v7.css).
  *   말풍선 글은 Delta 카드의 두 줄(.ai-line-1 · .ai-line-2)을 그대로 비춘다 — 카드 글이 바뀌면 따라 바뀐다. 단계 색(위험 · 주의)도 카드를 따른다.
- *   말풍선 [×] 로 닫으면 Delta 글이 새로 바뀔 때 다시 뜬다.
+ *   [11/11 디자이너] 말풍선 [×] 는 뺐다 — 대화창이 열려 있을 때만 숨는다.
  *   [11/11 디자이너] 대화창 자리 = 크롬 개발자 도구처럼 고른다(창 머리 [∧] 왼쪽 단추 셋) —
  *     ① 떠 있기(기본, 오브 옆) ② 오른쪽 붙임(지도 칸이 좁아지고 지도와 우측 패널 사이에 선다, 왼쪽 끝을 끌어 320~560)
  *     ③ 새 창(Delta 창 요소를 그대로 새 브라우저 창으로 옮긴다 — 답 · 묻기가 이 화면 스크립트로 그대로 돈다).
@@ -25,7 +25,6 @@
   dock.innerHTML =
     '<div class="dchat-bubble" role="status">' +
       '<button type="button" class="dchat-bubble-body" aria-label="Delta 대화창 열기"><span class="dchat-l1"></span><span class="dchat-l2"></span></button>' +
-      '<button type="button" class="dchat-x" aria-label="말풍선 닫기"><span class="i i-16" style="--i:var(--ic-close)" aria-hidden="true"></span></button>' +
     '</div>' +
     '<button type="button" class="dchat-orb" aria-label="Delta 대화창 열기" aria-expanded="false"><span class="dchat-orb-in" aria-hidden="true"></span><span class="dchat-badge" hidden></span></button>';
   stage.appendChild(dock);
@@ -37,7 +36,22 @@
   function sev() { return win.classList.contains("is-critical") ? "critical" : win.classList.contains("is-warning") ? "warning" : win.classList.contains("is-safe") ? "safe" : "info"; }
   if (window.PrismOrb) { orb = window.PrismOrb.mount(dock.querySelector(".dchat-orb-in"), { palette: sev() }); }
 
-  var dismissed = "", lastKey = "";
+  var lastKey = "";
+  // [11/11 디자이너] 말풍선 둘째 줄은 첫 문장("…있어요.") 뒤에서 한 번 줄을 바꾼다
+  function brAfterFirst(root) {
+    var w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT), n;
+    while ((n = w.nextNode())) {
+      var m = /[.?!](?=\s|$)/.exec(n.nodeValue);
+      if (!m) { continue; }
+      var r = document.createRange(); r.setStart(n, m.index + 1); r.setEnd(root, root.childNodes.length);
+      if (!r.toString().trim()) { return; }   // 한 문장뿐이면 그대로
+      var rest = n.splitText(m.index + 1);
+      rest.nodeValue = rest.nodeValue.replace(/^\s+/, "");
+      n.parentNode.insertBefore(document.createElement("br"), rest);
+      return;
+    }
+  }
+
   function sync() {
     var a = win.querySelector(".delta3-card .ai-line-1"), b = win.querySelector(".delta3-card .ai-line-2");
     var t1 = a ? a.textContent.trim() : "", t2 = b ? b.textContent.trim() : "";
@@ -46,6 +60,7 @@
       lastKey = key;
       l1.textContent = t1;
       l2.innerHTML = b ? b.innerHTML : "";   // 번호 원(.dl-wp) 같은 표식을 그대로 — 같은 화면이 만든 글이다
+      brAfterFirst(l2);
     }
     var s = sev();
     dock.setAttribute("data-sev", s);
@@ -54,7 +69,7 @@
     body.classList.toggle("dchat-open", open);
     orbBtn.setAttribute("aria-expanded", String(open));
     orbBtn.setAttribute("aria-label", open ? "Delta 대화창 닫기" : "Delta 대화창 열기");
-    bubble.hidden = open || dismissed === key || !t1;
+    bubble.hidden = open || !t1;
     // 말풍선을 닫아 두었을 때 위험 · 주의면 오브에 점
     badge.hidden = open || !bubble.hidden || (s !== "critical" && s !== "warning");
   }
@@ -69,7 +84,6 @@
     if (mode === "window" && pop && !pop.closed) { pop.focus(); return; }
     toggle.click(); sync();
   });
-  dock.querySelector(".dchat-x").addEventListener("click", function () { dismissed = lastKey; sync(); });
 
   /*
    * 자리 — 오브의 오른쪽 끝 = 지도 도구 줄 오른쪽 끝, 아래 끝 = 우측 패널 아래 끝(지도 칸 바닥에서 같은 여백).
