@@ -648,8 +648,6 @@ body.ver-7.d3-wide.v2-2.v3 .delta3:not(.is-open) .delta3-name { width: 526px; }
  *   ③ % 는 왼쪽 두 줄 덩이(제목 + 남은 시간)의 세로 가운데 — 두 줄을 요약하는 값으로 읽힌다. 크기 24 그대로 */
 body.ver-7 .rc-box .progress-meta { gap: var(--space-12); align-items: center; }
 body.ver-7 .rc-box .progress-percent { flex: none; min-width: 56px; text-align: right; }
-/* [11/11 디자이너] % 숫자 24 → 32(줄 40) · 단위 13 → 14 — 숫자 높이(약 23)가 왼쪽 두 줄 덩이(46)의 절반을 넘어 요약 값으로 선다. 칸 폭은 “100%” 자리 72 */
-body.ver-7 .rc-box .progress-percent { font-size: 32px; line-height: 40px; min-width: 72px; }
-body.ver-7 .rc-box .progress-percent .pp-unit { font-size: var(--font-size-14); line-height: var(--font-line-height-20); }
+/* [11/11 디자이너] % 숫자 32 로 키웠다가 24 로 되돌림(숫자 24/32 · 단위 13 · 칸 폭 56 — 위 균형 규칙 그대로) */
 /* [11/11 디자이너] 진행 칸 위아래 여백 16 → 12(좌우 8 그대로) */
 body.ver-7 .rc-box .progress-meta { padding-top: var(--space-12); padding-bottom: var(--space-12); }
