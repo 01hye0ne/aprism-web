@@ -677,3 +677,6 @@ body.ver-7 .ma-req-acts:empty { display: none; }
 body.ver-7 .ma-req-acts > .is-memo { list-style: none; margin-left: calc(var(--space-20) * -1); }
 body.ver-7 .ma-req-actions { display: flex; }
 body.ver-7 .ma-req-actions > .btn { flex: 1 1 0; min-width: 0; height: var(--size-control-sm); }
+
+/* [11/11 v7 디자이너] 우측 지점 목록 레일 — 주의 · 위험도 세모 대신 단계 색 점(지나온 지점 점과 같은 6). 지도 바닥 점과 같은 말 */
+:root[data-theme] body.ver-7.v2-2 [data-timeline] .timeline-item[data-wp-alert] .rail-dot { width: 6px; height: 6px; border: 0; border-radius: 50%; clip-path: none; background-color: currentColor; }
