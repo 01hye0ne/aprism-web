@@ -25,6 +25,8 @@
   dock.innerHTML =
     '<div class="dchat-bubble" role="status">' +
       '<button type="button" class="dchat-bubble-body" aria-label="Delta 대화창 열기"><span class="dchat-l1"></span><span class="dchat-l2"></span></button>' +
+      // [11/11 디자이너] iOS 메시지처럼 오른쪽 아래 꼬리 — 말풍선 면 · 테와 같은 색(v7.css --tf · --bl)
+      '<svg class="dchat-tail" viewBox="0 0 14 20" width="14" height="20" aria-hidden="true"><path class="f" d="M0 0C0 9 4 16.5 13.5 19.5C9 20 3.5 20 0 20Z"/><path class="s" d="M.5 0C.5 9 4.5 16.5 13.5 19.5C9 20 3.5 20 0 19.5"/></svg>' +
     '</div>' +
     '<button type="button" class="dchat-orb" aria-label="Delta 대화창 열기" aria-expanded="false"><span class="dchat-orb-in" aria-hidden="true"></span><span class="dchat-badge" hidden></span>' +
       '<span class="dchat-logo" role="img" aria-label="DELTA"></span></button>';   // [11/11 디자이너] 말풍선 상태(닫힘)엔 오브 아래 DELTA 워드마크
