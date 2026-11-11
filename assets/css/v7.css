@@ -807,3 +807,8 @@ body.ver-7 .dchat-l2 .dl-wp { display: inline-flex; align-items: center; justify
 body.ver-7 .dchat-l2 .dl-wp[data-sev] { border: 2px solid #0A0F18; color: #0A0F18; }
 body.ver-7 .dchat-l2 .dl-wp[data-sev="critical"] { background-color: #FF383C; }
 body.ver-7 .dchat-l2 .dl-wp[data-sev="warning"] { background-color: #FFC800; }
+
+/* [11/11] 새 APRISM 로고(가로 워드마크 · assets/img/logo/aprism.svg 를 icons/brand-wordmark.svg 로 인라인).
+ *   로고 칸 폭(GNB 레일 76)은 그대로 두고 좌우 여백만 16 → 8 로 줄여 워드마크 폭 60(높이 약 7.7). 색은 글자색(text/primary) 그대로 */
+body.ver-7 .status-bar-logo { padding-left: var(--space-8); padding-right: var(--space-8); }
+body.ver-7 .status-bar-logo .i { width: 60px; height: 8px; }
