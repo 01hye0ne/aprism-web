@@ -869,3 +869,5 @@ body.dchat-popup { height: 100%; margin: 0; overflow: hidden; background-color: 
   position: fixed !important; inset: 0 !important; left: 0 !important; top: 0 !important; right: 0 !important; bottom: 0 !important;
   width: auto !important; height: auto !important; max-height: none; transform: none !important; border-radius: 0; animation: none;
 }
+/* [11/11 디자이너] 로고를 오른쪽 탭 글자 줄에 맞춰 6px 내림 — 워드마크 가운데(28) → 탭 글자 몸통 가운데(34, '전체 미션' · 'M1' 실측) */
+body.ver-7 .status-bar-logo .i { transform: translateY(6px); }
