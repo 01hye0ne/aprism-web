@@ -519,3 +519,5 @@ body.ver-7 .rc-box .progress-percent .pp-unit { font-size: var(--font-size-13); 
 /* 상태 띠(통신 끊김 · 미션 완료 등)가 제목 자리에 오면 남은 시간은 띠 아래 줄로 */
 body.ver-7 .rc-box .progress-meta:has(> .rr-banner) { flex-wrap: wrap; }
 body.ver-7 .rc-box .progress-meta:has(> .rr-banner) .progress-titles { order: 3; flex-basis: 100%; }
+/* [11/11 디자이너] 로봇 그래픽 좌우 반전 — 머리가 오른쪽(정보 칸 쪽)을 본다. Figma 1068:16438 Robot-grahpics 와 같은 방향 */
+body.ver-7 .robot-strip.is-carousel .robot-thumb > svg { transform: scaleX(-1); }
