@@ -1220,3 +1220,25 @@ body.ver-7 .rc-box .progress-percent.is-counting { display: inline-flex; align-i
 body.ver-7 .rr-wp-head .rr-wp-n.is-counting { line-height: 0; }
 body.ver-7 .rr-wp-head .rr-wp-n.is-counting::before { display: inline-block; }
 body.ver-7 .rc-box .progress-percent.is-counting { justify-content: flex-end; }
+
+/* [11/12 디자이너 · Figma 1753:8824] 진행 칸 위 모서리 = 모따기(45° 8×8) 뒤 꼭짓점 반지름 16 — 원 모서리(8)보다 완만한 곡선, 모서리에서 14.6 안쪽까지 이어진다.
+ *   border-radius 로는 안 나와 Figma 채움 모양(fillGeometry)을 그대로 옮긴 모서리 그림(15×8)을 마스크로 — 왼 · 오른 모서리 + 가운데 띠 + 아래 몸통 네 층.
+ *   글 칸(.progress-meta)과 트랙 양 끝에 같은 모양. 트랙은 손잡이가 위로 삐져나와 트랙 자체 대신 바탕 층(::before)에만 씌운다 */
+body.ver-7 .rc-box {
+  --cf-l: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='15' height='8' viewBox='0 0 15 8'%3E%3Cpath d='M0 8 3.31371 4.68629C6.31429 1.68571 10.384 0 14.6274 0H15V8Z' fill='%23000'/%3E%3C/svg%3E");
+  --cf-r: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='15' height='8' viewBox='0 0 15 8'%3E%3Cpath d='M15 8 11.68629 4.68629C8.68571 1.68571 4.616 0 .3726 0H0V8Z' fill='%23000'/%3E%3C/svg%3E");
+  --cf-mask: var(--cf-l) left top / 15px 8px no-repeat, var(--cf-r) right top / 15px 8px no-repeat,
+             linear-gradient(#000 0 0) center top / calc(100% - 30px) 8px no-repeat, linear-gradient(#000 0 0) left 8px / 100% calc(100% - 8px) no-repeat;
+}
+body.ver-7 .rc-box .progress-meta { border-top-left-radius: 0; border-top-right-radius: 0; -webkit-mask: var(--cf-mask); mask: var(--cf-mask); }
+:root[data-theme] body.ver-7 .rc-box .progress-track, :root body.ver-7 .rc-box .progress-track { border-radius: 0; background: none; transition: none; }   /* 바탕은 ::before 가 — 트랙 자체 바탕(테마별 규칙)이 깎은 모서리 뒤로 비치지 않게 */
+body.ver-7 .rc-box .progress-track::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background-color: var(--color-gray-400);
+  background-image: var(--pt-fill); background-size: var(--progress, 0%) 100%; background-repeat: no-repeat;
+  transition: background-size 400ms ease;
+  -webkit-mask: var(--cf-mask); mask: var(--cf-mask);
+}
+:root:not([data-theme="light"]) body.ver-7 .rc-box .progress-track::before { background-color: var(--bg-selected); }
+body.ver-7 .rc-box .progress-track.cu-zero::before { transition: none; background-size: 0 100%; }
+body.ver-7 .rc-box .progress-track.cu-run::before { transition: background-size 600ms cubic-bezier(.22, .61, .36, 1); }
