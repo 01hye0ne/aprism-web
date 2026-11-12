@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>APRISM — 화면 구조 재정리 제안 (26.11.12)</title>
+  <meta name="description" content="전체 / 미션 두 층 · 전체 층의 축은 설비 · 누적 대시보드 — 와이어프레임" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/static/woff2/SUIT.css" />
+  <link rel="stylesheet" href="./assets/css/tokens.css?v=b64812bd" />
+  <link rel="stylesheet" href="./assets/css/base.css?v=5ccd4bb3" />
+  <style>
+    /*
+     * [11/12 내부] 화면 구조 재정리 제안 — 클라이언트 회의 전 내부 정리용(index 내부 문서 › 리서치).
+     *   피드백 세 가지(위계 · 설비 기준 · 누적 대시보드)를 "층 × 축 × 시간" 한 구조로 묶는다. 그림은 와이어프레임(상자 · 글만).
+     *   범위 색 — 전체 층 = 보라 테, 미션 층 = 청록 테. 화면 색(파랑 = 상태)과 섞이지 않게 둘 다 화면에 안 쓰는 색.
+     */
+    body { margin: 0; background-color: var(--bg-page); color: var(--text-primary); font-family: "SUIT", system-ui, sans-serif; }
+    :root { --g: #A78BFA; --g-bg: rgb(167 139 250 / 10%); --m: #2DD4BF; --m-bg: rgb(45 212 191 / 9%); --bad: #F87171; --wf: var(--bg-cell); --wf-line: var(--border-default); }
+    .back { position: fixed; top: 16px; right: 16px; z-index: 3; padding: 4px 12px; border: 1px solid var(--border-default); border-radius: 999px; background-color: var(--bg-panel); color: var(--text-secondary); font-size: 12px; text-decoration: none; }
+    .back:hover { color: var(--text-primary); }
+    main { max-width: 1240px; margin: 0 auto; padding: 56px 32px 96px; }
+    header.top h1 { margin: 0 0 8px; font-size: 28px; line-height: 36px; }
+    header.top p { margin: 0; color: var(--text-secondary); font-size: 15px; line-height: 24px; }
+    .meta { margin-top: 12px; color: var(--text-tertiary); font-size: 13px; }
+    section.part { margin-top: 64px; }
+    section.part > h2 { margin: 0 0 6px; font-size: 20px; line-height: 28px; }
+    section.part > h2 .no { color: var(--text-tertiary); margin-right: 8px; font-variant-numeric: tabular-nums; }
+    section.part > p.lead { margin: 0 0 20px; color: var(--text-secondary); font-size: 14px; line-height: 22px; max-width: 820px; }
+    .two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; }
+    @media (max-width: 960px) { .two { grid-template-columns: 1fr; } }
+    .cap { margin: 10px 0 0; color: var(--text-tertiary); font-size: 12px; line-height: 18px; }
+    .cap b { color: var(--text-secondary); }
+
+    /* ---------- 와이어프레임 화면(16:9) ---------- */
+    .wf { position: relative; aspect-ratio: 16 / 9; display: grid; gap: 4px; padding: 4px; border: 1px solid var(--wf-line); border-radius: 10px; background-color: var(--bg-frame, #11161f); font-size: 11px; line-height: 15px; overflow: hidden; }
+    .box { position: relative; display: flex; flex-direction: column; gap: 4px; min-width: 0; min-height: 0; padding: 6px 8px; border: 1px solid var(--wf-line); border-radius: 6px; background-color: var(--wf); color: var(--text-secondary); }
+    .box > .t { color: var(--text-primary); font-weight: 700; font-size: 11px; }
+    .box.g { border-color: var(--g); background-color: var(--g-bg); }
+    .box.m { border-color: var(--m); background-color: var(--m-bg); }
+    .box.bad { outline: 2px dashed var(--bad); outline-offset: 2px; }
+    .ln { height: 6px; border-radius: 3px; background-color: rgb(255 255 255 / 12%); }
+    .ln.s { width: 60%; } .ln.xs { width: 35%; }
+    .row { display: flex; align-items: center; gap: 6px; padding: 4px 6px; border-radius: 4px; background-color: rgb(255 255 255 / 5%); }
+    .row .tag { flex: none; padding: 0 5px; border-radius: 3px; background-color: rgb(255 255 255 / 10%); color: var(--text-secondary); font-size: 10px; }
+    .row .sev { flex: none; width: 6px; height: 6px; border-radius: 50%; background-color: #FF5A52; }
+    .row .sev.w { background-color: #FFCC00; }
+    .row .nm { flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; color: var(--text-primary); }
+    .row .mt { flex: none; color: var(--text-tertiary); font-size: 10px; }
+    .tabs { display: flex; gap: 3px; align-items: center; }
+    .tab { padding: 2px 7px; border: 1px solid var(--wf-line); border-radius: 4px; color: var(--text-secondary); white-space: nowrap; font-size: 10px; }
+    .tab.on { border-color: var(--m); color: var(--text-primary); background-color: var(--m-bg); }
+    .tab.all { border-color: var(--g); color: var(--text-primary); background-color: var(--g-bg); }
+    .pin { position: absolute; z-index: 2; display: grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; background-color: var(--bad); color: #1a0a0a; font-weight: 800; font-size: 11px; }
+    .note { position: absolute; z-index: 2; max-width: 46%; padding: 4px 7px; border-radius: 4px; background-color: rgb(248 113 113 / 16%); border: 1px solid var(--bad); color: #FECACA; font-size: 10px; line-height: 14px; }
+    .mapish { flex: 1 1 auto; border-radius: 4px; background:
+      repeating-linear-gradient(135deg, rgb(255 255 255 / 4%) 0 1px, transparent 1px 14px), rgb(0 0 0 / 25%); display: grid; place-items: center; color: var(--text-tertiary); }
+    .kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; }
+    .kpi { padding: 5px 6px; border-radius: 4px; background-color: rgb(255 255 255 / 5%); }
+    .kpi b { display: block; color: var(--text-primary); font-size: 14px; line-height: 18px; }
+    .kpi span { color: var(--text-tertiary); font-size: 9.5px; }
+    .chart { flex: 1 1 auto; border-radius: 4px; background-color: rgb(255 255 255 / 4%); display: flex; align-items: flex-end; gap: 3px; padding: 6px; }
+    .chart i { flex: 1 1 0; border-radius: 2px 2px 0 0; background-color: rgb(167 139 250 / 45%); }
+    .chart i.c { background-color: rgb(255 90 82 / 60%); }
+
+    /* 범례 */
+    .legend { display: flex; flex-wrap: wrap; gap: 16px; margin: 0 0 16px; color: var(--text-secondary); font-size: 13px; }
+    .legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .legend i { width: 14px; height: 10px; border-radius: 3px; border: 1px solid; }
+    .legend .lg i { border-color: var(--g); background-color: var(--g-bg); }
+    .legend .lm i { border-color: var(--m); background-color: var(--m-bg); }
+    .legend .lb i { border: 2px dashed var(--bad); }
+
+    /* 표 */
+    table.grid { width: 100%; border-collapse: collapse; font-size: 14px; line-height: 21px; }
+    table.grid th, table.grid td { padding: 12px 14px; border: 1px solid var(--border-divider); vertical-align: top; text-align: left; }
+    table.grid thead th { color: var(--text-tertiary); font-weight: 600; font-size: 13px; background-color: rgb(255 255 255 / 3%); }
+    table.grid tbody th { width: 150px; color: var(--text-primary); }
+    table.grid td.hl { background-color: var(--g-bg); }
+    table.grid td small { display: block; margin-top: 4px; color: var(--text-tertiary); font-size: 12px; }
+    ul.list, ol.list { margin: 0; padding-left: 20px; color: var(--text-secondary); font-size: 14px; line-height: 23px; max-width: 880px; }
+    ul.list li, ol.list li { margin: 4px 0; }
+    ul.list b, ol.list b { color: var(--text-primary); }
+    .callout { margin-top: 20px; padding: 14px 18px; border: 1px solid var(--border-default); border-radius: 10px; background-color: var(--bg-panel); color: var(--text-secondary); font-size: 14px; line-height: 23px; }
+    .callout b { color: var(--text-primary); }
+  </style>
+</head>
+<body>
+  <a class="back" href="./index.html">← 목록</a>
+  <main>
+    <header class="top">
+      <h1>화면 구조 재정리 제안</h1>
+      <p>피드백 세 가지 — <b>위계</b>(전체 미션과 M1~M8이 한 줄), <b>설비 기준</b>, <b>누적 대시보드</b> — 를 하나의 구조로 묶어 본 내부 정리입니다. 그림은 와이어프레임(배치 · 범위만)입니다.</p>
+      <p class="meta">26.11.12 · 내부 검토용 · 기준 화면 v7(main-v7)</p>
+    </header>
+
+    <!-- 01 지금 -->
+    <section class="part" id="now">
+      <h2><span class="no">01</span>지금 구조 — 범위가 다른 것이 같은 줄 · 같은 틀에</h2>
+      <p class="lead">피드백을 부품마다 그 자리에서 고치다 보니 "전체 이야기인가, 이 미션 이야기인가"라는 기준 없이 쌓였습니다.</p>
+      <div class="legend"><span class="lg"><i></i>전체 범위</span><span class="lm"><i></i>미션 범위</span><span class="lb"><i></i>범위가 어긋난 곳</span></div>
+      <div class="wf" style="grid-template-columns: 4% 20% 1fr 20%; grid-template-rows: 7% 1fr;">
+        <div class="box" style="grid-column: 1 / -1; flex-direction: row; align-items: center; gap: 10px; padding: 4px 8px;">
+          <span class="t">APRISM</span>
+          <div class="tabs box bad" style="flex-direction: row; padding: 3px; border-color: transparent; background: none;">
+            <span class="tab all">전체 미션</span><span class="tab on">M1</span><span class="tab">M2</span><span class="tab">M3</span><span class="tab">M4</span><span class="tab">…</span><span class="tab">M8</span>
+          </div>
+          <span style="margin-left: auto; color: var(--text-tertiary);">사용자 · 시각</span>
+        </div>
+        <div class="box" style="grid-row: 2;"><span class="t">GNB</span></div>
+        <div class="box bad" style="grid-row: 2;">
+          <span class="t">조치 필요 알림 (전체 5)</span>
+          <div class="row"><span class="sev"></span><span class="nm">안전벨트 미착용</span><span class="mt">B4 ⑦</span></div>
+          <div class="row"><span class="sev w"></span><span class="nm">부분방전 9.05</span><span class="mt">B4 ⑥</span></div>
+          <div class="row"><span class="sev w"></span><span class="nm">최고 온도 48.6℃</span><span class="mt">B4 ⑤</span></div>
+          <div class="row"><span class="sev w"></span><span class="nm">누출 의심도 62%</span><span class="mt">B4 ③</span></div>
+        </div>
+        <div class="box m" style="grid-row: 2;">
+          <span class="t">지도 (M1)</span>
+          <div class="mapish">3D 지도 · 경로 · 지점</div>
+          <div class="box g bad" style="position: absolute; left: 10px; top: 26px; width: 34%; padding: 5px 7px;">
+            <span class="t">Delta</span><span>위험 2건, 주의 9건 (전체 미션 합계)</span>
+          </div>
+        </div>
+        <div class="box m" style="grid-row: 2;"><span class="t">로봇 · 웨이포인트 (M1)</span><div class="ln"></div><div class="ln s"></div><div class="ln"></div><div class="ln xs"></div></div>
+        <span class="pin" style="left: 28.6%; top: 1.6%;">1</span>
+        <span class="pin" style="left: 28%; top: 30%;">2</span>
+        <span class="pin" style="left: 7%; top: 55%;">3</span>
+      </div>
+      <ol class="list" style="margin-top: 14px;">
+        <li><b>탭 위계</b> — 부모(전체 미션)와 자식(M1~M8)이 같은 탭 줄에 형제처럼 놓였습니다.</li>
+        <li><b>Delta 범위</b> — 전체 미션을 말하는 Delta가 M1 지도 틀 안에 있습니다.</li>
+        <li><b>숫자 불일치</b> — 알림 목록(전체 5 · 위험 1 · 주의 4)과 Delta(위험 2 · 주의 9)의 범위가 달라, 나란히 보면 틀린 숫자로 읽힙니다.</li>
+      </ol>
+    </section>
+
+    <!-- 02 제안 -->
+    <section class="part" id="layers">
+      <h2><span class="no">02</span>제안 — 두 층으로 나누고, 층마다 축을 하나씩</h2>
+      <p class="lead">좌측 열을 위에서 아래까지 <b>전체 층</b>으로, 오른쪽 작업 영역을 <b>미션 층</b>으로 나눕니다. 미션 탭은 작업 영역 위에만 놓여 "전체 미션"은 탭 줄에서 빠집니다. 전체 층의 축은 <b>설비 · 공간</b>, 미션 층의 축은 <b>로봇 · 미션</b>입니다.</p>
+      <div class="legend"><span class="lg"><i></i>전체 층 — 축: 설비 · 공간</span><span class="lm"><i></i>미션 층 — 축: 로봇 · 미션</span></div>
+      <div class="wf" style="grid-template-columns: 4% 22% 1fr 20%; grid-template-rows: 6% 6% 1fr;">
+        <div class="box" style="grid-column: 1 / -1; flex-direction: row; align-items: center; padding: 4px 8px;"><span class="t">APRISM</span><span style="margin-left: auto; color: var(--text-tertiary);">사용자 · 시각 · 통신</span></div>
+        <div class="box" style="grid-row: 2 / 4;"><span class="t">GNB</span></div>
+        <div class="box g" style="grid-row: 2 / 4;">
+          <span class="t">전체 미션 8 · 위험 2 · 주의 9 ›</span>
+          <div class="box g" style="padding: 5px 7px;"><span class="t">Delta</span><span>N₂ 배관 압력계부터 확인하세요.</span><span style="color: var(--text-tertiary);">M3에도 위험 1건</span></div>
+          <span class="t" style="margin-top: 2px;">조치 필요 알림 · 설비 기준</span>
+          <div class="row"><span class="sev"></span><span class="nm">N₂ 배관 압력계</span><span class="tag">M1</span></div>
+          <div class="row"><span class="sev"></span><span class="nm">HEPA 차압계</span><span class="tag">M3</span></div>
+          <div class="row"><span class="sev w"></span><span class="nm">냉각 펌프 P-2 · 2건</span><span class="tag">M1·M2</span></div>
+          <div class="row"><span class="sev w"></span><span class="nm">수배전반 MCC-1</span><span class="tag">M1</span></div>
+          <span class="t" style="margin-top: auto;">조치 요청된 알림</span>
+        </div>
+        <div class="box m" style="grid-column: 3 / 5; grid-row: 2; flex-direction: row; align-items: center; padding: 3px 6px;">
+          <div class="tabs"><span class="tab on">M1 정기 순회</span><span class="tab">M2</span><span class="tab">M3</span><span class="tab">M4</span><span class="tab">…</span><span class="tab">M8</span></div>
+        </div>
+        <div class="box m" style="grid-row: 3;"><span class="t">지도 (M1)</span><div class="mapish">경로 · 지점 · 알림 팝오버</div></div>
+        <div class="box m" style="grid-row: 3;"><span class="t">로봇 · 웨이포인트 (M1)</span><div class="ln"></div><div class="ln s"></div><div class="ln"></div><div class="ln xs"></div></div>
+      </div>
+      <ul class="list" style="margin-top: 14px;">
+        <li><b>Delta</b>는 전체 층 맨 위 — 요약이 먼저, 그 아래 알림 목록(근거)이 이어져 위에서 아래로 한 번에 읽힙니다. 지도 위에는 미션 것만 남습니다.</li>
+        <li><b>알림 줄의 주인은 설비</b> — 미션은 "어디서 감지했나" 꼬리표로 내려갑니다. 같은 설비 알림이 여러 미션에서 오면 한 줄로 묶습니다.</li>
+        <li><b>층 잇기</b> — 알림 줄을 누르면 그 미션 탭으로 넘어가며 지점 팝오버가 열립니다. 전체에서 미션으로 자연스럽게 들어갑니다.</li>
+        <li><b>숫자 맞추기</b> — 머리 숫자 · Delta · 목록이 모두 같은 범위(전체)를 말합니다. 미션만 보고 싶으면 목록에 "이 미션만" 거르기.</li>
+      </ul>
+    </section>
+
+    <!-- 03 전체 보기 -->
+    <section class="part" id="overview">
+      <h2><span class="no">03</span>전체 보기 — 설비 현황 · 대시보드(누적)</h2>
+      <p class="lead">탭에서 빠진 "전체 미션" 화면은 좌측 열 머리(전체 미션 8 · 위험 2 ›)를 누르면 작업 영역에 열립니다. 전체 층의 입구가 하나로 정리되고, 그 안을 <b>설비 현황</b>(건물 · 공간)과 <b>대시보드</b>(누적) 두 보기로 둡니다.</p>
+      <div class="two">
+        <div>
+          <div class="wf" style="grid-template-columns: 4% 22% 1fr; grid-template-rows: 6% 6% 1fr;">
+            <div class="box" style="grid-column: 1 / -1; padding: 4px 8px;"><span class="t">APRISM</span></div>
+            <div class="box" style="grid-row: 2 / 4;"><span class="t">GNB</span></div>
+            <div class="box g" style="grid-row: 2 / 4;"><span class="t">전체 미션 ‹ 선택됨</span><div class="box g" style="padding: 4px 6px;"><span class="t">Delta</span><div class="ln s"></div></div><div class="row"><span class="sev"></span><span class="nm">N₂ 배관 압력계</span><span class="tag">M1</span></div><div class="row"><span class="sev"></span><span class="nm">HEPA 차압계</span><span class="tag">M3</span></div></div>
+            <div class="box g" style="grid-row: 2; flex-direction: row; align-items: center; padding: 3px 6px;"><div class="tabs"><span class="tab all">설비 현황</span><span class="tab">대시보드</span></div><span style="margin-left: auto; color: var(--text-tertiary);">미션 탭으로 ›</span></div>
+            <div class="box g" style="grid-row: 3;"><span class="t">건물 전체 · 층별 설비 상태</span><div class="mapish">B4 · B3 … 층마다 설비 점(단계색) · 미션 경로는 옅게</div></div>
+          </div>
+          <p class="cap"><b>설비 현황</b> — 지금의 통합 순회(건물 보기)를 설비 축으로. 층 · 구역별로 어떤 설비가 위험한지, 어느 미션이 어디를 돌고 있는지.</p>
+        </div>
+        <div>
+          <div class="wf" style="grid-template-columns: 4% 22% 1fr; grid-template-rows: 6% 6% 1fr;">
+            <div class="box" style="grid-column: 1 / -1; padding: 4px 8px;"><span class="t">APRISM</span></div>
+            <div class="box" style="grid-row: 2 / 4;"><span class="t">GNB</span></div>
+            <div class="box g" style="grid-row: 2 / 4;"><span class="t">전체 미션 ‹ 선택됨</span><div class="box g" style="padding: 4px 6px;"><span class="t">Delta</span><div class="ln s"></div></div><div class="row"><span class="sev"></span><span class="nm">N₂ 배관 압력계</span><span class="tag">M1</span></div><div class="row"><span class="sev"></span><span class="nm">HEPA 차압계</span><span class="tag">M3</span></div></div>
+            <div class="box g" style="grid-row: 2; flex-direction: row; align-items: center; padding: 3px 6px;"><div class="tabs"><span class="tab">설비 현황</span><span class="tab all">대시보드</span></div><span style="margin-left: auto; color: var(--text-tertiary);">오늘 · 이번 주 · 기간</span></div>
+            <div class="box g" style="grid-row: 3;">
+              <div class="kpis"><div class="kpi"><b>11</b><span>위험 · 주의 (오늘)</span></div><div class="kpi"><b>3</b><span>재발 설비</span></div><div class="kpi"><b>42분</b><span>조치 평균 소요</span></div><div class="kpi"><b>92%</b><span>미션 완료율</span></div></div>
+              <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 4px; flex: 1 1 auto; min-height: 0;">
+                <div class="box" style="padding: 5px 6px;"><span class="t">알림 추이 (일)</span><div class="chart"><i style="height:30%"></i><i style="height:45%"></i><i class="c" style="height:70%"></i><i style="height:40%"></i><i style="height:55%"></i><i class="c" style="height:85%"></i><i style="height:50%"></i></div></div>
+                <div class="box" style="padding: 5px 6px;"><span class="t">알림 많은 설비</span><div class="row"><span class="nm">냉각 펌프 P-2</span><span class="mt">5</span></div><div class="row"><span class="nm">N₂ 압력계</span><span class="mt">3</span></div><div class="row"><span class="nm">HEPA 차압계</span><span class="mt">2</span></div></div>
+              </div>
+            </div>
+          </div>
+          <p class="cap"><b>대시보드</b> — 설비 축의 누적(알림 추이 · 재발 · 조치 소요 · 많이 난 설비)과 미션 축의 누적(완료율 · 건너뜀 · 정지 횟수). 숫자를 누르면 안전진단(설비 하나) · 보고서(미션 기록)로.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 04 표 -->
+    <section class="part" id="axes">
+      <h2><span class="no">04</span>층 × 축 × 시간 — 의견이 들어갈 자리</h2>
+      <p class="lead">시간 축(지금 · 누적 · 기록)을 겹치면 화면마다 역할이 나뉩니다. 대시보드 의견은 지금 비어 있는 <b>가운데 칸</b>입니다.</p>
+      <table class="grid">
+        <thead><tr><th></th><th>지금 (실시간)</th><th>누적 (오늘 ~ 이번 주)</th><th>기록 (기간)</th></tr></thead>
+        <tbody>
+          <tr><th>설비 · 공간 축<small style="display:block;color:var(--text-tertiary);font-weight:400;font-size:12px;">전체 층</small></th>
+            <td>Delta · 조치 필요 알림(설비 기준)<small>좌측 열</small></td>
+            <td class="hl">대시보드 — 알림 추이 · 재발 · 조치 소요 · 설비 순위<small>전체 보기 › 대시보드</small></td>
+            <td>안전진단 — 설비 하나 깊게<small>GNB 안전진단</small></td></tr>
+          <tr><th>로봇 · 미션 축<small style="display:block;color:var(--text-tertiary);font-weight:400;font-size:12px;">미션 층</small></th>
+            <td>지도 · 경로 · 로봇 상태와 제어<small>미션 탭</small></td>
+            <td class="hl">대시보드 일부 — 완료율 · 건너뜀 · 정지 횟수<small>전체 보기 › 대시보드</small></td>
+            <td>보고서 — 미션 기록<small>GNB 보고서</small></td></tr>
+        </tbody>
+      </table>
+      <div class="callout">세 의견이 한 구조로 묶입니다 — <b>위계 문제</b> → 층을 나눈다 · <b>설비 기준</b> → 전체 층의 축은 설비 · <b>누적 대시보드</b> → 전체 층에 누적 보기를 둔다.</div>
+    </section>
+
+    <!-- 05 정할 것 -->
+    <section class="part" id="decide">
+      <h2><span class="no">05</span>정할 것 · 챙길 것</h2>
+      <ol class="list">
+        <li><b>클라이언트 확인</b> — "전체 미션" 탭을 없애는 건 클라이언트가 본 구조를 바꾸는 일입니다. 탭 = 미션의 창(11/03) · M1~M8 순서(11/05)는 그대로 살아남습니다.</li>
+        <li><b>좌측 열 폭</b> — 320 안에 Delta와 전체 목록. Delta는 두세 줄로 짧게, 대화는 지도 쪽으로 펼쳐지는 서랍(약 460).</li>
+        <li><b>전체 목록 길이</b> — 미션 여덟 개 알림이 모이면 길어집니다. 위험 먼저 정렬 · 같은 설비 묶기 · "이 미션만" 거르기.</li>
+        <li><b>미션 안의 안내</b> — 미션 범위 안내가 필요하면 지도 위 Delta 대신 우측 패널 · 알림 팝오버 안 한 줄. Delta가 두 곳에 생기지 않게.</li>
+        <li><b>관제와 대시보드 분리</b> — 대시보드 숫자가 실시간 위험 알림과 같은 화면에서 경쟁하지 않게 다른 보기로. 위험이 새로 생기면 알림이 그 위로(위험도 정책).</li>
+        <li><b>좌측 열을 접었을 때</b> — 접힌 레일에 Delta 오브만 남겨 상태 색 · 맥박으로 위험을 알린다.</li>
+        <li><b>순서</b> — 화면부터 옮기기보다, 요소마다 "전체 / 미션" 소속을 표로 먼저 정하고 그 표를 기준으로 자리를 옮긴다.</li>
+      </ol>
+    </section>
+  </main>
+</body>
+</html>
