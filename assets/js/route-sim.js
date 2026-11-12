@@ -181,7 +181,35 @@
 
   /* ---------- 우측 지금 카드 — 상태 줄 ---------- */
   var CIRC = 69.12;
+  /*
+   * [11/12 v7 디자이너] 지금 지점 카드 상태 = 한 줄 틀로 통일 — [아이콘 16] [상태 이름(상태 색 · 굵게)] ··· [오른쪽 보조 정보] (+ 일시정지만 [재개]).
+   *   파랑 = 이동 중 · 측정 중 · 자동복귀 / 빨강 = 위험 감지 · 긴급정지 / 회색 = 일시정지 · 통신 끊김. 빨간 띠 · 점선 막대 · 두 줄은 걷었다(v7.css .rr-st)
+   */
+  var ST7 = {
+    run: '<svg viewBox="0 0 16 16" aria-hidden="true"><circle class="d1" cx="3" cy="8" r="1.8"/><circle class="d2" cx="8" cy="8" r="1.8"/><circle class="d3" cx="13" cy="8" r="1.8"/></svg>',
+    alert: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.6 15.2 14H.8Z" fill="currentColor"/><path d="M8 6v3.6" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/><circle cx="8" cy="11.8" r=".95" fill="#fff"/></svg>',
+    pause: '<svg viewBox="0 0 16 16" aria-hidden="true"><rect x="3.5" y="2.5" width="3" height="11" rx="1" fill="currentColor"/><rect x="9.5" y="2.5" width="3" height="11" rx="1" fill="currentColor"/></svg>',
+    estop: '<svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M8 1.8v5.4"/><path d="M4.4 4.1a5.6 5.6 0 1 0 7.2 0"/></svg>',
+    lost: '<svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M1.6 6a9.4 9.4 0 0 1 12.8 0M4 8.6a5.8 5.8 0 0 1 8 0M6.4 11.2a2.4 2.4 0 0 1 3.2 0"/><path d="M2 2l12 12"/></svg>',
+    home: '<svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"><path d="M2 7.4 8 2.4l6 5"/><path d="M3.6 6.2V13.6h8.8V6.2"/><path d="M6.6 13.6V10h2.8v3.6"/></svg>'
+  };
+  function st7(tone, ic, label, meta, extra) {
+    return '<div class="rr-st is-' + tone + '"><span class="rr-st-ic">' + ic + '</span><span class="rr-st-l">' + label + '</span>' +
+      '<span class="rr-st-m num">' + (meta || "") + '</span>' + (extra || "") + '</div>';
+  }
   function noteHtml(m) {
+    if (document.body.classList.contains("ver-7")) {
+      if (m === "inspect") {
+        return st7("blue", '<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.2" class="trk"></circle><circle cx="8" cy="8" r="6.2" class="val" stroke-dasharray="' + CIRC7 + '" stroke-dashoffset="' + CIRC7 + '" transform="rotate(-90 8 8)"></circle></svg>',
+          "측정 중", '<span data-rr="pct">0%</span>');
+      }
+      if (m === "run") { return st7("blue", ST7.run, "이동 중", '<span data-rr="eta"></span>'); }
+      if (m === "alert") { return st7("red", ST7.alert, "위험 감지", '<span data-rr="eta"></span>'); }
+      if (m === "pause") { return st7("gray", ST7.pause, '일시정지 <span data-rr="held">1:24</span>', '자동복귀 <span data-rr="auto">8:36</span>', '<button type="button" class="rr-resume">재개</button>'); }
+      if (m === "estop") { return st7("red", ST7.estop, "긴급정지", "현장 복구 필요"); }
+      if (m === "lost") { return st7("gray", ST7.lost, "통신 끊김", "마지막 통신 2분 전"); }
+      return "";
+    }
     if (m === "inspect") {
       return '<div class="rr-note is-measure"><svg viewBox="0 0 28 28" width="28" height="28" aria-hidden="true"><circle cx="14" cy="14" r="11" class="trk"></circle>' +
         '<circle cx="14" cy="14" r="11" class="val" stroke-dasharray="' + CIRC + '" stroke-dashoffset="' + CIRC + '" transform="rotate(-90 14 14)"></circle></svg>' +
@@ -199,6 +227,7 @@
     if (m === "lost") { return '<div class="rr-note"><span>위치 확인 중</span><span class="num">마지막 통신 2분 전</span></div>'; }
     return "";
   }
+  var CIRC7 = (2 * Math.PI * 6.2).toFixed(2);   // [11/12 v7] 측정 고리 16(반지름 6.2)
   var noteCard = null, noteMode = null;
   function placeNote(m) {
     var card = document.querySelector("[data-timeline] .timeline-item.is-running .step-card");
@@ -297,7 +326,9 @@
     var home = el("article", "timeline-item is-running rr-extra rr-home",
       '<span class="rail-capsule"><span class="rail-stub"></span><span class="rail-mark"><span class="rail-dot"></span></span></span>' +
       '<div class="step-wrap"><div class="step-card"><div class="step-head"><div class="step-title-row"><span class="t-label-1 step-title">충전 스테이션으로 복귀</span></div></div>' +
-      '<div class="rr-homebar"></div><div class="rr-note"><span>자동복귀 중</span><span class="num" data-rr="home-eta"></span></div></div></div>');
+      '' + (document.body.classList.contains("ver-7")
+        ? '<div class="rr-home-st">' + st7("blue", ST7.home, "자동복귀 중", '<span data-rr="home-eta"></span>') + '</div></div></div>'
+        : '<div class="rr-homebar"></div><div class="rr-note"><span>자동복귀 중</span><span class="num" data-rr="home-eta"></span></div></div></div>'));
     nodes.push(home);
     nodes.forEach(function (n) {
       if (after && after.parentNode) { after.parentNode.insertBefore(n, after.nextSibling); after = n; }
@@ -583,15 +614,16 @@
     alertLine(mode);
     if (mode === "return") {
       var he = document.querySelector('[data-rr="home-eta"]');
-      if (he) { var sec = Math.max(1, Math.round(api.get() / (api.total() / SPEED_SEC))); he.textContent = "도착 약 " + (sec >= 60 ? Math.floor(sec / 60) + "분 " : "") + (sec % 60) + "초"; }
+      if (he) { var sec = Math.max(1, Math.round(api.get() / (api.total() / SPEED_SEC))); var hs = (sec >= 60 ? Math.floor(sec / 60) + "분 " : "") + (sec % 60) + "초"; he.textContent = document.body.classList.contains("ver-7") ? "약 " + hs + " 남음" : "도착 약 " + hs; }   // [11/12 v7] 이동 중과 같은 말투
     }
     // 우측 카드 상태 줄
     var card = mode === "return" ? null : placeNote(mode);
     if (mode === "return") { placeNote(""); }
     if (card) {
       if (mode === "inspect") {
-        var fr = Math.min(1, (e % 4500) / 3000), v = card.querySelector(".rr-note .val"), pe = card.querySelector('[data-rr="pct"]');
-        if (v) { v.setAttribute("stroke-dashoffset", (CIRC * (1 - fr)).toFixed(2)); }
+        var fr = Math.min(1, (e % 4500) / 3000), v = card.querySelector(".rr-note .val, .rr-st .val"), pe = card.querySelector('[data-rr="pct"]');
+        var circ = document.body.classList.contains("ver-7") ? +CIRC7 : CIRC;
+        if (v) { v.setAttribute("stroke-dashoffset", (circ * (1 - fr)).toFixed(2)); }
         if (pe) { pe.textContent = Math.round(fr * 100) + "%"; }
       } else if (mode === "run" || mode === "alert") {
         var s = api.get(), next = api.stops().filter(function (x) { return x > s + 1e-6; })[0], eta = card.querySelector('[data-rr="eta"]');

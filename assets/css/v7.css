@@ -1056,3 +1056,27 @@ body.ver-7 .rc-box .progress-meta:has(> .rr-banner) { display: grid; grid-templa
 body.ver-7 .rc-box .progress-meta:has(> .rr-banner) > .rr-banner { grid-column: 1; grid-row: 1; }
 body.ver-7 .rc-box .progress-meta:has(> .rr-banner) > .progress-titles { grid-column: 1; grid-row: 2; order: 0; flex-basis: auto; }
 body.ver-7 .rc-box .progress-meta:has(> .rr-banner) > .progress-percent { grid-column: 2; grid-row: 1 / span 2; }
+
+/* [11/12 디자이너] 지금 지점 카드 상태 한 줄(route-sim.js st7) — 이동 중 · 측정 중 · 위험 감지 · 일시정지 · 자동복귀 · 긴급정지 · 통신 끊김 모두 같은 틀
+ *   [아이콘 16] [상태 이름 13/18 굵게, 상태 색] ··· [보조 정보 12/18, 카드 글자색 72%] (+ 일시정지 [재개] 22)
+ *   상태 색: 파랑 #1E7BE6 · 빨강 #E5383B · 회색 = 카드 글자색 70% — 카드 바탕이 테마마다 달라 양쪽에서 읽히는 중간 값 */
+body.ver-7 .rr-notes:has(> .rr-st), body.ver-7 .rr-home-st { margin-top: 6px; }
+body.ver-7 .rr-st { --st: #1E7BE6; display: flex; align-items: center; gap: 6px; min-height: 22px; font-size: 13px; line-height: 18px; color: var(--step-now-fg, inherit); }
+body.ver-7 .rr-st.is-red { --st: #E5383B; }
+body.ver-7 .rr-st.is-gray { --st: color-mix(in srgb, currentColor 70%, transparent); }
+body.ver-7 .rr-st-ic { flex: none; display: grid; place-items: center; width: 16px; height: 16px; color: var(--st); }
+body.ver-7 .rr-st-ic > svg { display: block; width: 16px; height: 16px; overflow: visible; }
+body.ver-7 .rr-st-l { flex: none; color: var(--st); font-weight: 700; font-variant-numeric: tabular-nums; }
+body.ver-7 .rr-st-m { margin-left: auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: color-mix(in srgb, currentColor 72%, transparent); font-size: 12px; font-variant-numeric: tabular-nums; }
+body.ver-7 .rr-st-m:empty { display: none; }
+/* 이동 중 점 셋이 차례로 밝아진다(흐름) · 측정 고리 */
+body.ver-7 .rr-st-ic circle.d1, body.ver-7 .rr-st-ic circle.d2, body.ver-7 .rr-st-ic circle.d3 { fill: currentColor; animation: rr-st-dot 1.2s ease-in-out infinite; }
+body.ver-7 .rr-st-ic circle.d2 { animation-delay: .2s; }
+body.ver-7 .rr-st-ic circle.d3 { animation-delay: .4s; }
+@keyframes rr-st-dot { 0%, 100% { opacity: .3; } 40% { opacity: 1; } }
+body.ver-7 .rr-st-ic .trk { fill: none; stroke: color-mix(in srgb, currentColor 25%, transparent); stroke-width: 2.4; }
+body.ver-7 .rr-st-ic .val { fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; transition: stroke-dashoffset .3s; }
+@media (prefers-reduced-motion: reduce) { body.ver-7 .rr-st-ic circle { animation: none; opacity: 1; } }
+/* 일시정지 [재개] — 줄 끝 작은 보조 단추(파랑 채움 대신 테 단추: 이 칸의 주인공은 상태) */
+body.ver-7 .rr-st .rr-resume { flex: none; height: 22px; margin: 0 0 0 4px; padding: 0 8px; border: 1px solid color-mix(in srgb, currentColor 30%, transparent); border-radius: 4px; background: none; color: inherit; font: inherit; font-size: 12px; font-weight: 600; cursor: pointer; }
+body.ver-7 .rr-st .rr-resume:hover { background-color: color-mix(in srgb, currentColor 10%, transparent); }
