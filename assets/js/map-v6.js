@@ -2379,6 +2379,26 @@
       var gap = (x - px) * (x - px) + (y - py) * (y - py);
       if (gap < best) { best = gap; near = mark; }
     });
+    if (near || !document.body.classList.contains("ver-7")) { return near; }
+    /*
+     * [11/12 v7 디자이너] 보이는 번호 핀도 누르는 자리 — 바닥 점뿐 아니라 위 번호 원(머리, 사방 4 여유)과 그 아래 막대(좌우 6)까지.
+     *   감춘 핀(is-quiet · 다른 층 hidden)은 화면에 없으니 빼고, 여럿 겹치면 머리 가운데가 가까운 쪽
+     */
+    var vr = view.getBoundingClientRect(), pinBest = Infinity;
+    wpSpots.forEach(function (mark) {
+      if (mark.floor && mark.floor !== floorNow) { return; }
+      var el = mark.pinEl, head = el && !el.hidden && el.querySelector(".rr-pin-head");
+      if (!head || !head.getClientRects().length) { return; }
+      var hr = head.getBoundingClientRect();
+      if (!hr.width) { return; }
+      var l = hr.left - vr.left, t = hr.top - vr.top, r = hr.right - vr.left, b = hr.bottom - vr.top;
+      var p = mark.spot.clone().project(camera), bx = (p.x * 0.5 + 0.5) * w, by = (-p.y * 0.5 + 0.5) * h;
+      var onHead = px >= l - 4 && px <= r + 4 && py >= t - 4 && py <= b + 4;
+      var onStem = Math.abs(px - bx) <= 6 && py >= b && py <= by;
+      if (!onHead && !onStem) { return; }
+      var cx = (l + r) / 2, cy = (t + b) / 2, d = (cx - px) * (cx - px) + (cy - py) * (cy - py);
+      if (d < pinBest) { pinBest = d; near = mark; }
+    });
     return near;
   }
 
