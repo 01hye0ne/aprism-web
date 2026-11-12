@@ -2704,10 +2704,10 @@
     if (!show) { return; }
     var wait = st === "done", scan = st === "inspect", hold = st === "pause";
     // [11/12 v7 디자이너] 평소(이동 · 위험 감지 · 자동복귀 · 긴급정지)도 4방위 호 — 원 두 줄(duo)은 v6 이하에만 남긴다
-    var arc4 = document.body.classList.contains("ver-7") && !wait && !hold;
+    var arc4 = document.body.classList.contains("ver-7") && !wait;   // 일시정지도 4방위 호(노랑, 멈춘 채) — 끊긴 두 줄(brk)은 v6 이하만
     halo.base.visible = halo.front.visible = scan || arc4;
     halo.duo.visible = !wait && !scan && !hold && !arc4;
-    halo.brk.visible = hold;
+    halo.brk.visible = hold && !arc4;
     halo.ring.visible = wait;
     var walk = DOG_MOTION[st] === "walk", now = performance.now();
     var tint = HALO_TINT[st] || HALO_GX;
