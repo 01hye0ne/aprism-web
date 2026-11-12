@@ -62,6 +62,13 @@
     .chart i { flex: 1 1 0; border-radius: 2px 2px 0 0; background-color: rgb(167 139 250 / 45%); }
     .chart i.c { background-color: rgb(255 90 82 / 60%); }
 
+    /* Delta 도우미 — 어느 층에도 속하지 않고 "지금 보는 범위"를 말한다(흰 점선 테). 오브 + 말풍선, 작업 영역 오른쪽 아래 */
+    .dl { position: absolute; z-index: 2; right: 8px; bottom: 8px; display: flex; align-items: flex-end; gap: 5px; }
+    .dl .bub { max-width: 200px; padding: 5px 8px; border: 1px dashed rgb(255 255 255 / 55%); border-radius: 9px 9px 2px 9px; background-color: rgb(20 24 34 / 92%); color: var(--text-secondary); font-size: 10px; line-height: 14px; }
+    .dl .bub b { display: block; color: var(--text-primary); font-size: 10px; letter-spacing: .02em; }
+    .dl .bub em { font-style: normal; color: var(--text-tertiary); }
+    .dl .orb { flex: none; width: 20px; height: 20px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #FFB4A8, #E5383B 60%, #5A1418); box-shadow: 0 0 0 1px rgb(255 255 255 / 25%); }
+
     /* 범례 */
     .legend { display: flex; flex-wrap: wrap; gap: 16px; margin: 0 0 16px; color: var(--text-secondary); font-size: 13px; }
     .legend span { display: inline-flex; align-items: center; gap: 6px; }
@@ -69,6 +76,7 @@
     .legend .lg i { border-color: var(--g); background-color: var(--g-bg); }
     .legend .lm i { border-color: var(--m); background-color: var(--m-bg); }
     .legend .lb i { border: 2px dashed var(--bad); }
+    .legend .ld i { border: 1px dashed rgb(255 255 255 / 55%); }
 
     /* 표 */
     table.grid { width: 100%; border-collapse: collapse; font-size: 14px; line-height: 21px; }
@@ -90,7 +98,7 @@
     <header class="top">
       <h1>화면 구조 재정리 제안</h1>
       <p>피드백 세 가지 — <b>위계</b>(전체 미션과 M1~M8이 한 줄), <b>설비 기준</b>, <b>누적 대시보드</b> — 를 하나의 구조로 묶어 본 내부 정리입니다. 그림은 와이어프레임(배치 · 범위만)입니다.</p>
-      <p class="meta">26.11.12 · 내부 검토용 · 기준 화면 v7(main-v7)</p>
+      <p class="meta">26.11.12 · 내부 검토용 · 기준 화면 v7(main-v7) · 2차 — Delta 는 지도 영역 안(챗봇형), "지금 보는 범위"를 말한다</p>
     </header>
 
     <!-- 01 지금 -->
@@ -136,47 +144,51 @@
     <!-- 02 제안 -->
     <section class="part" id="layers">
       <h2><span class="no">02</span>제안 — 두 층으로 나누고, 층마다 축을 하나씩</h2>
-      <p class="lead">좌측 열을 위에서 아래까지 <b>전체 층</b>으로, 오른쪽 작업 영역을 <b>미션 층</b>으로 나눕니다. 미션 탭은 작업 영역 위에만 놓여 "전체 미션"은 탭 줄에서 빠집니다. 전체 층의 축은 <b>설비 · 공간</b>, 미션 층의 축은 <b>로봇 · 미션</b>입니다.</p>
-      <div class="legend"><span class="lg"><i></i>전체 층 — 축: 설비 · 공간</span><span class="lm"><i></i>미션 층 — 축: 로봇 · 미션</span></div>
+      <p class="lead">좌측 열을 위에서 아래까지 <b>전체 층</b>으로, 오른쪽 작업 영역을 <b>미션 층</b>으로 나눕니다. 미션 탭은 작업 영역 위에만 놓여 "전체 미션"은 탭 줄에서 빠집니다. 전체 층의 축은 <b>설비 · 공간</b>, 미션 층의 축은 <b>로봇 · 미션</b>입니다.
+        <b>Delta</b>는 어느 층에도 속하지 않는 도우미로, 지금처럼 지도 영역 오른쪽 아래(챗봇형)에 서서 <b>지금 보고 있는 범위</b>를 말합니다.</p>
+      <div class="legend"><span class="lg"><i></i>전체 층 — 축: 설비 · 공간</span><span class="lm"><i></i>미션 층 — 축: 로봇 · 미션</span><span class="ld"><i></i>Delta — 지금 보는 범위를 말함</span></div>
       <div class="wf" style="grid-template-columns: 4% 22% 1fr 20%; grid-template-rows: 6% 6% 1fr;">
         <div class="box" style="grid-column: 1 / -1; flex-direction: row; align-items: center; padding: 4px 8px;"><span class="t">APRISM</span><span style="margin-left: auto; color: var(--text-tertiary);">사용자 · 시각 · 통신</span></div>
         <div class="box" style="grid-row: 2 / 4;"><span class="t">GNB</span></div>
         <div class="box g" style="grid-row: 2 / 4;">
           <span class="t">전체 미션 8 · 위험 2 · 주의 9 ›</span>
-          <div class="box g" style="padding: 5px 7px;"><span class="t">Delta</span><span>N₂ 배관 압력계부터 확인하세요.</span><span style="color: var(--text-tertiary);">M3에도 위험 1건</span></div>
           <span class="t" style="margin-top: 2px;">조치 필요 알림 · 설비 기준</span>
           <div class="row"><span class="sev"></span><span class="nm">N₂ 배관 압력계</span><span class="tag">M1</span></div>
           <div class="row"><span class="sev"></span><span class="nm">HEPA 차압계</span><span class="tag">M3</span></div>
           <div class="row"><span class="sev w"></span><span class="nm">냉각 펌프 P-2 · 2건</span><span class="tag">M1·M2</span></div>
           <div class="row"><span class="sev w"></span><span class="nm">수배전반 MCC-1</span><span class="tag">M1</span></div>
+          <div class="row"><span class="sev w"></span><span class="nm">냉각수 배관 밸브</span><span class="tag">M2</span></div>
           <span class="t" style="margin-top: auto;">조치 요청된 알림</span>
         </div>
         <div class="box m" style="grid-column: 3 / 5; grid-row: 2; flex-direction: row; align-items: center; padding: 3px 6px;">
           <div class="tabs"><span class="tab on">M1 정기 순회</span><span class="tab">M2</span><span class="tab">M3</span><span class="tab">M4</span><span class="tab">…</span><span class="tab">M8</span></div>
         </div>
-        <div class="box m" style="grid-row: 3;"><span class="t">지도 (M1)</span><div class="mapish">경로 · 지점 · 알림 팝오버</div></div>
+        <div class="box m" style="grid-row: 3;"><span class="t">지도 (M1)</span><div class="mapish">경로 · 지점 · 알림 팝오버</div>
+          <div class="dl"><div class="bub"><b>DELTA · M1</b>위험 1건 — ⑦ 작업 발판부터.<br><em>M3에도 위험 1건 ›</em></div><span class="orb"></span></div></div>
         <div class="box m" style="grid-row: 3;"><span class="t">로봇 · 웨이포인트 (M1)</span><div class="ln"></div><div class="ln s"></div><div class="ln"></div><div class="ln xs"></div></div>
       </div>
       <ul class="list" style="margin-top: 14px;">
-        <li><b>Delta</b>는 전체 층 맨 위 — 요약이 먼저, 그 아래 알림 목록(근거)이 이어져 위에서 아래로 한 번에 읽힙니다. 지도 위에는 미션 것만 남습니다.</li>
+        <li><b>Delta는 지금 보는 범위를 말한다</b> — 미션 탭에선 그 미션만("M1 · 위험 1건 — ⑦부터"), 다른 미션 위험은 끝에 한 줄("M3에도 위험 1건 ›"). 전체 보기에선 전체를 요약합니다. 지도 영역 안에 있어도 지도에 보이는 것과 Delta가 말하는 것이 늘 같습니다.</li>
+        <li><b>자리는 지금과 같게</b> — 지도 영역 오른쪽 아래 오브 + 말풍선(챗봇형). 펼치면 떠 있기 · 오른쪽 붙임 · 새 창. 좌측 열은 전체 알림 목록만 맡아 폭 걱정이 없습니다.</li>
         <li><b>알림 줄의 주인은 설비</b> — 미션은 "어디서 감지했나" 꼬리표로 내려갑니다. 같은 설비 알림이 여러 미션에서 오면 한 줄로 묶습니다.</li>
         <li><b>층 잇기</b> — 알림 줄을 누르면 그 미션 탭으로 넘어가며 지점 팝오버가 열립니다. 전체에서 미션으로 자연스럽게 들어갑니다.</li>
-        <li><b>숫자 맞추기</b> — 머리 숫자 · Delta · 목록이 모두 같은 범위(전체)를 말합니다. 미션만 보고 싶으면 목록에 "이 미션만" 거르기.</li>
+        <li><b>범위 표시로 숫자 오해 막기</b> — 좌측 머리 숫자 · 목록은 전체, Delta는 머리에 범위("DELTA · M1")를 적어 서로 달라도 틀린 숫자로 읽히지 않게. 미션만 보고 싶으면 목록에 "이 미션만" 거르기.</li>
       </ul>
     </section>
 
     <!-- 03 전체 보기 -->
     <section class="part" id="overview">
       <h2><span class="no">03</span>전체 보기 — 설비 현황 · 대시보드(누적)</h2>
-      <p class="lead">탭에서 빠진 "전체 미션" 화면은 좌측 열 머리(전체 미션 8 · 위험 2 ›)를 누르면 작업 영역에 열립니다. 전체 층의 입구가 하나로 정리되고, 그 안을 <b>설비 현황</b>(건물 · 공간)과 <b>대시보드</b>(누적) 두 보기로 둡니다.</p>
+      <p class="lead">탭에서 빠진 "전체 미션" 화면은 좌측 열 머리(전체 미션 8 · 위험 2 ›)를 누르면 작업 영역에 열립니다. 전체 층의 입구가 하나로 정리되고, 그 안을 <b>설비 현황</b>(건물 · 공간)과 <b>대시보드</b>(누적) 두 보기로 둡니다. 같은 자리의 Delta가 여기서는 <b>전체</b>(대시보드에선 고른 기간)를 말합니다.</p>
       <div class="two">
         <div>
           <div class="wf" style="grid-template-columns: 4% 22% 1fr; grid-template-rows: 6% 6% 1fr;">
             <div class="box" style="grid-column: 1 / -1; padding: 4px 8px;"><span class="t">APRISM</span></div>
             <div class="box" style="grid-row: 2 / 4;"><span class="t">GNB</span></div>
-            <div class="box g" style="grid-row: 2 / 4;"><span class="t">전체 미션 ‹ 선택됨</span><div class="box g" style="padding: 4px 6px;"><span class="t">Delta</span><div class="ln s"></div></div><div class="row"><span class="sev"></span><span class="nm">N₂ 배관 압력계</span><span class="tag">M1</span></div><div class="row"><span class="sev"></span><span class="nm">HEPA 차압계</span><span class="tag">M3</span></div></div>
+            <div class="box g" style="grid-row: 2 / 4;"><span class="t">전체 미션 ‹ 선택됨</span><div class="row"><span class="sev"></span><span class="nm">N₂ 배관 압력계</span><span class="tag">M1</span></div><div class="row"><span class="sev"></span><span class="nm">HEPA 차압계</span><span class="tag">M3</span></div><div class="row"><span class="sev w"></span><span class="nm">냉각 펌프 P-2</span><span class="tag">M1·M2</span></div></div>
             <div class="box g" style="grid-row: 2; flex-direction: row; align-items: center; padding: 3px 6px;"><div class="tabs"><span class="tab all">설비 현황</span><span class="tab">대시보드</span></div><span style="margin-left: auto; color: var(--text-tertiary);">미션 탭으로 ›</span></div>
-            <div class="box g" style="grid-row: 3;"><span class="t">건물 전체 · 층별 설비 상태</span><div class="mapish">B4 · B3 … 층마다 설비 점(단계색) · 미션 경로는 옅게</div></div>
+            <div class="box g" style="grid-row: 3;"><span class="t">건물 전체 · 층별 설비 상태</span><div class="mapish">B4 · B3 … 층마다 설비 점(단계색) · 미션 경로는 옅게</div>
+              <div class="dl"><div class="bub"><b>DELTA · 전체</b>8개 미션 · 위험 2건 — N₂ 압력계부터.</div><span class="orb"></span></div></div>
           </div>
           <p class="cap"><b>설비 현황</b> — 지금의 통합 순회(건물 보기)를 설비 축으로. 층 · 구역별로 어떤 설비가 위험한지, 어느 미션이 어디를 돌고 있는지.</p>
         </div>
@@ -184,7 +196,7 @@
           <div class="wf" style="grid-template-columns: 4% 22% 1fr; grid-template-rows: 6% 6% 1fr;">
             <div class="box" style="grid-column: 1 / -1; padding: 4px 8px;"><span class="t">APRISM</span></div>
             <div class="box" style="grid-row: 2 / 4;"><span class="t">GNB</span></div>
-            <div class="box g" style="grid-row: 2 / 4;"><span class="t">전체 미션 ‹ 선택됨</span><div class="box g" style="padding: 4px 6px;"><span class="t">Delta</span><div class="ln s"></div></div><div class="row"><span class="sev"></span><span class="nm">N₂ 배관 압력계</span><span class="tag">M1</span></div><div class="row"><span class="sev"></span><span class="nm">HEPA 차압계</span><span class="tag">M3</span></div></div>
+            <div class="box g" style="grid-row: 2 / 4;"><span class="t">전체 미션 ‹ 선택됨</span><div class="row"><span class="sev"></span><span class="nm">N₂ 배관 압력계</span><span class="tag">M1</span></div><div class="row"><span class="sev"></span><span class="nm">HEPA 차압계</span><span class="tag">M3</span></div><div class="row"><span class="sev w"></span><span class="nm">냉각 펌프 P-2</span><span class="tag">M1·M2</span></div></div>
             <div class="box g" style="grid-row: 2; flex-direction: row; align-items: center; padding: 3px 6px;"><div class="tabs"><span class="tab">설비 현황</span><span class="tab all">대시보드</span></div><span style="margin-left: auto; color: var(--text-tertiary);">오늘 · 이번 주 · 기간</span></div>
             <div class="box g" style="grid-row: 3;">
               <div class="kpis"><div class="kpi"><b>11</b><span>위험 · 주의 (오늘)</span></div><div class="kpi"><b>3</b><span>재발 설비</span></div><div class="kpi"><b>42분</b><span>조치 평균 소요</span></div><div class="kpi"><b>92%</b><span>미션 완료율</span></div></div>
@@ -192,6 +204,7 @@
                 <div class="box" style="padding: 5px 6px;"><span class="t">알림 추이 (일)</span><div class="chart"><i style="height:30%"></i><i style="height:45%"></i><i class="c" style="height:70%"></i><i style="height:40%"></i><i style="height:55%"></i><i class="c" style="height:85%"></i><i style="height:50%"></i></div></div>
                 <div class="box" style="padding: 5px 6px;"><span class="t">알림 많은 설비</span><div class="row"><span class="nm">냉각 펌프 P-2</span><span class="mt">5</span></div><div class="row"><span class="nm">N₂ 압력계</span><span class="mt">3</span></div><div class="row"><span class="nm">HEPA 차압계</span><span class="mt">2</span></div></div>
               </div>
+              <div class="dl"><div class="bub"><b>DELTA · 이번 주</b>냉각 펌프 P-2 재발 5회 — 점검 일정 제안.</div><span class="orb"></span></div>
             </div>
           </div>
           <p class="cap"><b>대시보드</b> — 설비 축의 누적(알림 추이 · 재발 · 조치 소요 · 많이 난 설비)과 미션 축의 누적(완료율 · 건너뜀 · 정지 횟수). 숫자를 누르면 안전진단(설비 하나) · 보고서(미션 기록)로.</p>
@@ -207,7 +220,7 @@
         <thead><tr><th></th><th>지금 (실시간)</th><th>누적 (오늘 ~ 이번 주)</th><th>기록 (기간)</th></tr></thead>
         <tbody>
           <tr><th>설비 · 공간 축<small style="display:block;color:var(--text-tertiary);font-weight:400;font-size:12px;">전체 층</small></th>
-            <td>Delta · 조치 필요 알림(설비 기준)<small>좌측 열</small></td>
+            <td>조치 필요 알림(설비 기준) · 전체 숫자<small>좌측 열</small></td>
             <td class="hl">대시보드 — 알림 추이 · 재발 · 조치 소요 · 설비 순위<small>전체 보기 › 대시보드</small></td>
             <td>안전진단 — 설비 하나 깊게<small>GNB 안전진단</small></td></tr>
           <tr><th>로봇 · 미션 축<small style="display:block;color:var(--text-tertiary);font-weight:400;font-size:12px;">미션 층</small></th>
@@ -216,6 +229,7 @@
             <td>보고서 — 미션 기록<small>GNB 보고서</small></td></tr>
         </tbody>
       </table>
+      <div class="callout" style="margin-bottom: 12px;"><b>Delta는 표의 한 칸에 속하지 않습니다</b> — 지금 보고 있는 칸(미션 탭 = 그 미션의 지금, 전체 보기 = 전체의 지금, 대시보드 = 고른 기간)을 요약하는 도우미입니다.</div>
       <div class="callout">세 의견이 한 구조로 묶입니다 — <b>위계 문제</b> → 층을 나눈다 · <b>설비 기준</b> → 전체 층의 축은 설비 · <b>누적 대시보드</b> → 전체 층에 누적 보기를 둔다.</div>
     </section>
 
@@ -224,11 +238,13 @@
       <h2><span class="no">05</span>정할 것 · 챙길 것</h2>
       <ol class="list">
         <li><b>클라이언트 확인</b> — "전체 미션" 탭을 없애는 건 클라이언트가 본 구조를 바꾸는 일입니다. 탭 = 미션의 창(11/03) · M1~M8 순서(11/05)는 그대로 살아남습니다.</li>
-        <li><b>좌측 열 폭</b> — 320 안에 Delta와 전체 목록. Delta는 두세 줄로 짧게, 대화는 지도 쪽으로 펼쳐지는 서랍(약 460).</li>
+        <li><b>Delta 자리 · 형태</b> — 지도 영역 오른쪽 아래 챗봇형(지금과 같은 자리). 위젯형 · 가로형은 지도를 덮어 범위 규칙과 덜 맞습니다.</li>
+        <li><b>범위 표시</b> — Delta 머리에 늘 범위("DELTA · M1" · "DELTA · 전체")를 적는다. 좌측 전체 숫자와 달라도 오해가 없게.</li>
+        <li><b>다른 미션의 위험</b> — Delta가 이 미션만 말할 때 다른 미션 위험은 탭의 ▲ · 좌측 전체 목록 · Delta 끝 한 줄 세 곳이 받친다(위험도 정책 — 위험은 늘 어딘가 보여야 한다).</li>
         <li><b>전체 목록 길이</b> — 미션 여덟 개 알림이 모이면 길어집니다. 위험 먼저 정렬 · 같은 설비 묶기 · "이 미션만" 거르기.</li>
-        <li><b>미션 안의 안내</b> — 미션 범위 안내가 필요하면 지도 위 Delta 대신 우측 패널 · 알림 팝오버 안 한 줄. Delta가 두 곳에 생기지 않게.</li>
+        <li><b>Delta는 하나</b> — 범위가 바뀌어도 Delta는 한 자리 하나. 좌측 열 · 우측 패널에 따로 요약을 두지 않는다.</li>
         <li><b>관제와 대시보드 분리</b> — 대시보드 숫자가 실시간 위험 알림과 같은 화면에서 경쟁하지 않게 다른 보기로. 위험이 새로 생기면 알림이 그 위로(위험도 정책).</li>
-        <li><b>좌측 열을 접었을 때</b> — 접힌 레일에 Delta 오브만 남겨 상태 색 · 맥박으로 위험을 알린다.</li>
+        <li><b>좌측 열을 접었을 때</b> — 접힌 레일에 전체 위험 수 배지만 남긴다. Delta는 지도 영역에 그대로 있어 영향이 없다.</li>
         <li><b>순서</b> — 화면부터 옮기기보다, 요소마다 "전체 / 미션" 소속을 표로 먼저 정하고 그 표를 기준으로 자리를 옮긴다.</li>
       </ol>
     </section>
