@@ -1242,3 +1242,7 @@ body.ver-7 .rc-box .progress-track::before {
 :root:not([data-theme="light"]) body.ver-7 .rc-box .progress-track::before { background-color: var(--bg-selected); }
 body.ver-7 .rc-box .progress-track.cu-zero::before { transition: none; background-size: 0 100%; }
 body.ver-7 .rc-box .progress-track.cu-run::before { transition: background-size 600ms cubic-bezier(.22, .61, .36, 1); }
+
+/* [11/12 디자이너] 트랙 왼쪽 깎은 모서리가 검게 남던 것 — 위로 번지는 빛이 채움의 box-shadow 라 채움 상자 안(= 깎인 모서리 자리)에는 안 그려졌다.
+ *   빛을 흐린 면(filter blur)으로 바꿔 채움 상자 안에도 깔린다 — 트랙 바탕(::before)이 덮고, 깎인 모서리로만 비친다. 값은 그대로(위로 5 · 흐림 20 · glow-blue-halo) */
+:root[data-theme] body.ver-7 .rc-box .progress-fill { box-shadow: none; background-color: var(--comp-alert-default-glow-halo); filter: blur(10px); transform: translateY(-5px); }
