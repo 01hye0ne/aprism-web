@@ -1122,3 +1122,9 @@ body.ver-7 [data-timeline] .rr-alert-line { margin-top: 0; }
  *   빛 층(.edge-light, 지도 판 전체를 덮음)이 plus-lighter 로 빛을 더해, 박동마다 Chrome 이 그 아래 흐림 판(backdrop-filter) 가장자리를 다시 합성하다 튀었다.
  *   라이트처럼 일반 혼합으로 — 빛 세기는 1배율 비교에서 차이가 거의 없다 */
 body.ver-7 .two-col > .edge-light { mix-blend-mode: normal; }
+
+/* [11/12 디자이너] 웨이포인트 목록 칸 위쪽이 덜 채워져 보이던 것 — 목록 칸(반투명 검정 50%)이 머리(불투명 bg/raised) 밑으로 6 겹쳐 올라가,
+ *   겹친 6 만 회색이 비쳐 밝았다(레일 기둥은 제 바탕이 있어 거기만 어두웠다). 겹침을 없애고 그만큼 머리 아래 여백을 16 → 10 — 칸 사이 간격은 그대로 */
+body.ver-7 .right-panel .rr-wp-head + .timeline, body.ver-7 .rr-wp-mini { margin-top: 0; }
+body.ver-7 .rr-wp-head { padding-bottom: 10px; }
+body.ver-7.rr-wp-closed .rr-wp-head { padding-bottom: var(--space-8); }
