@@ -24,16 +24,34 @@
     return Number(m[1]);
   }
 
+  // 진짜 숫자(첫 글자 덩이)만 칸(.cu-raw)으로 감싼다 — 글자(textContent)는 그대로, 카운터는 이 칸 안에 겹친다(v7.css)
+  function wrap(el) {
+    var tn = el.firstChild;
+    if (!tn || tn.nodeType !== 3 || !tn.nodeValue.trim()) { return false; }
+    var sp = document.createElement("span");
+    sp.className = "cu-raw";
+    if (el.hasAttribute("data-cu-total")) { sp.setAttribute("data-cu-total", el.getAttribute("data-cu-total")); }
+    el.insertBefore(sp, tn); sp.appendChild(tn);
+    return true;
+  }
+  function unwrap(el) {
+    Array.prototype.forEach.call(el.querySelectorAll(".cu-raw"), function (sp) {
+      while (sp.firstChild) { sp.parentNode.insertBefore(sp.firstChild, sp); }
+      sp.remove();
+    });
+    el.normalize();
+  }
+
   function stop() {
     clearTimeout(timer);
-    [pct(), wpn()].forEach(function (el) { if (el) { el.classList.remove("is-counting"); el.style.removeProperty("--cu-n"); } });
+    [pct(), wpn()].forEach(function (el) { if (el) { el.classList.remove("is-counting"); el.style.removeProperty("--cu-n"); unwrap(el); } });
     var tr = track(); if (tr) { tr.classList.remove("cu-zero", "cu-run"); }
   }
 
   function run() {
     if (reduce && reduce.matches) { return; }
     stop();
-    var els = [pct(), wpn()].filter(function (el) { return el && target(el); });   // 0 · 읽지 못한 값은 뺀다
+    var els = [pct(), wpn()].filter(function (el) { return el && target(el) && wrap(el); });   // 0 · 읽지 못한 값은 뺀다
     var tr = track();
     if (!els.length) { return; }
     els.forEach(function (el) { el.style.setProperty("--cu-n", "0"); el.classList.add("is-counting"); });
