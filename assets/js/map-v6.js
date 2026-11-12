@@ -3154,7 +3154,8 @@
       var ccx = (dRect ? dRect.left : hb0.left + rm.left) - op.left - (opEl ? opEl.clientLeft : 0) + w / 2;
       var cardTop = rm.floor - h + (hb0.top - op.top);
       // [11/11 디자이너] "조치 요청됨" 판은 위 끝을 지킨다 — 줄어든 만큼 아래 끝이 올라간다(예전엔 아래 끝에 붙어 아래로 모였다)
-      if (alertBox.classList.contains("is-requested")) {
+      // [11/12 디자이너] 위 끝 지키기는 챗봇형(body.d3-chat)만 — 위젯형 · 가로형은 예전처럼 아래 끝에 붙어 아래로 모인다
+      if (alertBox.classList.contains("is-requested") && document.body.classList.contains("d3-chat")) {
         if (reqTopY === null) { var py = parseFloat(alertBox.style.getPropertyValue("--y")); reqTopY = isNaN(py) ? cardTop : py; }
         cardTop = Math.min(reqTopY, cardTop);   // 판이 바닥을 넘으면 그만큼만 올린다
       } else { reqTopY = null; }
