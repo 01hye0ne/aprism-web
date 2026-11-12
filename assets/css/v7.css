@@ -1096,3 +1096,9 @@ body.ver-7 [data-timeline] .timeline-item:has(.rr-st.is-measure) .step-no::after
   -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2.5px), #000 calc(100% - 2px)); mask: radial-gradient(farthest-side, transparent calc(100% - 2.5px), #000 calc(100% - 2px));
 }
 body.ver-7 .rr-st .rr-st-m:empty + .rr-resume { margin-left: auto; }   /* 일시정지 — 보조 정보가 위로 올라가 비면 [재개]가 줄 끝 */
+
+/* [11/12 디자이너] 카드 제목 ↔ 아랫줄 간격 줄임 — 제목 글자 끝에서 아랫줄 글자 위까지 13 이 떠 보였다(카드 칸 사이 4 + 줄 위 여백 6 + 줄 높이 22 안쪽 2).
+ *   줄 위 여백 0 · 상태 줄 높이 20 → 약 6. 지나온 알림 지점의 설명 줄(.rr-alert-line)도 같은 값 */
+body.ver-7 .rr-notes:has(> .rr-st), body.ver-7 .rr-home-st { margin-top: 0; }
+body.ver-7 .rr-st { min-height: 20px; }
+body.ver-7 [data-timeline] .rr-alert-line { margin-top: 0; }
