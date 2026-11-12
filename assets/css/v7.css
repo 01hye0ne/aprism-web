@@ -1198,3 +1198,18 @@ body.ver-7 .rc-box .progress-track {
 }
 :root:not([data-theme="light"]) body.ver-7 .rc-box .progress-track { --pt-fill: linear-gradient(to right, var(--color-gray-0), var(--color-blue-300)); }
 :root[data-theme] body.ver-7 .rc-box .progress-fill { background-image: none; }
+
+/* [11/12 디자이너] 카운팅 — 미션 탭을 바꿀 때 진행 % · 웨이포인트 수(7/20)를 0 에서 세어 올리고 막대도 0 에서 차오른다(count-up-v7.js).
+ *   글자는 진짜 값 그대로 두고(글자 크기 0 으로 숨김) 앞에 붙인 카운터(::before)가 --cu-n 을 0.6초 동안 옮겨 가며 보인다 */
+@property --cu-n { syntax: "<integer>"; inherits: false; initial-value: 0; }
+body.ver-7 .is-counting { counter-reset: cu var(--cu-n); transition: --cu-n 600ms cubic-bezier(.22, .61, .36, 1); }
+body.ver-7 .rc-box .progress-percent.is-counting { font-size: 0; }
+body.ver-7 .rc-box .progress-percent.is-counting::before { content: counter(cu); font-size: var(--font-size-24); line-height: var(--font-line-height-32); }
+body.ver-7 .rr-wp-head .rr-wp-n.is-counting { font-size: 0; }
+body.ver-7 .rr-wp-head .rr-wp-n.is-counting::before { content: counter(cu) "/" attr(data-cu-total); font-size: var(--font-size-14); line-height: var(--font-line-height-20); }
+body.ver-7 .rc-box .progress-track.cu-zero { transition: none; background-size: 0 100%; }
+body.ver-7 .rc-box .progress-track.cu-zero .progress-fill { transition: none; width: 0; }
+body.ver-7 .rc-box .progress-track.cu-zero .progress-knob { transition: none; left: 12px; }
+body.ver-7 .rc-box .progress-track.cu-run { transition: background-size 600ms cubic-bezier(.22, .61, .36, 1); }
+body.ver-7 .rc-box .progress-track.cu-run .progress-fill { transition: width 600ms cubic-bezier(.22, .61, .36, 1); }
+body.ver-7 .rc-box .progress-track.cu-run .progress-knob { transition: left 600ms cubic-bezier(.22, .61, .36, 1); }
