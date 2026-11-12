@@ -2703,9 +2703,11 @@
     halo.g.visible = show;
     if (!show) { return; }
     var wait = st === "done", scan = st === "inspect", hold = st === "pause";
-    halo.base.visible = halo.front.visible = scan;
-    halo.duo.visible = !wait && !scan && !hold;
-    halo.brk.visible = hold;
+    // [11/12 v7 디자이너] 평소(이동 · 위험 감지 · 자동복귀 · 긴급정지)도 4방위 호 — 원 두 줄(duo)은 v6 이하에만 남긴다
+    var arc4 = document.body.classList.contains("ver-7") && !wait;   // 일시정지도 4방위 호(노랑, 멈춘 채) — 끊긴 두 줄(brk)은 v6 이하만
+    halo.base.visible = halo.front.visible = scan || arc4;
+    halo.duo.visible = !wait && !scan && !hold && !arc4;
+    halo.brk.visible = hold && !arc4;
     halo.ring.visible = wait;
     var walk = DOG_MOTION[st] === "walk", now = performance.now();
     var tint = HALO_TINT[st] || HALO_GX;
@@ -2715,7 +2717,8 @@
     //   예전(11/05)엔 호만 한 바퀴씩 시계방향으로 돌아 빔과 따로 놀았다. 다른 상태는 앞을 본다
     var look = st === "inspect" && !rrReduce;
     halo.front.rotation.y = look ? Math.sin(now / 650) * 0.42 : 0;   // 빔과 같은 식 · 같은 축이라 둘이 한 덩어리로 움직인다
-    halo.front.material.opacity = look ? 0.45 + 0.55 * (0.5 - 0.5 * Math.cos(now / HALO_BREATH * Math.PI * 2)) : 1;
+    halo.front.material.opacity = look ? 0.45 + 0.55 * (0.5 - 0.5 * Math.cos(now / HALO_BREATH * Math.PI * 2))
+      : (arc4 && walk && !rrReduce) ? 0.35 + 0.65 * (0.5 - 0.5 * Math.cos(now / 2400 * Math.PI * 2)) : 1;   // [11/12 v7] 걷는 동안 갈 방향(앞) 호만 점멸 — 시안 2.4초 · 35↔100%
     var sz = DOG_PX * baseSize / (view.clientHeight || 1);   // rrDog 와 같은 배율
     halo.g.position.set(onLane.here.x, onLane.here.y + span * 0.0006, onLane.here.z);
     halo.g.scale.setScalar(sz * HALO_R * halo.size * 2);
