@@ -1080,3 +1080,7 @@ body.ver-7 .rr-st-ic .val { fill: none; stroke: currentColor; stroke-width: 2.4;
 /* 일시정지 [재개] — 줄 끝 작은 보조 단추(파랑 채움 대신 테 단추: 이 칸의 주인공은 상태) */
 body.ver-7 .rr-st .rr-resume { flex: none; height: 22px; margin: 0 0 0 4px; padding: 0 8px; border: 1px solid color-mix(in srgb, currentColor 30%, transparent); border-radius: 4px; background: none; color: inherit; font: inherit; font-size: 12px; font-weight: 600; cursor: pointer; }
 body.ver-7 .rr-st .rr-resume:hover { background-color: color-mix(in srgb, currentColor 10%, transparent); }
+
+/* [11/12 디자이너] 지금 지점 카드도 시각 줄(예정 10:11–10:13 · 2분)을 뺀다 — 시각이 든 지점만 3줄이 돼 높이가 들쭉날쭉했다.
+ *   지금 칸의 시간은 상태 줄("약 n초 남음")이 말한다. 지나온 칸은 11/10 에 이미 뺐다 → 지금 칸 = 이름 + 상태 두 줄 */
+body.ver-7 [data-timeline] .timeline-item.is-running .step-times-foot { display: none; }
