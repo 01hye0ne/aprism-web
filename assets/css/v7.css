@@ -1083,3 +1083,11 @@ body.ver-7 .rc-box .progress-fill::before {
  *   진행 제목 → "약 … 종료 예정"(4)은 그대로 — 제목에 딸린 설명 줄이라 붙어 한 덩이로 읽혀야 한다 */
 body.ver-7 .rr-wp-head { padding-top: 12px; gap: 12px; }
 body.ver-7 .ah-body .ah-sec { padding-top: 10px; }
+
+/* [11/12 디자이너] 상태 배너(위험 감지 · 일시정지 · 긴급정지 · 통신 끊김 · 미션 완료)가 있으면 진행 글 칸이 70 → 86 으로 커졌다 —
+ *   배너가 % (높이 32)와 한 줄에 놓여 그 줄이 32 가 되고, 줄 바꿈 간격(12)까지 붙었다. 이동 중과 같은 짜임으로:
+ *   왼쪽 = 배너(24) · 사이 4 · 설명 줄, 오른쪽 % 는 두 줄의 세로 가운데 */
+body.ver-7 .rc-box .progress-meta:has(> .rr-banner) { display: grid; grid-template-columns: minmax(0, 1fr) auto; row-gap: 4px; column-gap: var(--space-12); align-items: center; }
+body.ver-7 .rc-box .progress-meta:has(> .rr-banner) > .rr-banner { grid-column: 1; grid-row: 1; }
+body.ver-7 .rc-box .progress-meta:has(> .rr-banner) > .progress-titles { grid-column: 1; grid-row: 2; order: 0; flex-basis: auto; }
+body.ver-7 .rc-box .progress-meta:has(> .rr-banner) > .progress-percent { grid-column: 2; grid-row: 1 / span 2; }
