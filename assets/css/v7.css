@@ -1117,3 +1117,8 @@ body.ver-7 [data-timeline] .rr-alert-line { margin-top: 0; }
 :root[data-theme] body.ver-7 .map-tools-box.is-floors .map-floor:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 1px; }
 /* 로봇이 있는 층 점(6) — 칸이 24 로 낮아져 "B4" 글자에 붙었다 → 칸 오른쪽 위 모서리에 걸치게 */
 :root[data-theme] body.ver-7 .map-tools-box.is-floors .map-floor.has-robot::after { top: -3px; right: -3px; }
+
+/* [11/12 디자이너] 지도 조작 판 오른쪽이 번쩍이던 것 — 녹화(assets/source/오류.mp4)에서 1.2초 주기 · 0.3초 간격 두 번 = 테두리 위험 빛 박동(edge-beat)과 같은 박자.
+ *   빛 층(.edge-light, 지도 판 전체를 덮음)이 plus-lighter 로 빛을 더해, 박동마다 Chrome 이 그 아래 흐림 판(backdrop-filter) 가장자리를 다시 합성하다 튀었다.
+ *   라이트처럼 일반 혼합으로 — 빛 세기는 1배율 비교에서 차이가 거의 없다 */
+body.ver-7 .two-col > .edge-light { mix-blend-mode: normal; }
