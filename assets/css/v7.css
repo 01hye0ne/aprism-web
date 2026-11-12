@@ -1072,3 +1072,7 @@ body.ver-7 .rc-box .progress-fill::before {
 
 /* [11/12 디자이너] 로봇 카드 진행 글 칸 바탕 = 웨이포인트 머리(.rr-wp-head)와 같은 bg/raised(예전 bg/cell — 한 단 어두웠다) */
 :root[data-theme] body.ver-7 .rc-box .progress-meta { background-color: var(--bg-raised); }
+
+/* [11/12 디자이너] 로봇 카드 진행 막대 트랙(다크) = gray/850 — comp/chart/track(gray/700)이 진행 글 칸(bg/raised = gray/700)과 같아 묻혔다.
+ *   한 단 들어간 홈으로 읽히게 위 그림 칸 · 아래 글 칸보다 어둡게. 토큰은 다른 차트도 써서 여기만. 라이트(gray/400)는 그대로 */
+:root:not([data-theme="light"]) body.ver-7 .rc-box .progress-track { background-color: var(--color-gray-850); }
