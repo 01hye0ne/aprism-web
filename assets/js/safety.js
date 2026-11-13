@@ -97,6 +97,7 @@
       if(!m || !m.r[s.detect]) return;   // 이 화면에 없는 미션 · 판정하지 않는 감지
       (got[mi + '|' + s.detect] = got[mi + '|' + s.detect] || []).push(s.cell);
       if(['누출감지', '온도감지', '이상음향', '부분방전'].includes(s.detect)) LAB7[s.detect] = s.label;
+      if(s.detect === '안전감지' && s.label === '안전모 미착용') MV[mi + '|안전감지|' + s.cell[0]] = '../alert/wp07-helmet.webp';   // [11/13] M1 WP-07 안전모 사진 — 관제 팝오버와 같은 사진
     });
     Object.keys(got).forEach(key => { const [mi, k] = key.split('|'), m = BASE[+mi], cs = got[key];
       m.r[k] = cs[0].slice(); if(cs.length > 1){ m.rs = m.rs || {}; m.rs[k] = cs; } });   // 한 감지에 여럿이면 rs(대표는 init 의 sync 가 고른다)

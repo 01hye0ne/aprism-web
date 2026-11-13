@@ -1313,6 +1313,7 @@
       "온도감지 · 냉각 펌프 P-2 48.6℃": "alert/wp05-temp-486.webp",
       "부분방전 · CH1 이상 점수 9.05": "alert/wp06-pd-905.webp",
       "안전감지 · 안전벨트 미착용 1명": "safety/safety_crit.jpg",
+      "안전감지 · 안전모 미착용 1명": "alert/wp07-helmet.webp",   // v7 M1 WP-07(11/13 디자이너 사진)
       "차압 NG · HEPA Filter 차압계": "alert/wp02-gauge-hepa.webp",
       "압력 편차 · N₂ 배관 압력계": "alert/wp04-gauge-n2.webp"
     };
