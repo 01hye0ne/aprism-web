@@ -1303,3 +1303,12 @@ body.ver-7 .robot-list .robot-counts .robot-head-name { font-weight: var(--font-
 :root[data-theme] body.ver-7.ver-3.v2-2.v3 .delta3.is-open .delta3-name { padding-bottom: var(--space-12); }   /* Delta 이름 줄 아래(펼침, 위 11/11 의 10) */
 /* 패딩 14 → 16 */
 :root body.ver-7 .rp-dh { padding-top: var(--space-16); }                          /* 보고서 본문 머리 위 */
+
+/* [11/13 디자이너] 핀 목(원 ↔ 막대 곡선)이 지도를 확대하면 계단처럼 보이던 것 — 원형 그라데이션 마스크의 딱딱한 경계(0.5px)는 커질수록 픽셀이 드러난다.
+ *   같은 모양(폭 8 · 높이 4 상자에서 양옆을 가로 2.875 · 세로 4 타원으로 깎아 막대 굵기 2.25 까지 좁힘)을 SVG 경로 마스크로 — 벡터라 배율과 상관없이 매끄럽다 */
+body.ver-7 .rr-pin .rr-pin-head::before {
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 4' preserveAspectRatio='none'%3E%3Cpath d='M0 0H8A2.875 4 0 0 0 5.125 4H2.875A2.875 4 0 0 0 0 0Z'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
+          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 4' preserveAspectRatio='none'%3E%3Cpath d='M0 0H8A2.875 4 0 0 0 5.125 4H2.875A2.875 4 0 0 0 0 0Z'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
+}
+/*   막대도 원 · 목과 같은 100%(route-rules.css 막대 .85) — 목(100%)과 막대(85%) 사이에 색이 끊긴 네모 경계가 보였다. 목만 .85 로 내리면 둘이 겹친 자리가 진해져 둘 다 100% 로 */
+body.ver-7 .rr-pin::before { opacity: 1; }
