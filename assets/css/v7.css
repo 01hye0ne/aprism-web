@@ -1325,3 +1325,71 @@ body.ver-7 .rr-wp-head,
 body.ver-7.rr-wp-closed .rr-wp-head { border-radius: 0; background: linear-gradient(to bottom, var(--bg-selected) 0, var(--bg-raised) 4.2px); }
 body.ver-7 .right-panel .rr-wp-head + .timeline,
 body.ver-7 .rr-wp-mini { box-shadow: inset 0 10px 8px rgb(0 0 0 / 25%); }   /* [11/13 디자이너] 테는 예전 border/divider 1 그대로(2 로 굵혔던 것 되돌림) */
+
+/* ================= [11/13 디자이너] 챗봇형 팝오버 덩어리 = 결과 → 원인 → 조치(ma-insight-v7.js 2차) =================
+ *   덩어리 머리(.ma-grp-h) 셋이 같은 꼴 — 12/18 semibold secondary + 오른쪽 보조 글(tertiary). 덩어리 안 사이 6 · 덩어리 사이 16.
+ *   결과 · 원인 = 카드(bg/inset · 반경 6 · 안쪽 10 12), 조치 = 위 구분선(border/divider) 뒤 머리 + 권고 · 체크 · 메모(카드 없이 — 행동 칸)
+ *   예전 기준 줄(.ma-reason)은 결과 카드 칩으로 흡수 */
+body.ver-7.d3-chat .map-alert.ma-v3.has-ins .ma-reason { display: none; }
+body.ver-7.d3-chat .ma-ins { gap: var(--space-16); margin: var(--space-4) 0 0; }
+body.ver-7 .ma-grp { display: flex; flex-direction: column; gap: 6px; min-height: 0; }
+body.ver-7 .ma-grp-h { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-8); margin: 0; color: var(--text-secondary); font-size: var(--font-size-12); line-height: var(--font-line-height-18); font-weight: var(--font-weight-semibold, 600); }
+body.ver-7 .ma-grp-sub { color: var(--text-tertiary); font-weight: 400; }
+body.ver-7 .ma-grp-sub:empty { display: none; }
+body.ver-7 .ma-ins-card { display: flex; flex-direction: column; gap: var(--space-8); min-height: 0; padding: 10px 12px; border-radius: 6px; background-color: var(--bg-inset); }
+/* ① 결과 — 값 줄 + 칩 + 그래프(남는 높이) */
+body.ver-7 .ma-grp.is-result { flex: 1 1 auto; }
+body.ver-7 .ma-grp.is-result > .ma-ins-card { flex: 1 1 auto; }
+body.ver-7 .ma-grp.is-result.no-chart, body.ver-7 .ma-grp.is-result.no-chart > .ma-ins-card { flex: none; }
+body.ver-7 .ma-res-top { display: flex; align-items: center; justify-content: space-between; gap: var(--space-8); }
+body.ver-7 .ma-res-v { color: var(--status-critical-text); font-size: 22px; line-height: 28px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -0.2px; }
+body.ver-7 .ma-ins[data-sev="warning"] .ma-res-v { color: var(--status-warning-text); }
+body.ver-7 .ma-res-v small { margin-left: 2px; font-size: var(--font-size-13); font-weight: 600; color: var(--text-secondary); }
+body.ver-7 .ma-res-chip { flex: none; padding: 2px 8px; border-radius: 999px; background-color: color-mix(in srgb, var(--status-critical-icon) 16%, transparent); color: var(--status-critical-text); font-size: var(--font-size-12); line-height: var(--font-line-height-18); font-weight: 600; font-variant-numeric: tabular-nums; }
+body.ver-7 .ma-ins[data-sev="warning"] .ma-res-chip { background-color: color-mix(in srgb, var(--status-warning-icon) 16%, transparent); color: var(--status-warning-text); }
+body.ver-7 .ma-res-chip[hidden] { display: none; }
+body.ver-7 .ma-grp.is-result .ma-ins-chart { position: relative; flex: 1 1 auto; min-height: 72px; max-height: 200px; }
+body.ver-7 .ma-grp.is-result.no-chart .ma-ins-chart { display: none; }
+body.ver-7 .ma-ins-zone.is-critical { fill: color-mix(in srgb, var(--status-critical-icon) 7%, transparent); }
+body.ver-7 .ma-ins-zone.is-warning { fill: color-mix(in srgb, var(--status-warning-icon) 7%, transparent); }
+body.ver-7 .ma-ins-grid { stroke: var(--border-divider); stroke-width: 1; }
+body.ver-7 .ma-ins-std.is-critical { stroke: color-mix(in srgb, var(--status-critical-icon) 70%, transparent); stroke-width: 1; stroke-dasharray: 4 3; }
+body.ver-7 .ma-ins-std.is-warning { stroke: color-mix(in srgb, var(--status-warning-icon) 70%, transparent); stroke-width: 1; stroke-dasharray: 4 3; }
+body.ver-7 .ma-ins-stdt { font-size: 10px; font-weight: 600; font-variant-numeric: tabular-nums; }
+body.ver-7 .ma-ins-stdt.is-critical { fill: var(--status-critical-text); }
+body.ver-7 .ma-ins-stdt.is-warning { fill: var(--status-warning-text); }
+body.ver-7 .ma-ins-f0 { stop-color: var(--text-secondary); stop-opacity: .22; }
+body.ver-7 .ma-ins-f1 { stop-color: var(--text-secondary); stop-opacity: 0; }
+body.ver-7 .ma-ins-area { fill: url(#maInsFill); }
+body.ver-7 .ma-ins-line { stroke: var(--text-secondary); stroke-width: 1.75; }
+body.ver-7 .ma-ins-pt { fill: var(--bg-inset); }
+body.ver-7 .ma-ins-pt.is-last { stroke-width: 2; }
+body.ver-7 .ma-ins-lastv { font-size: 11px; font-weight: 800; font-variant-numeric: tabular-nums; }
+body.ver-7 .ma-ins-lastv.is-critical { fill: var(--status-critical-text); }
+body.ver-7 .ma-ins-lastv.is-warning { fill: var(--status-warning-text); }
+body.ver-7 .ma-ins-t { fill: var(--text-tertiary); font-size: 10px; font-variant-numeric: tabular-nums; }
+body.ver-7 .ma-ins-t.is-last { fill: var(--text-secondary); font-weight: 600; }
+/* ② 원인 — 순위 · 이름 · 가능성 막대, 1순위 강조 + 먼저 볼 것 */
+body.ver-7 .ma-grp.is-cause { flex: none; }
+body.ver-7 .ma-cause { display: flex; flex-direction: column; gap: var(--space-8); margin: 0; padding: 0; list-style: none; }
+body.ver-7 .ma-cause > li { display: grid; grid-template-columns: 18px minmax(0, 1fr) auto; grid-template-rows: auto 3px; column-gap: var(--space-8); row-gap: 4px; align-items: center; }
+body.ver-7 .ma-cause-n { grid-row: 1 / span 2; align-self: start; display: grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; background-color: rgb(255 255 255 / 8%); color: var(--text-secondary); font-size: 11px; font-weight: 700; font-variant-numeric: tabular-nums; }
+body.ver-7 .ma-cause-t { color: var(--text-secondary); font-size: var(--font-size-13); line-height: var(--font-line-height-18); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+body.ver-7 .ma-cause-p { color: var(--text-tertiary); font-size: var(--font-size-12); line-height: var(--font-line-height-18); font-variant-numeric: tabular-nums; }
+body.ver-7 .ma-cause-bar { grid-column: 2 / span 2; height: 3px; border-radius: 2px; background-color: rgb(255 255 255 / 7%); overflow: hidden; }
+body.ver-7 .ma-cause-bar > i { display: block; height: 100%; border-radius: inherit; background-color: var(--text-tertiary); }
+body.ver-7 .ma-cause > li.is-top .ma-cause-n { background-color: var(--text-primary); color: var(--bg-inset); }
+body.ver-7 .ma-cause > li.is-top .ma-cause-t { color: var(--text-primary); font-weight: 700; }
+body.ver-7 .ma-cause > li.is-top .ma-cause-p { color: var(--text-secondary); font-weight: 600; }
+body.ver-7 .ma-cause > li.is-top .ma-cause-bar > i { background-color: var(--text-secondary); }
+body.ver-7 .ma-first { display: flex; gap: var(--space-8); margin: 2px 0 0; padding-top: var(--space-8); border-top: 1px solid var(--border-divider); color: var(--text-secondary); font-size: var(--font-size-12); line-height: var(--font-line-height-18); }
+body.ver-7 .ma-first > b { flex: none; color: var(--text-primary); font-weight: 700; }
+body.ver-7 .ma-first[hidden] { display: none; }
+/* ③ 조치 — 구분선 뒤 머리. 판단(위) → 행동(아래) 경계 */
+body.ver-7.d3-chat .map-alert.ma-v3 .ma-grp-h.is-act { flex: none; margin-top: var(--space-16); padding-top: var(--space-12); border-top: 1px solid var(--border-divider); }
+body.ver-7.d3-chat .map-alert.ma-v3.is-requested .ma-grp-h.is-act { display: none; }
+/* 그래프가 없는 알림(안전감지) — 사진이 결과의 근거라 남는 높이를 사진이 갖는다(결과 · 원인 카드는 내용만큼). 1순위 번호 글자는 진하게 */
+body.ver-7.d3-chat .map-alert.ma-v3.ins-nochart:not(.is-docked):not(.is-requested):not(.is-folded) .ma-snap { flex: 1 1 auto; height: auto; min-height: 187px; }
+body.ver-7.d3-chat .map-alert.ma-v3.ins-nochart .ma-ins { flex: none; }
+body.ver-7 .ma-cause > li.is-top .ma-cause-n { color: #0A0F18; }
+body.ver-7.d3-chat .map-alert.ma-v3.ins-nochart:not(.is-docked):not(.is-requested):not(.is-folded) > .ma-lower { flex: 0 0 auto; }
